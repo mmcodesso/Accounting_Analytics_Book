@@ -88,8 +88,9 @@ def _gap(d: Diagram, x: float, y: float, w: float, text: str, h: float = 24) -> 
 DIMENSIONS = ["Accuracy", "Completeness", "Consistency", "Timeliness"]
 
 # (finding, where it sits in the workbook, {dimension: "main" | "also"}, (kind, reason)).  The dimension a finding is
-# tested under follows Table 2.3 of the chapter and the guides' own readings: the In Transit rows disagree between two
-# columns (consistency) and the status was not updated (timeliness); a pair of customers with one name is a
+# tested under follows Table 2.3 of the chapter and the guides' own readings: if DeliveryDate records the delivery, the
+# In Transit rows disagree between two columns (consistency) and the status was not updated (timeliness), and if it is
+# only the expected date the shipments are overdue; a pair of customers with one name is a
 # consistency risk, and "no duplicate records" is an accuracy test; the rows with no amount are accuracy and
 # consistency (Exercise 2.5, Step 9); the small periods are the edge of the extract (timeliness) that reads like
 # missing transactions (completeness).
@@ -98,7 +99,7 @@ FINDINGS = [
     ("Blank tracking numbers", "Shipment, TrackingNumber (Step 2)", {"Completeness": "main"},
      ("error", "evidence should exist")),
     ("In Transit after the delivery date", "Shipment, Status and DeliveryDate (Step 3)",
-     {"Consistency": "main", "Timeliness": "also"}, ("error", "two columns disagree")),
+     {"Consistency": "main", "Timeliness": "also"}, ("error", "conflict, or overdue")),
     ("Invoice dated before first shipment", "SalesInvoice, InvoiceDate (Steps 6, 7)", {"Accuracy": "main"},
      ("error", "dates out of order")),
     ("Customers that share a name", "Customer, CustomerName (Step 4)", {"Consistency": "main", "Accuracy": "also"},

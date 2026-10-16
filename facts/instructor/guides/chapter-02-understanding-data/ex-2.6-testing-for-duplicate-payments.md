@@ -110,7 +110,7 @@ b. Filter the column for 2.
 {% endfor %}
 {% endfor %}
 
-Each pair pays two different invoices of different amounts, so a reused check number is the likelier reading, not one payment made twice. The evidence to request is the bank's record of the checks that cleared and the payables team's check register.
+Each pair pays two different invoices of different amounts, which is consistent with one check number reused on two payments rather than one payment made twice, but does not settle it. The pairs stay open until the bank's record of the checks that cleared and the payables team's check register, with any void and reissue, settle them.
 
 ### Requirement (4): Test each invoice for overpayment
 
@@ -136,7 +136,7 @@ A model answer on what a clean result shows: recorded payments never exceed an i
 
 ### Requirement (6): Write the memo
 
-**Step 7. Outline half a page.** A strong memo lists the pairs found and the check numbers, the conclusion for each, the overpayment result with its meaning, and the limits, ending with the evidence it would request.
+**Step 7. Outline half a page.** A strong memo lists the pairs found and the check numbers (in the attached schedule that requirement (6) allows), the conclusion for each, the overpayment result with its meaning, and the limits, ending with the evidence it would request.
 
 **Check:** it states each conclusion as open or closed and names the evidence that would settle it.
 

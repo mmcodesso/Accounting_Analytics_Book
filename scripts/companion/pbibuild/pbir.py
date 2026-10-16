@@ -174,6 +174,7 @@ class Page:
     width: int = 1280
     height: int = 720
     page_type: str | None = None                   # "Tooltip" for a tooltip page
+    display_option: str = "FitToPage"              # "FitToWidth": a tall page scrolls at the window's width
     extra: dict | None = None                      # other page.json properties (drillthrough config, filters)
     expect: list[str] = field(default_factory=list)  # text the canvas must show once rendered (verification only)
 
@@ -183,7 +184,7 @@ class Page:
         return v
 
     def doc(self) -> dict:
-        d = {"$schema": PAGE, "name": self.name, "displayName": self.display, "displayOption": "FitToPage",
+        d = {"$schema": PAGE, "name": self.name, "displayName": self.display, "displayOption": self.display_option,
              "height": self.height, "width": self.width}
         if self.hidden:
             d["visibility"] = "HiddenInViewMode"

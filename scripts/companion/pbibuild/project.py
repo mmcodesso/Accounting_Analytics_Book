@@ -17,6 +17,28 @@ from pbibuild.model import Model, write
 from pbibuild.pbir import Page, Report, textbox
 
 NOTES_PAGE = "notes"
+# The Notes text, 10 pt in a 610 px text box, as Power BI Desktop 2.158 sets it: about 96 characters and 18.1 px a
+# line (measured on captures of the page). The page and its two text boxes are as tall as the longer column needs,
+# with some room to spare and at least 2,000 px, and the page fits the window's width, so a long Notes page scrolls
+# as a whole instead of hiding text in a text box that scrolls on its own.
+NOTES_CHARS, NOTES_LINE, NOTES_MIN = 88, 19.0, 1960
+
+
+def text_lines(text: str, chars: int = NOTES_CHARS) -> int:
+    """The lines a paragraph takes when wrapped at word boundaries to `chars` characters (an empty one takes one)."""
+    lines, cur = 1, 0
+    for word in text.split(" "):
+        if cur and cur + 1 + len(word) > chars:
+            lines, cur = lines + 1, len(word)
+        else:
+            cur += len(word) + (1 if cur else 0)
+    return lines
+
+
+def notes_height(paragraphs: list) -> int:
+    """The height of a Notes text box that holds `paragraphs` (strings or (string, bold)) without scrolling."""
+    lines = sum(text_lines(p if isinstance(p, str) else p[0]) for p in paragraphs)
+    return max(NOTES_MIN, int(lines * NOTES_LINE) + 40)
 
 
 @dataclass
@@ -25,6 +47,19 @@ class Check:
     expected: float | int | str
     dax: str                              # a scalar DAX expression
     tolerance: float = 0.005
+    percent: bool = False                 # a fraction the Notes page shows as a percentage
+
+
+def shown(c: Check) -> str:
+    """A check's expected value as the Notes page prints it. Money keeps two decimals and counts stay whole, but a
+    value tested finer than a cent shows the decimals its tolerance tests (a rate of 0.0085 does not read 0.01), and
+    a fraction flagged `percent` reads as a percentage."""
+    if not isinstance(c.expected, float):
+        return str(c.expected)
+    places = 2 if c.tolerance >= 0.005 else 4 if c.tolerance >= 0.00005 else 6
+    if c.percent:
+        return f"{c.expected * 100:,.{max(places - 2, 2)}f}%"
+    return f"{c.expected:,.{places}f}"
 
 
 def dax_literal(v) -> str:
@@ -60,16 +95,16 @@ class Project:
     checks: list[tuple[str, Check]] = field(default_factory=list)
     tmdl_scripts: dict[str, str] = field(default_factory=dict)   # TMDL view script tabs: name -> script text
 
-    def check(self, section: str, label: str, expected, dax: str, tolerance: float = 0.005) -> None:
+    def check(self, section: str, label: str, expected, dax: str, tolerance: float = 0.005,
+              percent: bool = False) -> None:
         # Date and Item are reserved words: an unquoted one breaks the whole Checks query
         bad = re.search(r"(?<!['\[])\b(Date|Item)\b(?=\s*[\[)])", dax)
         assert not bad, f"{label}: write '{bad.group(1)}' in quotes: {dax}"
-        self.checks.append((section, Check(label, expected, dax, tolerance)))
+        self.checks.append((section, Check(label, expected, dax, tolerance, percent)))
 
     def notes_page(self, stamp: dict, role: str, sections: list[dict], contents: dict[str, list[str]]) -> None:
         """(Re)write the Notes page: the last page of the report, as the Solution Notes worksheet is in Excel."""
         self.report.pages = [p for p in self.report.pages if p.name != NOTES_PAGE]
-        page = Page(NOTES_PAGE, "Notes", width=1280, height=2000)
         left = [("Notes", True), f"{self.name}.pbip: {role}", "",
                 ("About this file", True), f"Book: {stamp['book']}", f"Dataset: {stamp['dataset']}",
                 f"Source: {stamp['source']}", f"Built: {stamp['built']}", "",
@@ -77,15 +112,16 @@ class Project:
         left += ["", ("Checks", True),
                  "Every check below is in the DAX query tab Checks: open DAX query view, select the Checks tab, and "
                  "choose Run after a refresh. Each row gives the expected value, the actual value, and whether they "
-                 "agree."] + [f"{s}: {c.label}: {c.expected:,.2f}" if isinstance(c.expected, float) else
-                              f"{s}: {c.label}: {c.expected}" for s, c in self.checks]
+                 "agree."] + [f"{s}: {c.label}: {shown(c)}" for s, c in self.checks]
         right = [("Steps completed and what they mean", True)]
         for sec in sections:
             right += ["", (f"{sec['label']}: {sec['title']}", True)] + sec["items"]
             if sec.get("meaning"):
                 right += [f"What it means: {sec['meaning']}"]
-        page.add(textbox("notesLeft", 20, 20, 610, 1960, left, size=10))
-        page.add(textbox("notesRight", 650, 20, 610, 1960, right, size=10))
+        h = max(notes_height(left), notes_height(right))
+        page = Page(NOTES_PAGE, "Notes", width=1280, height=h + 40, display_option="FitToWidth")
+        page.add(textbox("notesLeft", 20, 20, 610, h, left, size=10))
+        page.add(textbox("notesRight", 650, 20, 610, h, right, size=10))
         self.report.add(page)
         self.queries["Checks"] = checks_query(self.checks)
 

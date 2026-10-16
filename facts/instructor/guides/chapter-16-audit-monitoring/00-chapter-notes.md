@@ -54,7 +54,7 @@ The chapter depends on these conditions of the data:
 - The register holds {{ t3.n }} exceptions from {{ n_tests }} tests: {{ t2.process_n['JE'] }} journal entry, {{ t2.process_n['PO'] }} purchase order and {{ t2.process_n['PR'] }} payroll. January holds {{ jan_jepo }} of the {{ n_jepo }} journal entry and purchase order exceptions, and leads in every year.
 - One test recurs in every month: {{ t2.selfs.n }} payroll registers approved by the employee they pay. One employee, the Accounting Manager, approves every register.
 - A first review records {{ t3.n_disp }} dispositions and leaves {{ t3.open }} exceptions open. The {{ t2.n_closes }} year-end closes, two a year, are the expected ones.
-- The last payday is {{ mq.pay_day }}, while the journal entries and the orders run to {{ last_je }}. The purchase order numbers run from {{ t3.first }} to {{ t3.last_number|count }} with no gap.
+- The last pay date of a payroll register is {{ mq.pay_day }}, while the journal entries and the orders run to {{ last_je }}. No pay period has a later pay date in the year, and the rest of December's work is in periods marked Open, with no registers. The purchase order numbers run from {{ t3.first }} to {{ t3.last_number|count }} with no gap.
 
 ## What students should be able to do afterward
 
@@ -207,13 +207,13 @@ Plan A is the safest: the stumbles are in a merge key and a filter, and a demons
 
 **Stumbles to expect**
 
-- Step 1: keys that do not match character for character (see the pitfalls).
+- Step 1: keys that do not match character for character (see the pitfalls). The six Deficiency rows rest on the tutorial's assumption that the reviewer looked past the register, at the approval log, the employment records and the earnings. Ask what the flags alone would support.
 - Step 3: a Test 3 that reads reviewed equal to dispositions and so passes a disposition typed twice: the key counts catch it.
 - Step 7: MAX in place of MINX.
 - Step 8: the package saved over, or a test run without its comment line.
 - Step 9: the registers approved by their own employee reported document by document. The memo reports them once.
 
-**The checkpoint to look for.** The four bullets. A strong student says the card bounds what the tests can have seen and proves no refresh.
+**The checkpoint to look for.** The four bullets. A strong student calls the card a bound observed in the extract, proving neither a refresh nor a complete payroll.
 
 ## Difficult ideas and misconceptions
 
@@ -231,11 +231,11 @@ Plan A is the safest: the stumbles are in a merge key and a filter, and a demons
 
 **More exceptions than reviewers can examine.** Tutorial 16.3, question 10. Li and colleagues and Alles and colleagues describe alarm floods. The chapter's answer is a simple order and one disposition for what is expected or recurs. Ask: what would you change in the rules before adding reviewers?
 
-**A copy is not the controlled report.** Question 14. A .pbix that imports its data holds every row and stops at the date of the copy. Ask: who holds copies of the package?
+**An uncontrolled copy is not the controlled report.** Question 14. A .pbix that imports its data holds every row, and a copy kept outside the approved release stops at the date of the copy. Ask: who holds copies of the package?
 
 **A process's rate counts failed tests.** Tutorial 16.2 Step 10. A document that fails two tests counts twice. Ask: what does the journal entry rate count?
 
-**Agreeing totals do not prove completeness; Data Through proves no refresh.** Tutorial 16.1 Step 12, Tutorial 16.3 Step 7, question 12. Ask: what could be missing from both totals?
+**Agreeing totals do not prove completeness, and Data Through proves no refresh.** Tutorial 16.1 Step 12, Tutorial 16.3 Step 7, question 12. Ask: what could be missing from both totals?
 
 **Who sees the report matters.** Question 3. Gonzalez and Hoffman found that prompt notice can encourage fraud when detection is weak. The chapter calls it a reason to think, not a rule. Ask: what does a notice reveal about what the test cannot detect?
 
@@ -246,7 +246,7 @@ Plan A is the safest: the stumbles are in a merge key and a filter, and a demons
 1. **Should the monitoring report go to the managers whose approvals it tests?** It reaches Gonzalez and Hoffman and the chapter's split: the report to the people who oversee the controls, the exceptions to those who must explain them.
 2. **The recurring payroll test fires every month. Keep it, retire it or reclassify it?** It reaches one finding, then a test that the approver's own pay has another approver, and the unexplained rate.
 3. **Who should write dispositions, and what should the record show?** It reaches who and when in the record, a reviewer who is not the preparer, and review by the chief audit executive.
-4. **A December page shows no payroll exceptions after {{ mq.pay_day }}. What can you conclude?** It reaches nothing: Data Through bounds what the tests saw.
+4. **A December page shows no payroll exceptions after {{ mq.pay_day }}. What can you conclude?** It reaches the open pay periods that hold the rest of December's work, and Data Through as a bound on what the tests saw, not proof of a complete payroll.
 5. **Next month brings dozens of new exceptions. How do you order the review?** It reaches the score, novelty and Li and colleagues, and the alarm floods Alles and colleagues found at Siemens.
 6. **A measure passed its test in April and was changed in May. Do you trust it?** It reaches rerunning the tests, the change record and the project under version control.
 7. **Should anomaly tests share the register with rule tests?** It reaches the register's five columns, a different disposition path, and keeping the two layers apart.
@@ -285,9 +285,9 @@ All six exercises are Power BI work with a model answer in Chapter16-exercises-p
 - **Question 5.** Option C carries over UNION ALL's habit of matching by position. Append matches by name.
 - **Question 7.** Option C reads size as seriousness; D discards the design finding as noise.
 - **Question 9.** Option D confuses a null with a mistyped key. The null marks the exception open; Test 3 finds the mistype.
-- **Question 10.** Option C is the recurring design finding, one finding, not first; B is expected; D takes age over score.
+- **Question 10.** Option C is the recurring design finding, one finding, not first; B is expected; D takes age over score. The stem holds amounts and urgency alike, so the chapter's simple order applies.
 - **Question 11.** Option A reviews each register separately; D treats a design flaw as expected.
-- **Question 12.** Option A sounds like a refresh problem. It is a population that ends earlier.
+- **Question 12.** Option A sounds like a refresh problem. The card shows only that no payroll register has a later pay date, a bound observed in the extract.
 {% if not n_longest %}
 - **Length.** In none of the {{ n_questions }} questions is the correct option also the longest, so wording alone does not give it away.
 {% endif %}

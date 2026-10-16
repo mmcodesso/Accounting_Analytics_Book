@@ -11,7 +11,7 @@ D.  They move strongly in opposite directions along a straight line.
 
 **2.** Removing a single unusual month from a data set changes the correlation between revenue and the number of customers from strong to weak. What should an analyst do?
 
-A.  Investigate the month, and report both results with the reason for any exclusion.
+A.  Investigate the month and report both results, with any exclusion explained.
 B.  Report the weaker correlation, because unusual months should always be deleted.
 C.  Report neither, because correlation cannot be used with monthly data.
 D.  Report the stronger correlation, because it uses more of the data.
@@ -19,21 +19,21 @@ D.  Report the stronger correlation, because it uses more of the data.
 **3.** A regression of monthly revenue on a month index reports an R Square of 0.17. What does this mean?
 
 A.  Revenue grows by about 17 percent from one month to the next.
-B.  The fitted line explains about 17 percent of the variation in monthly revenue.
+B.  The line explains about 17 percent of the variation in monthly revenue.
 C.  The slope has a 17 percent chance of being zero in the population.
-D.  The forecast will be accurate to within 17 percent of actual revenue.
+D.  Each forecast from the line will fall within 17 percent of actual revenue.
 
 **4.** Fitted to all thirty-six months, the slope of Charles River's revenue trend has a p-value of about 0.01. Fitted without the start-up month, the p-value is about 0.07. What is the best conclusion?
 
 A.  Revenue has a strong upward trend that should be extended into the forecast.
 B.  The start-up month should be kept, because it makes the result significant.
-C.  Its significance rests on one unusual month, so test the trend before using it.
+C.  The significance depends on one month, so test the trend before using it.
 D.  A p-value above 0.05 proves that revenue will not grow in the coming year.
 
 **5.** What is a backtest of a forecasting method?
 
 A.  Recalculating a forecast after the period and replacing it with the actual amount
-B.  Fitting it to earlier data and comparing its forecasts of held-back later data with the actuals
+B.  Fitting it to earlier data and testing its forecasts on held-back later data
 C.  Forecasting the past by running the method backward from the latest period
 D.  Checking that the forecast formulas contain no errors before the forecast is used
 
@@ -46,7 +46,7 @@ D.  A method that cannot beat them is not worth its extra complexity.
 
 **7.** How do TREND and FORECAST.LINEAR differ?
 
-A.  Both fit a least-squares line; TREND can return several values at once, FORECAST.LINEAR one.
+A.  Both fit a least-squares line, but TREND takes a range of new x values.
 B.  FORECAST.LINEAR requires the Data Analysis ToolPak, while TREND does not.
 C.  TREND works only with dates, while FORECAST.LINEAR works only with numbers.
 D.  TREND fits a curved line, while FORECAST.LINEAR fits a straight line.
@@ -54,21 +54,21 @@ D.  TREND fits a curved line, while FORECAST.LINEAR fits a straight line.
 **8.** What is a flexible budget?
 
 A.  A budget that managers may change during the year without approval
-B.  The static budget with every amount increased by the same percentage
-C.  The budget recalculated at actual volume with the budgeted prices and unit costs
+B.  The static budget with every revenue and cost amount raised by the same percentage
+C.  The budget recalculated at actual volume with budgeted prices and unit costs
 D.  The actual results rearranged in the format and order of the budget
 
 **9.** What does the sales-volume variance measure?
 
 A.  The difference between the actual and the budgeted fixed costs
-B.  The effect of actual selling prices differing from the budgeted prices
-C.  The effect on margin of selling more or fewer units than planned, at planned margins
+B.  The effect on revenue of actual selling prices differing from the budgeted prices
+C.  The effect of selling more or fewer units than planned, at planned margins
 D.  The effect of producing more units than were sold in the period
 
 **10.** Actual sales commission expense is 75 percent below the static budget, and actual revenue is far below the budgeted revenue. What is the best interpretation?
 
 A.  The sales team cut its commission rates, which saved the company money.
-B.  Much of it may reflect lower revenue, so flex the budget before judging the rest.
+B.  Much may reflect lower revenue, so flex the budget before judging the rest.
 C.  Part of the commission expense was never recorded in the ledger.
 D.  Commissions are a fixed cost, so the whole difference is a spending variance.
 
@@ -102,7 +102,7 @@ D.  Only when the model has a single constraint on its variable cells
 
 **15.** Why does a documentation table for a model's assumptions include a sensitivity column?
 
-A.  To show which assumptions change the conclusion most, so review focuses on them
-B.  To prove that the assumptions used in the model are correct
+A.  To show which assumptions most affect the conclusion and need review
+B.  To prove that every assumption used in the model is correct and complete
 C.  To record the formula used in each cell of the model
 D.  To list the people who approved each assumption and when

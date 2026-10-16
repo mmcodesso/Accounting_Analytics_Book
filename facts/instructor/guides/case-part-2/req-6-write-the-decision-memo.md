@@ -68,9 +68,9 @@ Individual, about 60 minutes in class or as a take-home: 10 to plan the evidence
 
 **Step 3. Financial reporting.** In three short paragraphs: the cost in all, ${{ r2.total|money }}, and by year ({% for y in r2.years %}${{ y.disc|money }} in {{ y.year }}, {{ y.share|pct(2) }} of billed revenue{% if not loop.last %}; {% endif %}{% endfor %}); the ledger records revenue net, so account {{ x.discount_account }} is unused and the income statement shows no sign of the cost, which only a gross-to-net schedule reveals; and the lag from order to invoice, which puts ${{ r2.q4|money }} ({{ r2.q4_share|pct(0) }}) of the proposed promotions' ${{ r2.prop_total|money }} in the fourth quarter.
 
-**Step 4. Managerial accounting.** The differences from expectation run from {{ x.lift_low|spct }} to {{ x.lift_high|spct }}, all inside normal variation, and no first order came through a promotion. The break-evens run from {{ x.be_low|pct(0) }} to {{ x.be_high|pct(0) }}. The proposed calendar would cost about ${{ r4.cost|money }} of discounts, ${{ r4.contribution|money }} of contribution, against a {{ x.plan_year }} budget that plans no promotion. State the volume basis, and that the budget's quantities were not used. Offer one alternative, a small test at a discount near {{ discount|pct(1) }} (the rate the best measured increase would support), with a comparison group and a review afterward.
+**Step 4. Managerial accounting.** The differences from expectation run from {{ x.lift_low|spct }} to {{ x.lift_high|spct }}, none outside the scope's normal variation on an informal screen and none near its break-even, and no first order came through a promotion. The comparisons cannot show what would have sold without a promotion, and the memo says so. The break-evens run from {{ x.be_low|pct(0) }} to {{ x.be_high|pct(0) }}. The proposed calendar would cost about ${{ r4.cost|money }} of discounts, ${{ r4.contribution|money }} of contribution, against a {{ x.plan_year }} budget that plans no promotion, a sensitivity on the report year's billed volume and mix that leaves out the discount on orders not yet billed. State the volume basis, and that the budget's quantities were not used. Offer one alternative, a small, capped test with a comparison group and a review afterward, at a discount below the {{ discount|pct(1) }} at which the largest measured difference (promotion {{ x.best.id }}'s, applied to Furniture) would just pay for it. That rate is a sensitivity, not an optimal discount.
 
-**Step 5. Auditing.** The exceptions with their dispositions (the collection promotions' dates as a master-data error, the two out-of-scope lines as an incomplete item master), the concentration of approvals in one role and the pending overrides that were billed, and the conditions that would make a promotion safe to run. Say which findings are design and which operation.
+**Step 5. Auditing.** The exceptions with their dispositions (the collection promotions' dates as a likely master-data error, the two out-of-scope lines as a likely incomplete item master, each with the record that would confirm it), the concentration of approvals in one role and the pending overrides billed with no completed approval, and the conditions that would make a promotion safe to run. Classify the findings provisionally as design or operation, and say what would settle each.
 
 **Step 6. Recommend.** Decline the calendar as proposed, with the cost and the reason in one sentence. Say what would change the answer: evidence of a lift near a break-even, or a promotion designed to be measured. A test is offered only after the control changes of Step 5.
 
@@ -85,7 +85,7 @@ Individual, about 60 minutes in class or as a take-home: 10 to plan the evidence
 | Financial reporting | ${{ r2.total|money }} in all; {{ r2.years[0].share|pct(2) }} to {{ r2.years[-1].share|pct(2) }} of revenue; {{ r2.q4_share|pct(0) }} in the fourth quarter | R2 |
 | Managerial accounting | Differences {{ x.lift_low|spct }} to {{ x.lift_high|spct }}; break-evens {{ x.be_low|pct(0) }} to {{ x.be_high|pct(0) }}; ${{ r4.contribution|money }} of contribution | R3, R4 |
 | Auditing | {{ r5.good|capitalize }} of {{ r5.promos }} promotions pass the date test; {{ r5.oos }} out-of-scope lines; {{ r5.approved }} approvals by one employee | R5 |
-| Recommendation | Decline as proposed; a small test at about {{ discount|pct(1) }} after the controls | R4, R5 |
+| Recommendation | Decline as proposed, with at most a capped test priced below the {{ discount|pct(1) }} sensitivity, after the controls | R4, R5 |
 
 {{ expected() }}
 
@@ -94,7 +94,7 @@ Individual, about 60 minutes in class or as a take-home: 10 to plan the evidence
 - **Opening.** The question and the answer in two sentences, before any detail.
 - **Financial reporting.** The cost as a number and a share, the reason the income statement hides it, and the timing.
 - **Managerial accounting.** The test and its result with the limits of the data, the break-evens set against the measured differences, and the cost against the plan.
-- **Auditing.** Exceptions with dispositions, the cause and the fix placed in design or operation, and the conditions.
+- **Auditing.** Exceptions with dispositions, the likely cause and its provisional classification as design or operation, the fix, and the conditions.
 - **Recommendation.** A decision, the reason, what would change it, and a measured next step.
 
 What separates strong from weak: a strong memo makes choices. It leaves out the findings that do not bear on the decision, states what the data cannot show (that promotions never attract customers, what would have been ordered without them), and keeps the recommendation consistent with the exhibits. A weak memo reports every result in the order it was found, hedges the recommendation, or recommends something the exhibits do not support.

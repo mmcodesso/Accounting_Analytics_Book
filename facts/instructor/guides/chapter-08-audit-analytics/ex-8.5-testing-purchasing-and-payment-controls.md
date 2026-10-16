@@ -18,7 +18,7 @@ figures:
   - id: IF-08-5-B
     kind: excel-mock
     purpose: The flagged purchase orders pasted as values with their dispositions, as the model answer lays them out.
-    shows: "The flagged orders sorted by RiskScore, with PONumber, the three flag columns, RiskScore, Disposition and Design or operation (the other columns are hidden). The two capital orders are outlined. Disposition cells hold a wrapped sentence that starts with Follow up, cut at two lines as a fixed row height shows it."
+    shows: "The flagged orders sorted by RiskScore, with PONumber, the three flag columns, RiskScore, Disposition and Provisional classification (the other columns are hidden). The two capital orders are outlined. Disposition cells hold a wrapped sentence that starts with Follow up, cut at two lines as a fixed row height shows it."
     data: POApprovals filtered to RiskScore 1 or more (the Expected results table).
 ---
 {% set x = ch08_g5 %}
@@ -28,7 +28,7 @@ figures:
 
 ## Purpose and learning outcomes
 
-Tutorial 8.3 tested journal entries with flags, a score and dispositions. This exercise applies the same method to purchase orders and supplier invoices, then adds the three tests the chapter only describes: threshold bands, near-duplicates and a gap test. It ends where an auditor's report ends: weakness in the design of a control or failure in its operation, and the clean results recorded with the exceptions. The analytics type is diagnostic, with recommendations.
+Tutorial 8.3 tested journal entries with flags, a score and dispositions. This exercise applies the same method to purchase orders and supplier invoices, then adds the three tests the chapter only describes: threshold bands, near-duplicates and a gap test. It ends where an auditor's report ends: possible weakness in the design of a control or failure in its operation, with the evidence that would settle each, and the clean results recorded with the exceptions. The analytics type is diagnostic, with recommendations.
 
 By the end, students can:
 
@@ -77,13 +77,13 @@ c. Merge Approvers again on CreatedByEmployeeID, expand EmployeeName and rename 
 
 **Check:** {{ selfs|length }} self-approved orders, {{ n_above }} above the limit and {{ term|length }} approved after termination; {{ s2 }} orders score 2 and {{ s1 }} score 1. **Watch for:** the blank guard left out of AfterTermination. An empty cell compares as earlier than any date, so the flag is TRUE for nearly every order.
 
-**Step 3. Record a disposition for each flagged order.** Sort by RiskScore, filter to 1 or more, paste the rows as values with **Paste Special > Values** and add a `Disposition` column and a `Design or operation` column, as in Tutorial 8.3 Step 5. The model answer's groups:
+**Step 3. Record a disposition for each flagged order.** Sort by RiskScore, filter to 1 or more, paste the rows as values with **Paste Special > Values** and add a `Disposition` column and a provisional `Design or operation` column, as in Tutorial 8.3 Step 5. The model answer's groups:
 
-- {{ x.kinds.capital }} note-financed capital purchases, created and approved by the {{ big_role|lower }} (limit ${{ big_limit|money }}): follow up, design and operation; ask for the board's approval.
-- {{ x.kinds.self_zero }} orders created and approved by the same person, among the {{ zero_titles|join(' and ')|lower }}, whose limit is $0: follow up, design and operation.
+- {{ x.kinds.capital }} note-financed capital purchases, created and approved by the {{ big_role|lower }} (limit ${{ big_limit|money }}): follow up, possibly design and operation; ask for the board's approval.
+- {{ x.kinds.self_zero }} orders created and approved by the same person, among the {{ zero_titles|join(' and ')|lower }}, whose limit is $0: follow up, possibly design and operation.
 - {{ x.kinds.terminated }} orders approved under the ID of {{ term_name }}, {{ term_title|lower }}, terminated on {{ term_date }}: follow up; ask for the approval timestamp and the access log.
-- {{ x.kinds.self_within }} order created and approved by the purchasing manager within the limit: follow up at low risk, a design gap in segregation of duties.
-- {{ x.kinds.above_only }} orders approved above the approver's limit by someone with a limit above $0: follow up, operation.
+- {{ x.kinds.self_within }} order created and approved by the purchasing manager within the limit: follow up at low risk, a possible design gap in segregation of duties.
+- {{ x.kinds.above_only }} orders approved above the approver's limit by someone with a limit above $0: follow up, possibly operation.
 
 {{ figure('IF-08-5-B') }}
 
@@ -91,9 +91,9 @@ c. Merge Approvers again on CreatedByEmployeeID, expand EmployeeName and rename 
 
 **Step 4. Build InvoiceApprovals.** Import **T37_PurchaseInvoice** as `InvoiceApprovals`, merge Approvers on ApprovedByEmployeeID, expand the name, title and limit, add `AboveLimit` as `=[@GrandTotal]>[@ApproverLimit]` and list the invoices whose ApproverTitle is not Chief Financial Officer. **Check:** {{ inv_other }} of {{ inv_total|count }} invoices have another approver ({{ inv_cfo|count }} were approved by the chief financial officer), together ${{ x.other_total|money }}. They fall into three groups:
 
-- {{ g.zero.name }}, {{ g.zero.title }}, limit ${{ g.zero.limit|money }}: {{ g.zero.ids|length }} invoices. No: a role with no approval authority.
-- {{ g.within.name }}, {{ g.within.title }}, limit ${{ g.within.limit|money }}: {{ g.within.ids|length }} invoices, within the limit. No: a role outside purchasing and accounting can confirm receipt, not approve payment.
-- {{ g.beyond.name }}, {{ g.beyond.title }}, limit ${{ g.beyond.limit|money }}: {{ g.beyond.ids|length }} invoices, above the limit. No: the same person created and approved their orders.
+- {{ g.zero.name }}, {{ g.zero.title }}, limit ${{ g.zero.limit|money }}: {{ g.zero.ids|length }} invoices. Not on the records: a role with no recorded approval authority, so request the delegation policy.
+- {{ g.within.name }}, {{ g.within.title }}, limit ${{ g.within.limit|money }}: {{ g.within.ids|length }} invoices, within the limit. Not without the policy: a role outside purchasing and accounting usually confirms receipt, so request the policy that says who may approve invoices.
+- {{ g.beyond.name }}, {{ g.beyond.title }}, limit ${{ g.beyond.limit|money }}: {{ g.beyond.ids|length }} invoices, above the limit. Not for these: the same person created and approved their orders, so the records show no independent check.
 
 ### Requirement (4): Requisitions near an approval limit
 
@@ -132,7 +132,7 @@ Each year starts where the year before ended, which a reader of the prefix might
 
 ### Requirement (7): The memo
 
-**Step 9. Outline the memo.** To the chief audit executive: the exceptions with counts; design weaknesses (self-approval, a terminated employee's ID and unapproved requisitions were all accepted) against operation failures (managers approving above their limits); the clean results with what they exclude; follow-up requests; and a note that the classification is provisional until the policy, the configuration and the access logs are seen.
+**Step 9. Outline the memo.** To the chief audit executive: the exceptions with counts; possible design weaknesses (self-approval, a terminated employee's ID and unapproved requisitions were all accepted) against possible operation failures (managers approving above their limits), with the evidence that would settle each; the clean results with what they exclude; follow-up requests; and a note that the classification is provisional until the policy, the configuration and the access logs are seen.
 
 ## Expected results
 
@@ -150,8 +150,8 @@ Each year starts where the year before ended, which a reader of the prefix might
 ## What a strong answer says
 
 - **Requirements (2) and (3).** Each flagged order with the evidence that would clear it, never "expected" without evidence; the capital orders singled out; the terminated approver's orders called provisional.
-- **Requirement (4).** The band's count against its neighbors, the unapproved requisitions tied to Exercise 2.5, the identical consecutive requisitions and the limit just above the band, read together as a possible split to stay under a review level.
-- **Requirement (7).** Design and operation separated, the clean results recorded with what they exclude, and follow-up that names a document or a log.
+- **Requirement (4).** The band's count against its neighbors, the unapproved requisitions tied to Exercise 2.5, the identical consecutive requisitions and the limit just above the band, read together as a possible split to stay under a review level, once the threshold that governs requisitions is confirmed (their own approvers have higher limits).
+- **Requirement (7).** Possible design and operation failures separated and called provisional, the clean results recorded with what they exclude, and follow-up that names a document or a log.
 
 A weak answer lists counts without a classification, treats every exception as fraud, or leaves out the clean tests.
 

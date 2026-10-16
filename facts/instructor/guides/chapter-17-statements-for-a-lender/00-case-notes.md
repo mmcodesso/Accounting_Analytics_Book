@@ -48,7 +48,7 @@ The case depends on these conditions of the data, all visible in the files stude
 - Fiscal {{ d.N }} holds only supplier payments ({{ m4.payments }} of them, {{ sm(m4.amount) }}), the last pay date with registers is {{ c.pay_end }}, and the ledger ends {{ c.last }}.
 - Accrued expenses carry an opening line with no document, freight, and accruals that invoices cleared late or never: {{ m2.comp[0].n_old }}, {{ m2.comp[1].n_old }} and {{ m2.comp[2].n_old }} old items at the three year-ends.
 - Revenue, payroll and interest are each missing from a year-end: cutoff of {{ sm(m2.cut[0]) }}, {{ sm(m2.cut[1]) }} and {{ sm(m2.cut[2]) }} in revenue, and payroll owed of {{ sm(m2.pay[0]) }}, {{ sm(m2.pay[1]) }} and {{ sm(m2.pay[2]) }}.
-- Sales tax payable of {{ sm(m4.stax) }} has no remittance recorded, rent is paid from cash with no lease recorded, and balances that no document supports would raise equity by {{ sm(m4.equity) }} if none is real.
+- Sales tax payable of {{ sm(m4.stax) }} has no remittance recorded, rent is paid from cash with no lease recorded, and five opening lines that no document supports would raise equity by {{ sm(m4.equity) }} if none is real.
 
 ## What students should be able to do afterward
 
@@ -171,12 +171,12 @@ Students hold the adjusted statements, the notes with their reconciliations, and
 
 Students hold the review of later events, the going-concern conditions and the memo to the CFO.
 
-**Quick check:** the records after the year-end hold {{ m4.payments }} supplier payments ({{ sm(m4.amount) }}) and no unrecorded liability. The memo must cover the tax status, the leases, the sales tax payable of {{ sm(m4.stax) }} with no remittance recorded, and the balances no document supports, which would raise equity by {{ sm(m4.equity) }} if none is real. Read the opening and the recommendation first.
+**Quick check:** the records after the year-end hold {{ m4.payments }} supplier payments ({{ sm(m4.amount) }}), and the search finds no unrecorded liability in that limited population. The memo must cover the tax status, the leases, the sales tax payable of {{ sm(m4.stax) }} with no remittance recorded, and the balances no document supports, of which the five opening lines would raise equity by {{ sm(m4.equity) }} if none is real. Read the opening and the recommendation first.
 
 ## Difficult ideas and misconceptions
 
 - **A balanced trial balance is not a right one.** A strict less-than, every close left out and every close left in all balance. Ask what Chapter 6's total says.
-- **Age is not evidence.** An accrual older than the longest wait has gone unbilled, not unowed. Ask what the suppliers' statements would show.
+- **Age is not evidence.** An accrual older than the longest wait has gone unbilled, not unowed, and the wait only selects it for investigation. Ask what the suppliers' statements would show, and when the facts were known.
 - **Measure clearing from the ledger.** An invoice larger than its accrual clears only the accrual; the rest is expense. Ask what the ledger debited.
 - **Errors reverse.** A cutoff item missed at one year-end enters that year's income and reverses in the next. Ask what the year before already took out.
 - **Error or estimate.** The test is what the facts were at the year-end. Ask whether the facts existed and were missed.

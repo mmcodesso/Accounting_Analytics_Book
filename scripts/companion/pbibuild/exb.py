@@ -59,8 +59,8 @@ def ex1(b: Build) -> None:
         "'ExtendedLaborCost' in table 'LaborTimeEntry' cannot be found or may not be used in this expression, so the "
         "visual shows an error, while the Plant page's hours visuals still work, since no measure on it reads the cost. With "
         f"the Finance role the page shows every job title's cost ({money(total)} in fiscal {y}).",
-        "(4) Performance analyzer durations vary by machine; expect slightly longer durations under View as, because "
-        "every query carries the role's filters.",
+        "(4) Performance analyzer durations vary by machine and from run to run. The role's filters can lengthen "
+        "them, and the fewer rows the role leaves can shorten them, so compare repeated recordings of the same visuals.",
         "(5) Row-level security restricts rows, not columns: the managers must see the plant's employees and their "
         "hours, so the rows stay and only the column is hidden. The controller should keep cost measures off the "
         "pages the managers read (or in a finance report), so that no visual a manager opens fails."]))
@@ -108,27 +108,38 @@ def ex2(b: Build) -> None:
     m.add(query_table(q, summarize={"EmployeeID": "none", "CostCenterID": "none"}))
     # (2) to (4) the review, in its own query tab
     unmapped = ("FILTER ( CostCenter, ISEMPTY ( FILTER ( Security, Security[CostCenterID] = CostCenter[CostCenterID] ) ) )")
-    twice = ("FILTER ( ADDCOLUMNS ( VALUES ( Security[UserPrincipalName] ), \"CostCenters\", CALCULATE ( COUNTROWS ( "
-             "Security ) ) ), [CostCenters] > 1 )")
+    # (3) counts each user's distinct cost centers, so a mapping typed twice is not read as two cost centers
+    twice = ("FILTER ( ADDCOLUMNS ( VALUES ( Security[UserPrincipalName] ), \"CostCenters\", CALCULATE ( DISTINCTCOUNT ( "
+             "Security[CostCenterID] ) ) ), [CostCenters] > 1 )")
     look = "LOOKUPVALUE ( AccessEmployees[{}], AccessEmployees[EmployeeID], [EmployeeID] )"
+    # (4) one row per user (not per mapping): the user's cost centers listed, the employee matched once, and the user
+    # flagged when any of the cost centers mapped to them is not the employee's own
     review = (
-        "VAR Users =\n    ADDCOLUMNS (\n        Security,\n        \"EmployeeID\", LOOKUPVALUE ( AccessEmployees[EmployeeID], "
+        "VAR Users =\n    ADDCOLUMNS (\n        VALUES ( Security[UserPrincipalName] ),\n"
+        "        \"CostCenterIDs\", CALCULATE ( CONCATENATEX ( VALUES ( Security[CostCenterID] ), Security[CostCenterID], "
+        "\", \", Security[CostCenterID], ASC ) ),\n"
+        "        \"EmployeeID\", LOOKUPVALUE ( AccessEmployees[EmployeeID], "
         "AccessEmployees[Email], Security[UserPrincipalName] )\n    )\n"
         "VAR Matched =\n    ADDCOLUMNS (\n        Users,\n" + ",\n".join(
             f"        \"{n}\", {look.format(c)}" for n, c in [("EmployeeName", "EmployeeName"), ("JobTitle", "JobTitle"),
                                                              ("EmploymentStatus", "EmploymentStatus"),
                                                              ("TerminationDate", "TerminationDate"),
                                                              ("OwnCostCenterID", "CostCenterID")]) + "\n    )\n"
-        "RETURN\n    ADDCOLUMNS (\n        Matched,\n        \"Flag\",\n            SWITCH (\n                TRUE (),\n"
-        "                ISBLANK ( [EmployeeID] ), \"No matching employee\",\n"
-        "                [EmploymentStatus] <> \"Active\" || NOT ISBLANK ( [TerminationDate] ), \"Terminated\",\n"
-        "                [OwnCostCenterID] <> Security[CostCenterID], \"Mapped to another cost center\",\n"
-        "                BLANK ()\n            )\n    )")
+        "RETURN\n    ADDCOLUMNS (\n        Matched,\n        \"Flag\",\n"
+        "            VAR ThisUser = Security[UserPrincipalName]\n"
+        "            VAR OwnCenter = [OwnCostCenterID]\n"
+        "            VAR OtherCenters =\n                COUNTROWS ( FILTER ( Security, Security[UserPrincipalName] = ThisUser "
+        "&& Security[CostCenterID] <> OwnCenter ) )\n"
+        "            RETURN\n                SWITCH (\n                    TRUE (),\n"
+        "                    ISBLANK ( [EmployeeID] ), \"No matching employee\",\n"
+        "                    [EmploymentStatus] <> \"Active\" || NOT ISBLANK ( [TerminationDate] ), \"Terminated\",\n"
+        "                    OtherCenters > 0, \"Mapped to another cost center\",\n"
+        "                    BLANK ()\n                )\n    )")
     b.project.queries["Ex B.2"] = (
         "// Exercise B.2 (2): cost centers with no row in the security table\nEVALUATE\nSELECTCOLUMNS (\n    "
         f"{unmapped},\n    \"CostCenterID\", CostCenter[CostCenterID],\n    \"CostCenterName\", CostCenter[CostCenterName]\n)\n\n"
         f"// (3): users mapped to more than one cost center\nEVALUATE\n{twice}\n\n"
-        "// (4): each user, the employee whose Email matches, and a flag\nEVALUATE\n" + review + "\n")
+        "// (4): one row per user, the employee whose Email matches, and a flag\nEVALUATE\n" + review + "\n")
     # (5) and (6): the page and the note
     page = b.report.add(Page("exb2", "Ex B.2"))
     page.add(Visual("accessEmployees", "tableEx", 20, 20, 700, 690, {"Values": [
@@ -137,15 +148,17 @@ def ex2(b: Build) -> None:
     page.add(answer("exa2Answer", 740, 20, 520, 690, [
         f"(2) One cost center has no row in the security table: {ctx['center']} ({ctx['cc']}), whose manager of record is "
         f"{ctx['an']} {ctx['title']}.",
-        f"(3) None: {ctx['users']} users, {ctx['ccs']} cost centers.",
-        "(4) Every user name matches the Email of an active employee (" + ", ".join(f"{i} {t}" for i, t in ctx["matches"]) +
+        f"(3) None: {ctx['users']} users, {ctx['ccs']} cost centers, counted as each user's distinct cost centers, so a "
+        "mapping typed twice is not read as two.",
+        "(4) One row per user: every user name matches the Email of an active employee (" + ", ".join(f"{i} {t}" for i, t in ctx["matches"]) +
         "), each in the cost center the table gives them, so no user is flagged.",
         f"(5) Viewed as the Sales Manager, the page lists every row of AccessEmployees, all {ctx['n_employees']} "
-        "employees with their e-mail addresses and termination dates: no rule filters an unrelated table (the same "
+        "employees with their e-mail addresses and termination dates, because no rule filters an unrelated table (the same "
         "reason the Customer table lists every customer for a user missing from the security table).",
         f"(6) The review found the unmapped {ctx['center']} and nothing else. Internal audit should run it whenever the "
         "security table changes and at least quarterly, with the controller's approval recorded. Before the file is "
-        f"published, give AccessEmployees a rule of FALSE () in {ROLE}, or keep the table out of the published file."]))
+        f"published, keep the table out of the published file, or give it a rule of FALSE () in {ROLE}, which empties it "
+        "for the role but leaves its name and columns visible (object-level security would hide them too)."]))
     first = one("SELECT MIN(EmployeeName) FROM Employee")          # the table's first row, sorted by name
     page.expect = ["EmployeeName", "EmploymentStatus", first, "Model answer"]
 
@@ -154,6 +167,8 @@ def ex2(b: Build) -> None:
     b.check(t, "cost centers with no row in the security table", ctx["center"],
             f"CONCATENATEX ( {unmapped}, CostCenter[CostCenterName], \", \" )")
     b.check(t, "users mapped to more than one cost center", 0, f"COUNTROWS ( {twice} )", 0)
+    per_user = review.replace("RETURN\n    ADDCOLUMNS (", "RETURN\n    COUNTROWS ( ADDCOLUMNS (") + " )"
+    b.check(t, "rows of the review (one per user)", len({u for u, _ in appendix_b.SECURITY}), per_user.replace("\n", " "), 0)
     flagged = review.replace("RETURN\n    ADDCOLUMNS (", "RETURN\n    COUNTROWS ( FILTER ( ADDCOLUMNS (")[:-1] + \
         "), NOT ISBLANK ( [Flag] ) ) )"
     b.check(t, "users flagged (no employee, terminated, or another cost center)", 0, flagged.replace("\n", " "), 0)

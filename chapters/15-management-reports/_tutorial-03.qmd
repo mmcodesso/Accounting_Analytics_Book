@@ -97,7 +97,7 @@ RETURN
 Hours per Standard Hour = DIVIDE ( [Manufacturing Hours], [Standard Hours to Cut-off] )
 ```
 
-Standard hours are the hours the standards allow for the units completed, Chapter 10's standard hours allowed. The time records end in December 2026, before the end of the month, because the last pay periods are still open, while the completions run to the year's last day. The cut-off keeps only the output completed up to the last day with time records, so that hours and output cover the same days, as Chapters 10 and 11 did. REMOVEFILTERS inside the variable finds that last day in the whole table, whatever the visual is filtered to.
+Standard hours are the hours the standards allow for the units completed, Chapter 10's standard hours allowed. The time records end in December 2026, before the end of the month, because the last two pay periods are marked Open in the data, while the completions run to the year's last day. The cut-off keeps only the output completed up to the last day with time records, as Chapters 10 and 11 did. That day, December 11, 2026, is the last day of direct time, but indirect time ends a week earlier, on December 4, 2026. The ratio is therefore an observed-records diagnostic, as Chapter 10 called it, not a labor efficiency variance, and its last week holds direct time and output but no indirect time. REMOVEFILTERS inside the variable finds that last day in the whole table, whatever the visual is filtered to.
 
 **Step 7. Measure the trailing twelve months.**
 
@@ -121,7 +121,7 @@ RETURN
     )
 ```
 
-The window is the twelve months that end with the last day of the current month. The measure is blank until a full twelve months of data exist, as the view of Chapter 11 began in December 2024, and blank for the months of 2027, which have no time records. The line rises from the level of 2024 through 2025 and keeps rising through most of 2026: the plant used more hours for each standard hour of output in every successive year, the trend Part III explained.
+The window is the twelve months that end with the last day of the current month. The guard asks for twelve months of the Date table in the window and for manufacturing hours in the current month, so the measure is blank before December 2024, where the view of Chapter 11 began, and for the months of 2027, which have no time records. It counts calendar months, not months whose records are complete, and its last point, December 2026, is provisional for the reason Step 6 gave. The line rises from the level of 2024 through 2025 and keeps rising through most of 2026: the plant recorded more hours for each standard hour of output in every successive year, the trend Part III explained.
 
 **Step 8. Add the trailing ratio as a visual calculation.**
 
@@ -137,7 +137,7 @@ TTM (visual) = DIVIDE (
 )
 ```
 
-The ratio of two twelve-month averages equals the ratio of the twelve-month totals, so while the table starts in January 2024, the visual calculation agrees with the measure from December 2024 on.
+The ratio of two twelve-month averages over the same months equals the ratio of the twelve-month totals, so while the table starts in January 2024, the visual calculation agrees with the measure from December 2024 on.
 
 **Step 9. Filter the table's axis.** Change the visual's year filter to 2025 and 2026 only, and compare the two trailing columns for 2025 again.
 
@@ -170,14 +170,14 @@ c. Select the bar chart, choose **Format > Edit interactions**, and click the **
 Overtime Share = DIVIDE ( [Overtime Hours], [Manufacturing Hours] )
 ```
 
-@fig-15-11 shows the page. The bar chart shows that most direct hours of 2026 were recorded at Packing, the work center Chapter 11 found far above its planned load. The overtime share rose by two-thirds or more from 2024 to 2026 for every manufacturing job title alike, the plant-wide pattern of the surge days that Chapter 12 found. Editing the interactions keeps the card and the line chart plant-wide. Without it, clicking Packing in the bar chart would divide Packing's direct hours by the whole plant's output, because the work center filters the labor time and not the completions: a ratio well below the plant's that describes neither Packing nor the plant. A ratio for one work center would first need its output measured there.
+@fig-15-11 shows the page. The bar chart shows that most direct hours of 2026 were recorded at Packing, the work center Chapter 11 found far above its planned load. The overtime share rose by about two-thirds or more from 2024 to 2026 for every manufacturing job title alike, the plant-wide pattern of the surge days that Chapter 12 found. Editing the interactions keeps the card and the line chart plant-wide. Without it, clicking Packing in the bar chart would divide Packing's direct hours by the whole plant's output, because the work center filters the labor time and not the completions: a ratio well below the plant's that describes neither Packing nor the plant. A ratio for one work center would first need its output measured there.
 
 ![The Plant Page.](/visuals/svg/fig-15-11-plant-page.svg){#fig-15-11 fig-alt="A mock of a Power BI report page named Plant. At the top left, a card shows the trailing twelve-month hours per standard hour at December 2026 beside the 2024 level. A line chart shows the trailing ratio rising from December 2024 to December 2026. A bar chart of 2026 direct hours by work center shows Packing far longer than Assembly, Finishing and Test, Cutting, and Quality Assurance. A column chart shows the overtime share of each manufacturing job title in 2024, 2025, and 2026, rising for all three titles."}
 
 **Step 12. Add the About page and the navigation.**
 
 a. Add a page named `About`, and drag its tab to the first position.
-b. Choose **Insert > Text box**, and write a short statement of the report's purpose, its readers, its source (CharlesRiver.xlsx), its period and the last date of its time records, and where each KPI is defined, ending with a pointer to the Validation page and the Tests tab.
+b. Choose **Insert > Text box**, and write a short statement of the report's purpose, its readers, its source (CharlesRiver.xlsx), its period and the last dates of its direct and indirect time records, and where each KPI is defined, ending with a pointer to the Validation page and the Tests tab.
 c. In **Model view**, give every measure that has no description one in the **Properties** pane, as in Tutorial 14.2, Step 9, saying what it measures and any filter or cut-off it applies.
 d. Choose **Insert > Buttons > Navigator > Page navigator**, and place the navigator below the text.
 e. Right-click the tabs of Promotion Detail, Promotion Tooltip, and Cost Center Detail, and choose **Hide Page**.
@@ -205,7 +205,7 @@ SUMMARIZECOLUMNS (
 )
 ```
 
-The ratio for each year equals the trailing figure of its December and the figures of Chapter 11's MonthlyLaborEfficiency view, so the model's yearly figures agree with the queries of Part III. The test covers those totals, not what each visual shows under its filters and interactions, which Chapter 16 examines when it audits a report. A report opens on the page that was active when it was saved, which is why About is selected before saving.
+The ratio for each year equals the trailing figure of its December and the figures of Chapter 11's MonthlyLaborEfficiency view, so the model's yearly figures agree with the queries of Part III. The test shows that the model reproduces Part III's ratio, not that the ratio is a complete measure of the plant's labor performance. Counted to December 4, 2026, on both sides, hours and output alike, the 2026 figure would be a little lower, and the pattern of the three years would be the same. The test covers those totals, not what each visual shows under its filters and interactions, which Chapter 16 examines when it audits a report. When no landing page is set, a report opens on the page that was active when it was saved, which is why About is selected before saving.
 
 
 
@@ -214,7 +214,7 @@ The ratio for each year equals the trailing figure of its December and the figur
 
 - LaborTimeEntry and ProductionCompletionLine relate to their dimensions, and Test 5 returns Chapter 11's yearly ratios.
 - The trailing measure and the visual calculation agree on the full axis and differ on the filtered one, for the reason Step 9 gave.
-- The report opens on the About page, the navigator reaches every visible page, and the detail pages are hidden.
+- The report opens on the About page, the navigator reaches every visible page and lists none of the hidden ones, and the detail pages are hidden.
 - Clicking a work center in the bar chart leaves the card and the line chart unchanged.
 
 The package now answers three readers' questions on three pages, each with its comparison and its detail, and documents itself on the first. Its control totals are tested against the earlier Parts, which is what makes it fit to be sent every month.

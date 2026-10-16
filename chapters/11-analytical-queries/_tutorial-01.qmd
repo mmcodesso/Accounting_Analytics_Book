@@ -78,7 +78,7 @@ a. Type and run the query below.
 b. Read the number of rows in the message pane.
 c. Read the DirectHours and IndirectHours of the first six months, and the DaysWithTime of the last row.
 
-The result has one row for each month from January 2024 to December 2026, 36 in all, so a window over it can count months by counting rows. @fig-11-02 shows the first months, which tell a story of their own. January 2024 is the month in which the data begins, when the first work orders were only starting, and most of its time is indirect. From February to May 2024 the plant recorded far less indirect time than in the months that follow, and from the summer of 2024 indirect time is a large part of every month. A month with no indirect time at all would still have a row, because its direct entries create it, and the CASE would give it an IndirectHours of zero. The last row has far fewer days with time records than any other month, because the time records end on 11 December 2026, as Tutorial 10.3 found.
+The result has one row for each month from January 2024 to December 2026, 36 in all, so a window over it can count months by counting rows. @fig-11-02 shows the first months, which tell a story of their own. January 2024 is the month in which the data begins, when the first work orders were only starting, and most of its time is indirect. From February to May 2024 the plant recorded far less indirect time than in the months that follow, and from the summer of 2024 indirect time is a large part of every month. A month with no indirect time at all would still have a row, because its direct entries create it, and the CASE would give it an IndirectHours of zero. The last row has far fewer days with time records than any other month, because the time records end on December 11, 2026, as Tutorial 10.3 found.
 
 ![Manufacturing Labor Time in the First Months of 2024.](/visuals/svg/fig-11-02-early-months.svg){#fig-11-02 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Chapter11.sql, shows a query that groups the manufacturing labor time by month, counts the days with time records, and puts the direct, indirect, and overtime hours in columns of their own with conditional aggregation. The grid shows the first eight months, January to August 2024. January has more indirect than direct hours; the IndirectHours of February to May, outlined, are far lower than in the months that follow; and indirect time climbs from June."}
 
@@ -98,7 +98,7 @@ a. Type and run the query below.
 
 b. Compare LastWorkDate with MonthEnd, and read DaysNotRecorded.
 
-The time records end nearly three weeks before the end of December 2026. The measure of Tutorial 11.3 therefore counts the output only up to the same day, as Tutorial 10.3 did, so that its last month compares hours and output up to the same last day. That day does not show that every kind of time is complete up to it: indirect time ends a week earlier, on 4 December 2026, as Tutorial 10.3 noted.
+The time records end nearly three weeks before the end of December 2026. The measure of Tutorial 11.3 therefore counts the output only up to the same day, as Tutorial 10.3 did, so that the output of its last month stops where the time records stop. That day does not show that every kind of time is complete up to it. Indirect time ends a week earlier, on December 4, 2026, as Tutorial 10.3 noted.
 
 **Step 4. Compare the overtime share of each kind of labor.** Hours rise and fall with the number of working days in a month, but shares of the total can be compared from month to month. Each share divides one conditional sum by another.
 
@@ -150,7 +150,7 @@ a. Type and run the query below.
 
 b. Compare the two averages across the three years.
 
-The time from completion to close stayed at about the same number of days in each year. The time from release to completion more than doubled, from under three weeks for the work orders closed in fiscal 2024 to nearly six weeks for those closed in fiscal 2026. The first year's average is held down, because a work order closed in fiscal 2024 had to be released in the same year, the first of the data. Tutorial 10.3 found that direct hours per standard hour rose only a little, so work orders spent far longer on the plant floor without needing much more work, which fits a plant whose people spent more of their time away from the work orders.
+The time from completion to close stayed at about the same number of days in each year. The time from release to completion more than doubled, from under three weeks for the work orders closed in fiscal 2024 to nearly six weeks for those closed in fiscal 2026. The first year's average is held down, because a work order closed in fiscal 2024 had to be released in the same year, the first of the data. The averages group the work orders by the year they closed, so a change in the product mix or in how work moves through the plant can move them too. Check the dates themselves before reading the averages, because one work order, for example, is recorded as completed before its release. Tutorial 10.3 found that the direct hours recorded per standard hour rose only a little, so the work orders took far longer with little more recorded direct work. The dates do not show whether the orders waited, were worked more slowly, or had their time recorded against something else, which only the plant's operating records can answer.
 
 **Checkpoint.** Check that:
 
@@ -161,4 +161,4 @@ The time from completion to close stayed at about the same number of days in eac
 - the average time from release to completion more than doubled from fiscal 2024 to fiscal 2026;
 - Chapter11.sql holds the header and the queries of this tutorial, each under a comment.
 
-CASE, conditional aggregation, and the date functions have given the controller three views of the same change: indirect time that appears in the records in the middle of 2024, more overtime on direct labor, and work orders that take longer to finish.
+CASE, conditional aggregation, and the date functions have given the controller three views of the same change: indirect time that becomes a large part of the records from the middle of 2024, after far less from February to May, more overtime on direct labor, and work orders that take longer to finish.

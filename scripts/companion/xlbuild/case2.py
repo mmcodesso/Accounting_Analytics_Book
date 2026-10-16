@@ -798,14 +798,18 @@ def r1(b: ExerciseBuild) -> None:
                                "[@LinesTotal])<0.005."),
         "Conventions": ("Blue font marks input cells; black font marks formulas. Power Query amounts are unrounded; "
                         "the yearly promotion costs are rounded to the cent. A promotion applies to a line by its order "
-                        "date, so timing and volume use OrderLines; revenue and the ledger follow the invoice date, in "
-                        "BilledLines. The worksheets R2 to R5 answer their Requirements, and Memo holds Requirement 6."),
+                        "date, so timing and volume use OrderLines; billed revenue follows the invoice date, in BilledLines, "
+                        "and the ledger the posting date, in RevenuePostings. The worksheets R2 to R5 answer their "
+                        "Requirements, and Memo holds Requirement 6."),
         "Prepared by": "Accounting Analytics instructor solution (model answer)",
         "Reviewed by": "",
         "Open questions": (f"The recorded end dates of promotions {bad} fall on or before their start dates "
                            "(Requirement 5). CustomerSince cannot date a customer's first purchase: for most customers "
                            f"with a CustomerSince in {F} or later, the first order came before it (Requirement 3). "
-                           "Quantities are fractional even for items sold by the unit (Chapter 5).")},
+                           "Quantities are fractional even for items sold by the unit (Chapter 5). The windows of those "
+                           "promotions, the collection of the items outside their scope, and the approval of the Pending "
+                           "override requests that were billed stay open until the approved records are seen "
+                           "(Requirement 5).")},
         extra=[], sheets={
             "Documentation": "what the workbook is, how it was built, and the completeness checks of Requirement 1",
             "Parameters": "the proposal's rates, the commission rate, the years, and the promotions the proposal repeats",
@@ -1067,10 +1071,12 @@ def r2(b: ExerciseBuild) -> None:
         f"{F} ({pct(years[0]['share'], 2)} of billed revenue), {money(years[1]['disc'])} in {F + 1} "
         f"({pct(years[1]['share'], 2)}), and {money(years[2]['disc'])} in {y} ({pct(years[2]['share'], 2)}). Rounding "
         f"each line's discount to the cent, as Exercise 4.2 did, gives {money(n2['rounded'])}.",
-        f"Gross to net. In fiscal {y}, list prices would have billed {money(n2['list'])}. Price lists and approved "
+        f"Gross to net. In fiscal {y}, list prices would have billed {money(n2['list'])}. The price lists and "
         f"overrides took off {money(n2['red'])} and the promotions {money(n2['disc'])}, leaving {money(n2['net'])} "
-        f"billed; gross less discounts is {money(n2['after'])}, and the {money(n2['rounding'])} between them is the "
-        f"rounding of LineTotal line by line. Furniture carried {money(fur['disc'])} of the promotional discount.",
+        f"billed. Gross less discounts is {money(n2['after'])}, and the {money(n2['rounding'])} between them is the "
+        f"rounding of LineTotal line by line. Furniture carried {money(fur['disc'])} of the promotional discount. The "
+        "schedule measures the reductions, not their authorization, since Requirement 5 finds Pending override "
+        "requests billed with no completed approval.",
         f"Ledger. The sales-invoice credits to the revenue accounts total {money(n2['ledger_total'])}, "
         f"{money(n2['difference'])} more than the lines billed in {y}. The difference is invoices {n2['first']} to "
         f"{n2['last']}, dated in late {P} but posted on {n2['cutoff_posted']} (Exercise 6.1): "
@@ -1289,9 +1295,11 @@ def r3(b: ExerciseBuild) -> None:
         f"{spct(min(v['py'] for v in f.vol.values() if v['py'] is not None))} to "
         f"{spct(max(v['py'] for v in f.vol.values() if v['py'] is not None))}. None is unusual: the largest, "
         f"{spct(top['lift'])}, is {top['z']:.1f} standard deviations of a {n3['sd_total']}, and promotion "
-        f"{low['id']}'s fall is within its segment's normal swings ({pct(low['sd'])} a month). Every difference is far "
-        "below the promotion's break-even increase (Requirement 4): no promotion brought in sales that would not "
-        "otherwise have been made."], span=10)
+        f"{low['id']}'s fall is within its segment's normal swings ({pct(low['sd'])} a month). This is an informal "
+        "screen, not a test of significance. Every difference is far below the promotion's break-even increase "
+        "(Requirement 4), so the data show no increase near what any promotion needed. The comparisons describe the "
+        "orders and cannot show what would have been ordered without a promotion, which a comparison group or a "
+        "designed test would need."], span=10)
 
     # --- R3 Customers ---------------------------------------------------------------------------------------------
     cu = new_sheet(b, "R3 Customers")
@@ -1410,7 +1418,8 @@ def r4(b: ExerciseBuild) -> None:
               18: "Break-even lift found by Goal Seek (value)", 19: "Discount at the report year's volume",
               20: "Contribution given up, after the commissions saved"}
     sources = {4: "Parameters (the report year's promotion of that scope)", 5: "Parameters (the proposal's rates)",
-               6: "Assumption; Requirement 3 found no increase", 7: "BilledLines, the promotion's lines",
+               6: "Assumption, not a measured lift (Requirement 3 found no increase near the break-even)",
+               7: "BilledLines, the promotion's lines",
                8: "BilledLines: GrossAmount over units", 9: "BilledLines: Quantity x StandardCost over units",
                10: "Items[StandardFixedOverheadCost] of the lines' items", 11: "Parameters (Tutorial 7.3)",
                13: "Units x (price x (1 - commission) - cost)", 14: "Formula", 15: "With less without",
@@ -1535,7 +1544,8 @@ def r4(b: ExerciseBuild) -> None:
         ("Assumption", "Value used", "Basis", "Sensitivity"),
         ("Discount rates", "8%, 10%, 12%", "The proposal, which repeats the report year's rates",
          f"At 5% the Furniture promotion needs a {pct(f.be_at[0.05])} increase instead of {pct(n4['grp']['be'])}"),
-        ("Volume lift", "0%", "Requirement 3: no promotion's months showed an unusual increase",
+        ("Volume lift", "0%", "A scenario, because no promotion's months showed an increase near its break-even, and "
+         "the comparisons cannot show a promotion's effect",
          "The break-even lifts in row 16 are the increases each promotion would need"),
         ("Orders without the promotion", "Same orders at the price before discount",
          "Promotion lines carry the customer's usual price, with the discount on top",
@@ -1546,7 +1556,11 @@ def r4(b: ExerciseBuild) -> None:
         ("Variable cost per unit", "Standard cost per unit", "Item standard costs, including fixed overhead",
          f"Treating fixed overhead as fixed lowers the Furniture break-even to {pct(n4['grp']['be_variable'])}"),
         ("Commission rate", f"{pct(f.rate, 3)}", "Tutorial 7.3: commission expense over all revenue",
-         "Small; commissions fall with the discount")]
+         "Small; commissions fall with the discount"),
+        ("Orders not yet billed", "Left out",
+         f"The report year's orders of the three promotions carry {money(n4['unbilled_total'])} of discount not yet "
+         "billed in the data",
+         "If they are billed, the cost rises by about that amount, in quarters the data cannot show")]
     for i, row in enumerate(assumptions):
         for j, v in enumerate(row):
             ws.Cells(a0 + i, 1 + j).Value = v
@@ -1694,7 +1708,10 @@ def r4(b: ExerciseBuild) -> None:
         f"Data table and Goal Seek. At a 10% discount the Furniture promotion turns positive only between a 30% and a "
         f"35% increase; at 5% it needs {pct(f.be_at[0.05])}. Goal Seek at the largest increase measured in "
         f"Requirement 3 (promotion {best['id']}'s {spct(best['lift'])}) gives a Furniture discount of about "
-        f"{pct(f.goal_discount)}: the most generous discount the best response on record would pay for."], span=6)
+        f"{pct(f.goal_discount)}. It is a sensitivity, not an optimal discount"
+        + (f", because that increase was measured for another scope and year ({n4['best_year']}) and is an observed "
+           f"difference, not a measured effect. Furniture's own difference would support about "
+           f"{pct(n4['own_discount'], 2)}." if n4["cross"] else ".")], span=6)
     pq_ = f.prop_quarters
     text_block(bu, v0 + len(basis) + 2, f"{MA}, Requirement 4 (budgets and the cost of the calendar)", [
         f"The budgets. The {f.F} to {y} budgets planned their promotions: the promoted items are budgeted at "
@@ -1704,11 +1721,13 @@ def r4(b: ExerciseBuild) -> None:
         f"is budgeted lower in November, the segment promotion's month. The {N} budget, approved by the "
         f"{f.cfo_title.lower()} (EmployeeID {n4['cfo']}) on {n4['approved']}, is flat at about {n4['flat']:.4f} of "
         "list in every month: it plans no promotion.",
-        f"The cost of the calendar. At the {y} volumes and with no increase, the three promotions would give "
+        f"The cost of the calendar. At the {y} billed volumes and with no increase, the three promotions would give "
         f"{money(n4['cost'])} of discounts, or {money(n4['contribution'])} of contribution after the commissions saved, "
         f"against a budget without promotions. The discounts would land about {money(pq_[1], 0)} in the first quarter, "
         f"{money(pq_[2], 0)} in the second, {money(pq_[3], 0)} in the third, and {money(pq_[4], 0)} in the fourth, "
-        "because the fall promotion's orders are invoiced after it ends.",
+        "because the fall promotion's orders are invoiced after it ends. The estimate is a sensitivity that holds the "
+        f"{y} volume, mix, prices, and costs, and it leaves out {money(n4['unbilled_total'])} of discount on the "
+        "promotions' orders not yet billed in the data.",
         f"The volume basis. The estimate uses the {y} billed lines, not the budget's quantities, because the budget's "
         f"volume is several times actual (Chapter 7): it plans {n4['budget_units']:,.0f} Furniture units for "
         f"September and October {N} against {n4['ordered']:,.0f} ordered in those months of {y}, so a cost taken from "
@@ -1807,7 +1826,8 @@ def r5(b: ExerciseBuild) -> None:
 
     ws = new_sheet(b, "R5 Controls")
     title(ws, "Requirement 5: the controls over promotions (OrderLines, Promotions, Items, Overrides)")
-    heading(ws, 3, "(1) Four tests of every promotion line, by promotion (OrderLines columns DateOK, ScopeOK, RateOK)")
+    heading(ws, 3, "(1) Four tests by promotion: three on every promotion line (OrderLines columns DateOK, ScopeOK, "
+                   "RateOK), and completeness from all order lines")
     header(ws, 4, 1, ["PromotionID", "PromotionName", "ScopeType", "Scope", "Lines", "Outside the recorded dates",
                       "Outside the scope", "Rate differs from DiscountPct", "Window start", "Window end",
                       "In scope and window without the promotion"])
@@ -1837,8 +1857,9 @@ def r5(b: ExerciseBuild) -> None:
     fmt(ws, f"E5:H{tr}", COUNT)
     fmt(ws, f"K5:K{tr}", COUNT)
     bold(ws, f"A{tr}:K{tr}")
-    note(ws, "I4", "The recorded effective dates, except for a promotion whose lines all fail the date test: its window "
-                   "is then the calendar months in which its lines were ordered (the evidence in (2)).")
+    note(ws, "I4", "The recorded effective dates, except for a promotion whose lines all fail the date test. Its "
+                   "recorded dates hold no order line of its scope (column W of (2)), so that result is unresolved, and "
+                   "the window here is the calendar months in which its lines were ordered, a provisional test.")
 
     e0 = tr + 2
     heading(ws, e0, "(2) The promotions whose recorded dates fail: when were they meant to run? (the order months, and "
@@ -1846,7 +1867,7 @@ def r5(b: ExerciseBuild) -> None:
     header(ws, e0 + 1, 1, ["PromotionID", "Scope", "Recorded start", "Recorded end", "End on or before start",
                            "First order", "Last order"] + list(range(1, 13))
            + ["Highest budget ratio in the order months", "Lowest in months with no promotion",
-              "Budget planned a discount in those months"])
+              "Budget planned a discount in those months", "In-scope order lines within the recorded dates"])
     ea = e0 + 2
     put(ws, {f"A{ea}": f"=FILTER(A5:A{tr - 1},F5:F{tr - 1}>0)"})
     nb = len(f.bad)
@@ -1860,7 +1881,10 @@ def r5(b: ExerciseBuild) -> None:
                  f"F{r}": f"=MINIFS(OrderLines[OrderDate],OrderLines[PromotionID],$A{r})",
                  f"G{r}": f"=MAXIFS(OrderLines[OrderDate],OrderLines[PromotionID],$A{r})",
                  f"T{r}": f"=MAX(FILTER(H{r}:S{r},({mh}>=MONTH($F{r}))*({mh}<=MONTH($G{r}))))",
-                 f"U{r}": f"=MIN(CHOOSECOLS(H{r}:S{r},1,2,5,6,7,8,12))", f"V{r}": f"=T{r}<U{r}-0.02"})
+                 f"U{r}": f"=MIN(CHOOSECOLS(H{r}:S{r},1,2,5,6,7,8,12))", f"V{r}": f"=T{r}<U{r}-0.02",
+                 f"W{r}": (f"=COUNTIFS(CHOOSE(MATCH(XLOOKUP($A{r},$A$5:$A${tr - 1},$C$5:$C${tr - 1}),{SCOPES},0),"
+                           f"{scope_range('OrderLines')}),$B{r},"
+                           f'OrderLines[OrderDate],">="&C{r},OrderLines[OrderDate],"<="&D{r})')})
         for m in range(12):
             c = col(8 + m)
             crit = (f"BudgetPrices[CollectionName],$B{r},BudgetPrices[FiscalYear],YEAR($F{r}),BudgetPrices[Month],"
@@ -1874,6 +1898,7 @@ def r5(b: ExerciseBuild) -> None:
     fmt(ws, f"C{ea}:D{eb - 1}", DATE)
     fmt(ws, f"F{ea}:G{eb - 1}", DATE)
     fmt(ws, f"H{ea}:U{eb - 1}", "0.0000")
+    fmt(ws, f"W{ea}:W{eb - 1}", COUNT)
 
     s0 = eb + 3
     heading(ws, s0, "(3) The lines outside their promotion's scope (ScopeOK is FALSE), and the item master")
@@ -1953,35 +1978,45 @@ def r5(b: ExerciseBuild) -> None:
     bad_lines = sum(p["lines"] for p in bad)
     d0 = k0 + len(stacking) + 3
     heading(ws, d0, f"(5) Dispositions ({MA})")
-    header(ws, d0 + 1, 1, ["Exception", "Count", "Disposition", "Design or operation", "Action"])
+    header(ws, d0 + 1, 1, ["Exception", "Count", "Disposition", "Provisional classification", "Action"])
+    dates_kind = (f" (promotions {n5['reversed']})" if n5["n_reversed"] else "") + (
+        f", and promotion {n5['same_day']}'s one-day window may be allowed by policy" if n5["n_same_day"] == 1 else
+        f", and the one-day windows of promotions {n5['same_day']} may be allowed by policy" if n5["n_same_day"] else "")
     disp = [
         (f"Promotions {series(f.bad)}: every line ordered outside the recorded dates", f"=F{tr}",
-         "Master-data error, not discounts given without authority: the lines were ordered in March and April, every "
-         "collection line of those months carries the promotion, and each year's budget planned the discount then.",
-         "Design: the system accepts an end date on or before the start date",
-         "Correct the end dates; reject a promotion whose end date is not after its start"),
+         "Likely a master-data error in the end dates rather than discounts given without authority, since the lines "
+         "were ordered in March and April, every collection line of those months carries the promotion, and each "
+         "year's budget planned the discount then. The approved calendar and the change history would confirm it.",
+         f"Possibly design, since the records hold end dates before start dates{dates_kind}",
+         "Correct the end dates once the approved calendar confirms them, reject an end date before the start, and "
+         "decide whether a promotion may last one day"),
         (f"Order lines {n5['oos_ids']} (promotion {n5['oos_promo']}) outside the scope", f"=G{tr}",
-         f"The discount is right; the item master is incomplete: {n5['code']}, the {n5['base']}, has no CollectionName "
-         f"({n5['others']} also lack one).",
-         "Design: the scope is read from an incomplete item master",
-         "Complete CollectionName; check scope data before a promotion runs"),
-        ("Rates that differ from DiscountPct", f"=H{tr}", "None: every promotion line carries its promotion's rate.",
-         "Operating as designed", "None"),
-        ("Lines in scope and window without the promotion (completeness)", f"=K{tr}",
-         "None: every line in a promotion's scope and months carries it (collection months taken as March and April).",
-         "Operating as designed", "None"),
+         f"The name of {n5['code']}, the {n5['base']}, suggests an incomplete item master rather than a wrong discount, "
+         f"since it has no CollectionName ({n5['others']} also lack one). Its classification when it was sold and the "
+         "approved scope would settle whether the discount was authorized.",
+         "Possibly design, since the scope is read from an item master that can be incomplete",
+         "Complete CollectionName once confirmed, and check scope data before a promotion runs"),
+        ("Rates that differ from DiscountPct", f"=H{tr}", "None found. Every promotion line carries its promotion's rate.",
+         "No exception (the test does not reach scope or timing)", "None"),
+        ("Lines in scope and window without the promotion (completeness, from all order lines)", f"=K{tr}",
+         f"None in the provisional March-April windows of promotions {series(f.bad)}. Their recorded dates hold no "
+         "order line of their scopes (column W of (2)), so the result on the recorded dates is unresolved.",
+         "Not assessed until the windows are confirmed", "Confirm the windows, then rerun the test"),
         (f"Promotions and approved overrides all approved by {mgr['name']}, {mgr['title']}", f"=B{o0 + 5}",
-         f"{n5['own']} of the approved overrides were the manager's own requests; finance approves neither promotions "
-         "nor overrides.",
-         "Design (no finance approval) and operation (approvals by the person who requested them)",
+         f"{n5['own']} of the approved overrides were the manager's own requests, and no approval by anyone in finance "
+         "is recorded.",
+         "Possibly design if no rule requires an independent approver, or operation if one does (the authority matrix "
+         "decides)",
          "Finance co-approves promotions; overrides approved by someone other than the requester"),
         (f"Pending override requests billed anyway (IDs {', '.join(str(i) for i in n5['pending_ids'])})",
-         f"=B{o0 + 10}", "Billed at a price nobody approved; requested by the same manager.",
-         "Operation (and design: billing does not check the approval)", "Block billing until a request is approved"),
+         f"=B{o0 + 10}", "Billed with no completed approval in this extract, on lines with no override link, and "
+         "requested by the same manager.",
+         "Possibly both, since billing did not wait for an approval (the approval history and the workflow logs decide)",
+         "Block billing until a request is approved"),
         ("Promotion lines on top of an approved override (stacking)", f"=B{k0 + 1}",
          f"{n5['stack_billed']} billed lines, {money(n5['stack_disc'])} of discount: whether a negotiated price should "
-         "also receive a promotion is a policy question for management.", "Design: no stacking rule",
-         "Decide and enforce a stacking rule")]
+         "also receive a promotion is a policy question for management.",
+         "Possibly design, since no stacking rule is recorded", "Decide and enforce a stacking rule")]
     for i, row in enumerate(disp):
         r = d0 + 2 + i
         for j, v in enumerate(row):
@@ -1990,15 +2025,15 @@ def r5(b: ExerciseBuild) -> None:
     ws.Range(f"A{d0 + 1}:E{dl}").WrapText = True
     ws.Range(f"A{d0 + 1}:E{dl}").VerticalAlignment = TOP
     fmt(ws, f"B{d0 + 2}:B{dl}", COUNT)
-    widths(ws, {"A": 46, "B": 30, "C": 54, "D": 36, "E": 40})
-    for k in range(6, 23):
+    widths(ws, {"A": 46, "B": 30, "C": 54, "D": 40, "E": 40})
+    for k in range(6, 24):                  # F to W: the order months, the budget ratios, and the recorded-dates count
         ws.Columns(k).ColumnWidth = 12
     for r in range(d0 + 2, dl + 1):
         ws.Rows(r).AutoFit()
     c0 = dl + 3
     text_block(ws, c0, f"{MA}, Requirement 5: the conditions to meet before any promotion runs in {f.N}", [
-        "1. Validated dates: the system rejects a promotion whose end date is not after its start date, and the "
-        "recorded dates match the months the promotion is meant to run.",
+        "1. Validated dates: the system rejects an end date before the start date, a policy says whether a "
+        "promotion may last one day, and the recorded dates match the months the promotion is meant to run.",
         "2. Complete scope data: every item of a collection carries its CollectionName before a collection promotion "
         "runs.",
         "3. Approval by finance as well as sales: the controller (or the chief financial officer) approves each "
@@ -2012,17 +2047,21 @@ def r5(b: ExerciseBuild) -> None:
         f"test, and every line of the other {n5['good']} passes. Their recorded end dates fall on or before their start "
         "dates, yet all their lines were ordered from March 1 to April 30, every collection line ordered in those "
         "months carries the promotion, and each year's budget planned the collection's discount in March and April. "
-        "The evidence points to a March-April window entered with a wrong end date: a master-data error, not discounts "
-        "given without authority.",
+        "The evidence points to a March-April window entered with a wrong end date, a likely master-data error rather "
+        "than discounts given without authority, which the approved calendar and the change history would confirm.",
         f"Scope. Two order lines of promotion {n5['oos_promo']} (SalesOrderLineIDs {n5['oos_ids']}) are on "
-        f"{n5['code']}, the {n5['base']}, whose CollectionName is blank: the discount is right and the item master is "
-        f"incomplete ({n5['others']} also lack a collection). Rate and completeness: no exceptions.",
+        f"{n5['code']}, the {n5['base']}, whose CollectionName is blank. The name suggests an incomplete item master "
+        f"rather than a wrong discount ({n5['others']} also lack a collection). Rates: no exceptions. Completeness, "
+        f"from all order lines: none in the provisional March-April windows, while the recorded dates of promotions "
+        f"{series(f.bad)} hold no line to test, so that result is unresolved.",
         f"Approvals. {mgr['name']} ({mgr['title']}, EmployeeID {mgr['id']}) approved all {n5['promos']} promotions, each "
         f"on its start date, and all {n5['approved']} approved override requests, {n5['own']} of them her own. Her "
-        f"{n5['pending']} other requests are still Pending, yet they were billed (Exercises 4.6 and 8.6); the other "
-        f"requests came from {n5['requesters']}. Pricing authority sits with one person, and finance approves neither "
-        f"promotions nor overrides. Stacking: {n5['stack_orders']} order lines ({n5['stack_billed']} billed lines) carry "
-        f"both an approved override and a promotion, {money(n5['stack_disc'])} of discount."], span=5)
+        f"{n5['pending']} other requests are still Pending, yet they were billed with no completed approval in the "
+        f"records (Exercises 4.6 and 8.6). The other requests came from {n5['requesters']}. The records place pricing "
+        "authority with one person, and no approval by anyone in finance is recorded. Stacking: "
+        f"{n5['stack_orders']} order lines ({n5['stack_billed']} billed lines) carry both an approved override and a "
+        f"promotion, {money(n5['stack_disc'])} of discount. The classifications are provisional until the system's "
+        "configuration, the authority matrix, and the approval history are seen."], span=5)
     b.found["r5"] = dict(tr=tr, ea=ea, eb=eb, sa=sa, ia=ia, aa=aa, o0=o0, k0=k0, d0=d0)
 
     t = R5
@@ -2037,6 +2076,8 @@ def r5(b: ExerciseBuild) -> None:
     b.check(t, "in scope and window without the promotion (completeness)", 0, f"='R5 Controls'!K{tr}", 0, COUNT)
     b.check(t, "promotions whose recorded dates fail", nb, f"=ROWS('R5 Controls'!A{ea}#)", 0, COUNT)
     for i, p in enumerate(bad):
+        b.check(t, f"promotion {p['id']}: in-scope order lines within the recorded dates", 0,
+                f"='R5 Controls'!W{ea + i}", 0, COUNT)
         b.check(t, f"promotion {p['id']}: first order", serial(p["lo"]), f"='R5 Controls'!F{ea + i}", 0, DATE)
         b.check(t, f"promotion {p['id']}: last order", serial(p["hi"]), f"='R5 Controls'!G{ea + i}", 0, DATE)
     b.check(t, "promotions whose end date is on or before the start date", f.end_not_after, f"='R5 Controls'!E{eb}", 0,
@@ -2113,19 +2154,22 @@ def memo_text(f: Facts) -> list[str]:
         f"The ledger does not show this cost. Each invoice line is recorded at its net price, so the revenue accounts "
         f"already exclude every price reduction, and account {disc_name[0]} {disc_name[1]} has never been used. The "
         "income statement shows net revenue and nothing about the promotions. The cost is visible only in a gross-to-net "
-        f"schedule (Exhibit 2): in {y}, list prices would have billed {usd(n2['list'], 0)}, price lists and approved "
+        f"schedule (Exhibit 2): in {y}, list prices would have billed {usd(n2['list'], 0)}, price lists and "
         f"overrides took off {usd(n2['red'], 0)}, and the promotions {usd(n2['disc'], 0)}, leaving "
         f"{usd(n2['net'], 0)}. That amount ties to the sales-invoice revenue in the ledger, except "
         f"{usd(n2['difference'], 2)} of three invoices dated in late {P} and posted in {y} ({n2['first']} to "
         f"{n2['last']}), a cutoff matter already reported.",
-        "A promotion applies by order date, but revenue follows the invoice date, so its discounts reach the quarterly "
-        f"results late: of the {usd(n2['prop_total'], 0)} the three proposed promotions cost in {y}, "
+        "A promotion applies by order date, but billing follows the invoice date and the ledger the posting date, so "
+        f"its discounts reach the quarterly results late: of the {usd(n2['prop_total'], 0)} the three proposed "
+        f"promotions cost in {y}, "
         f"{usd(n2['q4'], 0)} ({pct(n2['q4_share'], 0)}) was billed in the fourth quarter.",
         "MANAGERIAL ACCOUNTING",
-        "No promotion brought in sales that would not otherwise have been made. Measured at list price in each "
+        "The data show no increase in sales near what any promotion needed. Measured at list price in each "
         "promotion's scope and months, against the other months of the same year and the same months a year earlier, "
         f"the differences run from {spct(low['lift'])} to {spct(top['lift'])}, all within the scope's normal "
-        f"month-to-month variation (the largest is {top['z']:.1f} standard deviations; Exhibit 3). No customer's first "
+        f"month-to-month variation on an informal screen (the largest is {top['z']:.1f} standard deviations; Exhibit "
+        "3). These comparisons describe the orders and cannot show what would have been ordered without a "
+        "promotion. No customer's first "
         f"order in the data included a promotion line. First orders cluster in early {F} because the data begins then, "
         f"and only {n3['late']} came after June {F}, so the data cannot prove that promotions never attract customers, "
         "but it gives the claim no support.",
@@ -2140,33 +2184,41 @@ def memo_text(f: Facts) -> list[str]:
         f"{usd(pq_[1], 0)} in the first quarter, {usd(pq_[2], 0)} in the second, {usd(pq_[3], 0)} in the third, "
         f"and {usd(pq_[4], 0)} in the fourth. I did not use the budget's quantities, which run several times actual "
         f"(it plans {n4['budget_units']:,.0f} Furniture units for September and October against {n4['ordered']:,.0f} "
-        f"ordered in {y}), and the budget has no customer dimension to cost the Design Trade promotion.",
-        f"An alternative worth testing: one promotion, in one scope, at a discount near {pct(f.goal_discount)}, the "
-        f"rate at which the best increase ever measured ({spct(top['lift'])}) would pay for itself, compared with a "
-        "similar scope or period and reviewed afterward.",
+        f"ordered in {y}), and the budget has no customer dimension to cost the Design Trade promotion. The estimate "
+        f"is a sensitivity at the {y} billed volume and mix, and it leaves out {usd(n4['unbilled_total'], 0)} of "
+        "discount on promotion orders not yet billed.",
+        "An alternative worth testing: one promotion, in one scope, with a capped spend, compared with a similar scope "
+        f"or period and reviewed afterward, at a discount below {pct(f.goal_discount)}. That is the rate at which the "
+        f"largest increase measured ({spct(top['lift'])}"
+        + (", in another scope and year" if n4["cross"] else "")
+        + ") would pay for itself, a sensitivity rather than an optimal discount.",
         "AUDITING",
         f"Extending the Exercise 8.6 tests to all {f.n1['promo_lines']:,} promotion lines (Exhibit 5): all "
         f"{sum(p['lines'] for p in bad)} lines of the collection promotions ({series(p['label'] for p in bad)}) fall "
         "outside their recorded dates, because the end dates were entered on or before the start dates. The lines were "
         "ordered in March and April, every collection line of those months carries the promotion, and each budget "
-        "planned the discount then: a master-data error, to be corrected, not discounts without authority. Two lines "
-        f"of the Alder promotion are on {n5['code']}, whose CollectionName is blank: the discount is right and the item "
-        "master is incomplete. Rates and completeness show no exceptions.",
+        "planned the discount then. That points to a likely master-data error rather than discounts without authority, "
+        "which the approved calendar and the change history would confirm. Two lines of the Alder promotion are on "
+        f"{n5['code']}, whose CollectionName is blank, which suggests an incomplete item master rather than a wrong "
+        "discount. Rates show no exceptions. Completeness, tested from all order lines, finds none in the March-April "
+        "windows, but the recorded windows hold no line to test, so that result stays unresolved.",
         f"{mgr['name']}, the {mgr['title'].lower()}, approved all nine promotions on their start dates and all "
-        f"{n5['approved']} approved price overrides, {n5['own']} of them her own requests; her {n5['pending']} pending "
-        f"requests were billed without approval. Finance approves neither. A promotion was also given on top of an "
-        f"approved override on {n5['stack_orders']} order lines ({usd(n5['stack_disc'])} of discount), a policy "
-        "question for management. The dates and scope data are design weaknesses; the self-approvals and the billing "
-        "of pending requests are failures in operation.",
-        f"Before any promotion runs in {N}: validated dates, complete collection data, approval by finance as well as "
+        f"{n5['approved']} approved price overrides, {n5['own']} of them her own requests. Her {n5['pending']} pending "
+        f"requests were billed with no completed approval in the records, and no approval by finance is recorded. A "
+        f"promotion was also given on top of an approved override on {n5['stack_orders']} order lines "
+        f"({usd(n5['stack_disc'])} of discount), a policy question for management. Provisionally, the dates and scope "
+        "data point to possible design weaknesses, and the self-approvals and the billing of pending requests to weaknesses in "
+        "design or operation, which the authority matrix and the approval history would settle.",
+        f"Before any promotion runs in {N}: validated dates (no end before the start, and a rule on one-day "
+        "promotions), complete collection data, approval by finance as well as "
         "sales, independent approval of overrides, a stacking rule, and a post-promotion review against a stated "
         "expectation.",
         "RECOMMENDATION",
         "Decline the calendar as proposed. It would cost about "
         f"{usd(round(n4['contribution'], -4))} of contribution against the {N} budget, most of it in the fourth "
-        "quarter, for increases in volume the data has never shown. If the sales team wants evidence, approve one small, "
-        f"measured test at a discount near {pct(f.goal_discount)}, and only after the control changes above are in "
-        "place."]
+        "quarter, for increases in volume far above any the data show. If the sales team wants evidence, approve one "
+        f"small, capped test with a comparison group, at a discount below {pct(f.goal_discount)}, and only after the "
+        "control changes above are in place."]
 
 
 def r6(b: ExerciseBuild) -> None:
@@ -2254,9 +2306,9 @@ def r6(b: ExerciseBuild) -> None:
     st["extra"] = [["Recommendation",
                     f"Decline the calendar as proposed: no promotion came near its break-even increase, and the three "
                     f"would cost about {money(round(f.n4['contribution'], -4), 0)} of contribution against the {f.N} "
-                    f"budget, most of it in the fourth quarter. A small, measured test at a discount near "
-                    f"{pct(f.goal_discount)} is worth considering, and only after the control changes of "
-                    "Requirement 5."]]
+                    f"budget, most of it in the fourth quarter. A small, capped test with a comparison group, at a "
+                    f"discount below the {pct(f.goal_discount)} sensitivity, is worth considering, and only after the "
+                    "control changes of Requirement 5."]]
     write_doc(b)
     doc = wb.Worksheets("Documentation")
     doc.Activate()

@@ -24,13 +24,21 @@ CASE = REPO / "cases" / "part-1-case.qmd"
 DECK = REPO / "slides" / "case-part-1" / "index.qmd"
 CHAPTER1 = REPO / "chapters" / "01-role-of-analytics" / "chapter.qmd"
 GROUP = "Furniture"
-# the six stages of Chapter 1's workflow (Figure 1.2), the requirement that practices each, and who completes it
-STAGES = [("Define the Question", "Completed here", "Requirement 1"),
-          ("Identify and Access the Data", "Completed here", "Requirement 2"),
-          ("Prepare and Clean the Data", "Completed here", "Requirements 3 to 5"),
-          ("Analyze the Data", "Left for Part II", "The Part II diagnosis"),
-          ("Visualize and Present the Results", "Left for Part II", "The Part II diagnosis"),
-          ("Communicate Findings and Recommendations", "Completed here, for the readiness findings only", "Requirement 6")]
+# the six stages of Chapter 1's workflow (Figure 1.2): what the case does at each, where, whether it completes the stage
+# ("done") or begins it and leaves the rest to Part II ("begun"), and the short label of the guide figure IF-C1-0-A.
+# Stage 4 begins here because Requirement 5 computes the descriptive margins (Chapter 1's stage 4 starts with them), and
+# stage 5 because the appendix presents the map and the reconciliation; the decomposition and its charts are Part II's.
+STAGES = [("Define the Question", "Completed here", "Requirement 1", "done", "Requirement 1"),
+          ("Identify and Access the Data", "Completed here", "Requirement 2", "done", "Requirement 2"),
+          ("Prepare and Clean the Data", "Completed here, for this comparison", "Requirements 3 to 5", "done",
+           "Requirements 3 to 5"),
+          ("Analyze the Data", "Begun here, with the descriptive margins of the two quarters, and finished in Part II with their decomposition",
+           "Requirement 5, then Part II", "begun", "Requirement 5's margins, then the diagnosis in Part II"),
+          ("Visualize and Present the Results", "Begun here, with the data map and the reconciliation table, and finished in "
+           "Part II with the charts of the diagnosis", "The appendix (Requirements 2 and 4), then Part II", "begun",
+           "The appendix's map and table, then the charts in Part II"),
+          ("Communicate Findings and Recommendations", "Completed here, for the readiness findings only", "Requirement 6", "done",
+           "Requirement 6, readiness findings only")]
 
 CASE_SCHEMA = {
     "Item": ["ItemID", "ItemGroup", "RevenueAccountID", "COGSAccountID", "InventoryAccountID", "StandardCost", "ListPrice", "SupplyMode"],
@@ -154,7 +162,7 @@ def chapter(d, claim):
     claim(n_req == 6, "the case has six requirements")
     claim(not re.search(r"^\s*-\s*\*\*Milestone", text, re.M) and "Milestone" not in text, "the case has no milestones")
     chapter1 = CHAPTER1.read_text(encoding="utf-8")
-    claim(all(name in chapter1 for name, _, _ in STAGES), "Chapter 1 names the six stages of the workflow")
+    claim(all(st[0] in chapter1 for st in STAGES), "Chapter 1 names the six stages of the workflow")
     claim("why did gross margins on the Furniture product line decline in the most recent quarter" in chapter1.replace("\n", " "),
           "Chapter 1's opening scenario poses the controller's question")
     slide = dict(opening=slide_range(titles, "The controller's question", "The Situation"), question=slide_range(titles, "The controller's question"), handin=slide_range(titles, "What you will hand in"),
@@ -167,6 +175,13 @@ def chapter(d, claim):
                  before=slide_range(titles, "Before you submit"), ahead=slide_range(titles, "From readiness"))
     r5 = n1.r5(d, claim)
     r4 = n1.r4(d, claim)
+    # the product line's revenue and cost accounts are its own; its inventory account is shared with other groups
+    _, revenue, cogs, inventory = n1.accounts(d)
+    claim(all(d.one(f"SELECT COUNT(DISTINCT ItemGroup) FROM Item WHERE {col} = ?", a["id"]) == 1
+              for col, a in (("RevenueAccountID", revenue), ("COGSAccountID", cogs))),
+          "the Furniture revenue and COGS accounts belong to Furniture items only")
+    claim(d.one("SELECT COUNT(DISTINCT ItemGroup) FROM Item WHERE InventoryAccountID = ?", inventory["id"]) > 1,
+          "the Furniture inventory account is shared with other item groups")
     return dict(**labels(d), rows=rows, n_sheets=len(sheets), first_post=first_post, last_post=last_post, last_invoice=last_invoice,
                 last_ship=last_ship, late_rows=sum(n for _, n in late), jan_invoices=jan, feb_invoices=feb, slides=len(titles), slide=slide,
                 n_req=n_req, m3=r5["m3"], m4=r5["m4"], drop=(r5["m3"] - r5["m4"]) * 100, naive_q4=r5["naive_q4"], close=r5["close"],
@@ -178,11 +193,14 @@ def chapter(d, claim):
 @context("case1.g1")
 def g1(d, claim):
     chapter1 = CHAPTER1.read_text(encoding="utf-8")
-    claim(all(name in chapter1 for name, _, _ in STAGES), "Chapter 1 names the six stages of the workflow")
+    claim(all(st[0] in chapter1 for st in STAGES), "Chapter 1 names the six stages of the workflow")
+    claim("calculate gross margin by quarter" in chapter1.replace("\n", " "),
+          "Chapter 1's fourth stage begins with the margin by quarter, which Requirement 5 computes (the stage is begun here)")
     n1 = notes_module()
     r5 = n1.r5(d, claim)
     claim(r5["m4"] < r5["m3"], "the Furniture margin falls from the first quarter to the second (the premise of the controller's question)")
-    stages = [dict(n=i, name=name, status=status, by=by) for i, (name, status, by) in enumerate(STAGES, 1)]
+    stages = [dict(n=i, name=name, status=status, by=by, kind=kind, short=short)
+              for i, (name, status, by, kind, short) in enumerate(STAGES, 1)]
     return dict(**labels(d), stages=stages, drop=(r5["m3"] - r5["m4"]) * 100, m3=r5["m3"], m4=r5["m4"])
 
 
@@ -437,6 +455,14 @@ def g6(d, claim):
     claim(q4["promo_discount"] > 2 * q3["promo_discount"], "the promotional discounts on Furniture lines more than double from Q3 to Q4")
     claim(d.one("SELECT COUNT(*) FROM GLEntry g LEFT JOIN Account a ON a.AccountID = g.AccountID WHERE a.AccountID IS NULL") == 0,
           "every AccountID in the ledger exists in the chart of accounts (no orphaned account reference)")
+    # every posting to the two Furniture accounts names a source document that exists (not true of the whole ledger)
+    _, revenue, cogs, _ = n1.accounts(d)
+    tables = {"SalesInvoice": "SalesInvoiceID", "Shipment": "ShipmentID", "SalesReturn": "SalesReturnID", "JournalEntry": "JournalEntryID"}
+    kinds = [r[0] for r in d.q("SELECT DISTINCT SourceDocumentType FROM GLEntry WHERE AccountID IN (?, ?)", revenue["id"], cogs["id"])]
+    claim(set(kinds) <= set(tables), "the Furniture accounts' postings come from sales invoices, shipments, returns and journal entries")
+    claim(all(d.one(f"SELECT COUNT(*) FROM GLEntry g LEFT JOIN {t} x ON x.{k} = g.SourceDocumentID WHERE g.AccountID IN (?, ?) "
+                    f"AND g.SourceDocumentType = ? AND x.{k} IS NULL", revenue["id"], cogs["id"], t) == 0 for t, k in tables.items()),
+          "every posting to the two Furniture accounts names a source document that exists")
     have = {t: [r[1] for r in d.q(f"PRAGMA table_info({t})")] for t in ("SalesInvoiceLine", "Item", "ShipmentLine")}
     fields = dict(line=[c for c in ("ItemID", "Quantity", "BaseListPrice", "UnitPrice", "Discount", "PromotionID", "LineTotal") if c in have["SalesInvoiceLine"]],
                   item=[c for c in ("ItemCode", "StandardCost", "ListPrice") if c in have["Item"]])

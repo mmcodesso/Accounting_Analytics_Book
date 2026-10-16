@@ -80,7 +80,7 @@ With the commission rate of {{ x.c|pct(3) }}, the three differences add to -${{ 
 
 **Step 2. Confirm each break-even with Goal Seek.** Choose **Data > What-If Analysis > Goal Seek**, enter the difference cell in **Set cell**, `0` in **To value** and the lift cell in **By changing cell**. Note the lift, then return the cell to zero: a lift left behind hides the cost of the discount. The found lift equals the formula's. Treating the fixed overhead in the standard cost as fixed lowers the Furniture break-even to {{ x.fur.be_fixed|pct(1) }}, as Tutorial 7.3 noted.
 
-**Step 3. Set the measured differences beside the break-evens.** Compute each promotion's break-even from its own billed lines and look up Requirement 3's difference.
+**Step 3. Set the measured differences beside the break-evens.** The requirement asks for the three proposed promotions. The model answer also computes the other six from their own billed lines, as corroboration, so a student who models the three is not marked down.
 
 | Promotion | Break-even lift | Measured difference | Share of break-even |
 |---|---:|---:|---:|
@@ -110,7 +110,7 @@ d. Choose **Home > Conditional Formatting > New Rule** to shade the positive cel
 
 **Step 5. Solve for the Furniture discount at the best measured increase.** Choose **Data > What-If Analysis > Goal Seek**: set the difference at that increase (the cell that holds `LargestLift`) to `0` by changing the discount-rate input cell.
 
-**Check:** the largest measured increase is {{ best.lift|spct }} (promotion {{ best.id }}, {{ best.label }}), and the Furniture discount that it would just pay for is about {{ discount|pct(1) }}. At 5 percent the promotion needs a {{ grp.be5|pct(1) }} increase instead of {{ x.fur.be|pct(1) }}. The discount is a ceiling, not a recommendation.
+**Check:** the largest measured increase is {{ best.lift|spct }} (promotion {{ best.id }}, {{ best.label }}), and the Furniture discount that it would just pay for is about {{ discount|pct(1) }}. At 5 percent the promotion needs a {{ grp.be5|pct(1) }} increase instead of {{ x.fur.be|pct(1) }}. The discount is a sensitivity, not a recommendation.{% if x.cross %} The increase was measured for another scope and year ({{ x.best_year }}) and is an observed difference, not an effect of a promotion. Furniture's own difference of {{ x.own_lift|spct }} would support {% if x.own_discount > 0 %}a discount of only about {{ x.own_discount|pct(2) }}{% else %}no discount{% endif %}.{% endif %}
 
 ### Phase 3: The budgets and the cost of the calendar
 
@@ -126,9 +126,9 @@ Then the same ratio for the promoted items in their promotion months, with the c
 
 **Step 7. Cost the calendar by quarter.** For each proposed promotion and quarter, multiply the proposed rate by the report year's gross amount (SUMIFS on `BilledLines` by PromotionID, year and InvoiceQuarter), total, round to hundreds, and multiply the total by one less the commission rate.
 
-**Check:** ${{ cost|money }} of discounts, ${{ contribution|money }} of contribution after the commissions saved, against a budget without promotions: about ${{ quarters[0][1]|money }} in the first quarter, ${{ quarters[1][1]|money }} in the second, ${{ quarters[2][1]|money }} in the third and ${{ quarters[3][1]|money }} in the fourth. **Watch for:** the rate applied to LineTotal, already net of the discount, which understates the cost by the rate itself.
+**Check:** ${{ cost|money }} of discounts, ${{ contribution|money }} of contribution after the commissions saved, against a budget without promotions. By quarter that is about ${{ quarters[0][1]|money }} in the first quarter, ${{ quarters[1][1]|money }} in the second, ${{ quarters[2][1]|money }} in the third and ${{ quarters[3][1]|money }} in the fourth. The estimate holds the report year's billed volume, mix, prices and costs, so it is a sensitivity, not a forecast. It also leaves out ${{ x.unbilled_total|money }} of discount on the proposal's report-year orders not yet billed in the data ({% for u in x.unbilled %}{{ u.label }} ${{ u.amount|money }}{% if not loop.last %}, {% endif %}{% endfor %}). **Watch for:** the rate applied to LineTotal, already net of the discount, which understates the cost by the rate itself.
 
-**Step 8. State the volume basis.** The estimate uses the report year's billed lines at no increase, because Requirement 3 found none. It does not use the budget's quantities: the budget plans {{ budget_units|num(0) }} Furniture units for September and October {{ x.plan_year }} against {{ ordered|num(0) }} ordered in those months of {{ x.year }}, {{ x.budget_over|num(1) }} times as many, so a cost taken from it would be overstated almost fourfold. BudgetLine has no customer dimension, so the Design Trade promotion cannot be costed from it at all.
+**Step 8. State the volume basis.** The estimate uses the report year's billed lines at no increase, because Requirement 3 found no increase near any break-even. It does not use the budget's quantities: the budget plans {{ budget_units|num(0) }} Furniture units for September and October {{ x.plan_year }} against {{ ordered|num(0) }} ordered in those months of {{ x.year }}, {{ x.budget_over|num(1) }} times as many, so a cost taken from it would be overstated almost fourfold. BudgetLine has no customer dimension, so the Design Trade promotion cannot be costed from it at all.
 
 ## Expected results
 
@@ -144,9 +144,9 @@ Then the same ratio for the promoted items in their promotion months, with the c
 ## What a strong answer says
 
 - **The model.** Three columns with stated assumptions, break-evens by formula and Goal Seek, and the fixed-overhead sensitivity.
-- **The comparison.** Each measured difference far below its break-even, so none of the proposed promotions would pay for itself on the evidence.
-- **The table and the discount.** Where each discount turns positive, and the Goal Seek discount as the most the best response on record would support.
-- **The cost and its basis.** A cost by quarter from actual volumes, in contribution terms, with the lag explained and the budget's quantities rejected.
+- **The comparison.** Each measured difference far below its break-even, so the evidence does not show that any proposed promotion would pay for itself.
+- **The table and the discount.** Where each discount turns positive, and the Goal Seek discount labeled a cross-scope sensitivity, not an optimal discount.
+- **The cost and its basis.** A cost by quarter from actual volumes, in contribution terms, with the lag explained, the fixed mix and the unbilled orders disclosed, and the budget's quantities rejected.
 
 A weak answer treats the break-even as a forecast, or costs the calendar from the budget's volume.
 
@@ -156,6 +156,7 @@ A weak answer treats the break-even as a forecast, or costs the calendar from th
 - **The wrong price.** *Symptom:* a Furniture break-even of {{ x.fur.be_net_price|pct(1) }}. *Response:* ask whether LineTotal is before or after the discount.
 - **The lift left behind.** *Symptom:* the difference row reads about zero. *Response:* ask where Goal Seek left the lift cell.
 - **The data table swapped or blocked.** *Symptom:* gains in the first row, or an error on the input cell. *Response:* check which input is the row and which the column, and which sheet each is on.
+- **The Goal Seek discount recommended.** *Symptom:* "run the Furniture promotion at the Goal Seek rate". *Response:* ask whose increase the rate rests on.
 - **The budget's volume used.** *Symptom:* a cost several times the model's. *Response:* ask what volume the budget plans against what was ordered.
 - **No commission.** *Symptom:* a contribution given up equal to the discount, ${{ cost|money }}. *Response:* ask what a lower price does to commissions.
 
@@ -164,9 +165,9 @@ A weak answer treats the break-even as a forecast, or costs the calendar from th
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
 | The model | 25 | Three columns, named inputs, correct formulas and sources | One column, or hard-coded inputs |
-| Break-even and Goal Seek | 15 | Formula and Goal Seek agree, all promotions compared | Formula only |
+| Break-even and Goal Seek | 15 | Formula and Goal Seek agree for the three proposed promotions, each beside its measured difference | Formula only |
 | Data table | 15 | Correct grid, inputs right, positives shown | Grid with a swapped input |
-| Discount from Goal Seek | 10 | Found and read as a ceiling | Found, not interpreted |
+| Discount from Goal Seek | 10 | Found and labeled a sensitivity | Found, not interpreted |
 | Budgets | 15 | Ratios by month, promoted items, the plan year flat | Whole-month ratios only |
 | Cost of the calendar | 15 | By quarter, in contribution terms | Total only |
 | Volume basis | 5 | Stated, with why not the budget's | Not stated |

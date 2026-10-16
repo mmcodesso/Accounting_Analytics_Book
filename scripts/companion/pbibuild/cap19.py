@@ -35,7 +35,7 @@ from pbibuild.audit_monitoring import dax_blocks, definitions, drillthrough
 from pbibuild.model import MEASURES_TABLE, Column, Measure, Model, Query, Table, query_table
 from pbibuild.pbir import Page, Report, Visual, agg, col, lit, meas, textbox
 from pbibuild.project import Project
-from pbibuild.reports import COUNT, MONEY, card, claim, entered, hide, keep, money
+from pbibuild.reports import COUNT, MONEY, card, claim, entered, hide, keep, money, relayout
 from xlbuild import pq
 from xlbuild.expected import Expected
 
@@ -612,6 +612,7 @@ def r5(b: Build) -> None:
         f"{money(ctx['top_damaged'][0])} to {money(ctx['top_damaged'][-1])}: the reason to follow up with the warehouse "
         f"and the carriers. In fiscal {y_c} the largest {top} families are {fams}. By segment, {ctx['top_segment']} "
         "customers return the most (" + " / ".join(money(v) for v in ctx["segment"]) + ")."]))
+    relayout(page, {"byYear": 165, "byGroup": 205, "families": 270, "bySegment": 200})   # every row on the page
     page.expect = ["Return Rate", "Damaged", f"{prefix}-{ctx['families'][0][0]}", money(g_first[-1]),
                    pct(rate_year[years[-1]]), money(ctx["damaged"][-1]), money(ctx["segment"][-1])]
 
@@ -631,7 +632,7 @@ def r5(b: Build) -> None:
         title=f"Fiscal {y_c} by month of the shipment", filters=[keep("smYear", year_col, [y_c])]))
     page.add(card("lagCards", 20, 365, 800, 110, [
         M("Fewest Days after Shipment"), M("Average Days after Shipment"), M("Most Days after Shipment"),
-        M("Lines Returned in a Later Year"), M("Credits Returned in a Later Year")], units_none=True))
+        M("Lines Returned in a Later Year"), M("Credits Returned in a Later Year")], units_none=True, size=18))
     lag = ctx["lag"]
     others = [v[2] for k, v in months_ship.items() if k != dec_key]
     page.add(answer("timingAnswer", 20, 490, 800, 225, "why the last months and the first year mislead", [
@@ -645,6 +646,7 @@ def r5(b: Build) -> None:
         f"; {ctx['cross']} return lines ({money(ctx['cross_amt'])}) came back in a later year than they shipped, and "
         f"fiscal {years[0]} has no carry-in from {years[0] - 1}. Compare rates over complete windows: by the month of "
         f"the shipment, leaving out the last month or two, and not against fiscal {years[0]}'s first months."]))
+    relayout(page, {"rateYears": 165})                                             # every year
     page.expect = ["Return Rate by Ship Date", dec_key, pct(ctx["dec"]), pct(ctx["by_ship_year"][-1]),
                    f"Average Days after Shipment, {lag['mean']:.1f} card", money(ctx["cross_amt"])]
 
@@ -680,6 +682,7 @@ def r5(b: Build) -> None:
         f" rank higher by rate, {small} of them on sales under a tenth of customer {focus}'s, so the rate alone "
         f"overstates small customers. Customer {focus} is the one to follow up: the credits, their approvers, and the "
         "refunds paid before the customer's payments were applied."]))
+    relayout(page, {"carriers": 200, "warehouses": 140, "overall": 100})           # every carrier and warehouse
     page.expect = ["Carrier", "Warehouse", "CustomerName", f"{higher[0][1]:.3%}", f"{ctx['rate']:.3%}",
                    money(ctx["focus_cred"]), f"{ctx['overall']:.3%} card"]
 
@@ -695,7 +698,8 @@ def r5(b: Build) -> None:
     page.add(Visual("approvers", "pivotTable", 340, 215, 600, 105, {
         "Rows": [col("CustomerRefund", "RefundApproverTitle")], "Columns": [year_col], "Values": [M("Refunds")]},
         title="Refunds by approver's job title"))
-    page.add(card("highCards", 960, 215, 300, 105, [M("High-Score Refunds"), M("High-Score Amount")], units_none=True))
+    page.add(card("highCards", 960, 215, 300, 105, [M("High-Score Refunds"), M("High-Score Amount")], units_none=True,
+                  size=18))
     rf_cols = [col("CustomerRefund", "RefundNumber"), col("CustomerRefund", "RefundDate"), col("CustomerRefund", "CustomerID"),
                (agg("CustomerRefund", "Amount"), "Amount")] + [(col("RefundFlags", f), n) for f, n in zip(FLAGS, FLAG_NAMES)] + [
                score]
@@ -711,6 +715,7 @@ def r5(b: Build) -> None:
         + "; ".join(f"{ti} {' / '.join(str(v) for v in xs)}" for ti, xs in ctx["approvers"]) +
         f". Weekend dates are spread evenly ({ctx['weekend_rf']} refunds, {ctx['weekend_cm']} credits), so they are not "
         "a useful flag here."]))
+    relayout(page, {"flagYears": 240, "approvers": 160, "highCards": 160})        # every flag and every title
     page.expect = ["Refunds by score", "Refund above authority", "Past due at least the refund",
                    f"{len(flag_rows['AboveLimit']):,}", money(r4["rf_above"]["amt"]),
                    f"High-Score Refunds, {ctx['hi']} card", f"High-Score Amount, {money(ctx['hi_amt'])} card"]
@@ -750,6 +755,7 @@ def r5(b: Build) -> None:
         f"It scores {t.score[big_k]} of 5. Disposition: follow up, not a conclusion. The evidence that would settle it lies "
         "outside the database: the wire confirmation's beneficiary and account against the customer's known bank "
         "details, a confirmation from the customer, the receiving and inspection record, and the customer's request."]))
+    relayout(page, {"refund": 115, "flags": 115, "credit": 115, "invoice": 115})   # each table shows its row
     page.expect = [big["num"], money(big["amt"]), big_cm["num"], big_inv["num"], money(big_inv["gt"] - paid_then),
                    money(paid_then), c.rcpt[big_apps[0][3]]["num"]]
 

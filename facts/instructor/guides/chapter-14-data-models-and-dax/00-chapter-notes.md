@@ -219,7 +219,7 @@ Plan A is the safest: the stumbles are about reading context, and a demonstratio
 - Step 7: a window built with DATESINPERIOD, which returned a stray date for the first month, so the text uses DATESBETWEEN with a guard. Without the guard, a total row compares a year with one month.
 - Step 9: a trial balance that keeps the {{ y }} closes. It balances, at ${{ tb_kept|money }} instead of Chapter 6's total.
 
-**The checkpoint to look for.** The four bullets. A strong student says why the six spike months are pay dates (Chapter 11) and not errors.
+**The checkpoint to look for.** The four bullets. A strong student explains the second month by its expectation of one month, links the other six to their three pay dates, payroll recorded when paid (Chapter 11), and names a check that would confirm it, such as the payroll postings of those months by pay date.
 
 ## Difficult ideas and misconceptions
 

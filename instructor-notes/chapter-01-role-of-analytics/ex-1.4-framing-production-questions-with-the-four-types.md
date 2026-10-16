@@ -79,7 +79,7 @@ A model assignment: the descriptive question needs Manufacturing and Master Data
 
 **Step 4. Write two or three sentences on data, assumptions and judgment.** A model outline:
 
-1. *Data.* It needs the other three types first: a baseline of what happened, an explanation of the costs, and a forecast of demand. It also needs the figures for its objective and constraints, such as the margin of each item and the hours of each work center.
+1. *Data.* It needs the other three types first: a baseline of what happened, an explanation of the costs, and a forecast of demand. It also needs the figures for its objective and constraints, such as the contribution margin of each item and the hours of each work center. List price less StandardCost is not that margin, because the standard cost of a manufactured item includes fixed overhead and actual prices are net of discounts.
 2. *Assumptions.* It assumes setup and run times stay as routed, that capacity is available as the calendar says, and that the forecast holds. The dataset has planned hours and a calendar with maintenance days, but no record of actual downtime, defects or scrap, so these assumptions cannot be tested here.
 3. *Judgment.* Someone must choose the objective and the trade-offs, such as margin against service or overtime, and must explain the recommendation to people who will act on it.
 

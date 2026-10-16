@@ -99,11 +99,19 @@ def ex1(d, claim):
     earlier = d.one("SELECT COUNT(*) FROM CreditMemoLine cl JOIN CreditMemo cm ON cm.CreditMemoID = cl.CreditMemoID "
                     "JOIN SalesInvoice si ON si.SalesInvoiceID = cm.OriginalSalesInvoiceID "
                     "WHERE substr(cm.CreditMemoDate, 1, 4) = ? AND substr(si.InvoiceDate, 1, 4) < ?", str(d.C), str(d.C))
+    earlier_furniture = d.one("SELECT COUNT(*) FROM CreditMemoLine cl JOIN CreditMemo cm ON cm.CreditMemoID = cl.CreditMemoID "
+                              "JOIN SalesInvoice si ON si.SalesInvoiceID = cm.OriginalSalesInvoiceID "
+                              "JOIN Item i ON i.ItemID = cl.ItemID WHERE i.ItemGroup = 'Furniture' "
+                              "AND substr(cm.CreditMemoDate, 1, 4) = ? AND substr(si.InvoiceDate, 1, 4) < ?", str(d.C), str(d.C))
+    claim(0 < earlier_furniture < earlier, "the credit memo lines for earlier years' invoices span several item groups, Furniture among them")
+    claim(d.one("SELECT COUNT(*) FROM GLEntry g JOIN CreditMemo cm ON cm.CreditMemoID = g.SourceDocumentID "
+                "WHERE g.SourceDocumentType = 'CreditMemo' AND g.PostingDate <> cm.CreditMemoDate") == 0,
+          "the ledger records every credit memo on its CreditMemoDate")
     claim(all(c["amount"] < 0.02 * gross[c["q"]] for c in credits), "the credits are small relative to revenue (under 2% each quarter)")
     claim(net[3] < net[2] and abs(credits[3]["amount"] - credits[2]["amount"]) < 0.25 * abs(gross[4] - gross[3]),
           "the credits do not explain the change between Q3 and Q4 (net revenue still falls, and the credits change little)")
     return dict(gross=[gross[qn] for qn in range(1, 5)], credits=credits, credit_lines=sum(c["lines"] for c in credits),
-                credit_total=sum(c["amount"] for c in credits), net=net, earlier=earlier)
+                credit_total=sum(c["amount"] for c in credits), net=net, earlier=earlier, earlier_furniture=earlier_furniture)
 
 
 @note("ch05.ex2", EXERCISES)

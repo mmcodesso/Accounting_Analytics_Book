@@ -303,7 +303,7 @@ def competency_labels(g: GUnit, item: Item) -> list[str]:
 def scaffold_note(g: GUnit) -> str:
     title = g.base.title
     h1 = (f"Chapter {g.base.number}: {title}" if g.base.kind == "chapter" else
-          f"Comprehensive Case, {g.base.number}: {title}" if g.base.kind == "case" else f"Appendix {g.base.number}: {title}")
+          f"Comprehensive Case, Part {ROMAN[int(g.base.number.split()[1])]}: {title}" if g.base.kind == "case" else f"Appendix {g.base.number}: {title}")
     meta = {"title": h1, "kind": "case-notes" if g.is_case else "chapter-notes", "unit": g.uid, "minutes": 0,
             "tool": "conceptual", "figures": []}
     front = yaml.safe_dump(meta, sort_keys=False, allow_unicode=True).rstrip()
@@ -522,7 +522,7 @@ def write_readme(units: list[GUnit]) -> None:
     for g in units:
         folder = OUT / g.folder
         n = len(list(folder.glob("*.md"))) if folder.is_dir() else 0
-        label = (f"Chapter {g.base.number}" if g.base.kind == "chapter" else f"Part {g.base.number.split()[1]} case"
+        label = (f"Chapter {g.base.number}" if g.base.kind == "chapter" else f"Part {ROMAN[int(g.base.number.split()[1])]} Case"
                  if g.base.kind == "case" else f"Appendix {g.base.number}")
         rows.append(f"| [{g.folder}]({g.folder}/{g.note_file}) | {label}: {g.base.title} | {n} of {len(g.files)} |")
     text = "\n".join([

@@ -268,14 +268,15 @@
   unit: case-part-1
   file: 00-case-notes.md
   kind: diagram
-  purpose: How the six requirements feed the memo and its appendix, and which workflow stages the case completes.
+  purpose: How the six requirements feed the memo and its appendix, and what the case completes or begins at each workflow
+    stage.
   shows: Six boxes stacked in a column for the requirements, each tagged with the chapter it draws on (Chapter 1, Chapter
     3, Chapter 2, Chapters 2 and 3, none, none). Arrows run from Requirements 2 and 4 into a box labeled "Appendix with the
     data map and the reconciliation table", from Requirements 3 and 4 into the memo section "Financial reporting", and from
     Requirement 5 into "Managerial accounting" and "Auditing", which sit with the first in a frame for the memo. A bracket
     down the left of the column leads into the frame for all six requirements feeding the memo. Beneath, a strip of the six
-    workflow stages with stages 1 to 3 and the readiness part of stage 6 filled and stages 4 and 5 outlined and labeled "Part
-    II". The arrows show the main source of each part.
+    workflow stages with stages 1 to 3 and stage 6 (for the readiness findings) filled, and stages 4 and 5 tinted with a dashed
+    outline as begun in the case and finished in Part II. The arrows show the main source of each part.
   data: none; the boxes and tags come from the case's requirements and the stage list of Chapter 1.
   status: built
 - id: IF-C1-0-B
@@ -441,7 +442,7 @@
     the review date, and the Status filter set to In Transit. The right pane shows the Analysis worksheet with the review
     date, the three exception counts, the blank tracking numbers by Status, the In Transit shipments by year, and the SUBTOTAL
     cells beside a Status slicer with In Transit selected.
-  data: Shipment at the review date, the last day of the extract (the Expected results table).
+  data: Shipment at the review date, the year-end under review and the last shipment date (the Expected results table).
   status: built
 - id: IF-04-6-A
   unit: chapter-04-excel-essentials
@@ -477,8 +478,9 @@
   shows: 'Two panels side by side. On the left a left outer merge of SalesInvoice with Customer on CustomerID: a row count
     box before and the same row count after, labeled each key appears once. On the right a merge of SalesInvoice with Shipment
     on SalesOrderID: a row count box before and a larger one after, labeled the key repeats in the second table, with one
-    invoice drawn as two rows after the merge. Under each panel a verdict reads count unchanged, merge safe, or count grew,
-    key repeats.'
+    invoice drawn as two rows after the merge. Under each panel a verdict reads count unchanged, no row repeated, or count
+    grew, the key repeats. A note beneath says the count cannot show that every invoice found a match, which a left anti merge
+    tests.'
   data: The row counts of SalesInvoice, and of SalesInvoice merged with Shipment on SalesOrderID (the Difficult ideas section).
   status: built
 - id: IF-05-1-A
@@ -739,12 +741,12 @@
   file: 00-chapter-notes.md
   kind: diagram
   purpose: Choosing a test by the kind of records, for the discussion of the exercises.
-  shows: A decision tree read from left to right. The root asks what the records are. Five branches. Amounts with no upper
-    limit lead to strata, then a first-digit test of the subsets. Documents numbered in a series lead to a uniqueness check,
-    then a gap test. Documents approved against a limit lead to flags and threshold bands. Pairs of records that could repeat
-    lead to a near-duplicate test on supplier and amount, then the invoice. A balance that should equal a ledger account leads
-    to a reconciliation, an aging and a confirmation sample. Each leaf names the tutorial step or exercise requirement that
-    practices it.
+  shows: A decision tree read from left to right. The root asks what the records are. Five branches. Measured amounts over
+    a wide range lead to strata, then a first-digit test of the subsets. Documents numbered in a series lead to a uniqueness
+    check, then a gap test. Documents approved against a limit lead to flags and threshold bands. Pairs of records that could
+    repeat lead to a near-duplicate test on supplier and amount, then the invoice. A balance that should equal a ledger account
+    leads to a reconciliation, an aging and a confirmation sample. Each leaf names the tutorial step or exercise requirement
+    that practices it.
   data: The chapter's own tests; no dataset values.
   status: built
 - id: IF-08-1-A
@@ -798,8 +800,8 @@
   file: ex-8.5-testing-purchasing-and-payment-controls.md
   kind: excel-mock
   purpose: The flagged purchase orders pasted as values with their dispositions, as the model answer lays them out.
-  shows: The flagged orders sorted by RiskScore, with PONumber, the three flag columns, RiskScore, Disposition and Design
-    or operation (the other columns are hidden). The two capital orders are outlined. Disposition cells hold a wrapped sentence
+  shows: The flagged orders sorted by RiskScore, with PONumber, the three flag columns, RiskScore, Disposition and Provisional
+    classification (the other columns are hidden). The two capital orders are outlined. Disposition cells hold a wrapped sentence
     that starts with Follow up, cut at two lines as a fixed row height shows it.
   data: POApprovals filtered to RiskScore 1 or more (the Expected results table).
   status: built
@@ -957,9 +959,9 @@
   file: 00-chapter-notes.md
   kind: sql-mock
   purpose: The in-class calculator demonstration, a statement with no table.
-  shows: The Execute SQL tab with the statement of the check slide, a division of whole numbers, a division with a decimal
-    and a text year compared with a number. The grid shows one row with three values, and the message pane reports one row
-    returned.
+  shows: The Execute SQL tab with the statement of the check slide, a division of two INTEGER values, a division with a REAL
+    operand and a text year compared with a number. The grid shows one row with three values, and the message pane reports
+    one row returned.
   data: The expressions of the check slide and of question 15, evaluated by SQLite.
   status: built
 - id: IF-09-1-A
@@ -1260,7 +1262,7 @@
   unit: chapter-12-sql-audit-analytics
   file: ex-12.3-where-did-the-time-go.md
   kind: chart
-  purpose: The first-year stock build, which explains the months with little indirect time.
+  purpose: The first-year stock build, a plausible explanation of the months with little indirect time.
   shows: Clustered columns for units completed and manufactured units shipped, January to July of the first year, with the
     months of the build marked, a row under the columns giving each month's late share and the month it passed a quarter labeled.
   data: The test T4 and T5 queries, run read-only.

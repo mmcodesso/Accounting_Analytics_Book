@@ -26,14 +26,14 @@ By the end, students can:
 ## Before you assign
 
 - Students need CharlesRiver_Work.xlsx, Tutorial 2.2's PivotTable and lookup method, and Exercise 2.4, whose count of ledger entries with no cost center the exercise reuses. If students skipped it, give them the count from Step 2.
-- The exercise relies on these conditions. CostCenter has 10 rows and no row names a parent. Budget has one row for each fiscal year, month, cost center and account, and every row names an account and a cost center that exist. GLEntry.CostCenterID is blank on 115,623 of 815,921 rows. GLEntry.FiscalPeriod is the month number, the same as Budget.Month. Every account in Budget has ledger rows.
+- The exercise relies on these conditions. CostCenter has 10 rows and no row names a parent. Budget has one row for each fiscal year, month, cost center and account, and every row names an account and a cost center that exist. GLEntry.CostCenterID is blank on 115,623 of 815,921 rows. GLEntry.FiscalPeriod is the month number, the same as Budget.Month. Every account in Budget has ledger rows. Every BudgetLine combination that names a cost center has its Budget row, and the 14 expense accounts that only BudgetLine budgets carry no cost center.
 - The scale: Budget has 1,385 rows, BudgetLine 31,426 and GLEntry 815,921. Build the PivotTables of requirement (4) on the Budget and GLEntry worksheets, not on formulas copied to every row.
 
 ## How to run it
 
 Individual work, with a short class comparison of requirement (3), where answers differ most. For about 75 minutes: 10 on the cost centers (requirement 1), 10 on the ledger link (requirement 2), 20 on Budget and BudgetLine (requirement 3), 20 on the test (requirement 4) and 15 on the assessment (requirement 5).
 
-**Hints.** For requirement (1), ask which column would hold a parent and what it contains. For requirement (3), ask which table has one row for each of the report's rows. For requirement (4), remind them of Tutorial 2.2 Step 5. **Collect** the assessment and the two lists of accounts.
+**Hints.** For requirement (1), ask which column would hold a parent and what it contains. For requirement (3), ask which table has one row for each of the report's rows, and what happens to a budget amount when one budget row meets many ledger rows. For requirement (4), remind them of Tutorial 2.2 Step 5. **Collect** the assessment and the two lists of accounts.
 
 ## Step-by-step solution
 
@@ -84,7 +84,9 @@ The categories of BudgetLine:
 | Operating Expense | 27 | 11,241 | 672 |
 | Revenue | 4 | 9,616 | 0 |
 
-**Check:** for a comparison by cost center, account and month, join Budget. It has one row for each row of the report, at the grain the ledger can be summed to, and every Budget row is the sum of the BudgetLine rows with the same year, month, cost center and account. BudgetLine is more detailed (by item and warehouse), but it also holds balance sheet lines and operating expense lines with no cost center, which do not belong in a cost-center report. Budget leaves those operating expense lines out: Exercise 2.4 found $2,024,273.70 of them in fiscal 2026. **Watch for:** a student who joins both budget tables to the ledger and counts the budget twice.
+**Check:** for a comparison by cost center, account and month, use Budget. It has one row for each row of the report, at the grain the ledger can be summed to, and every Budget row is the sum of the BudgetLine rows with the same year, month, cost center and account. BudgetLine is more detailed (by item and warehouse), but it also holds balance sheet lines and operating expense lines with no cost center, which do not belong in a cost-center report. Budget leaves those operating expense lines out. Exercise 2.4 found $2,024,273.70 of them in fiscal 2026, on the 14 expense accounts that only BudgetLine budgets. A report of all operating expense keeps them as an unassigned budget line, beside the ledger rows with no cost center.
+
+Whichever table is chosen, the comparison needs both sides at the report's grain, so each is summarized to fiscal year, month, cost center and account before the two are combined, as the requirement says. Matched row to row, a Budget row repeats once for every ledger row of its month, cost center and account. The fiscal 2026 row for 6290 Sales Commission Expense in Sales for March meets 871 ledger rows, so its $205,914.58 would add up to $179,351,599.18. **Watch for:** a student who joins both budget tables to the ledger and counts the budget twice, and a budget joined to the ledger row by row.
 
 ### Requirement (4): Test the accounts
 
@@ -100,13 +102,13 @@ c. Beside the Budget list, use XLOOKUP or COUNTIFS to look each AccountID up in 
 
 **Step 5. Outline half a page to one page.** A model assessment names the join path and then the gaps.
 
-The join: Budget and GLEntry are not related by a key. Match them on four columns, FiscalYear to FiscalYear, Month to FiscalPeriod, CostCenterID to CostCenterID and AccountID to AccountID, after excluding the year-end close entries from the ledger. Each table also relates to CostCenter and to Account through its own foreign keys.
+The join: Budget and GLEntry are not related by a key. Leave the year-end close entries out of the ledger, summarize its expense rows (debits less credits) to fiscal year, period, cost center and account, and match that summary to Budget on the four columns, FiscalYear to FiscalYear, Month to FiscalPeriod, CostCenterID to CostCenterID and AccountID to AccountID. Budget already has one row at that grain, and its revenue accounts fall outside an expense report. Keep the combinations found on one side only. Each table also relates to CostCenter and to Account through its own foreign keys.
 
 ![The join path from the Budget table to the ledger, drawn as two tables that share four columns and no key.](../figures/chapter-03-accounting-data-environment/IF-03-4-A.pdf)
 
 The gaps: no cost center hierarchy; ledger rows with no cost center; budget lines with no cost center that Budget omits; accounts with ledger rows and no budget; budgeted combinations with no ledger row; no actuals for the next year; and the month stored under two names.
 
-**Check:** the assessment states that the budget-to-ledger join is a match at a shared grain and not a foreign key, and each gap has its effect on the report.
+**Check:** the assessment states that the budget-to-ledger join is a match of two summaries at a shared grain and not a foreign key, names the accounts and periods in scope and the treatment of the closes, and gives each gap its effect on the report.
 
 ## Expected results
 
@@ -120,16 +122,17 @@ The gaps: no cost center hierarchy; ledger rows with no cost center; budget line
 | Ledger accounts used | 71 | Step 4 |
 | Revenue and expense accounts with ledger rows and no Budget rows | 21 | Step 4 |
 | Budget rows of fiscal 2026 with a ledger row; without | 288; 60 | Step 4 |
+| Most ledger rows one Budget row of fiscal 2026 meets; its amount so repeated | 871; $179,351,599.18 | Step 3 |
 
 ## What a strong answer says
 
 - **Requirement (1).** The key, the finding that the cost centers have no hierarchy, and what that means for a roll-up.
 - **Requirement (2).** The relationship read at both ends, the meaning of the optional end, and the count from Exercise 2.4.
-- **Requirement (3).** Each table's keys and row, the accounts compared, and Budget chosen with the reason.
+- **Requirement (3).** Each table's keys and row, the accounts compared, Budget chosen with the reason, and both sides summarized to the grain before they are combined.
 - **Requirement (4).** The test, the clean result, and what it does not show.
-- **Requirement (5).** The join described as a match on four columns, with the gaps and their effects.
+- **Requirement (5).** The join described as a match on four columns, with the scope, the closes and the gaps and their effects.
 
-A weak answer assumes a hierarchy, calls the blanks orphans, joins both budget tables, or calls the clean result complete coverage.
+A weak answer assumes a hierarchy, calls the blanks orphans, joins both budget tables, joins the budget to the ledger row by row, or calls the clean result complete coverage.
 
 ## Common mistakes and how to respond
 
@@ -137,6 +140,7 @@ A weak answer assumes a hierarchy, calls the blanks orphans, joins both budget t
 - **Blanks called orphans.** *Response:* ask which rows have a value with no match.
 - **One key for the budget join.** *Symptom:* "join on BudgetID". *Response:* ask which column of the ledger holds a BudgetID.
 - **Both budget tables joined.** *Symptom:* a budget total that is too high. *Response:* ask how Budget relates to BudgetLine.
+- **A row-to-row join.** *Symptom:* a budget total many times the budget. *Response:* ask how many ledger rows one budget row meets, and at what grain each side should be summed.
 - **AccountID tested against the account number.** *Response:* ask which Account column holds the key.
 - **The clean test read as coverage.** *Symptom:* "every budget line has actuals". *Response:* ask them to count the budget rows with a ledger row.
 - **Year-end closes forgotten.** *Symptom:* odd actuals in December. *Response:* ask what the close entries do to expense accounts.
@@ -147,9 +151,9 @@ A weak answer assumes a hierarchy, calls the blanks orphans, joins both budget t
 |---|---:|---|---|
 | Requirement 1: key and hierarchy | 15 | The key, no hierarchy, and the consequence | The key without the finding |
 | Requirement 2: the ledger link | 20 | Both ends, the optional end explained, the count reused | Cardinality without the meaning |
-| Requirement 3: the budget tables | 25 | Keys and rows of each, accounts compared, Budget chosen with a reason | A comparison without the choice |
+| Requirement 3: the budget tables | 25 | Keys and rows of each, accounts compared, Budget chosen with a reason, both sides at one grain | A comparison without the choice |
 | Requirement 4: the test | 20 | The lists, the clean result, its limits | The test without the limits |
-| Requirement 5: the assessment | 20 | The join as a four-column match, with the gaps | A list of gaps without the join |
+| Requirement 5: the assessment | 20 | The join as a four-column match of summaries, with the scope and the gaps | A list of gaps without the join |
 
 ## Extensions and discussion questions
 

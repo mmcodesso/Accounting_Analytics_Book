@@ -178,9 +178,10 @@ def tutorial_121(d, claim) -> dict:
     l3 = run(d, l3_sql)
     claim({r[0] for r in l3} == {"Posting with no payroll payment"}, "test L3: every exception is a posting with no payroll payment")
     # a column swapped in a query that returns no rows changes nothing in the result
-    swapped = sub(l3_sql, "SELECT 'Posting with no supplier payment', gl.GLEntryID, gl.PostingDate, gl.Debit + gl.Credit",
-                  "SELECT 'Posting with no supplier payment', gl.PostingDate, gl.GLEntryID, gl.Debit + gl.Credit")
+    swapped = sub(l3_sql, "SELECT 'Posting with no supplier payment', gl.GLEntryID, gl.SourceDocumentID, gl.PostingDate, gl.Debit + gl.Credit",
+                  "SELECT 'Posting with no supplier payment', gl.SourceDocumentID, gl.GLEntryID, gl.PostingDate, gl.Debit + gl.Credit")
     claim(run(d, swapped) == l3, "swapping two columns of the second query of test L3 changes nothing, because that query returns no rows")
+    claim(len({r[2] for r in l3}) * 2 == len(l3), "the six postings of test L3 point to three documents, two postings each")
     l4_sql = tutorial_sql("L4")
     l4 = run(d, l4_sql)
     l4_inner = run(d, sub(l4_sql, "LEFT JOIN PayrollPayment AS pay", "INNER JOIN PayrollPayment AS pay"))
@@ -322,7 +323,7 @@ def chapter(d, claim):
     claim(n_q == 15, "the chapter has fifteen multiple-choice questions (the key's rationales and the note's plans use their numbers)")
     first_surge = d.one("SELECT MIN(WorkDate) FROM (SELECT tc.WorkDate FROM TimeClockEntry tc JOIN Employee e ON e.EmployeeID = tc.EmployeeID "
                         "JOIN CostCenter cc ON cc.CostCenterID = e.CostCenterID WHERE cc.CostCenterName = 'Manufacturing' "
-                        "GROUP BY tc.WorkDate HAVING COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1 AND COUNT(*) > 1)")
+                        "GROUP BY tc.WorkDate HAVING COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1 AND COUNT(DISTINCT tc.EmployeeID) > 1)")
     return dict(f=d.F, p=d.P, y=d.C, n=d.N, n_exercises=sum(ex.values()), per_perspective=ex.get("financial", 0), slides=slide_count(),
                 n_questions=n_q, longest_correct=and_list(longest), n_longest=len(longest), t1=t1, t2=t2, t3=t3, first_surge=first_surge,
                 version="3.13.1")
@@ -464,12 +465,19 @@ def g3(d, claim):
     f = "Ex 12.3.sql"
     t1_sql = script_sql(f, "T1")
     t1 = run(d, t1_sql)
-    claim(all(r[3] == 0 for r in t1), "no direct entry is dated before its operation's actual start")
+    claim(all(r[5] == 0 for r in t1), "no direct entry is dated before its operation's actual start")
+    claim(all(r[2] > 0 for r in t1) and sum(r[2] for r in t1) < 0.01 * sum(r[1] for r in t1),
+          "test T1 keeps a few direct entries with no operation in every year, well under one percent")
+    t1_inner = run(d, sub(t1_sql, "LEFT JOIN WorkOrderOperation AS op", "INNER JOIN WorkOrderOperation AS op"))
+    claim(sum(r[1] for r in t1_inner) == sum(r[1] for r in t1) - sum(r[2] for r in t1) and all(r[8] == a[8] for r, a in zip(t1_inner, t1)),
+          "an inner join to the operations drops exactly the entries with no operation and leaves the shares unchanged")
     strict = run(d, sub(t1_sql, "CASE WHEN lt.WorkDate <= op.ActualEndDate THEN 1 ELSE 0 END", "CASE WHEN lt.WorkDate < op.ActualEndDate THEN 1 ELSE 0 END"))
-    claim(all(r[2] == 0 and r[6] == 1.0 for r in strict),
+    claim(all(r[4] == 0 and r[8] == 1.0 for r in strict),
           "no direct entry is dated before its operation's end date, so a strict comparison counts every entry as late")
     no_filter = run(d, sub(t1_sql, "WHERE lt.LaborType = 'Direct Manufacturing'", ""))
-    claim(no_filter == t1, "leaving out the LaborType filter changes nothing here, because only direct time has an operation")
+    claim(sum(r[2] for r in no_filter) > 100 * sum(r[2] for r in t1) and [r[8] for r in no_filter] == [r[8] for r in t1],
+          "leaving out the LaborType filter adds the indirect and non-manufacturing time, which has no operation, to the entries "
+          "with no operation, and leaves the shares unchanged")
     t2_sql = script_sql(f, "T2")
     t2 = run(d, t2_sql)
     last = [r for r in t2 if r[0] == str(d.C)]
@@ -505,7 +513,8 @@ def g3(d, claim):
     quarter = [r for r in t5 if r[1] > 0.25][0]
     claim(all(r[1] <= 0.25 for r in t5 if r[0] < quarter[0]), "the share of late direct time stays at or below a quarter until the month that first passes it")
     return dict(**window(d),
-        t1=t1, strict_open=[r[2] for r in strict], strict_share=[r[6] for r in strict], last=last,
+        t1=t1, strict_open=[r[4] for r in strict], strict_share=[r[8] for r in strict], last=last,
+        inner_entries=sum(r[1] for r in t1_inner), no_filter_noop=sum(r[2] for r in no_filter),
         inner_packing_all=[r[5] for r in inner if r[0] == str(d.C) and r[1].startswith("Packing")][0],
         inner_qa_all=[r[5] for r in inner if r[0] == str(d.C) and r[1].startswith("Quality")][0],
         fan_packing=fan_by[packing], fan_qa=fan_by[qa], order_all=order_all, order_open=order_open,
@@ -539,7 +548,7 @@ def g4(d, claim):
     o4_reg = run(d, sub(o4_sql, "HAVING COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1", "HAVING COUNT(DISTINCT tc.RegularHours) = 1"))
     reg_days = d.one("""SELECT COUNT(*) FROM (SELECT tc.WorkDate FROM TimeClockEntry AS tc INNER JOIN Employee AS e ON e.EmployeeID = tc.EmployeeID
         INNER JOIN CostCenter AS cc ON cc.CostCenterID = e.CostCenterID WHERE cc.CostCenterName = 'Manufacturing'
-        GROUP BY tc.WorkDate HAVING COUNT(DISTINCT tc.RegularHours) = 1 AND COUNT(*) > 1)""")
+        GROUP BY tc.WorkDate HAVING COUNT(DISTINCT tc.RegularHours) = 1 AND COUNT(DISTINCT tc.EmployeeID) > 1)""")
     claim(reg_days > o4[0][2] and any(r[1] == "No approval" for r in o4_reg),
           "counting regular hours alone adds days, and entries with no approval appear on them")
     o5_sql = script_sql(f, "O5")

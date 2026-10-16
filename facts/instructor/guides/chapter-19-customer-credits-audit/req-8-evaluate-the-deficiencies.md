@@ -25,7 +25,7 @@ figures:
 
 Requirements 4 to 7 produced patterns; this requirement turns them into judgments. Severity turns on whether a misstatement is reasonably possible and how large it could be, not on how many exceptions the tests found or whether a misstatement occurred, and a compensating control counts only if it is precise enough. An evaluation matrix keeps the judgment and its arithmetic in one workbook, with every exposure compared with the threshold cells of Requirement 3. The analytics type is diagnostic, with the judgment that makes a rating.
 
-Students can record each pattern with its control, kind, frequency and exposure (Part 1), combine deficiencies on the same account without counting a document twice and classify them with the evidence and what could change it (Part 2), and report the clean results as carefully as the exceptions (Part 3).
+Students can record each pattern with its control, kind, frequency and exposure (Part 1), assess together the deficiencies on the same account without counting a document twice and classify them with the evidence and what could change it (Part 2), and report the clean results as carefully as the exceptions (Part 3).
 
 **Competencies practiced.** CPA Evolution Core S2 M8 (audit evidence and tests of controls); IMA Reporting and Control (internal control); IFAC IES 2 (g) and IES 4 (a); AACSB A5 part 5.2 (judgment and communication).
 
@@ -70,7 +70,7 @@ c. Add the band as a formula that reads the exposure against the three threshold
 
 ### Part 2: Combine, classify and say what could change the rating
 
-**Step 3. Combine deficiencies on the same account and count each document once.** The credits that fail the authority test or the cash test make one group; the refunds that fail authority or timing another. A SUMPRODUCT adds each document's amount once.
+**Step 3. Assess the deficiencies on the same account together and count each document once.** The credits that fail the authority test or the cash test make one group; the refunds that fail authority or timing another. A SUMPRODUCT adds each document's amount once.
 
 ```jinja
 {{ g.f_union }}
@@ -114,7 +114,7 @@ c. Add the band as a formula that reads the exposure against the three threshold
 
 - **The matrix is live:** thresholds are named cells, exposures link to the Tests sheet, and each pattern says design or operation.
 - **Likelihood, magnitude and compensating controls decide the rating,** and the compensating controls are named with the evidence they would need.
-- **Deficiencies on the same account combine,** and each document is counted once.
+- **Deficiencies on the same account are assessed together,** and each document is counted once.
 - **Every classification says what would change it,** and the ratings are called provisional.
 - **The clean results sit beside the exceptions,** each with its test.
 

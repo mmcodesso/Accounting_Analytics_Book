@@ -24,7 +24,7 @@
 
 **Foreign key.** A column in one table that references the primary key of another table, creating a relationship between the two tables. For example, the CustomerID column in the Charles River SalesOrder table is a foreign key that references the Customer table.
 
-**General ledger.** The complete record of an organization's financial transactions, organized by account. In the Charles River database, the general ledger is the GLEntry table within the Accounting Core group.
+**General ledger.** The central record of an organization's posted financial transactions, organized by account. In the Charles River database, the general ledger is the GLEntry table within the Accounting Core group.
 
 **Microsoft Excel.** A spreadsheet application developed by Microsoft that organizes data in rows and columns and supports calculations, PivotTables, lookup functions, Power Query, and optimization with Solver. Part II of this book teaches Excel for accounting analytics.
 

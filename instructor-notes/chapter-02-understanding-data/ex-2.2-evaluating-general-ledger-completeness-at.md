@@ -20,7 +20,7 @@ By the end, students can:
 - say what equal totals and a full list of source types do and do not show (outcome 6);
 - write a one-page completeness assessment with a figure behind every statement.
 
-**Competencies practiced.** CPA Evolution Core S1 M8 T2 (cleansing financial data) and Core S1 M1 to M3 (financial statements, accounts and transactions); IMA Data Literacy, Financial Recordkeeping and Financial Statement Preparation; IFAC IES 2 (a), financial accounting and reporting, and IES 2 (i); AACSB A5 part 5.1.
+**Competencies practiced.** CPA Evolution Core S1 M8 T2 (cleansing financial data) and Core S1 M1 to M3 (financial statements, accounts and transactions); IMA Data Literacy and Financial Recordkeeping; IFAC IES 2 (a), financial accounting and reporting, and IES 2 (i); AACSB A5 part 5.1.
 
 ## Before you assign
 
@@ -76,7 +76,7 @@ The first is the start of the records, the start-up month that Chapter 7 names. 
 
 **Check:** 20 source types, from MaterialIssue (140,252 rows) down to SalesCommissionPayment (392). The six that the exercise names (SalesInvoice, Shipment, PurchaseInvoice, JournalEntry, PayrollPayment, and WorkOrderClose) are all present, in every fiscal year under review. In the latest fiscal year only the payments appear. If a type that should post were missing from a period in which the activity took place, that would be a completeness problem: a whole cycle that failed to post.
 
-**Step 5. Say what a full list shows and does not show.** A model answer: every kind of business event posts to the ledger, in every year, so no cycle is missing. The list cannot show that every document of each type posted, or that each posted in full. Only a test that starts from the documents can. For example, 6 material issue headers have no ledger rows and no lines, so there was nothing to post; a count of source types would not reveal them, and a student cannot be expected to find them in Excel. By contrast, all 20,914 sales invoices reconcile to the receivable that their rows debit, which is the evidence behind the chapter's traceability section.
+**Step 5. Say what a full list shows and does not show.** A model answer: every source type appears in every fiscal year under review, so no cycle is absent from the ledger. The list cannot show that every document of each type posted, or that each posted in full. Only a test that starts from the documents can. For example, 6 material issue headers have no ledger rows and no lines, so there was nothing to post; a count of source types would not reveal them, and a student cannot be expected to find them in Excel. By contrast, all 20,914 sales invoices reconcile to the receivable that their rows debit, which is the evidence behind the chapter's traceability section.
 
 **Check:** the answer names what the test shows (each cycle posts) and what it does not (each document posted, accurately and in the right period).
 
@@ -86,7 +86,7 @@ The first is the start of the records, the start-up month that Chapter 7 names. 
 
 ### Requirement (4): Write the memo
 
-**Step 7. Outline a one-page memo.** A strong memo has a header and the purpose; a conclusion up front (the ledger is complete for the years under review, with the edges explained); a table with one row per test (what was tested, the result with its figure, and what it shows); the limits (balance in total, types not documents); and a closing line on what would close the gap, such as a document-to-ledger reconciliation.
+**Step 7. Outline a one-page memo.** A strong memo has a header and the purpose, then the conclusion up front. The conclusion says that the tests found no gap in the years under review (the ledger balances in total, every period has entries, the edges are explained and every source type appears) and that a completeness conclusion for the financial statements still needs a test that starts from the documents, the extract's specification and the source system's control totals. A table follows with one row per test (what was tested, the result with its figure, and what it shows), then the limits (balance in total, types not documents) and a closing line on what would close the gap, such as a document-to-ledger reconciliation.
 
 **Check:** every statement in the memo has a number or a worksheet behind it.
 

@@ -11,10 +11,8 @@ are rounded half away from zero, as DAX's ROUND and Number.Round do.
 Requirement 3 states how far receivables run beyond terms both without the opening line and as recorded, and
 Requirement 5 names the credits still awaiting a refund at the year-end (the balance of 2060).
 
-One note is not registered, because its comment states a value the data do not give; its context function renders
-the corrected text, so register it once the comment is fixed:
-- r4 gives the purchase order lines not fully received at the year-end as 617,265.17, the sum of its two parts each
-  rounded (other items 208,680.287 and materials 408,584.875); the lines total 617,265.162, which rounds to 617,265.16.
+Every note is registered. r4 gives the purchase order lines not fully received at the year-end as the total of the
+lines rounded once, not the sum of its two parts each rounded first, which comes to a cent more.
 """
 
 from __future__ import annotations
@@ -27,6 +25,7 @@ from functools import lru_cache
 
 from notes import note
 from notes.case3 import processed
+from notes.ch16 import open_periods as pay_dates_open
 
 CASE = "cases/part-4-case.qmd"
 MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
@@ -481,6 +480,9 @@ def r1(d, claim):
     claim(open_periods and later == 0, "the open pay periods are the last ones")
     claim(payroll_end < thru and payroll_end < year_end(d.C),
           "payroll postings end before Data Through, so including them would blank the last quarter")
+    open_pays = pay_dates_open(d, claim)        # the open periods have no registers and pay in the next year (Chapter 16)
+    claim(len(open_pays) == len(open_periods) and all(p[:4] == str(d.N) for p in open_pays),
+          "the open pay periods are scheduled to pay in the next fiscal year")
     return dict(gl_rows=gl_rows, n_closes=word(len(d.closes)), closes=closes, close_rows=close_rows,
                 shortfall=channels["Shortfall"], supply=channels["Supply plan"], no_rec=no_rec,
                 n_other=word(channels.get("Other", 0)), receipt_lines=receipt_lines, po_lines=po_lines,
@@ -489,7 +491,7 @@ def r1(d, claim):
                 ni=ni, assets=assets, received=received, issued=issued, thru=thru, last=last, n_pay=n_pay,
                 rows_after=rows_after, pay_amount=xr(pay_amount), cash_last=xr(balance(d, ["1010"], last)),
                 ap_last=xr(-balance(d, ["2010"], last)), fall=xr(fall), payroll_end=payroll_end, remit_end=remit_end,
-                n_open=word(len(open_periods)),
+                n_open=word(len(open_periods)), open_pay_year=open_pays[0][:4],
                 never_channels=[(n, {"Shortfall": "work-order shortfall", "Supply plan": "supply plan"}.get(ch, "other"))
                                 for ch, n in never_channels.most_common()])
 
@@ -586,9 +588,16 @@ def r2(d, claim):
     # Sales tax, notes.
     tax = [xr(balance(d, ["1010", "2050"], year_end(y))) for y in d.years]
     tax_c = xr(-balance(d, ["2050"], year_end(d.C)))
-    claim(all(years[y]["sales_tax"] > 0 for y in d.years), "the unremitted tax added cash every year")
+    claim(all(years[y]["sales_tax"] > 0 for y in d.years), "the recorded sales tax payable grew every year")
     claim(d.one("SELECT COUNT(*) FROM GLEntry WHERE AccountID = ? AND Debit > 0 AND SourceDocumentType <> 'CreditMemo'",
                 d.account("2050")) == 0, "no remittance of the sales tax is recorded")
+    # 2050 is credited when an invoice posts, so the payable is tax billed: taxable invoices with no payment and no credit
+    # memo at the year-end still hold part of it
+    unpaid_n, unpaid_tax = d.q("SELECT COUNT(*), COALESCE(SUM(si.TaxAmount), 0) FROM SalesInvoice si WHERE si.InvoiceDate <= ?1 "
+                               "AND si.TaxAmount > 0 AND NOT EXISTS (SELECT 1 FROM CashReceiptApplication a WHERE a.SalesInvoiceID "
+                               "= si.SalesInvoiceID AND a.ApplicationDate <= ?1) AND NOT EXISTS (SELECT 1 FROM CreditMemo c WHERE "
+                               "c.OriginalSalesInvoiceID = si.SalesInvoiceID AND c.CreditMemoDate <= ?1)", year_end(d.C))[0]
+    claim(unpaid_n > 0 and unpaid_tax > 0, "some taxable invoices have no payment at the year-end, so the payable is not all tax collected")
     outstanding = xr(-balance(d, ["2110"], year_end(d.C)))
     schedule = [xr(r[1]) for r in d.q(
         "SELECT DebtAgreementID, (SELECT s.EndingPrincipal FROM DebtScheduleLine s WHERE s.DebtAgreementID = x.DebtAgreementID "
@@ -596,6 +605,24 @@ def r2(d, claim):
         "GROUP BY 1 ORDER BY 1", year_end(d.C), year_end(d.C))]
     claim(abs(outstanding - sum(schedule)) < 0.01, "the notes in 2110 equal the schedule, so all of them sit in 2110")
     due_next = xr(d.one("SELECT SUM(PrincipalAmount) FROM DebtScheduleLine WHERE substr(PaymentDate, 1, 4) = ?", str(d.N)))
+    # the schedule at each year-end: the principal after the date, of the notes originated by it, against the whole schedule
+    sched = ("SELECT COALESCE(SUM(s.PrincipalAmount), 0) FROM DebtScheduleLine s JOIN DebtAgreement a ON a.DebtAgreementID = "
+             "s.DebtAgreementID WHERE s.PaymentDate > ?1 AND s.PaymentDate <= ?2")
+    debt_hist = []
+    for y in d.years:
+        asof, horizon = year_end(y), year_end(9999)
+        h = dict(year=y, outstanding=xr(d.one(sched + " AND a.OriginationDate <= ?1", asof, horizon)),
+                 all=xr(d.one(sched, asof, horizon)), due=xr(d.one(sched + " AND a.OriginationDate <= ?1", asof, year_end(y + 1))),
+                 due_all=xr(d.one(sched, asof, year_end(y + 1))), gl=xr(-balance(d, ["2110"], asof)))
+        claim(abs(h["outstanding"] - h["gl"]) < 0.01, f"the notes originated by {asof} equal 2110 at that date")
+        debt_hist.append(h)
+    claim(abs(debt_hist[-1]["due"] - due_next) < 0.01 and debt_hist[-1]["all"] == debt_hist[-1]["outstanding"],
+          f"at the end of {d.C} every scheduled note had been originated")
+    notes_by_date = d.q("SELECT OriginationDate, PrincipalAmount FROM DebtAgreement ORDER BY OriginationDate")
+    later_note = [n for n in notes_by_date if n[0][:4] == str(d.C)]
+    claim(len(later_note) == 1 and all(abs(h["all"] - h["outstanding"] - later_note[0][1]) < 0.01 for h in debt_hist[:-1]),
+          f"at the earlier year-ends the whole schedule also counts the one note originated in {d.C}")
+    claim(debt_hist[-2]["due_all"] > debt_hist[-2]["due"], f"at the end of {d.P} the whole schedule overstates the current portion")
     claim(d.one("SELECT COUNT(*) FROM GLEntry g JOIN Account a ON a.AccountID = g.AccountID JOIN JournalEntry j ON j.EntryNumber = "
                 "g.VoucherNumber WHERE g.SourceDocumentType = 'JournalEntry' AND j.EntryType LIKE 'Debt%' "
                 "AND a.AccountSubType = 'Current Liability' AND g.Credit > 0") == 0,
@@ -607,7 +634,8 @@ def r2(d, claim):
                 capex_total=capex_total, capex_invoices=[r[0] for r in paid_capex],
                 tax_c=tax_c, net=tax, tax_steps=[years[y]["sales_tax"] for y in d.years],
                 without_tax=xr(rc["operating"] - cur["sales_tax"]), outstanding=outstanding, schedule=schedule,
-                due_next=due_next)
+                due_next=due_next, unpaid_n=unpaid_n, unpaid_tax=xr(unpaid_tax), debt_hist=debt_hist,
+                later_note=xr(later_note[0][1]))
 
 
 # --- Requirement 3 -------------------------------------------------------------------------------
@@ -646,11 +674,13 @@ def r3(d, claim):
     raw = sorted({r[4] for r in rows if r[0] == "Raw Materials"})
     pack = sorted({r[4] for r in rows if r[0] == "Packaging"})
     claim(len(raw) == 1 and len(pack) == 1, "raw materials and packaging each have one target")
+    claim(raw[0] >= pack[0], "the largest materials target is the raw materials target")
     made = [r for r in rows if r[1] == "Finished Good" and r[2] == "Manufactured"]
     bought = [r for r in rows if r[1] == "Finished Good" and r[2] == "Purchased"]
     claim({r[3] for r in made} == {"Lot-for-Lot"} and {r[3] for r in rows if r[3] == "Lot-for-Lot"} and
           all(r[2] == "Manufactured" for r in rows if r[3] == "Lot-for-Lot"), "the manufactured finished goods are lot-for-lot")
     claim({r[3] for r in bought} == {"Min-Max"}, "the purchased finished goods are min-max")
+    claim(max(r[4] for r in bought) >= max(r[4] for r in made), "the largest finished goods target is a purchased item's")
     claim(pol["ends"] == [year_end(d.C)], f"every policy ends {d.C}-12-31")
     customers = d.one("SELECT SUM(si.GrandTotal * CAST(REPLACE(c.PaymentTerms, 'Net ', '') AS REAL)) / SUM(si.GrandTotal) "
                       "FROM SalesInvoice si JOIN Customer c ON c.CustomerID = si.CustomerID")
@@ -660,7 +690,8 @@ def r3(d, claim):
           "receivables and payables (without the opening line) both run beyond terms")
     claim(abs(last["dso"] - first["dso"]) < 10 and abs(last["dpo_x"] - first["dpo_x"]) < 5,
           "receivables and payables barely moved")
-    claim(last["dio"] - first["dio"] >= last["ccc_x"] - first["ccc_x"] > 0, "the cycle grew entirely through inventory")
+    claim(last["dio"] - first["dio"] >= last["ccc_x"] - first["ccc_x"] > 0,
+          "the cycle grew mainly through inventory: without the opening lines, DIO rose by more than the cycle")
     claim(last["mat_balance"] - first["mat_balance"] > (last["inv"] - first["inv"]) / 2
           and last["mat"] - first["mat"] > last["fg"] - first["fg"], "materials above all")
     claim(last["dpo"] < first["dpo"], "DPO as recorded fell")
@@ -678,8 +709,6 @@ def r3(d, claim):
 
 # --- Requirement 4 -------------------------------------------------------------------------------
 
-# Not registered: the comment states the purchase order lines not fully received as 617,265.17, the sum of its two
-# rounded parts (208,680.29 + 408,584.88); the lines total 617,265.162, so 617,265.16. Register it once the comment is fixed.
 @note("case4.r4", CASE)
 def r4(d, claim):
     marks = ",".join("?" * len(MATERIALS))
@@ -746,6 +775,17 @@ def r4(d, claim):
                                            "SUM(l.QuantityIssued), SUM(l.ExtendedStandardCost) FROM MaterialIssueLine l "
                                            "JOIN MaterialIssue m ON m.MaterialIssueID = l.MaterialIssueID GROUP BY 1")}
     matched = [p for p in pairs if p[0] in issued]
+    # quantities by unit of measure: rolls and boxes do not add, so the model answer shows them apart
+    units_req = d.q("SELECT i.UnitOfMeasure, SUM(r.Quantity) FROM PurchaseRequisition r JOIN Item i ON i.ItemID = r.ItemID "
+                    "WHERE r.Justification LIKE 'WO-COMPONENT-SHORTFALL%' GROUP BY 1 ORDER BY 2 DESC")
+    item_unit = dict(d.q("SELECT ItemID, UnitOfMeasure FROM Item"))
+    units_iss = defaultdict(float)
+    for p in matched:
+        units_iss[item_unit[int(re.search(r"ITEM=(\d+)", p[0]).group(1))]] += issued[p[0]][0]
+    claim(len(units_req) > 1, "the shortfall requisitions name items in more than one unit of measure")
+    claim(abs(sum(q for _, q in units_req) - sum(p[2] for p in pairs)) < 0.01, "the units by unit of measure add up to the pairs")
+    by_unit = [dict(unit=u, plural=(u.lower() + ("es" if u.lower().endswith(("x", "s", "ch", "sh")) else "s")),
+                    req=xr(q, 1), issued=xr(units_iss.get(u, 0.0), 1)) for u, q in units_req]
     short_receipts = xr(d.one(f"SELECT SUM(l.ExtendedStandardCost) FROM GoodsReceiptLine l JOIN PurchaseOrderLine p ON p.POLineID = "
                               f"l.POLineID JOIN PurchaseRequisition r ON r.RequisitionID = p.RequisitionID WHERE {CHANNEL} = 'Shortfall'"))
     claim(abs(short_receipts - sum(y["short"][1] for y in by_year)) < 0.01, "every shortfall receipt is a materials receipt of the window")
@@ -773,6 +813,14 @@ def r4(d, claim):
         whatif.append(dict(days=days, allowed=xr(allowed), excess=xr(materials - allowed), months=xr((materials - allowed) / (ttm / 12), 2)))
     fall = -bridge(d, d.C)["cash"]
     claim(fall > 0 and whatif[-1]["excess"] / fall >= 2, "cash fell in the year, and even at 90 days the excess is several times the fall")
+    # the default is the largest materials target, a benchmark for the whole balance; each class at its own target instead
+    class_targets = dict(d.q(f"SELECT i.ItemGroup, MAX(p.TargetDaysSupply) FROM InventoryPolicy p JOIN Item i ON i.ItemID = p.ItemID "
+                             f"WHERE i.ItemGroup IN ({marks}) GROUP BY 1", *MATERIALS))
+    claim(set(class_targets) == set(MATERIALS) and abs(sum(groups.values()) - ttm) < 0.01,
+          "each materials class has a target, and the issues by class add up to the twelve months' issues")
+    claim(max(class_targets.values()) == TARGETS[0] and min(class_targets.values()) < TARGETS[0],
+          "the first target tested is the largest materials target, and packaging's is shorter")
+    policy_allowed = sum(groups[g] * class_targets[g] for g in MATERIALS) / 365
     multiple = whatif[-1]["excess"] / fall if fall > 0 else 0.0
     fg = balance(d, ["1040"], year_end(d.C))
     dr, cr = flow(d, ["1040"], f"{d.C}-01-01", year_end(d.C), "Shipment")
@@ -797,7 +845,8 @@ def r4(d, claim):
                 in_repeated=sum(p[1] for p in repeated), most=most, wo=wo[0], item=item_code, first_request=tp[4],
                 last_request=tp[5], due=wo[1], completed=wo[2], matched=len(matched), unmatched=len(pairs) - len(matched),
                 n_top=word(len(top_pairs)), per_month=(word(min(per_month)), word(max(per_month))),
-                units=xr(sum(p[2] for p in pairs), 1), estimated=xr(sum(p[3] for p in pairs)),
+                units=xr(sum(p[2] for p in pairs), 1), estimated=xr(sum(p[3] for p in pairs)), by_unit=by_unit,
+                class_targets=class_targets, policy_allowed=xr(policy_allowed), policy_excess=xr(materials - policy_allowed),
                 units_issued=xr(sum(issued[p[0]][0] for p in matched), 1), issued_cost=xr(sum(issued[p[0]][1] for p in matched)),
                 short_receipts=short_receipts, n_years=word(len(d.years)), n_short=n_short, approver=approver,
                 approver_title=approver_title, self_requested=self_requested,
@@ -827,6 +876,15 @@ def r5(d, claim):
     entry = opening_entry(d)
     capital = capital_invoices(d, asof)
     claim(len(capital) == 2 and all(c["paid"] == 0 for c in capital), "two note-financed invoices, never paid")
+    # the opening inventories: the whole JournalEntry part of 1040 and 1045, with no item detail behind it
+    opening_fg, opening_materials = xr(opening_line(d, "1040")), xr(opening_line(d, "1045"))
+    claim(abs(roll["1040"]["parts"]["JournalEntry"] - opening_fg) < 0.01 and abs(roll["1045"]["parts"]["JournalEntry"] - opening_materials) < 0.01,
+          "the journal-entry parts of the inventories are the opening entry's lines")
+    # the opening entry's other current lines, outside the accounts the case reconciles
+    names = dict((str(n), nm) for n, nm in d.q("SELECT AccountNumber, AccountName FROM Account"))
+    other_opening = [dict(number=n, name=names[n], amount=xr(abs(opening_line(d, n)))) for n in sorted(accounts(d))
+                     if accounts(d)[n][1] in ("Current Asset", "Current Liability") and n not in ROLL and abs(opening_line(d, n)) > 0.005]
+    claim(len(other_opening) > 0, "the opening entry has current lines outside the accounts the case reconciles")
     open_ap_line = -opening_line(d, "2010")
     claim(abs(roll["2010"]["parts"]["JournalEntry"] - (-open_ap_line + sum(c["amount"] for c in capital))) < 0.01,
           "the 2010 journal entries are the opening line plus the reclasses to notes")
@@ -928,8 +986,9 @@ def r5(d, claim):
     after_rows, after_amount = d.q("SELECT COUNT(*), SUM(Debit) FROM GLEntry WHERE PostingDate > ?", thru)[0]
     claim(all(abs(sum(bridge(d, y)[k] for k in STEPS) - bridge(d, y)["cash"]) < 0.01 for y in (d.P, d.C)),
           f"the bridge equals the change in cash in {d.P} and {d.C}")
-    claim(thru < f"{d.N}-03-31", f"every measure is blank in {d.N}")
-    return dict(roll=roll, opening_ap=xr(open_ap_line), capital=capital, n_ar=len(pos), open_ar=open_ar, n_neg=len(neg),
+    claim(thru < f"{d.N}-03-31", f"each working-capital measure is blank in every {d.N} quarter")
+    return dict(roll=roll, opening_fg=opening_fg, opening_materials=opening_materials, opening_inv=xr(opening_fg + opening_materials),
+                other_opening=other_opening, opening_ap=xr(open_ap_line), capital=capital, n_ar=len(pos), open_ar=open_ar, n_neg=len(neg),
                 neg=xr(sum(b for _, b in neg)), ar_diff=xr(roll["1020"]["total"] - open_ar), entry=entry, rebuilt=rebuilt,
                 n_ap=len(open_ap), ap_total=ap_total, ap_diff=ap_diff, notes_total=xr(sum(c["amount"] for c in capital)),
                 past_due=past_due, past_due_x=past_due_x, total_x=total_x, past_due_share=past_due_x / total_x,
@@ -950,12 +1009,12 @@ def r5(d, claim):
 def r6(d, claim):
     b = bridge(d, d.C)
     claim(b["net_income"] > 0 and b["inventories"] < 0 and -b["inventories"] > b["net_income"],
-          "the profit was real but went into inventories")
+          "the recorded profit went into inventories")
     first, last = quarter(d, year_end(d.P)), quarter(d, year_end(d.C))
     claim(last["mat_balance"] - first["mat_balance"] > -b["inventories"] / 2, "materials above all")
-    claim(b["sales_tax"] > 0 and b["payables"] > 0, "unremitted sales tax and growing payables held cash up")
+    claim(b["sales_tax"] > 0 and b["payables"] > 0, "the growth of the recorded sales tax payable and of the payables held cash up")
     claim(balance(d, ["1010", "2050"], year_end(d.C)) < balance(d, ["1010"], year_end(d.C)),
-          "the cash on the balance sheet overstates what the company can use")
+          "the cash on the balance sheet may overstate what the company can use until the tax is settled")
     claim(d.one("SELECT COUNT(*) FROM (SELECT Justification FROM PurchaseRequisition WHERE Justification LIKE "
                 "'WO-COMPONENT-SHORTFALL%' GROUP BY 1 HAVING COUNT(*) > 1)") > 0, "requisitions repeated for one work order and item")
     claim(policies(d)["ends"] == [year_end(d.C)], f"the policies ended with {d.C}")

@@ -25,7 +25,7 @@ Students can:
 ## Before you assign
 
 - **Files.** CharlesRiver.xlsx in the folder where students save Charles River Cash Case.pbix, and Power BI Desktop at the release the Part IV chapters use. The model answer is the project in PartIV-case.zip; open it as Opening a Companion File on the Downloads page describes (copy the .pbip and its two folders, open the .pbip, **Change Source**, refresh).
-- **Data conditions.** PurchaseRequisition.Justification names the channel; the order header's RequisitionID is blank on many orders; InventoryPolicy has one row for each item and warehouse; the ledger's last posting date is not the date the data are complete.
+- **Data conditions.** PurchaseRequisition.Justification names the channel; the order header's RequisitionID is blank on many orders; InventoryPolicy has one row for each item and warehouse; the ledger's last posting date is not Data Through, and Data Through itself is a bound observed in the extract, not proof that the data are complete.
 - **Verify first.** After a refresh, the 58 Requirement 1 rows of the Checks tab all agree.
 
 ## How to run it
@@ -107,7 +107,7 @@ c. Read Justification, Status and ApprovedByEmployeeID in Requisitions.
 ```dax
 Data Through =
 CALCULATE (
-    MINX (
+    VAR LastDates =
         {
             CALCULATE ( MAX ( GLEntry[PostingDate] ), GLEntry[SourceDocumentType] = "SalesInvoice" ),
             CALCULATE ( MAX ( GLEntry[PostingDate] ), GLEntry[SourceDocumentType] = "CashReceiptApplication" ),
@@ -116,14 +116,18 @@ CALCULATE (
             CALCULATE ( MAX ( GLEntry[PostingDate] ), GLEntry[SourceDocumentType] = "GoodsReceipt" ),
             CALCULATE ( MAX ( GLEntry[PostingDate] ), GLEntry[SourceDocumentType] = "MaterialIssue" ),
             CALCULATE ( MAX ( GLEntry[PostingDate] ), GLEntry[SourceDocumentType] = "Shipment" )
-        },
-        [Value]
-    ),
+        }
+    RETURN
+        IF (
+            COUNTROWS ( FILTER ( LastDates, ISBLANK ( [Value] ) ) ) > 0,
+            BLANK (),
+            MINX ( LastDates, [Value] )
+        ),
     REMOVEFILTERS ()
 )
 ```
 
-**Check:** Data Through reads 2026-12-31 under any slicer, because `REMOVEFILTERS ()` clears every filter. The ledger runs to 2027-02-23 only because 263 supplier payments of 2026 invoices ($271,327.17, 526 rows) follow the year. **Watch for:** two wrong answers. The last posting date puts cash at $8,170,928.63, and a bridge for 2027 shows a fall of $271,327.17 that only means the data stop. Adding payroll puts Data Through at 2026-12-18, and the last quarter goes blank: the last two pay periods are open.
+**Check:** Data Through reads 2026-12-31 under any slicer, because `REMOVEFILTERS ()` clears every filter. The ledger runs to 2027-02-23 only because 263 supplier payments of 2026 invoices ($271,327.17, 526 rows) follow the year. **Watch for:** two wrong answers. The last posting date puts cash at $8,170,928.63, and a bridge for 2027 shows a fall of $271,327.17 that only means the data stop. Adding payroll puts Data Through at 2026-12-18, and the last quarter goes blank, because the last two pay periods are marked Open in the data and are scheduled to pay in 2027. The About page states what Data Through does not show, that no document before it is missing.
 
 **Instructor check.** In **DAX query view**, run this and compare it with the Expected results.
 
@@ -150,14 +154,14 @@ ROW (
 | Materials received and issued, 2026 | $17,578,136.00; $10,161,204.64 | 6 |
 | Data Through; last posting; rows after | 2026-12-31; 2027-02-23; 526 | 8 |
 
-> **Instructor notes, Requirement 1:** GLEntry has 815,921 rows; the six year-end closes (JE-2024-000265 and -000266, JE-2025-000287 and -000288, JE-2026-000296 and -000297) post 134 rows. Channel: Text.StartsWith on Justification, "WO-COMPONENT-SHORTFALL \| WO=\<id\> \| ITEM=\<id\>" for a work-order shortfall (21,437 requisitions; the ITEM in the text always equals ItemID), "Supply plan \<id\> - ..." for the supply plan (3,921; all but 3 carry a SupplyPlanRecommendationID), and six capital requests ("Other"). Receipts: 29,597 lines, every one with its order line, and every order line (24,842) with exactly one requisition; the purchase order header's RequisitionID is blank on 4,408 orders, which is why the merge goes through the line. Issues: 70,126 lines on 19,234 issues, every issue with its work order; 6 issue headers have no lines (Chapter 12). Requisitions: 25,364; 6 with no approver (Exercise 2.5); 522 Approved and never ordered, all work-order shortfall requisitions of December 2026. Validation (fiscal 2024 / 2025 / 2026): net income 5,110,308.27 / 5,134,354.71 / 4,503,611.24; total assets 23,742,720.31 / 31,838,684.00 / 39,328,524.11; materials received (receipt lines of Raw Materials and Packaging items) 7,823,080.62 / 13,490,602.93 / 17,578,136.00 and issued 10,560,905.25 / 10,005,081.44 / 10,161,204.64, equal to the GoodsReceipt debits and MaterialIssue credits to 1045 (AccountNumber, not AccountID). Data Through: the minimum of the last PostingDate of SalesInvoice, CashReceiptApplication, PurchaseInvoice, DisbursementPayment, GoodsReceipt, MaterialIssue, and Shipment postings, each with REMOVEFILTERS ( 'Date' ), inside MINX over a table constructor: 2026-12-31. The ledger's last posting is 2027-02-23: 263 supplier payments of 2026 invoices, 526 rows, 271,327.17 (Dr 2010, Cr 1010); a balance taken at that date shows cash 8,170,928.63 and payables 5,966,139.49, and a bridge for 2027 shows a fall of 271,327.17 that only means the data stop. Payroll summaries and payments end 2026-12-18 (the last two pay periods are open, Part III case; the remittances of payroll liabilities run to 2026-12-30); including them would make Data Through 2026-12-18 and blank the last quarter, so the About page should say why payroll is left out. Engine-checked on a reference model in Desktop 2.158.
+> **Instructor notes, Requirement 1:** GLEntry has 815,921 rows; the six year-end closes (JE-2024-000265 and -000266, JE-2025-000287 and -000288, JE-2026-000296 and -000297) post 134 rows. Channel: Text.StartsWith on Justification, "WO-COMPONENT-SHORTFALL \| WO=\<id\> \| ITEM=\<id\>" for a work-order shortfall (21,437 requisitions; the ITEM in the text always equals ItemID), "Supply plan \<id\> - ..." for the supply plan (3,921; all but 3 carry a SupplyPlanRecommendationID), and six capital requests ("Other"). Receipts: 29,597 lines, every one with its order line, and every order line (24,842) with exactly one requisition; the purchase order header's RequisitionID is blank on 4,408 orders, which is why the merge goes through the line. Issues: 70,126 lines on 19,234 issues, every issue with its work order; 6 issue headers have no lines (Chapter 12). Requisitions: 25,364; 6 with no approver (Exercise 2.5); 522 Approved and never ordered, all work-order shortfall requisitions of December 2026. Validation (fiscal 2024 / 2025 / 2026): net income 5,110,308.27 / 5,134,354.71 / 4,503,611.24; total assets 23,742,720.31 / 31,838,684.00 / 39,328,524.11; materials received (receipt lines of Raw Materials and Packaging items) 7,823,080.62 / 13,490,602.93 / 17,578,136.00 and issued 10,560,905.25 / 10,005,081.44 / 10,161,204.64, equal to the GoodsReceipt debits and MaterialIssue credits to 1045 (AccountNumber, not AccountID). Data Through: the minimum of the last PostingDate of SalesInvoice, CashReceiptApplication, PurchaseInvoice, DisbursementPayment, GoodsReceipt, MaterialIssue, and Shipment postings, inside MINX over a table constructor and with the report's filters removed: 2026-12-31 (the model answer returns a blank if any of the seven has no posting, which MINX would skip). It is a bound observed in the extract, not proof that no document before it is missing, which the reconciliations of Requirement 5 and the source systems' own counts would show. The ledger's last posting is 2027-02-23: 263 supplier payments of 2026 invoices, 526 rows, 271,327.17 (Dr 2010, Cr 1010); a balance taken at that date shows cash 8,170,928.63 and payables 5,966,139.49, and a bridge for 2027 shows a fall of 271,327.17 that only means the data stop. Payroll summaries and payments end 2026-12-18, because the last two pay periods are marked Open in the data and are scheduled to pay in 2027 (Part III case), and the remittances of payroll liabilities run to 2026-12-30. Including them would make Data Through 2026-12-18 and blank the last quarter, so the About page should say why payroll is reported apart. Engine-checked on a reference model in Desktop 2.158.
 
 ## What a strong answer says
 
 - **Model.** Closes flagged and left out of every flow, the channel carried through the order line, the policy grouped before it is merged, every measure defined.
 - **Profiles and links.** Entire data set, each link tested, isolated exceptions recorded.
 - **Validation.** Totals that agree with Tutorial 14.3 and Exercise 14.1, and the new tables tied to account `1045` in a Tests tab.
-- **Data Through.** The earliest of the last posting dates of the documents behind the working-capital accounts, with the reason: supplier payments follow the year, and payroll ends before it.
+- **Data Through.** The earliest of the last posting dates of the documents behind the working-capital accounts, with the reason (supplier payments follow the year, and payroll ends before it) and the limit, a bound observed in the extract rather than proof of completeness.
 
 A weak submission says the totals "look right" and has no Tests tab.
 

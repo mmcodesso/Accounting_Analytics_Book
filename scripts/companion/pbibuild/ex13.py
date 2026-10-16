@@ -110,7 +110,8 @@ def ex1(b: Build) -> None:
         "; ".join(money(x["freight"]) for x in yrs) + ") plus sales tax (" + "; ".join(money(x["tax"]) for x in yrs) +
         "). The lines hold only the goods and services sold, so they reconcile to SubTotal. Revenue from the sale of "
         f"goods and services is SubTotal: freight billed to the customer posts to its own revenue account ({freight}), "
-        f"and sales tax is collected for the state and posts to a liability ({tax}), as Chapter 10's trace of "
+        f"and the sales tax billed to the customer is owed to the state and posts to a liability ({tax}), as "
+        "Chapter 10's trace of "
         f"{ctx['traced']} showed.",
         "(4) InvoiceHeaders is a control: its totals come from the invoice table alone, so they test the model instead "
         "of depending on its relationships (a filter on Item does not change them). Relating it would not create an "
@@ -166,7 +167,7 @@ def ex2(b: Build) -> None:
                     title="Customer names and the number of CustomerIDs that carry them", sort=[(ids, "Descending")]))
     dups = [ctx["merged"]["name"], ctx["single"]["name"]]
     seg, reg = col("Customer", "CustomerSegment"), col("Customer", "Region")
-    page.add(Visual("sharedRevenue", "tableEx", 20, 370, 620, 140, {"Values": [name, cid, seg, reg, LT]},
+    page.add(Visual("sharedRevenue", "tableEx", 20, 370, 620, 170, {"Values": [name, cid, seg, reg, LT]},
                     title=f"Fiscal {y} revenue of the names that belong to more than one CustomerID",
                     filters=[keep("sharedRevenueYear", FY, [y]), keep("sharedRevenueNames", name, dups)]))
     mg, tenth, single = ctx["merged"], ctx["tenth"], ctx["single"]
@@ -216,13 +217,13 @@ def ex2(b: Build) -> None:
     by = "ADDCOLUMNS ( VALUES ( Customer[{0}] ), \"R\", CALCULATE ( SUM ( SalesInvoiceLine[LineTotal] ) ) )"
     total = "SUM ( SalesInvoiceLine[LineTotal] )"
     b.check(t, f"largest customer's share ({ctx['largest']['name']})", round(ctx["largest"]["share"], 6),
-            f"CALCULATE ( DIVIDE ( MAXX ( {by.format('CustomerID')}, [R] ), {total} ), {fy} )", 0.000005)
+            f"CALCULATE ( DIVIDE ( MAXX ( {by.format('CustomerID')}, [R] ), {total} ), {fy} )", 0.000005, percent=True)
     b.check(t, "top ten share by key", round(ctx["top_key"], 6),
             f"CALCULATE ( DIVIDE ( SUMX ( TOPN ( {n}, {by.format('CustomerID')}, [R], DESC ), [R] ), {total} ), {fy} )",
-            0.000005)
+            0.000005, percent=True)
     b.check(t, "top ten share by name", round(ctx["top_name"], 6),
             f"CALCULATE ( DIVIDE ( SUMX ( TOPN ( {n}, {by.format('CustomerName')}, [R], DESC ), [R] ), {total} ), {fy} )",
-            0.000005)
+            0.000005, percent=True)
 
 
 def ex3(b: Build) -> None:
@@ -251,8 +252,10 @@ def ex3(b: Build) -> None:
         f"{cur[0]['short']} were ordered within its dates (Chapter 5): the discount is set when the order is priced, so "
         "invoicing later does not remove it.",
         f"(4) {bad['short']} ends on {bad['end']}, before it starts on {bad['start']}, so all {bad['n']} of its lines "
-        f"fall after its end date. They were ordered in {' and '.join(bad['ordered'])}, its real season: a master-data "
-        "error in the end date, not discounts given outside the promotion (the Part II case).",
+        f"fall after its end date. An end date before the start cannot be right, and the orders, placed in "
+        f"{' and '.join(bad['ordered'])}, make the end date the likely error, to confirm against the approved "
+        "promotion (the Part II case). The lines carry the promotion because their orders were priced with it, which "
+        "does not by itself show that the discount was authorized.",
         f"(5) In fiscal {y} the promotions gave away {money(ctx['total'])}: " +
         "; ".join(f"{p['short']} {money(p['disc'])}" for p in sorted(ctx["promos"], key=lambda p: -p["disc"])) +
         ". By item group: " + ", ".join(f"{g} {money(v)}" + (f" ({pct(v / ctx['total'])})" if i == 0 else "")
@@ -306,10 +309,10 @@ def ex4(b: Build) -> None:
     y = b.year
     seg, reg = col("Customer", "CustomerSegment"), col("Customer", "Region")
     page = b.report.add(Page("ex134", "Ex 13.4"))
-    page.add(slicer("regionSlicer", 20, 20, 260, 64, reg, style="dropdown", title="Region"))
-    page.add(card("discountCard", 300, 20, 340, 64, [(DA, "Discounts")], units_none=True,
+    page.add(slicer("regionSlicer", 20, 20, 260, 96, reg, style="dropdown", title="Region"))
+    page.add(card("discountCard", 300, 20, 340, 156, [(DA, "Discounts")], units_none=True,   # a two-line title
                   title=f"Promotional discounts, fiscal {y} (the segment selected in the bar chart)"))
-    page.add(Visual("segmentBars", "clusteredBarChart", 20, 100, 620, 300, {"Category": [seg], "Y": [LT]},
+    page.add(Visual("segmentBars", "clusteredBarChart", 20, 176, 620, 232, {"Category": [seg], "Y": [LT]},
                     title=f"Revenue by customer segment, fiscal {y}", sort=[(LT, "Descending")],
                     objects=labels(), alt_text=f"Revenue by customer segment in fiscal {y}, sorted from the largest. "
                                                "Wholesale is the largest segment, well ahead of Strategic; Small "
@@ -329,7 +332,7 @@ def ex4(b: Build) -> None:
                                                   f"discounts {money(s['disc'])})" for s in segs) +
         ". By region: " + "; ".join(f"{r} {money(v)}" for r, v in ctx["regions"]) +
         f". The largest cell is {ctx['cell']['segment']} in the {ctx['cell']['region']}, {money(ctx['cell']['rev'])}.",
-        "(3) By default, clicking a bar cross-highlights the matrix and filters the card to that segment. With Format > "
+        "(3) By default, clicking a bar filters the card to that segment and narrows the matrix to it. With Format > "
         "Edit interactions set to None on the matrix, the bar chart still filters the card but the matrix stays whole: "
         "better when the manager wants one segment's discounts beside the full table of exact figures. " +
         (f"{zero[0]} received no discounts: services carry no promotion." if zero else ""),
@@ -472,22 +475,24 @@ def ex6(b: Build) -> None:
     draft.expect = ["Average discount", "Furniture", "Services", "LineTotal and DiscountAmount"]
 
     # (3) and (4) the revised page
+    claim(all(c > 0 for c in ctx["changes"]), "revenue rose from each whole fiscal year to the next")
     rev = b.report.add(Page("ex136r", "Ex 13.6 Revised", height=1180))
     rev.add(Visual("groupBars", "clusteredBarChart", 20, 20, 600, 260, {"Category": [ig], "Y": [LT]},
                    title=f"Revenue by item group, fiscal {y} (all item groups, including Services)",
                    sort=[(LT, "Descending")], objects=labels(), filters=[keep("groupBarsYear", FY, [y])],
                    alt_text=f"Revenue by item group in fiscal {y}, sorted from the largest, with data labels. Furniture "
                             "holds more than half of revenue; Services is the smallest group."))
-    rev.add(card("discountCards", 640, 20, 620, 110, [(DA, "Promotional discounts"), (LA, "Revenue at list price")],
+    rev.add(card("discountCards", 640, 20, 620, 136, [(DA, "Promotional discounts"), (LA, "Revenue at list price")],
                  units_none=True, title=f"Promotional discounts beside revenue at list price, fiscal {y}",
                  filters=[keep("discountCardsYear", FY, [y])],
                  alt_text=f"Two cards for fiscal {y}: the promotional discounts in dollars and the revenue at list "
                           "price, shown side by side in place of an average of the line rates, which weights a small "
                           "line as much as a large one."))
-    rev.add(Visual("yearColumns", "clusteredColumnChart", 640, 150, 620, 130, {"Category": [FY], "Y": [LT]},
+    rev.add(Visual("yearColumns", "clusteredColumnChart", 640, 166, 620, 114, {"Category": [FY], "Y": [LT]},
                    title=f"Revenue by fiscal year, {first} to {y}", objects=labels(),
-                   alt_text=f"Revenue by whole fiscal year from {first} to {y}, with data labels. Revenue grew "
-                            "modestly from year to year."))
+                   alt_text=f"Revenue by whole fiscal year from {first} to {y}, with data labels. Revenue rose "
+                            f"{pct(ctx['changes'][0])} into {first + 1}, from a {first} that includes the small start-up "
+                            f"month of January {first}, and {pct(ctx['changes'][-1])} into {y}."))
     rev.add(Visual("monthsFromZero", "lineChart", 20, 300, 620, 260, {"Category": [month], "Y": [LT]},
                    title=f"Monthly revenue, January {first} to December {y}, on an axis from zero",
                    objects=value_axis(start=0),
@@ -535,17 +540,18 @@ def ex6(b: Build) -> None:
     rev_y = lt(fy)
     for g, s in sl:
         group = lt(fy, f"'Item'[ItemGroup] = \"{g}\"")
-        b.check(t, f"pie slice {g}", round(s, 6), f"DIVIDE ( {group}, {rev_y} )", 0.000005)
-    b.check(t, "card: Average of Discount", round(ctx["avg"], 6),
-            f"CALCULATE ( AVERAGE ( SalesInvoiceLine[Discount] ), {fy} )", 0.000005)
+        b.check(t, f"pie slice {g}", round(s, 6), f"DIVIDE ( {group}, {rev_y} )", 0.000005, percent=True)
+    b.check(t, "card: Average of Discount (each line weighted equally)", round(ctx["avg"], 6),
+            f"CALCULATE ( AVERAGE ( SalesInvoiceLine[Discount] ), {fy} )", 0.000005, percent=True)
     b.check(t, "discount dollars over the dollars before discount", round(ctx["ratio"], 6),
             f"CALCULATE ( DIVIDE ( SUM ( SalesInvoiceLine[DiscountAmount] ), SUMX ( SalesInvoiceLine, "
-            f"SalesInvoiceLine[Quantity] * SalesInvoiceLine[UnitPrice] ) ), {fy} )", 0.000005)
+            f"SalesInvoiceLine[Quantity] * SalesInvoiceLine[UnitPrice] ) ), {fy} )", 0.000005, percent=True)
     b.check(t, "discount dollars over revenue at list price", round(ctx["of_list"], 6),
             f"CALCULATE ( DIVIDE ( SUM ( SalesInvoiceLine[DiscountAmount] ), SUM ( SalesInvoiceLine[ListAmount] ) ), "
-            f"{fy} )", 0.000005)
+            f"{fy} )", 0.000005, percent=True)
     b.check(t, "Furniture's Average of Discount", round(ctx["f_avg"], 6),
-            f"CALCULATE ( AVERAGE ( SalesInvoiceLine[Discount] ), {fy}, 'Item'[ItemGroup] = \"Furniture\" )", 0.000005)
+            f"CALCULATE ( AVERAGE ( SalesInvoiceLine[Discount] ), {fy}, 'Item'[ItemGroup] = \"Furniture\" )", 0.000005,
+            percent=True)
     b.check(t, f"start-up month {first}-01", round(ctx["start"], 2), lt(f"SalesInvoice[Month] = \"{first}-01\""))
     other = (f"FILTER ( VALUES ( SalesInvoice[Month] ), SalesInvoice[Month] <> \"{first}-01\" && "
              f"VALUE ( LEFT ( SalesInvoice[Month], 4 ) ) >= {first} )")
@@ -555,15 +561,15 @@ def ex6(b: Build) -> None:
             f"MAXX ( {other}, CALCULATE ( SUM ( SalesInvoiceLine[LineTotal] ) ) )")
     dec, jan = lt(f"SalesInvoice[Month] = \"{y}-12\""), lt(f"SalesInvoice[Month] = \"{first}-01\"")
     b.check(t, f"December {y} against the start-up month", round(ctx["growth"], 6), f"DIVIDE ( {dec}, {jan} ) - 1",
-            0.000005)
+            0.000005, percent=True)
     for i, c in enumerate(ctx["changes"]):
         yy = first + 1 + i
         b.check(t, f"fiscal {yy} against {yy - 1}", round(c, 6), f"DIVIDE ( {lt(year_of(yy))}, {lt(year_of(yy - 1))} ) - 1",
-                0.000005)
+                0.000005, percent=True)
     pm = f"{y}-{MONTHS.index(ctx['peak']['month']) + 1:02d}"
     b.check(t, f"discounts as a share of revenue, {pm}", round(ctx["peak"]["share"], 6),
             f"CALCULATE ( DIVIDE ( SUM ( SalesInvoiceLine[DiscountAmount] ), SUM ( SalesInvoiceLine[LineTotal] ) ), "
-            f"SalesInvoice[Month] = \"{pm}\" )", 0.000005)
+            f"SalesInvoice[Month] = \"{pm}\" )", 0.000005, percent=True)
     b.check(t, "Services revenue (what the hidden filter removes)", round(ctx["services"], 2),
             lt(fy, "'Item'[ItemGroup] = \"Services\""))
     shown = one("SELECT SUM(l.LineTotal) FROM SalesInvoiceLine l JOIN SalesInvoice si ON si.SalesInvoiceID = "

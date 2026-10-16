@@ -30,7 +30,7 @@ By the end, students can:
 
 ## Before you assign
 
-- **Files and software.** The analysis workbook at the end of Chapter 7's tutorials, with the BudgetLine and Account queries of Tutorial 7.2. The model answer uses LET, VSTACK, HSTACK and XLOOKUP (Microsoft 365).
+- **Files and software.** The analysis workbook at the end of Chapter 7's tutorials, with the BudgetLine and Account queries of Tutorial 7.2. The model answer uses LET, VSTACK, HSTACK and XLOOKUP. VSTACK and HSTACK need a newer Excel than the tutorials do, as the chapter note says.
 - **Data conditions.** The Budget Table (T76_Budget) summarizes the budget by cost center and account for {{ g.years[0].year }} to {{ d.N }}, so it has {{ g.summary_rows|count }} rows in {{ d.C }}. BudgetLine (T77_BudgetLine) holds every line. Only operating-expense lines can have a blank CostCenterID, and the accounts concerned are budgeted only that way, so they are missing from the summary altogether.
 - **Verify first.** Run the comparison once. The gap is about one percent of the budget in every year, which is why a total-to-total glance at the summary would not alarm anyone.
 

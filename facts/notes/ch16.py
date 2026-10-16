@@ -152,6 +152,21 @@ def disposition(d, e: dict) -> str | None:
     return None
 
 
+def open_periods(d, claim) -> list[str]:
+    """The pay dates of the year's periods that are not processed (the work after the last register's pay date), with the
+    claims the Data Through wording makes: no processed period of the year pays later than the last register, and the
+    open periods have no registers and pay in the next year."""
+    last = d.one("SELECT MAX(pp.PayDate) FROM PayrollRegister r JOIN PayrollPeriod pp ON pp.PayrollPeriodID = r.PayrollPeriodID")
+    claim(d.one("SELECT COUNT(*) FROM PayrollPeriod WHERE PayDate > ? AND PayDate <= ?", last, asof(d)) == 0,
+          "no pay period has a pay date between the last register's pay date and the year-end")
+    rows = d.q("SELECT pp.PayDate, COUNT(r.PayrollRegisterID) FROM PayrollPeriod pp LEFT JOIN PayrollRegister r "
+               "ON r.PayrollPeriodID = pp.PayrollPeriodID WHERE pp.Status <> 'Processed' "
+               "AND pp.PeriodStartDate <= ? GROUP BY pp.PayrollPeriodID ORDER BY pp.PayDate", asof(d))
+    claim(bool(rows) and all(n == 0 for _, n in rows), "the year's open pay periods have no registers")
+    claim(all(p > asof(d) for p, _ in rows), "the year's open pay periods are scheduled to pay in the next year")
+    return [p for p, _ in rows]
+
+
 def populations(d) -> dict[str, list[str]]:
     """Each process's documents by the date the register relates to the Date table."""
     return dict(JE=[e["date"] for e in entries(d)], PO=[o["date"] for o in orders(d)], PR=[r["date"] for r in registers(d)])
@@ -213,7 +228,7 @@ def t2(d, claim):
     pops = populations(d)
     regs = registers(d)
     payments = d.one("SELECT COUNT(*) FROM PayrollPayment")
-    unpaid = [r["id"] for r in regs if r["paid"] is None]
+    unpaid = [r["id"] for r in regs if r["paid"] is None]  # registers with no payment record
     count = Counter(e["test"] for e in ex)
     process_n = Counter(e["process"] for e in ex)
     tests = {p: [(t.split(" ", 1)[1], count[t]) for t in TESTS if t.startswith(p + " ")] for p in PROCESSES}
@@ -261,6 +276,9 @@ def t2(d, claim):
     years = {p: per_year(d, [e["date"] for e in ex if e["process"] == p]) for p in PROCESSES}
     diaz_orders = sum(1 for o in orders(d) if o["approver"] == po_after[0]["approver"])
     claim(diaz_orders == len(po_after), "the departed approver approved only the orders flagged after termination")
+    claim(all(o["approver"] is not None and o["approver"] in emp and o["limit"] is not None for o in orders(d))
+          and all(r["approver"] is not None and r["approved"] is not None for r in regs),
+          "every order has an approver with a recorded limit, and every register an approver and an approval date")
     return dict(po=dict(n=len(pops["PO"]), years=per_year(d, pops["PO"])),
                 pr=dict(n=len(pops["PR"]), years=per_year(d, pops["PR"])), payments=payments, unpaid=unpaid,
                 n=len(ex), process_n=process_n, tests=tests,
@@ -338,17 +356,19 @@ def t3(d, claim):
     orphans = {r[0] for r in d.q("SELECT DISTINCT SourceDocumentID FROM GLEntry WHERE SourceDocumentType = 'PayrollPayment' "
                                  "AND SourceDocumentID NOT IN (SELECT PayrollPaymentID FROM PayrollPayment)")}
     claim(d.one("SELECT COUNT(*) FROM PayrollPayment WHERE PayrollPaymentID <> PayrollRegisterID") == 0
-          and orphans == {r["id"] for r in unpaid}, "the unpaid registers' PayrollPayment GL rows are the trace orphans")
+          and orphans == {r["id"] for r in unpaid},
+          "the PayrollPayment GL rows of the registers with no payment record are the trace orphans")
     flagged = {e["doc"] for e in ex if e["process"] == "PR"}
     ceo = d.one("SELECT EmployeeID FROM Employee WHERE JobTitle = 'Chief Executive Officer'")
     not_flagged = [r for r in unpaid if r["number"] not in flagged]
     claim(len(not_flagged) == 1 and not_flagged[0]["payee"] == ceo
           and not_flagged[0]["id"] == min(r["id"] for r in regs if r["payee"] == ceo),
-          "the one unpaid register that is not an exception is the CEO's first register")
+          "the one register with no payment record that is not an exception is the CEO's first register")
     # Data Through
     last = dict(JE=max(e["date"] for e in entries(d)), PO=max(o["date"] for o in orders(d)), PR=max(r["date"] for r in regs))
     through_years = [min(max((x for x in xs if x[:4] == str(y)), default="9999") for xs in populations(d).values())
                      for y in d.years]
+    open_pays = open_periods(d, claim)
     # The package's Tests 1, 3, and 5 (Chapters 14-15)
     test1 = d.q("SELECT CAST(substr(si.InvoiceDate, 1, 4) AS INTEGER), COUNT(*), SUM(l.LineTotal) FROM SalesInvoiceLine l "
                 "JOIN SalesInvoice si ON si.SalesInvoiceID = l.SalesInvoiceID GROUP BY 1 ORDER BY 1")
@@ -379,7 +399,7 @@ def t3(d, claim):
                 capital=capital, capital_amounts=[po[k]["amount"] for k in capital], capital_by=capital_by["id"],
                 capital_limit=capital_by["limit"], orders=len(numbers), first=min(numbers), last_number=max(numbers),
                 registers=len(regs), unpaid=[r["id"] for r in unpaid], ceo_register=not_flagged[0]["id"] if not_flagged else None, last=last,
-                through=min(last.values()),
+                through=min(last.values()), open_pays=open_pays, n_open=word(len(open_pays)),
                 through_years=through_years, test1=[(n, rev) for _, n, rev in test1], test1_outside=test1_outside,
                 tb_accounts=len(tb), tb=tb_debit,
                 test5=[hours[y] / standard[y] for y in d.years])
@@ -395,7 +415,8 @@ def ex1(d, claim):
                "Credited AS (SELECT OriginalSalesInvoiceID AS SalesInvoiceID, SUM(GrandTotal) AS Credited FROM CreditMemo "
                "WHERE CreditMemoDate <= ?1 GROUP BY OriginalSalesInvoiceID) "
                "SELECT si.SalesInvoiceID, si.CustomerID, ROUND(si.GrandTotal - COALESCE(a.Applied, 0) - COALESCE(c.Credited, 0), 2), "
-               "julianday(?1) - julianday(si.DueDate), COALESCE(a.Applied, 0), si.GrandTotal FROM SalesInvoice si "
+               "julianday(?1) - julianday(si.DueDate), COALESCE(a.Applied, 0), si.GrandTotal, "
+               "a.Applied IS NOT NULL AND c.Credited IS NOT NULL FROM SalesInvoice si "
                "LEFT JOIN Applied a ON a.SalesInvoiceID = si.SalesInvoiceID LEFT JOIN Credited c ON c.SalesInvoiceID = si.SalesInvoiceID "
                "WHERE si.InvoiceDate <= ?1", end)
     positive = [r for r in rows if r[2] > 0]
@@ -404,6 +425,8 @@ def ex1(d, claim):
                       "AND a.ApplicationDate <= ?1) AND NOT EXISTS (SELECT 1 FROM CreditMemo c WHERE "
                       "c.OriginalSalesInvoiceID = si.SalesInvoiceID AND c.CreditMemoDate <= ?1)", end)
     claim(0 < untouched < len(positive), "some open invoices have no application or credit memo (the nulls matter)")
+    both = sum(1 for r in positive if r[6])
+    claim(both < 0.05 * len(positive), "few open invoices have both an application and a credit memo, so leaving both nulls drops almost all")
     buckets = [dict(name=name, balances=[]) for _, name in BUCKETS]
     for r in positive:
         buckets[[i for i, (low, _) in enumerate(BUCKETS) if r[3] >= low][-1]]["balances"].append(r[2])
@@ -433,7 +456,7 @@ def ex1(d, claim):
                 b=[dict(name=b["name"], amount=sum(b["balances"])) for b in buckets], ledger=ledger,
                 difference=ledger - total, entry=entry, n_negative=len(negative), negative=sum(r[2] for r in negative),
                 oldest=dict(n=len(oldest), largest=max((r[2] for r in oldest), default=0.0)), refunded=refunded,
-                untouched=untouched, ar_id=d.account("1020"))
+                untouched=untouched, both=both, ar_id=d.account("1020"))
 
 
 # --- Exercise 16.2 --------------------------------------------------------------------------------
@@ -678,4 +701,5 @@ def mcq(d, claim):
     claim(min(last.values()) == last["PR"] < min(last["JE"], last["PO"]), "the last pay date is the earliest of the last dates")
     claim(d.one("SELECT COUNT(*) FROM PayrollPeriod WHERE Status <> 'Processed' AND PeriodStartDate <= ?", asof(d)) > 0,
           "pay periods of the year are open")
+    open_periods(d, claim)
     return dict(pay_day=f"{MONTHS[int(last['PR'][5:7]) - 1]} {int(last['PR'][8:])}")

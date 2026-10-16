@@ -20,7 +20,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 (3) Repeat the test for supplier invoices, comparing InvoiceDate with the posting date of each invoice's ledger rows. Compare the posting dates with ReceivedDate, and explain which date Charles River posts supplier invoices on.
 
-(4) Total the hourly labor cost of LaborTimeEntry (ExtendedLaborCost) by the year of its WorkDate and the fiscal year of its pay period, and identify the cost of work done in December that was recorded in the next fiscal year. Estimate the full payroll cost of the work of 14 to 31 December 2026, whose pay periods have no registers, from the average cost of the last pay periods of fiscal 2026, and state the assumptions behind the estimate.
+(4) Total the hourly labor cost of LaborTimeEntry (ExtendedLaborCost) by the year of its WorkDate and the fiscal year of its pay period, and identify the cost of work done in December that was recorded in the next fiscal year. Estimate the full payroll cost of the work of December 14 to 31, 2026, whose pay periods have no registers, from the average cost of the last pay periods of fiscal 2026, and state the assumptions behind the estimate.
 
 (5) Write a short memo (one half page) to the controller with the effect on each year and a recommendation for the year-end close.
 
@@ -60,17 +60,17 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Table group:** Manufacturing
 
-**Scenario.** Tutorial 11.2 showed Packing and Quality Assurance recording several times their planned hours, and Tutorial 12.3 showed that much of the time was recorded after operations had ended, and that the months of 2024 with little indirect time are complete. The plant manager asks what the work-center comparison looks like when only the time recorded while each operation was open is counted, and what the plant was doing in the first months of 2024.
+**Scenario.** Tutorial 11.2 showed Packing and Quality Assurance recording several times their planned hours, and Tutorial 12.3 showed that much of the time was recorded after operations had ended, and that the months of 2024 with little indirect time are recorded like the others. The plant manager asks what the work-center comparison looks like when only the time recorded while each operation was open is counted, and what the plant was doing in the first months of 2024.
 
 **Requirements.**
 
-(1) For each direct labor time entry, flag whether it was recorded on or before the operation's ActualEndDate, and count the entries dated before the operation's ActualStartDate, which would also fall outside the time the operation was open.
+(1) For each direct labor time entry, flag whether it was recorded on or before the operation's ActualEndDate, and count the entries dated before the operation's ActualStartDate, which would also fall outside the time the operation was open. Keep the entries with no valid operation, and count them as a group of their own.
 
 (2) Repeat the work-center comparison of Tutorial 11.2, with the planned hours of each work center and year, and two recorded-to-planned ratios: one for all direct hours, and one for the hours recorded while the operation was open.
 
 (3) Rank the work centers by each ratio, and describe how the ranking changes.
 
-(4) For each month from January to July 2024, count the work orders released and total the units completed and the manufactured units shipped. Explain why there is so little indirect time from February to May 2024, and find the month in which the share of direct time recorded after its operation ended first passed a quarter.
+(4) For each month from January to July 2024, count the work orders released and total the units completed and the manufactured units shipped. Explain what may account for the little indirect time from February to May 2024 and what evidence would confirm it. Find the month in which the share of direct time recorded after its operation ended first passed a quarter.
 
 (5) Write a short memo (one half page) to the plant manager: what the operation-level data can and cannot support, and what should change in how time is recorded.
 
@@ -96,7 +96,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 (4) For the surge days of Tutorial 12.3, report who approved the overtime and when, and compare the overtime on those days with the overtime on other days in each year.
 
-(5) Explain what the results say about the design of the overtime approval control, and suggest two changes that would make it a real control.
+(5) Explain what the results say about the design of the overtime approval control, and suggest two changes that would make it a stronger control.
 
 **Deliverable.** A script with the analysis and a short list of findings and recommendations.
 

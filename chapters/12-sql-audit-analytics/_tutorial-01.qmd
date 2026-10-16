@@ -31,7 +31,7 @@ a. Type and run the test below.
 
 b. Compare the first two columns with the last two.
 
-The number of entries and their total agree with the entries and the debits posted to the ledger, as Tutorial 8.3 found in Excel. The agreement supports the completeness of the population with respect to the ledger, at the level of counts and totals. As Tutorial 4.1, Step 10 showed, differences that offset would leave the totals equal, and only a comparison of the entries themselves, an anti-join like those of Step 3, would find them.
+The number of entries and their total agree with the entries and the debits posted to the ledger, as Tutorial 8.3 found in Excel. The agreement supports the completeness of the population with respect to the ledger, at the level of counts and totals. As Tutorial 4.1, Step 10 showed, differences that offset would leave the totals equal. An anti-join like those of Step 3 finds an entry missing from one side, but an entry posted at the wrong amount still has its match, so only a comparison of each entry's total with its own postings would find such differences.
 
 **Step 2. Reconcile the manufacturing payroll to the ledger.** The payroll registers state what each employee was paid and what the company paid on top, and GLEntry records the cost center of each posting.
 
@@ -77,8 +77,8 @@ a. Type and run the test below.
    -- Tutorial 12.1, test L3: postings and documents traced both ways
    -- Population: four document types; expected: no rows
    SELECT 'Posting with no payroll payment' AS Test,
-       gl.GLEntryID AS RecordID, gl.PostingDate AS RecordDate,
-       gl.Debit + gl.Credit AS Amount
+       gl.GLEntryID AS RecordID, gl.SourceDocumentID AS DocumentID,
+       gl.PostingDate AS RecordDate, gl.Debit + gl.Credit AS Amount
    FROM GLEntry AS gl
        LEFT JOIN PayrollPayment AS pp
            ON pp.PayrollPaymentID = gl.SourceDocumentID
@@ -86,7 +86,7 @@ a. Type and run the test below.
        AND pp.PayrollPaymentID IS NULL
    UNION ALL
    SELECT 'Posting with no supplier payment', gl.GLEntryID,
-       gl.PostingDate, gl.Debit + gl.Credit
+       gl.SourceDocumentID, gl.PostingDate, gl.Debit + gl.Credit
    FROM GLEntry AS gl
        LEFT JOIN DisbursementPayment AS dp
            ON dp.DisbursementID = gl.SourceDocumentID
@@ -94,14 +94,14 @@ a. Type and run the test below.
        AND dp.DisbursementID IS NULL
    UNION ALL
    SELECT 'Sales invoice never posted', si.SalesInvoiceID,
-       si.InvoiceDate, si.GrandTotal
+       si.SalesInvoiceID, si.InvoiceDate, si.GrandTotal
    FROM SalesInvoice AS si
        LEFT JOIN GLEntry AS gl ON gl.SourceDocumentType = 'SalesInvoice'
            AND gl.SourceDocumentID = si.SalesInvoiceID
    WHERE gl.GLEntryID IS NULL
    UNION ALL
    SELECT 'Supplier invoice never posted', pi.PurchaseInvoiceID,
-       pi.InvoiceDate, pi.GrandTotal
+       pi.PurchaseInvoiceID, pi.InvoiceDate, pi.GrandTotal
    FROM PurchaseInvoice AS pi
        LEFT JOIN GLEntry AS gl ON gl.SourceDocumentType = 'PurchaseInvoice'
            AND gl.SourceDocumentID = pi.PurchaseInvoiceID
@@ -110,9 +110,9 @@ a. Type and run the test below.
 
 b. Read the Test column of each row in the result.
 
-The result, shown in @fig-12-02, holds six rows, all from the first test: the postings that Exercise 10.5 found. The six ledger rows refer to three payroll payments that do not exist in the PayrollPayment table: three pairs, each a debit to accrued payroll and a credit to cash, in January of each year. The other three tests return no rows. Every supplier payment in the ledger has its document, and every sales and supplier invoice was posted. Each kind of document is traced in one direction only, and no amounts are compared; a full trace would run both directions, and compare the amounts, for every kind of document the ledger records.
+The result, shown in @fig-12-02, holds six rows, all from the first test: the postings that Exercise 10.5 found. DocumentID shows the SourceDocumentID that each posting points to, and for an invoice it repeats the invoice's own ID. The six ledger rows point to three payroll payments that do not exist in the PayrollPayment table, in three pairs that share a DocumentID, each a debit to accrued payroll and a credit to cash, in January of each year. The other three tests return no rows. Every supplier payment in the ledger has its document, and every sales and supplier invoice was posted. Each kind of document is traced in one direction only. An anti-join tests only that a matching ID exists, so a document posted at the wrong amount would pass it, and a full trace would run both directions, and compare the amounts, for every kind of document the ledger records.
 
-![The Trace Exceptions in One List.](/visuals/svg/fig-12-02-trace-exceptions.svg){#fig-12-02 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Audit.sql, shows the start of a test that combines four anti-joins with UNION ALL: ledger postings with no payroll payment, ledger postings with no supplier payment, sales invoices never posted, and supplier invoices never posted. The result grid holds six rows, all labeled Posting with no payroll payment, three pairs of equal amounts dated in January 2024, January 2025, and January 2026. The Test column is outlined."}
+![The Trace Exceptions in One List.](/visuals/svg/fig-12-02-trace-exceptions.svg){#fig-12-02 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Audit.sql, shows the start of a test that combines four anti-joins with UNION ALL: ledger postings with no payroll payment, ledger postings with no supplier payment, sales invoices never posted, and supplier invoices never posted. The result grid holds six rows, all labeled Posting with no payroll payment, three pairs of equal amounts dated in January 2024, January 2025, and January 2026, each pair pointing to the same missing payment. The Test column is outlined."}
 
 **Step 4. Explain the six postings.** In this data, a payroll payment carries the same ID as the payroll register it pays, so the missing payments point to their registers. CostCenter appears twice in the test, as ec for the employee's own cost center and as rc for the register's, so that each row can show both.
 
@@ -136,7 +136,7 @@ a. Type and run the test below.
    WHERE pay.PayrollPaymentID IS NULL;
    ```
 
-b. Compare the register IDs and net pay with the SourceDocumentID and amounts of the six postings.
+b. Compare the register IDs and net pay with the DocumentID and amounts of the six postings.
 c. Compare each register's cost center with its employee's.
 
 Three approved registers have no payment record, and their IDs and net pay match the six postings: the ledger recorded the cash, but the payment documents are missing. The first register pays the chief executive officer. The other two pay an Account Executive of the Sales cost center, terminated in April 2024, in January 2025 and January 2026, and they are charged to the Executive cost center at the same gross pay as the chief executive's register. A credit to cash does not say who received the money, so the bank records must confirm the payee. Exercise 12.5 follows the employee further.

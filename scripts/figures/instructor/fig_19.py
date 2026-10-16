@@ -380,7 +380,11 @@ def if_19_0_a() -> Diagram:
     assert "no more than three pages" in text and "appendix of exhibits" in text, "the report's page limits are the case's"
     # the four model files: the Power BI row of the case's table names two
     sql_f, xl_f, pbi_f = files
-    names = [sql_f["file"].split(",")[0], xl_f["file"], *[x.strip() for x in pbi_f["file"].split(", and ")]]
+    # the Power BI row names Credits Analytics.pbix plus the monitoring file updated, or a register in its place; the model
+    # answer updates Audit Monitoring.pbix, so the figure draws that file
+    report, monitoring = [x.strip() for x in pbi_f["file"].split(", plus ")]
+    assert monitoring == "an updated Audit Monitoring.pbix or a small register in Credits Analytics.pbix", monitoring
+    names = [sql_f["file"].split(",")[0], xl_f["file"], report, "Audit Monitoring.pbix updated"]
     holds = [sql_f["holds"], xl_f["holds"], *[x.strip() for x in pbi_f["holds"].split("; ")]]
     assert names == ["Credits.sql", "Credits Audit.xlsx", "Credits Analytics.pbix", "Audit Monitoring.pbix updated"], names
     assert len(holds) == 4 and "Export to CSV" in sql_f["handoff"] and "refund flags" in pbi_f["handoff"], (holds, files)
@@ -575,8 +579,9 @@ def if_19_1_a() -> Diagram:
     c = n.cycle(data)
     points = _control_points()
     styles = {p["point"]: p["style"] for p in points}
-    assert styles == {"C1": "partial", "C2": "partial", "C3": "full", "C4": "partial", "C5": "partial", "C6": "partial", "C7": "partial",
-                      "C8": "outside", "C9": "partial"}, styles
+    # C3 is partial: the freight policy and the tax criterion lie outside the records (U26)
+    assert styles == {"C1": "partial", "C2": "partial", "C3": "partial", "C4": "partial", "C5": "partial", "C6": "partial",
+                      "C7": "partial", "C8": "outside", "C9": "partial"}, styles
     # the departments and the postings, asserted against the records
     cc = lambda ids: sorted({c.emp[e]["cc"] for e in ids})                                                     # noqa: E731
     dept = {"CashReceipt": cc(r["rec"] for r in c.rcpt.values()), "SalesReturn": cc(s["recv"] for s in c.sr.values()),
@@ -632,8 +637,10 @@ def if_19_1_a() -> Diagram:
         ry += rh + 2
     ly = ry + 14
     cx = 0.0
-    for style, label in (("full", "The records evidence it"), ("partial", "The records evidence part of it: the rest is written beside the badge"),
-                         ("outside", "The evidence lies outside the database")):
+    used = {p["style"] for p in points}
+    for style, label in [x for x in (("full", "The records evidence it"),
+                                     ("partial", "The records evidence part of it: the rest is written beside the badge"),
+                                     ("outside", "The evidence lies outside the database")) if x[0] in used]:
         _badge(d, "C", cx, ly, style, 22)
         width = text_width(label, SMALL, False) + 12
         d.text(esc(label), cx + 28, ly, width, 22, size=SMALL, valign="middle")
@@ -643,8 +650,10 @@ def if_19_1_a() -> Diagram:
     d.line_sample(190, ly + 44, 44, color=AMBER, dashed=True, end="blockThin")
     d.text("Posting to the ledger", 242, ly + 34, 180, 20, size=SMALL, valign="middle")
     counts = {s: sum(1 for p in points if p["style"] == s) for s in ("full", "partial", "outside")}
-    _note(d, f"The model answer's marking, from the Cycle Map and Risks sheets: {counts['full']} control point is evidenced by the records (C3, whose recomputation "
-             f"is complete in them), {counts['partial']} are evidenced in part, and {counts['outside']} (C8) rests mostly on evidence in no table. The badge style "
+    full = (f"{counts['full']} control point is evidenced by the records (C3, whose recomputation is complete in them), {counts['partial']} are evidenced in part"
+            if counts["full"] else f"{counts['partial']} control points are evidenced in part (C3 among them, since the freight policy for partial returns and "
+            f"a criterion for the tax lie outside the records)")
+    _note(d, f"The model answer's marking, from the Cycle Map and Risks sheets: {full}, and {counts['outside']} (C8) rests mostly on evidence in no table. The badge style "
              f"carries the reading with its fill and its outline, not its color alone. Departments are the cost centers of the people each document names.", ly + 66)
     return d
 
@@ -2215,7 +2224,7 @@ def if_19_10_a() -> Diagram:
     _mon_page_tabs(page, d, canvas_h + 4)
     through = findings[names[0]][2]
     fix = findings[names[0]][3]
-    _note(d, f"Report view, page Credits Cycle of Audit Monitoring, in a different arrangement from the model answer's (its text box with the written answer is not drawn). The matrix gives, for each "
+    _note(d, f"Report view, page Credits Cycle of Audit Monitoring (the text box with the written answer, below the table, is not drawn). The matrix gives, for each "
              f"new test, the exceptions, the population and the rate per 1,000 by year and over the three years; the Total row's population and rate are blank (outlined in coral) because the Population "
              f"measure reads one process at a time. The cards count the register: {r10['new']:,} exceptions, of which {g10['reviewed']} are reviewed, {new_rows:,} covered by a design finding (outlined in "
              f"teal, as in the table) and {g10['open_old']} open, as before the four tests; the table's Open Exceptions is blank because every exception of the new tests is covered. In amber, the date each "

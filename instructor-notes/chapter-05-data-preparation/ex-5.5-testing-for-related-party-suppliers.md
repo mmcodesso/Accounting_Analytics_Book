@@ -25,7 +25,7 @@ By the end, students can:
 
 ## Before you assign
 
-- **Files and software.** CharlesRiver.xlsx and a workbook for the exercise. The exercise says a new workbook. The model answer keeps all six exercises in one file, so its Supplier Table is the one Exercise 5.6 uses. Either works; tell students which, because Exercise 5.6 says "the workbook of Exercise 5.5".
+- **Files and software.** CharlesRiver.xlsx and a new workbook, as the exercise says. The model answer keeps all six exercises in one file, so its worksheets Ex 5.5, Ex 5.5 Supplier, Ex 5.5 Employee and Ex 5.5 DisbursementPayment stand for that new workbook, and its Supplier Table is the one Exercise 5.6 extends. Either layout works. Tell students which to use, because Exercise 5.6 says "the workbook of Exercise 5.5".
 - **Load time.** The DisbursementPayment Table holds 40,127 rows. Load it to a worksheet with **Close & Load To**, and expect a pause on the load and on each SUMIFS.
 - **Data conditions.** 110 suppliers and 120 employees. No address or city has a stray space, so TRIM changes nothing, and the as-recorded match finds the same 6 suppliers as the standardized key. The address alone finds the same suppliers too, so the effect of including the city cannot be shown in this data. The explanation in requirement (2) is an argument, and students should give it as one.
 - **Who the matches are.** All 6 matched suppliers are approved and rated Low risk. The matched employees have 4 different job titles, none in purchasing.

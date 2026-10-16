@@ -25,7 +25,7 @@ By the end, students can:
 - say which revenue information lives only in the Accounting Core, and which keys reach it (outcome 4);
 - turn the findings into a one-page data dictionary excerpt that a colleague could use.
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and Core S2 M4 (information technology and IT controls); IMA Data Literacy, and Financial Recordkeeping and Financial Statement Preparation; IFAC IES 2 (a), financial accounting and reporting, and IES 3 (a), evaluating data and information from several sources; AACSB A5 part 5.2.
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and Core S2 M4 (information technology and IT controls); IMA Data Literacy, and Financial Recordkeeping; IFAC IES 2 (a), financial accounting and reporting, and IES 3 (a), evaluating data and information from several sources; AACSB A5 part 5.2.
 
 ## Before you assign
 

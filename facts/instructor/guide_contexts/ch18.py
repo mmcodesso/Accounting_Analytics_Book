@@ -912,7 +912,8 @@ def g7(d, claim):
     remain_h = sum(v["unit"]["time"] * v["units"] for v in m["fam"].values()) - m["hours"]
     return dict(
         f=f, n_q23=len(q23), positions=m["positions"], remain_h=remain_h, spread=m["hours"] * m["td_rate"] / remain_h,
-        unused_after=(m["unused_h"] + m["hours"]) * m["td_rate"], run_only=round(run_only, 2), avail_before=avail_before, avail_after=avail_after, wrong=wrong,
+        unused_after=(m["unused_h"] + total) * m["td_rate"], mixed_after=(m["unused_h"] + m["hours"]) * m["td_rate"],
+        run_only=round(run_only, 2), avail_before=avail_before, avail_after=avail_after, wrong=wrong,
         sales_hours=m["hours"], sheet=gname, sheets=[n18_growth_name(i) for i in range(len(n18.GROWTH))],
         growths=list(n18.GROWTH), n_wcs=len(m["wcs"]))
 

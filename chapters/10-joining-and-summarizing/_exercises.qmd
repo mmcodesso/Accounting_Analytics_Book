@@ -2,7 +2,7 @@
 
 ## Applied Exercises
 
-Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of each exercise in a script of its own, named after the exercise (such as `Ex 10.1.sql`), with a header comment and a comment above each query. Test every join by comparing the number of rows it returns with the number it should return, and group by key rather than by name.
+Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of each exercise in a script of its own, named after the exercise (such as `Ex 10.1.sql`), with a header comment and a comment above each query. Test every join by its keys, its row count, and its totals, as the chapter does, and group by key rather than by name.
 
 ### Financial Accounting Exercises
 

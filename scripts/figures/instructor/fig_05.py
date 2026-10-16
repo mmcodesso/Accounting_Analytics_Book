@@ -306,12 +306,12 @@ def if_05_0_b() -> Diagram:
         (0, "Merge SalesInvoice with Customer on CustomerID", invoices, with_customer, TEAL_TINT, TEAL, box_h,
          f"<b>CustomerID</b> in Customer: each key appears once<br>{n_customers:,} rows, {distinct_customers:,} different keys",
          ["InvoiceNumber", "CustomerName"], [[demo["invoice"], demo["customer"]]], [False, False],
-         "<b>Count unchanged: merge safe</b>", "teal"),
+         "<b>Count unchanged, no row repeated</b>", "teal"),
         (pw + gap, "Merge SalesInvoice with Shipment on SalesOrderID", invoices, with_shipment, CORAL_TINT, CORAL, after_h,
          f"<b>SalesOrderID</b> in Shipment: the key repeats in the second table<br>{n_ships:,} rows for {ship_orders:,} "
          f"orders; {t2['multi_ship']:,} orders have several",
          ["InvoiceNumber", "ShipmentDate"], [[demo["invoice"], d1] for _, d1 in demo["ships"]], [True, False],
-         "<b>Count grew: the key repeats</b>", "coral"),
+         "<b>Count grew, the key repeats</b>", "coral"),
     ]
     sketch_top = 48 + after_h + 14 + 52 + 14 + 20
     verdict_y = sketch_top + 24 * 3 + 16
@@ -335,10 +335,12 @@ def if_05_0_b() -> Diagram:
                       stroke=AMBER if hot else RULE, size=SMALL, rounded=False, align="left")
         fill_v, stroke_v = kit.tint(tone)
         d.box(verdict, px, verdict_y, pw, 40, fill=fill_v, stroke=stroke_v, stroke_width=1.5, size=BODY)
-    d.text(f"<i>Both merges are left outer merges, so no invoice is dropped. The row count after loading is the test: compare "
-           f"it with the {invoices:,} invoices. Merging on a key that repeats in the second table gives the invoice one row "
-           f"for each match, here one for each shipment of its order, and every total on the invoice then counts twice or more. "
-           f"Amber cells: the invoice number repeated by the merge.</i>", 0, verdict_y + 54, 860, 52, size=SMALL, color=GRAY)
+    d.text(f"<i>Both merges are left outer merges, so no invoice is dropped. The row count after loading tests repetition, "
+           f"so compare it with the {invoices:,} invoices. It cannot show that every invoice found a match, because an invoice "
+           f"without one stays in the result with empty columns, and a left anti merge that returns no rows tests that. Merging "
+           f"on a key that repeats in the second table gives the invoice one row for each match, here one for each shipment of "
+           f"its order, and every total on the invoice then counts twice or more. Amber cells: the invoice number repeated by "
+           f"the merge.</i>", 0, verdict_y + 54, 860, 72, size=SMALL, color=GRAY)
     return d
 
 

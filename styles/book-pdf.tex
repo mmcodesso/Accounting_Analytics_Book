@@ -1,6 +1,18 @@
 \usepackage[T1]{fontenc}
 \usepackage{mathpazo}
 \usepackage[scaled=0.92]{helvet}
+% The book's fonts are T1-encoded Palatino and Helvetica, so LuaLaTeX sends a character outside T1 to the slot of
+% its code point: × (U+00D7) printed as Œ, and −, ² and Σ were dropped or replaced ("ranges from −1 to +1" read
+% "from 1 to +1"). Each is mapped to the text symbol of the companion encoding (TS1), and Σ, which T1 and TS1
+% lack, to TeX Gyre Pagella, the OpenType Palatino.
+\usepackage{newunicodechar}
+\newunicodechar{×}{\texttimes}
+\newunicodechar{−}{\textminus}
+\newunicodechar{²}{\texttwosuperior}
+\ifdefined\newfontfamily
+  \newfontfamily\aagreek{TeX Gyre Pagella}
+  \newunicodechar{Σ}{{\aagreek Σ}}
+\fi
 \usepackage{microtype}
 \usepackage{booktabs}
 \usepackage{longtable}
@@ -122,6 +134,19 @@
     \dimen@ii\pagegoal \advance\dimen@ii-\pagetotal
     \ifdim\dimen@>\dimen@ii \global\aa@incodetrue \break \global\aa@incodefalse \fi
   \endgroup}
+% A tutorial step's label ("Step 5. Add the cards.") is a paragraph, not a heading, so the page could break right
+% after it and leave it alone at the foot. The same filter puts \aaKeepLabel before each label: when the page
+% cannot hold the label and the first lines of the step, the label starts the next page. Unlike \aaNeedspace, it
+% adds no penalty that would invite a break, only \penalty0, a break the paragraphs allow anyway, so that a page
+% already full is sent out before the room is measured (without it, the page after a full one held only the last
+% paragraph before the label). Waiting figures and tables stay free to go first.
+\newcommand{\aaKeepLabel}[1]{%
+  \par\penalty0
+  \begingroup
+    \setlength\dimen@{#1}%
+    \dimen@ii\pagegoal \advance\dimen@ii-\pagetotal
+    \ifdim\dimen@>\dimen@ii \break \fi
+  \endgroup}
 \makeatother
 
 % Long Excel formulas in code blocks wrap after commas and asterisks, with a continuation mark,
@@ -129,6 +154,11 @@
 % spaces. Deferred to \begin{document} because a package loaded later in Quarto's template
 % redefines the verbatim environment.
 \usepackage{fvextra}
+% fvextra's continuation mark, \hookrightarrow in math mode, became U+21AA in a font that lacks it (the log read
+% "Missing character: There is no ↪", and the PDF printed no mark), so the mark comes from TeX Gyre Pagella.
+\ifdefined\aagreek
+  \fvset{breaksymbolleft={\tiny{\aagreek ↪}}}
+\fi
 \AtBeginDocument{%
   \renewenvironment{verbatim}{\VerbatimEnvironment\begin{Shaded}%
     \begin{Verbatim}[breaklines,breakafter={,*},breakaftersymbolpre={}]}{\end{Verbatim}\end{Shaded}}%

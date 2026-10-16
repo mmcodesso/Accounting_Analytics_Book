@@ -64,7 +64,7 @@ With the commission rate of 1.903%, the three differences add to -$347,840.88. *
 
 **Step 2. Confirm each break-even with Goal Seek.** Choose **Data > What-If Analysis > Goal Seek**, enter the difference cell in **Set cell**, `0` in **To value** and the lift cell in **By changing cell**. Note the lift, then return the cell to zero: a lift left behind hides the cost of the discount. The found lift equals the formula's. Treating the fixed overhead in the standard cost as fixed lowers the Furniture break-even to 28.9%, as Tutorial 7.3 noted.
 
-**Step 3. Set the measured differences beside the break-evens.** Compute each promotion's break-even from its own billed lines and look up Requirement 3's difference.
+**Step 3. Set the measured differences beside the break-evens.** The requirement asks for the three proposed promotions. The model answer also computes the other six from their own billed lines, as corroboration, so a student who models the three is not marked down.
 
 | Promotion | Break-even lift | Measured difference | Share of break-even |
 |---|---:|---:|---:|
@@ -100,8 +100,7 @@ d. Choose **Home > Conditional Formatting > New Rule** to shade the positive cel
 
 **Step 5. Solve for the Furniture discount at the best measured increase.** Choose **Data > What-If Analysis > Goal Seek**: set the difference at that increase (the cell that holds `LargestLift`) to `0` by changing the discount-rate input cell.
 
-**Check:** the largest measured increase is +11.9% (promotion 2, Accessories), and the Furniture discount that it would just pay for is about 4.5%. At 5 percent the promotion needs a 13.3% increase instead of 30.8%. The discount is a ceiling, not a recommendation.
-
+**Check:** the largest measured increase is +11.9% (promotion 2, Accessories), and the Furniture discount that it would just pay for is about 4.5%. At 5 percent the promotion needs a 13.3% increase instead of 30.8%. The discount is a sensitivity, not a recommendation. The increase was measured for another scope and year (2024) and is an observed difference, not an effect of a promotion. Furniture's own difference of +0.3% would support a discount of only about 0.15%.
 ### Phase 3: The budgets and the cost of the calendar
 
 **Step 6. Read how the budgets planned prices.** On `R4 Budgets`, for each fiscal year and month:
@@ -116,9 +115,9 @@ Then the same ratio for the promoted items in their promotion months, with the c
 
 **Step 7. Cost the calendar by quarter.** For each proposed promotion and quarter, multiply the proposed rate by the report year's gross amount (SUMIFS on `BilledLines` by PromotionID, year and InvoiceQuarter), total, round to hundreds, and multiply the total by one less the commission rate.
 
-**Check:** $354,589.72 of discounts, $347,840.88 of contribution after the commissions saved, against a budget without promotions: about $7,600.00 in the first quarter, $22,500.00 in the second, $96,400.00 in the third and $228,100.00 in the fourth. **Watch for:** the rate applied to LineTotal, already net of the discount, which understates the cost by the rate itself.
+**Check:** $354,589.72 of discounts, $347,840.88 of contribution after the commissions saved, against a budget without promotions. By quarter that is about $7,600.00 in the first quarter, $22,500.00 in the second, $96,400.00 in the third and $228,100.00 in the fourth. The estimate holds the report year's billed volume, mix, prices and costs, so it is a sensitivity, not a forecast. It also leaves out $5,625.76 of discount on the proposal's report-year orders not yet billed in the data (Furniture $891.18, Design Trade $4,734.58). **Watch for:** the rate applied to LineTotal, already net of the discount, which understates the cost by the rate itself.
 
-**Step 8. State the volume basis.** The estimate uses the report year's billed lines at no increase, because Requirement 3 found none. It does not use the budget's quantities: the budget plans 17,580 Furniture units for September and October 2027 against 4,839 ordered in those months of 2026, 3.6 times as many, so a cost taken from it would be overstated almost fourfold. BudgetLine has no customer dimension, so the Design Trade promotion cannot be costed from it at all.
+**Step 8. State the volume basis.** The estimate uses the report year's billed lines at no increase, because Requirement 3 found no increase near any break-even. It does not use the budget's quantities: the budget plans 17,580 Furniture units for September and October 2027 against 4,839 ordered in those months of 2026, 3.6 times as many, so a cost taken from it would be overstated almost fourfold. BudgetLine has no customer dimension, so the Design Trade promotion cannot be costed from it at all.
 
 ## Expected results
 
@@ -129,14 +128,14 @@ Then the same ratio for the promoted items in their promotion months, with the c
 | Discounts of the calendar; contribution given up | $354,589.72; $347,840.88 | 7 |
 | Budget quantity over quantity ordered, fall months | 3.6 | 8 |
 
-> **Instructor notes, Requirement 4:** model inputs from the 2026 billed lines: Harbor (promotion 7) 569.21 units, price before discount 669.32, standard cost 378.46; Furniture (8) 4,823.89 units, 613.72, 346.36; Design Trade (9) 561.74 units, 416.23, 215.99. With CommissionRate 1.903%, the break-even increases are Harbor 23.3%, Furniture 30.8% (28.9% if fixed overhead is excluded from the standard cost, as in Tutorial 7.3), and Design Trade 34.2%; across all nine promotions they run from 23% to 40%. At a 5% Furniture discount the break-even increase is 13.3%. Goal Seek at promotion 2's +11.9% gives a Furniture discount of about 4.5%. Budgets (BudgetAmount / (Quantity x Item ListPrice) by month): the 2024-2026 budgets planned lower prices in the promotion months, 0.8806 of list for the promoted items (the year's collection in March-April, the year's item group in September-October), with every group lower in November. The 2027 budget, approved by the chief financial officer (EmployeeID 2) on 2026-12-15, is flat at about 0.9277 of list in every month. Cost at 2026 volumes, with no increase: discounts of 354,589.72, or 347,840.88 of contribution after the commission saved. The discounts land in Q1 about 7,600, Q2 22,500, Q3 96,400, and Q4 228,100 (Requirement 2). The budget's volume is several times actual (Chapter 7): it plans 17,580 Furniture units for September-October 2027 against 4,839 ordered in those months of 2026, so a cost taken from it would be overstated almost fourfold. BudgetLine has no customer dimension, so the Design Trade promotion cannot be costed from the budget at all.
+> **Instructor notes, Requirement 4:** model inputs from the 2026 billed lines: Harbor (promotion 7) 569.21 units, price before discount 669.32, standard cost 378.46; Furniture (8) 4,823.89 units, 613.72, 346.36; Design Trade (9) 561.74 units, 416.23, 215.99. With CommissionRate 1.903%, the break-even increases are Harbor 23.3%, Furniture 30.8% (28.9% if fixed overhead is excluded from the standard cost, as in Tutorial 7.3), and Design Trade 34.2%; across all nine promotions they run from 23% to 40%. At a 5% Furniture discount the break-even increase is 13.3%. Goal Seek at promotion 2's +11.9% gives a Furniture discount of about 4.5%, a cross-scope sensitivity, because that difference was measured for the Accessories promotion of 2024 and is an observed difference, not a measured effect. The Furniture promotion's own +0.3% would support about 0.15%. Budgets (BudgetAmount / (Quantity x Item ListPrice) by month): the 2024-2026 budgets planned lower prices in the promotion months, 0.8806 of list for the promoted items (the year's collection in March-April, the year's item group in September-October), with every group lower in November. The 2027 budget, approved by the chief financial officer (EmployeeID 2) on 2026-12-15, is flat at about 0.9277 of list in every month. At 2026 billed volumes and with no increase, a sensitivity that holds the 2026 volume, mix, prices and costs, the calendar gives discounts of 354,589.72, or 347,840.88 of contribution after the commission saved. It leaves out 5,625.76 of discount on the proposal's orders not yet billed in the data (Furniture 891.18, Design Trade 4,734.58), whose billing dates are unknown. The discounts land in Q1 about 7,600, Q2 22,500, Q3 96,400, and Q4 228,100 (Requirement 2). The budget's volume is several times actual (Chapter 7): it plans 17,580 Furniture units for September-October 2027 against 4,839 ordered in those months of 2026, so a cost taken from it would be overstated almost fourfold. BudgetLine has no customer dimension, so the Design Trade promotion cannot be costed from the budget at all.
 
 ## What a strong answer says
 
 - **The model.** Three columns with stated assumptions, break-evens by formula and Goal Seek, and the fixed-overhead sensitivity.
-- **The comparison.** Each measured difference far below its break-even, so none of the proposed promotions would pay for itself on the evidence.
-- **The table and the discount.** Where each discount turns positive, and the Goal Seek discount as the most the best response on record would support.
-- **The cost and its basis.** A cost by quarter from actual volumes, in contribution terms, with the lag explained and the budget's quantities rejected.
+- **The comparison.** Each measured difference far below its break-even, so the evidence does not show that any proposed promotion would pay for itself.
+- **The table and the discount.** Where each discount turns positive, and the Goal Seek discount labeled a cross-scope sensitivity, not an optimal discount.
+- **The cost and its basis.** A cost by quarter from actual volumes, in contribution terms, with the lag explained, the fixed mix and the unbilled orders disclosed, and the budget's quantities rejected.
 
 A weak answer treats the break-even as a forecast, or costs the calendar from the budget's volume.
 
@@ -146,6 +145,7 @@ A weak answer treats the break-even as a forecast, or costs the calendar from th
 - **The wrong price.** *Symptom:* a Furniture break-even of 38.3%. *Response:* ask whether LineTotal is before or after the discount.
 - **The lift left behind.** *Symptom:* the difference row reads about zero. *Response:* ask where Goal Seek left the lift cell.
 - **The data table swapped or blocked.** *Symptom:* gains in the first row, or an error on the input cell. *Response:* check which input is the row and which the column, and which sheet each is on.
+- **The Goal Seek discount recommended.** *Symptom:* "run the Furniture promotion at the Goal Seek rate". *Response:* ask whose increase the rate rests on.
 - **The budget's volume used.** *Symptom:* a cost several times the model's. *Response:* ask what volume the budget plans against what was ordered.
 - **No commission.** *Symptom:* a contribution given up equal to the discount, $354,589.72. *Response:* ask what a lower price does to commissions.
 
@@ -154,9 +154,9 @@ A weak answer treats the break-even as a forecast, or costs the calendar from th
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
 | The model | 25 | Three columns, named inputs, correct formulas and sources | One column, or hard-coded inputs |
-| Break-even and Goal Seek | 15 | Formula and Goal Seek agree, all promotions compared | Formula only |
+| Break-even and Goal Seek | 15 | Formula and Goal Seek agree for the three proposed promotions, each beside its measured difference | Formula only |
 | Data table | 15 | Correct grid, inputs right, positives shown | Grid with a swapped input |
-| Discount from Goal Seek | 10 | Found and read as a ceiling | Found, not interpreted |
+| Discount from Goal Seek | 10 | Found and labeled a sensitivity | Found, not interpreted |
 | Budgets | 15 | Ratios by month, promoted items, the plan year flat | Whole-month ratios only |
 | Cost of the calendar | 15 | By quarter, in contribution terms | Total only |
 | Volume basis | 5 | Stated, with why not the budget's | Not stated |

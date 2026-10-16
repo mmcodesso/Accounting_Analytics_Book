@@ -105,7 +105,7 @@ In the model answer B39 holds the sum of the four effects and B34 the change in 
 
 ### Requirement (5): The recommendation
 
-**Step 6. Recommend a level.** The model answer presents the Furniture-level bridge as the headline, because each of its effects has one meaning: price is the change in price-list reductions and promotional discounts on the same items, cost is zero by construction and mix is every shift between items. The product-type bridge is supporting detail for the sales team and should be labeled as one in which item mix appears as price and cost.
+**Step 6. Recommend a level.** The model answer presents the Furniture-level bridge as the headline, because its cost effect is zero by construction and its mix effect measures the change in list margin per unit from the items sold. Its price-list and promotion effects are changes in the average reduction per unit, which a shift between items can also move, so both bridges rest on a stated convention. The product-type bridge is supporting detail for the sales team and should be labeled as one in which item mix appears as price and cost.
 
 ## Expected results
 
@@ -128,9 +128,9 @@ In the model answer B39 holds the sum of the four effects and B34 the change in 
 
 ## What a strong answer says
 
-- **Requirement (3).** The four effects sum to the change, and the check cell proves it.
+- **Requirement (3).** The four effects sum to the change, and the check cell shows it.
 - **Requirement (4).** The change in margin is the same, and so is volume. The rest is divided differently because the level differs: items within a type change price and cost together, and that appears as price and cost by type and as mix for Furniture as a whole. The cost effect is not a cost change.
-- **Requirement (5).** A stated level with a reason. The Furniture level gives each effect one meaning, and the type level serves the assortment planners, labeled.
+- **Requirement (5).** A stated level with a reason. The Furniture level keeps cost at zero and mix at the item level, and the type level serves the assortment planners, labeled. A strong answer adds that a price effect is not by itself evidence of a price change.
 
 A weak answer reads the cost effect as evidence of rising costs, or recommends a level without saying what each effect means at it.
 

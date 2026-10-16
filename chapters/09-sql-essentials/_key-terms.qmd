@@ -26,7 +26,7 @@
 
 **Result set.** The rows and columns that a query returns. It looks like a table but exists only as the answer to the query.
 
-**Scalar function.** A function that returns one value for each row it is applied to, such as ROUND, ABS, CAST, SUBSTR, or COALESCE.
+**Scalar function.** A function that returns one value for each row it is applied to, such as ROUND, ABS, SUBSTR, or COALESCE. CAST is a conversion expression rather than a function, but it is used the same way, row by row.
 
 **SQL (Structured Query Language).** The standard language for accessing, querying, and manipulating data stored in relational databases. It is a declarative language, and although database systems differ in details of their dialects, its core of SELECT, FROM, WHERE, and ORDER BY works the same way across them.
 

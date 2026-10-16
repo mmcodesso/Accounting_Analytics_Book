@@ -293,10 +293,12 @@ def g1(d, claim):
         surge_body, plant_body = k.body("SurgeDays"), k.body("PlantEntries")
         claim(norm(surge_body) in norm(tutorial_sql("H9")), "the SurgeDays view is the definition of the SurgeDays CTE of Tutorial 12.3's test H9")
         no_mfg = d.one(f"SELECT COUNT(*) FROM ({sub(surge_body, 'WHERE cc.CostCenterName = ' + chr(39) + 'Manufacturing' + chr(39), 'WHERE 1 = 1')})")
-        no_single = d.one(f"SELECT COUNT(*) FROM ({sub(surge_body, 'AND COUNT(*) > 1', '')})")
+        no_single = d.one(f"SELECT COUNT(*) FROM ({sub(surge_body, 'AND COUNT(DISTINCT tc.EmployeeID) > 1', '')})")
+        by_rows = d.one(f"SELECT COUNT(*) FROM ({sub(surge_body, 'AND COUNT(DISTINCT tc.EmployeeID) > 1', 'AND COUNT(*) > 1')})")
         surge_n = d.one("SELECT COUNT(*) FROM SurgeDays")
         claim(no_mfg == 0, "without the Manufacturing filter no day of the company has one pattern of hours")
-        claim(no_single == surge_n, "every Manufacturing work date has more than one clock entry, so the test for more than one entry removes nothing")
+        claim(no_single == surge_n, "every Manufacturing work date has more than one employee clocking in, so the test for more than one employee removes nothing")
+        claim(by_rows == surge_n, "counting clock rows instead of employees gives the same surge days here")
         inner = d.one(f"SELECT COUNT(*) FROM ({sub(plant_body, 'LEFT JOIN SurgeDays', 'INNER JOIN SurgeDays')})")
         no_class = d.one(f"SELECT COUNT(*) FROM ({sub(plant_body, 'AND e.PayClass = ' + chr(39) + 'Hourly' + chr(39), '')})")
         entries = d.one("SELECT COUNT(*) FROM PlantEntries")
@@ -342,6 +344,12 @@ def g2(d, claim):
         rows = {name: k.run(key) for name, key in keys.items()}
         n = {name: len(r) for name, r in rows.items()}
         daily_key = keys["daily"]
+        # the attendance counted in clock rows rather than people
+        by_rows = k.alt(daily_key, "COUNT(DISTINCT EmployeeID) AS Employees", "COUNT(*) AS Employees")
+        rows_present = {r[0]: r[3] for r in by_rows}
+        people_present = {r[0]: r[3] for r in rows["daily"]}
+        claim(rows_present["Ordinary"] != people_present["Ordinary"] and rows_present["Surge"] == people_present["Surge"],
+              "counting clock rows instead of people changes the ordinary days with everyone present, and not the surge days")
         # the largest group on one clock-in time: a window with no ClockInTime in its partition
         flat = k.alt(daily_key, "COUNT(*) OVER (PARTITION BY WorkDate, ClockInTime)", "COUNT(*) OVER (PARTITION BY WorkDate)")
         flat_largest = {r[0]: r[5] for r in flat}
@@ -371,11 +379,23 @@ def g2(d, claim):
         # the rule
         rule = rows["rule"]
         by_type = {r[0]: r for r in rule}
+        late_in = d.q("SELECT COUNT(*), SUM(r.RosterDate <> pe.WorkDate) FROM PlantEntries pe JOIN EmployeeShiftRoster r "
+                      "ON r.EmployeeShiftRosterID = pe.EmployeeShiftRosterID WHERE ROUND((julianday(pe.ClockInTime) - "
+                      "julianday(r.RosterDate || ' ' || r.ScheduledStartTime)) * 1440) >= (SELECT MIN(MinutesVariance) FROM "
+                      "AttendanceException WHERE ExceptionType = 'Off Shift Clocking')")[0]
+        claim(late_in[0] == by_type["Ordinary"][2] and late_in[0] == late_in[1],
+              "the ordinary entries that arrive the rule's minutes late are all rostered on another date (Requirement 1's shifted entries)")
         gt = k.alt(keys["rule"], "WHEN t.Arrival >= (SELECT Minutes FROM RuleMinutes)", "WHEN t.Arrival > (SELECT Minutes FROM RuleMinutes)")
         ge = k.alt(keys["rule"], "WHEN t.Departure > (SELECT Minutes FROM RuleMinutes)", "WHEN t.Departure >= (SELECT Minutes FROM RuleMinutes)")
+        raw = k.alt(keys["rule"], "ROUND((julianday(pe.ClockOutTime) - julianday(r.RosterDate || ' ' || r.ScheduledEndTime)) * 1440) AS Departure",
+                    "(julianday(pe.ClockOutTime) - julianday(r.RosterDate || ' ' || r.ScheduledEndTime)) * 1440 AS Departure")
+        ge_o, raw_o = {r[0]: r for r in ge}["Ordinary"][3], {r[0]: r for r in raw}["Ordinary"][3]
+        rule_o = {r[0]: r for r in rule}["Ordinary"][3]
         ungrouped = k.alt(keys["rule"], "Flagged AS ( SELECT TimeClockEntryID FROM AttendanceException GROUP BY TimeClockEntryID )",
                           "Flagged AS ( SELECT TimeClockEntryID FROM AttendanceException )")
-        claim(gt == rule and ge == rule, "no entry arrives, or leaves, exactly on the rule's minutes, so > and >= give the same counts")
+        claim(gt == rule, "no plant entry arrives exactly on the rule's minutes, so > and >= give the same arrivals")
+        claim(ge_o > rule_o and raw_o != rule_o, "some ordinary entries leave exactly the rule's minutes late, so in whole minutes >= counts more "
+              "than >, and the raw julianday minutes put some of those exact cases on the wrong side")
         claim(ungrouped == rule, "no plant entry carries two exceptions, so joining the exceptions without grouping them gives the same counts")
         claim(by_type["Surge"][2] == 0 and by_type["Surge"][3] == by_type["Surge"][1] and by_type["Surge"][4] == 0,
               "no surge entry arrives late, every one leaves late by the rule's minutes, and none was flagged")
@@ -383,13 +403,14 @@ def g2(d, claim):
         minutes_rule = off[0][1]
         claim(all(r[1] == minutes_rule == r[4] for r in off), "each Off Shift Clocking exception records the minutes its clock-in was after the scheduled start")
         # the plan: available hours summed straight from the item rows, and weeks beyond the last time record
-        flat_load = k.alt(keys["load"], "Available AS ( SELECT WeekStart, SUM(Hours) AS AvailableHours FROM ( SELECT BucketWeekStartDate "
-                          "AS WeekStart, WorkCenterID, MAX(AvailableHours) AS Hours FROM RoughCutCapacityPlan GROUP BY "
-                          "BucketWeekStartDate, WorkCenterID ) AS t GROUP BY WeekStart ),", "Available AS ( SELECT BucketWeekStartDate "
-                          "AS WeekStart, SUM(AvailableHours) AS AvailableHours FROM RoughCutCapacityPlan GROUP BY BucketWeekStartDate ),")
+        flat_load = k.alt(keys["load"], "SUM(PlannedLoadHours) AS PlannedHours, MAX(AvailableHours) AS AvailableHours",
+                          "SUM(PlannedLoadHours) AS PlannedHours, SUM(AvailableHours) AS AvailableHours")
         flat_shares = [r[3] for r in flat_load]
         claim(max(flat_shares) < 0.05, "summing the available hours of every item row makes the load a few hundredths of capacity")
-        no_cut = k.alt(keys["load"], "WHERE p.WeekStart <= ( SELECT date(MAX(WorkDate), '-6 days', 'weekday 1') FROM TimeClockEntry)", "")
+        no_cut = k.alt(keys["load"], "WHERE w.WeekStart <= ( SELECT date(MAX(WorkDate), '-6 days', 'weekday 1') FROM TimeClockEntry)", "")
+        surge_load = [r for r in rows["load"] if r[1] == "Surge days"]
+        claim(sum(r[4] for r in surge_load) > 0 and all(r[3] < 1 for r in rows["load"]),
+              "every group of weeks is planned below capacity on average, yet some surge weeks are planned above it")
         beyond = [r for r in no_cut if r[0] > str(d.C)]
         claim(len(beyond) == 1 and len(no_cut) == len(rows["load"]) + 1, "the plan runs into the next year, one more row")
         weekday1 = k.alt(keys["load"], "date(WorkDate, '-6 days', 'weekday 1')", "date(WorkDate, 'weekday 1')")
@@ -415,7 +436,8 @@ def g2(d, claim):
         no_date_min=no_date_min, tod_late=tod_late, rule=rule, minutes_rule=minutes_rule, flat_shares=flat_shares,
         beyond=beyond, weekday1=w_last, ap_inner=ap, le=le, centers=centers, load=rows["load"], cite=cite,
         rosters=rows["rosters"], operation=rows["operation"], calendar=rows["calendar"],
-        by_type=by_type, ordinary_ended_le={r[0]: r[3] for r in le}["Ordinary"])
+        by_type=by_type, ordinary_ended_le={r[0]: r[3] for r in le}["Ordinary"], ge_ordinary=ge_o, raw_ordinary=raw_o, rows_present=rows_present,
+        surge_load=surge_load)
 
 
 # --- requirement 3: what the hours produced and what they cost -----------------------------------------------------------
@@ -460,6 +482,13 @@ def g3(d, claim):
         claim(max(cum_next) - min(cum_next) < 0.1 * max(cum_next), "a running average of the earlier weeks is nearly the same for every group of weeks")
         claim(own_next != model_next, "a frame that includes the week itself changes the average of its following weeks")
         claim(d.one("SELECT COUNT(*) FROM PlantWeeks WHERE StandardHours = 0") == 0, "every week with hours has some completions, so the join to output loses no week")
+        with k.swapped("PlantWeeks", "WHERE pc.CompletionDate <= (SELECT MAX(WorkDate) FROM TimeClockEntry)", ""):
+            versus_no_cut = k.run(keys["versus"])
+        surge_v = next(r for r in rows["versus"] if r[0] == str(d.C) and r[1] == "Surge days")
+        surge_nc = next(r for r in versus_no_cut if r[0] == str(d.C) and r[1] == "Surge days")
+        claim(surge_nc[4] > surge_v[4], "without the cut-off the weekly output takes in the completions dated after the last day with time records")
+        short = sum(r[7] for r in rows["versus"] if r[0] == str(d.C))
+        claim(short > 0, "some frames at the end of the series hold fewer than six weeks")
         # cost
         all_centers = k.alt(keys["cost"], "WHERE cc.CostCenterName = 'Manufacturing' GROUP BY pp.FiscalYear", "GROUP BY pp.FiscalYear")
         claim(all_centers[-1][4] < rows["cost"][-1][4], "the burden of all cost centers is lower than the plant's")
@@ -484,7 +513,8 @@ def g3(d, claim):
         n=n, year=year, no_cut=no_cut[-1], december=rows["december"], groups=rows["groups"], versus=rows["versus"], err=err,
         cum_next=cum_next, own_next=own_next, limits=rows["limits"][0], capacity=cap, cost=rows["cost"], all_centers=all_centers,
         ledger=rows["ledger"], closes_in=closes_in, by_id=len(by_id), bridge=rows["bridge"][0], direct=rows["direct"], m=m, m_cut=m_cut,
-        m_cal=m_cal, pay_dates=two_dates)
+        m_cal=m_cal, pay_dates=two_dates, surge_no_cut=surge_nc, short=short,
+        ind_end=d.one("SELECT MAX(WorkDate) FROM LaborTimeEntry WHERE LaborType = 'Indirect Manufacturing'"))
 
 
 # --- requirement 4: the plan ----------------------------------------------------------------------------------------------
@@ -549,7 +579,7 @@ def g5(d, claim):
     schema(d, claim, SCHEMA)
     with kit(d) as k:
         keys = dict(
-            total="the accrual for 14-31 December 2026 in total", centers="the accrual at 2026-12-31 by cost center",
+            total="the accrual for December 14-31, 2026, in total", centers="the accrual at 2026-12-31 by cost center",
             accounts="the accounts each cost center's payroll is debited to", names="the accounts the adjusting entries credit",
             prior="the 2025 work in the registers paid in fiscal 2026", l8="test L8 of Audit.sql rerun", l5="test L5 of Audit.sql rerun",
             l6="test L6 of Audit.sql rerun", adjust="the proposed adjustments and their effect", asc="actual conversion cost per standard hour",

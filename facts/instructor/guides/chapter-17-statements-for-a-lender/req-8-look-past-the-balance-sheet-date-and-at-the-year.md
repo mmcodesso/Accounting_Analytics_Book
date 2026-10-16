@@ -50,7 +50,7 @@ Individual or pairs, about 90 minutes: 20 to profile and compare, 20 to search, 
 
 ```sql
 -- Requirement 8: the records dated after fiscal 2026
--- Population: GLEntry after 2026-12-31; expected: 526 supplier-payment rows, 1 January to 23 February 2027, debiting 2010 and crediting 1010
+-- Population: GLEntry after 2026-12-31; expected: 526 supplier-payment rows, January 1 to February 23, 2027, debiting 2010 and crediting 1010
 SELECT gl.SourceDocumentType, a.AccountNumber,
     COUNT(*) AS Postings,
     ROUND(SUM(gl.Debit), 2) AS Debits,
@@ -65,7 +65,7 @@ ORDER BY a.AccountNumber;
 
 **Check:** {{ rows }} ledger rows, all supplier payments, from {{ first_day }} to {{ last_day }} {{ d.N }}, debiting `2010` and crediting `1010`, {{ n_pay }} payments in all.
 
-**Step 2. Compare them with the same weeks of the year before.** Count the payments of {{ d.C }} from 1 January to the extract's last date, and the payables at the year-end that were due in those months.
+**Step 2. Compare them with the same weeks of the year before.** Count the payments of {{ d.C }} from January 1 to the extract's last date, and the payables at the year-end that were due in those months.
 
 ```sql
 -- Requirement 8: the same weeks of 2026, and the payables at 2026-12-31 due in the weeks the extract covers
@@ -147,7 +147,7 @@ FROM Paid AS p
         ON pi.PurchaseInvoiceID = p.PurchaseInvoiceID;
 ```
 
-**Check:** {{ n_pay }} payments (${{ paid|money }}) settle {{ n_inv }} invoices of {{ n_sup }} suppliers, received in {{ recv_first }} to {{ recv_last }} {{ d.C }} and already in payables, {{ full }} of them paid in full; no invoice was received after the year-end, so the search finds none. **Watch for:** reporting the ${{ paid|money }} as unrecorded. It reduces payables the ledger already holds; the payments outnumber the invoices only because {{ g.split_word }} invoice was paid in two parts.
+**Check:** {{ n_pay }} payments (${{ paid|money }}) settle {{ n_inv }} invoices of {{ n_sup }} suppliers, received in {{ recv_first }} to {{ recv_last }} {{ d.C }} and already in payables, {{ full }} of them paid in full; no invoice was received after the year-end, so the search finds none in this limited population. **Watch for:** reporting the ${{ paid|money }} as unrecorded. It reduces payables the ledger already holds; the payments outnumber the invoices only because {{ g.split_word }} invoice was paid in two parts.
 
 ### Part 3: Events the CFO must evaluate
 
@@ -182,7 +182,7 @@ SELECT
 
 **Check:** cash net of sales tax payable ${{ cash_net|money }}; quick ratio {{ qr_c|num(2) }}, down from {{ qr_p|num(2) }}; operating cash flow {{ sm(op_c) }} against {{ sm(op_p) }}; inventories {{ inv_share|pct(0) }} of current assets, with materials (${{ mat|money }}) above twelve months of issues (${{ issues|money }}), about {{ g.months|num(1) }} months; ${{ opening_ap|money }} of opening payables unchanged for {{ years }} years. Mitigating: profit, working capital of {{ wc_m }} million and debt of ${{ debt|money }}. **Watch for:** leading with the current ratio, {{ g.cr_c|num(2) }}, which hides the quick ratio.
 
-**Step 7. State what the evaluation needs beyond the database.** The terms of the credit line, management's plans for the materials, and evidence on the sales tax and the opening payables. Conclude in two sentences: the ledger alone does not establish substantial doubt, but the sales tax and the opening payables could change that.
+**Step 7. State what the evaluation needs beyond the database.** The terms of the credit line, management's plans for the materials, and evidence on the sales tax and the opening payables. The evaluation weighs the conditions first, without management's plans. A plan counts only if it is probable that it will be put in place and will mitigate them, and an application for the line is not committed financing. Conclude in two sentences: the ledger alone does not establish substantial doubt, but the sales tax and the opening payables could change that.
 
 ## Expected results
 

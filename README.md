@@ -38,8 +38,9 @@ Visit the [Charles River dataset website](https://charlesriver.accountinganalyti
 for documentation and additional information. All dataset changes and updates
 will be posted there.
 
-**The book is under development.** Chapters and supporting materials are being
-added and refined. Please review the available content when planning your course.
+**First Edition, Revision 2027.1.** Corrections and improvements are published
+as new revisions of the first edition, each with its own release of the PDF,
+EPUB, DOCX, slides, and companion files.
 
 ## Contributing to the book
 
@@ -97,8 +98,8 @@ plain `git push` also deploys the website but leaves the downloads as they were;
 the workflow's summary then lists the files that are older than the text.
 
 The revision is set in `_variables.yml` (`book.revision`). To start a new one, run
-`python scripts/release.py bump <revision>` (for example `2027.2`), commit, and
-publish: the new revision gets a tag and release of its own, and earlier revisions
+`python scripts/release.py bump <revision>` (for example `2027.2`), update the
+revision named near the top of this README, commit, and publish. The new revision gets a tag and release of its own, and earlier revisions
 keep theirs. The companion and solution files are built with
 `scripts/companion/build.py` and kept, untracked, in `supplementary/` (see
 [its README](supplementary/README.md)). The [contributor guide](CONTRIBUTING.md#building-the-book)

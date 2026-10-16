@@ -10,9 +10,13 @@ hours that buying would free, and the stock on hand at each year-end). Two views
 in the capstone's working copy, as Chapter 11 made MonthlyLaborEfficiency), let the later queries read those results
 without repeating them.
 
-Every query the workbook pastes carries a check that its result equals, cell for cell (to the cent), what the
-workbook's own query returns, run as xlbuild/cap18.py runs it (its QUERIES and query_text are read from that module's
-source, because the module imports Excel's COM helpers, which the SQL build's Python need not have). The other checks
+Every query the workbook pastes carries a check that its result equals, cell for cell, what the workbook's own query
+returns, run as xlbuild/cap18.py runs it (its QUERIES and query_text are read from that module's source, because the
+module imports Excel's COM helpers, which the SQL build's Python need not have). The comparison is at floating-point
+precision, not to the cent: the workbook's controls test the pasted values at full precision (hours to a ten-thousandth,
+rates to 1e-9), so a pasted query returns its hours, products and ratios unrounded and rounds only sums of values stored
+to two places (amounts in cents, quantities), where ROUND changes nothing; the workbook's number formats round for
+display. The other checks
 take their expected values from the notes' model (facts/notes/ch18.py, the values of the generated instructor notes) or
 from read-only SQL of this module.
 """
@@ -54,7 +58,8 @@ def script(b):
     return b.script(FILE, f"make, buy, or reprice: what the records show for fiscal {d.C}",
                     f"family variances against account 5080; inputs to 1090 against the ledger and the standard cost "
                     f"released; routing time against the standard hours completed; each result the workbook pastes "
-                    f"against the workbook's own query", database=DATABASE)
+                    f"against the workbook's own query, unrounded, because the workbook's controls test it at full "
+                    f"precision", database=DATABASE)
 
 
 def window(b) -> tuple[str, str]:
@@ -103,14 +108,17 @@ def workbook(b):
 
 
 def equal_cells(x, y) -> bool:
+    """Equal at floating-point precision: the same value summed in another order, or a sum of cents rounded to the
+    cent, agrees; a value rounded to two or four places does not."""
     if isinstance(x, (int, float)) and isinstance(y, (int, float)) and not isinstance(x, bool):
-        return abs(float(x) - float(y)) <= 0.0051 + 1e-12 * max(abs(x), abs(y))
+        return abs(float(x) - float(y)) <= 1e-9 + 1e-12 * max(abs(x), abs(y))
     return x == y
 
 
 def same_as_workbook(b, key: str, **extra) -> Check:
     """The query's result equals the workbook's pasted result: the same columns, the same rows in the same order, and
-    every value equal to the cent (the script rounds what the workbook pastes unrounded)."""
+    every value equal at floating-point precision, so that a reader who reruns the script and pastes its results gets
+    the workbook's controls to agree."""
     cols, rows = workbook(b)(key, **extra)
     expected = f"{len(rows)} row{'' if len(rows) == 1 else 's'} of {len(cols)} columns, equal"
 
@@ -176,7 +184,7 @@ SELECT
                                          f"{d.C}-12-31"), lambda r: r.value("LastInvoice")),
              Check("last time record", d.one("SELECT MAX(WorkDate) FROM LaborTimeEntry WHERE WorkDate <= ?",
                                              f"{d.C}-12-31"), lambda r: r.value("LastTimeRecord"))])
-    s.query("Requirement 1, Q2: the family results of the base year, kept as the view FamilyResults",
+    s.query("Requirement 1, Q2: the family results of the base year, kept unrounded as the view FamilyResults",
             "Population: finished goods by family (ItemCode's first seven characters); expected: each family sold",
             f"""\
 DROP VIEW IF EXISTS FamilyResults;
@@ -228,18 +236,11 @@ SELECT s.Family,
     (SELECT MIN(fg.ItemGroup)
      FROM FinishedGoods AS fg
      WHERE fg.Family = s.Family) AS ItemGroup,
-    ROUND(s.Units, 2) AS Units, ROUND(s.Revenue, 2) AS Revenue,
-    ROUND(s.ListValue, 2) AS ListValue,
-    ROUND(s.StandardCost, 2) AS StandardCost, c.Closes,
-    ROUND(c.MaterialVariance, 2) AS MaterialVariance,
-    ROUND(c.LaborVariance, 2) AS LaborVariance,
-    ROUND(c.OverheadVariance, 2) AS OverheadVariance,
-    ROUND(c.TotalVariance, 2) AS TotalVariance,
-    ROUND(m.UnitsCompleted, 2) AS UnitsCompleted,
-    ROUND(m.StandardCostCompleted, 2) AS StandardCostCompleted,
-    ROUND(m.StandardMaterialCompleted, 2) AS StandardMaterialCompleted,
-    ROUND(p.Revenue, 2) AS PurchasedRevenue,
-    ROUND(p.StandardCost, 2) AS PurchasedStandardCost
+    s.Units, s.Revenue, s.ListValue, s.StandardCost, c.Closes,
+    c.MaterialVariance, c.LaborVariance, c.OverheadVariance,
+    c.TotalVariance, m.UnitsCompleted, m.StandardCostCompleted,
+    m.StandardMaterialCompleted, p.Revenue AS PurchasedRevenue,
+    p.StandardCost AS PurchasedStandardCost
 FROM Sold AS s
     LEFT JOIN Closes AS c ON c.Family = s.Family
     LEFT JOIN Made AS m ON m.Family = s.Family
@@ -358,13 +359,11 @@ SELECT
             f"Population: {d.C} order lines for purchased finished goods; expected: near standard, half of list",
             f"""\
 SELECT SUBSTR(i.ItemCode, 1, 7) AS Family,
-    ROUND(SUM(pol.Quantity * pol.UnitCost), 2) AS OrderCost,
-    ROUND(SUM(pol.Quantity * i.ListPrice), 2) AS ListValue,
-    ROUND(SUM(pol.Quantity * i.StandardCost), 2) AS StandardValue,
-    ROUND(MIN(pol.UnitCost / i.StandardCost), 4)
-        AS LowestCostToStandard,
-    ROUND(MAX(pol.UnitCost / i.StandardCost), 4)
-        AS HighestCostToStandard
+    SUM(pol.Quantity * pol.UnitCost) AS OrderCost,
+    SUM(pol.Quantity * i.ListPrice) AS ListValue,
+    SUM(pol.Quantity * i.StandardCost) AS StandardValue,
+    MIN(pol.UnitCost / i.StandardCost) AS LowestCostToStandard,
+    MAX(pol.UnitCost / i.StandardCost) AS HighestCostToStandard
 FROM PurchaseOrderLine AS pol
     INNER JOIN PurchaseOrder AS po
         ON po.PurchaseOrderID = pol.PurchaseOrderID
@@ -403,8 +402,8 @@ SELECT
         OR ABS(sl.ExtendedStandardCost
             - ROUND(sl.QuantityShipped * i.StandardCost, 2)) > 0.011)
         AS ShipmentCostDiffers,
-    (SELECT ROUND(MAX(ABS(pcl.ExtendedStandardTotalCost
-            - pcl.QuantityCompleted * i.StandardCost)), 4)
+    (SELECT MAX(ABS(pcl.ExtendedStandardTotalCost
+            - pcl.QuantityCompleted * i.StandardCost))
      FROM ProductionCompletionLine AS pcl
         INNER JOIN Item AS i ON i.ItemID = pcl.ItemID)
         AS LargestCompletionDifference,
@@ -517,8 +516,8 @@ ORDER BY Source;""",
     q = s.query("Requirement 2, Q12: what the base year's completions released at standard, and 1090's credits",
                 f"Population: the completion lines of {d.C}; expected: conversion equal to the credits for them",
                 f"""\
-SELECT ROUND(SUM(pcl.QuantityCompleted
-        * i.StandardLaborHoursPerUnit), 2) AS StandardHours,
+SELECT SUM(pcl.QuantityCompleted * i.StandardLaborHoursPerUnit)
+        AS StandardHours,
     ROUND(SUM(pcl.ExtendedStandardMaterialCost), 2) AS Material,
     ROUND(SUM(pcl.ExtendedStandardDirectLaborCost), 2) AS DirectLabor,
     ROUND(SUM(pcl.ExtendedStandardVariableOverheadCost), 2)
@@ -707,7 +706,7 @@ Paid AS (
     WHERE cc.CostCenterName = 'Manufacturing'
     GROUP BY Month
 )
-SELECT mo.Month, ROUND(mo.StandardHours, 2) AS StandardHours,
+SELECT mo.Month, mo.StandardHours,
     ROUND(mo.AppliedOverhead, 2) AS AppliedOverhead,
     ROUND(COALESCE(p.FactoryOverhead, 0), 2) AS FactoryOverhead,
     ROUND(COALESCE(p.Payroll, 0), 2) AS Payroll,
@@ -782,9 +781,9 @@ def r3(b):
                      f"            THEN o.Units * ro.StandardRunHoursPerUnit END) AS {n}Run" for w, n in wcs)
     setup = ",\n".join(f"        SUM(CASE WHEN ro.WorkCenterID = {w}\n"
                        f"            THEN ro.StandardSetupHours END) AS {n}Setup" for w, n in wcs)
-    cols = ",\n".join(f"    ROUND(h.{n}Run, 2) AS {n}Run" for w, n in wcs) + ",\n" + \
-        ",\n".join(f"    ROUND(h.{n}Setup, 2) AS {n}Setup" for w, n in wcs)
-    s.query("Requirement 3, Q15: the activities of the base year's completions, kept as the view FamilyActivity",
+    cols = ",\n".join(f"    h.{n}Run" for w, n in wcs) + ",\n" + \
+        ",\n".join(f"    h.{n}Setup" for w, n in wcs)
+    s.query("Requirement 3, Q15: the activities of the year's completions, kept unrounded as the view FamilyActivity",
             f"Population: work orders completed in {d.C}, their routings and issues; expected: each family made",
             f"""\
 DROP VIEW IF EXISTS FamilyActivity;
@@ -828,8 +827,7 @@ Hours AS (
         INNER JOIN RoutingOperation AS ro ON ro.RoutingID = o.RoutingID
     GROUP BY o.Family
 )
-SELECT f.Family, f.ItemGroup, f.WorkOrders,
-    ROUND(f.UnitsCompleted, 2) AS UnitsCompleted,
+SELECT f.Family, f.ItemGroup, f.WorkOrders, f.UnitsCompleted,
 {cols},
     f.IssueLines
 FROM Families AS f
@@ -989,10 +987,11 @@ ORDER BY COALESCE(WorkCenterID, 99);""", checks)
 Routing time is the right measure of use because it is what each product should take, set by engineering for every
 operation, and it does not depend on the time records that Part III found drifting toward packing and quality assurance
 and recorded after the operations ended: the {d.C} completions' run hours ({v['run']:,.2f}) equal their standard labor
-hours exactly. What it leaves out is everything the plant pays for beyond that standard: the indirect time, the hours
-beyond the work, and the overtime of the surge days. The plant used {pct(v['of_pract'])} of its practical capacity on
-routing time ({one(v['used'])} of {one(v['pract'])} hours); the {one(m['unused_h'])} practical hours left over are
-exactly what Requirement 4's unused capacity holds.""")
+hours exactly. It leaves out the indirect activity that routings do not list (maintenance, training, rework, scheduling)
+and the hours recorded above the routings that Part III found, including the overtime of the surge days, and it takes
+the routings as right. The plant used {pct(v['of_pract'])} of its practical capacity on routing time ({one(v['used'])}
+of {one(v['pract'])} hours). The {one(m['unused_h'])} practical hours left over are Requirement 4's unused capacity, an
+estimate from standard times on the case's {PRACTICAL:.0%} assumption, not a finding that those hours went unworked.""")
 
 
 # --- Requirement 4 -----------------------------------------------------------------------------------------------
@@ -1082,8 +1081,8 @@ FamilyIssues AS (
         AND SUBSTR(i.ItemCode, 1, 7) IN ({fams})
 )
 SELECT
-    (SELECT ROUND(SUM(pcl.QuantityCompleted
-            * (i.StandardCost - i.StandardConversionCost)), 2)
+    (SELECT SUM(pcl.QuantityCompleted
+            * (i.StandardCost - i.StandardConversionCost))
      FROM ProductionCompletionLine AS pcl
         INNER JOIN ProductionCompletion AS pc
             ON pc.ProductionCompletionID = pcl.ProductionCompletionID
@@ -1171,7 +1170,7 @@ def r8(b):
     d, m = b.data, model(b)
     v = context(b, "r8")
     s = script(b)
-    months = ",\n".join(f"    ROUND(SUM(CASE WHEN sc.M = {k} THEN sc.ListValue ELSE 0 END), 2)\n        AS M{k:02d}"
+    months = ",\n".join(f"    SUM(CASE WHEN sc.M = {k} THEN sc.ListValue ELSE 0 END) AS M{k:02d}"
                         for k in range(1, 13))
     b.data
     from notes import case2
@@ -1193,8 +1192,12 @@ def r8(b):
                          lambda r, pid=pid: r.where(PromotionID=pid)["PromotionMonths"]),
                    Check(f"promotion {pid} lift on the other months of its year", round(lifts[pid], 4),
                          lambda r, pid=pid: round(lift(r, pid), 4), 0.00006)]
+    n_up = sum(1 for x in lifts.values() if x > 0)
+    checks.append(Check("lifts above zero (the comment's count)", n_up,
+                        lambda r: sum(1 for p in promos if lift(r, p["id"]) > 0)))
     s.query("Requirement 8, Q24: list-price order value by month in each promotion's scope (the Part II case)",
-            "Population: every sales order line in each promotion's scope and year; expected: no lift",
+            f"Population: order lines in each promotion's scope and year; expected: {n_up} lifts up, "
+            f"{len(lifts) - n_up} down, none past a z of 2 (a screen, not a forecast)",
             f"""\
 WITH Orders AS (
     SELECT so.OrderDate, sol.Quantity * sol.BaseListPrice AS ListValue,
@@ -1247,11 +1250,11 @@ ORDER BY p.PromotionID;""", checks)
             """\
 SELECT pl.PriceListID, pl.PriceListName, pl.ScopeType, pl.Status,
     pl.EffectiveStartDate, pl.EffectiveEndDate,
-    (SELECT ROUND(MIN(pll.UnitPrice / i.ListPrice), 4)
+    (SELECT MIN(pll.UnitPrice / i.ListPrice)
      FROM PriceListLine AS pll
         INNER JOIN Item AS i ON i.ItemID = pll.ItemID
      WHERE pll.PriceListID = pl.PriceListID) AS LowestPriceToList,
-    (SELECT ROUND(MAX(pll.UnitPrice / i.ListPrice), 4)
+    (SELECT MAX(pll.UnitPrice / i.ListPrice)
      FROM PriceListLine AS pll
         INNER JOIN Item AS i ON i.ItemID = pll.ItemID
      WHERE pll.PriceListID = pl.PriceListID) AS HighestPriceToList,
@@ -1458,7 +1461,8 @@ units ({one(v['s_f']['stdh'])} standard hours) at the end of {d.F}, {one(v['s_p'
 {one(s3['units'])} ({one(s3['stdh'])} standard hours, {money(s3['std'])} at standard) at the end of {d.C}, carried at
 about {s3['per_hour']:.2f} of conversion per standard hour. {' and '.join(f"{c} at {y}" for c, y in negatives)} come
 out negative, so they drew on stock that predates the ledger's item detail; they are left out, as is the opening
-{money(v['opening_fg'])} of finished goods (Q31). The rebuild counts the stock as made since the opening only if
+{money(v['opening_fg'])} of finished goods (Q31). Purchased finished goods are carried at their receipt cost, so a new
+standard does not revalue them. The rebuild counts the stock as made since the opening only if
 shipments drew on new production first, and the negative items show that the opening stock was drawn on, so item-level
 opening balances would be needed to know which layers remain. The workbook revalues this stock at the proposed
 standard, a sensitivity on next year's plan rather than an established error; Q30 gives the 5% screen it is measured

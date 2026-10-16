@@ -227,7 +227,7 @@ tests_rows = [
     ("JE RoundAmount", "Entry in whole thousands", "Journal entries", "Chapter 8"),
     ("PO SelfApproved", "Order approved by its creator", "Purchase orders", "Chapter 12"),
     ("PO AboveLimit", "Order above its approver's limit", "Purchase orders", "Chapter 12"),
-    ("PO AfterTermination", "Order approved after the approver left", "Purchase orders", "Chapter 12"),
+    ("PO AfterTermination", "Order dated after the approver left", "Purchase orders", "Chapter 12"),
     ("PR PaidBeforeApproval", "Pay made before the register was approved", "Payroll", "Exercise 12.5"),
     ("PR AfterTermination", "Pay period ending after termination", "Payroll", "Exercise 12.5"),
     ("PR SelfApproved", "Register approved by its own employee", "Payroll", "Exercise 12.5"),

@@ -1,6 +1,6 @@
 ---
 uses: [case4.chapter, case4.r1, case4.r2, case4.r3, case4.r4, case4.r5]
-title: 'Comprehensive Case, Part 4: Finding the Cash Behind the Profit'
+title: 'Comprehensive Case, Part IV: Finding the Cash Behind the Profit'
 kind: case-notes
 unit: case4
 minutes: 150
@@ -27,7 +27,7 @@ figures:
 {% set s = c.slide %}
 {% set q0 = r3.qs[0] %}
 {% set q1 = r3.qs[-1] %}
-# Comprehensive Case, Part 4: Finding the Cash Behind the Profit
+# Comprehensive Case, Part IV: Finding the Cash Behind the Profit
 
 {{ header() }}
 
@@ -46,9 +46,9 @@ figures:
 The case depends on these conditions of the data, all visible in the file students build:
 
 - Net income was {{ sm(r2.cur.net_income) }} in {{ d.C }} while cash fell {{ sm(-r2.cur.cash) }}, after rising {{ sm(r2.pri.cash) }} the year before. Inventories absorbed {{ sm(-r2.cur.inventories) }}.
-- Three dates differ: the last payroll posting ({{ c.pay_end }}), Data Through ({{ c.thru }}) and the ledger's last posting ({{ c.last }}), which holds only supplier payments of the year's invoices.
-- The opening entry {{ r5.entry }} of the first fiscal year brings in receivables of ${{ r5.opening_ar|money }}, payables of ${{ r5.opening_ap|money }} and materials of ${{ r4.opening_materials|money }} that no document supports.
-- Sales tax payable of ${{ r2.tax_c|money }} has no remittance recorded. The notes, ${{ r2.outstanding|money }}, all sit in a long-term account although ${{ r2.due_next|money }} falls due in the next year.
+- Three dates differ: the last payroll posting ({{ c.pay_end }}), Data Through ({{ c.thru }}) and the ledger's last posting ({{ c.last }}), which holds only supplier payments of the year's invoices. Data Through is a bound observed in the extract, not proof that the data are complete.
+- The opening entry {{ r5.entry }} of the first fiscal year brings in receivables of ${{ r5.opening_ar|money }}, payables of ${{ r5.opening_ap|money }}, materials of ${{ r5.opening_materials|money }} and finished goods of ${{ r5.opening_fg|money }} that no document in the extract supports.
+- Sales tax payable of ${{ r2.tax_c|money }}, the tax billed less credit memos, has no remittance recorded. The notes, ${{ r2.outstanding|money }}, all sit in a long-term account although ${{ r2.due_next|money }} falls due in the next year.
 - One employee, the {{ r4.approver_title }}, approved every work-order shortfall requisition, and every inventory policy ends at the current year-end.
 
 ## What students should be able to do afterward
@@ -125,9 +125,9 @@ The case depends on these conditions of the data, all visible in the file studen
 - **A flow is not a difference of balances.** A bridge from differences of Balance gives a net income step of {{ sm(r2.cur.net_income - r2.pri.net_income) }}, because the prior close sits in retained earnings. Ask what a close does at two dates.
 - **The first year starts at zero.** The opening entry makes the first year's bridge show ${{ r2.first.cash|money }} and its DSO and DPO rest on balances no document supports. Ask what the opening line stands for.
 - **A ratio needs a definition.** DSO on revenue reads differently from DSO on billing, and a quarter's flow overstates every measure about fourfold. Ask what each balance is compared with.
-- **Data Through is not the last posting.** The last posting is supplier payments. Ask what the report would claim if it ran to the last date.
+- **Data Through is not the last posting.** The last posting is supplier payments. Nor does Data Through prove the data complete, because it is a bound observed in the extract. Ask what the report would claim if it ran to the last date, and what would show that no document is missing.
 - **A difference is not an error.** Each difference equals recorded items to the cent: ${{ r5.ar_diff|money }} and ${{ r5.ap_diff|money }}. Ask which items and what disposition each earns.
-- **Describe, do not accuse.** The records show no remittance of ${{ r2.tax_c|money }}; they do not show anyone withholding it. Ask what evidence outside the database would settle it.
+- **Describe, do not accuse.** The records show no remittance of ${{ r2.tax_c|money }}, which is tax billed rather than tax collected, and they do not show anyone withholding it. Ask what evidence outside the database would settle it.
 - **An estimate is not a forecast.** The excess at the year's rate of issue is ${{ r4.whatif[0].excess|money }} at {{ r4.whatif[0].days }} days. Ask what the estimate assumes and leaves out.
 
 ## Discussion prompts
@@ -188,7 +188,7 @@ Each requirement guide has its own grading table out of 100; scale it by the wei
 
 ## Connections
 
-**Builds on.** Chapter 13 supplies the loading options, the profiles and the honest visuals. Chapter 14 supplies the Date table, the ledger star with its flagged closes, Exercise 14.1's Balance measure and the DAX of CALCULATE and KEEPFILTERS. Chapter 15 supplies the waterfall, the drill-through and tooltip pages, the trailing twelve-month measure with its guard, the field parameter and the what-if. Chapter 16 supplies the document key, the Tests tab, the dispositions table and Data Through. Chapter 8 supplies the dispositions and the unsupported opening balances, Chapter 6 and Chapter 12 the cutoff findings, and the Part III case the payroll accrual that belongs in the findings (${{ r5.accrual|money }}). The Part I to Part III cases supply the memo form. The finished guides for Chapters 13 to 16 hold the detail each requirement relies on.
+**Builds on.** Chapter 13 supplies the loading options, the profiles and the honest visuals. Chapter 14 supplies the Date table, the ledger star with its flagged closes, Exercise 14.1's Balance measure and the DAX of CALCULATE and KEEPFILTERS. Chapter 15 supplies the waterfall, the drill-through and tooltip pages, the trailing twelve-month measure with its guard, the field parameter and the what-if. Chapter 16 supplies the document key, the Tests tab, the dispositions table and Data Through. Chapter 8 supplies the dispositions and the unsupported opening balances, Chapter 6 and Chapter 12 the cutoff findings, and the Part III case the payroll accrual it proposed (${{ r5.accrual|money }}), carried into the findings as a proposal, not posted. The Part I to Part III cases supply the memo form. The finished guides for Chapters 13 to 16 hold the detail each requirement relies on.
 
 **What builds on it.** Part V offers capstone cases that are independent final projects: each states the methods it needs and asks students to choose the tool for every step. This case is the last one that fixes the tool; those cases ask students to choose it.
 

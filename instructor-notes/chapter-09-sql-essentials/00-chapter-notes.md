@@ -245,7 +245,7 @@ Key: 1 B, 2 D, 3 A, 4 C, 5 C, 6 A, 7 D, 8 B, 9 A, 10 D, 11 B, 12 C, 13 A, 14 D, 
 | 12 | C | the clauses must be written as SELECT, FROM, WHERE, ORDER BY, LIMIT. |
 | 13 | A | % matches any run of characters; = compares the pattern literally, \_ matches exactly one character, and IN needs an exact value. |
 | 14 | D | documentation lets another person understand, rerun, and review the queries; the data release and cutoff make it stronger. |
-| 15 | B | two whole numbers divide as whole numbers, a decimal keeps the fraction, and text never equals a number when neither side has an affinity (a column or a CAST); SELECT needs no FROM. |
+| 15 | B | two INTEGER values divide as integers, a REAL operand keeps the fraction, and text never equals a number when neither side has an affinity (a column or a CAST); SELECT needs no FROM. |
 
 **Questions where a wrong option tempts**
 
@@ -256,7 +256,6 @@ Key: 1 B, 2 D, 3 A, 4 C, 5 C, 6 A, 7 D, 8 B, 9 A, 10 D, 11 B, 12 C, 13 A, 14 D, 
 - **Question 11.** Option A expects an error, and the missing comma makes the second name an alias.
 - **Question 13.** Option B uses `=` with a wildcard, and option C a pattern whose `_` stands for exactly one character.
 - **Question 15.** Option A keeps Excel's 3.5 for the first division and treats the text `'2026'` as equal to the number.
-- **Length.** The correct option is also the longest in 1 of the 15 questions (4), so wording alone can give it away. If you grade with these, ask students to explain their answer or reword the options.
 
 Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 1, 7 and 13 make a quiz of SELECT, DISTINCT and LIKE, questions 2 to 5 and 12 of the filters, questions 6 and 15 of NULL and types, and questions 8 to 11 and 14 of ranking, copies and scripts.
 

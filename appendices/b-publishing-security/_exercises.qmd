@@ -16,7 +16,7 @@ Work on both exercises in a copy of Charles River Reports.pbix, saved with **Fil
 
 (1) Add a measure `Labor Cost`, the sum of LaborTimeEntry[ExtendedLaborCost], and a page `Ex B.1` with a table visual of Manufacturing Hours and Labor Cost by JobTitle for 2026.
 
-(2) In **TMDL view**, script the Cost Center Managers role by dragging it from the **Model** tab of the Data pane into a new script tab. Add a column permission that sets the metadata permission of ExtendedLaborCost to none, keep the role's existing rules, and choose **Preview** and then **Apply**.
+(2) In **TMDL view**, script the Cost Center Managers role by dragging it from the **Model** tab of the Data pane into a new script tab. Add a column permission that sets the metadata permission of ExtendedLaborCost to none, written as Microsoft's page on object-level security shows (Microsoft, 2026b), and keep the role's existing rules. Choose **Preview**, confirm that the rules are still there, and then choose **Apply**.
 
 (3) View the report as the Production Manager with **View as**, and record what happens to the page of requirement (1) and to the Plant page. View it with the Finance role and compare.
 
@@ -46,7 +46,7 @@ Work on both exercises in a copy of Charles River Reports.pbix, saved with **Fil
 
 (4) Add a query that returns one row per user in the security table, with the employee whose Email matches the user's name, that employee's job title, status, termination date, and own cost center, and a column that flags users who match no employee, who are terminated, or who are mapped to a cost center other than their own.
 
-(5) The role of Guided Tutorial B.1 has no rule on AccessEmployees. View the report as the Sales Manager, and find out what a manager in the role could see of the new table.
+(5) The role of Guided Tutorial B.1 has no rule on AccessEmployees. On the page Ex B.2, add a table visual of AccessEmployees, view the report as the Sales Manager, and find out what a manager in the role could see of the new table.
 
 (6) Explain what the queries found, how often internal audit should run them, and what to do about AccessEmployees before the file is published.
 

@@ -169,9 +169,9 @@ Plan A is the safest, because the stumbles of this chapter are about reading a r
 | 1, 2 | Profile; the chain | {{ t3.h1[0]|count }} entries, {{ t3.h1[1] }} not approved, {{ t3.h1[2] }} with no clock-out; {{ t3.h2[0] }} periods, {{ t3.h2[1] }} differ |
 | 3 | The first year | {{ t3.quiet_n }} periods from February to May with at most {{ t3.quiet_max|num }} indirect hours, against {{ t3.first_indirect|num }} in the first period |
 | 4, 5 | Whose pay; the expectation | {{ t3.n_other }} lines paid to another employee, {{ t3.n_unapproved }} on unapproved entries; differences {% for r in t3.h5 %}${{ r[3]|money }}{{ ", " if not loop.last else "" }}{% endfor %}, no line above a cent |
-| 6, 7 | Overtime | {{ t3.h6[0][1]|count }} short entries, none approved; {{ t3.n_h7 }} long entries without a link |
-| 8 | Surge days | {% for r in t3.h8 %}{{ r[1] }}{{ ", " if not loop.last else "" }}{% endfor %} days a year; share of overtime {% for r in t3.h8 %}{{ r[4]|pct }}{{ ", " if not loop.last else "" }}{% endfor %} |
-| 9, 10 | Late direct time | share after the end {% for r in t3.h9 %}{{ r[3]|pct }}{{ ", " if not loop.last else "" }}{% endfor %}; Packing {{ t3.h10[0][2]|pct }} |
+| 6 | Overtime | {{ t3.h6[0][1]|count }} short entries, none approved; {{ t3.n_h7 }} long entries without a link |
+| 7 | Surge days | {% for r in t3.h8 %}{{ r[1] }}{{ ", " if not loop.last else "" }}{% endfor %} days a year; share of overtime {% for r in t3.h8 %}{{ r[4]|pct }}{{ ", " if not loop.last else "" }}{% endfor %} |
+| 8, 9 | Late direct time | share after the end {% for r in t3.h9 %}{{ r[3]|pct }}{{ ", " if not loop.last else "" }}{% endfor %}; Packing {{ t3.h10[0][2]|pct }} |
 
 **Stumbles to expect**
 
@@ -198,11 +198,11 @@ Plan A is the safest, because the stumbles of this chapter are about reading a r
 
 **Sum before you compare, and fix the tolerance first.** Questions 6 and 7, Tutorial 12.2. Receipt lines and invoice lines do not pair row by row. A tolerance set after the result is a choice of answer. Goods received and not invoiced are an accrual, not an exception (question 8).
 
-**Concentration is design.** Questions 10 and 11, Exercises 12.4 and 12.5. An approval that never changes a request and comes from one person records; it does not authorize. Ask: what could the approver have stopped?
+**Concentration is a design risk.** Questions 10 and 11, Exercises 12.4 and 12.5. An approval that never changes a request and comes from one person looks like a record more than an authorization, until the requests and the evidence of review show otherwise. Ask: what could the approver have stopped, and what else would catch an error the approver missed?
 
 **An expectation from the system's own rates recalculates.** Question 15, Tutorial 12.3 Step 5. The pay fits the hours and rates on file; whether the hours were worked is another question.
 
-**A pattern is not proof.** Questions 9 and 12, Exercise 12.3. Surge-day records look entered in bulk and late time is parked on finished operations. Neither shows that hours were not worked. Ask: what would corroborate them from outside the payroll system?
+**A pattern is not proof.** Questions 9 and 12, Exercise 12.3. Surge-day records look entered in bulk and late time is parked on finished operations. Neither shows that hours were not worked, and records that agree do not show that they were. Ask: what would corroborate them from outside the payroll system?
 
 **Plausible numbers from a wrong query.** Questions 4, 13 and 14, Exercise 12.6. A self-join pairs each row twice, a LAG partition skips a boundary, and a first character reads a tenth digit. Ask: what known answer checks this?
 
@@ -213,8 +213,8 @@ Plan A is the safest, because the stumbles of this chapter are about reading a r
 3. **A test returns no rows. When do you accept that?** It reaches positive controls, reconciled populations and the logic of the join.
 4. **One person approves nearly every order, register and overtime request. Exception or design?** It reaches concentration, segregation of duties and who reviews the reviewer.
 5. **The tolerance is two percent or three. Who sets it, and when?** It reaches policy, advance choice and follow-up capacity.
-6. **The staff accountant of Chapters 9 to 11 and the auditor of this chapter reach different strengths of conclusion. Why?** It reaches independence and which conclusions survived.
-7. **Do the standards still fit?** It reaches the plant-level conclusion that survives, time paid beyond the work, and the calendar effect, the answer to Chapter 9.
+6. **The staff accountant of Chapters 9 to 11 and the auditor of this chapter reach different strengths of conclusion. Why?** It reaches independence, and which conclusions the tests left standing and which need corroboration.
+7. **Do the standards still fit?** It reaches the plant-level totals that reproduce, time paid beyond the work, the calendar effect, and what agreeing records cannot show about the work the output required, the answer to Chapter 9.
 
 ## Using the exercises
 

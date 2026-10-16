@@ -419,7 +419,7 @@ def g0(d, claim):
         r2=at(t, "Review the statements before adjusting them"), m1=at(t, "Milestone 1"),
         p2=span(t, "Phase 2: The Adjustments", "Phase 3: The Statements"), r3=span(t, "Rebuild accrued expenses", "Test cutoff at every year-end"),
         r4=at(t, "Test cutoff at every year-end"), r5=span(t, "Classify, measure and judge", "Check your understanding", after_nth=2),
-        err=span(t, "A missed cutoff item", "Check your understanding", after_nth=2),
+        err=span(t, "Cutoff items recorded next year", "Check your understanding", after_nth=2),
         check2=span(t, "Check your understanding", "Milestone 2", nth=2), m2=at(t, "Milestone 2"),
         p3=span(t, "Phase 3: The Statements", "Phase 4: What the Data Cannot Settle"), st=span(t, "Prepare the four statements", "Build each note from the records"),
         notes=at(t, "Build each note from the records"), m3=at(t, "Milestone 3"),
@@ -824,7 +824,8 @@ def g6(d, claim):
     claim(lines["head"] == ["No", "Adjustment", "YearEnd", "Account", "Presentation", "Amount", "Type", "Evidence",
                             "AccountName", "StatementLine", "Debit", "Credit"],
           "the AdjustmentLines Table has the twelve columns the Review file reads")
-    claim(lines["entries"] == 4 * 3 + 2 * 2, "the Table holds A1 to A4 at three year-ends and R1 and R2 at two")
+    # R1 at the first year-end too (U24, N03)
+    claim(lines["entries"] == 5 * 3 + 2, "the Table holds A1 to A4 and R1 at three year-ends and R2 at two")
     claim(abs(lines["debit"] - lines["credit"]) < 0.005 and lines["debit"] > 0, "the totals row holds equal debits and credits")
     page = [title(claim, "packageTests", v) for v in ("testCards", "entryMatrix", "agreeTable", "assetTable", "incomeMatrix")]
     has_visual(claim, "packageTests", "packageAnswer")

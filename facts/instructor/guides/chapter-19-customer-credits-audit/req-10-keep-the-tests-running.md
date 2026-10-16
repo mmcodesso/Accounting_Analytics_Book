@@ -30,9 +30,9 @@ figures:
 
 An audit that ends with a report tests the past. The register of Chapter 16 already runs the rule tests of earlier chapters with every refresh, and adding this cycle's rules to it, under the change control that chapter described, turns the audit into monitoring. Two judgments carry the requirement. A rule test, where a document either passes or fails, belongs in the register; an anomaly, a reason to look, stays outside it. And the historical exceptions of the new tests are recorded once, as a finding about the control's design, so that they do not flood the review. The analytics type is prescriptive: the tests are the action that outlasts the report.
 
-Students can add rule tests and their populations to a register (Part 1), keep anomalies outside it (Part 2), treat historical exceptions as one design finding and close it on a retest (Part 3), build the small alternative when no register exists (Part 4), and recheck the date the data run through and record the change (Part 5).
+Students can add rule tests and their populations to a register (Part 1), keep anomalies outside it (Part 2), link the historical exceptions that share a supported cause to a finding and close it on a retest (Part 3), build the small alternative when no register exists (Part 4), and recheck the date the data run through and record the change (Part 5).
 
-**Competencies practiced.** CPA Evolution ISC M2 (tests of internal controls, logical access and change management) and Core S2 M9; IMA Reporting and Control (internal control); IFAC IES 2 (g) and (i); AACSB A5 parts 5.1 (Power BI) and 5.3 (learning to learn).
+**Competencies practiced.** CPA Evolution ISC M2 (tests of internal controls, logical access and change management) and Core S2 M9; IMA Reporting and Control (internal control); IFAC IES 2 (g) and (i); AACSB A5 part 5.1 (Power BI).
 
 ## Before you assign
 
@@ -42,7 +42,7 @@ Students can add rule tests and their populations to a register (Part 1), keep a
 
 ## How to run it
 
-Pairs, about 90 minutes: 35 for the flags and the exception queries, 10 for the tests and the populations, 15 for the anomalies, 15 for the design finding, 15 for Data Through and the change log. Hold back the design finding until the register shows the flood, then ask what the committee would do with it. **Collect** the project and a screenshot of the Tests tab.
+Pairs, about 90 minutes: 35 for the flags and the exception queries, 10 for the tests and the populations, 15 for the anomalies, 15 for the findings, 15 for Data Through and the change log. Hold back the design finding until the register shows the flood, then ask what the committee would do with it. **Collect** the project and a screenshot of the Tests tab.
 
 ## Step-by-step solution
 
@@ -103,9 +103,9 @@ CustomerRefund merges the limit, the credit's invoice and the last application, 
 
 **Check:** {{ g.mism }} refunds by a method no receipt on the invoice used, and {{ g.pd2 }} paid while the customer's past-due balance was at least the refund. They stay out because no customer pays by one method only and a method chosen at random would mismatch about as often, and because the records hold no policy that requires an offset. **Watch for:** adding them to the register, which makes it {{ g.anomaly_flood|count }} rows and buries the rule failures.
 
-### Part 3: Give the historical exceptions one design-finding treatment
+### Part 3: Link the historical exceptions to findings by supported cause
 
-**Step 5. Record the finding once and keep every exception.** A Design Findings table (**Home > Enter data**) holds, for each new test, the finding, the date it covers through and the date it is to be fixed. Merge it into the register by TestID and add a Covered column, then measure the open exceptions without the covered ones.
+**Step 5. Link each exception to its finding and keep every exception.** The model links each test's historical exceptions to one of two findings, credits and refunds, the causes Requirement 8 supports. A Design Findings table (**Home > Enter data**) holds, for each new test, the finding, the date it covers through and the date it is to be fixed. Merge it into the register by TestID and add a Covered column, then measure the open exceptions without the covered ones.
 
 ```jinja
 {{ g.m_cov }}
@@ -154,7 +154,7 @@ CustomerRefund merges the limit, the credit's invoice and the last application, 
 - **The four tests use Requirement 4's definitions,** and the definition of "before the payment" is stated.
 - **The processes are in the populations,** so each rule has a `Rate per 1,000` by year.
 - **Anomalies stay outside the register,** with the reason.
-- **The historical exceptions are one design finding with a fix-by date,** each kept in the register, later exceptions reviewed, and the finding closed on a retest.
+- **The historical exceptions are linked to findings by supported cause,** design or operation stated, with the covered period, the fix-by date, the date of the fix and the retest kept apart, each exception kept in the register, later exceptions reviewed, and a finding closed on a retest.
 - **Data Through is rechecked and the change is logged.**
 
 A weak answer floods the register with the anomalies or the history, or closes the finding on the date.
@@ -165,7 +165,7 @@ A weak answer floods the register with the anomalies or the history, or closes t
 - **A same-day refund flagged.** *Symptom:* {{ g.same_day }} refunds. *Response:* ask what the records say about the order within a day.
 - **A process label that does not match.** *Symptom:* a blank rate beside a count. *Response:* compare the Tests table with the measure.
 - **The anomalies in the register.** *Symptom:* {{ g.anomaly_flood|count }} rows. *Response:* ask which of them is a rule failure.
-- **No design finding.** *Symptom:* {{ g.open_flood }} open exceptions. *Response:* ask who reviews that many.
+- **No finding.** *Symptom:* {{ g.open_flood }} open exceptions. *Response:* ask who reviews that many.
 - **The finding closed on the date.** *Symptom:* a status of closed with no retest. *Response:* ask what shows the control works.
 - **The latest date as Data Through.** *Symptom:* {{ g.max_through }}. *Response:* ask which process ends first.
 
@@ -176,7 +176,7 @@ A weak answer floods the register with the anomalies or the history, or closes t
 | Four rule tests with Requirement 4's definitions | 30 | All four, counts agreeing | Three, or a changed definition unstated |
 | Two processes in the populations | 15 | A `Rate per 1,000` by year | Counts only |
 | Anomalies kept outside | 10 | Columns, measures and a page, with the reason | In the register |
-| One design finding | 20 | Covered period, fix-by date, later exceptions open | History left open |
+| Findings by supported cause | 20 | Covered period, fix-by date, later exceptions open | History left open |
 | Data Through rechecked | 10 | The earliest date, with the reason | Latest date |
 | Change recorded | 15 | Log with object, change and reason | No record |
 
@@ -185,4 +185,4 @@ A weak answer floods the register with the anomalies or the history, or closes t
 - Record a disposition for the largest refund's exception with Chapter 16's Dispositions merge, and watch Reviewed Exceptions rise by one.
 - Add the anomaly tests to the register once a refund policy exists, and say what the policy must state.
 - Discuss: after the fix, which two tests should fall to zero, and which two would catch the next case?
-- Discuss: how long should a design finding stay open when the retest keeps failing?
+- Discuss: how long should a finding stay open when the retest keeps failing?

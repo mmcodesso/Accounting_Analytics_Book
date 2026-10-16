@@ -35,7 +35,7 @@ d. In the **Columns** area, Excel has added a field named Σ Values. Drag it to 
 
 The label Sum of MarginPct looks odd for a percentage, but it is accurate: Excel sums LineTotal and StdCostAmount for each cell and then applies the formula, so every cell shows the margin of its total revenue.
 
-**Step 4. Read the margins.** @fig-06-06 shows the result. The Furniture margin is lower than that of the other product lines in every quarter, and it falls in the fourth quarter, while the margins of Lighting, Textiles, and Accessories barely move. The ledger margin you calculated in the Part I case uses the standard cost of the goods shipped in each quarter, and this one uses the standard cost of the goods invoiced, so the two differ slightly in level but show the same decline.
+**Step 4. Read the margins.** @fig-06-06 shows the result. The Furniture margin is lower than that of the other product lines in every quarter, and it falls in the fourth quarter, while the margins of Lighting, Textiles, and Accessories barely move. The margin of the Part I case came from the posted Furniture revenue and cost of goods sold accounts, without the closing entry. Its revenue equals the invoice lines' revenue in these quarters, but its cost is the standard cost of the goods shipped in each quarter less the cost of goods that customers returned. This margin uses the standard cost of the quantities invoiced and leaves returns out, so the two measures differ slightly in level but show the same decline.
 
 ![Revenue and Margin at Standard Cost by Item Group and Quarter.](/visuals/svg/fig-06-06-revenue-margin-pivot.svg){#fig-06-06 fig-alt="A mock of the RevenuePivot worksheet. The PivotTable is filtered to fiscal year 2026, with the four quarters and a Grand Total across the top. Down the side, each of the five item groups shows two rows, Sum of LineTotal and Sum of MarginPct, followed by the totals of both measures. The Furniture margin row is outlined, showing a lower margin in the fourth quarter than in the third, and the Services margin row is outlined, showing 100 percent in every quarter."}
 
@@ -70,7 +70,7 @@ The chart shows four lines. The Furniture line is the lowest in every quarter an
 
 **Step 8. Refresh and document.**
 
-a. Choose **Data > Refresh All**, and confirm that the totals on the PivotTable worksheets are unchanged. If a PivotTable does not show a column you have just added to the query, choose **Refresh All** a second time. With background refresh, a setting that is on by default and lets you keep working while a query runs, Excel can refresh a PivotTable before its query has finished.
+a. Choose **Data > Refresh All**, and confirm that the totals on the PivotTable worksheets are unchanged. If a PivotTable does not show a column you have just added to the query, wait until the query has finished loading, and then choose **Refresh All** again. With background refresh, a setting that is on by default and lets you keep working while a query runs, Excel can refresh a PivotTable before its query has finished.
 b. On the **Documentation** worksheet, add the StdCostAmount custom column to the Query steps entry, the RevenuePivot, SegmentPivot, and MarginChart worksheets to the Worksheets entry, and a new entry, `Calculated fields`, with the MarginPct formula.
 c. Save the workbook.
 
@@ -84,4 +84,4 @@ The workbook now records how each PivotTable and chart was built, and a refresh 
 - the SegmentPivot PivotTable shows each segment's revenue in 2025 and 2026 and its change from the previous year;
 - the MarginChart shows the Furniture margin below the others and falling in the fourth quarter.
 
-The PivotTable has described the problem precisely. The Furniture margin fell in the fourth quarter, the other product lines did not, and the business as a whole kept growing. Why the Furniture margin fell is a diagnostic question, and it needs the tools of the next section.
+The PivotTable has described the problem precisely. Furniture has by far the largest fall in margin in the fourth quarter, the margins of the other product lines barely move, and total revenue for the year grew. Why the Furniture margin fell is a diagnostic question, and it needs the tools of the next section.

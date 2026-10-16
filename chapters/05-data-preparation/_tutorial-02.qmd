@@ -96,7 +96,8 @@ More than a hundred promotion lines were invoiced in November and December, afte
 
 a. On the **Documentation** worksheet, add T9_SalesOrder to the Source entry and the SalesOrder query to the Query steps entry.
 b. Add the six lookup columns on SalesInvoiceLine to the Calculated columns entry: InvoiceDate, Period, SalesOrderID, OrderDate, ItemGroup, and ProductType.
-c. Add the checks in rows 41 to 47 of the Analysis worksheet to the entry that describes it, and save the workbook.
+c. In the Open questions entry, replace the sentence that says the lines carry no invoice date or item group with the next question, how much of the change in the Furniture margin the promotion explains.
+d. Add the checks in rows 41 to 47 of the Analysis worksheet to the entry that describes it, and save the workbook.
 
 A reviewer can now trace every new column on the invoice lines to the Table it came from and the key it followed.
 

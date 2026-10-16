@@ -79,7 +79,7 @@ Individual or pairs, about 60 minutes: 10 on the year columns (requirement 1), 1
 
 ### Requirement (5): The memo
 
-**Step 6. Write the half page.** The outline: the two tests and what each compares; the results, with the nine invoices and which test finds which; the effect on cutoff (a revenue period could be wrong, in either direction); and the evidence to request. The six invoices with the next year's prefix carry $5,231.42 of subtotal and all nine $12,719.09. The evidence: invoice creation logs, shipping documents and customer acknowledgments, and how the billing system assigns the invoice date.
+**Step 6. Write the half page.** The outline: the two tests and what each compares; the results, with the nine invoices and which test finds which; the effect on cutoff (a revenue period could be wrong, in either direction); and the evidence to request. The six invoices with the next year's prefix carry $5,231.42 of subtotal and all nine $12,719.09. The evidence: invoice creation logs, shipping documents and customer acknowledgments, and how the billing system assigns invoice numbers and dates.
 
 **Check:** the memo states that neither test shows who dated the invoices or why.
 
@@ -106,7 +106,7 @@ Individual or pairs, about 60 minutes: 10 on the year columns (requirement 1), 1
 ## What a strong answer says
 
 - **Requirements (2) and (3).** Two counts, with the reason that a text year needs VALUE and that a lookup is checked for "No match" before its result is used.
-- **Requirement (4).** The two tests find different invoices and together find exactly Tutorial 2.1's. The findings point one way: these invoices are dated earlier than the events they record.
+- **Requirement (4).** The two tests find different invoices and together find exactly Tutorial 2.1's. The findings are consistent with invoices dated earlier than the events they record, which the evidence the memo requests would test.
 - **Requirement (5).** A cutoff risk with its limits. The six year-end invoices are the first numbers issued in each following year, yet dated before it began, which suggests dating back into the earlier period. The three invoices dated a day before their order cannot be explained by numbering. Neither test shows who dated them or why, so the memo asks for logs and shipping documents, and it does not call the invoices errors or fraud.
 
 A weak answer reports counts without comparing them with Tutorial 2.1, or states a cause.

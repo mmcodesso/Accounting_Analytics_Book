@@ -19,7 +19,7 @@ By the end, students can:
 - trace an odd total to a source document type, a voucher and an EntryType;
 - explain why the entry does not belong in a quarterly measure, exclude it by a rule, and recompute the margins.
 
-**Competencies practiced.** CPA Evolution Core S1 M8 T7 (data ethics) and Core S2 M5 (risk of fraud and noncompliance); IMA Data Literacy, and Internal Control within Reporting and Control; IFAC IES 4 (a), professional skepticism and professional judgment; AACSB A5 part 5.2. The analytics type is descriptive, applied with an auditor's skepticism.
+**Competencies practiced.** CPA Evolution Core S2 M5 (risk of fraud and noncompliance); IMA Data Literacy, and Internal Control within Reporting and Control; IFAC IES 4 (a), professional skepticism and professional judgment; AACSB A5 part 5.2. The analytics type is descriptive, applied with an auditor's skepticism.
 
 ## Before you assign
 
@@ -102,7 +102,7 @@ The margin at standard cost is 42.26% in 2026 Q3 and 40.78% in 2026 Q4.
 
 ![The naive and the corrected Furniture margin for the two quarters, side by side.](../figures/case-part-1/IF-C1-5-B.pdf)
 
-**Step 7. State what the margins show.** The Furniture margin fell from 43.33% to 41.06%, a drop of 2.27 points, and the standard-cost view agrees, with a drop of 1.48 points. Revenue fell 3.0% from 2026 Q3 to 2026 Q4 while cost rose 0.9%. That is the descriptive answer. Why it fell is the Part II question.
+**Step 7. State what the margins show.** On this measure the Furniture margin fell from 43.33% to 41.06%, a drop of 2.27 points. Revenue fell 3.0% from 2026 Q3 to 2026 Q4 while cost rose 0.9%. The measure takes revenue before customer credits, which post to a shared account, and cost after the returned goods, so it overstates the margin, and a model answer says so. The cross-check at standard cost also falls, by 1.48 points, but it is a separate measure (the invoice lines before returns), so it supports the direction of the change, not the level. That is the descriptive answer. Why it fell is the Part II question.
 
 ## Expected results
 
@@ -116,14 +116,14 @@ The margin at standard cost is 42.26% in 2026 Q3 and 40.78% in 2026 Q4.
 | Corrected margin, 2026 Q3; 2026 Q4 | 43.3%; 41.1% | Step 6 |
 | Margin at standard cost, 2026 Q3; 2026 Q4 | 42.3%; 40.8% | Step 6 |
 
-> **Instructor notes, Requirement 5:** using all rows, Q4 Furniture revenue is -\$13,241,499.72 and COGS is -\$7,496,777.60, because year-end close JE-2026-000296 (EntryType "Year-End Close - P&L to Income Summary", posted 2026-12-31) debits 4010 by \$17,398,287.56 and credits 5010 by \$9,946,838.67. The naive margin percentage is 43.4%, almost identical to Q3's 43.3%, so the ratio alone hides both the nonsense totals and the decline. Excluding the closing entry (SourceDocumentType JournalEntry with a Year-End Close EntryType), Q4 revenue is \$4,156,787.84 and COGS \$2,450,061.07 (shipments less returns), and the margin falls from 43.3% in Q3 to 41.1% in Q4. A sub-ledger check at standard cost (invoiced quantity x Item.StandardCost) also falls, from 42.3% to 40.8%.
+> **Instructor notes, Requirement 5:** using all rows, Q4 Furniture revenue is -\$13,241,499.72 and COGS is -\$7,496,777.60, because year-end close JE-2026-000296 (EntryType "Year-End Close - P&L to Income Summary", posted 2026-12-31) debits 4010 by \$17,398,287.56 and credits 5010 by \$9,946,838.67. The naive margin percentage is 43.4%, almost identical to Q3's 43.3%, so the ratio alone hides both the nonsense totals and the decline. Excluding the closing entry (SourceDocumentType JournalEntry with a Year-End Close EntryType), Q4 revenue is \$4,156,787.84 and COGS \$2,450,061.07 (shipments less returns), and the margin falls from 43.3% in Q3 to 41.1% in Q4. This measure takes revenue before customer credits (the shared returns account) and cost net of the returned goods, so it overstates the Furniture margin. Taking the Furniture credit memo lines, traced through SourceLineID, off revenue gives 42.6% and 40.5%, and the fall remains. A separate measure from the invoice lines at standard cost (invoiced quantity x Item.StandardCost, before returns) also falls, from 42.3% to 40.8%. Its population differs, so it supports the direction of the change, not the level.
 
 ## What a strong answer says
 
 - **The trap.** Using all rows gives a 2026 Q4 margin of 43.4%, almost identical to the 2026 Q3 figure, on negative totals; the percentage hides both the nonsense and the decline.
 - **The entry.** JE-2026-000296, a journal entry of EntryType "Year-End Close - P&L to Income Summary", posted on the last day of the year, debiting revenue and crediting cost by the year's balances.
 - **The reason.** It is a bookkeeping transfer, not a transaction of the quarter, so it must be excluded from a quarterly margin; the exclusion rule is stated.
-- **The result.** 43.3% to 41.1%, a fall, confirmed at standard cost.
+- **The result.** 43.3% to 41.1%, a fall on the stated basis (revenue before customer credits, cost after returned goods). The invoice-line view at standard cost falls too.
 
 A weak answer reports the naive percentage as the result, removes one side of the close only, or drops the entry without saying why.
 

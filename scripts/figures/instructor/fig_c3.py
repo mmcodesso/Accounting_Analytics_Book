@@ -61,13 +61,13 @@ def _signed(x: float, places: int = 2) -> str:
 
 
 def _day_text(iso: str, year: bool = True) -> str:
-    """'2026-12-11' -> '11 December 2026' (no break inside the date)."""
-    text = f"{int(iso[8:10])} {MONTH_NAMES[int(iso[5:7]) - 1]}" + (f" {iso[:4]}" if year else "")
+    """'2026-12-11' -> 'December 11, 2026' (no break inside the date)."""
+    text = f"{MONTH_NAMES[int(iso[5:7]) - 1]} {int(iso[8:10])}" + (f", {iso[:4]}" if year else "")
     return f'<span style="white-space:nowrap">{text}</span>'
 
 
 def _plain_day(iso: str) -> str:
-    return f"{int(iso[8:10])} {MONTH_NAMES[int(iso[5:7]) - 1]} {iso[:4]}"
+    return f"{MONTH_NAMES[int(iso[5:7]) - 1]} {int(iso[8:10])}, {iso[:4]}"
 
 
 def _nb(text: str) -> str:
@@ -507,7 +507,7 @@ def if_c3_1_b() -> Diagram:
     assert head_all[:3] == ["AttendanceExceptionID", "ExceptionType", "WorkDate"], head_all
     assert [r[0] for r in rows_all] == list(range(1, len(rows_all) + 1)), "the row numbers are the AttendanceExceptionIDs"
     first_visible = 3
-    mock = _mock(d, "each attendance exception against", lines=slice(5, 14), cols=slice(first_visible, None))
+    mock = _mock(d, "each attendance exception against", lines=slice(5, 15), cols=slice(first_visible, None))
     rows = mock["rows"]
     heads = mock["headers"]
     assert heads == ["EmployeeID", "EntryEmployeeID", "TimeClockEntryID", "ClockStatus", "Disposition"], heads
@@ -532,10 +532,12 @@ def if_c3_1_b() -> Diagram:
     named = sorted({r[3] for r in (rows[i] for i in wrong)})
     owners = sorted({r[4] for r in (rows[i] for i in wrong)})
     assert len(named) == 1 and len(owners) == 1, (named, owners)
+    assert not any(r[-1].startswith("Dated differently") for r in rows), "no exception carries another date than its entry"
     ids_text = ", ".join(f"{i}" for i in ids[:-1]) + f" and {ids[-1]}"
     _note(d, f"The grid is scrolled right, so its row numbers are the AttendanceExceptionIDs. Outlined: exceptions {ids_text}, which name "
-             f"employee {named[0]} on clock entries that belong to employee {owners[0]}: the report misattributes its own rows. The others are "
-             f"{count['Isolated']} isolated and {count['Paid on a Pending entry']} paid on a Pending entry.", mock["bottom"], gap=6)
+             f"employee {named[0]} on clock entries that belong to employee {owners[0]}: the report misattributes its own rows, and none carries "
+             f"another date. The others are {count['Isolated']} isolated and {count['Paid on a Pending entry']} paid on a "
+             f"Pending entry.", mock["bottom"], gap=6)
     return d
 
 
@@ -545,6 +547,8 @@ def if_c3_2_a() -> Diagram:
     """The nine tests of Requirement 2 and the output comparison of Requirement 3, each with one result mark and the grade for
     independence of its record."""
     r2, r3 = ctx.values("case3.r2"), ctx.values("case3.r3")
+    over_weeks, center_over = r2["over_weeks"], r2["center_over"]
+    assert over_weeks and center_over >= len(over_weeks), (over_weeks, center_over)
     s, o, plant, meals, equal, cite = r2["s"], r2["o"], r2["plant"], r2["meals"], r2["equal"], r2["cite"]
     boss = r2["creator_title"]
     last_load = r2["load"][-1]
@@ -565,18 +569,18 @@ def if_c3_2_a() -> Diagram:
                                               f"{equal['Surge'][1]} of {equal['Surge'][0]:,} surge entries"),
         ("Overtime approvals", con, "boss", f"{cite['Surge']['cited']:,} of {cite['Surge']['approvals']:,} surge approvals cite an "
                                             f"operation, all already ended; all approved by the {boss}"),
-        ("Planned load", con, "outside", f"Surge weeks carried {last_load[0]:.2f} of capacity against {last_load[1]:.2f} for other "
-                                         f"weeks in {ctx.data().C}: no planned overload"),
+        ("Planned load", con, "outside", f"Surge weeks {last_load[0]:.2f} of capacity against {last_load[1]:.2f} for others in "
+                                         f"{ctx.data().C}; yet {len(over_weeks)} surge weeks and {center_over} work-center weeks over it"),
         ("Calendar", con, "outside", f"Every surge day is a working day; {r2['maintenance']} had maintenance and {r2['reduced']} reduced "
                                      "capacity at a work center"),
         ("Output", con, "outside", f"Surge weeks completed {surge['ratio']:.2f} standard hours per hour clocked against "
-                                   f"{other['ratio']:.2f}; the six weeks after completed less"),
+                                   f"{other['ratio']:.2f}; the following weeks completed less"),
         ("Absences", sil, "none", "None recorded in Manufacturing in any year"),
     ]
     assert all(src != "outside" or res != sup for _, res, src, _ in rows) and all(src in ("clock", "both") for _, res, src, _ in rows if res == sup), \
         "every record that supports the hours comes from the time clock"
     grade = {"clock": ("✕ No: time clock", CORAL_TINT, CORAL), "both": (f"✕ No: {boss} and time clock", CORAL_TINT, CORAL),
-             "boss": (f"✕ No: {boss}", CORAL_TINT, CORAL), "outside": ("✓ Yes: outside both", TEAL_TINT, TEAL),
+             "boss": (f"✕ No: {boss}", CORAL_TINT, CORAL), "outside": ("– Not established: outside the clock", AMBER_TINT, AMBER),
              "none": ("– Nothing to grade", GRAY_TINT, GRAY)}
     marks = {sup: (1, TEAL_TINT, TEAL), con: (2, CORAL_TINT, CORAL), sil: (3, GRAY_TINT, GRAY)}
     widths = [152, 66, 108, 58, 150, 326]
@@ -604,8 +608,9 @@ def if_c3_2_a() -> Diagram:
         d.box(esc(evidence), xs[5], y, widths[5], h, fill=WHITE, stroke=RULE, size=SMALL, rounded=False, align="left")
         y += h
     _note(d, "Every record that agrees with the hours comes from the time clock. The three records outside it (the capacity plan, the calendar and the "
-             "output) do not support the hours as recorded, and absences are silent: the hours are unsupported, not unworked. "
-             "Output is from Requirement 3's weekly comparison.", y, gap=6)
+             f"output) do not support the hours as recorded, and the records do not show who keeps them, so their independence from the {boss} "
+             "is not established. Absences are silent. The hours are unsupported, not unworked. Output is from Requirement 3's weekly "
+             "comparison.", y, gap=6)
     return d
 
 
@@ -703,7 +708,8 @@ def if_c3_4_a() -> Diagram:
     ny = 400 + 8
     _note(d, f"Hours needed are the {ctx.data().C} output of {r4['std']:,.0f} standard hours times each scenario's ratio. Regular capacity is "
              f"{r4['employees']} hourly employees × 8 hours × {r4['days']} working days of {ctx.data().C}, because the calendar stops early in "
-             f"{year}. Every scenario fits inside it, so the plan allows no routine overtime.", ny)
+             f"{year}. Every scenario fits inside it on the year's total, so the plan allows no routine overtime. Weeks and work centers can "
+             f"still bind, so any exception is approved against a dated plan.", ny)
     return d
 
 
@@ -720,7 +726,7 @@ def if_c3_5_a() -> Diagram:
     base = 292.0                                                   # the baseline of both panels
     bw = 110.0
     d = Diagram("Why Two Accruals Move the Liability Far More Than Income")
-    for px, title in ((0.0, f"<b>Income</b> (fiscal {cur})"), (445.0, f"<b>Balance sheet</b> at 31 December {cur}")):
+    for px, title in ((0.0, f"<b>Income</b> (fiscal {cur})"), (445.0, f"<b>Balance sheet</b> at December 31, {cur}")):
         d.box(title, px, 0, 415, 30, fill=BLUE, stroke=BLUE, color=WHITE, size=HEAD, rounded=False)
         d.box("", px, base, 415, 2, fill=INK, stroke=INK, rounded=False)
 
@@ -740,7 +746,7 @@ def if_c3_5_a() -> Diagram:
 
     # Income: the expense to add and the expense to remove, side by side
     x1, x2 = 36.0, 186.0
-    top1 = bar(x1, accrual, CORAL, f"+{_money(accrual)}", f"<b>Expense added</b>:<br>work of {left_day}–31<br>December {cur}")
+    top1 = bar(x1, accrual, CORAL, f"+{_money(accrual)}", f"<b>Expense added</b>:<br>work of December<br>{left_day}–31, {cur}")
     top2 = bar(x2, prior, TEAL, f"{MINUS}{_money(prior)}", f"<b>Expense removed</b>:<br>{prev} work paid<br>in {cur}")
     bx = x2 + bw + 6                                                # the small net difference, a bracket between the two tops
     for ty in (top1, top2):
@@ -749,7 +755,7 @@ def if_c3_5_a() -> Diagram:
     d.text(f"<b>Net</b>: expense<br>up <b>{_money(net)}</b>", bx + 18, top1 - 2, 415 - bx - 18, 36, size=SMALL, color=AMBER)
     # Balance sheet: the liability, and opening retained earnings with the income effect stacked on it
     x3, x4 = 445.0 + 36, 445.0 + 186
-    top3 = bar(x3, accrual, BLUE, f"+{_money(accrual)}", f"<b>Liability</b> rises:<br>accrued payroll at<br>31 December")
+    top3 = bar(x3, accrual, BLUE, f"+{_money(accrual)}", f"<b>Liability</b> rises:<br>accrued payroll at<br>December 31")
     h4, hn = prior * scale, net * scale
     d.box("", x4, base - h4, bw, h4, fill=GRAY, stroke=GRAY, rounded=False)
     d.box("", x4, base - h4 - hn, bw, hn, fill=AMBER_TINT, stroke=AMBER, stroke_width=1.5, rounded=False)

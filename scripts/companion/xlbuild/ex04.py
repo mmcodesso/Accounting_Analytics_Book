@@ -540,7 +540,8 @@ def ex4_1(b: ExerciseBuild) -> None:
         f"This schedule shows what Charles River billed, not the revenue it reports. It does not net the credit memos "
         f"(the CreditMemo worksheet holds {cm['n']:,} credit memos dated in {c}, with a SubTotal of "
         f"{money(cm['sub'])}), which reduce revenue for returns and allowances. Its GrandTotal includes sales tax "
-        f"({money(yr['tax'])} in {c}), a liability collected for the government rather than revenue, and freight billed "
+        f"({money(yr['tax'])} in {c}), which is billed to customers and owed to the tax authority, a liability rather than "
+        f"revenue, and freight billed "
         f"({money(yr['frt'])}), which the ledger records in its own revenue account (4050) rather than in product "
         f"sales, so only SubTotal, net of credit memos, approaches the sales revenue of the financial statements."])
 
@@ -685,9 +686,10 @@ def ex4_2(b: ExerciseBuild) -> None:
         "show how far the largest stands above the others.",
         "Consistency test: for each promotion I counted the invoice lines whose Discount differs from the promotion's "
         "DiscountPct. The count is zero for every promotion, no invoice line carries a discount without a "
-        "PromotionID, and every PromotionID on the lines is in the PromotionProgram Table. Every promotion was "
-        "therefore applied at its approved rate. A matching rate shows that the rates are consistent, not that "
-        "each line was eligible for its promotion or billed within its dates.",
+        "PromotionID, and every PromotionID on the lines is in the PromotionProgram Table. Every promotion line "
+        "therefore carries the rate the PromotionProgram Table records for its promotion. A matching rate shows "
+        "that the lines agree with that Table, not that the Table's rates were authorized, or that each line was "
+        "eligible for its promotion or billed within its dates.",
         "What the analysis cannot yet show: the invoice lines carry no invoice date, so this workbook cannot test "
         "whether each discounted line was billed within its promotion's effective dates. That test matters here, "
         f"because the PromotionProgram Table itself is suspect: {and_join(oddities)}, so the recorded dates "
@@ -847,7 +849,8 @@ def ex4_3(b: ExerciseBuild) -> None:
         + (f", and no {and_join(none_below)} item." if none_below else ".")
         + " A margin at list price is not what Charles River earns: most sales are billed at price-list prices "
         "below list, some lines carry promotional discounts on top, and StandardCost is a standard, not the actual "
-        "cost, so realized margins are lower and differ by customer and period."])
+        "cost, so realized margins are lower and differ by customer and period. These group averages also give "
+        "each finished good the same weight, whatever it sold, so they are not the groups' margins on sales."])
 
     settle(b)
     e = "4.3"
@@ -1063,9 +1066,10 @@ def ex4_5(b: ExerciseBuild) -> None:
     par.Range("B4").Font.Color = xl.BLUE
     xl.name_cell(wb, "ReviewDate", "'Ex 4.5 Parameters'!$B$4")
     validate(par.Range("B4"), XL_VALIDATE_DATE, XL_GREATER_EQUAL, "=DATE(1900,1,1)", title="ReviewDate",
-             message="Enter the review date, the last day of the extract.", error="ReviewDate must be a date.")
+             message="Enter the review date, the year-end under review.", error="ReviewDate must be a date.")
     par.Range("C4").Value = (
-        f"The review date is the last day of the extract, {long_date(review)}, not TODAY(). A shipment is late only "
+        f"The review date is {long_date(review)}, the year-end under review and the last shipment date in the "
+        "extract, not TODAY(). A shipment is late only "
         "relative to the date of the data: with a fixed date the counts stay the same every time the report is "
         "refreshed or reviewed, so the work can be re-performed and the workpaper agrees with the evidence, while "
         "TODAY() would change the results every day and, long after the extract, flag every In Transit shipment. "
@@ -1196,11 +1200,11 @@ def ex4_5(b: ExerciseBuild) -> None:
         "system does not require). Without it, the extract gives no way to trace these shipments to the carrier's "
         "records. Evidence: the carrier's bills of lading or invoices and proof of delivery for a sample, and the "
         "shipping procedure for recording tracking numbers.",
-        f"2. Stale In Transit status: {fx['late']:,} of the {fx['status']['In Transit']:,} In Transit shipments have "
-        f"a DeliveryDate before the review date, and they come from every year of the data ({by_year}). If "
-        "DeliveryDate records the actual delivery, the status was not updated when the goods arrived; if it is a "
-        "planned date, the shipments may still be unresolved. Either way the two fields conflict, a consistency and "
-        "timeliness problem (Chapter 2). Likely cause: no process or interface updates the status on delivery. "
+        f"2. In Transit after the DeliveryDate: {fx['late']:,} of the {fx['status']['In Transit']:,} In Transit shipments "
+        f"have a DeliveryDate before the review date, and they come from every year of the data ({by_year}). If "
+        "DeliveryDate records the actual delivery, the two fields conflict, a consistency and timeliness problem "
+        "(Chapter 2), and the status was not updated when the goods arrived. If it is a planned date, the shipments "
+        "are overdue and may still be unresolved. Likely cause: no process or interface updates the status on delivery. "
         "Evidence: proof of delivery or carrier tracking for a sample, the customers' receipt of the goods, the "
         "history of status changes, and the process that is meant to close a shipment.",
         f"3. Both: all {fx['both']} In Transit shipments without a tracking number are past their DeliveryDate, so "
@@ -1427,8 +1431,9 @@ def ex4_6(b: ExerciseBuild) -> None:
         f"Exception 1, approvals made by the requester: all {fx['status'].get('Approved', 0)} approvals were made by "
         f"one person, EmployeeID {approver} ({a_name}, {a_title}), who also requested {own['n']} of the "
         f"{fx['n']} overrides and approved {own['own']} of her own requests. A control in which the only approver is "
-        "also a requester is not designed to prevent an unjustified price: the records show no independent review "
-        "of the manager's own overrides, and no other approver for them.",
+        "also a requester gives no independent check of that person's prices. The records show no other approver "
+        "and no independent review of the manager's own overrides, so the first question is whether the policy "
+        "requires one, or whether another review compensates.",
         f"Exception 2, requests without an approval: requests {ids} are Pending, with no approver and no approval "
         f"date, and all {len(pend)} were requested by the {a_title}. A pending request should never reach an "
         "invoice, so the design question is whether the system blocks a price until it is approved.",

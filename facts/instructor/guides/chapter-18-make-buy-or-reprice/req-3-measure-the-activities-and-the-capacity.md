@@ -151,7 +151,7 @@ ORDER BY COALESCE(WorkCenterID, 99)
 
 ### Part 3: Say what routing time measures
 
-**Step 5. Write the two sentences.** Routing time is the right measure because it is what the products should take, measured independently of the time recorded, which drifted toward Packing and Quality Assurance and was often recorded after the operation ended. It leaves out the indirect time and the hours paid beyond the work that Part III found, which are what the unused capacity of Requirement 4 will hold, and it takes the routings as right.
+**Step 5. Write the two sentences.** Routing time is the right measure because it is what the products should take, measured independently of the time recorded, which drifted toward Packing and Quality Assurance and was often recorded after the operation ended. It leaves out the indirect activity routings do not list (maintenance, training, rework, scheduling) and the hours recorded above the routings that Part III found, and it takes the routings as right. So the unused capacity of Requirement 4 is an estimate from standard times, not a finding that those hours went unworked.
 
 {{ figure('IF-18-3-B') }}
 
@@ -174,7 +174,7 @@ ORDER BY COALESCE(WorkCenterID, 99)
 ## What a strong answer says
 
 - **Routing time is the measure of use.** It is what the products should take at the standard routings, independent of recorded time; the plant used {{ of_pract|pct(1) }} of its practical capacity.
-- **What it leaves out.** The indirect time and the hours beyond the work, which Requirement 4 treats as unused capacity, and any difference between the routing and the work.
+- **What it leaves out.** Indirect activity the routings do not list and the hours recorded above them, which Requirement 4's unused capacity holds as an estimate, and any difference between the routing and the work. The practical share is the case's assumption, which Requirement 4's Data Table tests.
 - **The activity differences.** {{ small }}'s small batches carry about twice the setup per unit, and more issue lines per unit.
 - **Practical, not theoretical.** The controller's table sets practical capacity at a share of the available hours; reporting use on the available hours understates it.
 

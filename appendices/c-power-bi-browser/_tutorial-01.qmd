@@ -14,7 +14,7 @@ c. Choose **Excel workbook**.
 d. Under **Connection settings**, select **Upload file**, click **Browse...**, and choose CharlesRiver.xlsx.
 e. When the box reads **Upload successful**, click **Next**.
 
-Selecting **Upload file** sets **Authentication kind** to **Organizational account** and signs you in with your school account, so there is nothing to choose under **Connection credentials**. The copy you uploaded is the one the model reads from now on; if your OneDrive already holds a file of the same name, the copy gets a number, such as CharlesRiver 1.xlsx. @fig-c-01 shows the two pages of Get data.
+When this appendix was tested, selecting **Upload file** set **Authentication kind** to **Organizational account** and signed in with the school account by itself. If **Connection credentials** reads **Anonymous** or offers **Sign in**, choose **Organizational account** and sign in with your school account before you click **Next**. The copy you uploaded is the one the model reads from now on; if your OneDrive already holds a file of the same name, the copy gets a number, such as CharlesRiver 1.xlsx. @fig-c-01 shows the two pages of Get data.
 
 ![Uploading the Workbook and Choosing Its Tables.](/visuals/svg/fig-c-01-upload-and-choose.svg){#fig-c-01 fig-alt="A mock of two pages of Power Query Online's Get data in the Power BI service. On the left, Connect to data source for an Excel workbook, with Upload file selected, the uploaded CharlesRiver.xlsx marked Upload successful, and the connection credentials reduced to an organizational account. On the right, Choose data lists the workbook's Tables and worksheets in text order, with four Tables checked, and Transform data as the only way on."}
 
@@ -37,10 +37,10 @@ Power Query Online also types each column from its first 200 rows, so Discount, 
 **Step 4. Keep the items Charles River sells, and set the date type.**
 
 a. In the **Item** query, click the arrow on the ListPrice header, clear **(null)**, and click **OK**.
-b. In the **SalesInvoice** query, look at InvoiceDate: it shows five-digit numbers, not dates.
-c. Click the icon on its header, and choose **Date**.
+b. In the **SalesInvoice** query, look at the icon on the InvoiceDate header and at the column's values.
+c. If the icon shows a whole number and the values are five-digit numbers, click the icon, and choose **Date**.
 
-The workbook stores InvoiceDate as an Excel date, a count of days that Excel displays as a date. Desktop reads it as a date, but Power Query Online reads the bare number, and the custom columns of Step 5 cannot take a year or a quarter from a number. After the change, the column shows dates again, and the query ends with a step named Changed column type 1. @fig-c-02 shows the column before the change.
+The workbook stores InvoiceDate as an Excel date, a count of days that Excel displays as a date. Desktop reads it as a date, but Power Query Online read the bare number when this appendix was tested, and the custom columns of Step 5 cannot take a year or a quarter from a number. After the change, the column shows dates again, and the query ends with a step named Changed column type 1. @fig-c-02 shows the column before the change.
 
 ![InvoiceDate as Power Query Online Reads It.](/visuals/svg/fig-c-02-dates-as-numbers.svg){#fig-c-02 fig-alt="A mock of Power Query Online with the SalesInvoice query selected. The InvoiceDate column carries the whole number icon and shows five-digit numbers. The Applied steps list Source, Navigation 1, Changed column type, and Choose columns. A note beside the grid shows the same rows after the type is set to Date, when the numbers read as dates."}
 
@@ -60,19 +60,19 @@ c. Open the arrow again, and select **Show column quality details** and **Show c
 d. Click **Column profiling based on top 1,000 rows** in the status bar, and choose **Column profiling based on entire data set**.
 e. Record the share of PromotionID that is empty and the number of distinct values of Discount, on both bases.
 
-The two profiles differ exactly as they do in Tutorial 13.1, and the entire data set takes only a few seconds to profile (Microsoft, 2025e).
+The two profiles differ exactly as they do in Tutorial 13.1 (Microsoft, 2025e). The entire data set took a few seconds to profile when this appendix was tested, and it can take longer on a slow connection.
 
 **Step 7. Create the semantic model.**
 
 a. At the bottom right of Power Query, click the arrow beside **Create a report**, and choose **Create a semantic model only**.
 b. In **Create new semantic model**, keep **My workspace** selected, type `Charles River Reports` in **Semantic model name**, and click **Create**.
 
-The service loads the four Tables and opens the model editor, which shows the tables in a diagram, a **Properties** pane, and a **Data** pane, with **Model view**, **DAX query view**, and **TMDL View (Preview)** at the bottom. A model you have just created opens in Editing mode. If you return to it later and its commands are unavailable, open the menu at the top right that reads **Viewing**, and choose **Editing**.
+The service loads the four Tables and opens the model editor, which shows the tables in a diagram, a **Properties** pane, and a **Data** pane, with **Model view**, **DAX query view**, and **TMDL View (Preview)** at the bottom. A model you have just created opens in Editing mode. If you return to it later and its commands are unavailable, open the menu at the top right that reads **Viewing**, and choose **Editing**. Guided Tutorial B.2, in the appendix on publishing and security, needs the model in a shared workspace in which you are an Admin. If you have one and plan to do that tutorial, choose it here instead of My workspace, and save the report there in Step 11.
 
 **Step 8. Turn off two defaults.**
 
 a. In the model editor, choose **File > Options**.
-b. Under **Current File > Data Load**, clear **Autodetect new relationships after data is loaded** and **Auto date/time**, and click **OK**.
+b. Under **Current File > Data Load**, clear **Autodetect new relationships after data is loaded** and **Auto date/time**, and click **OK** (or **Save**, if your dialog names the button so).
 c. Choose **Manage relationships** on the ribbon, and check that it reads "There are no relationships defined yet."
 
 Tutorial 13.1 turns these settings off before loading. The browser offers them only once the model exists, so Step 8 checks that the defaults created no relationships; if some are listed, select each one and click **Delete**.
@@ -92,21 +92,23 @@ e. Create two more relationships in the same way: ItemID from **SalesInvoiceLine
 a. Select FiscalYear in the SalesInvoice table, in the diagram or the **Data** pane.
 b. In the **Properties** pane, under **Advanced**, set **Summarize by** to **None**.
 c. Do the same for FiscalQuarter.
-d. Select LineTotal, ListAmount, and DiscountAmount together, holding Ctrl, and under **Formatting** turn on **Thousands separator**.
+d. Select LineTotal, ListAmount, and DiscountAmount together, holding Ctrl, or one at a time, and under **Formatting** turn on **Thousands separator** and check that **Decimal places** reads 2.
 
-**Properties** takes the place of Desktop's Column tools tab: **Summarize by** with **None** is Desktop's Summarization with Don't summarize. Turning on the separator sets the format to **Decimal number** with two decimal places, for all three columns at once. @fig-c-03 shows the model at this point.
+**Properties** takes the place of Desktop's Column tools tab: **Summarize by** with **None** is Desktop's Summarization with Don't summarize. Turning on the separator sets the format to **Decimal number** with two decimal places, for all three columns at once when they are selected together. @fig-c-03 shows the model at this point.
 
-![The Model Editor After Steps 9 and 10.](/visuals/svg/fig-c-03-model-editor.svg){#fig-c-03 fig-alt="A mock of the model editor of the Power BI service in Editing mode. The diagram shows SalesInvoiceLine related many to one to SalesInvoice, Item, and Customer. FiscalYear is selected, and the Properties pane shows its Advanced settings, with Summarize by set to None. Model view, DAX query view, and TMDL View (Preview) are the tabs at the bottom."}
+![The Model Editor After Steps 9 and 10.](/visuals/svg/fig-c-03-model-editor.svg){#fig-c-03 fig-alt="A mock of the model editor of the Power BI service in Editing mode. The diagram shows Customer related one to many to SalesInvoice on CustomerID, SalesInvoice to SalesInvoiceLine on SalesInvoiceID, and Item to SalesInvoiceLine on ItemID, each with a single filter direction toward the invoice lines. FiscalYear is selected, and the Properties pane shows its Advanced settings, with Summarize by set to None. Model view, DAX query view, and TMDL View (Preview) are the tabs at the bottom."}
 
 **Step 11. Build the Validation page.**
 
 a. Choose **New report** on the model editor's ribbon. The report editor opens in a new browser tab.
 b. Double-click the tab **Page 1**, and rename it `Validation`.
 c. Select **Table** in the **Visualizations** pane, and select the check boxes of FiscalYear, SalesInvoiceLineID, LineTotal, ListAmount, and DiscountAmount in the **Data** pane.
-d. Click an empty part of the page, add a second **Table**, and select ItemGroup and LineTotal.
-e. Click the **Save this report** button at the top right, type `Charles River Reports` as the name, keep **My workspace**, and click **Save**.
+d. In the **Columns** well, click the arrow beside SalesInvoiceLineID, and choose **Count**.
+e. Check that the three amounts read as sums and that the table has one row for each fiscal year.
+f. Click an empty part of the page, add a second **Table**, and select ItemGroup and LineTotal.
+g. Click the **Save this report** button at the top right, type `Charles River Reports` as the name, keep the workspace of the model, and click **Save**.
 
-SalesInvoiceLineID comes in as Count of SalesInvoiceLineID, because the service set the key not to summarize; Tutorial 13.1 chooses **Count** by hand. Saving puts the report in My workspace, beside the semantic model of the same name, and reopens it in Reading view.
+Choosing **Count** yourself, as Tutorial 13.1 does, keeps the line count from depending on the visual's default, which can differ from Desktop's. Every invoice line has its own SalesInvoiceLineID, so the count is the number of invoice lines. Saving puts the report beside the semantic model of the same name and reopens it in Reading view.
 
 **Checkpoint.** Before you build on the model, confirm the following:
 
@@ -114,4 +116,4 @@ SalesInvoiceLineID comes in as Count of SalesInvoiceLineID, because the service 
 - InvoiceDate is a date, and FiscalYear, Period, and Month read like Tutorial 13.1's.
 - The fiscal 2026 row of the Validation page matches the invoice line count and line total of Chapter 6, and the item group table has no (Blank) row.
 
-A model built in the browser that reproduces Chapter 6's totals is the same model as Tutorial 13.1's, and the rest of Part IV builds on it.
+A model built in the browser that passes these checks takes the place of Tutorial 13.1's in the rest of Part IV. Its matching totals are good evidence that it holds the same rows, although equal totals alone could hide changes that offset, as Tutorial 4.1, Step 10 showed.

@@ -33,7 +33,7 @@ The chapter depends on these conditions of the data:
 3. Relate tables, test the relationships and say which way a filter flows. Practiced in Tutorial 13.1 (Steps 8 and 11), Tutorial 13.2 (Step 8), Exercises 13.1 (4) and 13.3 (1), and questions 4 and 6.
 4. Reconcile a report to control totals before anyone reads it, and tell revenue from the other amounts on an invoice. Practiced in Tutorial 13.1 (Step 10), Exercises 13.1 and 13.2.
 5. Choose the summary and the visual for the reader's task, build a page, and control how its visuals filter one another. Practiced in Tutorial 13.2, Exercises 13.2 and 13.4, and questions 1, 5, 7, 9 and 15.
-6. Review a page for misleading axes, scales, periods and hidden filters, and make it accessible. Practiced in Tutorial 13.3, Exercises 13.3 (5) and 13.6, and questions 8 and 10 to 14.
+6. Review a page for misleading axes, scales, periods and hidden filters, and apply the chapter's accessibility practices. Practiced in Tutorial 13.3, Exercises 13.3 (5) and 13.6, and questions 8 and 10 to 14.
 
 ## Preparing to teach
 
@@ -43,7 +43,7 @@ The chapter depends on these conditions of the data:
 - Do the three tutorials yourself in order and save Charles River Reports.pbix. **Close & Apply** on the large workbook takes a minute or more: tell students to start it before a break.
 - Show students **File > Options and settings > Options > Global**, where clearing Auto date/time for new files saves Step 1's setting in later reports. Tutorial 13.1 sets it for the current file only.
 - A late student takes Charles River Reports from Chapter13-companion.zip, from the folder of the tutorial they start. Its README gives the steps: copy the folder, open the .pbip, point the queries at CharlesRiver.xlsx (they read `C:\CharlesRiver\CharlesRiver.xlsx`, or use **Home > Transform data > Data source settings > Change Source**), choose **Home > Refresh**, and **File > Save as** a .pbix. The deck has a checkpoint slide for each tutorial.
-- Open the model answer once. Its pages are Sales and Discounts, Validation and Review (the end of the tutorials), Ex 13.1 to Ex 13.5, Ex 13.6 Draft, Ex 13.6 Revised and Notes. In **DAX query view**, the Checks tab tests every value of the tutorials and exercises after a refresh: choose **Run**.
+- Open the model answer once. Its pages are Sales and Discounts, Validation and Review (the end of the tutorials), Ex 13.1 to Ex 13.5, Ex 13.6 Draft, Ex 13.6 Revised and Notes. In **DAX query view**, the Checks tab tests the control values listed on the Notes page after a refresh: choose **Run**. The figures of Exercise 13.5's Profile queries, which do not load, are checked in Power Query, not by the tab.
 - If a student's window shows separate Build and Format panes instead of Visualizations, the on-object interaction preview is on. The tutorials describe the default panes.
 
 **Pitfalls that cost class time**
@@ -153,7 +153,7 @@ Plan A is the safest: the stumbles of this chapter are about reading what a visu
 
 ### Guided Tutorial 13.3: Correcting Three Misleading Charts
 
-**Purpose.** Students rebuild a colleague's three draft charts, correct each and make the page accessible. **Time.** About 40 to 50 minutes. **Demonstrate, then hand over.** Demonstrate Step 2 (the axis minimum) and Step 6 (one axis). Leave the rest to students.
+**Purpose.** Students rebuild a colleague's three draft charts, correct each and describe the charts for screen-reader users. **Time.** About 40 to 50 minutes. **Demonstrate, then hand over.** Demonstrate Step 2 (the axis minimum) and Step 6 (one axis). Leave the rest to students.
 
 | Step | Look for | Value |
 |---|---|---|
@@ -248,7 +248,7 @@ Key: 1 B, 2 D, 3 C, 4 A, 5 B, 6 D, 7 A, 8 C, 9 D, 10 B, 11 C, 12 A, 13 D, 14 B, 
 | 12 | A | the comparison starts at the start-up month; whole years show little growth. |
 | 13 | D | meaning must not rest on color alone. |
 | 14 | B | good performers graphed more, about 30% of the graphs of key financial figures distorted them by more than 5%, and across all of those graphs the changes were exaggerated by about 11% on average. |
-| 15 | A | a hidden page filter changes the numbers without telling the reader. |
+| 15 | A | a Filters pane filter that nothing on the page mentions, at the visual, page or report level, changes the numbers without telling the reader. |
 
 **Questions where a wrong option tempts**
 

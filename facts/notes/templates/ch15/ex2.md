@@ -1,5 +1,6 @@
 <!-- Instructor notes, Exercise 15.2 (CR15 reference model): {{ d.C }} net income by month: {% for m, v in months %}{{ m }} {{ v|money }}{{ '; ' if not loop.last }}{% endfor %}; YTD at June {{ june|money }}, December {{ ni|money }} (equal to {{ close }}). Visual calculations:
-     YTD = RUNNINGSUM ( [Net Income] ); Change = [Net Income] - PREVIOUS ( [Net Income] ). (3) Filtered to July-December, the running
+     YTD = RUNNINGSUM ( [Net Income] ); Change = IF ( ISBLANK ( PREVIOUS ( [Net Income] ) ), BLANK (), [Net Income] -
+     PREVIOUS ( [Net Income] ) ), blank in January, which has no previous row (without the guard January shows its own net income). (3) Filtered to July-December, the running
      sum starts at July and reaches {{ h2|money }} in December, while TOTALYTD still shows {{ july|money }} in July and {{ ni|money }} in
      December, because the measure reads the model and the visual calculation only the visual's rows. (4) {% for x in low %}{{ x.name }}{{ ', the low point,' if loop.first }}{% if x.pay %} has three
      pay dates{% if x.others %}, as does {{ x.others|join(' and ') }}{% endif %} (Chapters 11 and 14){% elif x.promo %} has Furniture revenue {{ x.furniture|pct }} below {{ x.name }} {{ d.P }} (Chapter 11) at the peak

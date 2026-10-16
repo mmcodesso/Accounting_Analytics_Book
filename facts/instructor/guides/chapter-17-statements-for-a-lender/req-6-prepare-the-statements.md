@@ -24,11 +24,11 @@ figures:
 
 ## Purpose and learning outcomes
 
-Requirement 5 left a schedule of entries; this requirement turns it into the four statements the bank reads and shows that the package agrees with itself. The cash flow statement is where a reviewer looks hardest: no adjustment moves cash, so they may change lines of the reconciliation but no total. The workbook builds the statements; the Review file tests them by recomputing the balances from the ledger. The analytics type is descriptive, with a diagnostic test.
+Requirement 5 left a schedule of entries; this requirement turns it into the four statements the bank reads and shows that the package agrees with itself. The cash flow statement is where a reviewer looks hardest: no adjustment moves cash or changes how a cash flow is classified, so they may change lines of the reconciliation but no total. The workbook builds the statements; the Review file tests them by recomputing the balances from the ledger. The analytics type is descriptive, with a diagnostic test.
 
 Students can prepare classified balance sheets and statements of income from the adjusted balances (Part 1), roll equity forward with the corrected year labeled restated (Part 2), prepare cash flows by the indirect method while disclosing what moved no cash (Part 3), and test the package against the ledger in a second tool (Part 4).
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts, and transactions); IMA Reporting and Control (financial recordkeeping; financial statement preparation); IFAC IES 2 (a); AACSB A5 part 5.1 (technology integration: Excel with Power Query and data models).
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts, and transactions); IMA Reporting and Control (financial statement preparation); IFAC IES 2 (a); AACSB A5 part 5.1 (technology integration: Excel).
 
 ## Before you assign
 
@@ -44,7 +44,7 @@ Pairs, about 180 minutes: 50 for the balance sheets and income statements, 15 fo
 
 ### Part 1: Balance sheets and statements of income
 
-**Step 1. Build the adjusted balance sheets.** On a worksheet named **Statements** give each year-end a column: {{ d.C }}, {{ d.P }} (restated) and, as the model does, {{ d.F }} (restated), the opening balances of {{ d.P }}. Each line adds what WorkingTB records under its StatementLine to what the adjustment lines add at that year-end; liabilities and equity take the opposite sign. The model's formula for cash:
+**Step 1. Build the adjusted balance sheets.** On a worksheet named **Statements** give each year-end a column: {{ d.C }}, {{ d.P }} (restated) and, as the model does, {{ d.F }} (restated), the opening balances of {{ d.P }}, which as a classified column also needs R1's current portion at that year-end. Each line adds what WorkingTB records under its StatementLine to what the adjustment lines add at that year-end; liabilities and equity take the opposite sign. The model's formula for cash:
 
 ```jinja
 {{ g.f.cash }}
@@ -52,13 +52,13 @@ Pairs, about 180 minutes: 50 for the balance sheets and income statements, 15 fo
 
 **Check:** total assets ${{ s_c.ta|money }} and ${{ s_p.ta|money }}, equal to total liabilities and equity, so each check row is zero. **Watch for:** a retained earnings line without the year's net income, which the ledger has not closed. The check row then reads the income, ${{ i_c.ni|money }} for {{ d.C }}.
 
-**Step 2. Build the statements of income by function.** Lay out operating revenue to net income by function, with the loss on disposals and an income taxes line of zero (the ledger records none).
+**Step 2. Build the statements of income by function.** Lay out operating revenue to net income by function, with the loss on disposals and an income taxes line of zero (the ledger records none, so the net income below it is provisional until the tax expense is determined).
 
 **Check:** income before income taxes ${{ i_c.ni|money }} and ${{ i_p.ni|money }}, the recorded income plus the schedule's effect. **Watch for:** the loss on a disposal, a debit on a revenue-type account. Adding it instead of subtracting it overstates income by ${{ g.loss_double[d.C]|money }} in {{ d.C }}.
 
 ### Part 2: Changes in stockholders' equity
 
-**Step 3. Roll equity forward from 1 January {{ d.P }}.** Columns for common stock, retained earnings and total. Start from retained earnings as previously reported: the {{ d.F }} trial balance leaves out its own close, so that is `3030` plus {{ d.F }} net income. Add the correction, then each year's net income and distributions (none). The model's first row:
+**Step 3. Roll equity forward from January 1, {{ d.P }}.** Columns for common stock, retained earnings and total. Start from retained earnings as previously reported: the {{ d.F }} trial balance leaves out its own close, so that is `3030` plus {{ d.F }} net income. Add the correction, then each year's net income and distributions (none). The model's first row:
 
 ```jinja
 {{ g.f.re_reported }}
@@ -119,14 +119,14 @@ The page holds a card visual titled "{{ g.t_cards }}", a matrix of debits and cr
 {{ g.dax_check }}
 ```
 
-**Check:** zero, zero, zero and zero; the {{ g.n_checks }} Checks rows of this requirement all agree. The project proves these numbers; how the page renders is visible only in Desktop.
+**Check:** zero, zero, zero and zero; the {{ g.n_checks }} Checks rows of this requirement all agree. The project tests these numbers; how the page renders is visible only in Desktop.
 
 ## Expected results
 
 | Quantity | Value | Step |
 |---|---|---|
 | Income before income taxes, {{ d.P }}; {{ d.C }} | ${{ i_p.ni|money }}; ${{ i_c.ni|money }} | 2 |
-| Retained earnings, 1 January {{ d.P }}, restated | ${{ restated|money }} | 3 |
+| Retained earnings, January 1, {{ d.P }}, restated | ${{ restated|money }} | 3 |
 | Operating cash flow, {{ d.P }}; {{ d.C }} | {{ sm(cf_p.operating) }}; {{ sm(cf_c.operating) }} | 4 |
 
 {{ expected() }}

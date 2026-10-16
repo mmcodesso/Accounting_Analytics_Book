@@ -346,6 +346,13 @@ def t5_2(b: Build) -> None:
     b.doc["Calculated columns"] += (" SalesInvoiceLine lookups: InvoiceDate, Period, SalesOrderID (XLOOKUP on "
                                     "SalesInvoice), OrderDate (INDEX and MATCH on SalesOrder, inside IFERROR), ItemGroup "
                                     "and ProductType (XLOOKUP on Item).")
+    # Step 8c: the lines now carry the invoice date and item group, so the open question moves on
+    promo = e.promotion(PROMO)
+    b.doc["Open questions"] = (
+        f"Promotion {PROMO}, the {promo['name']} ({promo['pct'] * 100:.0f} percent, {long_date(promo['start'], year=False)} "
+        f"to {long_date(promo['end'])}), has the most promotion lines and the most discount dollars, and its dates "
+        "straddle the two quarters under review. How much of the change in the Furniture margin between the third and "
+        "fourth quarters it explains is the next question.")
     b.sheets["SalesOrder"] = "the sales orders (query SalesOrder)"
     b.sheets["SalesInvoiceLine"] += " and six lookup columns"
     b.sheets["Analysis"] += "; lookup check (B41), Furniture revenue by quarter (row 45), late promotion lines (B47)"
@@ -977,14 +984,14 @@ def t7_2(b: Build) -> None:
                     FurniturePrices="planned and actual Furniture prices as a percentage of list, by month",
                     OpexReport="operating expenses against their budget, and the two driver tests")
     b.extra.append(["Finding", f"The sales-volume variance ({gsum('volume_var'):,.0f}) says more about the budget's "
-                    "forecast, which planned several times the units sold, than about the year, so 2026 is judged against "
-                    "the flexible budget. Against "
+                    "forecast, which planned several times the units sold, than about the year, so the static budget "
+                    "shows the gap from the plan and 2026's prices and costs are judged against the flexible budget. Against "
                     f"it, every product line earned less than planned ({gsum('flex_var'):,.0f} in all): the planned "
                     "net prices were a few percent above what the price lists delivered, and Furniture adds the "
                     f"promotional discounts ({fur['discounts']:,.0f}), which came later than the budget planned them. "
                     f"Two expense assumptions did not hold: the payroll burden rate ({op['burden_budget']:.1%} budgeted, "
                     f"{op['burden_actual']:.1%} actual) and the commission budget, which flexes to {flexed:,.0f} against "
-                    f"{op['commission_actual']:,.2f} paid."])
+                    f"{op['commission_actual']:,.2f} of commission expense."])
     write_documentation(b)
 
     t = "7.2"
@@ -1009,7 +1016,7 @@ def t7_3(b: Build) -> None:
     labels = ["Discount rate", "Volume lift", "Units on promotion lines", "Price before discount per unit",
               "Variable cost per unit", "Commission rate"]
     names = ["Discount", "Lift", "PromoUnits", "PriceBeforeDiscount", "VariableCost", "CommissionRate"]
-    sources = [f"PromotionProgram, promotion {PROMO}", "Assumption; no increase in orders",
+    sources = [f"PromotionProgram, promotion {PROMO}", "Assumption, not a measured lift",
                f"InvoiceLines, promotion {PROMO}", f"InvoiceLines, promotion {PROMO}", "Standard cost per unit",
                f"Tutorial 7.2, actual {y}"]
     values(ws, {"A1": "Input or result", "B1": "Value", "C1": "Name", "D1": "Source"})
@@ -1076,7 +1083,8 @@ def t7_3(b: Build) -> None:
     table = [("Assumption", "Value used", "Basis", "Sensitivity"),
              ("Discount rate", "10%", "The promotion's DiscountPct in the PromotionProgram Table",
               "A 5% discount would need a much smaller lift to break even"),
-             ("Volume lift", "0%", "Furniture orders in the promotion's months were in line with other months",
+             ("Volume lift", "0%", "A scenario, because orders in the promotion's months rose only slightly and "
+              "cannot show the promotion's effect",
               f"The break-even lift is {lift:.1%} (Goal Seek), between the data table's 30% and 35% rows"),
              ("Orders without the promotion", "Same orders at the price before discount",
               "Promotion lines carry the customer's usual price, with the discount applied on top",
@@ -1116,6 +1124,10 @@ def t7_3(b: Build) -> None:
             "=Model!B11", 0.01)
     b.check(t, "Goal Seek's break-even lift (Model, assumption table)", round(pm["breakeven"], 4), round(lift, 4),
             1e-4, PCT)
+    b.check(t, "break-even lift recomputed from the named cells (a live check of Goal Seek's answer)",
+            round(pm["breakeven"], 9),
+            "=(PriceBeforeDiscount*(1-CommissionRate)-VariableCost)"
+            "/(PriceBeforeDiscount*(1-Discount)*(1-CommissionRate)-VariableCost)-1", 1e-9, PCT)
     b.check(t, "data table: 10% discount, 30% lift (Model!C22), still negative", round(pm["difference"](0.1, 0.3), 2),
             "=Model!C22", 0.01)
     b.check(t, "data table: 10% discount, 35% lift (Model!C23), positive", round(pm["difference"](0.1, 0.35), 2),

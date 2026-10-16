@@ -36,7 +36,7 @@ By the end, students can:
 - identify SourceDocumentType as the column that says what kind of document created a ledger row, and say what SourceDocumentID and SourceLineID add;
 - compare what an invoice holds with what its ledger rows hold, and say why an analyst needs both.
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and ISC M4 (use and management of data); IMA Data Literacy, and Financial Recordkeeping and Financial Statement Preparation; IFAC IES 2 (a), financial accounting and reporting, and IES 2 (i), using information technology to analyze data; AACSB A5 part 5.2.
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and ISC M4 (use and management of data); IMA Data Literacy, and Financial Recordkeeping; IFAC IES 2 (a), financial accounting and reporting, and IES 2 (i), using information technology to analyze data; AACSB A5 part 5.2.
 
 ## Before you assign
 

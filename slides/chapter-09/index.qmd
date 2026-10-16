@@ -86,7 +86,7 @@ DB Browser can change a database as well as read it, which is why the tutorials 
 {{< book-figure fig-09-02 crop="0,0.3092,1,0.4819" >}}
 
 ::: {.notes}
-Look here first when you plan a query: it gives the exact name of every table and column and the type each holds. As Chapter 3 explained, SQLite stores whole numbers as INTEGER, amounts as REAL, and dates as TEXT in year-month-day form.
+Look here first when you plan a query: it gives the exact name of every table and column and the type each holds. As Chapter 3 explained, the Charles River database stores whole numbers as INTEGER, amounts as REAL, and dates as TEXT in year-month-day form.
 :::
 
 ## Watch out: do not type in Browse Data {.watch-out}
@@ -124,7 +124,7 @@ A statement is a complete instruction ending with a semicolon, built from clause
 {{< book-table tbl-09-01 >}}
 
 ::: {.notes}
-An error like these stops the query, turns the message pane red, and gives the line where the statement starts; the message can point near the mistake rather than at it. A misspelled name, which SQLite finds before it runs anything, is the most common cause, and the Database Structure tab is where to check the spelling.
+An error like these stops the query, turns the message pane red, and gives the line where the statement starts; the message can point near the mistake rather than at it. A misspelled name, which SQLite finds before it runs anything, is one cause to rule out, and the Database Structure tab is where to check the spelling.
 :::
 
 ## Watch out: when a query misbehaves, check these first {.watch-out}
@@ -144,8 +144,8 @@ Running with nothing selected runs the whole script and shows only the last resu
 
 - AS gives a result column a new heading; the table keeps its names
 - A calculated column applies `+`, `-`, `*` and `/` to each row
-- ROUND to two places removes the binary fractions of a cent
-- Two whole numbers divide as whole numbers: multiply one by 1.0 for decimals
+- ROUND to two places rounds an amount to the cent
+- Two INTEGER values divide as integers: multiply one by 1.0 for a fraction
 
 ::: {.notes}
 A calculated column exists only in the result, not in the table. The percent operator returns a remainder, but it drops decimals first, which makes it unsuitable for amounts.
@@ -156,7 +156,7 @@ A calculated column exists only in the result, not in the table. The percent ope
 {{< book-table tbl-09-02 1-5 >}}
 
 ::: {.notes}
-ROUND to two places is the right precision for money, and CAST converts text to a number when a calculation needs one. UPPER of TRIM puts inconsistently entered text into one form before it is compared.
+ROUND to two places matches the cents of the dataset's amounts, and CAST converts text to a number when a calculation needs one. UPPER of TRIM puts inconsistently entered text into one form before it is compared.
 :::
 
 ## Functions that take text apart and fill gaps
@@ -193,8 +193,8 @@ Ask students to predict each answer before revealing it, then to name the Excel 
 
 ## SQLite has its own rules {.answer}
 
-1. 3: two whole numbers divide as whole numbers
-2. 3.5: one decimal keeps the decimals
+1. 3: two INTEGER values divide as integers
+2. 3.5: a REAL operand keeps the fraction
 3. 1235.0: negative places count as zero, unlike Excel's 1200
 4. LLC: spaces trimmed, then capitals
 
@@ -293,7 +293,7 @@ For a column that stores a time, such as a journal entry's CreatedDate, end the 
 
 - NULL is not zero or empty text: the value is unknown or does not exist
 - Find missing values with IS NULL; exclude them with IS NOT NULL
-- NULL spreads through calculations: a NULL in a sum makes the sum NULL
+- NULL spreads through calculations: a NULL in an addition makes the result NULL
 - COALESCE replaces a NULL, which is a decision, not a correction
 
 ::: {.notes}
@@ -518,7 +518,7 @@ Most of this chapter's work was descriptive analytics: finding, listing and rank
 - Errors that stop a query name themselves; logical errors need a check
 
 ::: {.notes}
-Ask students which logical error they think they are most likely to make. The AND and OR precedence and the comparison with NULL are the usual answers.
+Ask students which logical error they think they are most likely to make, and how they would catch it. The AND and OR precedence and the comparison with NULL are two to discuss.
 :::
 
 ## Key terms

@@ -293,9 +293,11 @@ class Facts:
                    "Year-End Close - Income Summary to Retained Earnings": "the year's net income to retained earnings"}
         if only("AboveLimit") and kind in carries and r["approver"]["limit"] == top_limit:
             return ("expected:close",
-                    f"Expected: a year-end closing entry of {money(total)}, which carries {carries[kind]}, above the "
-                    f"approver's limit of {money(r['approver']['limit'])}, the highest limit of any employee. Agree it "
-                    "to the year's balances, and report the gap in the approval policy for closing entries.")
+                    f"Expected in size: a year-end closing entry of {money(total)}, which carries {carries[kind]}, "
+                    f"above the approver's limit of {money(r['approver']['limit'])}, the highest limit any employee has "
+                    "on record. Agree it to the year's balances, and request the closing-entry policy, the limits that "
+                    "applied at the time, and the evidence of review before deciding whether the exception is a gap in "
+                    "the policy or a failure to follow it.")
         if only("AboveLimit", "RoundAmount") and kind == "Debt Reclass" and r["approver"]["title"] == "Controller":
             return ("follow:reclass",
                     f"Follow up: a round debt reclassification of {money(total)}, above the controller's limit of "
@@ -318,7 +320,7 @@ class Facts:
             return ("expected:disposal",
                     f"Expected: an asset disposal whose total, {money(total)}, is the original cost of the asset it "
                     f"retires ({code} in the fixed-asset register). Agree the cost and the accumulated depreciation "
-                    "to the register.")
+                    "to the register, and check the approval of the disposal.")
         raise AssertionError(f"no disposition rule fits {r['number']} ({kind}, flags {f})")
 
     @cached_property
@@ -581,10 +583,13 @@ def t8_1(b: Build) -> None:
                                       "in parts only invoices of $1,000 or more (the smallest is "
                                       f"{money(bn['smallest_part_invoice'])}), {bn['part_under_2000']:.0%} of them "
                                       "under $2,000, so their parts start with the digits 5 to 9 more often than "
-                                      "Benford's Law expects, and with 2 and 3 less often; the nonconformity comes from "
-                                      "the payment process, not from invented amounts.",
+                                      "Benford's Law expects, and with 2 and 3 less often. The size selection and the "
+                                      "installments give a plausible explanation for the nonconformity, but the digit "
+                                      "test cannot show that each payment is genuine, which takes the supporting "
+                                      "documents and approvals.",
         "Conclusion": "The payments agree with the ledger in count and total, the largest ones are identified for "
-                      "vouching, and the one departure from Benford's Law has an explanation that the data supports. The "
+                      "vouching, and the one departure from Benford's Law has a plausible explanation in the payment "
+                      "process. The "
                       "tests found no exception that points to an error; the vouching of the four payments is still to do.",
         "Prepared by": PREPARED,
         "Reviewed by": ""})
@@ -808,7 +813,8 @@ def t8_2(b: Build) -> None:
                                       "accounts 1030 and 6170 have no postings in the three years. The FASB credit "
                                       "loss standard requires the estimate of expected credit losses to reflect the "
                                       "risk of loss even when it is remote, and an aging schedule is one of the "
-                                      "methods it accepts; request management's assessment. "
+                                      "methods it accepts. An estimate of zero needs an expectation of no nonpayment "
+                                      "that management can support, so request management's assessment. "
                                       f"Finding 3: the {len(a['old'])} invoices more than 60 days past due hold "
                                       f"{money(sum(i['balance'] for i in a['old']))}; {len(small)} of them are "
                                       "residual balances under $10 left after the customer's payment. Write them off "
@@ -816,8 +822,9 @@ def t8_2(b: Build) -> None:
         "Conclusion": "Most of the balance open at the year-end is not yet due. Part of the receivables balance has "
                       "no invoice detail in the extract, and no allowance has been recorded against any of the balance. "
                       "Both findings could affect the amount at which receivables are reported, and both go to the audit "
-                      "committee with the evidence. The confirmation requests are still to be sent and their replies "
-                      "evaluated.",
+                      "committee with the evidence. The confirmation selection covers the balances rebuilt from the "
+                      "invoices, not the unsupported opening balance. The confirmation requests are still to be sent and "
+                      "their replies evaluated.",
         "Prepared by": PREPARED,
         "Reviewed by": ""})
 
@@ -984,10 +991,12 @@ def t8_3(b: Build) -> None:
     # Step 7: the workpaper.
     sc = j["scores"]
     flagged = j["count"] - sc[0]
-    expected = {"expected:depreciation": "depreciation entries created on weekend month-ends, the dates they post to",
-                "expected:close": "year-end closes above every approval limit (no limit exceeds $250,000; a gap in "
-                                  "the approval policy to report)",
-                "expected:disposal": "asset disposals at the round original cost of the asset retired"}
+    expected = {"expected:depreciation": "depreciation entries created on weekend month-ends, the dates they post to "
+                                         "(agree each to the depreciation schedule)",
+                "expected:close": "year-end closes above every approval limit on record (no recorded limit exceeds "
+                                  "$250,000, so request the closing-entry policy and the limits that applied)",
+                "expected:disposal": "asset disposals at the round original cost of the asset retired (agree each to "
+                                     "the fixed-asset register)"}
     follow = {"follow:opening": f"the opening entry {opening} (four flags)",
               "follow:backdated": "entries created on the first Saturday of January and posted to January 1",
               "follow:self": "rent and utilities entries created and approved by the accounting manager",
@@ -1014,11 +1023,12 @@ def t8_3(b: Build) -> None:
                       "MaxApprovalAmount (Employee). RoundAmount: MOD(TotalAmount,1000)=0.",
         "Results": f"{flagged} entries flagged: {sc[1]} with one flag, {sc[2]} with two, and {sc[4]} with four. "
                    "Flags: " + ", ".join(f"{k} {v}" for k, v in j["flags"].items()) + ".",
-        "Exceptions and disposition": f"Expected, with evidence: {summary(expected)}. Follow up: {summary(follow)}. "
+        "Exceptions and disposition": f"Expected patterns, with the evidence still to examine: {summary(expected)}. "
+                                      f"Follow up: {summary(follow)}. "
                                       "Details on the Dispositions worksheet.",
         "Conclusion": "The flags on the recurring entries are explained by their timing, which leaves their amounts "
-                      "and approvals to be checked against their schedules. The tests found weaknesses in how entries "
-                      "are approved. The opening balance entry, created after its date, "
+                      "and approvals to be checked against their schedules. The tests found approval exceptions to "
+                      "follow up. The opening balance entry, created after its date, "
                       "approved by its own creator, and carrying balances that the detail does not support, is the "
                       "first item for the audit committee; the approval of opening and recurring entries needs "
                       "follow-up before a conclusion on the control can be reached.",

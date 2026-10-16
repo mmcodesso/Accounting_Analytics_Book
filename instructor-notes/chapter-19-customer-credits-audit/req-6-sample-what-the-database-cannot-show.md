@@ -89,7 +89,7 @@ c. Record the date, the parameters and the method next to the selection.
 =IF(B115>=SampleSize,1,BETA.INV(SampleConfidence,B115+1,SampleSize-B115))
 ```
 
-**Check:** the model's draw holds 16 deviations (27.1%), an upper limit of 38.2%: no reliance. The population test finds 52 of the 215 (24.2%) and 6 of the 7 key items, the same conclusion. A draw holds 10 to 19 deviations in 93% of cases, with limits from 27% to 44%, and a draw with no deviation has probability 3.1e-09.
+**Check:** the model's draw holds 15 deviations (25.4%), an upper limit of 36.4%: no reliance. The population test finds 52 of the 215 (24.2%) and 6 of the 7 key items, the same conclusion. A draw holds 10 to 19 deviations in 93% of cases, with limits from 27% to 44%, and a draw with no deviation has probability 3.1e-09.
 
 **Watch for:** the draw's rate offered as the population's, or the limit as a forecast. Where the data hold the evidence, the query replaces the sample.
 
@@ -103,7 +103,7 @@ c. Record the date, the parameters and the method next to the selection.
 =SUM(--(XLOOKUP(XLOOKUP(Refunds[CreditMemoID],Credits[CreditMemoID],Credits[SalesReturnID]),ReturnLines[SalesReturnID],ReturnLines[ReasonCode])="Damaged"))
 ```
 
-**Check:** 50 refunds, 2 key and 48 in the remainder. The model's draw holds 11, and even if all of them passed the limit would be 23.84%, so examine all 50: with no sample, no sampling risk. **Watch for:** the whole draw counted as inspected, which gives 4.95% and a false pass.
+**Check:** 50 refunds, 2 key and 48 in the remainder. The model's draw holds 7, and even if all of them passed the limit would be 34.82%, so examine all 50: with no sample, no sampling risk. **Watch for:** the whole draw counted as inspected, which gives 4.95% and a false pass.
 
 **Step 8. Mark what is not tested.** Fill the attribute columns of the draw with the words the model uses (Not tested: no document in the database; Not applicable for A3 on a refund of another return). The deliverable is the plan, the frozen selection and the rule.
 
@@ -116,10 +116,10 @@ c. Record the date, the parameters and the method next to the selection.
 | Remainder; amount | 215; $185,089.94 | 3 |
 | Upper limit at zero to three deviations | 4.95%; 7.79%; 10.29%; 12.62% | 5 |
 | D1 in the remainder; in the key items | 52 of 215; 6 of 7 | 6 |
-| Model draw: deviations; limit; Damaged refunds | 16; 38.2%; 11 | 6, 7 |
+| Model draw: deviations; limit; Damaged refunds | 15; 36.4%; 7 | 6, 7 |
 | Damaged refunds: all; in the remainder | 50; 48 | 7 |
 
-> **Instructor notes, Requirement 6:** key items 7 refunds, 31,628.48 (RF-2025-000097, -000109, -000113, -000120, -000134, RF-2026-000158, -000218), examined in full and evaluated apart from the sample; remainder 215 (185,089.94). Expected parameters 95% / 5% / 0%, so n = 59 (27% of 215; the large-population table is conservative). Upper limits at n = 59: 0 deviations 4.95%, 1 7.79%, 2 10.29%, 3 12.62%; only zero deviations supports reliance at 5%, and the rule must reach at least one more deviation than the plan allows (BETA.INV holds for fewer deviations than items; every item deviating gives 100%). A1 and A2 apply to every refund; A3 applies only to refunds of Damaged returns: 50 in all (2 key items, 48 in the remainder), so a draw of 59 expects about 13.2 of them, and 13 inspected with no deviation give an upper limit of 20.58%, far above 5%: plan A3 on its own population, best by examining all 50 (no sampling risk) or by a sample sized for the 48, and record the other refunds as not applicable, never as passes. The draw covers fiscal 2024 to 2026, so it supports a conclusion on the three years together (81 of the 215 remainder refunds are dated in 2026); a conclusion as at the end of 2026 also needs evidence that the controls did not change. Data attribute (Requirement 4's definition): 52 of the 215 deviate (24.2%), and 6 of the 7 key items (by receipt date 45 and 6, the same conclusion); a sample of 59 expects 14.3, and about 93% of draws give 10 to 19 (P(X \<= 9) = 0.041, P(X \<= 19) = 0.967), with upper limits of about 27% at 10, 35% at 14, and 44% at 19: every plausible draw concludes the control is ineffective, as the population did (a draw with no deviation at all has a probability of about 3.1e-09). Point: where the data allow, a population test replaces the sample; sampling remains for evidence outside the database. No document results exist, so the deliverable is the plan, the frozen selection, and the decision rule; do not invent results.
+> **Instructor notes, Requirement 6:** key items 7 refunds, 31,628.48 (RF-2025-000097, -000109, -000113, -000120, -000134, RF-2026-000158, -000218), examined in full and evaluated apart from the sample; remainder 215 (185,089.94). Expected parameters 95% / 5% / 0%, so n = 59 (27% of 215; the large-population table is conservative). Upper limits at n = 59: 0 deviations 4.95%, 1 7.79%, 2 10.29%, 3 12.62%; only zero deviations supports reliance at 5%, and the rule must reach at least one more deviation than the plan allows (BETA.INV holds for fewer deviations than items; every item deviating gives 100%). A1 and A2 apply to every refund; A3 applies only to refunds of Damaged returns: 50 in all (2 key items, 48 in the remainder), so a draw of 59 expects about 13.2 of them (a frozen draw holds its own number, to count on the sheet), and even 13 that all passed would give an upper limit of 20.58%, far above 5%: plan A3 on its own population, best by examining all 50 (no sampling risk) or by a sample sized for the 48, and record the other refunds as not applicable, never as passes. The draw covers fiscal 2024 to 2026, so it supports a conclusion on the three years together (81 of the 215 remainder refunds are dated in 2026); a conclusion as at the end of 2026 also needs evidence that the controls did not change. Data attribute (Requirement 4's definition): 52 of the 215 deviate (24.2%), and 6 of the 7 key items (by receipt date 45 and 6, the same conclusion); a sample of 59 expects 14.3, and about 93% of draws give 10 to 19 (P(X \<= 9) = 0.041, P(X \<= 19) = 0.967), with upper limits of about 27% at 10, 35% at 14, and 44% at 19: no plausible draw supports reliance on the control, as the population test does not (a draw with no deviation at all has a probability of about 3.1e-09). Point: where the data allow, a population test replaces the sample; sampling remains for evidence outside the database. No document results exist, so the deliverable is the plan, the frozen selection, and the decision rule; do not invent results.
 
 ## What a strong answer says
 
@@ -156,4 +156,4 @@ A weak answer samples A3 across all refunds, or reports passes for documents nob
 
 - A sample of 59 is 27% of the remainder. Explain why a finite-population correction would allow a smaller one, and why the table's size at a `2%` expected rate, 181, is 84% of it and calls for examining all.
 - Discuss: when would you still sample an attribute the data can test?
-- Discuss: the sample's limit is 38.2%. What can the committee do with it, and what can it not?
+- Discuss: the sample's limit is 36.4%. What can the committee do with it, and what can it not?

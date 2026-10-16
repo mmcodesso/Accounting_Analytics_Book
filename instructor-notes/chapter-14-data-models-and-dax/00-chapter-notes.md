@@ -186,7 +186,7 @@ Plan A is the safest: the stumbles are about reading context, and a demonstratio
 - Step 7: a window built with DATESINPERIOD, which returned a stray date for the first month, so the text uses DATESBETWEEN with a guard. Without the guard, a total row compares a year with one month.
 - Step 9: a trial balance that keeps the 2026 closes. It balances, at $41,637,511.12 instead of Chapter 6's total.
 
-**The checkpoint to look for.** The four bullets. A strong student says why the six spike months are pay dates (Chapter 11) and not errors.
+**The checkpoint to look for.** The four bullets. A strong student explains the second month by its expectation of one month, links the other six to their three pay dates, payroll recorded when paid (Chapter 11), and names a check that would confirm it, such as the payroll postings of those months by pay date.
 
 ## Difficult ideas and misconceptions
 
@@ -264,7 +264,7 @@ Key: 1 A, 2 C, 3 B, 4 D, 5 C, 6 A, 7 B, 8 D, 9 B, 10 D, 11 A, 12 C, 13 B, 14 C, 
 | 9 | B | the row, the column, and the slicer all filter the cell. |
 | 10 | D | a row context does not filter other tables; CALCULATE's context transition would. |
 | 11 | A | a filter argument replaces the existing filter on the same column. |
-| 12 | C | ALL on the fact table removes the filters that reach it from Date as well (Furniture 20.12% instead of 58.46%). |
+| 12 | C | inside CALCULATE, ALL on the fact table also removes the filters on the dimensions it relates to, Date among them (Furniture 20.12% instead of 58.46%). |
 | 13 | B | a test compares the model's result with a total trusted from elsewhere. |
 | 14 | C | the 2027 rows of the date table have 2026 as their prior year. |
 | 15 | A | the closes move each year's revenue and expenses to retained earnings, netting them to zero. |

@@ -19,7 +19,7 @@ By the end, students can:
 - find open records with IS NULL and explain why `= NULL` returns nothing (outcome 4);
 - take a year out of a document number with SUBSTR and CAST, and label a missing date with COALESCE (outcome 2);
 - compare dates stored as text, and sort to find the oldest item (outcomes 3 and 5);
-- say why the variance of open work orders is not in the year's results, and what the status cannot show (outcome 6).
+- say why any variance of open work orders is not in the year's results, and what the status cannot show (outcome 6).
 
 **Competencies practiced.** CPA Evolution BAR M5 and ISC M4 (cost accounting; use and management of data); IMA Reporting and Control (cost accounting) and Business Acumen and Operations (operational knowledge); IFAC IES 2 (b) and (i); AACSB A5 part 5.1.
 
@@ -114,7 +114,7 @@ WHERE ClosedDate IS NULL AND Status = 'Completed';
 
 ### Requirement (4): The past-due work orders
 
-**Step 5. List those due on or before the last day of the year.**
+**Step 5. List those due on or before the year-end.**
 
 ```sql
 -- Requirement (4): the open work orders due on or before 2026-12-31
@@ -128,7 +128,7 @@ ORDER BY DueDate, WorkOrderNumber;
 
 ![A mock of the oldest past-due work orders that are still marked Released, for the discussion of what a status proves.](../figures/chapter-09-sql-essentials/IF-09-4-A.pdf)
 
-**Check:** 471 rows; the oldest is WO-2026-011512, released 2026-05-23 and due 2026-06-07, then WO-2026-011742 (due 2026-06-21) and WO-2026-012609 (due 2026-08-30). **Watch for:** `<` and `<=` return the same 471 rows here, because no open work order is due on the last day; that is a property of this data, not a rule. A date typed as `12/31/2026` returns 0 rows, because the stored dates begin with the year.
+**Check:** 471 rows; the oldest is WO-2026-011512, released 2026-05-23 and due 2026-06-07, then WO-2026-011742 (due 2026-06-21) and WO-2026-012609 (due 2026-08-30). **Watch for:** `<` and `<=` return the same 471 rows here, because no open work order is due on 2026-12-31 itself. That is a property of this data, not a rule. A date typed as `12/31/2026` returns 0 rows, because the stored dates begin with the year.
 
 ### Requirement (5): Past due and still Released
 
@@ -158,19 +158,19 @@ ORDER BY DueDate, WorkOrderNumber;
 | Open work orders, and by status | 670; Released 558, In Progress 27, Completed 85 | 1, 4 |
 | Release years, and the date range | 2026; 2026-05-23 to 2026-12-31 | 2 |
 | Not completed on | 585 rows | 2 |
-| Due on or before the last day, by status | 471: Released 406, Completed 64, In Progress 1 | 5 |
+| Due on or before the year-end, by status | 471: Released 406, Completed 64, In Progress 1 | 5 |
 | Oldest | WO-2026-011512, due 2026-06-07 | 5 |
 | Still Released and past due | 406 | 6 |
 
-> **Instructor notes, Exercise 9.4:** 670 work orders have a NULL ClosedDate: Released 558, In Progress 27, Completed 85 (completed but not closed). Every WorkOrderNumber carries the year of its ReleasedDate, and every open work order is a 2026 work order (released 2026-05-23 to 2026-12-31); COALESCE shows not completed for the 585 released or in progress and a date for the 85 completed. Due on or before 2026-12-31: 471 (Released 406, Completed 64, In Progress 1). The oldest is WO-2026-011512, released 2026-05-23 and due 2026-06-07, still Released at the end of the data; the next are WO-2026-011742 (due 2026-06-21) and WO-2026-012609 (due 2026-08-30). Hundreds of work orders are past due and still Released, but the status is not proof that work has not started: 26 of the 406 have material issues, production completions, and started operations in other tables (23 also labor time), including the three named above, which a cross-table check beyond this chapter's single-table queries finds (Chapter 10's joins can show it). The statuses need reconciling with production; for the others, the absence of recorded activity in the extract is not proof that nothing happened. Any variance on the open work orders will be recorded when they close, after the data ends, and the open status alone does not say how large it will be. Counting needs one query per status (COUNT comes in Chapter 10).
+> **Instructor notes, Exercise 9.4:** 670 work orders have a NULL ClosedDate: Released 558, In Progress 27, Completed 85 (completed but not closed). Every WorkOrderNumber carries the year of its ReleasedDate, and every open work order is a 2026 work order (released 2026-05-23 to 2026-12-31); COALESCE shows not completed for the 585 released or in progress and a date for the 85 completed. Due on or before 2026-12-31: 471 (Released 406, Completed 64, In Progress 1). The oldest is WO-2026-011512, released 2026-05-23 and due 2026-06-07, still marked Released in the records; the next are WO-2026-011742 (due 2026-06-21) and WO-2026-012609 (due 2026-08-30). Hundreds of work orders are past due and still Released, but the status is not proof that work has not started: 26 of the 406 have material issues, production completions, and started operations in other tables (23 also labor time), including the three named above, which a cross-table check beyond this chapter's single-table queries finds (Chapter 10's joins can show it). The statuses need reconciling with production; for the others, the absence of recorded activity in the extract is not proof that nothing happened. Completed output on 112 of the open work orders, all 85 Completed ones among them, has already moved its standard cost to finished goods, so only the cost not yet relieved stays in work in process and 1090. A variance would be recorded only if and when an order closes, and the open status does not say whether it will close, or how large or in which direction its variance would be. Counting needs one query per status (COUNT comes in Chapter 10).
 
 ## What a strong answer says
 
-- **Requirement (2).** Every open work order was released in the current year, so nothing from earlier years is open, and COALESCE separates the work that was never completed from the work that was completed and not closed.
+- **Requirement (2).** Every open work order was released in the current year, so nothing from earlier years is open, and COALESCE separates the work orders with no CompletedDate from those completed and not closed. The label reports a missing date, not proof that no output was made, and some Released work orders already have production completions.
 - **Requirement (5).** Hundreds of work orders are past due and still Released. A strong answer treats the status as unreliable, not as a fact: some of them show activity in other tables, so production should reconcile the statuses. For the others, no recorded activity does not prove that nothing happened.
-- **Requirement (6).** The counts by status and the late ones, the oldest named, and the accounting: the variance is recorded when the WorkOrderClose document posts the difference between actual and standard cost to 5080. Until then the costs sit in work in process and 1090, so any variance on these work orders is not in the year's results, and the open status does not say how large it will be. The completed work orders should be closed.
+- **Requirement (6).** The counts by status and the late ones, the oldest named, and the accounting. The variance is recorded when the WorkOrderClose document posts the difference between actual and standard cost to 5080. Completed output on 112 of the open work orders, all 85 Completed ones among them, has already moved its standard cost to finished goods, so only the cost not yet relieved stays in work in process and 1090. None has a recorded close, so any variance on them is not in the year's results, and the status does not say whether an order will close or how large or in which direction its variance would be. Production and cost accounting should explain why the completed work orders are still open and close or correct them through the approved process.
 
-A weak memo says that no work has started on the Released orders, or leaves out why the year's variance is understated.
+A weak memo says that no work has started on the Released orders, says that all their costs are still in work in process, or calls the year's variance understated, when the direction of any variance on the open work orders is unknown.
 
 ## Common mistakes and how to respond
 

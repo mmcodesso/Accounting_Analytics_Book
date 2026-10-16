@@ -88,7 +88,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 **Table group:** Manufacturing
 
-**Scenario.** A work order's variance is recorded only when it closes, so any variance on the work orders still open at the end of fiscal 2026 has not yet reached the ledger. The production manager and the controller want to know how many work orders are open, in what state, and how late they are.
+**Scenario.** A work order's variance is recorded only when it closes, so the variance of a work order still open at the end of fiscal 2026, if it has one, is not in the ledger. The production manager and the controller want to know how many work orders are open, in what state, and how late they are.
 
 **Requirements.**
 
@@ -102,7 +102,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 (5) Among them, list the work orders whose Status is still Released, a status meant for work orders not yet started. Describe what you find.
 
-(6) Write a short memo (one half page) to the production manager on the open work orders, and explain why any variance on them is not yet in the fiscal 2026 results.
+(6) Write a short memo (one half page) to the production manager on the open work orders, and explain why any variance on them is not in the fiscal 2026 results.
 
 **Deliverable.** A script with the queries and a half-page memo.
 
@@ -124,7 +124,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 (2) List the shipments with no TrackingNumber, with their ShipmentNumber, ShipmentDate, ShippedBy, and Status, sorted by ShipmentDate. Report the number of rows and the range of dates.
 
-(3) List the shipments whose Status is In Transit and whose DeliveryDate is before 2026-12-31, the last day of the data, sorted by DeliveryDate. Report the number of rows and the oldest DeliveryDate.
+(3) List the shipments whose Status is In Transit and whose DeliveryDate is before 2026-12-31, the last shipment date in the data, sorted by DeliveryDate. Report the number of rows and the oldest DeliveryDate.
 
 (4) Compare your results with your findings from Tutorial 2.1, and explain why the SQL version of the tests is easier to rerun.
 
@@ -150,6 +150,6 @@ Work on these exercises in CharlesRiver_Work.sqlite, the working copy you made i
 
 (3) List the employees with a TerminationDate, with their EmploymentStatus and IsActive flag, and check whether the three columns agree.
 
-(4) For each finding, explain why a missing value matters for the labor cost that reaches the manufacturing variance, and what you would ask the payroll or production team.
+(4) For each finding, explain why it matters for the reliability of the labor or payroll records, and whether these tests show an effect on manufacturing cost or only a possible one. Say what you would ask the payroll or production team to verify.
 
 **Deliverable.** A script with the queries and a short list of findings with follow-up questions.

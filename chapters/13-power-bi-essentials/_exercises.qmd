@@ -85,7 +85,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 (1) Using the theory of cognitive fit, decide which visual serves each of the manager's two tasks, and explain your choice in two or three sentences.
 
-(2) Build the page for fiscal 2026: a clustered bar chart of revenue by segment, sorted from the largest, a matrix of revenue by segment and region with totals, and a card of discounts by segment. Add a slicer for Region that the manager can see.
+(2) Build the page for fiscal 2026: a clustered bar chart of revenue by segment, sorted from the largest, a matrix of revenue by segment and region with totals, and a card of the promotional discounts, which shows one segment's discounts when its bar is selected. Add a slicer for Region that the manager can see.
 
 (3) Click each segment's bar in turn and describe what happens to the matrix and the card. Then use **Format > Edit interactions** so that the bar chart filters the card but leaves the matrix unchanged, and explain when that behavior is preferable.
 
@@ -112,7 +112,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 (2) With **Column quality**, **Column distribution**, and **Column profile** turned on, record for each query, on the top 1,000 rows, the share of empty values in every column that has any, and the number of distinct values of PricingMethod, Discount, and Status.
 
-(3) Switch to the entire data set and record the same figures. Identify every column whose profile changes materially, and explain why the first 1,000 rows of these Tables are not representative.
+(3) Switch to the entire data set and record the same figures. Identify every column whose profile changes materially. Explain why the first 1,000 rows of the invoice and invoice line Tables are not representative, and why the Item and Customer profiles do not change.
 
 (4) For three of the columns with empty values, decide whether the blanks are meaningful blanks (Chapter 5), data that should exist, or a matter for follow-up, and give your reason.
 

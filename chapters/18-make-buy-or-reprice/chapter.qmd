@@ -24,7 +24,7 @@ After completing this chapter, you will be able to:
 
 It is August 2027. Reviewing the fiscal 2026 results, the CFO found one comparison that would not go away. Once the manufacturing variance is charged, the furniture Charles River makes earns about ten points less than its standard margin, while the furniture it buys earns about what its standards say. The CFO's reading is blunt. The plant applies overhead at little more than a third of what it costs, and neither list prices nor standard costs have changed in three years, so the standards understate what every manufactured product costs. Is Charles River selling below cost, and should it be making these products at all?
 
-The production manager disagrees. The plant has room to spare, and idle capacity, in the production manager's words, is not the products' fault. To test the CFO's question, the purchasing manager asked a contract manufacturer to quote six of the families the plant makes, and the quote has arrived. It expires on 15 September, because the supplier needs the autumn to tool up for January deliveries, and the 2028 price list must go to customers on 1 October. The CFO and the production manager meet on 31 August to decide.
+The production manager disagrees. The plant has room to spare, and idle capacity, in the production manager's words, is not the products' fault. To test the CFO's question, the purchasing manager asked a contract manufacturer to quote six of the families the plant makes, and the quote has arrived. It expires on September 15, because the supplier needs the autumn to tool up for January deliveries, and the 2028 price list must go to customers on October 1. The CFO and the production manager meet on August 31 to decide.
 
 The controller asks you, the staff accountant, for the analysis and a decision memo. This chapter is a case, and it has no tutorials. Each requirement states what the decision needs and names the chapters it draws on, and you decide how to produce it. Where a tool is the clear choice, the requirement says why; elsewhere, choose and explain your choice in your documentation.
 
@@ -42,7 +42,7 @@ The production manager adds two:
 - what happens to the plant's hours, its crew, and the costs that stay;
 - whether the standards should change, and to what.
 
-The controller sets five conditions. First, everyone works from the same assumptions, which she lists in @tbl-18-02. Second, every figure reconciles to the ledger: the manufacturing variance in account 5080 and the costs that flow into account 1090 Manufacturing Cost Clearing, which are the payroll, the Factory Overhead entries, and the depreciation charged to it, not the debits that favorable closes post back to it. Third, fiscal 2026 is the base year, because the records end there. Fourth, the decision is made family by family; the products Charles River buys in the same families are different products, not substitutes for the ones it makes. Fifth, decisions about positions belong to the production manager, so the memo states what a change in the crew would save and what it would cost, and leaves the decision there.
+The controller sets five conditions. First, everyone works from the same assumptions, which she lists in @tbl-18-02. Second, every figure reconciles to the ledger: the manufacturing variance in account 5080 and the costs that flow into account 1090 Manufacturing Cost Clearing, which are the payroll, the Factory Overhead entries, and the depreciation charged to it, not the debits that favorable closes post back to it. Third, fiscal 2026 is the base year, because the records end there, even though the decisions take effect in 2028 and 2029. Fourth, the decision is made family by family; the products Charles River buys in the same families are different products, not substitutes for the ones it makes. Fifth, decisions about positions belong to the production manager, so the memo states what a change in the crew would save and what it would cost, and leaves the decision there.
 
 The quote is in @tbl-18-01. Its prices are averages per unit at the 2026 mix of items in each family. They are the case's assumption, set to resemble what Charles River pays for the products it already buys in those families, and they are not part of the dataset.
 
@@ -87,7 +87,7 @@ You will keep three files, listed in @tbl-18-03.
 
 | Tool | File | Holds | Hand-off |
 |--------|------------------------|--------------------------|------------------------|
-| SQL | MakeBuy.sql, run on CharlesRiver_Capstone.sqlite | Family results, the inputs to 1090, activities, capacity | Copy with Headers or Export to CSV |
+| SQL | MakeBuy.sql, run on CharlesRiver_Capstone.sqlite | Family results, the inputs to 1090, activities, capacity | Copy with Headers or Export to CSV, unrounded |
 | Excel | Make Buy Reprice.xlsx | Assumptions, cost behavior, costs, make or buy, capacity, prices, standards, documentation | A Table of item costs, one row per item |
 | Power BI | Product Costs.pbix | The explorer for the meeting, with a Validation page and a Tests tab | Reads the workbook and CharlesRiver.xlsx |
 
@@ -170,9 +170,9 @@ What each family uses of the plant comes from the routings, multiplied by what w
 
 ### Phase 2: What a Product Costs
 
-Three costing views answer different questions, as @fig-18-01 shows. Standard costing charges each product a rate per standard hour and sends everything else to the variance account. Actual absorption spreads the year's whole cost over the units made, so a product's cost rises whenever the plant runs below capacity. Time-driven costing charges each product for the capacity it uses at the cost of practical capacity, and reports the capacity left unused as a cost of the plant. If supplying an hour of practical capacity costs 40 and a product's routing takes 1.5 hours a unit, setup included, the product carries 60 of conversion cost, however much of its capacity the plant uses that year. All three are views for managers; what inventory may carry is a separate question, which Requirement 9 takes up.
+Three costing views answer different questions, as @fig-18-01 shows. Standard costing charges each product a rate per standard hour and sends everything else to the variance account. Actual absorption spreads the year's whole cost over the units made, so a product's cost rises whenever the plant runs below capacity. This case can only approximate that view, as Requirement 4 explains, so its absorption figures are a proxy rather than the year's whole cost spread over every unit. Time-driven costing charges each product for the capacity it uses at the cost of practical capacity, and reports the capacity left unused as a cost of the plant. If supplying an hour of practical capacity costs 40 and a product's routing takes 1.5 hours a unit, setup included, the product carries 60 of conversion cost, however much of its capacity the plant uses that year. All three are views for managers; what inventory may carry is a separate question, which Requirement 9 takes up.
 
-![Three ways to cost the plant's time.](/visuals/svg/fig-18-01-costing-views.svg){#fig-18-01 fig-alt="A diagram of three costing views fed by what the plant paid for in a year: crew, supervision, equipment, and factory overhead. Standard costing charges products the standard rate times standard hours and leaves a variance, which Charles River charges to cost of goods sold. Actual absorption charges products all of the year's cost divided by the units made and leaves nothing out, so idle time is spread into every unit. Time-driven costing charges products a capacity cost rate times the routing time used, plus factory overhead, and reports unused capacity as a cost of the plant."}
+![Three ways to cost the plant's time.](/visuals/svg/fig-18-01-costing-views.svg){#fig-18-01 fig-alt="A diagram of three costing views fed by what the plant paid for in a year: crew, supervision, equipment, and factory overhead. Standard costing charges products the standard rate times standard hours and leaves a variance, which Charles River charges to cost of goods sold. Actual absorption, in concept, charges products all of the year's cost divided by the units made and leaves nothing out, so idle time is spread into every unit, and the case can only approximate it. Time-driven costing charges products a capacity cost rate times the routing time used, plus factory overhead, and reports unused capacity as a cost of the plant."}
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
@@ -214,7 +214,7 @@ The test for one family is in @fig-18-02. What matters is which costs stop if Ch
 
 The comparison is a few lines per family, with two assumptions that the decision turns on: the quote and what happens to the crew. A workbook lets the decision makers change both and watch the answer move.
 
-- For each quoted family, compute the relevant cost per unit with the crew kept, which is materials and the overhead that varies, and with the crew reduced in step with the hours freed, which adds the crew's cost of the routing time. Compare each with the delivered quote, and compute the annual effect at the 2026 volume.
+- For each quoted family, compute the relevant cost per unit with the crew kept, which is materials and the overhead that varies, and with the crew reduced in step with the hours freed, which adds the crew's cost of the routing time. Compare each with the delivered quote, and compute the annual effect at the 2026 volume sold.
 - Add the one-time costs for the families you would buy: tooling, and severance for the positions no longer needed under @tbl-18-02. Show the effect over the two years the prices are fixed, before taxes and without discounting.
 - Use Goal Seek for the quote at which each family breaks even under each crew case, and build a two-way Data Table of the quote, 10% either side, against the share of the freed crew time actually removed, for the families you would buy taken together.
 - Set the CFO's absorption view beside your answer, and explain in two sentences why the two disagree.
@@ -230,10 +230,10 @@ Actual absorption cost is not a relevant cost. It includes supervision, deprecia
 
 **Requirement 7: Value the capacity that buying would free (Chapter 7).**
 
-- Measure the hours that buying the families of Requirement 6 would free at each work center, and the plant's use of its practical capacity afterwards.
-- Compare them with the capacity the plant already leaves unused, in hours and in positions, and explain what that comparison means for the decision.
+- Measure the hours that buying the families of Requirement 6 would free at each work center, on the 2026 completions that Requirement 3 measured, and the plant's use of its practical capacity afterwards.
+- Compare them with the capacity the plant already leaves unused, in hours and in positions on the same base, and explain what that comparison means for the decision. Hours spare over a year may not be spare in every week, work center, or skill, so say what a plan to change the crew would also have to check.
 - Show what happens to the cost of the remaining families if the crew is kept.
-- Optional: with Solver, find which families to buy if volume grew by 40% and by 50%, minimizing the added cost with the crew kept and practical capacity at each work center as the limit, and report which work center binds and its shadow price. This model leaves out the quote's minimum volume and tooling, so treat its answer as a benchmark: check each family it buys against the minimum, and say what a plan the supplier would accept costs over the two years.
+- Optional: with Solver, find which families to buy if volume grew by 40% and by 50%, minimizing the added cost with the crew kept and practical capacity at each work center as the limit, and report which work center binds and its shadow price. This model leaves out the quote's minimum volume and tooling, and it plans a year, not a production schedule, so treat its answer as a benchmark: check each family it buys against the minimum, and say what a plan the supplier would accept costs over the two years.
 
 
 
@@ -246,7 +246,7 @@ Actual absorption cost is not a relevant cost. It includes supervision, deprecia
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
-Price is the most powerful lever on profit, and often the least managed. On the average economics of more than two thousand companies, a 1% improvement in price, with no loss of volume, would raise operating profit by 11.1%, three to four times the effect of a 1% gain in volume (Marn & Rosiello, 1992). The authors traced how the price a customer finally pays falls from the list price through discounts to the invoice price, and then through cash discounts, allowances, rebates, and freight to what they called the pocket price. Chapter 15's gross-to-net waterfall did the same for Charles River, from list price to net revenue.
+Price is the most powerful lever on profit, and often the least managed. On the average economics of more than two thousand companies, a 1% improvement in price, with no loss of volume, would raise operating profit by 11.1%, three to four times the effect of a 1% gain in volume (Marn & Rosiello, 1992). The authors traced how the price a customer finally pays falls from the list price through discounts to the invoice price, and then through cash discounts, allowances, rebates, and freight to what they called the pocket price. Chapter 15's gross-to-net waterfall traced the invoice part of that path for Charles River, from list price to net revenue.
 :::
 
 
@@ -293,7 +293,7 @@ Before you submit, check that you have each of these:
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
-This case brought back earlier answers. Chapters 10 to 12 found that the plant pays for hours beyond its work; here those hours became the unused capacity that no product should carry. Chapter 7 found that a promotion needed more lift than the orders showed, which is part of the evidence the price increases rest on. And the fiscal 2026 statements come back too, because a cost study can raise the question of what the statements should have said.
+This case brought back earlier answers. Chapters 10 to 12 found more hours paid and recorded than the plant's output needed at standard. Here the routings estimated the capacity left unused, which no product should carry, and that estimate is not a finding that anyone did no work or that every hour could be removed. Chapter 7 found that a promotion needed more lift than the orders showed, which is part of the evidence the price increases rest on. And the fiscal 2026 statements come back too, because a cost study can raise the question of what the statements should have said.
 :::
 
 

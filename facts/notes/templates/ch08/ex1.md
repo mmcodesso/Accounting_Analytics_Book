@@ -10,5 +10,7 @@
      Expense, Cr 1030 Allowance for Doubtful Accounts. Neither account has any GL rows. A student who also writes off the
      small balances must sequence the entries: the write-off is charged to the allowance, which then needs topping up to the
      estimate on the invoices that remain; accept either order if the ending allowance is right. ASC 326-20-30-3 accepts aging-schedule methods
-     and 326-20-30-10 requires the estimate to reflect risk even when remote; Example 5 (326-20-55-37 to 55-40) adjusts historical
-     bucket rates for current conditions and forecasts. -->
+     and 326-20-30-10 requires the estimate to reflect risk even when remote, requiring none only where the adjusted information
+     gives an expectation that nonpayment is zero, which the absence of postings does not show. Example 5 (326-20-55-37 to 55-40)
+     adjusts historical bucket rates for current conditions and forecasts. For fiscal {{ d.C }}, the practical expedient for current receivables
+     (FASB, 2025) and the private-company election to consider later collections are options the exercise assumes Charles River does not take. -->

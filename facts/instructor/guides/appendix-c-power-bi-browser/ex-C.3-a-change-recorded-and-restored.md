@@ -34,7 +34,7 @@ Students can:
 - restore a model and show by the test that it is restored (Requirement 4);
 - write a change log entry and say what version history records and leaves out (Requirement 5).
 
-**Competencies practiced.** Appendix D maps this exercise to CPA Evolution Core S2 M4 (information technology and IT controls) and ISC M2 (tests of internal controls, logical access and change management); to the IMA competencies for internal control and data governance; to IFAC IES 2 (g) on governance, risk management and internal control and (i); and to AACSB A5 parts 5.1 to 5.3.
+**Competencies practiced.** Appendix D maps this exercise to CPA Evolution Core S2 M4 (information technology and IT controls) and ISC M2 (tests of internal controls, logical access and change management); to the IMA competencies for internal control and data governance; to IFAC IES 2 (g) on governance, risk management and internal control and (i); and to AACSB A5 parts 5.1 and 5.2, with part 5.3 when the instructor adds an independent-learning task.
 
 ## Before you assign
 
@@ -42,6 +42,7 @@ Students can:
 - **Data conditions.** ListAmount, Quantity times BaseListPrice, exceeds LineTotal in every fiscal year, so the changed test is higher in all three rows.
 - **Verify first, in a live tenant.** The author's test read the two commands, **Save to version history** and **Version history**, on the **File** menu of a Pro account, but not their windows. Check that a description box exists, what the restore control is called, and what a free account's **File** menu shows.
 - **Order.** Do this exercise after C.1 and C.2: it changes the Revenue measure that C.1's query reads.
+- **One sitting, one editor.** Have students do (1) to (4) in one session, on a model only they edit. Microsoft supports restoring a version only up to 14 days old, and a restore brings back the model's data as it stood, as well as its measures.
 
 ## How to run it
 
@@ -113,7 +114,7 @@ Without a Pro license, retype the formula in the formula bar and press Enter:
 
 **Step 5. Write the entry and the comparison.** The model entry has five rows: what changed (the Revenue measure, from LineTotal to ListAmount), when (the student's date and time), the results (${{ cur.rev|money }}, ${{ cur.list|money }}, ${{ cur.rev|money }}), how it was restored, and by whom.
 
-**Check:** the comparison says that version history records the model as it stood at each saved version, keeps only the last five, names only the last person to change each, and needs a Pro license. It does not record what changed or why, and nothing reviews a change before it takes effect. A Power BI project under version control, Chapter 16's change control, records every change with its author and message and can be reviewed before it is merged.
+**Check:** the comparison says that version history records the model and its data as they stood at each saved version, with the time of the last change, the person who made it, and a description if one was typed. It keeps only the last five, supports a restore up to 14 days back, and needs a Pro license. It does not record what changed, change by change, or why, unless someone wrote it in the description, and nothing reviews a change before it takes effect. A Power BI project under version control, Chapter 16's change control, records every change with its author and message and can be reviewed before it is merged.
 
 ## Expected results
 
@@ -132,14 +133,14 @@ Without a Pro license, retype the formula in the formula bar and press Enter:
 - **(1), (2)** A version before the change and a baseline result.
 - **(3)** The test moved in all three years and the pages did not, with the reason: the cards read columns. A strong answer adds that a report built on the measure would have changed on every page at once.
 - **(4)** The restore proved by the third run, not by the version history window.
-- **(5)** A complete entry, and a comparison that names what version history leaves out: what and why, review, and more than five versions.
+- **(5)** A complete entry, and a comparison that names what version history leaves out: the change itself, a reason unless one was typed, review, and more than five versions.
 
 ## Common mistakes and how to respond
 
 - **No version before the change.** *Symptom:* nothing to restore. *Response:* ask what the model's last known state was.
 - **The page checked, not the test.** *Symptom:* "nothing changed". *Response:* ask which visuals read the measure.
 - **The restore untested.** *Symptom:* a log that says restored with no third result. *Response:* ask what shows it.
-- **Version history credited with the reason.** *Symptom:* a log that cites the version as evidence of who and why. *Response:* ask what the version records.
+- **Version history credited with the reason.** *Symptom:* a log that cites the version's description as evidence of what changed and why. *Response:* ask who typed the description, and what the version records of the change itself.
 - **A lost test.** *Symptom:* an empty query tab after the model is reopened. *Response:* the tab is discarded on close; paste it back from Tests.dax.
 
 ## Grading guide

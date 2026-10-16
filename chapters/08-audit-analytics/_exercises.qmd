@@ -18,6 +18,8 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 - 61 to 90 days: 15 percent;
 - more than 90 days: 40 percent.
 
+An update to the credit loss standard, effective for Charles River's fiscal 2026, lets an entity elect to assume that the conditions at the balance sheet date do not change over the remaining life of its current trade receivables, and lets an entity other than a public business entity that makes that election also consider collections after the balance sheet date (FASB, 2025). This exercise assumes neither election.
+
 **Requirements.**
 
 (1) Add a `LossRate` column to the Buckets Table of Tutorial 8.2 with the proposed rates, and calculate the expected credit loss of each bucket and in total on the Aging worksheet.
@@ -112,7 +114,7 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 
 **Table group:** Procure-to-Pay, with the Employee table from Master Data
 
-**Scenario.** The journal entry tests of Tutorial 8.3 found weaknesses in how entries are approved. The chief audit executive asks you to apply the same approach to purchasing and payments: the approval of purchase orders and supplier invoices, the amounts of purchase requisitions around an approval limit, and the duplicate and gap tests described in this chapter.
+**Scenario.** The journal entry tests of Tutorial 8.3 found exceptions in how entries are approved. The chief audit executive asks you to apply the same approach to purchasing and payments: the approval of purchase orders and supplier invoices, the amounts of purchase requisitions around an approval limit, and the duplicate and gap tests described in this chapter.
 
 **Requirements.**
 
@@ -135,7 +137,7 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 
 (6) Run a gap test on the purchase order numbers. Add a column with the year of each PONumber, `=--MID([@PONumber],4,4)`, and one with its sequence number, `=--RIGHT([@PONumber],6)`. For each year, check that no sequence number repeats, compare the number of orders with the largest sequence number minus the smallest, plus one, and state whether any numbers are missing.
 
-(7) Write a memo of one half to one page that summarizes the exceptions, distinguishes weaknesses in the design of the approval controls from failures in their operation, records the clean results of the duplicate and gap tests, and recommends follow-up.
+(7) Write a memo of one half to one page that summarizes the exceptions, distinguishes possible weaknesses in the design of the approval controls from possible failures in their operation, names the evidence that would settle each, records the clean results of the duplicate and gap tests, and recommends follow-up.
 
 **Deliverable.** The flagged purchase orders and invoices with their dispositions, the requisition band analysis with its chart, the duplicate and gap tests, and the memo.
 
@@ -147,7 +149,7 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 
 **Table group:** Order-to-Cash
 
-**Scenario.** Exercise 4.6 found price override requests that were never approved, and the promotion analyses of Chapters 4 through 6 relied on the effective dates in the PromotionProgram Table without testing them. The price lists that set most prices have effective dates too. The chief audit executive asks you to test these pricing controls against the sales actually ordered and billed.
+**Scenario.** Exercise 4.6 found price override requests still recorded as Pending, and the promotion analyses of Chapters 4 through 6 relied on the effective dates in the PromotionProgram Table without testing them. The price lists that set most prices have effective dates too. The chief audit executive asks you to test these pricing controls against the sales actually ordered and billed.
 
 **Requirements.**
 
@@ -161,7 +163,7 @@ Work on these exercises in a copy of AuditAnalytics.xlsx, made after you finish 
 
 (5) For the customers that have their own price list (ScopeType Customer), find the order lines whose PricingMethod is neither Customer Price List nor Approved Override. Compare each line's UnitPrice with the customer's own list and with the list the line cites, and explain what the comparison shows.
 
-(6) For each exception, decide whether it shows a weakness in the design of the control, a failure in its operation, or both, and explain why.
+(6) For each exception, decide whether it points to a weakness in the design of the control, a failure in its operation, or both, explain why, and name the evidence that would confirm the classification.
 
 (7) Write a memo of one half to one page to the sales manager and the controller that describes the exceptions, their amounts, and the changes you would recommend to the pricing controls.
 

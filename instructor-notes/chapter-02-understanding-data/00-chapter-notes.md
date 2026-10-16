@@ -98,7 +98,7 @@ The chapter depends on these conditions of the data, all visible in the workbook
 
 ### Guided Tutorial 2.1: Inspecting Charles River O2C and Item Data for Data Quality Problems
 
-**Purpose.** Students apply the four dimensions to real tables before they write a memo. They find three genuine problems, weigh three that need judgment (one turns out to be expected) and make the working copy.
+**Purpose.** Students apply the four dimensions to real tables before they write a memo. They find three findings to follow up (the In Transit rows conflict with their dates only if DeliveryDate records the delivery), weigh three that need judgment (one turns out to be expected) and make the working copy.
 
 **Time.** About 45 minutes in class, or 30 if students have read the steps. Steps 6 and 7 take longest, because they build formulas over whole columns.
 
@@ -117,13 +117,13 @@ The chapter depends on these conditions of the data, all visible in the workbook
 
 **Stumbles to expect**
 
-- Steps 2 and 3: students filter the wrong column, or leave the filter on. In Step 3 they call "In Transit" wrong only because the date is old. The point is that two columns of one record disagree, and the tutorial asks what the DeliveryDate means before blaming the Status.
+- Steps 2 and 3: students filter the wrong column, or leave the filter on. In Step 3 they call "In Transit" wrong only because the date is old. Every DeliveryDate falls on or before the year-end under review. If the date records the delivery, two columns of one record disagree, and if it is only the expected date, the shipments are overdue. The tutorial asks what the DeliveryDate means before blaming the Status, and either reading is a finding to follow up.
 - Step 4: the Smith Ltd pair is the harder one, because both customers share a region and a segment. Make students compare the city, the contact and the activity before they conclude.
 - Step 5: students stop at "several times the average". The next move is to read the freight against the size of the shipment: the largest freight costs are on the largest shipments.
 - Steps 6 and 7: a column letter that differs from the tutorial's, a result not formatted as a date, and a formula not copied to the first row.
 - Step 8: students record the blank list prices as errors. The contrast with Step 2 is the lesson.
 
-**The checkpoint to look for.** The tutorial lists three genuine problems and three judgments. A good written list names the table, the column, the type, the count and the conclusion for each, as the checkpoint says. A list with counts and no conclusion is the common weak answer.
+**The checkpoint to look for.** The tutorial lists three findings to follow up and three judgments. A good written list names the table, the column, the type, the count and the conclusion for each, as the checkpoint says. A list with counts and no conclusion is the common weak answer.
 
 ### Guided Tutorial 2.2: Examining the Charles River Accounting Core for Completeness and Consistency
 
@@ -138,7 +138,7 @@ The chapter depends on these conditions of the data, all visible in the workbook
 | Step | Look for | Value |
 |---|---|---|
 | 2 | Account types in the chart | 5 classes, 104 accounts |
-| 4 | Debit and credit totals | $731,949,908.31 each; difference $0.00 |
+| 4 | Debit and credit totals | $731,949,908.31 each; difference, rounded to the cent, $0.00 |
 | 5 | Distinct AccountIDs in the ledger; unmatched | 71 of the chart's 104; 0 |
 | 6 | Periods; the small ones | 38 periods; 3 small ones, the first and the last two |
 | 7 | Rows with no debit and no credit | 128 rows, all PayrollPayment |
@@ -146,7 +146,7 @@ The chapter depends on these conditions of the data, all visible in the workbook
 
 **Stumbles to expect**
 
-- Step 4: pressing Ctrl+Shift+Down from the wrong cell, or typing the totals directly below the data so the Table swallows them. The tutorial says to leave one blank row.
+- Step 4: students press Ctrl+Down from a column with blanks, such as SourceLineID or CostCenterID, which stops at the first blank and puts the totals over ledger rows (the tutorial starts in A2, the GLEntryID column, which is never blank). Others type the totals directly below the data, so the Table swallows them (the tutorial leaves one blank row), or compare the unrounded totals, whose difference can show a fraction of a cent (the tutorial rounds each to the cent and investigates any other difference).
 - Step 5: students expect a mismatch and think a clean result means the test failed.
 - Step 6: students read the last periods as missing transactions. Send them to the SourceDocumentType of those rows.
 - Step 7: the zero rows sit on 1010 Cash and Cash Equivalents and 2030 Accrued Payroll. The tutorial says only that they should be investigated and explained.
@@ -156,7 +156,7 @@ The chapter depends on these conditions of the data, all visible in the workbook
 
 ## Difficult ideas and misconceptions
 
-**One finding, two dimensions.** Shipments still In Transit are a consistency problem (two columns disagree) and a timeliness problem (the status was not updated). Question 6 asks about an extract taken before the final entries were posted, which is also a completeness problem. Students who want one right answer lose marks. Teach them to name the dimension the test examines and to add the second when it applies.
+**One finding, two dimensions.** If the DeliveryDate records the delivery, shipments still In Transit are a consistency problem (two columns disagree) and a timeliness problem (the status was not updated). If it is only the expected date, they are overdue shipments to follow up. Question 6 asks about an extract taken before the final entries were posted, which is also a completeness problem. Students who want one right answer lose marks. Teach them to name the dimension the test examines and to add the second when it applies.
 
 ![Where each finding of the two tutorials sits among the four data quality dimensions, and whether it is an error.](../figures/chapter-02-understanding-data/IF-02-0-A.pdf)
 
@@ -178,7 +178,7 @@ The chapter depends on these conditions of the data, all visible in the workbook
 
 ## Discussion prompts
 
-1. **A test finds nothing. Is that a finding?** A good discussion reaches the chapter's line: it tells you which data you can rely on, and the memo should record the test, the population and the result.
+1. **A test finds nothing. Is that a finding?** A good discussion reaches the chapter's line. Such a result tells you which tested relationships held in the population tested, not that the data are right in every other respect, and the memo should record the test, the population and the result.
 2. **How would you decide whether two customers with one name are one company?** Compare the rest of the record: city, contact, segment, activity. Then ask what a wrong merge or a wrong split would do to a receivables report.
 3. **A shipment has no tracking number. What evidence would you ask for, and from whom?** A dispatch log or a signed delivery receipt, from the warehouse or the carrier. The extract holds no other carrier reference.
 4. **Which of the four dimensions is hardest to test from inside one extract?** Accuracy needs an independent source, and completeness needs a population from outside the records. Expect the answer that each test has a blind spot.
@@ -215,11 +215,11 @@ Key: 1 A, 2 B, 3 C, 4 A, 5 D, 6 D, 7 C, 8 A, 9 C, 10 A, 11 B, 12 C, 13 B, 14 D, 
 |---:|:---:|---|
 | 1 | A | a recorded value that differs from the true value is an accuracy problem. |
 | 2 | B | blank values in a required field are a completeness problem. |
-| 3 | C | two columns of the same record that disagree are a consistency problem. |
+| 3 | C | with the DeliveryDate recording the arrival, as the stem states, two columns of the same record disagree, a consistency problem (the stale status is also a timeliness concern). |
 | 4 | A | a cost center's name is a category, not a measurement. |
 | 5 | D | months as column headers leave the month without a column and put several observations in one row. |
 | 6 | D | an extract taken before the final entries were posted is not current as of the reporting date (its missing entries are also a completeness concern; the dimensions overlap). |
-| 7 | C | most accounting work uses structured data, while unstructured data is growing. |
+| 7 | C | a general ledger table has defined columns and types, while a contract's narrative has no predefined format (an XBRL filing is semi-structured, a file does not make a scanned invoice structured, and a payroll register is structured). |
 | 8 | A | one product under two ItemIDs is a duplicate record. |
 | 9 | C | the general ledger is the broadest record of the organization's posted financial transactions. |
 | 10 | A | SourceDocumentType names the kind of business event that created the ledger row. |
@@ -232,7 +232,8 @@ Key: 1 A, 2 B, 3 C, 4 A, 5 D, 6 D, 7 C, 8 A, 9 C, 10 A, 11 B, 12 C, 13 B, 14 D, 
 **Questions where a wrong option tempts**
 
 - **Questions 1, 2, 3 and 6 (the dimensions)** share one set of options. Ask students to name the test before they choose: a value that differs from the truth (accuracy), a value that is missing (completeness), two fields that disagree (consistency), a date that is too early (timeliness).
-- **Question 3.** Timeliness tempts because the delivery date is old. The question asks about the disagreement between two columns, which is consistency.
+- **Question 3.** Timeliness tempts because the status is stale. The stem says that the DeliveryDate records the arrival, so the two columns disagree, which is consistency. Without that statement the rows could be overdue expectations, which is why Tutorial 2.1 asks what the date means first.
+- **Question 7.** Option A tempts students who remember that XBRL is not a table, but the chapter calls it semi-structured. Option B tests whether a file in a system makes a document structured. A payroll register is one of the chapter's structured examples.
 - **Question 5.** The stem says each department-month is one observation, so both principles are broken. Students who pick only one of them have read half of the layout.
 - **Question 6.** Completeness tempts, because the final entries are missing from the extract. The question asks about the date of the extract. Accept the discussion that the dimensions overlap.
 - **Question 8.** A duplicate record, not a missing value or an outlier: the same product under two keys.
@@ -240,7 +241,7 @@ Key: 1 A, 2 B, 3 C, 4 A, 5 D, 6 D, 7 C, 8 A, 9 C, 10 A, 11 B, 12 C, 13 B, 14 D, 
 - **Question 12.** A formula error tempts. The result is correct arithmetic on the wrong grouping.
 - **Question 13.** A relational database tempts because it is true of an ERP system, but it does not set an ERP system apart from other software. The question asks what does, and the answer is integration across functional areas.
 - **Question 15.** Calculating revenue tempts because the question mentions SalesInvoice. The separation matters for choosing the journal entries as a starting population.
-- **Questions 4, 7, 10, 12, 13, 14 and 15.** The correct option is also the longest. If you grade with these, ask students to explain their answer or reword the options.
+- **Questions 4, 10, 12, 13, 14 and 15.** The correct option is also the longest. If you grade with these, ask students to explain their answer or reword the options.
 
 Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 1, 2, 3, 6 and 11 make a good quiz of the dimensions. Questions 4 and 7 cover data types, 9, 10 and 13 sources, and 12 and 15 the Charles River tables.
 

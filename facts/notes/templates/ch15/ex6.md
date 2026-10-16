@@ -5,5 +5,5 @@
      lines ({{ (late_differ / differ)|pct }}) against {{ late_direct|count }} of all {{ direct|count }} direct lines of {{ d.C }} ({{ (late_direct / direct)|pct(2) }}); the {{ untested|count }} without an operation cannot be tested, and among the {{ now|count }} lines that join both
      paths the share is {{ (late_all / now)|pct(2) }}. Accept either denominator when it is named. The disagreement concentrates in the late time of Chapter 12. Indirect
      {{ d.C }} by clock work center: {% for n, h in indirect %}{{ n }} {{ h|num(1) }}{{ ', ' if not loop.last }}{% endfor %}. Conclusion:
-     the operation path answers "what work was the time charged to"; the clock path "where the employee was"; neither alone supports
+     the operation path answers "what work was the time charged to"; the clock path "where the time clock placed the employee"; neither alone supports
      the Packing finding, which needs corroboration (Chapter 12). -->

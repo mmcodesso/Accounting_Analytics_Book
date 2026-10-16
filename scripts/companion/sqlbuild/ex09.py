@@ -238,8 +238,8 @@ def ex1(b: Build) -> None:
              f"{n['clearing_name']} rather than the inactive {' and '.join(str(a['number']) for a in idle)}, so manufacturing cost reaches cost of goods "
              f"sold through inventory and 5080 {n['variance_name']}.\n\n"
              f"Before year-end, two points deserve review. First, {allowance['number']} {allowance['name']} has no "
-             f"postings in the three years of the extract, so no allowance for credit losses has been recorded in that "
-             f"period (Chapter 8 estimates one). Second, 4070 Sales Discounts is inactive and has no postings; the Part II "
+             f"postings in the three years of the extract, which should be read with Chapter 8's estimate of the "
+             f"allowance the receivables need. Second, 4070 Sales Discounts is inactive and has no postings; the Part II "
              f"case found the promotion discounts netted in the invoice prices rather than shown separately, so the "
              f"presentation should be a decision, not a default. The inactive accounts should stay closed to posting.")
 
@@ -572,20 +572,23 @@ def ex4(b: Build) -> None:
     s.answer("Requirement (6), memo to the production manager",
              f"At {end}, {n['n']} work orders had no ClosedDate: {statuses}. All were released in {year}. Of them, "
              f"{n['due']} were due on or before {end} ({due}). The oldest, {oldest['number']}, was released on "
-             f"{oldest['released']} and due on {oldest['due']}, and it was still Released at the end of the data; the "
+             f"{oldest['released']} and due on {oldest['due']}, and it is still marked Released in the records. The "
              f"next are {n['next'][0]['number']} (due {n['next'][0]['due']}) and {n['next'][1]['number']} (due "
              f"{n['next'][1]['due']}). Of the past-due work orders, {released} are still marked Released. The status "
              f"alone is not proof that work has not started: material issues, production completions, and operation "
              f"start dates in other tables record activity on {n['active']['n']} of them"
              + (", including the three named above" if n["named_active"] else "")
              + f", so production should reconcile their statuses (Chapter 10's joins can test the rest). For the "
-             f"others, ask whether they are still needed or should be cancelled. The {n['status']['Completed']} "
-             f"completed work orders should be closed.\n\n"
+             f"others, ask whether they are still needed or should be cancelled. Ask production and cost accounting "
+             f"why the {n['status']['Completed']} completed work orders are still open, check their completion and the "
+             f"charges that remain on them, and close or correct them through the approved process.\n\n"
              f"A work order's variance is recorded only when it closes, when the WorkOrderClose document posts the "
-             f"difference between actual and standard cost to 5080. The costs recorded against these work orders so "
-             f"far stay in work in process and 1090 until then, so any variance on them is not in the fiscal {year} "
-             f"results; it will be recorded when they close, after the data ends, and the open status alone does not "
-             f"say how large it will be. (Counting each status takes one query and the message pane; COUNT comes in "
+             f"difference between actual and standard cost to 5080. Completed output on {n['completed_out']} of these "
+             f"work orders, all {n['status']['Completed']} Completed ones among them, has already moved its standard "
+             f"material and conversion cost to finished goods, so what remains in work in process and 1090 is the cost "
+             f"not yet relieved. None of them has a recorded close, so any variance on them is not in the fiscal {year} "
+             f"results. The open status does not say whether an order will close, or how large or in which direction "
+             f"its variance would be. (Counting each status takes one query and the message pane. COUNT comes in "
              f"Chapter 10.)")
 
 
@@ -661,7 +664,7 @@ def ex5(b: Build) -> None:
             [Check("In Transit, delivered on or after the end", n["later"], len)])
 
     s.answer("Requirement (4)",
-             f"The SQL results equal the Excel filters of Tutorial 2.1: the blank TrackingNumber filter shows the "
+             f"The SQL results reproduce the Excel filters of Tutorial 2.1: the blank TrackingNumber filter shows the "
              f"same {n['n']} shipments (NULL in the database, dated {n['low']} to {n['high']}), and the Status filter "
              f"shows the same {num(dict(n['status'])['In Transit'])} In Transit shipments, of which {n['transit']} have "
              f"a DeliveryDate before {end}, the oldest {n['oldest']}; {n['later_word']} more has a DeliveryDate on or "
@@ -691,6 +694,13 @@ def ex6(b: Build) -> None:
     terminated = d.one("SELECT COUNT(*) FROM Employee WHERE TerminationDate IS NOT NULL")
     left = d.one("SELECT TerminationDate FROM Employee WHERE EmployeeID = ?", n["clock_employee"])
     after = [w for _, w in missing if left is not None and w > left]
+    # The labor records linked to the entries with no clock-out: non-manufacturing time with no work order, so the tests
+    # show a gap in the time support, not a cost charged to manufacturing (a claim of the notes, asserted here too).
+    linked = d.q("SELECT LaborType, WorkOrderID FROM LaborTimeEntry WHERE TimeClockEntryID IN "
+                 "(SELECT TimeClockEntryID FROM TimeClockEntry WHERE ClockOutTime IS NULL)")
+    assert len(linked) == len(missing) and {r[0] for r in linked} == {"NonManufacturing"} \
+        and all(r[1] is None for r in linked), linked
+    linked_type = linked[0][0]
     s = b.script("Ex 9.6.sql", "missing values in time and labor records",
                  f"{len(labor)} direct rows without an operation; {len(missing)} clock entries without a "
                  f"clock-out; terminations consistent")
@@ -799,17 +809,21 @@ def ex6(b: Build) -> None:
     rows = "; ".join(f"{x['id']} (employee {x['employee']}, work order {x['work_order']}, {x['date']}, "
                      f"{num(x['hours'], 2)} hours)" for x in labor)
     s.answer("Requirement (4), findings and follow-up questions",
-             f"1. {n['n_labor'].capitalize()} Direct Manufacturing rows have no WorkOrderOperationID: {rows}; the "
-             f"employees are {n['title']}. Their cost was charged as direct labor but cannot be traced to an "
-             f"operation, so it reaches the work order's actual cost (and the variance) without a routing step to "
-             f"compare it with. Ask production which operation the time belongs to, and why the time entry system "
-             f"accepted direct time without one.\n\n"
+             f"1. {n['n_labor'].capitalize()} Direct Manufacturing rows have no WorkOrderOperationID: {rows}. The "
+             f"employees are {n['title']}. The rows are charged to their work orders, and a check beyond this "
+             f"chapter's single-table queries shows that each close counts them in actual direct labor, so they reach "
+             f"the variance. They cannot be traced to an operation, though, so an operation-level comparison with the "
+             f"routing leaves them out, and the missing link does not show that the hours are wrong. Ask production "
+             f"which operation the time belongs to, what supports it, and why the time entry system accepted direct "
+             f"time without one.\n\n"
              f"2. ClockStatus is {wording([f'{st} ({num(k)})' for st, k in n['clock']])}. {n['n_missing']} entries "
              f"have no ClockOutTime, all for employee {n['clock_employee']} ({n['clock_title']}) on January 1 of "
              f"{d.F}, {d.P} and {d.C}, all Pending, yet each records regular and overtime hours"
              + (f", and {ch09.word(len(after))} of them fall after the employee's termination on {left}" if after else "")
-             + ". Hours without a complete time record cannot be verified, and if they were paid they reach labor "
-             "cost without support. Ask payroll who entered the hours, on what support, and whether they were "
+             + ". Hours without a complete time record cannot be verified. The labor records linked to these entries "
+             f"are {linked_type}, with no work order, so the tests show a gap in the time and payroll support, not a "
+             "cost charged to manufacturing, and any effect on the manufacturing variance would first need a trace of "
+             "how the cost was allocated. Ask payroll who entered the hours, on what support, and whether they were "
              "paid, and to whom.\n\n"
              f"3. {cap(terminated)} employees have a TerminationDate; all are Terminated with IsActive 0, and no employee "
              f"without one is Terminated or inactive, so the three columns agree. Ask payroll to confirm that no time "

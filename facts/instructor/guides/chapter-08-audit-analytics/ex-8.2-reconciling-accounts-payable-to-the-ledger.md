@@ -32,7 +32,7 @@ By the end, students can:
 - trace a reconciling invoice to the order behind it and to the people who created and approved it (outcome 6);
 - write a reconciliation workpaper with no unexplained difference (outcome 6).
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and Core S2 M9 (audit procedures, analytical procedures and data analytics); IMA Reporting and Control (financial recordkeeping, statement preparation and internal control); IFAC IES 2 (a) and (f); AACSB A5 part 5.1.
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and Core S2 M9 (audit procedures, analytical procedures and data analytics); IMA Reporting and Control (financial recordkeeping and internal control); IFAC IES 2 (a) and (f); AACSB A5 part 5.1.
 
 ## Before you assign
 
@@ -100,7 +100,7 @@ The model answer's items are the opening entry (less the credit that has no invo
 
 **Check:** the unexplained difference is 0. **Watch for:** the signs. A student who subtracts the reclassifications ends ${{ (2 * reclassed)|money }} away.
 
-**Step 6. Explain each item.** The opening entry has no supplier invoices behind it, and no payment reduces it because every payment names an invoice. The same entry debits cash with exactly the same amount (${{ opening|money }}), which students should flag as a question. The reclassifications moved note-financed capital invoices to `2110` Notes Payable, so the ledger is right and the invoice detail should be closed or marked settled by the note.
+**Step 6. Explain each item.** The opening entry has no supplier invoices behind it, and no payment reduces it because every payment names an invoice. The same entry debits cash with exactly the same amount (${{ opening|money }}), which students should flag as a question. The reclassifications moved note-financed capital invoices to `2110` Notes Payable, so the ledger records the reclassification, which the note agreements should support, and the invoice detail should be closed or marked settled by the note.
 
 **Step 7. Look up the orders.** Import **T33_PurchaseOrder** as `PurchaseOrders` with the creator's and approver's names, then look up each invoice's order. One formula pattern serves for every column:
 
@@ -134,7 +134,7 @@ The model answer's items are the opening entry (less the credit that has no invo
 
 ## What a strong answer says
 
-- **Requirement (4).** The opening balance is unsupported by the extract's detail, and whether it belongs in the ledger or in missing invoice detail depends on the conversion records. The reclassifications are explained: the ledger is right and the invoice detail is wrong. The orders were created and approved by one person for more than ten times that person's limit, which goes to Exercise 8.5 and to the chief financial officer.
+- **Requirement (4).** The opening balance is unsupported by the extract's detail, and whether it belongs in the ledger or in missing invoice detail depends on the conversion records. The reclassifications are explained by recorded entries, which the note agreements should support, and the fix belongs in the invoice detail. The orders were created and approved by one person for more than ten times that person's limit, which goes to Exercise 8.5 and to the chief financial officer.
 - **Requirement (5).** Objective, both balances, three explained items, no unexplained difference, and a conclusion that separates the reclassifications (a fix in the detail) from the opening balance (goes to the audit committee with the receivables finding).
 
 A weak answer calls the opening balance an error and proposes to correct the ledger, or leaves the two reclassified invoices on the open list as if they were owed to the supplier.

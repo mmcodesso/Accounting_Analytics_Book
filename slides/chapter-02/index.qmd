@@ -41,10 +41,10 @@ None of these observations proves an error yet, and that is the point of the cha
 - A PivotTable on revenue with missing dates understates period totals
 - A SQL test for duplicate payments misses duplicates if vendor names differ
 - A budget dashboard misleads when budget and actual use different accounts
-- Auditors must evaluate the reliability of the data they use as evidence
+- Financial statement auditors must evaluate the data they use as evidence
 
 ::: {.notes}
-No technique, however sophisticated, can repair the data it runs on. For accountants, data quality is a professional responsibility: auditing standards require it for audit evidence, and anyone presenting numbers is vouching for them. Wang and Strong showed that data quality can be measured along defined dimensions.
+No technique, however sophisticated, can repair the data it runs on. For accountants, data quality is a professional responsibility. The AICPA's standards for audits of financial statements require it for audit evidence, and anyone presenting numbers is vouching for them. Wang and Strong showed that data quality can be measured along defined dimensions.
 :::
 
 # Data Types in Accounting
@@ -62,15 +62,15 @@ Quantitative values support arithmetic. Continuous values can take any amount, s
 {{< book-table tbl-02-01 columns="Subtype,Accounting Example,Charles River Source" rows="Qualitative" >}}
 
 ::: {.notes}
-Qualitative values are categories and labels. Nominal categories have no order, such as account names; ordinal categories do, such as a supplier risk rating or a sales order's status. You can count them, but you cannot average them.
+Qualitative values are categories and labels. Nominal categories have no order, such as account names or a sales order's status. Ordinal categories do, such as a supplier risk rating. You can count them, but you cannot average them, and the same goes for an ID stored as a number.
 :::
 
-## Most accounting data is structured
+## Structure runs from tables to free text
 
 {{< book-figure fig-02-01 >}}
 
 ::: {.notes}
-Structured data sits in rows and columns with defined types, like every Charles River table. Semi-structured data, such as an XBRL filing, has tags but no table; unstructured data, such as contracts or scanned invoices, needs other tools. Unstructured data is growing in accounting work, but structured skills are the foundation.
+Structured data sits in rows and columns with defined types, like every Charles River table. Semi-structured data, such as an XBRL filing, has tags but no table; unstructured data, such as contracts or scanned invoices, needs other tools. The ledgers and transaction records this book analyzes are structured, and structured skills are the foundation for the rest.
 :::
 
 ## Check your understanding {.check}
@@ -79,7 +79,7 @@ What type of data is each value?
 
 1. The total of a sales invoice line
 2. An item's group, such as Furniture
-3. A sales order's status, from Open to Closed
+3. A sales order's status, such as Open or Backordered
 4. The number of ledger entries posted in a month
 
 ::: {.notes}
@@ -90,7 +90,7 @@ Ask for two labels per value: quantitative or qualitative, then the subtype.
 
 1. Quantitative, continuous: an amount
 2. Qualitative, nominal: a category with no order
-3. Qualitative, ordinal: categories in a meaningful sequence
+3. Qualitative, nominal: status categories with no single defined ranking
 4. Quantitative, discrete: a count
 
 ::: {.notes}
@@ -152,7 +152,7 @@ A clean result on one dimension says nothing about the others. The checklist lat
 {{< book-figure fig-02-03 >}}
 
 ::: {.notes}
-Each panel uses real Charles River records: blank tracking numbers, a supplier invoice number used twice, shipments still in transit after delivery, and an unusually large freight cost. The tutorial that follows finds each of them.
+Each panel uses real Charles River records: blank tracking numbers, a supplier invoice number used twice, shipments still marked In Transit years after their delivery date, and an unusually large freight cost. The tutorial that follows finds each of them.
 :::
 
 ## Blanks and outliers call for judgment
@@ -193,12 +193,12 @@ Give students a minute; ask them to note which finding might not be an error at 
 ## Problems, dimensions and judgment {.answer}
 
 1. Missing values: completeness
-2. Fields that contradict each other: consistency, and timeliness
+2. If DeliveryDate is the delivery, fields that disagree: consistency, and timeliness
 3. A possible duplicate: an accuracy test, and a duplicate-payment risk
 4. Missing by design: not an error, because raw materials are not sold
 
 ::: {.notes}
-The last finding is the trap: a blank is a problem only when the information should exist. Recording why a finding is not an error is as useful as recording an error.
+The last finding is the trap: a blank is a problem only when the information should exist. The second depends on what DeliveryDate records. If it is only the expected date, the shipments are overdue, not contradictory, so confirm the meaning first. Recording why a finding is not an error is as useful as recording an error.
 :::
 
 ## Tests for accuracy and completeness
@@ -206,7 +206,7 @@ The last finding is the trap: a blank is a problem only when the information sho
 {{< book-table tbl-02-03 rows="Accuracy,Completeness" >}}
 
 ::: {.notes}
-The chapter's checklist assigns tests to each dimension, with the Excel technique for each. A test that finds no problem is also a finding, because it tells you which data you can rely on.
+The chapter's checklist assigns tests to each dimension, with the Excel technique for each. A test that finds no problem is also a finding, because it tells you which tested relationships held in the population you tested.
 :::
 
 ## Tests for consistency and timeliness
@@ -240,7 +240,7 @@ Because an order can ship in parts, each invoice is compared with the earliest s
 {{< book-checkpoint 2.1 >}}
 
 ::: {.notes}
-The first three findings are genuine problems; the last three need judgment, and one of them turns out to be expected. Students should list the table, column, problem type, count and conclusion for each.
+The first three findings need follow-up evidence. The last three need judgment, and one of them turns out to be expected. The In Transit rows conflict with their dates only if DeliveryDate records the actual delivery. Students should list the table, column, problem type, count and conclusion for each.
 :::
 
 # The Concept of Tidy Data
@@ -304,7 +304,7 @@ Students continue in their working copy. The ledger fills most of an Excel works
 {{< book-figure fig-02-07 >}}
 
 ::: {.notes}
-Totals at the bottom of the GLEntry worksheet test consistency at the aggregate level. The difference is zero, a clean result worth recording, just like the referential integrity test of the next step. Equal totals cannot reveal an entry left out with both its sides, or errors that offset.
+Totals at the bottom of the GLEntry worksheet test consistency at the aggregate level, starting from A2 so Ctrl+Down reaches the last row, with one blank row so the Table does not grow. Rounded to the cent, the difference is zero, a clean result worth recording, just like the referential integrity test of the next step. Equal totals cannot reveal an entry left out with both its sides, or errors that offset.
 :::
 
 ## Checkpoint

@@ -104,7 +104,7 @@ The filter lists 9 invoices. To see which hold Furniture lines, filter SalesInvo
 | Same-name customer pairs | 2 | Step 3 |
 | Items with a blank list price; Furniture among them | 43; none | Step 4 |
 
-> **Instructor notes, Requirement 3:** invoices run through 2026-12-31, and the GL continues to 2027-02-23 with only DisbursementPayment rows (supplier payments for prior-year invoices), so the latest complete quarter is 2026 Q4 (compared with 2026 Q3). Of the 9 invoices dated before their order's first shipment, 3 contain Furniture lines (SI-2024-000003, SI-2025-006735, SI-2026-013742), and none is dated, shipped, or posted in 2026 Q3 or Q4, so they do not affect this comparison (though they matter for revenue cutoff in general: two of them cross a quarter end, SI-2025-006735 dated 2024-12-15, shipped 2024-12-17, and posted 2025-01-01; SI-2026-013742 dated 2025-12-04, shipped 2025-12-06, and posted 2026-01-01). Same-name customers do not affect a product-line margin. Blank list prices belong to purchased items and services, not to Furniture products.
+> **Instructor notes, Requirement 3:** invoices run through 2026-12-31, and the GL continues to 2027-02-23 with only DisbursementPayment rows (supplier payments for prior-year invoices), so the latest complete quarter is 2026 Q4 (compared with 2026 Q3). Of the 9 invoices dated before their order's first shipment, 3 contain Furniture lines (SI-2024-000003, SI-2025-006735, SI-2026-013742), and none is dated, shipped, or posted in 2026 Q3 or Q4, so they do not affect this comparison. They matter for revenue cutoff in general, because two of them cross a year-end. SI-2025-006735 is dated 2024-12-15, shipped 2024-12-17 and posted 2025-01-01. SI-2026-013742 is dated 2025-12-04, shipped 2025-12-06 and posted 2026-01-01. Same-name customers do not affect a product-line margin. Blank list prices belong to purchased items and services, not to Furniture products.
 
 ## What a strong answer says
 
@@ -140,4 +140,4 @@ A weak answer names the findings without a verdict, calls all of them threats, o
 - Add the tracking-number and "In Transit" findings to the table, and say which kind of assertion they weaken (the shipment's occurrence) and which they leave alone (its measurement).
 - Rerun the Furniture comparison for the previous fiscal year's last two quarters. Which findings of the nine invoices now matter?
 - Discuss: the case's findings were found by one analyst for another question. What should a data readiness memo do with findings that do not matter this time?
-- Discuss: Requirement 4 tests whether the documents reached the ledger. Which finding of this requirement would most weaken that test if it mattered?
+- Discuss: Requirement 4 tests whether the documents' totals agree with the ledger. Which finding of this requirement would most weaken that test if it mattered?

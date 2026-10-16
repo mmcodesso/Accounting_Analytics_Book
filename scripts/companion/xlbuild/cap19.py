@@ -550,11 +550,14 @@ class Facts:
             applied[rid] += a
         not_full = sum(1 for k, r in self.rcpt.items() if abs(applied[k] - r["amt"]) > 0.005)
         early = [(rid, a) for inv, day, a, e, rid in self.all_apps if self.rcpt[rid]["date"] < self.inv[inv]["date"]]
+        raw = [((iso(day) - iso(self.rcpt[rid]["date"])).days, self.rcpt[rid]["date"] < self.inv[inv]["date"])
+               for inv, day, a, e, rid in self.all_apps]
         return dict(lines=len(lines), traced=traced, over=over, qty_off=qty_off, half_up=half_up, freight_over=freight_over,
                     price_off=price_off, total_off=total_off, twice=twice,
                     distinct_inv=distinct_inv, above_invoice=above_invoice, rate=rate, tax_ok=tax_ok,
                     with_freight=with_freight, other=other, dep_lo=min(dep), dep_hi=max(dep), lag_lo=min(lag),
-                    lag_hi=max(lag), not_full=not_full, early_receipts=len({rid for rid, _ in early}),
+                    lag_hi=max(lag), raw_lo=min(x for x, _ in raw), raw_hi=max(x for x, _ in raw),
+                    raw_over=sum(1 for x, _ in raw if x > 2), not_full=not_full, early_receipts=len({rid for rid, _ in early}),
                     early_apps=len(early), early_amount=r2(sum(a for _, a in early)))
 
     @cached_property
@@ -1099,8 +1102,8 @@ def documentation(b: ExerciseBuild, ws) -> int:
                     "and the evaluation of deficiencies, with the tables for the appendix of the report to the audit "
                     "committee's November meeting."),
         ("Scope", f"Analytics and tests of controls over fiscal {f.F} to {f.C}; conclusions on controls as at the end of "
-                  f"fiscal {f.C}. Magnitude is judged against 5% of fiscal {f.C} income before income taxes as the ledger "
-                  "records it (Materiality worksheet)."),
+                  f"fiscal {f.C}. Materiality starts from a benchmark of 5% of fiscal {f.C} income before income taxes as "
+                  "the ledger records it (Materiality worksheet)."),
         ("Sources", "CharlesRiver.xlsx, imported with Power Query: T1_Account, T2_JournalEntry, T3_GLEntry (Transform "
                     f"Data, filtered to postings before {f.C + 1}-01-01 first), T19_CashReceipt, "
                     "T20_CashReceiptApplication, T21_SalesReturn, T22_SalesReturnLine, T23_CreditMemo, T24_CreditMemoLine, "
@@ -1387,7 +1390,8 @@ def r1(b: ExerciseBuild) -> None:
          "=COUNTIF(Credits[AboveLimit],TRUE)", "Requirement 4"),
         ("C3", "Credits at the invoice price for no more than was shipped",
          "Each credit line against its return, shipment, and invoice lines; tax and freight on each credit.",
-         "Nothing material: the recomputation is complete in the records.", 0, "Requirement 7"),
+         "The freight-credit policy for partial returns and an outside criterion for the tax; the stored totals keep "
+         "a few cent-level rounding variants.", 0, "Requirement 7"),
         ("C4", "The credit approver does not handle that customer's cash",
          "Who recorded each receipt and who applied it to the credited invoice.",
          "Cash handled outside the system (mail opening, deposits, remittance advices).",
@@ -1800,9 +1804,10 @@ def r3(b: ExerciseBuild) -> None:
     b.check(t, f"expectation at the {f.F} rate", e["exp_f"], "=Materiality!B27", 0.005)
     b.check(t, f"difference at the {f.F} rate, percentage", e["f_pct"], "=Materiality!B29", 5e-5, "0.0%")
     text_block(ws, 31, MA, [
-        f"Materiality is 5% of fiscal {f.C} income before income taxes as the ledger records it, {money(m['income'])}: "
-        f"{money(m['mat'])}, with performance materiality of {money(m['perf'])} and a clearly trivial threshold of "
-        f"{money(m['trivial'])}. The chart of accounts has no income tax account, so the ledger's net income is the "
+        f"Materiality starts from a benchmark of 5% of fiscal {f.C} income before income taxes as the ledger records "
+        f"it, {money(m['income'])}: {money(m['mat'])}, with performance materiality of {money(m['perf'])} and a "
+        f"clearly trivial threshold of {money(m['trivial'])}, all case assumptions, and a fraud or governance risk can "
+        "matter below them. The chart of accounts has no income tax account, so the ledger's net income is the "
         "basis; the CFO's open questions on tax status do not change it for this audit.",
         f"At the {f.P} return rate ({pct(e['rates'][1], 3)} of the revenue sales invoices posted), fiscal {f.C} "
         f"returns would be expected at {money(e['exp'])}; the ledger records {money(e['actual'])}, "
@@ -1871,7 +1876,7 @@ def r3(b: ExerciseBuild) -> None:
                                   "Traces a query can look for", "Test"], [
         ["Lapping", "Customer service staff who record receipts and apply cash", "CashReceipt, CashReceiptApplication",
          "Personal financial pressure; a debt to cover", "One department records receipts, deposits them, and applies "
-         "them; nobody outside it reconciles deposits to applications", "\"I will put it back before anyone notices\"",
+         "them; the records show no reconciliation of deposits to applications by anyone outside it", "\"I will put it back before anyone notices\"",
          "Receipts applied to another customer's invoices; growing delays from receipt to deposit and to application",
          "Requirement 7 (lapping tests)"],
         ["False credit", "A customer service representative or the manager", "CreditMemo, CashReceiptApplication",
@@ -1885,7 +1890,7 @@ def r3(b: ExerciseBuild) -> None:
          "Refunds by a method unlike the customer's payments; refunds of credits not yet paid for; concentration by "
          "approver or customer", "Requirements 4, 5, and 6 (C6 to C8)"],
         ["Unauthorized credits", "Customer service representatives", "CreditMemo, SalesReturn",
-         "Keeping a customer satisfied; sales or service targets", "Approval limits are not enforced by the system",
+         "Keeping a customer satisfied; sales or service targets", "Approvals above the approvers' recorded limits; whether the system enforces limits is not in the records",
          "\"I am helping the customer, and the goods came back\"",
          "Credits above authority; concentration by approver and customer; return rates out of line",
          "Requirements 4 and 5 (C2)"],
@@ -1902,7 +1907,8 @@ def r3(b: ExerciseBuild) -> None:
          "authority for credits is outside", "414 credits above the limit", "High"],
         ["A false credit covers stolen cash", "Occurrence of credits; completeness of cash", "C1, C4",
          "Every credit rests on a return received in the warehouse; the approver does not handle the customer's cash",
-         "Anti-join of credits to returns; credit approver against the recorders and appliers of the invoice's cash",
+         "Anti-join of credits to returns; credit approver against the people who applied the invoice's cash (who "
+         "recorded it, too, as an extension)",
          "SQL", "Database", "206 credits whose approver applied the invoice's cash", "High"],
         ["Credit amounts are wrong", "Accuracy and valuation of credits", "C3",
          "Credits at the invoice price for no more than was shipped", "Recompute each credit line, its tax and freight",
@@ -1928,7 +1934,7 @@ def r3(b: ExerciseBuild) -> None:
          "Cash applied promptly to the remitting customer's invoices", "Receipts applied to other customers' invoices; "
          "receipt to deposit and to application delays", "SQL", "Database; remittance advices are outside", "Clean",
          "Moderate"],
-        ["Returned goods are restocked at full value", "Valuation of inventory", "C1",
+        ["Returned goods are restocked above their value", "Valuation of inventory", "C1",
          "Returned goods are inspected, and damaged goods are written down", "Restocking cost by reason; the sample's "
          "inspection record for Damaged returns", "SQL; Excel sample", "Outside: the inspection record", "Damaged "
          "returns restocked at standard cost", "Moderate"],
@@ -1980,7 +1986,17 @@ def r4(b: ExerciseBuild) -> None:
     header(fs, 1, 1, FLAG_COLUMNS)
     paste(fs, 2, 1, rows, "refund flags exported as RefundFlags.csv (one row per refund; flags 1 or 0; PastDue is the "
                           "customer's past-due balance on the refund date)", {1: DATE, 4: MONEY, 9: MONEY})
-    lo = fs.ListObjects.Add(1, fs.Range(fs.Cells(1, 1), fs.Cells(1 + len(rows), len(FLAG_COLUMNS))), None, xl.XL_YES)
+    xl.wait_ready(wb.Application)
+    for attempt in range(40):                  # a busy Excel can refuse even the method's name (AttributeError: Add)
+        try:
+            lo = fs.ListObjects.Add(1, fs.Range(fs.Cells(1, 1), fs.Cells(1 + len(rows), len(FLAG_COLUMNS))), None,
+                                    xl.XL_YES)
+            break
+        except AttributeError:
+            if attempt == 39:
+                raise
+            xl.wait_ready(wb.Application)
+            time.sleep(0.5)
     lo.Name = "RefundFlags"
     fs.Columns.AutoFit()
 
@@ -2018,7 +2034,8 @@ def r4(b: ExerciseBuild) -> None:
          "Credits", tt["cash_credit"], "gt"),
         ("T3", "... and did so on or before the credit date", "C4", "Credit memos", cflag("AppliedByCreditDate"),
          "Credits", tt["cc_early"], "gt"),
-        ("T4", "Credit approver recorded or applied cash on the credited invoice", "C4", "Credit memos",
+        ("T4", "Credit approver recorded or applied cash on the credited invoice (the wider test, an extension)", "C4",
+         "Credit memos",
          cflag("HandledCash"), "Credits", tt["cc_rec"], "gt"),
         ("T5", "Return received by the credit's approver", "C1", "Credit memos",
          dict(year=f"=SUMPRODUCT((Credits[FiscalYear]={{c}}$4)*{receiver})", total=f"=SUMPRODUCT(--{receiver})",
@@ -2165,7 +2182,7 @@ def r4(b: ExerciseBuild) -> None:
               ["... before any receipt", len(tt["nothing_rcpt"])],
               ["Refunds the two definitions part on: dated the day of the last receipt", len(tt["same_day"])],
               ["Credits that posted a part to 2060", cz["to_2060"]],
-              ["... of which posted when nothing had been paid on the invoice", cz["unpaid"]]]
+              ["... of which posted before any cash was applied to the invoice", cz["unpaid"]]]
     for i, (label, v) in enumerate(pasted):
         put(ws, {f"B{r + i}": label})
     paste(ws, r, 8, [[v] for _, v in pasted], "refunds before payment, by application and by receipt dates (test T6), "
@@ -2515,8 +2532,8 @@ def r6(b: ExerciseBuild) -> None:
              f"B{v0 + 17}": f"=HYPGEOM.DIST(0,SampleSize,B{v0 + 5},B27,FALSE)",
              f"A{v0 + 18}": "Comparison",
              f"B{v0 + 18}": f'=IF(AND(B{v0 + 4}="Does not support reliance",B{v0 + 8}>0),"The sample agrees with the '
-                            f'population test: the control is not effective","The sample and the population disagree: '
-                            f'investigate")'})
+                            f'population test: neither supports reliance on the control","The sample and the population '
+                            f'disagree: investigate")'})
     fmt(ws, f"B{v0 + 1}", COUNT)
     fmt(ws, f"B{v0 + 2}:B{v0 + 3}", "0.0%")
     fmt(ws, f"B{v0 + 5}", COUNT)
@@ -2796,6 +2813,8 @@ def r7(b: ExerciseBuild) -> None:
          "Clean (an upper bound: no freight policy in the records)"),
         ("Receipts applied to another customer's invoices", f"{sb['other']}", "Clean"),
         ("Days from receipt to deposit", f"{sb['dep_lo']} to {sb['dep_hi']}", "Clean"),
+        ("Days from receipt to application", f"{sb['raw_lo']} to {sb['raw_hi']} ({sb['raw_over']} over two days, all of "
+         f"receipts dated before their invoice)", "Deposits held until the invoice, as the next row allows for"),
         ("Days from the later of receipt and invoice date to application", f"{sb['lag_lo']} to {sb['lag_hi']}",
          "Clean"),
         ("Receipts not fully applied", f"{sb['not_full']}", "Clean"),
@@ -2810,10 +2829,12 @@ def r7(b: ExerciseBuild) -> None:
         "Restocking. Returned goods go back to inventory at standard cost whatever their reason, so goods returned "
         f"Damaged were restocked at {money(sum(f.restock.get(('Damaged', y), 0.0) for y in f.years))} over three "
         f"years ({money(f.restock.get(('Damaged', f.C), 0.0))} in fiscal {f.C}), and with Quality Concern "
-        f"{money(sum(f.restock.get((x, f.C), 0.0) for x in dq))} in fiscal {f.C}; no write-down account exists. "
-        "These are gross flows, not the inventory still held: a valuation question for the inventory at the "
-        "year-end (lower of cost and net realizable value), below performance materiality but worth an inspection "
-        "step.",
+        f"{money(sum(f.restock.get((x, f.C), 0.0) for x in dq))} in fiscal {f.C}; the chart has no write-down "
+        f"account. The {fr['n']} return lines of less than one unit are costed below standard ({money(fr['gap'])}, "
+        f"{money(fr['gap_dq'])} of it Damaged and Quality Concern). These are gross flows, not the inventory still "
+        "held: a valuation question for the inventory at the year-end (lower of cost and net realizable value), to "
+        "settle with the inspection records and the stock on hand, below performance materiality but worth an "
+        "inspection step.",
         "First digits. A first-digit test is a weak procedure here, by Chapter 8's criteria, though no minimum count "
         "rules it out: the credits and refunds are subsets selected by events (a return, then the part of a credit "
         "posted to customer deposits), and their amounts follow the invoice lines they reverse. With "
@@ -2853,39 +2874,43 @@ def r8(b: ExerciseBuild) -> None:
         return [f"=Tests!H{r}", f"=Tests!G{r}", f"=Tests!I{r}", f"=Tests!J{r}"]
     am = AM
     rows = [
-        ["D1", "Credits approved above the approver's authority", "C2", "Design", *tref("T1"), against,
-         "Reasonably possible: the system accepts any approver, and representatives with a limit of $0 approved "
+        ["D1", "Credits approved above the approver's recorded authority", "C2", "Design, provisional (no delegation "
+         "in the records)", *tref("T1"), against,
+         "Reasonably possible: the records show representatives with a limit of $0 approving "
          f"{pct(len(tt['cm_above']) / len(f.cm), 0)} of the credits.",
          "Every credit traces to a return received in the warehouse, at invoice prices and quantities (Requirement 7); "
          "the manager's limit is never exceeded. These limit what a credit can be for, not who grants it.",
          "D2", "Significant deficiency (combined with D2), provisional", "Control deficiency: report"],
         ["D2", "Customer service records receipts, applies cash, and approves credits and clawbacks (approver applied "
-               "cash to the credited invoice)", "C4", "Design", *tref("T2"), against,
+               "cash to the credited invoice)", "C4", "Design, provisional (duties as recorded)", *tref("T2"), against,
          "Reasonably possible: one department can take a payment and close the invoice with a credit.",
          "The warehouse receipt behind every credit; refunds are approved outside customer service (in "
          "Administration); no lapping or false-credit trace (Requirement 7).", "D1",
          "Significant deficiency (combined with D1), provisional", "Control deficiency: report"],
-        ["D3", "Refunds approved above the approver's authority", "C6", "Design", *tref("T7"), against,
+        ["D3", "Refunds approved above the approver's recorded authority", "C6", "Design, provisional (no delegation "
+         "in the records)", *tref("T7"), against,
          "Reasonably possible: Staff Accountants and Administrative Specialists with a limit of $0 approve refunds.",
          "Each refund equals its credit's 2060 part; the credits are clean. No control over the payee.", "D4, D6",
          "Significant deficiency (combined with D4 and D6), provisional", "Control deficiency: report"],
         ["D4", "Refunds dated before the last application of the customer's payments to the credited invoice", "C7",
-         "Design", *tref("T9"),
+         "Design, provisional (the refund step as recorded)", *tref("T9"),
          against, "Reasonably possible: credits on unpaid invoices go to 2060, and nothing in the records shows the "
                   "refund step checking payment.",
          f"None found: the last application came {min(tt['wait'])} to {max(tt['wait'])} days later, which no control "
          "required.",
          "D3, D6", "Significant deficiency (combined with D3 and D6), provisional", "Control deficiency: report"],
         ["D5", "No offset of past-due balances before a refund (refunds to customers past due by at least the refund)",
-         "C8", "Design (no policy)", *tref("T12"), against,
+         "C8", "Not established: no policy in the records", *tref("T12"), against,
          "Not a misstatement in itself: the receivable remains collectible.", "Collection of the past-due balances "
                                                                                "afterwards.", "D3",
          "Follow up: any policy lies outside the records; recommend one", "Follow up"],
-        ["D5", "Refund method unlike every receipt on the credited invoice", "C8", "Design (no policy)", *tref("T13"),
+        ["D5", "Refund method unlike every receipt on the credited invoice", "C8",
+         "Not established: no policy in the records", *tref("T13"),
          against, "An anomaly: a method chosen at random would mismatch about as often.",
          "None in the records: no payee or account to verify.", "D3",
          "Follow up: any policy lies outside the records; recommend one", "Follow up"],
-        ["D6", "No preparer recorded on credits or refunds (all refunds)", "C2, C6", "Design", "=ROWS(Refunds)",
+        ["D6", "No preparer recorded on credits or refunds (all refunds)", "C2, C6",
+         "Evidence gap, pending the system's design", "=ROWS(Refunds)",
          f"=COUNTIFS(Refunds[FiscalYear],{cy})", "=SUM(Refunds[Amount])",
          f"=SUMIFS(Refunds[Amount],Refunds[FiscalYear],{cy})", against,
          "An evidence gap: the records cannot show that the preparer differs from the approver; a design deficiency if "
@@ -2893,14 +2918,16 @@ def r8(b: ExerciseBuild) -> None:
          "None in the records.", "D3, D4", "Evidence gap; combines with D3 and D4 if the system keeps no preparer",
          "Control deficiency: report"],
         ["D7", f"The {am}'s concentration: commission rates, accruals, and payments; refunds within limit, "
-               "including the largest; all payroll registers (Chapters 12 and 16)", "C5, C6", "Design",
+               "including the largest; all payroll registers (Chapters 12 and 16)", "C5, C6",
+         "Design, provisional (no independent review in the records)",
          f'=COUNTIF(Refunds[ApproverTitle],"{am}")', f'=COUNTIFS(Refunds[ApproverTitle],"{am}",Refunds[FiscalYear],{cy})',
          f'=SUMIFS(Refunds[Amount],Refunds[ApproverTitle],"{am}")',
          f'=SUMIFS(Refunds[Amount],Refunds[ApproverTitle],"{am}",Refunds[FiscalYear],{cy})', against,
          "Reasonably possible in this cycle, though no exception was found in the clawbacks.",
          "The clawbacks are complete and accurate (Requirement 4).", "Entity-wide: payroll approvals",
          "Deficiency (may combine entity-wide into a significant deficiency)", "Control deficiency: report to management"],
-        ["D8", "Damaged goods restocked at full standard cost (Damaged returns)", "C1", "Design",
+        ["D8", "Damaged goods restocked at standard cost, a flow and not the stock still held (Damaged returns)", "C1",
+         "Not established: valuation follow-up",
          '=COUNTIF(ReturnLines[ReasonCode],"Damaged")', f'=COUNTIFS(ReturnLines[ReasonCode],"Damaged",'
                                                          f'ReturnLines[FiscalYear],{cy})',
          '=SUMIFS(ReturnLines[ExtendedStandardCost],ReturnLines[ReasonCode],"Damaged")',
@@ -2946,7 +2973,7 @@ def r8(b: ExerciseBuild) -> None:
 
     # combined
     r = end
-    heading(ws, r, "Combined evaluation (deficiencies that affect the same account or assertion combine)")
+    heading(ws, r, "Combined evaluation (deficiencies on the same account or assertion, assessed together)")
     r += 1
     credits_c = ("=SUMPRODUCT((Credits[FiscalYear]={y})*((Credits[AboveLimit]+Credits[CashAndCredit])>0)*"
                  "Credits[GrandTotal])").format(y=cy)
@@ -2985,8 +3012,9 @@ def r8(b: ExerciseBuild) -> None:
          f'=SUMIFS(ReturnLines[ExtendedStandardCost],ReturnLines[ReasonCode],"Damaged",ReturnLines[FiscalYear],{cy})'
          f'+SUMIFS(ReturnLines[ExtendedStandardCost],ReturnLines[ReasonCode],"Quality Concern",ReturnLines[FiscalYear],'
          f'{cy})', f"=SUMIFS(ReturnLines[ExtendedStandardCost],ReturnLines[FiscalYear],{cy})", pot, "None.",
-         "Valuation follow-up", "Damaged and Quality Concern returns restocked at full standard cost; inspect and write "
-                                "down."],
+         "Valuation follow-up", "Damaged and Quality Concern returns restocked at standard cost (the lines of less "
+                                "than one unit below it): find what is still held, inspect it, and write it down where "
+                                "needed."],
     ]
     c0 = r + 1
     for i, row in enumerate(comb):
@@ -3037,7 +3065,8 @@ def r8(b: ExerciseBuild) -> None:
          "Exceptions: none"],
         ["One refund per refunded credit", f"=Tests!H{T['T14']}+Tests!H{T['T15']}", "Exceptions: none"],
         ["Credits recomputed from their return, shipment, and invoice lines", "Clean (Timeline, Credits.sql)",
-         "Quantities, prices, tax, and freight all agree"],
+         "Quantities, prices, and discounts agree, with a few cent-level rounding variants; tax as a diagnostic; "
+         "freight only against the invoice's"],
         ["Lapping: receipts, deposits, and applications", "Clean (Timeline, Credits.sql)", "No trace of lapping"],
     ]
     k0 = r + 1
@@ -3054,7 +3083,7 @@ def r8(b: ExerciseBuild) -> None:
         f"({money(m['perf'])}) and below materiality ({money(m['mat'])}), and all {cy} credits, "
         f"{money(all_c)}, exceed materiality, because any credit could have been approved without authority. D2 "
         "(customer service records receipts, applies cash, approves credits, and approves clawbacks) is a design "
-        "deficiency, mitigated, if they operate, by every credit tracing to a return received in the warehouse at "
+        "deficiency as the duties are recorded, to confirm against the access rights, mitigated, if they operate, by every credit tracing to a return received in the warehouse at "
         "invoice prices, by refunds approved outside customer service, and by the absence of any lapping or "
         "false-credit trace. The rating is provisional: a material misstatement through credits would need a "
         "warehouse record that does not reflect a real return, or collusion between the warehouse and customer "
@@ -3074,8 +3103,8 @@ def r8(b: ExerciseBuild) -> None:
         f"rates, all {f.commission['n_accruals']:,} accruals, all {f.commission['n_payments']} commission payments, "
         f"the largest refund, and all {f.payroll_approvals['registers']:,} payroll registers of Chapters 12 and 16), is "
         "a deficiency in this cycle that may combine entity-wide into a significant deficiency. D8, damaged goods "
-        "restocked at full cost, is a valuation follow-up. No material weakness is identified on the records; the "
-        "final ratings wait for the evidence outside them.",
+        "restocked at standard cost, is a valuation follow-up. No material weakness is identified on the records; each "
+        "rating stays provisional until the cause, the policy, and any compensating review are known.",
         "Clean: the reconciliations, the clawbacks, the employment dates, the separation of refund and credit "
         "approvers, one refund per credit, the substantive tests of every credit, and the lapping tests."], span=11)
 
@@ -3118,11 +3147,12 @@ def r9(b: ExerciseBuild) -> None:
         f"returns, credit memos, customer refunds, commission clawbacks, and cash application) over fiscal {f.F} to "
         f"{f.C}, and states its conclusions on controls as at the end of fiscal {f.C}.",
         "Overall conclusion. The recorded populations agree with the ledger to the cent in every year, every credit "
-        "recomputes from its return, shipment, and invoice, and the lapping tests found no trace, on the definitions "
+        "recomputes from its return, shipment, and invoice within the limits we state (cent-level rounding, tax as a "
+        "diagnostic, freight only against the invoice's), and the lapping tests found no trace, on the definitions "
         "we state; the customer's requests, the payee checks, the inspection of returned goods, the bank clearance "
         "of refunds, and the operation of the compensating controls lie outside the database and remain untested, so "
-        "this report gives no assurance on them. The controls over who may grant credits and refunds, however, are "
-        f"not designed to prevent an unauthorized one: {c1['n']} credits ({money(c1['amt'])}) and {r3_['n']} "
+        "this report gives no assurance on them. The records show, however, that the approval limits did not stop "
+        f"approvals above them: {c1['n']} credits ({money(c1['amt'])}) and {r3_['n']} "
         f"refunds ({money(r3_['amt'])}) were approved by employees whose recorded approval limit is $0, and "
         f"{r4_['n']} refunds ({money(r4_['amt'])}) were dated before the customer's payments on the credited invoice "
         f"had been applied ({len(tt['before_rcpt'])} before the last receipt, by the receipts' own dates). We rate "
@@ -3134,21 +3164,21 @@ def r9(b: ExerciseBuild) -> None:
         f"{len(f.rf)} refunds ({money(sum(x['amt'] for x in f.rf.values()))}), {len(f.adj)} clawbacks "
         f"({money(sum(a['amt'] for a in f.adj))}), and {len(f.rcpt):,} receipts ({money(rec_total)}) with "
         f"{len(f.all_apps):,} applications, all tested in full. Each population reconciles to its ledger accounts by "
-        "year with no difference (appendix: Reconciliation). Magnitude is judged against materiality of "
-        f"{money(m['mat'])}, 5% of fiscal {f.C} income before income taxes as the ledger records it. Sampling was "
+        "year with no difference (appendix: Reconciliation). Materiality starts from a benchmark of 5% of fiscal "
+        f"{f.C} income before income taxes as the ledger records it, {money(m['mat'])}. Sampling was "
         "used only for what the records cannot show (the customer's request, an independent payee check, and the "
         "inspection of damaged goods, which needs a population of its own); the plan and the frozen selection are "
         "in the appendix, and the documents have been requested."], span=7)
     heading(ws, r, "Findings")
     r += 1
     findings = [
-        ["F1. Credits approved without authority, in the department that handles the customer's cash (D1, D2)",
+        ["F1. Credits approved above recorded authority, in the department that handles the customer's cash (D1, D2)",
          f"{c1['n']} credits ({money(c1['amt'])}; {c1['cur']} in fiscal {f.C}, {money(c1['cur_amt'])}) were approved by "
          "customer service representatives whose approval limit is $0. On "
          f"{c2['n']} credits the approver had also applied cash to the credited invoice.",
          "Credits are approved within delegated authority, by someone who does not handle the customer's cash (C2, C4).",
-         "No delegation of authority for credits exists in the records, and the system accepts any approver; customer "
-         "service records receipts, applies cash, and approves credits and clawbacks.",
+         "No delegation of authority for credits is in the records, and whether the system enforces the limits is "
+         "not shown; customer service records receipts, applies cash, and approves credits and clawbacks.",
          f"A credit could be granted, or cash concealed, without independent approval. Fiscal {f.C} credits above "
          f"authority ({money(c1['cur_amt'])}) exceed performance materiality; every credit traces to a return "
          "received in the warehouse at invoice prices.", "Significant deficiency (provisional)",
@@ -3178,7 +3208,8 @@ def r9(b: ExerciseBuild) -> None:
          f"all {f.commission['n_payments']} commission payments and {sum(1 for x in f.rf.values() if f.title(x['appr']) == AM)} "
          f"refunds (the largest among them), and approved all {f.payroll_approvals['registers']:,} payroll registers "
          "(Chapters 12 and 16).", "Incompatible duties are separated, or reviewed independently.",
-         "A small accounting team with no independent review of commissions and refunds.",
+         "No independent review of commissions and refunds appears in the records; obtain the workflow and any "
+         "review evidence.",
          "An error or a fraud in commissions or refunds could go undetected; no exception was found in the "
          "clawbacks.", "Deficiency (may combine entity-wide)",
          f"Have someone independent approve commission rates and payments; obtain the approved {f.C + 1} rates and "
@@ -3191,11 +3222,13 @@ def r9(b: ExerciseBuild) -> None:
          "An anomaly, not a misstatement: consistent with a diverted refund, and with a legitimate refund by another "
          "method.",
          "Follow up", "Adopt a refund policy: original instrument or verified account, open balances offset first."],
-        ["F5. Damaged goods restocked at full cost (D8)",
+        ["F5. Damaged goods restocked at standard cost (D8)",
          f"Damaged returns were restocked at standard cost ({money(sum(f.restock.get(('Damaged', y), 0.0) for y in f.years))}"
          f" over three years; with Quality Concern {money(sum(f.restock.get((x, f.C), 0.0) for x in ('Damaged', 'Quality Concern')))}"
-         f" in fiscal {f.C}).", "Inventory at the lower of cost and net realizable value.",
-         "No inspection or write-down step for returned goods.",
+         f" in fiscal {f.C}), gross flows and not the stock still held; {f.fractional['n']} return lines of less than "
+         "one unit sit below standard.", "Inventory at the lower of cost and net realizable value.",
+         "No inspection or write-down step appears in the records; the receiving and inspection records lie outside "
+         "them.",
          "Inventory may be overstated by part of these amounts; below performance materiality.", "Valuation follow-up",
          "Inspect returned goods and write down damaged items before restocking."],
         ["F6. The largest refund (follow-up)",
@@ -3211,10 +3244,12 @@ def r9(b: ExerciseBuild) -> None:
     r = text_block(ws, r, "Clean results", [
         "The reconciliations of every population, the completeness and accuracy of the clawbacks, the approvers' "
         "employment dates, the separation of the refund approver from the credit approver, one refund per credit, "
-        "the recomputation of every credit (quantity, price, discount, tax, and freight), and the lapping tests "
-        "(no receipt applied to another customer's invoice; deposits within two days) found no exception. The "
+        "the recomputation of every credit (quantity, price, and discount, with a few cent-level rounding variants; "
+        "tax as a diagnostic on a rate the invoices share; freight only against the invoice's, since no freight "
+        "policy is in the records), and the lapping tests (no receipt applied to another customer's invoice; "
+        "deposits within two days) found no exception. The "
         "receipts applied to invoices dated after them are customer deposits held in 2060, not lapping."], span=7)
-    heading(ws, r, "Action plans")
+    heading(ws, r, "Action plans (proposed, for the owners to accept)")
     r += 1
     plans = [
         ["Approve a delegation of authority for credits and refunds, and enforce it in the system", "Controller, with "
@@ -3238,20 +3273,21 @@ def r9(b: ExerciseBuild) -> None:
         ["Review the concentration of duties with the Accounting Manager (commissions, refunds, payroll)",
          "Chief financial officer", f"{f.C + 1}-12-31", "May argue that the team is small",
          "The audit partners Cohen et al. (2020) interviewed describe managers who resist a weakness when no error has "
-         "been detected: answer with the likelihood and the absence of any independent review, not with a detected "
+         "been detected: answer with the likelihood and the absence of evidence of an independent review, not with a "
+         "detected "
          "error."],
         [f"Obtain the approved {f.C + 1} commission rates and who approved them (the records end on "
          f"{f.commission['rate_ends'][-1]}, the end of the data)",
          "Chief financial officer", f"{f.C + 1}-11-30", "Will provide them", "None expected."],
         ["Inspect returned goods and write down damaged items before restocking", "Warehouse manager, with the "
          "controller", f"{f.C + 2}-03-31", "Agree; may question the cost of inspection",
-         "Show the Damaged and Quality Concern returns restocked at full cost."],
+         "Show the Damaged and Quality Concern returns restocked at standard cost, and ask what is still held."],
         ["Settle the follow-up of the largest refund", "Internal audit", f"{f.C + 1}-10-31", "Owners will supply the "
          "documents", "None expected; the result goes to the committee."],
         ["Keep the four rule tests running in the exception register (credits and refunds above authority, the credit "
-         "approver's cash, refunds before payment), with the historical exceptions recorded once as a design finding "
-         "and each kept in the register; review later exceptions as they arrive, and close the findings on a retest "
-         "after the fix",
+         "approver's cash, refunds before payment), with the historical exceptions that share a supported cause linked "
+         "to a finding and each kept in the register; review later exceptions as they arrive, and close the findings "
+         "on a retest after the fix",
          "Internal audit", f"{f.C + 1}-11-30", "Agree", "None expected; after remediation the two authority tests "
                                                          "should fall to zero."],
     ]

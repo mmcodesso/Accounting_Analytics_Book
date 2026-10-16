@@ -4,7 +4,7 @@
 
 **1.** In a relational database, which of the following best describes the role of a primary key?
 
-A.  It uniquely identifies each row in a table and cannot be duplicated or left blank.
+A.  It uniquely identifies each row and cannot be duplicated or blank.
 B.  It stores the most important data value in the table.
 C.  It connects one table to another by referencing a column in a different table.
 D.  It defines the data type for all columns in the table.
@@ -34,8 +34,8 @@ D.  It resolves a many-to-many relationship between sales orders and items.
 
 A.  The O2C group, because it contains product pricing data in SalesOrderLine
 B.  The Accounting Core group, because it contains a complete general ledger
-C.  The Manufacturing group, because it contains WorkOrder, ProductionCompletionLine, and WorkOrderClose tables with standard cost and variance data
-D.  The Master Data group, because the Item table contains StandardCost and ListPrice
+C.  The Manufacturing group, whose completions and closes hold standard costs and variances
+D.  The Master Data group, because the Item table contains the StandardCost and ListPrice columns
 
 **6.** In the Charles River database, the Account table contains a column called ParentAccountID that references another row in the same Account table. This is an example of a:
 
@@ -54,16 +54,16 @@ D.  Item and Warehouse from the Master Data group
 **8.** The Charles River SQLite file declares a primary key for every table but declares no foreign key constraints. What does this mean for an analyst who plans to join SalesOrder to Customer?
 
 A.  The join will fail because the relationship is not declared in the file.
-B.  The database automatically prevents orphaned orders, so no testing is needed.
-C.  The relationship can still be used in the join, but the analyst should test that every CustomerID in SalesOrder matches a customer, because nothing in the file enforces it.
+B.  The database automatically prevents orphaned orders, so the analyst does not need to test anything.
+C.  The join still works, but the analyst should test that every CustomerID matches a customer.
 D.  CustomerID must first be converted to text before the two tables can be joined.
 
 **9.** A relational database enforces referential integrity. This means that:
 
 A.  Every table must contain at least one foreign key.
-B.  Primary key values can be duplicated as long as the duplicates are in different tables.
+B.  Primary key values can be duplicated, as long as the duplicate values appear in different tables of the database.
 C.  Tables without relationships are automatically deleted from the database.
-D.  Every foreign key value that is not blank must correspond to an existing primary key value in the referenced table.
+D.  Every foreign key value that is not blank matches an existing primary key in the referenced table.
 
 **10.** An analyst joins the Charles River Customer table to SalesOrder and then to SalesOrderLine. One customer has 10 orders, and those 10 orders contain a total of 45 line items. How many rows will this customer contribute to the joined result?
 
@@ -82,16 +82,16 @@ D.  The accounts receivable sub-ledger
 **12.** The Charles River GLEntry table uses SourceDocumentType and SourceDocumentID to link general ledger entries to their source documents. This design differs from a standard foreign key because:
 
 A.  It uses two columns instead of one.
-B.  It can reference a different table depending on the SourceDocumentType value, so no single foreign key constraint can describe it.
-C.  It stores the amount of the source document rather than its key.
-D.  It is only used for journal entries and not for other transaction types.
+B.  It points to a different table depending on SourceDocumentType, so no one foreign key describes it.
+C.  It stores the amount of the source document in the ledger row rather than the key of that document.
+D.  It is used only for manual journal entries, and not for invoices, payments, or other transaction types.
 
 **13.** Which of the following is the best definition of a relational database?
 
-A.  A data storage system that organizes information into tables connected through defined relationships using primary and foreign keys
-B.  A database that stores all data in a single large table
+A.  A system that stores data in tables linked by primary and foreign keys
+B.  A database that keeps all of its data together in one single large table
 C.  A spreadsheet with multiple worksheets
-D.  A database that requires SQL to access its data
+D.  A database whose data can be read and changed only by writing SQL statements
 
 **14.** In a database that enforces data types, a column defined as INTEGER could store which of the following values?
 
@@ -103,6 +103,6 @@ D.  4500
 **15.** The Charles River Master Data group has only a few tables, while the Order-to-Cash group is the largest table group in the database. Which of the following best explains this difference?
 
 A.  The O2C group is a newer part of the database and uses more modern design principles.
-B.  The O2C group captures a complex transactional cycle spanning pricing, ordering, shipping, invoicing, commissions, returns, and cash collection, each of which requires its own set of tables.
+B.  The O2C cycle has many stages, from pricing to cash collection, and each one needs its own tables.
 C.  The Master Data group contains errors that should have been stored in additional tables.
 D.  The number of tables is arbitrary and has no relationship to the complexity of the business process.

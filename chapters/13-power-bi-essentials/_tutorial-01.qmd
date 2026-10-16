@@ -73,7 +73,7 @@ d. Click **Column profiling based on top 1000 rows** in the status bar at the bo
 e. Read the two columns again.
 f. Record the share of PromotionID that is empty and the number of distinct values of Discount, on both bases.
 
-On the first 1,000 rows, PromotionID is empty everywhere and Discount has a single value. On the entire data set, part of PromotionID is filled and Discount has four values, as @fig-13-03 shows. Profiling the whole population takes longer, but it is the profile you can rely on.
+On the first 1,000 rows, PromotionID is empty everywhere and Discount has a single value. On the entire data set, part of PromotionID is filled and Discount has four values, as @fig-13-03 shows. Profiling the whole population takes longer, but it is the profile that describes every row.
 
 **Step 7. Load the data.**
 
@@ -119,7 +119,7 @@ c. Save the report.
 
 @fig-13-05 shows the finished page. The item group table should have five rows and no (Blank) row, which confirms that every invoice line found its item after the filter of Step 4.
 
-![The Validation Page of the Charles River Reports File.](/visuals/svg/fig-13-05-validation-page.svg){#fig-13-05 fig-alt="A mock of a report page named Validation in Power BI Desktop. A table visual lists fiscal years 2024, 2025, and 2026 with the count of invoice lines, the sum of LineTotal, the sum of ListAmount, and the sum of DiscountAmount for each, and a total row. The fiscal 2026 row is outlined. A second table lists the five item groups, Accessories, Furniture, Lighting, Services, and Textiles, with their line totals and no blank row."}
+![The Validation Page of the Charles River Reports File.](/visuals/svg/fig-13-05-validation-page.svg){#fig-13-05 fig-alt="A mock of a report page named Validation in Power BI Desktop. A table visual lists fiscal years 2024, 2025, and 2026 with the count of invoice lines, the sum of LineTotal, the sum of ListAmount, and the sum of DiscountAmount for each, and a total row. The fiscal 2026 row is outlined. A second table lists the five item groups, Accessories, Furniture, Lighting, Services, and Textiles, with their line totals over all three fiscal years and no blank row."}
 
 
 

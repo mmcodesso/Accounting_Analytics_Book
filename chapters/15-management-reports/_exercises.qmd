@@ -16,7 +16,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 (1) Add a page named `Ledger Detail` with AccountSubType from Account in its drill-through well. Add a table visual with PostingDate, VoucherNumber, SourceDocumentType, AccountNumber, AccountName, and the P&L Amount measure.
 
-(2) On the Income Statement page, drill through from the Other Income or Expense row of fiscal 2026, and then of fiscal 2025. Record the entries you find, their dates, and their amounts.
+(2) On the Income Statement page, right-click the Other Income or Expense amount in the fiscal 2026 column and drill through, and then do the same in the fiscal 2025 column. Record the entries you find, their dates, and their amounts.
 
 (3) In DAX query view, write a query that lists every posting of the 2026 entry with its account number, account name, debit, and credit. Use RELATED to bring the account columns onto the postings.
 
@@ -37,7 +37,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 **Requirements.**
 
-(1) Add a table visual with YearMonth and Net Income, filtered to 2026. Add two visual calculations: the year to date with RUNNINGSUM, and the change from the previous month with PREVIOUS.
+(1) Add a table visual with YearMonth and Net Income, filtered to 2026. Add two visual calculations: the year to date with RUNNINGSUM, and the change from the previous month with PREVIOUS, left blank in the first month, which has no previous month on the table.
 
 (2) Add a measure, Net Income YTD, that uses TOTALYTD, and place it in the same table. Confirm that it equals the visual calculation in every month, and that both reach the net income of Tutorial 14.3 in December.
 
@@ -85,7 +85,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 **Requirements.**
 
-(1) Choose **Modeling > New parameter > Numeric range**, name it `Discount`, set **Data type** to **Whole number**, with a minimum of 0, a maximum of 20, an increment of 1, and a default of 12, and add its slider to the page. The slider reads in whole percents, so divide its value by 100 wherever a measure uses it. A decimal range from 0 to 0.2 in steps of 0.01 would stop at 0.19, because 0.01 is not stored exactly.
+(1) Choose **Modeling > New parameter > Numeric range**, name it `Discount`, set **Data type** to **Whole number**, with a minimum of 0, a maximum of 20, an increment of 1, and a default of 12, and add its slider to the page. The slider reads in whole percents, so divide its value by 100 wherever a measure uses it. In Power BI Desktop 2.158, a decimal range from 0 to 0.2 in steps of 0.01 stopped at 0.19, so check that the slider reaches both 0 and 20.
 
 (2) Write measures, filtered to the Design Trade Customer Promotion's 2026 lines, for the units, the price before discount per unit, and the standard cost per unit.
 
@@ -137,7 +137,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 (1) Import T52_WorkOrderOperation again as `OperationPaths`, keeping WorkOrderOperationID, WorkCenterID, and ActualEndDate, with ActualEndDate typed as **Date**, and T66_TimeClockEntry as `ClockPaths`, keeping TimeClockEntryID and WorkCenterID. Clear **Enable load** on both.
 
-(2) Import T60_LaborTimeEntry again as `LaborPaths`, keeping LaborTimeEntryID, TimeClockEntryID, WorkOrderOperationID, WorkDate, LaborType, RegularHours, and OvertimeHours, with WorkDate typed as **Date**. Merge it with OperationPaths with a left outer join, which keeps the lines that have no operation, expand WorkCenterID and ActualEndDate, and rename WorkCenterID to `OperationWorkCenterID`. Merge it with ClockPaths the same way, expand WorkCenterID, and rename it `ClockWorkCenterID`. Then merge each of the two keys with the WorkCenter query to bring its work-center name, as OperationWorkCenter and ClockWorkCenter.
+(2) Import T60_LaborTimeEntry again as `LaborPaths`, keeping LaborTimeEntryID, TimeClockEntryID, WorkOrderOperationID, WorkDate, LaborType, RegularHours, and OvertimeHours, with WorkDate typed as **Date**. Merge it with OperationPaths with a left outer join, which keeps the lines that have no operation, expand WorkCenterID and ActualEndDate, and rename WorkCenterID to `OperationWorkCenterID`. Merge it with ClockPaths the same way, expand WorkCenterID, and rename it `ClockWorkCenterID`. Then merge each of the two keys with the WorkCenter query to bring its work-center name, as OperationWorkCenter and ClockWorkCenter. After Close & Apply, relate LaborPaths to the Date table on WorkDate, so that a year can filter it.
 
 (3) Add custom columns that test whether the two work centers agree and whether the work date falls after the operation's actual end date, each left blank (null) when a line has nothing to compare, such as a line without an operation.
 

@@ -14,7 +14,7 @@ figures:
   - id: IF-08-0-B
     kind: diagram
     purpose: Choosing a test by the kind of records, for the discussion of the exercises.
-    shows: "A decision tree read from left to right. The root asks what the records are. Five branches. Amounts with no upper limit lead to strata, then a first-digit test of the subsets. Documents numbered in a series lead to a uniqueness check, then a gap test. Documents approved against a limit lead to flags and threshold bands. Pairs of records that could repeat lead to a near-duplicate test on supplier and amount, then the invoice. A balance that should equal a ledger account leads to a reconciliation, an aging and a confirmation sample. Each leaf names the tutorial step or exercise requirement that practices it."
+    shows: "A decision tree read from left to right. The root asks what the records are. Five branches. Measured amounts over a wide range lead to strata, then a first-digit test of the subsets. Documents numbered in a series lead to a uniqueness check, then a gap test. Documents approved against a limit lead to flags and threshold bands. Pairs of records that could repeat lead to a near-duplicate test on supplier and amount, then the invoice. A balance that should equal a ledger account leads to a reconciliation, an aging and a confirmation sample. Each leaf names the tutorial step or exercise requirement that practices it."
     data: The chapter's own tests; no dataset values.
 ---
 # Chapter 8: Audit Analytics in Excel
@@ -37,7 +37,7 @@ The chapter depends on these conditions of the data:
 - The three fiscal years hold {{ t1.n|count }} supplier payments, which agree in count and total with the ledger's cash credits. A further {{ t1.after|count }} payments are dated {{ n }}, so a date filter must leave them out on both sides.
 - Charles River pays only larger invoices in parts (the smallest is ${{ t1.min_part|money }}), which is why the partial payments fail a first-digit test that the full payments pass.
 - Account 1020 exceeds the open invoices by exactly one journal entry line of ${{ t2.opening|money }}, and accounts 1030 and 6170 have no postings. The same entry credits payables with ${{ t3.ap_opening|money }}.
-- Of {{ t3.n }} journal entries, {{ t3.flagged }} have at least one flag. Most flags have an ordinary explanation (weekend depreciation, year-end closes); one entry carries four.
+- Of {{ t3.n }} journal entries, {{ t3.flagged }} have at least one flag. Many flags have a likely ordinary explanation (weekend depreciation, the size of the year-end closes) that still needs its evidence, and one entry carries four.
 - The purchasing and pricing exercises rest on planted conditions: self-approved orders, orders approved under the ID of an employee whose recorded termination precedes the order, requisitions clustered just under an approval limit, promotions with impossible dates, and expired price lists still cited.
 - Two tests are clean on purpose: no purchase order number repeats or goes missing, and no near-duplicate pair pays the same invoice.
 
@@ -53,10 +53,10 @@ The chapter depends on these conditions of the data:
 ## Preparing to teach
 **Before the first class**
 
-- Students need desktop Excel with Power Query (on a Mac, Excel for Microsoft 365). The tutorials use XLOOKUP, FILTER, SORTBY, RANDARRAY and SEQUENCE, so Microsoft 365 or Excel 2021 or later. The model answers also use LET, HSTACK, VSTACK, MAP and LAMBDA, which need Microsoft 365 or Excel 2024.
+- Students need a supported desktop Excel with Power Query, Microsoft 365 recommended, as the Preface's What You Need says. On a Mac the Power Query Editor needs Excel for Microsoft 365. XLOOKUP, FILTER, SORTBY, RANDARRAY and SEQUENCE are in Excel for Microsoft 365, Excel 2024 and Excel 2021, whose support ended in October 2026. The model answers also use LET, HSTACK, VSTACK, MAP and LAMBDA, so open them in Microsoft 365 or Excel 2024.
 - A late student takes the start file from Chapter08-companion.zip, points its queries at their copy of CharlesRiver.xlsx (**Data > Get Data > Data Source Settings**, **Change Source**) and chooses **Data > Refresh All**. Its Solution Notes worksheet then checks every control total.
 - Do the three tutorials yourself. Each imports T3_GLEntry, a Table of {{ gl_n|count }} rows, so students choose **Transform Data**, never **Load**. Time the first refresh of each.
-- - Get the PowerPoint deck from the Downloads page. Its modules follow the chapter's sections, and each tutorial has a checkpoint slide.
+- Get the PowerPoint deck from the Downloads page. Its modules follow the chapter's sections, and each tutorial has a checkpoint slide.
 
 **Pitfalls that cost class time**
 
@@ -116,7 +116,7 @@ Plan A is the safest. Plan B gives students ownership of the findings and needs 
 ## Tutorial guide
 ### Guided Tutorial 8.1: Stratifying and Testing Supplier Payments
 
-**Purpose.** Students start the audit workbook, agree a population to the ledger, stratify it, examine the largest items and run a first-digit test that fails for a reason the data explains. **Time.** About 75 to 90 minutes. **Demonstrate, then hand over.** Demonstrate Step 2 (Group By before loading) and Steps 5 and 6 (the first-digit formula and the MAD). Leave Steps 1, 4 and 9 to students.
+**Purpose.** Students start the audit workbook, agree a population to the ledger, stratify it, examine the largest items and run a first-digit test that fails for a reason the payment process plausibly explains. **Time.** About 75 to 90 minutes. **Demonstrate, then hand over.** Demonstrate Step 2 (Group By before loading) and Steps 5 and 6 (the first-digit formula and the MAD). Leave Steps 1, 4 and 9 to students.
 
 **What students should see.**
 
@@ -136,7 +136,7 @@ Plan A is the safest. Plan B gives students ownership of the findings and needs 
 - Step 5: the shortcut formulas. `LEFT([@Amount],1)` returns 0 for the {{ t1.below1|count }} payments below $1, and `LEFT(TEXT([@Amount],"0"),1)` rounds before it takes the digit. Together they misclassify {{ t1.wrong_either|count }} payments, so B6 is not zero.
 - Step 6: the combo chart with the Expected series as columns, or a selection of the wrong columns.
 
-**The checkpoint to look for.** The four bullets. A strong student says the payments agree with the ledger and that the nonconformity points to a subset, not to fraud: the invoices themselves conform ({{ t1.inv.mad|num(4) }}).
+**The checkpoint to look for.** The four bullets. A strong student says the payments agree with the ledger and that the nonconformity points to a subset, not to fraud, since the invoices themselves conform ({{ t1.inv.mad|num(4) }}). The student adds that the explanation does not show each payment is genuine, which takes documents and approvals.
 
 ### Guided Tutorial 8.2: Aging Receivables and Reconciling Them to the Ledger
 
@@ -183,7 +183,7 @@ Plan A is the safest. Plan B gives students ownership of the findings and needs 
 - Step 5: the filtered rows pasted without **Paste Special > Values**, or dispositions typed in the live Table, where a refresh moves them.
 - Step 6: **Load** instead of **Transform Data** for T3_GLEntry, and a drill-down with no empty cells below it.
 
-**The checkpoint to look for.** The four bullets. A strong student says that the weekend depreciation entries and the year-end closes are expected, with the evidence still to examine, that the approval weaknesses go to follow-up, and that one entry is the first item for the audit committee.
+**The checkpoint to look for.** The four bullets. A strong student says that the weekend depreciation entries are expected, with their schedules still to examine, that the size of the year-end closes explains their flag while the authority to approve them is still to be requested, that the approval exceptions go to follow-up, and that one entry is the first item for the audit committee.
 
 {{ figure('IF-08-0-A') }}
 
@@ -244,12 +244,12 @@ All six exercises are Excel builds with a model answer in the solution workbook 
 
 **Questions where a wrong option tempts**
 
-- **Question 4.** Option A is the `LEFT` shortcut and option C the `TEXT(...,"0")` shortcut; both look right on most payments.
+- **Question 4.** Option A is the `LEFT` shortcut and option C the `TEXT(...,"0")` shortcut, and both look right on most payments. Option D takes the last character of the exponent.
 - **Question 5.** Option A reads a significant chi-square as fraud, option B a MAD below 0.015 as close conformity.
 - **Question 6.** Option A reads nonconformity as proof of invented amounts, option D blames the formula.
 - **Question 8.** Option C drops an invoice paid after the as-of date, which the aging at that date must keep.
 - **Question 9.** Option C calls the difference the allowance. Accounts 1030 and 6170 have no postings.
-- **Question 14.** Option A invents a rule against formulas; only pasted values preserve a RANDARRAY selection.
+- **Question 14.** Option A invents a rule against formulas. Pasting the selection as values is what preserves it.
 {% if n_longest %}
 - **Length.** The correct option is also the longest in {{ n_longest }} of the {{ n_questions }} questions ({{ longest_correct }}), so wording alone can give it away. If you grade with these, ask students to explain their answer or reword the options.
 {% endif %}

@@ -49,7 +49,7 @@ SQL is a declarative language, which means that you state what you want rather t
 
 @fig-09-01 contrasts the two ways of getting data to an analysis. Neither replaces the other. As @tbl-01-02 in Chapter 1 summarized, Excel is strongest for ad hoc analysis, modeling, and workpapers a reviewer can trace. SQL is strongest when data is large, when it spans related tables, and when a procedure must be repeated. Much professional work uses both, with SQL extracting and summarizing the data and Excel taking the result from there.
 
-![Importing Data Compared with Querying It.](/visuals/svg/fig-09-01-import-vs-query.svg){#fig-09-01 fig-alt="Two paths to an analysis. The upper path, from Part II, imports the chosen tables of CharlesRiver.xlsx into an analysis workbook with Power Query, whose steps are recorded and can be refreshed, and merges the copies before analyzing them. The lower path, from Part III, sends a saved SQL query to CharlesRiver.sqlite, which returns only the rows and columns requested. The query text documents the extraction and runs again when the data changes."}
+![Importing Data Compared with Querying It.](/visuals/svg/fig-09-01-import-vs-query.svg){#fig-09-01 fig-alt="Two paths to an analysis. The upper path, from Part II, imports the chosen rows of the CharlesRiver.xlsx Tables into an analysis workbook with Power Query, whose steps are recorded and can be refreshed, and combines related tables through merges or lookups before analyzing them. The lower path, from Part III, sends a saved SQL query to CharlesRiver.sqlite, which returns only the rows and columns requested. The query text documents the extraction and runs again when the data changes."}
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
@@ -65,7 +65,7 @@ To query the file, you will use DB Browser for SQLite, a free program for Window
 
 Before you open the database, make a copy of it. DB Browser can change a database as well as read it: a value typed into Browse Data edits the table, and the Write Changes button saves the edit into the file. The queries in this chapter only read data, but a stray keystroke can still alter a record. So you will work in a copy named CharlesRiver_Work.sqlite and keep the downloaded file untouched, for the same reason that the Part II tutorials never edited CharlesRiver.xlsx. If the copy is ever damaged, you replace it with a fresh copy of the download. When you only need to read a database, you can also open it with Open Database Read Only, from the arrow beside the Open Database button, and DB Browser then prevents changes to the database. The working copy is still needed, because Chapter 11 saves queries in it.
 
-@fig-09-02 shows the working copy open in DB Browser, on the Database Structure tab. The tab is the first place to look when you plan a query, because it tells you the exact name of every table and column and the type of data each column holds. As Chapter 3 explained, SQLite stores whole numbers as INTEGER, amounts as REAL, and dates as TEXT in the form year-month-day.
+@fig-09-02 shows the working copy open in DB Browser, on the Database Structure tab. The tab is the first place to look when you plan a query, because it tells you the exact name of every table and column and the type of data each column holds. As Chapter 3 explained, the Charles River database stores whole numbers as INTEGER, amounts as REAL, and dates as TEXT in the form year-month-day.
 
 ![The Database Structure Tab of DB Browser for SQLite.](/visuals/svg/fig-09-02-database-structure.svg){#fig-09-02 fig-alt="A mock of DB Browser for SQLite with CharlesRiver_Work.sqlite open on the Database Structure tab. The title bar shows the path of the file, and Write Changes and Revert Changes are grayed out. The Tables group lists the tables in alphabetical order, shortened. The GLEntry table is expanded to show all sixteen of its columns with their declared types: INTEGER for the keys, the account, the cost center, the fiscal year and period, and the other identifiers; REAL for Debit and Credit; and TEXT for the posting and created dates, the voucher type and number, the source document type, and the description. Below the tables come the Indices, Views, and Triggers groups. The four main tabs, Database Structure, Browse Data, Edit Pragmas and Execute SQL, run across the top of the window."}
 
@@ -109,7 +109,7 @@ A mistake in the wording of a query is a syntax error, and a name the database d
 
 : Common SQLite error messages and their usual causes {#tbl-09-01}
 
-A misspelled name is the most common cause. A query that asks for AccountNumbr, or for a table called Accounts, fails, and the Database Structure tab is the place to check the spelling. Errors that stop a query are usually easy to fix, because the message names the problem, although it can point near the mistake rather than at it. A second kind of error runs without any complaint, and this chapter returns to it once you have written a few queries.
+A misspelled name is one cause to rule out. A query that asks for AccountNumbr, or for a table called Accounts, fails, and the Database Structure tab is the place to check the spelling. The message is a useful clue, but it can point near the mistake rather than at it, and it does not say how to repair it. A second kind of error runs without any complaint, and this chapter returns to it once you have written a few queries.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
@@ -139,13 +139,13 @@ SELECT WorkOrderCloseID,
 FROM WorkOrderClose;
 ```
 
-The result is calculated when the query runs and is not stored anywhere. Amounts are stored as REAL numbers, which a computer holds in binary, so adding or multiplying two amounts can leave a tiny fraction of a cent. The ROUND function removes it: `ROUND(x, 2)` rounds x to two decimal places, the right precision for money.
+The result is calculated when the query runs and is not stored anywhere. Amounts are stored as REAL numbers, which a computer holds in binary, so adding or multiplying two amounts can leave a tiny fraction of a cent. `ROUND(x, 2)` rounds x to two decimal places, the cents in which this dataset records its dollar amounts. The rounded result is still a REAL number held in binary, so ROUND sets the precision you report rather than making the arithmetic exact.
 
-Division needs one more precaution. When both numbers are whole, SQLite divides them as whole numbers and drops the remainder, so `7 / 2` returns 3. When either number has decimals, the result keeps them, so `7 / 2.0` returns 3.5. Amounts stored as REAL keep their decimals, but a ratio of two counts, or of two INTEGER columns, loses them unless you multiply one of them by 1.0 or convert it with CAST, described below. The `%` operator returns the remainder of a division, so `7 % 2` returns 1. Given a number with decimals, it drops the decimals first, which makes it unsuitable for amounts.
+Division needs one more precaution. When both numbers are INTEGER values, SQLite divides them as integers and drops the remainder, so `7 / 2` returns 3. When either one is a REAL value, even one written as 7.0, the result keeps its fraction, so `7 / 2.0` and `7.0 / 2` both return 3.5. Amounts stored as REAL keep their decimals, but a ratio of two counts, or of two INTEGER columns, loses them unless you multiply one of them by 1.0 or convert it with CAST, described below. The `%` operator returns the remainder of a division, so `7 % 2` returns 1. Given a number with decimals, it drops the decimals first, which makes it unsuitable for amounts.
 
 ### Functions
 
-A function takes one or more values and returns a result. A scalar function returns one result for each row it is applied to, as ROUND does. @tbl-09-02 lists the scalar functions you will use most often in this Part, with CAST, an expression that works like one, and the SQLite documentation describes them all (SQLite, n.d.-a).
+A function takes one or more values and returns a result. A scalar function returns one result for each row it is applied to, as ROUND does. @tbl-09-02 lists the scalar functions you will use most often in this Part, with CAST, an expression that works like one, and the SQLite documentation describes them all (SQLite, n.d.-a, n.d.-d).
 
 | Function | Returns | Example | Result |
 |---------|---------------------|------------------|--------|
@@ -233,7 +233,7 @@ IN selects any value in a list, so `AccountNumber IN (1090, 5080)` is shorter th
 
 ## Missing Values and NULL
 
-A column with no value holds NULL. NULL is not zero, and it is not an empty piece of text. It means that the value is unknown or does not exist, as with the ClosedDate of a work order that has not yet closed. Chapter 2 discussed why missing values matter. SQL treats them in a way that surprises most new users. Any ordinary comparison with NULL, such as `=` or `<`, is itself unknown, so a condition such as `ClosedDate = NULL` is never true, and a query that uses it returns no rows at all.
+A column with no value holds NULL. NULL is not zero, and it is not an empty piece of text. It means that the value is unknown or does not exist, as with the ClosedDate of a work order that has not yet closed. Chapter 2 discussed why missing values matter. SQL treats them in a way that often surprises new users. Any ordinary comparison with NULL, such as `=` or `<`, is itself unknown, so a condition such as `ClosedDate = NULL` is never true, and a query that uses it returns no rows at all.
 
 To find missing values, use IS NULL, and to exclude them, use IS NOT NULL (SQLite, n.d.-d). The condition `ClosedDate IS NULL` returns every work order that has not yet closed, as @fig-09-06 shows. NULL also spreads through calculations: an expression such as `ListPrice - StandardCost` is NULL for any row whose ListPrice is NULL. When a result has unexpected blank cells, look for a NULL in one of the columns it was calculated from.
 
@@ -302,7 +302,7 @@ The clauses of a query must be written in a fixed order: SELECT, FROM, WHERE, OR
 
 ![The Anatomy of a SQL Query.](/visuals/svg/fig-09-08-query-anatomy.svg){#fig-09-08 fig-alt="A query written clause by clause, each clause labeled with its role. SELECT lists the columns, including a calculated column with an alias. FROM names the WorkOrderClose table. WHERE keeps the closes of fiscal 2026 with BETWEEN. ORDER BY sorts the total variance in descending order, and LIMIT keeps the first ten rows. A note states that the clauses must be written in this order and that a comment line above the query explains what it answers."}
 
-Errors that stop a query name the problem. A logical error is more dangerous. It lets the query run and return a result, but the result answers a different question from the one you asked. In an analysis of more than 33,000 queries written by database students, Taipalus et al. (2018) found that such errors recur in similar ways from student to student. Nothing flags them, so they are harder to catch than syntax errors.
+Errors that stop a query name the problem. A logical error is more dangerous. It lets the query run and return a result, but the result answers a different question from the one you asked. In an analysis of more than 33,000 queries written by database students, Taipalus et al. (2018) found that such errors recur in similar ways from student to student. Nothing flags them, so a query that runs without an error has not yet shown that it answers the question.
 
 You have already met several. A missing pair of parentheses around an OR condition, a comparison with NULL, a text value in the wrong case, and a text value compared with a number each return a wrong result, or none, without complaint. A missing comma is another. `SELECT AccountNumber AccountName FROM Account` runs, because SQL reads AccountName as an alias for AccountNumber and returns a single column.
 
@@ -310,7 +310,7 @@ The defense against logical errors is the same as in a workbook: know what the r
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
-SQLite is more forgiving than most database systems, and its tolerance can hide mistakes. It accepts a text value written in double quotes when no column has that name, a habit that some builds of SQLite turn off, so `SourceDocumentType = "JournalEntry"` works here but fails in most other systems (SQLite, n.d.-c). It treats a column's declared type as a preference rather than a rule, so a column declared INTEGER can hold text. And, as the section on WHERE explained, it converts values in some comparisons but not in others. A query that relies on any of these habits may run in SQLite and fail, or return a different result, elsewhere. Write text values in single quotes, compare numbers with numbers and dates with dates written as text, and your queries will travel.
+SQLite is more forgiving than most database systems, and its tolerance can hide mistakes. It accepts a text value written in double quotes when no column has that name, a habit that some builds of SQLite turn off, so `SourceDocumentType = "JournalEntry"` works here but fails in most other systems (SQLite, n.d.-c). In ordinary tables like these, which are not declared STRICT, it treats a column's declared type as a preference rather than a rule, so a column declared INTEGER can hold text. And, as the section on WHERE explained, it converts values in some comparisons but not in others. A query that relies on any of these habits may run in SQLite and fail, or return a different result, elsewhere. Write text values in single quotes, compare numbers with numbers and dates with dates written as text, and your queries will travel.
 :::
 
 

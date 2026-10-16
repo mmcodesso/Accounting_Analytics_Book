@@ -120,6 +120,7 @@
   "date.invoice_before_shipment.first_ship": "2024-01-03",
   "date.je.backdated_created": "2024-01-06",
   "date.payroll.last_pay": "2026-12-18",
+  "date.payroll.open_start": "2026-12-14",
   "date.promo.furniture.end": "2026-10-31",
   "date.promo.furniture.start": "2026-09-01",
   "date.surge.first": "2024-05-31",

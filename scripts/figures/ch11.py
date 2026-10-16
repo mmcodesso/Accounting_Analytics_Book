@@ -52,6 +52,15 @@ def num(value: float, places: int = 2) -> str:
     return f"{value:,.{places}f}"
 
 
+MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+               "November", "December"]
+
+
+def long_date(iso: str) -> str:
+    """A YYYY-MM-DD date as the chapter writes it, such as December 11, 2026."""
+    return f"{MONTH_NAMES[int(iso[5:7]) - 1]} {int(iso[8:10])}, {iso[:4]}"
+
+
 def fig_11_01() -> Diagram:
     d = Diagram("Conditional Aggregation Turns Rows into Columns")
     by_source = q("SELECT SourceDocumentType, SUM(Debit), SUM(Credit) FROM GLEntry "
@@ -229,9 +238,9 @@ def fig_11_08() -> Diagram:
                 450, 0, 410, 80, fill=BLUE_TINT, stroke=BLUE)
     mon = d.box("<b>Monthly</b><br>joins the two steps on Month", 230, 130, 400, 60, fill=BLUE_TINT, stroke=BLUE)
     trl = d.box("<b>Trailing</b><br>the monthly ratio, and the trailing twelve-month direct, indirect, and total<br>"
-                "hours per standard hour and overtime share over the window w;<br>the months in each window",
+                "hours per standard hour and overtime share over the window w;<br>the rows in each window",
                 100, 240, 660, 90, fill=BLUE_TINT, stroke=BLUE)
-    sel = d.box("<b>Final SELECT</b><br>keeps the months whose window holds twelve months", 230, 380, 400, 60,
+    sel = d.box("<b>Final SELECT</b><br>keeps the months whose window holds twelve monthly rows", 230, 380, 400, 60,
                 fill=GRAY_TINT, stroke=GRAY)
     d.arrow(out, mon, exit=(0.5, 1), entry=(0.25, 0))
     d.arrow(hrs, mon, exit=(0.5, 1), entry=(0.75, 0))
@@ -286,10 +295,17 @@ def fig_11_10() -> Diagram:
     total = [r[4] for r in rows]
     assert max(indirect) - min(indirect) < 0.06, indirect                  # flat indirect time
     assert direct[-1] > direct[0] and max(total) == total[9] == 1.54, (direct, total)
+    # The last row is provisional (decision N3): direct time and the output cut-off end on the last day with time
+    # records, indirect time a week earlier.
+    ends = dict(q("SELECT LaborType, MAX(WorkDate) FROM LaborTimeEntry WHERE LaborType <> 'NonManufacturing' "
+                  "GROUP BY LaborType"))
+    cut = q("SELECT MAX(WorkDate) FROM LaborTimeEntry")[0][0]
+    assert rows[-1][0] == cut[:7] and ends["Direct Manufacturing"] == cut and ends["Indirect Manufacturing"] < cut, ends
     out = CHAPTER11.mock(d, "query_view", [90, 180, 110, 120, 110, 160], compact=True)
     db.emphasize_cells(d, out["geometry"], [(-1, 2), (11, 5)])
-    note(d, "Outlined: the trailing twelve-month columns, which change slowly while the monthly ratio swings.",
-         out["bottom"] + 8, 22)
+    note(d, "Outlined: the trailing twelve-month columns, which change slowly while the monthly ratio swings. "
+            f"The December row is provisional, because its direct time and output run to {long_date(cut)}, and its "
+            f"indirect time to {long_date(ends['Indirect Manufacturing'])}.", out["bottom"] + 8, 40)
     return d
 
 

@@ -31,7 +31,7 @@ By the end, students can:
 
 ## How to run it
 
-Individual, about 45 minutes: 10 for requirement (1), 10 for (2), 10 for (3), 15 for (4) and (5). The routine of Exercise 9.1 applies: type the comment lines and query at the end of the script, select it, click **Execute all/selected SQL** and read the message pane. Hold back the boundary hint until a student's count in (3) differs from the Excel filter. Collect the script and the comparison.
+Individual, about 45 minutes: 10 for requirement (1), 10 for (2), 10 for (3), 15 for (4) and (5). The routine of Exercise 9.1 applies: type the comment lines and query at the end of the script, select it, click **Execute all/selected SQL** and read the message pane. Hold back the boundary hint until a student asks why the count in (3) is one short of the In Transit rows of the Excel filter, or reports all of them. Collect the script and the comparison.
 
 ## Step-by-step solution
 
@@ -110,7 +110,7 @@ WHERE Status = 'In Transit' AND DeliveryDate < '2026-12-31'
 ORDER BY DeliveryDate;
 ```
 
-**Check:** 739 rows, the oldest delivery date 2024-01-10 in the first row. **Watch for:** `<=` returns 740, adding SH-2026-009705, shipped on the last day of the data with a DeliveryDate of the same day, which cannot yet be late. Without the Status condition the date test keeps 9,672 rows, almost every shipment.
+**Check:** 739 rows, the oldest delivery date 2024-01-10 in the first row. **Watch for:** `<=` returns 740, adding SH-2026-009705, shipped on 2026-12-31, the last shipment date in the data, with a DeliveryDate of the same day, which cannot yet be late. Without the Status condition the date test keeps 9,672 rows, almost every shipment.
 
 **Step 6. Look at the one that is left.** The exercise does not ask for this query; the model answer uses it to account for every In Transit shipment.
 
@@ -126,7 +126,7 @@ WHERE Status = 'In Transit' AND DeliveryDate >= '2026-12-31';
 
 ### Requirement (4): The comparison with Tutorial 2.1
 
-**Step 7. Compare the counts and the method.** The counts should equal the Excel results; the answer is about why the SQL version reruns more easily. See "What a strong answer says".
+**Step 7. Compare the counts and the method.** The counts should reproduce the Excel results, the blank tracking numbers and the 740 In Transit shipments of the Status filter, 739 of them dated before the cutoff. The answer is about why the SQL version reruns more easily. See "What a strong answer says".
 
 ### Requirement (5): Dimensions and questions
 
@@ -139,14 +139,14 @@ WHERE Status = 'In Transit' AND DeliveryDate >= '2026-12-31';
 | Shipments by status | Delivered 8,967; In Transit 740 | 2 |
 | Carriers | 4 | 3 |
 | No tracking number, and the dates | 392; 2024-01-16 to 2026-12-31 | 4 |
-| In Transit before the last day, and the oldest | 739; 2024-01-10 | 5 |
-| In Transit on or after the last day | 1 | 6 |
+| In Transit before 2026-12-31, and the oldest | 739; 2024-01-10 | 5 |
+| In Transit on or after 2026-12-31 | 1 | 6 |
 
-> **Instructor notes, Exercise 9.5:** Status values Delivered (8,967) and In Transit (740); ShippedBy DHL Supply Chain, FedEx Freight, Private Fleet, UPS Freight. No TrackingNumber (NULL): 392 shipments, dated 2024-01-16 to 2026-12-31. In Transit with DeliveryDate before 2026-12-31: 739, the oldest dated 2024-01-10 (one more In Transit shipment has a DeliveryDate on or after 2026-12-31). The SQL results equal the Excel filters of Tutorial 2.1. Dimensions: completeness (tracking number) and consistency or timeliness (status that contradicts the delivery date). The tests are saved as text, so a reviewer can read the conditions, and they rerun on a new extract once the cutoff date is changed and the results are checked again; an Excel filter is kept with its workbook too, but its conditions are read from each column's filter menu. A DeliveryDate does not by itself prove that a shipment was delivered: whether it records the delivery or the date expected is a question for the shipping team.
+> **Instructor notes, Exercise 9.5:** Status values Delivered (8,967) and In Transit (740); ShippedBy DHL Supply Chain, FedEx Freight, Private Fleet, UPS Freight. No TrackingNumber (NULL): 392 shipments, dated 2024-01-16 to 2026-12-31. In Transit with DeliveryDate before 2026-12-31: 739, the oldest dated 2024-01-10 (one more In Transit shipment has a DeliveryDate on or after 2026-12-31). The SQL results reproduce the Excel filters of Tutorial 2.1: the same blank tracking numbers, and the same In Transit shipments, all but one of them with a DeliveryDate before 2026-12-31. Dimensions: completeness (tracking number) and consistency or timeliness (status that contradicts the delivery date). The tests are saved as text, so a reviewer can read the conditions, and they rerun on a new extract once the cutoff date is changed and the results are checked again; an Excel filter is kept with its workbook too, but its conditions are read from each column's filter menu. A DeliveryDate does not by itself prove that a shipment was delivered: whether it records the delivery or the date expected is a question for the shipping team.
 
 ## What a strong answer says
 
-- **Requirement (4).** The SQL counts equal the Excel filters of Tutorial 2.1. Both tests are written as conditions that a reviewer reads in plain text, so the same script runs on a later extract once its cutoff date is changed, and the results are checked again. An Excel filter stays with its workbook too, but its conditions sit in each column's filter menu and apply to whatever rows the sheet holds.
+- **Requirement (4).** The SQL counts reproduce the Excel filters of Tutorial 2.1, with the one In Transit shipment dated on the cutoff accounted for. Both tests are written as conditions that a reviewer reads in plain text, so the same script runs on a later extract once its cutoff date is changed, and the results are checked again. An Excel filter stays with its workbook too, but its conditions sit in each column's filter menu and apply to whatever rows the sheet holds.
 - **Requirement (5).** The blank tracking number is a completeness test: ask why the number was not recorded and whether the carrier's records hold it. The status after the delivery date is a consistency, or timeliness, test: ask who updates the status on delivery, whether DeliveryDate records the delivery or the date expected, and what evidence of delivery exists. A DeliveryDate does not prove delivery.
 
 A weak answer calls the blanks inaccurate, or gives a test but no question for the process owner.
@@ -155,7 +155,7 @@ A weak answer calls the blanks inaccurate, or gives a test but no question for t
 
 - **`= NULL` or `= ''`.** *Symptom:* no rows for a test that must find rows. *Response:* ask how the blank is stored.
 - **A status typed from memory.** *Symptom:* no rows. *Response:* run DISTINCT first, as in Step 1.
-- **`<=` on the cutoff.** *Symptom:* 740 rows against Tutorial 2.1's 739. *Response:* ask which shipments can already be late on the last day.
+- **`<=` on the cutoff.** *Symptom:* 740 rows, every In Transit shipment, against the 739 expected. *Response:* ask which shipments can already be late on the cutoff date.
 - **No status condition.** *Symptom:* 9,672 rows. *Response:* ask what the test is meant to find.
 - **A cutoff typed in two places without a note.** *Symptom:* a rerun that changes one date and not the other. *Response:* record the date in the header comment.
 - **The wrong dimension.** *Symptom:* "accuracy" for a missing value. *Response:* ask whether the value is wrong or absent.

@@ -226,8 +226,8 @@ def fig_04_07() -> Diagram:
 
     # Parameters.
     d.header_box("3  Parameters", 260, 340, 250, 32, fill=TEAL)
-    params = d.box("Named, validated inputs:<br>ThresholdPercentile (input)<br>LargeLineThreshold "
-                   "(formula)", 260, 372, 250, 76, fill=TEAL_TINT, stroke=RULE, align="left",
+    params = d.box("Named parameters:<br>ThresholdPercentile (validated input)<br>LargeLineThreshold "
+                   "(derived formula)", 260, 372, 250, 76, fill=TEAL_TINT, stroke=RULE, align="left",
                    valign="top", rounded=False)
 
     # Analysis.

@@ -15,7 +15,7 @@ This is the comprehensive case that closes Part IV, not a chapter. The deck open
 - You are the staff accountant of Chapters 13 to 15 again
 
 ::: {.notes}
-The case puts the four Power BI chapters to work together. You build, profile and validate a model of your own as in Chapters 13 and 14, measure balances and how fast they turn with Chapter 14's DAX, build pages the committee can explore with Chapter 15's drill-through, tooltips and parameters, and test your own report as the internal auditor tested the package in Chapter 16. The Part III case ended with a plan for the plant; this one ends with a recommendation on the cash held in working capital.
+The case puts the four Power BI chapters to work together. You build, profile and validate a model of your own as in Chapters 13 and 14, measure balances and how fast they turn with Chapter 14's DAX, build pages the committee can explore with Chapter 15's drill-through, tooltips and parameters, and test your own report as the internal auditor tested the package in Chapter 16. The Part III case ended with a plan for the plant and proposed year-end adjustments, which are not posted to the workbook, so this case starts from the unchanged data and ends with a recommendation on the cash held in working capital.
 :::
 
 ## What you will hand in
@@ -70,7 +70,7 @@ The second question also asks how the turnover has changed since the first year 
 
 - Internal audit will test the report, as it tested the package
 - So the file needs a Validation page and a Tests tab
-- And it shows the date through which its data run
+- And it shows the latest date that all its sources reach
 - Findings state what the records show, not what anyone did
 
 ::: {.notes}
@@ -84,10 +84,10 @@ Some balances will look wrong. Word each finding as what the records show, such 
 - Charles River Cash Case.pbix, next to CharlesRiver.xlsx
 - Turn off the two loading options of Tutorial 13.1
 - The package and the monitoring file stay as they are
-- Every requirement uses techniques you have already practiced
+- Review Exercises 8.2, 14.1, 15.1, 15.3, 15.4 and 16.1 first
 
 ::: {.notes}
-Import the Tables with Home > Get data > Excel workbook, under the query names the case gives, so that a reviewer can follow the model from its queries.
+Import the Tables with Home > Get data > Excel workbook, under the query names the case gives, so that a reviewer can follow the model from its queries. The requirements combine the Part IV tutorials with the exercises listed, so a student who skipped one should review it before starting.
 :::
 
 ## The queries the case builds
@@ -116,13 +116,13 @@ These are the model rules of Chapters 13 and 14. The descriptions matter here: t
 ## Watch out: rows a working-capital report treats apart {.watch-out}
 
 - Leave the year-end closes out of every flow
-- The opening entry brings in balances that no document supports
+- No document in the extract supports the opening balances
 - The ledger's last posting date is not the report's data-through date
 - Some entries move a balance without moving any cash
 - Group the inventory policies by item before you merge them
 
 ::: {.notes}
-Because the first year was the ledger's first, a figure for it built on an average balance or on the change from the opening says little. Supplier payments are the only postings after the latest year. The inventory policies hold one row for each item and warehouse, so without grouping every item appears twice.
+The missing schedules are evidence to request, not proof that the opening balances are wrong. Because the first year was the ledger's first, a figure for it built on an average balance or on the change from the opening says little. Supplier payments are the only postings after the latest year. The inventory policies hold one row for each item and warehouse, so without grouping every item appears twice.
 :::
 
 ## Watch out: a ratio is only as good as its definition {.watch-out}
@@ -130,7 +130,7 @@ Because the first year was the ledger's first, a figure for it built on an avera
 - Compare receivables with what was billed, not with revenue
 - Materials and finished goods each have their own flow and target
 - Take each balance at a quarter-end, with the twelve months before it
-- Let the Balance measure filter Date; add no columns to GLEntry
+- Let Balance filter Date, and add no calculated columns to GLEntry
 
 ::: {.notes}
 None of these ratios is standard enough to go unstated, so state each definition. Receivables include sales tax and freight, which revenue does not. GLEntry is large, so a measure that iterates it, or a calculated column on it, slows the whole report.
@@ -180,7 +180,7 @@ The requirements follow the controller's questions: build and validate the file,
 - **Check:** the Validation page reproduces totals you already trust
 
 ::: {.notes}
-Add a channel column to Requisitions from each justification, and carry it into Receipts. Profile the new Tables on the entire data set and test their links. The Validation page ties net income, total assets with Exercise 14.1's Balance measure, and the materials received and issued against the materials inventory account, with the queries in a Tests tab. Data Through is the earliest of the last posting dates of the documents behind the working-capital accounts, as Tutorial 16.3 found it.
+Add a channel column to Requisitions from each justification, and carry it into Receipts. Profile the new Tables on the entire data set and test their links. The Validation page ties net income, total assets with Exercise 14.1's Balance measure, and the materials received and issued against the materials inventory account, with the queries in a Tests tab. Data Through is the earliest of the last posting dates of the documents behind the working-capital accounts, as Tutorial 16.3 found it. It is a bound observed in the extract, not proof that every document up to it is present, and the payroll records, which end earlier, are reported apart.
 :::
 
 ## Explain where the cash went
@@ -193,7 +193,7 @@ Add a channel column to Requisitions from each justification, and carry it into 
 - **Check:** the bridge ends exactly at the change in cash
 
 ::: {.notes}
-Assign each account to a step of the bridge from net income to the change in cash, and each step to an activity. Measure each step from the year's postings without the closes, not from two balances. Chart the year as a waterfall with its steps sorted, compare the year before, and drill through to find the entries that moved no cash. The standard on cash flows, ASC Topic 230, reports only cash receipts and payments and requires noncash activities to be disclosed. Then measure cash net of uncollected sales tax, and the notes' principal due within a year.
+Assign each account to a step of the bridge from net income to the change in cash, and each step to an activity. Measure each step from the year's postings without the closes, not from two balances. Chart the year as a waterfall with its steps sorted, compare the year before, and drill through to find the entries that moved no cash. The standard on cash flows, ASC Topic 230, reports only cash receipts and payments and requires noncash activities to be disclosed. Then measure cash less the recorded sales tax payable, which is tax billed rather than tax collected and awaits the tax returns and bank evidence, and the principal due within a year on the notes outstanding at that date.
 :::
 
 ## Check your understanding {.check}
@@ -230,7 +230,7 @@ An activity that moves no cash is disclosed beside the statement, not reported i
 - **Check:** blank until twelve months exist, and after Data Through
 
 ::: {.notes}
-Each measure divides a balance at a quarter-end by the ledger flow of the twelve months that end on that date, converted to days. Add days of supply for materials and finished goods, to compare with each item's target. On one page, let a field parameter switch a line chart among the measures, with a tooltip page behind each point and a matrix with icons against the targets. Then recompute two measures without the opening entry and compare an average-balance version.
+Each measure divides a balance at a quarter-end by the ledger flow of the twelve months that end on that date, converted to days. Add days of supply for materials and finished goods, compared with the largest item target of each class, labeled as a benchmark. On one page, let a field parameter switch a line chart among the measures, with a tooltip page behind each point and a matrix with icons against those benchmarks. Then recompute two measures without the opening entry and compare an average-balance version.
 :::
 
 ## Trace the materials build and set a target
@@ -243,7 +243,7 @@ Each measure divides a balance at a quarter-end by the ledger flow of the twelve
 - **Check:** the estimate states what it assumes and what it leaves out
 
 ::: {.notes}
-Chart the materials received and issued by month with receipts split by channel, and the build by item group and item. Group the work-order shortfall requisitions by their justification, build the same key for each issue line with `Text.From`, and compare what was requisitioned with what was used. A what-if parameter sets the target days of supply, with the policy target as its default; test several targets and compare the excess with the year's fall in cash.
+Chart the materials received and issued by month with receipts split by channel, and the build by item group and item. Group the work-order shortfall requisitions by their justification, build the same key for each issue line with `Text.From`, and compare what was requisitioned with what was used. A what-if parameter sets the target days of supply, with the largest materials target as its default. Test several targets and compare the excess with the year's fall in cash. The item chart shows a build, not each item's stock, and the 2027 target is the controller's to approve.
 :::
 
 ## Test the balances behind the report
@@ -256,7 +256,7 @@ Chart the materials received and issued by month with receipts split by channel,
 - **Check:** in the Tests tab, each difference equals its recorded items
 
 ::: {.notes}
-Roll each working-capital account forward by its sources, and identify the parts no subledger document supports. Reconcile receivables and payables to their open items, compare billing with the invoices dated in each year, and age the open payables without those already moved to notes. Test what posts to sales tax payable and what never does. Enter each finding with its account, amount and disposition in Chapter 8's terms, as Chapter 16 kept its dispositions.
+Break the working-capital balances down by source document, which only decomposes the ledger, and trace the journal-entry parts to the opening entry and the reclassifications. Reconcile receivables and payables to their open items, compare billing with the invoices dated in each year, and age the open payables without those already moved to notes. Test what posts to sales tax payable and what never does. Enter each finding with its account, amount and disposition in Chapter 8's terms, as Chapter 16 kept its dispositions, and the Part III case's proposed adjustments as proposals if students worked that case.
 :::
 
 ## Check your understanding {.check}
@@ -299,7 +299,7 @@ The financial reporting section covers the sales tax, the notes due within a yea
 ## Before you submit
 
 - The file refreshes, and its Tests tab passes
-- The About page shows the date through which the data run
+- The About page shows Data Through and what it does not prove
 - The appendix holds the five exhibits the case lists
 - The memo keeps to its length, and ends with a recommendation
 

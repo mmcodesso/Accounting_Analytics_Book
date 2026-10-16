@@ -37,11 +37,11 @@ By the end, students can:
 - tie billed revenue to the ledger by account and explain the difference by the invoices that caused it;
 - say what the income statement shows and does not show about a price reduction.
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and M8 T3 to T4 (data mining and analysis); IMA Reporting and Control (financial recordkeeping, financial statement preparation) and strategic cost management; IFAC IES 2 (a), financial accounting and reporting; AACSB A5 part 5.1.
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and M8 T3 to T4 (data mining and analysis); IMA Reporting and Control (financial recordkeeping) and strategic cost management; IFAC IES 2 (a), financial accounting and reporting; AACSB A5 part 5.1.
 
 ## Before you assign
 
-- **From Requirement 1.** The `BilledLines`, `RevenuePostings`, `Accounts` and `Items` queries with their checks agreeing. From Chapter 6 the PivotTable and the tie from ledger to statements; Exercise 6.1 introduced the three invoices dated in the prior year and posted on 1 January.
+- **From Requirement 1.** The `BilledLines`, `RevenuePostings`, `Accounts` and `Items` queries with their checks agreeing. From Chapter 6 the PivotTable and the tie from ledger to statements. Exercise 6.1 introduced the three invoices dated in the prior year and posted on January 1.
 - **Data conditions.** Only promotion lines carry a discount, so the discount total is the cost of the promotions ({{ x.promo_billed|count }} billed lines of {{ x.billed_lines|count }}). The design services carry no reductions and no discounts. Each item group posts its revenue to one account through Item.RevenueAccountID. Account {{ x.discount_account }}, {{ x.discount_name }}, exists and has no postings.
 - **A limit of the case's queries.** `RevenuePostings` holds only the report year's sales-invoice postings, so it can show that no invoice posted to {{ x.discount_account }} that year. The claim that the account was never used, in any year, needs the ledger across years; the model answer adds a `LedgerActivity` query for it. Accept the narrower statement from a student who states its scope.
 
@@ -108,7 +108,7 @@ Add a total row and, optionally, a waterfall from the total row.
 {% endfor %}
 | Total | ${{ list|money }} | ${{ red|money }} | ${{ disc|money }} | ${{ net|money }} |
 
-List less reductions less promotions is ${{ after|money }}; the ${{ rounding|money }} to the net is the rounding of LineTotal line by line. **Watch for:** reductions computed as list less LineTotal. That counts the promotional discount twice, once in the reductions and once in its own column, so the schedule is off by exactly the discount.
+List less reductions less promotions is ${{ after|money }}, and the ${{ rounding|money }} to the net is the rounding of LineTotal line by line. The schedule measures the reductions, not their authorization. They include lines billed on Pending override requests, which carry a price-list label and no completed approval (Requirement 5), so a label such as "approved overrides" would claim more than the data show. **Watch for:** reductions computed as list less LineTotal. That counts the promotional discount twice, once in the reductions and once in its own column, so the schedule is off by exactly the discount.
 
 {{ figure('IF-C2-2-B') }}
 
@@ -131,11 +131,11 @@ b. For each account, total its credits in `RevenuePostings` and compare with the
 | {{ t.number }} {{ t.name }} | {{ t.group }} | ${{ t.credit|money }} | ${{ t.net|money }} | ${{ t.diff|money }} |
 {% endfor %}
 
-The ledger is ${{ ledger_total|money }} against ${{ net|money }}, a difference of ${{ difference|money }}. It is the invoices {{ first }} to {{ last }}, dated late in {{ x.prior_year }} and posted on {{ cutoff_posted }}, a cutoff matter from Exercise 6.1. **Watch for:** freight and sales tax. {{ freight_name }} ({{ x.freight_account }}) comes from the invoice header, not the lines, so a student who adds it to the revenue accounts reads a difference of ${{ x.with_freight|money }} instead; account {{ x.tax_account }} holds the sales tax.
+The ledger is ${{ ledger_total|money }} against ${{ net|money }}, a difference of ${{ difference|money }}. It is the invoices {{ first }} to {{ last }}, dated late in {{ x.prior_year }} and posted on {{ cutoff_posted }}, a cutoff matter from Exercise 6.1. The ledger selects by posting date and `BilledLines` by invoice date, so the posting date is the evidence that places them in the report year's ledger, and the invoice number's year is only the clue that finds them. **Watch for:** freight and sales tax. {{ freight_name }} ({{ x.freight_account }}) comes from the invoice header, not the lines, so a student who adds it to the revenue accounts reads a difference of ${{ x.with_freight|money }} instead; account {{ x.tax_account }} holds the sales tax.
 
 **Step 5. Say where the cost appears.** In `Accounts` find {{ x.discount_account }} {{ discounts_name }}, a contra revenue account, and look for it in `RevenuePostings` and the ledger: there are no postings. Each invoice line is recorded at its net price, so the revenue accounts already exclude every price reduction and the income statement shows net revenue and nothing about the promotions. The cost becomes visible only in a gross-to-net schedule, or if revenue were recorded at the price before the promotion and the discount in {{ x.discount_account }}. **Watch for:** {{ x.returns_account }} {{ x.returns_name }}, which records returns, offered as the discount account.
 
-**Step 6. Place the proposal's discounts in quarters.** Use SUMIFS on `BilledLines` by PromotionID, the report year and InvoiceQuarter.
+**Step 6. Place the proposal's discounts in quarters.** Use SUMIFS on `BilledLines` by PromotionID, the report year and InvoiceQuarter. These are invoice quarters, and the ledger's quarter follows the posting date, which differs only for invoices like those of Step 4.
 
 **Check:**
 

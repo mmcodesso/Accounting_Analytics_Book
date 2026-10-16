@@ -31,7 +31,7 @@ This chapter is a case, and it has no tutorials. Each requirement states what th
 
 ## The Situation
 
-The bank asks for four statements and their notes: balance sheets at 31 December 2026 and 2025, statements of income, statements of changes in stockholders' equity, and statements of cash flows for the two fiscal years. The statements will be management's own, prepared by the company, but the relationship manager adds that the bank may ask for a review or an audit by an outside accountant before it sets final terms. Every number in the package must therefore be traceable to the records that support it.
+The bank asks for four statements and their notes: balance sheets at December 31, 2026 and 2025, statements of income, statements of changes in stockholders' equity, and statements of cash flows for the two fiscal years. The statements will be management's own, prepared by the company, but the relationship manager adds that the bank may ask for a review or an audit by an outside accountant before it sets final terms. Every number in the package must therefore be traceable to the records that support it. The case treats Charles River as a private company that is not a public business entity and files nothing with the Securities and Exchange Commission (SEC). That status decides which disclosure relief its notes may use and the date through which later events are evaluated.
 
 The controller has set out what she needs to know before the package goes to the CFO:
 
@@ -40,7 +40,7 @@ The controller has set out what she needs to know before the package goes to the
 - what the notes must say, with each note tied to the statements;
 - what the data cannot settle, which goes to the CFO before the package leaves the company.
 
-She adds four conditions. First, nothing is posted to the ledger: every adjustment lives in the workbook as a numbered entry with its evidence, the query and the document numbers behind it, so that the CFO can approve it before anyone posts it. Second, materiality is 5% of income before income taxes for the year in question, as the ledger records it, and every adjustment is listed, however small. Third, findings are worded as what the records show, not as what anyone did. Fourth, the package states the date through which its data run.
+She adds four conditions. First, nothing is posted to the ledger: every adjustment lives in the workbook as a numbered entry with its evidence, the query and the document numbers behind it, so that the CFO can approve it before anyone posts it. Second, materiality starts from a benchmark of 5% of income before income taxes for the year in question, as the ledger records it, and every adjustment is listed, however small. Third, findings are worded as what the records show, not as what anyone did. Fourth, the package states the date through which its data run.
 
 Her outline of the package is in @tbl-17-01, with the topic of the Financial Accounting Standards Board (FASB) Accounting Standards Codification (ASC) that governs each component. Its last row holds matters that the ledger does not record and the package must still address; part of Requirement 2 is to find what else the ledger leaves out.
 
@@ -63,7 +63,7 @@ Her outline of the package is in @tbl-17-01, with the topic of the Financial Acc
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
-Lenders use financial statements to monitor borrowers as well as to decide whether to lend. In a study of small commercial loans, banks requested financial statements to monitor about half of the loans after making them, more or less often depending on the borrower's credit risk, the length of the relationship, the collateral, and whether the borrower provided business tax returns (Minnis & Sutherland, 2017). The quality of the statements matters too. Private firms with audited statements pay less for their debt, and lenders place more weight on audited figures when they set the rate (Minnis, 2011). A working-capital line is often limited to a share of the borrower's eligible receivables and inventories, which is one reason a lender asks for their detail.
+Lenders use financial statements to monitor borrowers as well as to decide whether to lend. In a study of small commercial loans, banks requested financial statements to monitor about half of the loans after making them, more or less often depending on the borrower's credit risk, the length of the relationship, the collateral, and whether the borrower provided business tax returns (Minnis & Sutherland, 2017). The quality of the statements matters too. In a large sample of private U.S. firms, those with audited statements paid less for their debt, and lenders placed more weight on audited figures when they set the rate (Minnis, 2011). A working-capital line is often limited to a share of the borrower's eligible receivables and inventories, which is one reason a lender asks for their detail.
 :::
 
 
@@ -85,7 +85,7 @@ You will keep three files of your own, listed in @tbl-17-02. Each tool hands its
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
-Every balance in this case is taken as of a date, and each kind of posting needs its own rule. A trial balance leaves out only the closing entries dated on its own as-of date: the closes of earlier years have already moved their income into retained earnings, so they stay in. The opening entry of 1 January 2024 is a 2024 posting. Supplier payments are the only postings after fiscal 2026, so a balance taken at the ledger's last date is not a year-end balance. Revenue belongs to the year of delivery, not the year of the invoice. And supplier invoices post on the day they were received and approved, not on their invoice date.
+Every balance in this case is taken as of a date, and each kind of posting needs its own rule. A trial balance leaves out only the closing entries dated on its own as-of date: the closes of earlier years have already moved their income into retained earnings, so they stay in. The opening entry of January 1, 2024, is a 2024 posting. Supplier payments are the only postings after fiscal 2026, so a balance taken at the ledger's last date is not a year-end balance. Revenue belongs to the year of delivery, not the year of the invoice. And supplier invoices post on the day they were received and approved, not on their invoice date.
 :::
 
 ::: {.callout-warning .watch-out icon=false}
@@ -128,7 +128,7 @@ The requirements fall into four phases: the ledger as it stands, the adjustments
 
 Three trial balances that differ only in their date are one query, rerun with a parameter, as Chapter 11's Params CTE showed. Mapping accounts to statement lines and laying out the statements are workbook work, as in Chapter 6, and the workbook is where the adjustments will go.
 
-- In LenderPackage.sql, write one trial-balance query whose as-of date sits in a Params CTE and that leaves out only the closing entries dated on that date. Run it for 31 December 2024, 2025, and 2026.
+- In LenderPackage.sql, write one trial-balance query whose as-of date sits in a Params CTE and that leaves out only the closing entries dated on that date. Run it for December 31, 2024, 2025, and 2026.
 - Copy each result into its own worksheet of the package workbook, map the accounts to statement lines by AccountSubType and account number, and build the recorded balance sheets and statements of income. Validate them against control totals you can trace: Chapter 6's pre-closing trial balance at the end of fiscal 2026 and its net income.
 - List the accounts that have never been posted with an anti-join (Chapter 10), and note any account that a company like Charles River would need and the chart does not have.
 
@@ -155,7 +155,7 @@ Account 2040 Accrued Expenses has grown every year. Apart from its opening line,
 - Split 2040 at each year-end into the opening line, the freight accrued on shipments and not yet settled, and the service accruals not yet cleared, and reconcile the parts to the ledger at all three dates.
 - For each accrual entry, subtract what had cleared it by each date: the invoice postings to 2040 for the invoice lines that refer to it, and the Accrual Adjustment entries that reverse it.
 - Measure how long invoices took to clear the accruals, and age the open accruals at each year-end against the longest wait you observe.
-- Decide which of the old accruals you treat as still owed and which you would reverse, and in which period. Age shows that an accrual has gone unbilled, not that nothing is owed, so state the assumption your decision rests on and the evidence that would confirm it, such as the suppliers' statements and the service contracts.
+- Decide which of the old accruals you treat as still owed and which you would reverse, and in which period. Age shows that an accrual has gone unbilled, not that nothing is owed. The longest wait selects the items to investigate, and the period of any reversal depends on what the facts were at each year-end and when they became known. So state the assumption your decision rests on and the evidence that would confirm it, such as the suppliers' statements and the service contracts.
 
 ![How an accrued expense is recorded and cleared.](/visuals/svg/fig-17-01-accrual-trace.svg){#fig-17-01 fig-alt="An entity-relationship diagram of the tables behind account 2040 Accrued Expenses. JournalEntry holds the accrual entries and the Accrual Adjustment entries, which refer back to the accrual they clear through ReversesJournalEntryID. PurchaseInvoiceLine refers to the accrual it clears through AccrualJournalEntryID and belongs to a PurchaseInvoice. JournalEntry, PurchaseInvoice, and Shipment each post to GLEntry through the source-document trace, shown as dashed amber lines. Crow's-foot endpoints show that most invoice lines refer to no accrual and that an accrual is cleared by at most one invoice line."}
 
@@ -167,7 +167,7 @@ Account 2040 Accrued Expenses has grown every year. Apart from its opening line,
 Chapter 12 tested revenue and payroll cutoff, and Exercise 12.1 measured it at each year-end. The statements need those measurements as entries with their accounts, made by one method at every year-end they present and at the one before, because an error at the end of 2024 reverses in 2025. Queries find the populations; prorating a pay period or an interest payment is a formula that a reviewer should be able to see, so it belongs in the workbook.
 
 - Revenue: at the end of 2024, 2025, and 2026, find the invoices whose revenue was posted in a different year from the delivery of the goods they bill, and the shipments never invoiced, as tests L5 and L6 of Audit.sql do. Recognize revenue in the year of delivery, when this case assumes that control of the goods passes, and value the unbilled shipments at their order price less discount.
-- Payroll: measure the cost of the work done in the last days of each December and paid in the next year, with one working-day method (tests L7 and L8 of Audit.sql list the pay periods that cross each year-end). For 2024 and 2025, take the registers of those pay periods, prorated by the working days in WorkCenterCalendar. For 2026, whose last pay periods have no registers, multiply the cost per working day of the last eight processed pay periods by the working days left in the year. Split manufacturing from the other cost centers, and explain where each part ends up.
+- Payroll: measure the cost of the work done in the last days of each December and paid in the next year, with one working-day method (test L7 of Audit.sql lists the pay periods that cross each year-end, and test L8 shows that 2030 accrued none of them). For 2024 and 2025, take the registers of those pay periods, prorated by the working days in WorkCenterCalendar. For 2026, whose last pay periods have no registers, multiply the cost per working day of the last eight processed pay periods by the working days left in the year. Split manufacturing from the other cost centers, and explain where each part ends up.
 - Interest: from DebtScheduleLine, measure the interest that each note had accrued between its last payment and each year-end, and state your day-count convention.
 
 
@@ -177,7 +177,7 @@ Chapter 12 tested revenue and payroll cutoff, and Exercise 12.1 measured it at e
 
 A working trial balance, with the recorded balances, the adjustments, and the adjusted balances side by side, is the accountant's standard form, and in a workbook every adjustment stays traceable to its evidence. @tbl-17-03 lays out the schedule of adjustments.
 
-- Number each adjustment and write its entries for the 31 December 2025 and 2026 trial balances, with the accounts and the queries or document numbers that support it. Keep the entry lines in an Excel Table, one row per account, so that the Review file can load them.
+- Number each adjustment and write its entries for the trial balances at December 31, 2025 and 2026, with the accounts and the queries or document numbers that support it. Keep the entry lines in an Excel Table, one row per account, so that the Review file can load them.
 - Classify each as the correction of an error, a change in estimate, or a reclassification, and assign it to a period. @fig-17-02 shows how a cutoff item missed at each year-end, and recorded in the next year, moves across the periods presented; a balance that does not reverse needs an analysis of its own.
 - Compute the controller's materiality for each year, and decide what to record and what to pass, individually and in aggregate. Consider also an allowance for credit losses at the rates of Exercise 8.1 (0.5%, 2%, 5%, 15%, and 40% of the balances current, 1 to 30, 31 to 60, 61 to 90, and more than 90 days past due), the returns expected after the year-end on the year's deliveries, and the condition of returned goods put back into stock at full cost.
 - Show that every adjusted trial balance balances and that no adjustment touches cash. Decide how the 2025 column and the statement of changes in equity present the corrections, under the guidance on accounting changes and error corrections (ASC Topic 250).
@@ -188,15 +188,15 @@ A working trial balance, with the recorded balances, the adjustments, and the ad
 | Adjustment | What the entry corrects or estimates, in a few words |
 | Accounts | The accounts debited and credited |
 | Evidence | The query in LenderPackage.sql and the document or entry numbers |
-| Retained earnings, 1 January 2025 | The effect on opening equity |
+| Retained earnings, January 1, 2025 | The effect on opening equity |
 | Income 2025 and 2026 | The effect on each year's income before income taxes |
 | Balance 2025 and 2026 | The effect on the balance sheet at each year-end |
 | Type | Error, change in estimate, or reclassification |
-| Decision | Recorded or passed, and why |
+| Decision | Recorded, passed, or held for evidence, and why |
 
 : Layout of the schedule of adjustments {#tbl-17-03}
 
-![How a year-end cutoff adjustment moves across the periods presented.](/visuals/svg/fig-17-02-adjustment-timeline.svg){#fig-17-02 fig-alt="A timeline of three year-ends, 2024, 2025, and 2026, with the periods the statements present, for items that the next year records. An item missed at the end of 2024 enters retained earnings at 1 January 2025 and reverses in 2025 income. An item missed at the end of 2025 enters 2025 income and the 2025 balance sheet and reverses in 2026 income. An item missed at the end of 2026 enters 2026 income and the 2026 balance sheet. A note says that a balance that persists does not reverse. A side panel contrasts the correction of an error, which changes the period in which the facts existed and, when the error is material, restates the prior year, with a change in estimate, which changes only the current and later periods."}
+![How a year-end cutoff adjustment moves across the periods presented.](/visuals/svg/fig-17-02-adjustment-timeline.svg){#fig-17-02 fig-alt="A timeline of three year-ends, 2024, 2025, and 2026, with the periods the statements present, for items that the next year records. An item missed at the end of 2024 enters retained earnings at January 1, 2025, and reverses in 2025 income. An item missed at the end of 2025 enters 2025 income and the 2025 balance sheet and reverses in 2026 income. An item missed at the end of 2026 enters 2026 income and the 2026 balance sheet. A note says that a balance that persists does not reverse. A side panel contrasts the correction of an error, which changes the period in which the facts existed and, when the error is material, restates the prior year, with a change in estimate, which changes only the current and later periods."}
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
@@ -213,7 +213,7 @@ An estimate that later proves wrong is not an error. If the facts available at t
 The statements come from the adjusted trial balances in the workbook, and the Review file tests them against the ledger. A statement of changes in equity carries each component of equity from its opening balance to its closing one; when an error of an earlier year is corrected, the opening retained earnings are adjusted and the earlier year's columns are labeled as restated (ASC Topic 250).
 
 - Prepare classified balance sheets at both year-ends, and statements of income by function with a line for income before income taxes.
-- Prepare a statement of changes in stockholders' equity from 1 January 2025 that shows the correction of the opening balance.
+- Prepare a statement of changes in stockholders' equity from January 1, 2025, that shows the correction of the opening balance.
 - Prepare statements of cash flows by the indirect method: start from net income, add back depreciation and the loss on disposals, adjust for the change in each working-capital balance, and classify the rest as investing or financing. Find the entries that moved no cash, such as equipment financed by a note and a disposal with no proceeds, and disclose them instead of reporting them as cash flows. Show that the adjustments, none of which moves cash, change only the lines of the reconciliation, not its totals. Add the supplemental information: interest paid, income taxes paid, and investing and financing activities that involved no cash.
 - In the Review file, load the adjustment lines from the package workbook beside the ledger, and add tests to its Tests tab: each entry balances, no entry touches cash, adjusted net income agrees with the workbook, and recorded total assets agree with your trial balances of Requirement 1.
 
@@ -226,7 +226,7 @@ Each note is a schedule that the records can produce and that must agree with a 
 
 - Property and equipment: roll cost and accumulated depreciation forward by class from FixedAsset and FixedAssetEvent, reconcile the roll-forward to the ledger, and state the method and the lives.
 - Notes payable: the terms of each note, the asset the records link it to, the principal due in each of the next five years, the current portion, and the interest paid.
-- Revenue: disaggregate revenue on the adjusted basis by product line, customer segment, and timing of transfer, and show the contract balances that ASC Topic 606 requires: receivables, contract assets, and contract liabilities. Test whether any service work was done and not billed at a year-end.
+- Revenue: disaggregate revenue on the adjusted basis by product line, customer segment, and timing of transfer, and show the contract balances that ASC Topic 606 requires: receivables, contract assets, and contract liabilities. For the timing, the case assumes that the design-service contracts give Charles River an enforceable right to payment for the work completed to date, so their revenue is recognized over time. The contracts would confirm it before release. Test whether any recorded service work was not billed at a year-end.
 - Accrued liabilities by component, and inventories by component and basis.
 - Write the text of the notes on property and equipment, notes payable, revenue, and accrued liabilities, and of the note on the correction of the 2025 statements. A package that can go to the bank also needs the notes on accounting policies and inventories, and on the matters of Requirement 9 such as income taxes and leases: draft them if your instructor asks, and list in the memo those still to be written.
 
@@ -237,7 +237,7 @@ Each note is a schedule that the records can produce and that must agree with a 
 
 **Requirement 8: Look past the balance-sheet date and at the year ahead (Chapters 8 and 12).**
 
-The statements must account for what happened after 31 December 2026, up to the date they are available to be issued (ASC Topic 855), and management must evaluate whether conditions raise substantial doubt about the company's ability to continue as a going concern for a year after that date (ASC Subtopic 205-40). The database can contribute to both, but it cannot complete either.
+The statements must account for what happened after December 31, 2026, up to the date they are available to be issued (ASC Topic 855), and management must evaluate whether conditions raise substantial doubt about the company's ability to continue as a going concern for a year after that date (ASC Subtopic 205-40). The database can contribute to both, but it cannot complete either.
 
 - Profile the records dated after fiscal 2026, compare them with the same weeks of 2026, and state what they contain and what they cannot contain.
 - Search them for liabilities missing at the year-end: payments in 2027 for goods or services received in 2026 and not recorded as payables, Chapter 12's unrecorded liabilities.
@@ -271,7 +271,7 @@ Before you submit, check that you have each of these:
 - Trial balances that anyone can rerun from one query and that agree with control totals already trusted.
 - Every adjustment numbered, supported by a query or a document, assigned to a period, and classified, with the line between an error and an estimate drawn and explained, and the assumption stated wherever the records cannot prove it.
 - Materiality judged in aggregate and on qualitative grounds as well as by size, with the passed items listed for approval.
-- Statements that agree with one another, with cash and the totals of the statement of cash flows unchanged by adjustments that move no cash.
+- Statements that agree with one another, with cash unchanged by adjustments that move no cash, and the totals of each cash-flow activity unchanged as long as no adjustment changes how a cash flow is classified.
 - Notes reconciled to the statements, each built from records that a reviewer can trace.
 - A memo that measures only what the ledger supports, describes rather than accuses, and ends with a recommendation the CFO can act on.
 
@@ -285,7 +285,7 @@ This case reused work from across the book: the trial balance and statement mapp
 
 This case turned a ledger into a traceable draft of the statements a lender asked for, and found along the way what a ledger alone cannot support: the evidence and the decisions needed before a lender can rely on them. Most of the work was descriptive and diagnostic analytics, in the terms of @tbl-01-01: the statements and the notes describe the company, and the rebuilt accruals, the cutoff tests, and the review of the opening balances diagnose where the ledger and its documents part. The estimates were small predictive models, of the payroll owed at a cost per working day, of the accruals that invoices would clear, and of the returns still to come. The recommendations to the CFO, on what to record, what to pass, and what to settle before the package leaves, are prescriptive.
 
-Work like this rarely ends when the package leaves. A lender reads the statements and the notes, asks questions, and comes back each quarter to test the terms of the loan, and an outside accountant, if the bank asks for one, starts from the same trial balances and adjustments. The reconciliations and the documentation you built are what make those conversations short, and the matters you raised for the CFO are the ones that will decide whether the package can be relied on.
+Work like this rarely ends when the package leaves. A lender reads the statements and the notes, asks questions, and comes back at the intervals the loan agreement sets to test its terms, and an outside accountant, if the bank asks for one, starts from the same trial balances and adjustments. The reconciliations and the documentation you built are what make those conversations short, and the matters you raised for the CFO are the ones that will decide whether the package can be relied on.
 
 
 {{< include _further-reading.qmd >}}

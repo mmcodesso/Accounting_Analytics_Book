@@ -6,12 +6,12 @@
 
 A.  Because auditing standards prohibit testing any data that was not extracted by the auditor
 B.  Because the ledger contains more columns than the source tables
-C.  Because a test on an incomplete extract cannot find problems in records that were never extracted
+C.  Because a test cannot find problems in records that were never extracted
 D.  Because the reconciliation replaces the need to test individual transactions
 
 **2.** A stratification of supplier payments shows that about three-quarters of the payments are under $1,000 but hold less than a quarter of the value, and that four payments exceed $50,000. How should the auditor use this result?
 
-A.  Examine the largest payments one by one, and focus testing on the high-value strata.
+A.  Examine the largest payments one by one, and focus on the high-value strata.
 B.  Test only the payments under $1,000, because they are the most numerous.
 C.  Replace every other test of the payments with the stratification table.
 D.  Ignore the payments over $50,000, because there are too few of them to matter.
@@ -23,24 +23,24 @@ B.  About 11 percent, one-ninth of the amounts
 C.  About 50 percent
 D.  About 30 percent
 
-**4.** Which formula returns the first significant digit of a positive amount in dollars and cents in A2, including amounts below $1?
+**4.** Which formula returns the first significant digit of a Charles River payment amount in A2, including amounts below $1?
 
 A.  `=LEFT(A2,1)`
 B.  `=--LEFT(TEXT(A2,"0.00000000E+00"),1)`
 C.  `=LEFT(TEXT(A2,"0"),1)`
-D.  `=ROUND(A2,-1)`
+D.  `=--RIGHT(TEXT(A2,"0.00000000E+00"),1)`
 
 **5.** A first-digit test of about forty thousand payments has a mean absolute deviation (MAD) of 0.013, and a chi-square test calls the difference from Benford's Law highly significant. What is the best interpretation?
 
 A.  The payments are fraudulent, because the chi-square test is significant.
 B.  The payments conform closely, because the MAD is below 0.015.
-C.  The test is invalid, because Benford's Law needs fewer than a thousand amounts.
-D.  The MAD shows marginal conformity; with so many amounts, chi-square flags tiny differences.
+C.  The test is invalid, because Benford's Law applies only to populations of fewer than a thousand amounts.
+D.  Marginally acceptable conformity, and a population this large can make a small departure significant.
 
-**6.** At Charles River, payments that cover only part of an invoice do not conform to Benford's Law, while full payments do. What explains the difference?
+**6.** At Charles River, payments that cover only part of an invoice do not conform to Benford's Law, while full payments do. What best explains the difference?
 
 A.  The partial payments were invented, because nonconformity proves that amounts were fabricated.
-B.  Only invoices of $1,000 or more are paid in parts, so partial payments are a subset selected by size.
+B.  Only invoices of $1,000 or more are paid in parts, a subset selected by size.
 C.  Partial payments are recorded in a different currency from the full payments.
 D.  The formula that extracts the first digit does not work on partial payments.
 
@@ -53,7 +53,7 @@ D.  Journal entry line amounts
 
 **8.** An invoice due on November 15, 2026, is aged at an as-of date of December 31, 2026. The customer paid it in full on January 5, 2027. How should the aging at December 31, 2026, treat the invoice?
 
-A.  Include its full balance in the 31 to 60 days bucket, as of December 31.
+A.  Include its full balance in the 31 to 60 days bucket.
 B.  Include it as current, because it was paid within 90 days.
 C.  Exclude it, because it has been paid in full.
 D.  Include it in the over 90 days bucket, because the payment was late.
@@ -63,13 +63,13 @@ D.  Include it in the over 90 days bucket, because the payment was late.
 A.  The ledger is always right, so the difference can safely be ignored.
 B.  The aging schedule has been calculated incorrectly and should be discarded.
 C.  The difference is the allowance for credit losses, which the ledger records.
-D.  The ledger holds unsupported amounts, or the detail misses invoices the ledger recorded.
+D.  The ledger holds unsupported amounts, or the detail is missing invoices.
 
 **10.** Which statement about the allowance for credit losses under the credit loss standard of the Financial Accounting Standards Board (FASB) is correct?
 
-A.  An allowance is required only when a specific customer has declared bankruptcy.
+A.  An allowance is required only when a specific customer has declared bankruptcy or stopped paying.
 B.  Historical loss rates must be used as they are, without any adjustment.
-C.  The estimate must reflect risk even when it is remote, and aging-based methods are acceptable.
+C.  The estimate must reflect even a remote risk, and aging-based methods are acceptable.
 D.  Trade receivables are outside the scope of the credit loss standard.
 
 **11.** Which of the following is not one of the characteristics of fraudulent journal entries that the fraud standard of the Public Company Accounting Oversight Board (PCAOB) describes?
@@ -84,13 +84,13 @@ D.  Entries recorded at the end of a period or as post-closing entries with litt
 A.  Entries created on a later day than the date they post to
 B.  Entries whose total exceeds the approver's limit
 C.  Entries created and approved by the same employee
-D.  Entries created on a Saturday or a Sunday
+D.  Entries created on a Saturday or a Sunday, whatever their posting date
 
 **13.** How should an auditor interpret a journal entry's risk score, calculated as the number of flags the entry has?
 
 A.  As proof of override whenever the score is at least 2
 B.  As the probability that the entry is fraudulent
-C.  As a ranking of entries for review, not a probability of fraud
+C.  As a ranking for review, not a probability of fraud
 D.  As a replacement for examining supporting documents
 
 **14.** An auditor selects customers for confirmation by sorting them with SORTBY on a column from RANDARRAY. Why should the selection be pasted as values as soon as it is made?
@@ -98,11 +98,11 @@ D.  As a replacement for examining supporting documents
 A.  The sampling standard forbids formulas in audit workpapers
 B.  Paste Values makes the random numbers more evenly spread across the customers
 C.  SORTBY cannot sort a list that contains formulas
-D.  RANDARRAY recalculates, so the selection would change and could not be reproduced
+D.  RANDARRAY recalculates, so the selection could not be reproduced
 
 **15.** A gap test on Charles River's check numbers finds thousands of missing numbers. What is the most likely explanation?
 
-A.  Check numbers follow all payment numbers, so ACH and wire payments leave the gaps.
-B.  Thousands of checks were written and never recorded in the ledger.
+A.  Checks share one numbering series with ACH and wire payments.
+B.  Thousands of checks were written and never recorded in the general ledger.
 C.  The gap test does not work on check numbers stored as text.
 D.  The missing checks were all voided at the end of each year.

@@ -578,9 +578,11 @@ def if_ab_2_a() -> Diagram:
     assert "\n".join(lines[start - 1:end]).strip() == g["q4"].strip(), "the query is the guide's third query"
     rn = lambda text: next(i for i in range(start, end + 1) if lines[i - 1].strip() == text)     # noqa: E731
     users_at, flag_at = rn("VAR Users ="), rn('"Flag",')
+    # The review lists one row per user (round 2 of the review): Users lists each user's cost centers as CostCenterIDs.
+    assert '"CostCenterIDs"' in g["q4"], "query (4) returns one row per user"
     width = 772 - 34 - 28
     rows: list[tuple[int | None, str]] = [(n, _fit_dax(lines[n - 1], width)) for n in range(start, users_at + 1)]
-    rows.append((None, f"lines {users_at + 1} to {flag_at - 1} not shown: Users adds the EmployeeID, Matched looks up five more columns by that ID"))
+    rows.append((None, f"lines {users_at + 1} to {flag_at - 1} not shown: Users lists each user once with an EmployeeID, Matched adds five columns"))
     rows.append((flag_at, _fit_dax(lines[flag_at - 1], width)))
     rows.append((None, f"lines {flag_at + 1} to {end} not shown: the SWITCH that sets the Flag, its three tests and a BLANK"))
     # the nine rows, as the query returns them
@@ -591,7 +593,8 @@ def if_ab_2_a() -> Diagram:
         table.append([u["upn"], str(u["cc"]), str(e["id"]), e["name"], e["title"], e["status"], _mdy(e["terminated"]) if e["terminated"] else "",
                       str(e["cc"]), ""])
     assert all(r[6] == "" and r[8] == "" and r[1] == r[7] for r in table)
-    heads = ["Security[UserPrincipalName]", "Security[CostCenterID]", "[EmployeeID]", "[EmployeeName]", "[JobTitle]", "[EmploymentStatus]",
+    cc_head = "[CostCenterIDs]"
+    heads = ["Security[UserPrincipalName]", cc_head, "[EmployeeID]", "[EmployeeName]", "[JobTitle]", "[EmploymentStatus]",
              "[TerminationDate]", "[OwnCostCenterID]", "[Flag]"]
 
     def widths(cols: list[int], pad: float = 14) -> list[float]:
@@ -627,7 +630,7 @@ def if_ab_2_a() -> Diagram:
     d.text(esc(f"9 columns, {len(table)} rows"), x, gy2 + pane_h + 16, 220, 20, size=SMALL, color=GRAY)
     _note(d, f"The tab Ex B.2 with the third query selected and run; the lines in the gaps are left out. The grid is wider than the window, so it is drawn "
              f"twice, before and after scrolling right, with the name and job title repeated. One row for each of the {len(table)} users, in the security table's order. "
-             "Outlined: CostCenterID (first pane) and OwnCostCenterID (second) agree in every row, and TerminationDate and Flag are empty in every row.",
+             f"Outlined: {cc_head.split('[')[1].rstrip(']')} (first pane) and OwnCostCenterID (second) agree in every row, and TerminationDate and Flag are empty in every row.",
           win.bottom + 10)
     return d
 

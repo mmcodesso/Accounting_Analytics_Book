@@ -247,9 +247,10 @@ def fig_14_05() -> Diagram:
     fx, fy, fw, _ = t["geometry"][(-1, 2)]
     xl.emphasis(d, fx, fy, fw, pbi.ROW * 7)
     note_x = t["right"] + 20
-    d.box(f"<b>With ALL ( SalesInvoiceLine )</b> as the denominator instead, Furniture's share reads "
-          f"{pct(furniture / all_years)} and the five shares add up to {pct(year_total / all_years)}: removing "
-          "the filters from the fact table removes the year as well.", note_x, 86, 860 - 16 - note_x, 118,
+    d.box(f"<b>With CALCULATE ( [Revenue], ALL ( SalesInvoiceLine ) )</b> as the denominator instead, "
+          f"Furniture's share reads {pct(furniture / all_years)} and the five shares add up to "
+          f"{pct(year_total / all_years)}. Removing the filters from the fact table removes the year as well.",
+          note_x, 86, 860 - 16 - note_x, 118,
           fill=CORAL_TINT, stroke=CORAL, size=SMALL, align="left", valign="top")
     d.text("<i>The table visual on the Margins page of Tutorial 14.2, with the year slicer set to 2026. "
            "Outlined: Furniture Revenue, the same on every row because its filter replaces the row's item "

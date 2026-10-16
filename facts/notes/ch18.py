@@ -43,6 +43,7 @@ from scipy.optimize import linprog
 from notes import note
 from notes.case2 import promotions, volume
 from notes.case3 import burden as part3_burden
+from notes.case3 import last_work, monday
 from notes.case3 import depreciation as part3_depreciation
 from notes.case3 import rate as part3_rate
 from notes.case3 import working_days
@@ -832,6 +833,8 @@ def r4(d, claim):
                                                      "burden (the standards miss the rate increase)")
     e = m["explorer"]
     claim(e["std"] > e["td"] > e["absorp"], "in total, time-driven cost lies between standard and absorption")
+    claim(abs((e["td"] - e["absorp"]) - unused) > 1000,
+          "the gap between the time-driven and absorption-proxy margins is not the measured cost of unused capacity")
     # where each group's time-driven cost sits, by its totals: nearer standard or nearer absorption
     near = defaultdict(list)
     for g in m["groups"]:
@@ -915,6 +918,23 @@ def r6(d, claim):
 
 # --- Requirement 7 -----------------------------------------------------------------------------------
 
+def overloaded_weeks(d) -> dict:
+    """The base year's rough-cut plan (RoughCutCapacityPlan, Monday buckets through the week of the last time record):
+    the weeks whose planned load is above the plant's available hours, the work-center weeks above their own, and the
+    highest of each. Spare hours over a year do not make every week spare."""
+    through = monday(last_work(d))
+    centers = ("WITH C AS (SELECT BucketWeekStartDate AS W, WorkCenterID, SUM(PlannedLoadHours) AS L, "
+               "MAX(AvailableHours) AS A FROM RoughCutCapacityPlan WHERE BucketWeekStartDate BETWEEN ? AND ? GROUP BY 1, 2) ")
+    args = (f"{d.C}-01-01", through)
+    weeks = d.one(centers + "SELECT COUNT(DISTINCT W) FROM C", *args)
+    plant = d.q(centers + "SELECT W, SUM(L) / SUM(A) FROM C GROUP BY W HAVING SUM(L) > SUM(A) ORDER BY 2 DESC", *args)
+    center = d.q(centers + "SELECT C.W, w.WorkCenterName, C.L / C.A FROM C JOIN WorkCenter w ON w.WorkCenterID = "
+                 "C.WorkCenterID WHERE C.L > C.A ORDER BY 3 DESC", *args)
+    return dict(weeks=weeks, plant=len(plant), centers=len(center), through=through,
+                peak=dict(week=plant[0][0], share=plant[0][1]) if plant else None,
+                center_peak=dict(week=center[0][0], name=wc_short(center[0][1]), share=center[0][2]) if center else None)
+
+
 @note("ch18.r7", CHAPTER)
 def r7(d, claim):
     m = model(d)
@@ -934,10 +954,18 @@ def r7(d, claim):
           "with the minimum kept, the least annual cost and the least two-year cost pick the same families")
     claim(all(s["contract"]["total"] > PRICE_YEARS * s["cost"] for s in lp),
           "the plan that keeps the terms costs more over the two years than the relaxed optimum")
+    # two bases: the capacity table counts the year's completions, Requirement 6's positions the year's sales
+    claim(abs(total - m["hours"]) > 1, "the hours freed on the year's completions differ from those on the year's sales")
+    wk = overloaded_weeks(d)
+    claim(m["used"] / m["pract"] < 0.8 and wk["plant"] > 0 and wk["centers"] > wk["plant"],
+          "the plant runs well below its practical capacity over the year, yet some weeks, and more work-center weeks, "
+          "were planned above the available hours")
     return dict(buy=m["buy"], freed=freed, total=total, use_before=m["used"] / m["pract"],
                 use_after=(m["used"] - total) / m["pract"], unused_h=m["unused_h"],
                 unused_positions=m["unused_h"] / m["pos_hours"], n_buy=word(len(m["buy"])), supervision=m["supervision"],
-                crew_hours=m["hours"], crew_cost=m["hours"] * m["crew_rate"],
+                crew_hours=m["hours"], crew_cost=m["hours"] * m["crew_rate"], freed_positions=total / m["pos_hours"],
+                sales_positions=m["positions"], unused=m["unused_h"] * m["td_rate"],
+                unused_after=(m["unused_h"] + total) * m["td_rate"], weeks=wk,
                 headroom=[dict(short=wc_short(m["wc_names"][wc]), ratio=head[wc]) for wc in m["wcs"]],
                 lp=[dict(growth=s["growth"], cost=float(s["cost"]),
                          binding=[dict(short=b["short"], price=float(b["price"])) for b in s["binding"]],
@@ -997,6 +1025,12 @@ def r9(d, claim):
           "at 1.0 hours the prior year's balance falls below materiality and the current year's stays above")
     claim(all(s_p["normal"][k] > mat_p and s_c["normal"][k] > mat_c for k in range(len(NORMAL_RANGE))),
           "at 90% and 110% of the plan volume both balance sheet effects stay above materiality")
+    gap = d.one("SELECT MAX(ABS(grl.ExtendedStandardCost - grl.QuantityReceived * pol.UnitCost)) FROM GoodsReceiptLine grl "
+                "JOIN PurchaseOrderLine pol ON pol.POLineID = grl.POLineID JOIN Item i ON i.ItemID = grl.ItemID "
+                "WHERE i.ItemType = 'Finished Good' AND i.SupplyMode = 'Purchased'")
+    claim(gap is not None and gap < 0.0051,
+          "purchased finished goods are received at their purchase-order cost (to the cent), not at standard, so a new "
+          "standard does not revalue them")
     negatives = [dict(code=c, year=s["year"]) for s in m["stock"] for c in s["negative"]]
     opening = d.one("SELECT EntryNumber FROM JournalEntry WHERE EntryType = 'Opening' ORDER BY PostingDate LIMIT 1")
     opening_fg = d.one("SELECT SUM(Debit) - SUM(Credit) FROM GLEntry WHERE AccountID = ? AND VoucherNumber = ?",
@@ -1015,8 +1049,9 @@ def r10(d, claim):
     m = model(d)
     make_buy_claims(m, claim)
     unused_positions = m["unused_h"] / m["pos_hours"]
-    claim(unused_positions > m["positions"] and m["unused_h"] * m["crew_rate"] > m["gain"],
-          "the unused capacity costs more than buying would save")
+    freed_positions = sum(m["freed"].values()) / m["pos_hours"]
+    claim(unused_positions > freed_positions and m["unused_h"] * m["crew_rate"] > m["gain"],
+          "on the same base, the unused capacity is larger than buying would free and costs more than buying would save")
     paths = paths_compared(m)
     claim(paths["make"] > paths["buy"], "if volume holds, making and repricing every family below the floor earns more a "
                                        "year than buying the families and repricing the rest")
@@ -1024,5 +1059,6 @@ def r10(d, claim):
     buy_names = [q["name"] for q in m["buy"]]
     need = [r["short"] for r in m["reprice"] if r["name"] not in buy_names]
     return dict(lose=m["lose"], buy=m["buy"], positions=m["positions"], unused_positions=unused_positions, need=need,
+                freed_positions=freed_positions, weeks=overloaded_weeks(d),
                 buy_below=[q["short"] for q in m["buy"] if q["name"] in below], unused_crew=m["unused_h"] * m["crew_rate"],
                 paths=paths, n_below=word(len(below)), n_lose=word(len(m["lose"])))

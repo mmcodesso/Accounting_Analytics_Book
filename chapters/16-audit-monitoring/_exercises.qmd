@@ -71,7 +71,7 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 {"HoursValues", each List.Count(List.Distinct([TotalHours])), Int64.Type},
 ```
 
-(3) In SurgeDays, keep the days with more than one employee and a single distinct value of total hours, Chapter 12's test H8, and load both queries.
+(3) In SurgeDays, keep the days with more than one employee and a single distinct value of total hours, Chapter 12's test H8. Like H8, it counts the employees who clocked in, not the plant's roster. Load both queries, and relate each to the Date table on WorkDate.
 
 (4) Show the surge days and their overtime hours by month, with a line of the share of the plant's overtime they account for, the overtime of all of the month's entries in ClockEntries.
 
@@ -86,7 +86,7 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 **Table group:** Accounting Core, Procure-to-Pay, Payroll and Time
 
-**Scenario.** The audit committee asks whether the controls behind the monitoring tests are getting better or worse. Counts cannot answer that when the number of documents changes from year to year, and the exceptions already explained, the year-end closes and the recurring payroll test, hide what changes in the rest.
+**Scenario.** The audit committee asks whether the controls behind the monitoring tests are getting better or worse. Counts alone cannot answer that when the number of documents changes from year to year, and the exceptions already explained, the year-end closes and the recurring payroll test, hide what changes in the rest.
 
 **Requirements.**
 
@@ -98,7 +98,7 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 (4) Compare the purchase orders' exceptions and their rate from 2025 to 2026, and explain why the count and the rate tell different stories.
 
-(5) Write a short note for the audit committee: whether each process is improving, and what the unexplained rate adds to the rate of all exceptions.
+(5) Write a short note for the audit committee: how each process's rate has changed, what more you would need before calling a change an improvement in its controls, and what the unexplained rate adds to the rate of all exceptions.
 
 **Deliverable.** The page, the measure, and the note.
 
@@ -119,7 +119,7 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 (2) Add a calculated column `FirstDigit` that takes the first digit of the amount from its scientific notation, as Chapter 8 did, so that amounts below one dollar are classified correctly. Explain why taking the first character of the amount as text would fail.
 
-(3) Build a disconnected table of the digits 1 to 9, with Benford's expected share for each digit, `LOG10 ( 1 + 1 / [Digit] )`. Write measures for the observed share of each digit and for the mean absolute deviation across the nine digits.
+(3) Build a disconnected table of the digits 1 to 9, with Benford's expected share for each digit, `LOG10 ( 1 + 1 / [Digit] )`. Write measures for the observed share of each digit and for the mean absolute deviation across the nine digits, one that ignores a digit selected on the page.
 
 (4) Show the observed and expected shares by digit, with a slicer of PaymentKind, and record the mean absolute deviation for all payments, full payments, and partial payments.
 

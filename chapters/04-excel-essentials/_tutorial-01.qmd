@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will create the workbook in which you will analyze the controller's question. Instead of working in CharlesRiver.xlsx, you will start a new workbook and use Power Query to import the four Tables the analysis needs: the sales invoices, the invoice lines, the items Charles River sells, and the promotion programs. You will filter and trim the data before loading it, add two calculated columns with structured references, and build control totals that check the imported data. The master workbook is never changed, and the new workbook can be refreshed whenever the data is updated.
 
-**Prerequisites.** You need the desktop version of Microsoft Excel with Power Query (see the Watch out box earlier in this chapter) and the CharlesRiver.xlsx file provided with this textbook. You do not need to open CharlesRiver.xlsx, because Power Query reads it directly.
+**Prerequisites.** You need the desktop version of Microsoft Excel with Power Query (see the Watch out box earlier in this chapter and [What You Need](#sec-what-you-need) in the Preface) and the CharlesRiver.xlsx file provided with this textbook. You do not need to open CharlesRiver.xlsx, because Power Query reads it directly.
 
 **Step-by-step instructions.**
 

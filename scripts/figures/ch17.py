@@ -98,9 +98,9 @@ def fig_17_01() -> Diagram:
 def fig_17_02() -> Diagram:
     d = Diagram("How a Year-End Cutoff Adjustment Moves Across the Periods Presented")
     label_w, col_w, gap = 176, 128, 8
-    heads = ["Retained earnings<br>1 January 2025", "Income<br>fiscal 2025",
-             "Balance sheet<br>31 December 2025", "Income<br>fiscal 2026",
-             "Balance sheet<br>31 December 2026"]
+    heads = ["Retained earnings<br>January 1, 2025", "Income<br>fiscal 2025",
+             "Balance sheet<br>December 31, 2025", "Income<br>fiscal 2026",
+             "Balance sheet<br>December 31, 2026"]
     xs = [label_w + 8 + i * (col_w + gap) for i in range(len(heads))]
     for x, head in zip(xs, heads):
         d.box(f"<b>{head}</b>", x, 0, col_w, 64, fill=BLUE, stroke=BLUE, color=WHITE, size=BODY)

@@ -23,7 +23,7 @@ The chapter depends on these conditions of the data:
 - The three fiscal years hold 39,864 supplier payments, which agree in count and total with the ledger's cash credits. A further 263 payments are dated 2027, so a date filter must leave them out on both sides.
 - Charles River pays only larger invoices in parts (the smallest is $1,000.24), which is why the partial payments fail a first-digit test that the full payments pass.
 - Account 1020 exceeds the open invoices by exactly one journal entry line of $380,000.00, and accounts 1030 and 6170 have no postings. The same entry credits payables with $2,096,371.12.
-- Of 851 journal entries, 33 have at least one flag. Most flags have an ordinary explanation (weekend depreciation, year-end closes); one entry carries four.
+- Of 851 journal entries, 33 have at least one flag. Many flags have a likely ordinary explanation (weekend depreciation, the size of the year-end closes) that still needs its evidence, and one entry carries four.
 - The purchasing and pricing exercises rest on planted conditions: self-approved orders, orders approved under the ID of an employee whose recorded termination precedes the order, requisitions clustered just under an approval limit, promotions with impossible dates, and expired price lists still cited.
 - Two tests are clean on purpose: no purchase order number repeats or goes missing, and no near-duplicate pair pays the same invoice.
 
@@ -39,10 +39,10 @@ The chapter depends on these conditions of the data:
 ## Preparing to teach
 **Before the first class**
 
-- Students need desktop Excel with Power Query (on a Mac, Excel for Microsoft 365). The tutorials use XLOOKUP, FILTER, SORTBY, RANDARRAY and SEQUENCE, so Microsoft 365 or Excel 2021 or later. The model answers also use LET, HSTACK, VSTACK, MAP and LAMBDA, which need Microsoft 365 or Excel 2024.
+- Students need a supported desktop Excel with Power Query, Microsoft 365 recommended, as the Preface's What You Need says. On a Mac the Power Query Editor needs Excel for Microsoft 365. XLOOKUP, FILTER, SORTBY, RANDARRAY and SEQUENCE are in Excel for Microsoft 365, Excel 2024 and Excel 2021, whose support ended in October 2026. The model answers also use LET, HSTACK, VSTACK, MAP and LAMBDA, so open them in Microsoft 365 or Excel 2024.
 - A late student takes the start file from Chapter08-companion.zip, points its queries at their copy of CharlesRiver.xlsx (**Data > Get Data > Data Source Settings**, **Change Source**) and chooses **Data > Refresh All**. Its Solution Notes worksheet then checks every control total.
 - Do the three tutorials yourself. Each imports T3_GLEntry, a Table of 815,921 rows, so students choose **Transform Data**, never **Load**. Time the first refresh of each.
-- - Get the PowerPoint deck from the Downloads page. Its modules follow the chapter's sections, and each tutorial has a checkpoint slide.
+- Get the PowerPoint deck from the Downloads page. Its modules follow the chapter's sections, and each tutorial has a checkpoint slide.
 
 **Pitfalls that cost class time**
 
@@ -102,7 +102,7 @@ Plan A is the safest. Plan B gives students ownership of the findings and needs 
 ## Tutorial guide
 ### Guided Tutorial 8.1: Stratifying and Testing Supplier Payments
 
-**Purpose.** Students start the audit workbook, agree a population to the ledger, stratify it, examine the largest items and run a first-digit test that fails for a reason the data explains. **Time.** About 75 to 90 minutes. **Demonstrate, then hand over.** Demonstrate Step 2 (Group By before loading) and Steps 5 and 6 (the first-digit formula and the MAD). Leave Steps 1, 4 and 9 to students.
+**Purpose.** Students start the audit workbook, agree a population to the ledger, stratify it, examine the largest items and run a first-digit test that fails for a reason the payment process plausibly explains. **Time.** About 75 to 90 minutes. **Demonstrate, then hand over.** Demonstrate Step 2 (Group By before loading) and Steps 5 and 6 (the first-digit formula and the MAD). Leave Steps 1, 4 and 9 to students.
 
 **What students should see.**
 
@@ -122,7 +122,7 @@ Plan A is the safest. Plan B gives students ownership of the findings and needs 
 - Step 5: the shortcut formulas. `LEFT([@Amount],1)` returns 0 for the 121 payments below $1, and `LEFT(TEXT([@Amount],"0"),1)` rounds before it takes the digit. Together they misclassify 673 payments, so B6 is not zero.
 - Step 6: the combo chart with the Expected series as columns, or a selection of the wrong columns.
 
-**The checkpoint to look for.** The four bullets. A strong student says the payments agree with the ledger and that the nonconformity points to a subset, not to fraud: the invoices themselves conform (0.0034).
+**The checkpoint to look for.** The four bullets. A strong student says the payments agree with the ledger and that the nonconformity points to a subset, not to fraud, since the invoices themselves conform (0.0034). The student adds that the explanation does not show each payment is genuine, which takes documents and approvals.
 
 ### Guided Tutorial 8.2: Aging Receivables and Reconciling Them to the Ledger
 
@@ -169,7 +169,7 @@ Plan A is the safest. Plan B gives students ownership of the findings and needs 
 - Step 5: the filtered rows pasted without **Paste Special > Values**, or dispositions typed in the live Table, where a refresh moves them.
 - Step 6: **Load** instead of **Transform Data** for T3_GLEntry, and a drill-down with no empty cells below it.
 
-**The checkpoint to look for.** The four bullets. A strong student says that the weekend depreciation entries and the year-end closes are expected, with the evidence still to examine, that the approval weaknesses go to follow-up, and that one entry is the first item for the audit committee.
+**The checkpoint to look for.** The four bullets. A strong student says that the weekend depreciation entries are expected, with their schedules still to examine, that the size of the year-end closes explains their flag while the authority to approve them is still to be requested, that the approval exceptions go to follow-up, and that one entry is the first item for the audit committee.
 
 ![One journal entry reached by three different tests, for the discussion at the end of Tutorial 8.3.](../figures/chapter-08-audit-analytics/IF-08-0-A.pdf)
 
@@ -234,27 +234,26 @@ Key: 1 C, 2 A, 3 D, 4 B, 5 D, 6 B, 7 C, 8 A, 9 D, 10 C, 11 B, 12 A, 13 C, 14 D, 
 | 2 | A | large items are examined individually, and the strata that hold most of the value get the most careful tests. |
 | 3 | D | Benford's Law expects LOG10(2), about 30 percent, of amounts to begin with 1. |
 | 4 | B | scientific notation starts with the first significant digit of a positive amount in dollars and cents, including amounts below \$1. |
-| 5 | D | a MAD of 0.013 is marginally acceptable; with so many amounts, chi-square flags even small differences. |
+| 5 | D | a MAD of 0.013 is marginally acceptable, and a population this large can make even a small departure significant, so neither result is a probability of fraud. |
 | 6 | B | partial payments come only from invoices of \$1,000 or more, a subset selected by size. |
 | 7 | C | check numbers are assigned, not measured, so they carry no information about magnitude. |
 | 8 | A | the payment came after the as-of date, and the invoice was 46 days past due on December 31. |
-| 9 | D | when no reconciling item explains it, the ledger holds unsupported amounts or the detail is incomplete; trace it first. |
-| 10 | C | the standard requires the estimate to reflect remote risks and accepts aging-based methods. |
-| 11 | B | entries posted automatically for each sales invoice are routine, not a characteristic of fraudulent entries. |
+| 9 | D | when no reconciling item explains it, the ledger holds unsupported amounts or the detail is incomplete, so trace it first. |
+| 10 | C | the standard requires the estimate to reflect remote risks and accepts aging-based methods (no estimate is required only where the expectation of nonpayment is zero, and the exercise's rates are assumptions). |
+| 11 | B | entries posted automatically for each sales invoice are routine, not a characteristic of fraudulent entries, although automation alone does not make an entry valid. |
 | 12 | A | INT removes the time, so the flag is TRUE when the entry was created after the date it posts to. |
 | 13 | C | a risk score ranks entries for review; it is not a probability of fraud. |
-| 14 | D | RANDARRAY recalculates, so only pasted values preserve the selection as evidence. |
+| 14 | D | RANDARRAY recalculates, so pasting the selection as values preserves it as evidence. |
 | 15 | A | check numbers follow the numbering of all payments, so ACH and wire payments leave gaps. |
 
 **Questions where a wrong option tempts**
 
-- **Question 4.** Option A is the `LEFT` shortcut and option C the `TEXT(...,"0")` shortcut; both look right on most payments.
+- **Question 4.** Option A is the `LEFT` shortcut and option C the `TEXT(...,"0")` shortcut, and both look right on most payments. Option D takes the last character of the exponent.
 - **Question 5.** Option A reads a significant chi-square as fraud, option B a MAD below 0.015 as close conformity.
 - **Question 6.** Option A reads nonconformity as proof of invented amounts, option D blames the formula.
 - **Question 8.** Option C drops an invoice paid after the as-of date, which the aging at that date must keep.
 - **Question 9.** Option C calls the difference the allowance. Accounts 1030 and 6170 have no postings.
-- **Question 14.** Option A invents a rule against formulas; only pasted values preserve a RANDARRAY selection.
-- **Length.** The correct option is also the longest in 12 of the 15 questions (1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, and 15), so wording alone can give it away. If you grade with these, ask students to explain their answer or reword the options.
+- **Question 14.** Option A invents a rule against formulas. Pasting the selection as values is what preserves it.
 
 Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 1 and 2 make a quiz of populations, 3 to 7 of digit tests, 8 to 10 and 14 of receivables, and 11 to 13 and 15 of journal entries, gaps and scores.
 

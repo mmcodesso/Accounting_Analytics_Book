@@ -83,7 +83,7 @@ def if_c1_0_a() -> Diagram:
     reqs = _requirements()
     stages = ctx.values("case1.g1")["stages"]
     assert len(reqs) == 6 and len(stages) == 6, (len(reqs), len(stages))
-    d = Diagram("How the Requirements Feed the Memo and Which Workflow Stages They Complete")
+    d = Diagram("How the Requirements Feed the Memo and What the Case Does at Each Workflow Stage")
     lx, lw, rh, step = 24.0, 250.0, 60.0, 68.0
     cy = lambda i: i * step + rh / 2
     req_ids = []
@@ -129,24 +129,27 @@ def if_c1_0_a() -> Diagram:
           rounded=False)
     # The stages of the workflow.
     sy = 478.0
-    d.text("<b>The six stages of the analytics workflow</b> (Chapter 1), and what the case completes", 0, sy - 28, 860, 22,
-           size=SMALL)
+    d.text("<b>The six stages of the analytics workflow</b> (Chapter 1), and what the case completes or begins", 0, sy - 28,
+           860, 22, size=SMALL)
     sw, sg, sh = 130.0, 16.0, 96.0
+    assert {st["kind"] for st in stages} <= {"done", "begun"}, stages
     for i, st in enumerate(stages):
-        part2 = st["status"].startswith("Left")
-        by = "Part II" if part2 else st["by"] + (", readiness findings only" if "only" in st["status"] else "")
-        text = f"<b>{st['n']} {esc(st['name'])}</b><br>{esc(by)}"
+        text = f"<b>{st['n']} {esc(st['name'])}</b><br>{esc(st['short'])}"
         assert kit.height_for(text, sw, SMALL) <= sh, (st, kit.height_for(text, sw, SMALL))
-        if part2:
-            d.box(text, i * (sw + sg), sy, sw, sh, fill=WHITE, stroke=GRAY, stroke_width=1.5, size=SMALL, dashed=True)
+        if st["kind"] == "begun":
+            d.box(text, i * (sw + sg), sy, sw, sh, fill=BLUE_TINT, stroke=BLUE, stroke_width=1.5, size=SMALL, dashed=True)
         else:
             d.box(text, i * (sw + sg), sy, sw, sh, fill=BLUE, stroke=BLUE, color=WHITE, size=SMALL)
     ly = sy + sh + 14
-    kit.legend(d, 0, ly, [("Completed in the case", BLUE, "box")])
-    d.box("", 214, ly + 3, 14, 14, fill=WHITE, stroke=GRAY, rounded=False, dashed=True, stroke_width=1.5)
-    d.text("Left for Part II", 234, ly, 110, 20, size=SMALL, valign="middle")
-    d.line_sample(366, ly + 10, 28, color=GRAY, end="blockThin")
-    d.text("The main input of a part of the memo", 400, ly, 260, 20, size=SMALL, valign="middle")
+    cx = kit.legend(d, 0, ly, [("Completed in the case", BLUE, "box")])
+    begun = "Begun in the case, finished in Part II"
+    bw = text_width(begun, SMALL, False) + 8
+    d.box("", cx, ly + 3, 14, 14, fill=BLUE_TINT, stroke=BLUE, rounded=False, dashed=True, stroke_width=1.5)
+    d.text(begun, cx + 20, ly, bw, 20, size=SMALL, valign="middle")
+    lx = cx + 20 + bw + 22
+    d.line_sample(lx, ly + 10, 28, color=GRAY, end="blockThin")
+    d.text("The main input of a part of the memo", lx + 34, ly, 260, 20, size=SMALL, valign="middle")
+    assert lx + 34 + text_width("The main input of a part of the memo", SMALL, False) <= 860, lx
     d.text("<i>The arrows show the main source of each part. The Requirement 6 guide lists every source: the Auditing "
            "section also draws on Requirements 2 to 4, and the Managerial accounting section on Requirement 2.</i>", 0,
            ly + 30, 860, 36, size=SMALL, color=GRAY)
@@ -206,7 +209,7 @@ def if_c1_0_b() -> Diagram:
     d.box(f"<b>only supplier payments</b><br>{tail_rows:,} ledger rows, {tail_first} to {tail_last}", 560, 0, 300, 34,
           fill=WHITE, stroke=GRAY, size=SMALL, rounded=False)
     d.box("", tail_c - 0.75, 34, 1.5, ledger_y - 34, fill=GRAY, stroke=GRAY, rounded=False)
-    # The axis, with a tick at each 1 January.
+    # The axis, with a tick at each January 1.
     d.box("", X0, axis_y, X1 - X0, 2, fill=INK, stroke=INK, rounded=False)
     years = list(range(int(first_post[:4]), int(last_post[:4]) + 1))
     for y_ in years:
@@ -231,7 +234,7 @@ def if_c1_0_b() -> Diagram:
     d.text("Ledger rows after the last sale", 350, ky, 200, 20, size=SMALL, valign="middle")
     d.vertex("", f"rhombus;html=1;fillColor={CORAL};strokeColor={WHITE};strokeWidth=1.5;", 568, ky + 2, 16, 16)
     d.text("The year-end close", 590, ky, 140, 20, size=SMALL, valign="middle")
-    d.text(f"<i>Ticks mark 1 January. The invoices and the shipments end on {last_invoice}, the last day of fiscal {year}, so "
+    d.text(f"<i>Ticks mark January 1. The invoices and the shipments end on {last_invoice}, the last day of fiscal {year}, so "
            f"{year} Q4 is the latest complete quarter. The ledger runs {tail_rows:,} rows further, to {last_post}, but "
            f"they are {tail_types[0].replace('DisbursementPayment', 'supplier payments')} for earlier purchases: no sales, "
            f"no shipments and so no margin. The close, {close}, is posted on the last day of the year, inside Q4.</i>",
@@ -603,7 +606,7 @@ def if_c1_5_b() -> Diagram:
     kit.callout(d, f"Revenue {money(r5['rev4'])}<br>Cost of goods sold {money(r5['cogs4'])}<br>Margin {corrected[1]:.1%}, "
                    f"{(corrected[0] - corrected[1]) * 100:.1f} points below {q3}'s {corrected[0]:.1%}.", px, 210, pw, color="blue")
     d.text(f"<i>The {q3} bars match because no journal entry posts to the two Furniture accounts in that quarter. The axis "
-           f"starts at zero. Cost of goods sold is shipments less returns; revenue is the sales invoices.</i>", 0, 438, 860, 36,
+           f"starts at zero. Cost of goods sold is shipments less returns, and revenue is the sales invoices before customer credits.</i>", 0, 438, 860, 36,
            size=SMALL, color=GRAY)
     return d
 

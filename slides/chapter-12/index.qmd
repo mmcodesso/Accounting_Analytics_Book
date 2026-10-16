@@ -117,7 +117,7 @@ No error says so. Check that every query lists its columns in the same order bef
 - Wages belong to the period of the work: compare the work with the pay date
 
 ::: {.notes}
-Revenue from goods belongs to the period in which control passed to the customer, which depends on the terms of the sale; the chapter assumes it passes on delivery, and that invoices are dated no earlier than the goods ship. Services ship nothing, so their revenue needs a test of its own. A company that records transactions when it invoices or pays them, rather than when it earns or incurs them, needs an accrual at each period end for the difference; without one, each year-end is misstated by the transactions on either side of it. Tutorial 3.2 traced one sale; these tests trace whole tables at once, and Exercise 10.5 already found six payroll payment postings with no payment, which Tutorial 12.1 explains.
+Revenue from goods belongs to the period in which control passed to the customer, which depends on the terms of the sale; the chapter assumes it passes on delivery, reads Shipment.DeliveryDate as the date the goods arrived, and assumes that invoices are dated no earlier than the goods ship. Services ship nothing, so their revenue needs a test of its own. A company that records transactions when it invoices or pays them, rather than when it earns or incurs them, needs an accrual at each period end for the difference; without one, each year-end is misstated by the transactions on either side of it. Tutorial 3.2 traced one sale; these tests trace whole tables at once, and Exercise 10.5 already found six payroll payment postings with no payment, which Tutorial 12.1 explains.
 :::
 
 ## Check your understanding {.check}
@@ -159,7 +159,7 @@ Students start Audit.sql with a header comment. Each test goes at the end of the
 {{< book-figure fig-12-02 crop="0,0.6003,0.9224,0.2219" >}}
 
 ::: {.notes}
-The four traces, two from the ledger to the payments and two from the invoices to the ledger, return six rows, all from the first test: three pairs, each a debit to accrued payroll and a credit to cash, in January of each year. Every supplier payment has its document, and every sales and supplier invoice was posted. Step 4 matches the six to three approved registers with no payment: one pays the chief executive, and two pay an Account Executive who left in the first year, charged to the Executive cost center at the chief executive's gross pay. Only the bank records can confirm who received the cash.
+The four traces, two from the ledger to the payments and two from the invoices to the ledger, return six rows, all from the first test: three pairs, each a debit to accrued payroll and a credit to cash, in January of each year. Every supplier payment has its document, and every sales and supplier invoice was posted. The DocumentID column shows which missing payment each pair points to, and Step 4 matches the six to three approved registers with no payment: one pays the chief executive, and two pay an Account Executive who left in the first year, charged to the Executive cost center at the chief executive's gross pay. Only the bank records can confirm who received the cash.
 :::
 
 ## December deliveries were posted in January
@@ -175,7 +175,7 @@ More than twenty invoices for goods delivered in December were posted in January
 {{< book-checkpoint 12.1 1-3 lead="true" >}}
 
 ::: {.notes}
-The reconciliations agree to the cent; the payroll agrees because both sides record it on its pay date. Agreement of totals supports the populations' completeness; it is not a comparison of every record. The six postings are the only exceptions of the trace, and they record cash paid without a payment record.
+The reconciliations agree to the cent; the payroll agrees because both sides record it on its pay date. Agreement of totals supports the populations' completeness, but it is not a comparison of every record, and an anti-join compares IDs, not amounts. The six postings are the only exceptions of the trace, and they record cash paid without a payment record.
 :::
 
 ## Checkpoint (continued)
@@ -233,10 +233,10 @@ Where a table records no approval date, as PurchaseOrder does not, the document'
 - Approval tests look for a few exceptions in a large population
 - They often return a clean result, and that is evidence too
 - Provided the population was reconciled first
-- If one person approves nearly everything, that is the whole control
+- If one person approves nearly everything, the control rests on one review
 
 ::: {.notes}
-If that one approval failed, nothing else would notice. Concentration can therefore indicate a weakness in the design of the control, rather than an exception in any one document.
+If that one review missed an error, nothing else would notice unless another control, such as a budget review or a reconciliation, would catch it. Concentration can therefore indicate a weakness in the design of the control, rather than an exception in any one document, and the auditor asks what else would detect an error.
 :::
 
 ## Check your understanding {.check}
@@ -260,7 +260,7 @@ Ask students which of the four needs a disposition for a single document.
 4. A risk: a possible weakness in the control's design
 
 ::: {.notes}
-Only the third needs a disposition for the document itself. The fourth goes in the report as a matter of control design.
+Only the third needs a disposition for the document itself. The fourth goes in the report as a design risk to investigate.
 :::
 
 # Guided Tutorial 12.2: Matching Purchases and Testing Their Approvals
@@ -294,7 +294,7 @@ Step 5 lists fourteen orders, most failing two tests. The two largest are capita
 {{< book-checkpoint 12.2 lead="true" >}}
 
 ::: {.notes}
-The purchasing chain holds together in the records tested: no line was billed above what was received, prices were close to the orders, and its unbilled receipts agree with the ledger. Its approval control has exceptions and a single point of failure, which the chief audit executive will want in the report.
+The purchasing chain holds together in the records tested: no line was billed above what was received, prices were close to the orders, and its unbilled receipts agree with the ledger. Its approval control has exceptions and depends on one approver, which the chief audit executive will want in the report once the policy, the approvers' authority at the time, and any compensating review have been examined.
 :::
 
 # Testing the Records Behind a Cost
@@ -371,7 +371,7 @@ Which kind an exception is depends on its cause, which the auditor must find. Th
 {{< book-steps 12.3 1-5 >}}
 
 ::: {.notes}
-The profile fixes the dates over which every total is measured. The hours clocked, recorded and paid agree in every pay period the records share, and the four quiet months are recorded like any others: the plant was building stock, completing thousands of units more than it shipped, which kept most hours on work orders. Every earnings line agrees with its hours times the paid employee's rate on file to within a cent.
+The profile fixes the dates over which the totals are measured, although indirect time ends a week before the last day. The hours clocked, recorded and paid agree in every pay period the records share, and the four quiet months are recorded like any others. The plant was building stock then, completing thousands of units more than it shipped, which is consistent with most hours staying on work orders, a plausible explanation still to confirm. Every earnings line agrees with its hours times the paid employee's rate on file to within a cent.
 :::
 
 ## Steps 6 to 10: overtime, surge days and late time
@@ -387,7 +387,7 @@ No overtime of half an hour or less has an approval, and nearly every longer ent
 {{< book-figure fig-12-08 crop="0,0.6941,0.832,0.1298" >}}
 
 ::: {.notes}
-The number of surge days grew each year, and by the latest year their overtime was more than two-thirds of the plant's, while overtime on other days stayed about the same. This is the most important finding of the audit. Identical times for a whole plant look like time entered in bulk, or a schedule recorded in place of the clock; they do not prove that the hours were not worked, but the records cannot show that they were.
+The number of surge days grew each year, and by the latest year their overtime was more than two-thirds of the plant's, while overtime on other days stayed about the same. This is the most important finding of the audit. The query counts the employees who clocked in, and a separate count against the Employee table shows they are the plant's whole hourly staff, one entry each. Identical times for a whole plant look like time entered in bulk, or a schedule recorded in place of the clock; they do not prove that the hours were not worked, but the records cannot show that they were.
 :::
 
 ## On an ordinary day, times and hours differ
@@ -395,7 +395,7 @@ The number of surge days grew each year, and by the latest year their overtime w
 {{< book-figure fig-12-09 crop="0,0,1,0.4275" >}}
 
 ::: {.notes}
-Six Assemblers on a day before the first surge day: their clock-in and clock-out times differ by minutes and hours, their regular hours vary, and only some of them worked overtime. The line under the table summarizes the day for every hourly manufacturing employee: many different clock-in times and numbers of hours.
+Six Assemblers on a day before the first surge day: their clock-in and clock-out times differ by minutes and hours, their regular hours vary, and only some of them recorded overtime. The line under the table summarizes the day for every hourly manufacturing employee: many different clock-in times and numbers of hours.
 :::
 
 ## On a surge day, everyone clocks the same minutes
@@ -411,7 +411,7 @@ The same six on a surge day clock in and out at the same minutes on one of two s
 {{< book-figure fig-12-10 crop="0,0.6293,0.8204,0.1573" >}}
 
 ::: {.notes}
-The share of the direct hours recorded against an operation that came after the operation had ended rose from about a fifth to half and then to about two-thirds, and most of it fell on surge days. Step 9 finds it at Packing, where nearly all of the latest year's direct time came after the operation ended, and at Quality Assurance: the hours above plan there in Tutorial 11.2 are time charged to finished work.
+The share of the direct hours recorded against an operation that came after the operation had ended rose from about a fifth to half and then to about two-thirds, and most of it fell on surge days. Step 9 finds it at Packing, where nearly all of the latest year's direct time came after the operation ended, and at Quality Assurance: much of the time above plan there in Tutorial 11.2 was charged to finished work.
 :::
 
 ## Checkpoint
@@ -427,7 +427,7 @@ The time that pays one employee's hours to others belongs to an Inventory Specia
 {{< book-checkpoint 12.3 5-8 >}}
 
 ::: {.notes}
-The hours were recorded, paid at the rates on file, and posted, so the variance is a cost the records say the plant incurred. The chief audit executive will report the exceptions for correction, the time-recording practice as a weakness in the design of controls, and the surge-day overtime as a matter to corroborate before the committee relies on it.
+The hours were recorded, paid at the rates on file, and posted, so the variance is a cost the records say the plant incurred. The chief audit executive will report the exceptions for correction, ask whether the time-recording practice reflects a control that is missing or one that did not operate, and report the surge-day overtime as a matter to corroborate before the committee relies on it.
 :::
 
 # Chapter 8's Tests in SQL
@@ -480,7 +480,7 @@ A test that is saved, documented and run again every period becomes part of the 
 {{< book-table tbl-12-01 5-10 >}}
 
 ::: {.notes}
-An expected result is not always "no rows": the purchasing tests expect the unbilled receipts to equal the ledger account, and the late direct time is expected to be a small share.
+An expected result is not always "no rows": the purchasing tests expect the unbilled receipts to agree with the ledger account within rounding, and the late direct time is expected to be a small share.
 :::
 
 ## Each test opens with what it tests
@@ -508,7 +508,7 @@ Saved as views, as in Tutorial 11.3, the tests run again every quarter with a si
 
 - The ledger reconciles and traces, but no year-end accrues the late wages
 - Purchasing matches, with approval exceptions and one dominant approver
-- The hours were clocked, recorded and paid; the quiet months built stock
+- The hours were clocked, recorded and paid; the quiet months match a stock build
 - The surge-day overtime cannot be corroborated from the records alone
 
 ::: {.notes}
@@ -519,11 +519,11 @@ Revenue and payroll are recorded when invoiced and paid, so each year-end is mis
 
 - The records give no reason to revise them: direct time stayed within them
 - What grew is the time paid beyond the work: indirect time and overtime
-- By the records, less efficient not at the work but around it
+- In the records, the hours grew around the work, not in it
 - Part of the growth is the calendar: the first year charged two payrolls fewer
 
 ::: {.notes}
-This answers the question the controller asked at the start of Chapter 9. The plant-level conclusions of Chapters 10 and 11 survive the audit; the operation-level comparison does not until time is recorded against open operations, and neither does the surge-day overtime until it is corroborated. How much of the extra time was avoidable, the records cannot measure. Management decides what to do once the hours are corroborated: hours that bring nothing can be cut, and a standard is revised only if the work itself has changed. The Part III case asks what the plant should plan for and what the latest statements need before they are final.
+This answers the question the controller asked at the start of Chapter 9. The plant-level totals of Chapters 10 and 11 reproduce within the populations tested, although records that agree cannot show how much work the output required. The operation-level comparison does not hold until time is recorded against open operations, and neither does the surge-day overtime until it is corroborated. How much of the extra time was avoidable, the records cannot measure. Management decides what to do once the hours are corroborated: hours that bring nothing can be cut, and a standard is revised when the work or the conditions it assumes have changed, not to absorb inefficiency. The Part III case asks what the plant should plan for and what the latest statements need before they are final.
 :::
 
 ## Summary

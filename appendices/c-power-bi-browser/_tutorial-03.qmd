@@ -8,7 +8,7 @@
 
 **Step 1. Open the model for editing.**
 
-a. In **My workspace**, open the **Charles River Reports** semantic model, the item whose type is Semantic model.
+a. In **My workspace**, or the workspace you chose in Guided Tutorial C.1, open the **Charles River Reports** semantic model, the item whose type is Semantic model.
 b. If the menu at the top right reads **Viewing**, open it and choose **Editing**.
 
 **Step 2. Create the Key Measures table with Enter data.** Tutorial 14.2 keeps its measures in a table named Key Measures, typed with Enter data; in the browser, Enter data is in Power Query Online.
@@ -18,7 +18,7 @@ b. In Power Query Online, choose **Home > Enter data**.
 c. In the **Create table** dialog, leave the grid as it is, type `Key Measures` in **Name**, and click **OK**.
 d. Click **Save** at the bottom right to apply the change to the model.
 
-The dialog is Desktop's Enter data, with the same grid and the same one empty column, Column1. After a few seconds, Power Query closes and Key Measures appears in the **Data** pane. The other tables the chapters type by hand, such as the Steps table of Tutorial 15.1, are created the same way, and the settings icon of their Source step reopens **Create table** to change them.
+The dialog is Desktop's Enter data, with the same grid and the same one empty column, Column1. After a few seconds, Power Query closes and Key Measures appears in the **Data** pane. The other tables the chapters type by hand, such as the Steps table of Tutorial 15.1, are created the same way. When this appendix was tested, the settings icon of such a table's Source step reopened **Create table**, but the test saved no change through it, so after you change a table that way, check that the change reached the model.
 
 **Step 3. Write the measure.**
 

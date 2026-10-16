@@ -24,7 +24,7 @@ a. Type and run the test below.
 
 b. Read each column of the result.
 
-The table holds tens of thousands of entries by several dozen employees, from 1 January 2024 to 11 December 2026, the last day with time records that Tutorial 10.3 found. A handful of entries are still waiting for approval, and three have no clock-out time; Steps 4 and 6 find whose they are. The profile also fixes the dates over which every total of this tutorial is measured.
+The table holds tens of thousands of entries by several dozen employees, from January 1, 2024, to December 11, 2026, the last day with time records that Tutorial 10.3 found. A handful of entries are still waiting for approval, and three have no clock-out time; Steps 4 and 6 find whose they are. The profile also fixes the dates over which the totals of this tutorial are measured, although indirect time, as Tutorial 10.3 found, ends a week before the last day.
 
 **Step 2. Reconcile the hours along the chain.** Every hour clocked should be recorded as labor time and paid. Read the test from the top: the CTEs Clocked, Recorded, and Paid each total the hours of every pay period on one record, and the final query joins them on the period and counts the periods in which they differ.
 
@@ -92,7 +92,7 @@ a. Type and run the test below.
 
 b. Read the IndirectHours of the periods from February to May.
 
-The result answers the second question that Chapter 11 handed on. From February to May 2024, the plant recorded normal hours in every pay period, and most of them were direct time; from June, a large part of most periods is indirect. Nothing is missing from those months, as far as the chain of Step 2 can show: their hours were clocked, recorded, and paid like any others. The production records suggest why so little was indirect: the plant was building stock, completing thousands of units more than it shipped in its first months, which kept most hours on work orders. When production fell back to the rate of shipments in the summer, the same employees kept their hours, and the time that no work order needed became indirect time. Exercise 12.3 measures the build.
+The result answers, as far as the records can, the second question that Chapter 11 handed on. From February to May 2024, the plant recorded normal hours in every pay period, and most of them were direct time. From June, a large part of most periods is indirect. Nothing is missing from those months, as far as the chain of Step 2 can show: their hours were clocked, recorded, and paid like any others. The production records suggest an explanation. The plant was building stock, completing thousands of units more than it shipped in its first months, which is consistent with most hours being assigned to work orders. Indirect time rose from June, and by July completions had fallen back to the rate of shipments while the same employees kept recording their hours. The build is a plausible explanation of the mix, to be tested against the production schedules and the way hours were assigned. Exercise 12.3 measures the build.
 
 **Step 4. Test whose time was paid.** A payroll earnings line points to the labor time entry it pays, so each line can be checked against the employee paid and against the approval of the clock entry behind it. Employee appears twice in the test, as pe for the employee paid and as we for the employee who worked, so that each row can show both.
 
@@ -241,11 +241,11 @@ a. Type and run the test below.
 
 b. Read SurgeDays and SurgeShare for each year.
 
-The result, shown in @fig-12-08, is the most important finding of the audit. On a growing number of days since mid-2024, all 64 hourly manufacturing employees recorded the same hours. @fig-12-09 shows six of them on such a day and on an ordinary day before the first one. On the surge day, they worked eight regular hours and four and a half of overtime, clocked in and out at the same minutes on one of two shifts, and the Production Manager approved all of the overtime on the work date. The overtime of the surge days grew to more than two-thirds of the plant's overtime by fiscal 2026, while overtime on other days, which Exercise 12.4 compares, stayed about the same. Identical times for a whole plant look like time entered in bulk, or a schedule recorded in place of the clock, rather than clocked by each employee. They do not prove that the hours were not worked, but the records cannot show that they were.
+The result, shown in @fig-12-08, is the most important finding of the audit. On a growing number of days since mid-2024, all 64 hourly manufacturing employees recorded the same hours. The query counts only the employees who clocked in each day. A separate count from the Employee table shows that the 64 are the plant's whole hourly staff, each with one entry on every surge day. @fig-12-09 shows six of them on such a day and on an ordinary day before the first one. On the surge day, every entry records eight regular hours and four and a half of overtime, clocked in and out at the same minutes on one of two shifts, and the Production Manager approved all of the overtime on the work date. The overtime of the surge days grew to more than two-thirds of the plant's overtime by fiscal 2026, while overtime on other days, which Exercise 12.4 compares, stayed about the same. Identical times for a whole plant look like time entered in bulk, or a schedule recorded in place of the clock, rather than clocked by each employee. They do not prove that the hours were not worked, but the records cannot show that they were.
 
 ![Days on Which Every Hourly Manufacturing Employee Clocked the Same Hours.](/visuals/svg/fig-12-08-surge-days.svg){#fig-12-08 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Audit.sql, shows a test that groups the manufacturing time clock entries by day in a CTE, counts the different numbers of hours recorded each day, and summarizes by year the days on which every employee recorded the same hours. The result has one row for each of 2024, 2025, and 2026, with the number of such days, which rises each year, the 64 employees on each of them, their overtime hours, and their share of the year's manufacturing overtime, which rises from about a third to more than two-thirds. The SurgeDays and SurgeShare columns are outlined."}
 
-![A Day Before the Surge Days and a Surge Day.](/visuals/svg/fig-12-09-normal-and-surge-day.svg){#fig-12-09 fig-alt="Two tables of the time clock entries of the same six Assemblers. On a day in March 2024, before the first surge day, their clock-in and clock-out times differ by minutes and hours, their regular hours vary, and only some of them worked overtime, approved by the Production Manager. On a surge day in June 2026, all six clocked in and out at the same minutes on one of two shifts and recorded the same regular and overtime hours, all approved by the Production Manager on the work date; those cells are highlighted. A line under each table summarizes the day for all 64 hourly manufacturing employees: many different clock-in times and numbers of hours on the first day, and two clock-in times and one number of hours on the surge day, when every employee worked overtime."}
+![A Day Before the Surge Days and a Surge Day.](/visuals/svg/fig-12-09-normal-and-surge-day.svg){#fig-12-09 fig-alt="Two tables of the time clock entries of the same six Assemblers. On a day in March 2024, before the first surge day, their clock-in and clock-out times differ by minutes and hours, their regular hours vary, and only some of them recorded overtime, approved by the Production Manager. On a surge day in June 2026, all six clocked in and out at the same minutes on one of two shifts and recorded the same regular and overtime hours, all approved by the Production Manager on the work date; those cells are highlighted. A line under each table summarizes the day for all 64 hourly manufacturing employees: many different clock-in times and numbers of hours on the first day, and two clock-in times and one number of hours on the surge day, when every employee recorded overtime."}
 
 **Step 8. Test when direct labor was recorded.** Direct labor is recorded against a work order operation, which has an actual end date, and time recorded after that date was charged to work that was already finished. A CTE lists the surge days again, and a left join marks the time recorded on them.
 
@@ -262,7 +262,7 @@ a. Type and run the test below.
        WHERE cc.CostCenterName = 'Manufacturing'
        GROUP BY tc.WorkDate
        HAVING COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1
-           AND COUNT(*) > 1
+           AND COUNT(DISTINCT tc.EmployeeID) > 1
    )
    SELECT strftime('%Y', lt.WorkDate) AS WorkYear,
        ROUND(SUM(lt.RegularHours + lt.OvertimeHours), 0) AS DirectHours,
@@ -315,7 +315,7 @@ a. Type and run the test below.
 
 b. Compare the ShareAfterEnd of the work centers.
 
-At Packing, the last operation of every routing, nearly all the direct time of fiscal 2026 was recorded after the operation had ended, and at Quality Assurance most of it was. Much of the time above plan at those work centers in Tutorial 11.2 was charged to operations already complete, so the operation records cannot say which operations the direct time belongs to.
+At Packing, the last operation of every routing, nearly all the direct time of fiscal 2026 was recorded after the operation had ended, and at Quality Assurance most of it was. Much of the time above plan at those work centers in Tutorial 11.2 was charged to operations already complete, so the operation records cannot reliably say which operations the late time belongs to.
 
 **Step 10. Complete and save the script.** The header comment should record the checks that the chapter's tests passed.
 
@@ -334,7 +334,7 @@ The script now holds the tests of the three tutorials, L1 to H10, each under a c
 
 **Checkpoint.** Check that:
 
-- the profile finds a handful of entries awaiting approval and three with no clock-out time, in records that end on 11 December 2026;
+- the profile finds a handful of entries awaiting approval and three with no clock-out time, in records that end on December 11, 2026;
 - clocked, recorded, and paid hours agree in every pay period the records share, and the manufacturing hours of February to May 2024 are recorded like any others, most of them direct;
 - six earnings lines pay a terminated employee's time to others, two of them to an Assembler, and eight rest on unapproved clock entries;
 - every earnings line agrees with the expectation from its hours and the employee's rate to within a cent;
@@ -343,4 +343,4 @@ The script now holds the tests of the three tutorials, L1 to H10, each under a c
 - the share of direct time recorded after its operation ended rose to about two-thirds, most of it on surge days and at Packing;
 - Audit.sql is saved with a completed header and a comment above each test.
 
-The tests support part of the controller's explanation. The hours behind the variance were recorded, paid at the rates on file, and posted, and the manufacturing payroll ties to the ledger, so the variance is a cost that the plant's records say it incurred. The growth in overtime, though, sits on surge days whose identical times, single approver, and charges to finished operations the records cannot explain. The chief audit executive will report the exceptions for correction, the time-recording practice as a weakness in the design of controls, and the surge-day overtime as a matter to corroborate before the committee relies on it.
+The tests support part of the controller's explanation. The hours behind the variance were recorded, paid at the rates on file, and posted, and the manufacturing payroll ties to the ledger, so the variance is a cost that the plant's records say it incurred. The growth in overtime, though, sits on surge days whose identical times, single approver, and charges to finished operations the records cannot explain. The chief audit executive will report the exceptions for correction, ask whether the time-recording practice reflects a control that is missing or one that did not operate, and report the surge-day overtime as a matter to corroborate before the committee relies on it.

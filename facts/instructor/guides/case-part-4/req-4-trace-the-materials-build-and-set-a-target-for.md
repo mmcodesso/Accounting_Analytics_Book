@@ -83,11 +83,11 @@ c. In Issues, add `PairKey` with **Add Column > Custom Column**, group Issues by
 {{ g.key_m }}
 ```
 
-**Check:** {{ pairs|count }} pairs, {{ matched|count }} matched to issues and {{ unmatched }} with nothing issued. **Watch for:** two wrong versions. Grouping by work order alone gives {{ g.wo_groups|count }} groups and a maximum of {{ g.wo_most }}, against {{ most }} for a pair. An inner join drops the {{ unmatched }} unmatched pairs, so the requisitioned units read {{ g.units_inner|num(1) }} in place of {{ units|num(1) }}.
+**Check:** {{ pairs|count }} pairs, {{ matched|count }} matched to issues and {{ unmatched }} with nothing issued. **Watch for:** two wrong versions. Grouping by work order alone gives {{ g.wo_groups|count }} groups and a maximum of {{ g.wo_most }}, against {{ most }} for a pair. An inner join drops the {{ unmatched }} unmatched pairs, so the groups hold {{ matched|count }} pairs in place of {{ pairs|count }}, and the {{ by_unit[0].plural }} requisitioned read {{ g.main_inner|num(1) }} in place of {{ by_unit[0].req|num(1) }}.
 
 **Step 3. Compare and count.** Add cards titled "{{ g.t_cards }}" and a table titled "{{ g.t_pairs }}" sorted by the count.
 
-**Check:** {{ repeated|count }} pairs were requisitioned more than once, holding {{ in_repeated|count }} requisitions, and {{ units|num(1) }} units were requisitioned (${{ estimated|money }}) against {{ units_issued|num(1) }} issued to the same pairs. The pair with the most is {{ wo }} and {{ item }}: {{ most }} requisitions, one or two a month from {{ first_request }} to {{ last_request }}, for a work order due {{ due }} and completed {{ completed }}.
+**Check:** {{ repeated|count }} pairs were requisitioned more than once, holding {{ in_repeated|count }} requisitions. By unit of measure, {% for u in by_unit %}{{ u.req|num(1) }} {{ u.plural }} were requisitioned against {{ u.issued|num(1) }} issued{{ " and " if not loop.last else "" }}{% endfor %} to the same pairs, and in value the requisitions' estimate of ${{ estimated|money }} sits beside ${{ issued_cost|money }} issued at standard, two different bases. **Watch for:** a card that adds rolls and boxes into one total of {{ units|num(1) }} units. The model answer shows the units in a table by unit of measure, and its unit measures are blank across units. The pair with the most is {{ wo }} and {{ item }}: {{ most }} requisitions, one or two a month from {{ first_request }} to {{ last_request }}, for a work order due {{ due }} and completed {{ completed }}.
 
 **Step 4. Show the approvals.** Add a **Matrix** titled "{{ g.t_approvals }}" with Channel and ApproverTitle on **Rows** and the requisition count and `Self-requested` in **Values**.
 
@@ -98,14 +98,14 @@ c. In Issues, add `PairKey` with **Add Column > Custom Column**, group Issues by
 **Step 5. Add the what-if.**
 
 a. Choose **Modeling > New parameter > Numeric range**, **Whole number**, named `Target Days`; keep **Add slicer to this page**.
-b. Add the measures below, with the policy target ({{ g.raw_target }} days for raw materials) as the default.
+b. Add the measures below, with the largest materials target ({{ g.raw_target }} days, raw materials) as the default, a benchmark for the whole balance.
 c. Add a **Table** titled "{{ g.t_tested }}" filtered to {{ whatif[0].days }}, {{ whatif[1].days }} and {{ whatif[2].days }} days.
 
 ```dax jinja
 {{ g.d_target }}
 ```
 
-**Check:** at the year's issues the target allows {% for w in whatif %}${{ w.allowed|money }}{{ ", " if not loop.last else "" }}{% endfor %} and the excess is {% for w in whatif %}${{ w.excess|money }}{{ ", " if not loop.last else "" }}{% endfor %}, or {% for w in whatif %}{{ w.months|num(2) }}{{ ", " if not loop.last else "" }}{% endfor %} months of issues. Even at {{ whatif[2].days }} days the excess is about {{ multiple }} times the year's fall in cash. **Watch for:** the excess measured on all the inventories, which reads ${{ g.all_inv_excess|money }} at {{ whatif[0].days }} days because finished goods and work in process are in it, and a slider left at the series' first value of {{ g.low_days }} days, which reads ${{ g.low_excess|money }}.
+**Check:** at the year's issues the target allows {% for w in whatif %}${{ w.allowed|money }}{{ ", " if not loop.last else "" }}{% endfor %} and the excess is {% for w in whatif %}${{ w.excess|money }}{{ ", " if not loop.last else "" }}{% endfor %}, or {% for w in whatif %}{{ w.months|num(2) }}{{ ", " if not loop.last else "" }}{% endfor %} months of issues. Even at {{ whatif[2].days }} days the excess is about {{ multiple }} times the year's fall in cash. **Watch for:** the excess measured on all the inventories, which reads ${{ g.all_inv_excess|money }} at {{ whatif[0].days }} days because finished goods and work in process are in it, and a slider left at the series' first value of {{ g.low_days }} days, which reads ${{ g.low_excess|money }}. Each class at its own target (packaging at {{ g.pack_target }} days) allows ${{ policy_allowed|money }} and leaves ${{ policy_excess|money }}, an accepted alternative when its definition is stated.
 
 {{ figure('IF-C4-4-B') }}
 
@@ -135,15 +135,16 @@ c. Add a **Table** titled "{{ g.t_tested }}" filtered to {{ whatif[0].days }}, {
 ## What a strong answer says
 
 - **Channel and items.** The supply plan's receipts stay below use; the shortfall channel carries the build; six raw materials make up most of it.
-- **Requisitions.** Repeated for one work order and item, long after the order was due, approved by one manager, with no check against stock or open orders in the records. The wording describes the records, not a person.
-- **Target.** The policy's days reached by buying less than production uses, an interim target for the committee, and the excess several times the fall in cash even at the longest target.
+- **Requisitions.** Repeated for one work order and item, long after the order was due, and approved by one manager, while the records do not show whether stock on hand or open orders were checked. The wording describes the records, not a person.
+- **Target.** A stated benchmark (the largest materials target, or each class at its own) reached by buying less than production uses, an interim target for the committee, the controller's approval because the policies have ended, and the excess several times the fall in cash even at the longest target.
 - **Limits.** Issues continue at the year's rate, the stock is usable at standard, finished goods and open orders are left out, and the policies need approval.
 
 ## Common mistakes and how to respond
 
 - **Channel through the header.** *Symptom:* blank channels on most receipt lines. *Response:* ask which table names the requisition for each line.
 - **Group by work order alone.** *Symptom:* a maximum of {{ g.wo_most }}. *Response:* ask what the justification names besides the work order.
-- **Inner join.** *Symptom:* units of {{ g.units_inner|num(1) }}. *Response:* ask which pairs have no issue.
+- **Inner join.** *Symptom:* {{ matched|count }} pairs, or {{ g.main_inner|num(1) }} {{ by_unit[0].plural }} requisitioned. *Response:* ask which pairs have no issue.
+- **Rolls and boxes added.** *Symptom:* a card of {{ units|num(1) }} units. *Response:* ask what one unit is.
 - **Excess on all inventories.** *Symptom:* ${{ g.all_inv_excess|money }}. *Response:* ask which balance the target covers.
 - **Default left at the first value.** *Symptom:* cards at {{ g.low_days }} days. *Response:* ask what the policy target is.
 

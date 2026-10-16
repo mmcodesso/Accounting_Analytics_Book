@@ -37,7 +37,9 @@ TOOLS = {
                 appendix="b-publishing-security"),
 }
 IGNORE = {
-    "SQL": {"DATEDIFF"},     # SQL Server's function, a wrong option in a Chapter 11 multiple-choice question
+    # SQL Server's functions: DATEDIFF a wrong option in a Chapter 11 multiple-choice question, SUBSTRING named in
+    # Chapter 10's paragraph on aliases in GROUP BY
+    "SQL": {"DATEDIFF", "SUBSTRING"},
     "DAX": {"TTM"},          # part of a measure name, "Hours per Standard Hour TTM"
 }
 PLACEHOLDERS = {"FALSE", "TRUE", "A1", "ROWS"}     # argument values in the first column, not functions
@@ -58,7 +60,8 @@ def code_of(text: str, fences: set[str]) -> list[str]:
 
 def sections(text: str) -> dict[str, str]:
     parts = re.split(r"(?m)^## (.+)$", text)
-    return {parts[i].strip(): parts[i + 1] for i in range(1, len(parts) - 1, 2)}
+    # A heading can carry attributes, such as `## SQL {.new-page}`; the key is the title alone.
+    return {re.sub(r"\s*\{[^}]*\}\s*$", "", parts[i]).strip(): parts[i + 1] for i in range(1, len(parts) - 1, 2)}
 
 
 def first_cells(section: str) -> list[str]:

@@ -245,7 +245,10 @@ def t3(d, claim):
                                   "BETWEEN ? AND ? GROUP BY 1 ORDER BY 1", str(d.F), str(d.C))]
     claim(invoices[0] < 0.75 * sorted(invoices)[len(invoices) // 2], f"January {d.F} is a start-up month (few invoices)")
     claim(spikes[1:] == paydays, "the other months above 20% are exactly the months with three pay dates")
-    rest = [v for m, v in deviation.items() if m not in spikes]
+    claim(paydays[0] == months[2] and deviation[paydays[0]] == max(deviation.values()),
+          "the first three-pay-date month is the third month of the data, whose expectation averages two months, "
+          "and it deviates most")
+    rest =[v for m, v in deviation.items() if m not in spikes]
     by_year = [sum(v for m, v in opex.items() if m.startswith(str(y))) for y in d.years]
     accounts, debit, credit = trial_balance(d, f"{d.C}-12-31")
     claim(abs(debit - credit) < 0.005, "the debit and credit balances are equal")

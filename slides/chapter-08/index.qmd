@@ -44,7 +44,7 @@ The earlier chapters followed a staff accountant and turned up conditions an aud
 - A test of every record returns exceptions, and judgment explains them
 
 ::: {.notes}
-Traditional procedures examine a sample and infer the rest; analytics examines every payment, invoice or entry. Most exceptions turn out to have an ordinary explanation, so the auditor's judgment goes into designing the test, investigating each exception and deciding what it means. The AICPA's Guide to Audit Data Analytics covers how auditors can use such analyses.
+Traditional procedures examine a sample and infer the rest. Analytics applies a test to every payment, invoice or entry, though each test covers only what it looks for. Many exceptions turn out to have an ordinary explanation, so the auditor's judgment goes into designing the test, investigating each exception and deciding what it means. The AICPA's Guide to Audit Data Analytics covers how auditors can use such analyses.
 :::
 
 ## An audit analytics workflow
@@ -63,7 +63,7 @@ Every test follows these steps, from the objective to the workpaper. The dashed 
 - Entries at the end of a period are the ones auditing standards single out
 
 ::: {.notes}
-Chapter 7 left the closes out when it compared operating expenses with the budget. Tutorial 8.3 keeps them in, and explains why they exceed every approver's limit.
+Chapter 7 left the closes out when it compared operating expenses with the budget. Tutorial 8.3 keeps them in, and asks what authority covers their size, above every approval limit on record.
 :::
 
 # Reconciling the Population
@@ -89,7 +89,7 @@ The ledger already holds supplier payments dated early in the next fiscal year, 
 - Keep the strata bounds in cells, counted with COUNTIFS and summed with SUMIFS
 
 ::: {.notes}
-The PCAOB's sampling standard uses strata to reduce a sample and directs the auditor to examine in full the items that could equal or exceed tolerable misstatement, often called individually significant items. In analytics, where every item is tested, the table still directs attention.
+The PCAOB's sampling standard uses strata to reduce a sample and directs the auditor to examine in full the items that could equal or exceed tolerable misstatement, often called individually significant items. In analytics, where a test can run on every item, the table still directs attention.
 :::
 
 # Benford's Law
@@ -98,19 +98,19 @@ The PCAOB's sampling standard uses strata to reduce a sample and directs the aud
 
 - In many data sets, about three in ten numbers start with 1, and under one in twenty with 9
 - The expected share of first digit d is `LOG10(1+1/d)`
-- It holds for amounts that combine many quantities and span several magnitudes
+- It is plausible for amounts that combine many quantities and span several magnitudes
 - Departures can point to invented or altered amounts (Nigrini and Mittermaier)
 
 ::: {.notes}
 Newcomb noticed that the early pages of logarithm tables wore out first, and Benford tested the pattern on many kinds of data. Nigrini and Mittermaier introduced digit tests as analytical procedures for audit planning.
 :::
 
-## Not every population should conform
+## Not every population should be expected to conform
 
-- Assigned numbers, such as invoice or check numbers, carry no magnitude
-- Amounts with a minimum or maximum cannot spread across the digits
-- Nor can a subset selected by its size
-- Amounts set by people, such as prices ending in 99, follow their preferences
+- Assigned numbers, such as invoice or check numbers, are unsuitable
+- A minimum, a maximum or a size-based selection can distort the digits
+- So can amounts people set, such as prices ending in 99
+- A population shaped by them needs a reason to expect the pattern
 
 ::: {.notes}
 Nigrini reviews which kinds of audit data suit a Benford analysis, a question to answer before running the test.
@@ -121,7 +121,7 @@ Nigrini reviews which kinds of audit data suit a Benford analysis, a question to
 {{< book-table tbl-08-01 >}}
 
 ::: {.notes}
-With tens of thousands of amounts, chi-square and z tests find a significant difference in almost any population, however small. Nigrini recommends the mean absolute deviation, the average of the nine absolute differences between actual and expected shares, judged against these ranges.
+Chi-square and z tests take the number of amounts into account, so with tens of thousands of amounts they can call a small departure significant. Nigrini recommends the mean absolute deviation, the average of the nine absolute differences between actual and expected shares, which leaves the count out, judged against these practical screening ranges.
 :::
 
 ## A nonconformity shows where to look
@@ -137,7 +137,7 @@ Nigrini examined a method that samples the transactions whose removal would make
 
 ## Check your understanding {.check}
 
-Should each set of numbers follow Benford's Law?
+Should each set of numbers be expected to follow Benford's Law?
 
 1. Supplier payment amounts over three years
 2. Check numbers
@@ -148,15 +148,15 @@ Should each set of numbers follow Benford's Law?
 Ask students which property of the data decides each answer.
 :::
 
-## Only measured, unbounded amounts should conform {.answer}
+## Measured amounts are the candidates to conform {.answer}
 
-1. Yes: measured amounts that span several magnitudes
+1. Likely: measured amounts that span several magnitudes
 2. No: assigned numbers carry no magnitude
-3. No: a subset selected by its size
-4. No: amounts set by people's preferences
+3. Not without a reason: a subset selected by its size
+4. Not without a reason: prices set by people's preferences
 
 ::: {.notes}
-Even for the first, a nonconformity is a reason to look, not a finding; Tutorial 8.1 shows how.
+Even for the first, a nonconformity is a reason to look, not a finding. Tutorial 8.1 shows how.
 :::
 
 # Guided Tutorial 8.1: Stratifying and Testing Supplier Payments
@@ -198,7 +198,7 @@ The columns are the actual shares and the line Benford's expected shares. The pa
 {{< book-figure fig-08-04 >}}
 
 ::: {.notes}
-Full payments conform acceptably; partial payments do not. Charles River pays in parts only larger invoices, most of them just above a thousand dollars, so their parts are amounts in the hundreds that start with the digits 5 to 9 far more often than expected, and with 2 and 3 far less often. The cause is the payment process, not invented amounts.
+Full payments conform acceptably; partial payments do not. Charles River pays in parts only larger invoices, most of them just above a thousand dollars, so their parts are amounts in the hundreds that start with the digits 5 to 9 far more often than expected, and with 2 and 3 far less often. The payment process is a plausible explanation, but the digit test cannot show that each payment is genuine.
 :::
 
 ## Checkpoint
@@ -206,7 +206,7 @@ Full payments conform acceptably; partial payments do not. Charles River pays in
 {{< book-checkpoint 8.1 lead="true" >}}
 
 ::: {.notes}
-The first test found no exception that points to an error, and that is a result worth documenting. The payments agree with the ledger in count and total, the largest are identified for vouching, and the one departure from expectations has an explanation the data supports.
+The first test found no exception that points to an error, and that is a result worth documenting. The payments agree with the ledger in count and total, the largest are identified for vouching, and the one departure from expectations has a plausible explanation in the payment process, with the payments' support still to examine.
 :::
 
 # Aging and Reconciling Receivables
@@ -219,7 +219,7 @@ The first test found no exception that points to an error, and that is a result 
 - The as-of date matters: later payments must not reduce the balance
 
 ::: {.notes}
-The standard requires the estimate to reflect the risk of loss even when it is remote, and illustrates it with loss rates by bucket. Charles River's chart calls the valuation account the Allowance for Doubtful Accounts, the older name.
+The standard requires the estimate to reflect the risk of loss even when it is remote, and illustrates it with loss rates by bucket. Only an expectation of no nonpayment at all, which management must support, removes the need for an estimate. Charles River's chart calls the valuation account the Allowance for Doubtful Accounts, the older name.
 :::
 
 ## Reconcile the aging to the ledger
@@ -241,7 +241,7 @@ Either the ledger holds an amount no invoice supports, or the detail misses invo
 - RANDARRAY and SORTBY shuffle the list; freeze it with Paste Values
 
 ::: {.notes}
-The PCAOB's confirmation standard requires confirming receivables from sales, or obtaining the evidence directly from a knowledgeable external source. A selection that cannot be reproduced cannot be reviewed, so record its date and parameters.
+The PCAOB's confirmation standard requires confirming receivables from sales, or directly accessing a knowledgeable external source's information. Where neither is feasible, the auditor documents why and obtains external information indirectly through other substantive procedures. A selection that cannot be reproduced cannot be reviewed, so record its date and parameters.
 :::
 
 ## Check your understanding {.check}
@@ -327,7 +327,7 @@ A backdated entry is created on a later day than the date it posts to, so it may
 
 - Each flag is TRUE or FALSE, and their sum is a risk score
 - A score ranks entries; it is not a probability of fraud
-- One flag often has an ordinary cause; several together rarely do
+- Several flags come first in review, though they can share one cause
 - Equal weights are a judgment too
 
 ::: {.notes}
@@ -336,7 +336,7 @@ Digit tests apply to journal entries with care: Debreceny and Gray found that jo
 
 ## Every exception gets a disposition
 
-- Most flagged entries are false positives: they meet the criteria but are legitimate
+- Many flagged entries are false positives, legitimate entries that meet the criteria
 - Expected: record the evidence that explains it
 - Follow up: record the question to ask and the document to request
 - A misstatement or control deficiency: report it
@@ -361,12 +361,12 @@ Ask students what evidence would support each disposition.
 ## Expected, or follow up {.answer}
 
 1. Expected: they post on the month-end date itself
-2. Expected: a close carries a whole year's amounts
+2. Expected in size, but request the closing-entry authority
 3. Follow up: ask why, and request the support
 4. Follow up, as a possible control deficiency: segregation of duties
 
 ::: {.notes}
-Tutorial 8.3 explains the first two once with a PivotTable, so that the entries left to follow up stand out.
+Tutorial 8.3 shows the pattern behind the first two once with a PivotTable, so that the entries left to follow up stand out.
 :::
 
 # Guided Tutorial 8.3: Testing Journal Entries for Management Override
@@ -408,7 +408,7 @@ The outlined line is the receivables difference found in Tutorial 8.2. The journ
 {{< book-checkpoint 8.3 lead="true" >}}
 
 ::: {.notes}
-The flags on the recurring entries are explained by their timing, which leaves their amounts and approvals to check against their schedules; the tests also found weaknesses in how entries are approved. The opening balance entry, created after its date, approved by its own creator, and carrying balances the detail does not support, is the first item for the audit committee.
+The flags on the recurring entries are explained by their timing, which leaves their amounts and approvals to check against their schedules. The tests also found approval exceptions to follow up. The opening balance entry, created after its date, approved by its own creator, and carrying balances the detail does not support, is the first item for the audit committee.
 :::
 
 # Duplicate, Gap, and Threshold Tests
@@ -454,7 +454,7 @@ Amounts just above or below control thresholds are one of the patterns Nigrini f
 - Unapproved suppliers and items sold outside their life (Exercise 5.6)
 
 ::: {.notes}
-Each is a test of a control and belongs in the workpapers with its population, its results and a disposition for every exception. Pricing is another control area: promotion and price-list dates and override approvals can be compared with the orders, as Exercise 8.6 does.
+Each can point to a risk or give evidence about a control, so the workpaper names the question it tests, with its population, its results and a disposition for every exception. Pricing is another control area: promotion and price-list dates and override approvals can be compared with the orders, as Exercise 8.6 does.
 :::
 
 # Documenting Audit Analytics
@@ -464,10 +464,10 @@ Each is a test of a control and belongs in the workpapers with its population, i
 {{< book-figure fig-08-09 >}}
 
 ::: {.notes}
-The PCAOB requires documentation that lets an experienced auditor with no previous connection understand the work, the evidence and the conclusions, and shows who performed and reviewed it. The workpaper adds the objective, the reconciliation of the population, the exceptions with their dispositions, and a conclusion.
+The PCAOB requires documentation that lets an experienced auditor with no previous connection understand the work, the evidence and the conclusions, and shows who performed and reviewed it, and when. The workpaper adds the objective, the reconciliation of the population, the exceptions with their dispositions, and a conclusion.
 :::
 
-## Analytics adds reproducibility and dispositions
+## Analytics depends on reproducibility and dispositions
 
 - Record the extract, its as-of date and every test's parameters
 - Then the workbook can be refreshed and the tests rerun
@@ -482,9 +482,9 @@ The parameters include the strata bounds, the aging buckets and the approval lim
 
 ## What the review found
 
-- Payments: agree with the ledger; the largest identified; the nonconformity explained
+- Payments: agree with the ledger; the largest identified; the nonconformity plausibly explained
 - Receivables: part of the balance has no invoice detail, and no allowance
-- Journal entries: approval weaknesses, led by the opening balance entry
+- Journal entries: approval exceptions, led by the opening balance entry
 - Next: the Part II case, then Part III and the database
 
 ::: {.notes}

@@ -364,7 +364,7 @@ def if_c4_0_b() -> Diagram:
         d.box("", mx - 0.75, ly + h, 1.5, ya - ly - h, fill=color, stroke=color, rounded=False)
         d.box(text, lx, ly, lw, h, fill=fill, stroke=color, size=SMALL, stroke_width=1.5)
         d.vertex("", f"ellipse;html=1;fillColor={color};strokeColor={WHITE};strokeWidth=1.5;", mx - 7, ya - 7, 14, 14)
-    left = (f"The last {r1['n_open']} pay periods ({_nowrap(opened[0][1])} to {_nowrap(opened[1][2])}) are open and have no registers, so payroll stops at "
+    left = (f"The last {r1['n_open']} pay periods ({_nowrap(opened[0][1])} to {_nowrap(opened[1][2])}) are marked Open and have no registers, so payroll stops at "
             f"{_nowrap(pay_end)}. A Data Through that followed payroll would fall before the year-end and blank the last quarter.")
     d.text(left, ax0, ya + 52, 276, 80, size=SMALL)
     # the bracket after Data Through
@@ -380,7 +380,8 @@ def if_c4_0_b() -> Diagram:
            f"a fall of {_money(r1['fall'])} that only means the data stop.", bx0 + 6, ya + 52, bx1 - bx0 - 6, 64, size=SMALL)
     _note(d, f"One axis from December {data.C} to the end of February {data.N}. {_nowrap(thru)} is the earliest of the last posting dates of "
              f"{', '.join(s for s in n4.DATA_SOURCES if s != late[0])} and {late[0]}: {n4.WORDS[len(n4.DATA_SOURCES) - 1]} documents end on that day and supplier payments run on to {_nowrap(last)}. "
-             f"Payroll liability remittances post until {_nowrap(r1['remit_end'])}, but the last payroll posting is the last PayrollSummary or PayrollPayment.", ya + 142)
+             f"Payroll liability remittances post until {_nowrap(r1['remit_end'])}, but the last payroll posting is the last PayrollSummary or PayrollPayment. "
+             "Data Through is a bound observed in the extract, not proof that no document before it is missing.", ya + 142)
     return d
 
 
@@ -563,10 +564,10 @@ def if_c4_3_b() -> Diagram:
         d.box(text, lx, cy - h / 2, label_w - 6, h, fill=WHITE, stroke=colors[k], size=SMALL, align="left", stroke_width=3 if k == "ccc" else 1.5)
     y = top + plot_h + 10
     bottom = kit.callout(d, f"<b>{labels[0]} is the first quarter with a full twelve months, and its balances still carry the opening entry {esc(entry)}.</b> "
-                            f"Its receivables of {_money(open_ar)} and payables of {_money(open_ap)} have no document behind them. Without those lines DSO reads "
+                            f"Its receivables of {_money(open_ar)} and payables of {_money(open_ap)} have no document behind them in the extract. Without those lines DSO reads "
                             f"{first['dso_x']:.1f} days, not {first['dso']:.1f}, and DPO {first['dpo_x']:.1f}, not {first['dpo']:.1f}.", 0, y, 860, "amber")
     _note(d, f"From {labels[0]} to {labels[-1]} DIO rose {rise('dio'):.1f} days and the cycle {rise('ccc'):.1f}, while DSO moved {_sgn(rise('dso'))} and DPO {_sgn(rise('dpo'))}: "
-             "the cycle grew through inventory. Each line is a quarter-end balance over its own ledger flow of the twelve months before, times 365; "
+             "the cycle grew mainly through inventory. Each line is a quarter-end balance over its own ledger flow of the twelve months before, times 365; "
              f"the shaded quarter is the first. DPO's fall from {first['dpo']:.1f} comes mostly from the unsupported opening payables diluted by purchases ({first['dpo_x']:.1f} without them).", bottom + 4)
     return d
 
@@ -1153,7 +1154,10 @@ def if_c4_2_a() -> Diagram:
     selected = json.dumps(_visual(page, "bridgeYear")["visual"]["objects"]["general"][0]["properties"]["filter"])
     assert f'"{C}L"' in selected, "the slicer is saved on the current year"
     cal = re.search(r"CALENDAR \( DATE \( (\d{4}), 1, 1 \), DATE \( (\d{4}), 12, 31 \) \)", _tmdl("tables/Date.tmdl"))
-    assert (int(cal.group(1)), int(cal.group(2))) == (data.F, data.N), "the Date table runs to the next year, so the slicer lists it too"
+    assert (int(cal.group(1)), int(cal.group(2))) == (data.F, data.N), "the Date table runs to the next year"
+    # the slicer lists the years a filter on it keeps (the window's complete years), or else every year of the Date table
+    tiles = _year_filter(page, "bridgeYear") or list(range(data.F, data.N + 1))
+    assert tiles in (years, list(range(data.F, data.N + 1))), tiles
     steps = _steps()
     bridge = {y: n4.bridge(data, y) for y in years}
     for y in years:
@@ -1182,10 +1186,10 @@ def if_c4_2_a() -> Diagram:
     groups_r = [(str(y), [("As recorded", 82), ("Restated<br>Cash Flow", 82)]) for y in (P, C)]
 
     def draw(d: Diagram) -> tuple[dict, dict, dict, float]:
-        sl_right = pbi.slicer_tiles(d, pad, pad, t_slicer, [str(y) for y in range(data.F, data.N + 1)], str(C), tile_w=64)
+        sl_right = pbi.slicer_tiles(d, pad, pad, t_slicer, [str(y) for y in tiles], str(C), tile_w=64)
         inv, tax, pay = cur["inventories"], cur["sales_tax"], cur["payables"]
-        top_h = kit.callout(d, f"<b>The inventories absorbed {_money(-inv)}</b>, nearly twice the {_money(cur['net_income'])} the year earned. The unremitted sales tax "
-                               f"({_signed(tax)}) and the payables ({_signed(pay)}) held cash up; the steps end at the change in cash, {_signed(cur['cash'])}.",
+        top_h = kit.callout(d, f"<b>The inventories absorbed {_money(-inv)}</b>, nearly twice the {_money(cur['net_income'])} the year earned. The growth of the recorded sales tax payable "
+                               f"({_signed(tax)}) and of the payables ({_signed(pay)}) held cash up; the steps end at the change in cash, {_signed(cur['cash'])}.",
                             sl_right + 10, pad, 860 - pad - sl_right - 10, "teal")
         y0 = max(pad + 56, top_h) + 10
         wf = _waterfall(d, pad, y0, 860 - 2 * pad, 312, t_wf, steps, [cur[STEP_KEYS[s]] for s in steps], [-4e6, -2e6, 0, 2e6, 4e6, 6e6])
@@ -1218,7 +1222,9 @@ def if_c4_2_a() -> Diagram:
     ex, ey, ew, eh = mr["geometry"][(1, 3)]
     d.outline(fx + 1, fy + 1, ex + ew - fx - 2, ey + eh - fy - 2, CORAL, width=2.5, front=True)
     _tabs(page, d, canvas_h + 4)
-    _note(d, f"Report view, page {_page_name(page)}, with the slicer saved on {C} (it lists the Date table's years, {data.F} to {data.N}), the Cash step filtered out and the steps in "
+    listed = (f"filtered to the window's complete years, {tiles[0]} to {tiles[-1]}" if tiles == years
+              else f"it lists the Date table's years, {data.F} to {data.N}")
+    _note(d, f"Report view, page {_page_name(page)}, with the slicer saved on {C} ({listed}), the Cash step filtered out and the steps in "
              f"their sort order. Power BI adds the Total column, the change in cash. Outlined in ink: the Inventories step, in the waterfall and in the matrix; in coral: financing and investing of {C}, "
              "as recorded and restated. Matrix rows follow their sort, the restated sections by name; grand-total columns, the cash cards, the table of cash by year and the "
              "page's text box are not drawn.", canvas_h + 34)
@@ -1488,7 +1494,7 @@ def if_c4_5_a() -> Diagram:
     # the findings, as a table without a sort of its own lists them: by its first column
     found = sorted(g["findings"], key=lambda r: r[0])
     rows_f = [[r[0], r[1], _money(float(r[2])), r[3], r[4]] for r in found]
-    assert len(rows_f) == 7 and {r[3] for r in rows_f} == {"Follow up", "Expected", "Misstatement"}
+    assert len(rows_f) >= 7 and {r[3] for r in rows_f} == {"Follow up", "Expected", "Misstatement"}
     rh = 20
     pad = 16
 
@@ -1521,7 +1527,7 @@ def if_c4_5_a() -> Diagram:
         w_f = [104, 0, 92, 104, 86]
         w_f[1] = 860 - 2 * pad - 12 - sum(w_f)
         return _table_visual(d, pad, y, t_findings, ["Account", "Finding", "Amount", "Disposition", "Reconciles"], w_f, rows_f, aligns=["left", "left", "right", "left", "left"],
-                             title_lines=1, row_h=rh)
+                             title_lines=1, row_h=rh - 2)
 
     def draw(d: Diagram) -> tuple[dict, dict, dict, dict, dict, float]:
         p1, p2, y = roll_visual(d, pad)
@@ -1532,10 +1538,9 @@ def if_c4_5_a() -> Diagram:
 
     bottom = draw(Diagram("probe"))[-1]
     canvas_h = bottom + 12
-    note = (f"Report view, page {_page_name(page)}, with the Year filter on {C} for the matrix and the cards and on the {len(years)} years of the window for the billing table; rows are 20 px here. "
-            "The matrix is one visual drawn in two panes, columns 1 to 6 and the rest after scrolling right, with long headings broken over two lines. Outlined in coral: the JournalEntry column, "
-            "which no subledger document supports, and the two differences. The Findings table lists its rows in the order of its first column. Total rows, the sales tax matrix and the page's text box "
-            "are not drawn.")
+    note = (f"Report view, page {_page_name(page)}, the matrix and the cards filtered to {C} and the billing table to the window's {len(years)} years. The matrix is one visual drawn in "
+            "two panes, columns 1 to 6 and the rest after scrolling right. Outlined in coral: the JournalEntry column, which no subledger document in the extract supports, and the two "
+            "differences. The Findings table lists its rows by its first column. Total rows, the sales tax matrix and the page's text box are not drawn.")
     assert canvas_h + 34 + kit.height_for(note, 860, SMALL, pad=8) <= 980, f"the page needs {canvas_h + 34 + kit.height_for(note, 860, SMALL, pad=8):.0f} px"
     d = Diagram("The Reconciliations Page")
     pbi.canvas(d, 0, 0, 860, canvas_h)

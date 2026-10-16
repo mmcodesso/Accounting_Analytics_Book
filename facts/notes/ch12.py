@@ -44,12 +44,13 @@ def weekdays(first: str, last: str) -> int:
 
 
 def surge_days(d) -> list[str]:
-    """Test H8's surge days: days on which every manufacturing employee who clocked in clocked the same hours."""
+    """Test H8's surge days: days on which every manufacturing employee who clocked in clocked the same hours,
+    with more than one employee (test H9's CTE counts them the same way)."""
     return [r[0] for r in d.q(
         "SELECT tc.WorkDate FROM TimeClockEntry tc JOIN Employee e ON e.EmployeeID = tc.EmployeeID "
         "JOIN CostCenter cc ON cc.CostCenterID = e.CostCenterID WHERE cc.CostCenterName = 'Manufacturing' "
-        "GROUP BY tc.WorkDate HAVING COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1 AND COUNT(*) > 1 "
-        "ORDER BY tc.WorkDate")]
+        "GROUP BY tc.WorkDate HAVING COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1 "
+        "AND COUNT(DISTINCT tc.EmployeeID) > 1 ORDER BY tc.WorkDate")]
 
 
 def runs(numbers: list[str]) -> list[str]:
@@ -276,6 +277,13 @@ def ex2(d, claim):
                          f"(SELECT SUM(a.AppliedAmount) FROM CashReceiptApplication a WHERE a.SalesInvoiceID = si.SalesInvoiceID "
                          f"AND a.ApplicationDate <= ?)", end)
     claim(refunded >= 0.95 * len(negative), "the credits on those invoices are (almost all) refunded")
+    # paid in full strictly before the first credit memo (a date has no time, so a same-day application is left out)
+    full_before = d.one(f"SELECT COUNT(*) FROM SalesInvoice si WHERE si.SalesInvoiceID IN ({ids}) AND si.GrandTotal - 0.005 <= "
+                        f"(SELECT COALESCE(SUM(a.AppliedAmount), 0) FROM CashReceiptApplication a WHERE a.SalesInvoiceID = "
+                        f"si.SalesInvoiceID AND a.ApplicationDate < (SELECT MIN(cm.CreditMemoDate) FROM CreditMemo cm "
+                        f"WHERE cm.OriginalSalesInvoiceID = si.SalesInvoiceID))")
+    claim(0 < full_before < paid_in_full, "some, not all, of the invoices paid in full by the as-of date were paid in full "
+                                          "before their first credit")
     by_customer = defaultdict(float)
     for r in positive:
         by_customer[r[1]] += r[2]
@@ -294,6 +302,16 @@ def ex2(d, claim):
                "ON ibr.GoodsReceiptLineID = grl.GoodsReceiptLineID "
                "WHERE gr.ReceiptDate <= ?1 AND COALESCE(ibr.QtyInvoiced, 0) < grl.QuantityReceived - 0.0001", end)
     grni_total = round(sum(r[2] for r in grni), 2)
+    # the lines as test A7 displays them, each rounded to the cent by SQLite, then added
+    grni_shown = d.one("WITH InvoicedByReceipt AS (SELECT pil.GoodsReceiptLineID, SUM(pil.Quantity) AS QtyInvoiced "
+                       "FROM PurchaseInvoiceLine pil JOIN PurchaseInvoice pi ON pi.PurchaseInvoiceID = pil.PurchaseInvoiceID "
+                       "WHERE pi.ReceivedDate <= ?1 GROUP BY pil.GoodsReceiptLineID) "
+                       "SELECT ROUND(SUM(ROUND(grl.ExtendedStandardCost * (1 - COALESCE(ibr.QtyInvoiced, 0) / "
+                       "grl.QuantityReceived), 2)), 2) FROM GoodsReceiptLine grl JOIN GoodsReceipt gr "
+                       "ON gr.GoodsReceiptID = grl.GoodsReceiptID LEFT JOIN InvoicedByReceipt ibr "
+                       "ON ibr.GoodsReceiptLineID = grl.GoodsReceiptLineID "
+                       "WHERE gr.ReceiptDate <= ?1 AND COALESCE(ibr.QtyInvoiced, 0) < grl.QuantityReceived - 0.0001", end)
+    claim(0 < abs(grni_shown - grni_total) < 1, "the lines rounded one by one add up to a few cents from the total rounded once")
     gl2020 = -d.balance(["2020"], end)
     claim(0 < abs(grni_total - gl2020) < 1, "the receipts not invoiced differ from account 2020 by less than a dollar")
     months = defaultdict(lambda: [0, 0.0])
@@ -307,7 +325,7 @@ def ex2(d, claim):
     claim(len(old) >= 2, "receipts of more than one month are more than two months old")
     return dict(asof=end, n=len(positive), total=total, customers=len(by_customer), b=buckets, ar=ar, ledger=ledger,
                 difference=ledger - total, entry=entry, n_negative=len(negative), negative=sum(r[2] for r in negative),
-                paid_in_full=paid_in_full, refunded=refunded,
+                paid_in_full=paid_in_full, full_before=full_before, refunded=refunded, grni_shown=grni_shown,
                 strata=strata, key_share=strata[-1]["amount"] / total, grni_lines=len(grni), grni=grni_total, gl2020=gl2020,
                 rounding=abs(grni_total - gl2020),
                 months=[(m, months[m][1], months[m][0]) for m in sorted(months, reverse=True)],
@@ -327,6 +345,12 @@ def ex3(d, claim):
                 "lt.WorkOrderOperationID WHERE lt.LaborType = 'Direct Manufacturing' AND (op.ActualStartDate IS NULL "
                 "OR lt.WorkDate < op.ActualStartDate)") == 0,
           "no direct time is dated before its operation's ActualStartDate (and every operation with time has one)")
+    # the direct entries with no valid operation (a NULL key or one that matches no operation), kept apart
+    direct_n, no_op, no_op_hours = d.q(
+        "SELECT COUNT(*), SUM(op.WorkOrderOperationID IS NULL), SUM(CASE WHEN op.WorkOrderOperationID IS NULL "
+        "THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END) FROM LaborTimeEntry lt LEFT JOIN WorkOrderOperation op "
+        "ON op.WorkOrderOperationID = lt.WorkOrderOperationID WHERE lt.LaborType = 'Direct Manufacturing'")[0]
+    claim(0 < no_op < 0.01 * direct_n, "a few direct entries, well under one percent, have no valid operation")
     rows = d.q("SELECT CAST(strftime('%Y', op.ActualEndDate) AS INTEGER), wc.WorkCenterName, SUM(op.PlannedLoadHours), "
                "SUM(lab.H), SUM(lab.Hin) FROM WorkOrderOperation op JOIN WorkCenter wc ON wc.WorkCenterID = op.WorkCenterID "
                "LEFT JOIN (SELECT lt.WorkOrderOperationID AS id, SUM(lt.RegularHours + lt.OvertimeHours) AS H, "
@@ -339,6 +363,12 @@ def ex3(d, claim):
     centers = sorted({c for _, c, *_ in rows})
     short = lambda c: c.removesuffix(" Work Center")
     claim(all(ratio[(d.C, c)]["open"] < 1 for c in centers), f"every work center falls below plan in {d.C} on the time while open")
+    above = [dict(center=c.removesuffix(" Work Center"),
+                  years=[dict(year=y, ratio=ratio[(y, c)]["open"]) for y in (d.F, d.P) if ratio[(y, c)]["open"] > 1])
+             for c in centers]
+    above = [a for a in above if a["years"]]
+    claim(bool(above), "in an earlier year at least one work center is above plan even on the time while open (the note scopes "
+                       "the below-plan reading to the last year)")
     packing = next(c for c in centers if c.startswith("Packing"))
     claim(ratio[(d.C, packing)]["all"] > 1 > ratio[(d.C, packing)]["open"], "the Packing excess disappears")
     last = d.q("SELECT wc.WorkCenterName, COUNT(*) FROM WorkOrderOperation op JOIN WorkCenter wc ON wc.WorkCenterID = op.WorkCenterID "
@@ -366,6 +396,12 @@ def ex3(d, claim):
     claim(released.get(after, 0) < sum(released.get(m, 0) for m in build) / max(len(build), 1),
           "releases after the build fell below their level during it")
     surplus = sum(completed[m] - shipped[m] for m in build)
+    kinds = {(m, k): h for m, k, h in d.q("SELECT substr(WorkDate, 1, 7), LaborType, SUM(RegularHours + OvertimeHours) "
+                                          "FROM LaborTimeEntry WHERE LaborType <> 'NonManufacturing' GROUP BY 1, 2")}
+    quiet = [m for m in build if kinds.get((m, "Indirect Manufacturing"), 0) < 0.05 * kinds.get((m, "Direct Manufacturing"), 0)]
+    claim(bool(quiet) and quiet == build[:len(quiet)] and len(quiet) < len(build),
+          "indirect time is almost absent in the first months of the build but not in its last month")
+    build_end_indirect = kinds.get((build[-1], "Indirect Manufacturing"), 0)
     staff_months = year[1:year.index(after) + 2]             # February through the month after that
     staff = [{r[0] for r in d.q("SELECT DISTINCT EmployeeID FROM LaborTimeEntry WHERE LaborType <> 'NonManufacturing' "
                                 "AND substr(WorkDate, 1, 7) = ?", m)} for m in staff_months]
@@ -382,7 +418,9 @@ def ex3(d, claim):
     first = first or year[6]
     early = [late[m] for m in sorted(late) if m < first]
     claim(bool(early) and late.get(first, 0) > max(early), "the late share in that month is higher than in any month before it")
-    return dict(cutoff=cutoff, centers=[short(c) for c in centers],
+    return dict(cutoff=cutoff, centers=[short(c) for c in centers], no_op=no_op, no_op_hours=no_op_hours, above=above,
+                quiet_from=MONTHS[int(quiet[0][5:]) - 1], quiet_to=MONTHS[int(quiet[-1][5:]) - 1],
+                build_end_indirect=build_end_indirect,
                 now=[ratio[(d.C, c)]["open"] for c in centers], now_all=[ratio[(d.C, c)]["all"] for c in centers],
                 then=[ratio[(d.F, c)]["open"] for c in centers], months_to=MONTHS[int(months[-1][5:]) - 1],
                 released=[released.get(m, 0) for m in months], completed=[completed.get(m, 0) for m in months],
@@ -418,6 +456,11 @@ def ex4(d, claim):
                   f"WHERE cc.CostCenterName = 'Manufacturing' AND tc.WorkDate IN ({marks})")
     claim(all(r[1] == manager and r[2] == r[3] for r in entries),
           "every clock entry of the surge days was approved by the Production Manager on the work date")
+    creators = d.q(f"SELECT r.CreatedByEmployeeID, COUNT(*) FROM EmployeeShiftRoster r JOIN Employee e ON e.EmployeeID = "
+                   f"r.EmployeeID JOIN CostCenter cc ON cc.CostCenterID = e.CostCenterID WHERE cc.CostCenterName = "
+                   f"'Manufacturing' AND r.RosterDate IN ({marks}) GROUP BY 1")
+    claim(len(creators) == 1 and creators[0][0] == manager and creators[0][1] == len(entries),
+          "the Production Manager created the shift roster of every surge-day clock entry")
     overtime = {(int(y), s): h for y, s, h in d.q(
         f"SELECT substr(tc.WorkDate, 1, 4), tc.WorkDate IN ({marks}), SUM(tc.OvertimeHours) FROM TimeClockEntry tc "
         f"JOIN Employee e ON e.EmployeeID = tc.EmployeeID JOIN CostCenter cc ON cc.CostCenterID = e.CostCenterID "
@@ -479,11 +522,14 @@ def ex5(d, claim):
     claim(all(r[2] == "Chief Financial Officer" for r in early), "the payments before approval pay the chief financial officer")
     claim(all(r[3] == 1 for r in early), "each was made the day before the register was approved")
     times = round(gross / usual)
+    pay_years = len({r[7][:4] for r in after})
+    claim(pay_years > 1, "the post-termination registers fall in more than one pay year")
     return dict(n_after=word(len(after)), title=title, emp=emp, center=center, terminated=terminated,
                 after=[dict(id=r[0], start=r[5], paid=r[7]) for r in after], gross=gross, times=word(times), usual=usual,
                 charged=charged.pop(), first=after[0][0], unpaid=unpaid, approver=approver, approver_title=approver_title,
                 registers=len(registers), own=len(own), own_net=sum(r[5] for r in own),
-                n_early=word(len(early)), early=[r[0] for r in early], early_net=sum(r[1] for r in early))
+                n_early=word(len(early)), early=[r[0] for r in early], early_net=sum(r[1] for r in early),
+                pay_years=word(pay_years), n_unpaid=word(len(unpaid)))
 
 
 # --- Exercise 12.6 --------------------------------------------------------------------------------
@@ -539,6 +585,11 @@ def ex6(d, claim):
         return sum(abs(digits[k] / n - math.log10(1 + 1 / k)) for k in range(1, 10)) / 9
 
     smallest = min(a for a, _ in payments)
+    for group in ([a for a, _ in payments], [a for a, g in payments if abs(a - g) < 0.005], [a for a, g in payments if a < g - 0.005]):
+        claim({int(f"{a:.15e}"[0]) for a in group} == set(range(1, 10)), "every group of payments has all nine first digits")
+    partial_min = min(g for a, g in payments if a < g - 0.005)
+    claim(partial_min >= 1000 > min(g for a, g in payments if abs(a - g) < 0.005),
+          "only the larger invoices (from the floor the note names) are paid in parts, and smaller ones are paid in full")
     claim(smallest > 0, "every payment is positive")
     claim(all(f"{a:e}"[0] == f"{a:.15e}"[0] for a, _ in payments),
           "no payment's first digit changes between six and fifteen decimals")
@@ -547,4 +598,5 @@ def ex6(d, claim):
                 pairs=len(pairs), within30=sum(1 for r in pairs if abs(r[0]) <= 30),
                 within14=sum(1 for r in pairs if abs(r[0]) <= 14), series=series,
                 mad_all=mad([a for a, _ in payments]), mad_full=mad([a for a, g in payments if abs(a - g) < 0.005]),
-                mad_partial=mad([a for a, g in payments if a < g - 0.005]), smallest=smallest, smallest_e=f"{smallest:.15e}")
+                mad_partial=mad([a for a, g in payments if a < g - 0.005]), smallest=smallest, smallest_e=f"{smallest:.15e}",
+                partial_floor=int(partial_min // 1000 * 1000))

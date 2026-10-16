@@ -85,12 +85,12 @@ The second question also asks whether incompatible duties are separated. The thi
 
 ## The chief audit executive's three conditions
 
-- Magnitude is judged against a set share of income before income taxes
+- Materiality starts from a set share of income before income taxes
 - Every finding is worded as what the records show, not what anyone did
 - The owners own their responses, but you draft the action plans
 
 ::: {.notes}
-Income before income taxes is taken as the ledger records it, for the latest fiscal year, and the chapter states the share; use it as written. A finding reads like "a refund dated before the customer's payment was received" until evidence from outside the database settles the question.
+Income before income taxes is taken as the ledger records it, for the latest fiscal year, and the chapter states the share; use it as written. A fraud or governance risk can matter below it. A finding reads like "a refund dated before the customer's payment was received" until evidence from outside the database settles the question.
 :::
 
 # The Credits Cycle and Its Risks
@@ -138,15 +138,15 @@ Each scheme leaves traces a query can look for. Lapping hides a stolen receipt b
 These traces are what the control tests of Requirement 4 and the refund score of Requirement 5 search for. Finding a trace is not proof of a scheme: the finding says what the records show.
 :::
 
-## Fraud here is more often theft than misreporting
+## Theft dominated the frauds the ACFE studied
 
-- Asset misappropriation far outnumbers financial statement fraud
+- In its cases, asset misappropriation far outnumbered statement fraud
 - Fraud usually needs an incentive, an opportunity and a rationalization
 - Preventive controls stop a refund going to the wrong account
 - Detective controls look for the traces in the table
 
 ::: {.notes}
-The ACFE's latest study found asset misappropriation in the great majority of occupational fraud cases, and found that anti-fraud controls go with lower losses and faster detection. AS 2401 frames the brainstorming of Requirement 3 around the three conditions. COSO and the ACFE describe preventive controls in a refund process: pay refunds only to the instrument the customer used or to an account verified independently, offset any open balance first, and keep the approval of credits away from the people who handle the customer's cash.
+The ACFE's study found asset misappropriation in the great majority of the occupational fraud cases investigated for it, and found that anti-fraud controls go with lower losses and faster detection. It shows what those cases involved, not how likely a fraud is at Charles River. AS 2401 frames the brainstorming of Requirement 3 around the three conditions. COSO and the ACFE describe preventive controls in a refund process: pay refunds only to the instrument the customer used or to an account verified independently, offset any open balance first, and keep the approval of credits away from the people who handle the customer's cash.
 :::
 
 # The Data You Will Use
@@ -336,13 +336,13 @@ Ask students what each test would let them rely on: a control, an amount, or bot
 
 ## Each test has its type {.answer}
 
-1. Both: one population tests the control and totals the balance
+1. A test of controls: the total measures exposure, not the amount
 2. Substantive: it tests the balance
 3. A test of controls: separation of duties
 4. Substantive: it tests the amount credited
 
 ::: {.notes}
-The risk-and-control matrix of Requirement 3 records each test's type, so that the evidence on a control and the test of its balance are planned together.
+The risk-and-control matrix of Requirement 3 records each test's type, so that the evidence on a control and the test of its balance are planned together. Totaling the flagged credits measures the exposure; a substantive objective needs its own procedure, such as recomputing each credit and examining its support.
 :::
 
 ## Milestone 1: before you hand it in
@@ -397,7 +397,7 @@ Show return rates by year, item group, product family and reason, and compare ra
 ## Sampling still has a place
 
 - Some evidence is a document: a request, a payee check, an inspection
-- Documents are examined one at a time, so they need a sample
+- Documents are examined one by one, in a sample or all if few
 - You choose the confidence, the tolerable rate and the expected rate
 - The upper deviation limit decides whether the sample supports reliance
 
@@ -423,7 +423,7 @@ The sizes come from the binomial distribution, and the number in parentheses is 
 - **Check:** the rule is written before the test, and no result is invented
 
 ::: {.notes}
-Define three attributes that need outside evidence: a written request from the customer, a payee checked independently, and an inspection record for refunds of goods returned damaged. The inspection applies only to those refunds, so size it on their own population, or examine them all: another refund is not a passed inspection. Choose the parameters, take the size from the table, take the key items in full under the chapter's thresholds, select the rest, and record the date and parameters. Write the rule for zero to three deviations, or up to one more than the plan allows. Apply the same sample to one attribute the data can test, the refund dated before the payment as Requirement 4 defined it, and compare its conclusion with the whole population's.
+Define three attributes that need outside evidence: a written request from the customer, a payee checked independently, and an inspection record for refunds of goods returned damaged. The inspection applies only to those refunds, so size it on their own population, or examine them all: another refund is not a passed inspection. Choose the parameters, take the size from the table, take the key items in full under the chapter's thresholds and evaluate them apart, select the rest, and record the date and parameters. Write the rule for zero to three deviations, or up to one more than the plan allows. Apply the same sample to one attribute the data can test, the refund dated before the payment as Requirement 4 defined it, and compare its conclusion with the result for the same remaining refunds. A sample over three years does not show by itself how the controls operated at the latest year-end.
 :::
 
 ## Check your understanding {.check}
@@ -442,12 +442,12 @@ Ask students where the evidence for each one lies.
 ## Where the evidence lies decides {.answer}
 
 1. Query: both dates are in the records
-2. Sample: the request is a document outside the database
+2. Sample, or all if few: the request is outside the database
 3. Query: the approver and the limit are in the records
-4. Sample: the inspection record is outside the database
+4. All or a sample: the inspection record is outside the database
 
 ::: {.notes}
-A query of the whole population replaces a sample wherever the records hold the evidence. Requirement 6 compares the two on the one attribute both can test.
+A query of the whole population replaces a sample wherever the records hold the evidence. Where the evidence lies decides the procedure; the risk and the size of the population decide whether to sample, and the refunds of Damaged returns are few enough to examine in full. Requirement 6 compares the two on the one attribute both can test.
 :::
 
 ## Test the balances, and follow the largest refund
@@ -460,7 +460,7 @@ A query of the whole population replaces a sample wherever the records hold the 
 - **Check:** the timeline names each step's role and the evidence needed
 
 ::: {.notes}
-Recompute each credit line from its return, shipment and invoice lines, the tax, freight and clawbacks, and list the open items in the hub account at the latest year-end. Measure what returned goods were put back into inventory at, by reason. Test for lapping, and explain with Chapter 8's criteria why a first-digit test does not suit these populations. Build the largest refund's timeline from the shipment to the last receipt on its invoice, and record a disposition.
+Recompute each credit line from its return, shipment and invoice lines, the tax at the invoice's rate, and the clawbacks. Compare the freight with the invoice's, recompute a share only under a stated freight policy, and report the limit of the test without one. List the open items in the hub account at the latest year-end. Measure what returned goods were put back into inventory at, by reason. Test for lapping, and explain with Chapter 8's criteria why a first-digit test does not suit these populations. Build the largest refund's timeline from the shipment to the last receipt on its invoice, and record a disposition.
 :::
 
 ## Milestone 2: before you hand it in
@@ -488,10 +488,10 @@ Phase 3 turns the results into judgments the committee can act on, and the tests
 
 ## What makes a control deficient
 
-- A missing control, or one that did not operate as designed
+- A control missing, poorly designed, or not operating as designed
 - Severity turns on likelihood and magnitude, not on what occurred
 - A compensating control counts only if it is precise enough
-- Deficiencies on the same account combine
+- Deficiencies on the same account are assessed together
 
 ::: {.notes}
 A deficiency exists when a control does not allow timely prevention or detection of misstatements in the normal course of work. Its severity depends on whether a misstatement is reasonably possible and how large it could be, not on whether one actually occurred, as AS 2201 sets out. Internal auditors then rate their findings and agree on action plans with management under the IIA's Global Internal Audit Standards.
@@ -502,7 +502,7 @@ A deficiency exists when a control does not allow timely prevention or detection
 {{< book-table tbl-19-04 widths="17,37,27,19" >}}
 
 ::: {.notes}
-The definitions are abridged. A material weakness turns on a reasonable possibility of a material misstatement with no compensating control precise enough; a significant deficiency is less severe but merits the attention of those who oversee financial reporting. Management hears of every deficiency; the audit committee hears of the significant deficiencies and material weaknesses.
+The definitions are abridged. A material weakness turns on a reasonable possibility of a material misstatement with no compensating control precise enough; a significant deficiency is less severe but merits the attention of those who oversee financial reporting. Management hears of every deficiency in writing, and the audit committee is told so; the significant deficiencies and material weaknesses go to both in writing. For a public company, a material weakness also leads to an adverse opinion on internal control.
 :::
 
 ## Four judgments lead to a classification
@@ -510,7 +510,7 @@ The definitions are abridged. A material weakness turns on a reasonable possibil
 {{< book-figure fig-19-02 crop="0,0.1499,1,0.6816" >}}
 
 ::: {.notes}
-Once a deficiency is identified, a control that is missing or one that did not operate as designed, work down the judgments: the likelihood, the magnitude against materiality, the compensating controls, and the deficiencies that combine on the same account. Then internal audit rates each finding, agrees on action plans with management, and monitors them until they are complete.
+Once a deficiency is identified, a needed control missing or poorly designed, or one not operating as designed, work down the judgments: the likelihood, the magnitude against materiality, the compensating controls, and the deficiencies on the same account, assertion or component, assessed together. Then internal audit rates each finding, agrees on action plans with management, and monitors them until they are complete.
 :::
 
 ## Evaluate the deficiencies
@@ -523,7 +523,7 @@ Once a deficiency is identified, a control that is missing or one that did not o
 - **Check:** the clean results are reported with the same care
 
 ::: {.notes}
-For each pattern from Requirements 4 to 7, record the control, whether the deficiency is in design or in operation, its frequency, its exposure in the latest year and over the three years, the likelihood of a misstatement, the compensating controls and the evidence that they operate, and the deficiencies it combines with. Say what evidence each classification rests on and what could change it.
+For each pattern from Requirements 4 to 7, record the control, whether the deficiency is in design or in operation, its frequency, its exposure in the latest year and over the three years, the likelihood of a misstatement, the compensating controls and the evidence that they operate, and the deficiencies it combines with. Classify provisionally until the cause, the policy and any compensating review are known, and say what evidence each classification rests on and what could change it.
 :::
 
 ## Check your understanding {.check}
@@ -543,7 +543,7 @@ Ask students what the evaluation matrix should record for each one.
 
 1. No: what matters is whether one is reasonably possible
 2. Yes: magnitude is judged against materiality
-3. Yes: a precise compensating control reduces the severity
+3. Yes, if evidence shows it operates precisely enough
 4. No: classify by likelihood and magnitude, not by counts
 
 ::: {.notes}
@@ -570,10 +570,10 @@ The conclusion says what the tests covered and what they could not reach, such a
 - **Produce:** four rule tests and two processes added to the register
 - **Tool:** Power BI: Audit Monitoring.pbix, or a small register of your own
 - **Revisit:** Chapter 16's register, design findings and change control
-- **Check:** past exceptions get one design finding and do not flood review
+- **Check:** past exceptions link to a finding and do not flood review
 
 ::: {.notes}
-The four rule tests are credits above authority, credits approved by someone who handled the invoice's cash, refunds above authority, and refunds dated before the customer's payment as Requirement 4 defined it; the processes are Credit memos and Refunds. Keep the refund method and the missing offset as anomaly tests, outside the register of rules. Record the historical exceptions once, as Chapter 16 treated the payroll registers' self-approval, with the date by which the design will be fixed, and keep each exception in the register. Keep reviewing the exceptions that arrive after the period the finding covers, and close it only when a retest shows the fix works. Recheck the date through which the data run, and record the change.
+The four rule tests are credits above authority, credits approved by someone who applied cash to the invoice, refunds above authority, and refunds dated before the customer's payment as Requirement 4 defined it; the processes are Credit memos and Refunds. Keep the refund method and the missing offset as anomaly tests, outside the register of rules. Link the historical exceptions that share a supported cause to one finding, as Chapter 16 treated the payroll registers' self-approval, and keep each exception in the register. Say whether the finding concerns design or operation, and keep its covered period, the date the fix is due, the date it is made, and the retest apart. Keep reviewing the exceptions that arrive after the covered period, and close the finding only when the retest shows the fix works. Recheck the date through which the data run, and record the change.
 :::
 
 ## Milestone 3: before you hand it in
@@ -617,11 +617,11 @@ These are the four types of analytics of Chapter 1. Most of the work was descrip
 
 - The owners agree on actions and dates
 - The committee asks for their status at its next meetings
-- The register's tests show every month whether the actions worked
+- The register shows every month whether the exceptions come back
 - Careful findings that rest on evidence are the ones that get fixed
 
 ::: {.notes}
-An audit like this does not end with the report. The tests you added to the register keep watching the cycle, so the next review starts from what changed rather than from the beginning.
+An audit like this does not end with the report. The tests you added to the register keep watching the rules they cover, so the next review starts from what changed rather than from the beginning, and a retest, not a refresh, shows that a fix works.
 :::
 
 ## About these slides

@@ -31,7 +31,7 @@ Students can:
 - map every account to a statement line and build recorded statements that agree with control totals they trust (Part 2);
 - list the accounts never posted with an anti-join and name what the chart lacks (Part 3).
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts, and transactions) and BAR M10 (advanced data analytics); IMA Reporting and Control (financial recordkeeping; financial statement preparation); IFAC IES 2 (a) and 2 (i); AACSB A5 part 5.1 (technology integration: SQL; Excel).
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts, and transactions) and BAR M10 (advanced data analytics); IMA Reporting and Control (financial statement preparation); IFAC IES 2 (a) and 2 (i); AACSB A5 part 5.1 (technology integration: SQL; Excel).
 
 ## Before you assign
 

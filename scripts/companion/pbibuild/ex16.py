@@ -130,7 +130,7 @@ def ex1(b: Build) -> None:
         col("ARInvoices", "Bucket"), M("Open Balance"), M("Open Invoices")]}, title=f"Receivables aged at {end}",
         sort=[(col("ARInvoices", "BucketOrder"), "Ascending")]))
     page.add(card("reconCards", 600, 20, 660, 110, [M("Open Balance"), M("Ledger Receivables"), M("Unreconciled Difference")],
-                  units_none=True))
+                  units_none=True, size=20))
     page.add(card("creditCards", 600, 140, 660, 110, [M("Credit Balances"), M("Credit Balance Invoices")], units_none=True))
     page.add(Visual("ledgerBySource", "tableEx", 20, 270, 560, 200, {"Values": [
         col("ARLedger", "SourceDocumentType"), M("Ledger Receivables")]}, title="Account 1020 by source document"))
@@ -311,13 +311,15 @@ def ex3(b: Build) -> None:
         f"(5) The first surge day was {ctx['first']}. From {ctx['several']}, surge days occurred in {ctx['with_surge']} of "
         f"the {ctx['span']} months (about {ctx['average']:.0f} a month), up to {ctx['peak']} in {ctx['peak_month']}: "
         + ", ".join(f"{k} in {yy}" for yy, k in ctx["by_year"]) + f". Every one has all {ctx['employees']} hourly "
-        f"manufacturing employees at {ctx['regular']:.1f} regular plus {ctx['overtime']:.1f} overtime hours. Their share of "
+        f"manufacturing employees at {ctx['regular']:.1f} regular plus {ctx['overtime']:.1f} overtime hours (the test counts "
+        "those who clocked in, as H8 does; a count against Employee shows they are the whole hourly crew). Their share of "
         "the plant's overtime rose from " + " to ".join(pct(s) for s in ctx["shares"]) + ", while overtime on other "
         "days did not grow (" + ", ".join(f"{h:,.0f}" for h in ctx["other"]) + " hours).",
         "The production manager approved every entry the test flags. Telling the approver what the test detects is "
         "the prompt notification that Gonzalez and Hoffman (2018) found can encourage fraud when detection is weak, "
         "so the test stays in internal audit's file and goes to the audit committee; the Plant page's overtime share "
-        "is a management measure, the surge-day test an audit test.",
+        "is a management measure, the surge-day test an audit test. It selects days to corroborate against the rosters, "
+        "attendance and production records, not proof that the hours are false.",
         "Group By in Desktop has no count of distinct values (Count Distinct Rows counts whole rows), so Employees "
         "and HoursValues are List.Count ( List.Distinct ( ... ) ) of EmployeeID and TotalHours. The share divides "
         "by all of the month's overtime in ClockEntries; divided by SurgeDays alone it would be 100%."], size=10))
@@ -363,7 +365,7 @@ def ex4(b: Build) -> None:
             "DIVIDE (\n    CALCULATE (\n        [Exceptions],\n        KEEPFILTERS ( Exceptions[Disposition] <> \"Expected\" ),\n"
             "        KEEPFILTERS ( Tests[TestID] <> \"PR SelfApproved\" )\n    ),\n    [Population]\n) * 1000", "0.0")
     process = {r[0][:2]: r[2] for r in md_table(CHAPTER / "chapter.qmd", "tbl-16-01")}
-    page = b.report.add(Page("ex164", "Ex 16.4"))
+    page = b.report.add(Page("ex164", "Ex 16.4", height=860))   # room for the answer
     pr, yr = col("Tests", "Process"), col("Date", "Year")
     page.add(Visual("ratesMatrix", "pivotTable", 20, 20, 1240, 230, {"Rows": [pr], "Columns": [yr], "Values": [
         M("Exceptions"), M("Population"), M("Rate per 1,000"), M("Unexplained Rate per 1,000")]},
@@ -375,7 +377,7 @@ def ex4(b: Build) -> None:
                         filters=[keep(f"rl{i}Years", yr, years)]))
     tbl = dict(ctx["table"])
     po, je = tbl["PO"], ctx["unexplained"]["JE"]
-    page.add(answer("ex164Answer", 860, 270, 400, 440, [
+    page.add(answer("ex164Answer", 860, 270, 400, 570, [
         "(1) Population counts the documents of SELECTEDVALUE ( Tests[Process] ), which is blank when several "
         "processes are in context, so the total row shows no rate: a rate across processes would mix populations.",
         "(2) The measure leaves out only the expected closes and the recurring PR SelfApproved: open exceptions, "
@@ -388,8 +390,10 @@ def ex4(b: Build) -> None:
         f"rose to {je[2]:.2f}, mostly through single documents that fail several tests (the opening entry's "
         f"{ctx['opening']}, the debt reclassifications' {ctx['reclass']} each), while Weekend, Backdated, and "
         f"SelfApproved {ctx['still']}. Payroll's unexplained exceptions are {ctx['pr_left']} a year, so its rate is "
-        "almost entirely the design finding; purchase orders are improving. The unexplained rate shows what changes "
-        "once the expected and recurring exceptions are set aside."], size=10))
+        f"almost entirely the design finding. The purchase orders' rate fell by {ctx['fell']} from {years[0]} and "
+        f"{ctx['moved']} in the last year. A lower rate under the same tests is not by itself better controls: the mix "
+        "of documents and the causes of the exceptions would show whether a control changed. The unexplained rate shows "
+        "what changes once the expected and recurring exceptions are set aside."], size=10))
     page.add(Visual("ratesTable", "tableEx", 20, 530, 820, 180, {"Values": [
         pr, M("Exceptions"), M("Population"), M("Rate per 1,000"), M("Unexplained Rate per 1,000")]},
         title=f"Fiscal {years[-1]}", filters=[keep("rtYear", yr, [years[-1]])]))
@@ -442,7 +446,10 @@ def ex5(b: Build) -> None:
             ("Observed Share", "VAR Digit = SELECTEDVALUE ( Digits[Digit] )\nRETURN\n    DIVIDE ( CALCULATE ( "
                                "COUNTROWS ( Payments ), Payments[FirstDigit] = Digit ), COUNTROWS ( Payments ) )", "0.0%"),
             ("Benford Share", "SELECTEDVALUE ( Digits[Expected Share] )", "0.0%"),
-            ("Benford MAD", "AVERAGEX ( VALUES ( Digits[Digit] ), ABS ( [Observed Share] - [Benford Share] ) )", "0.00000")]:
+            # REMOVEFILTERS keeps all nine digits when a digit is selected on the chart (each digit's own share comes
+            # back through the context transition of the iteration)
+            ("Benford MAD", "CALCULATE (\n    AVERAGEX ( VALUES ( Digits[Digit] ), ABS ( [Observed Share] - [Benford Share] ) ),\n"
+                            "    REMOVEFILTERS ( Digits )\n)", "0.00000")]:
         measure(b, folder, n, dax, fmt)
     page = b.report.add(Page("ex165", "Ex 16.5"))
     kind = col("Payments", "PaymentKind")
@@ -461,9 +468,9 @@ def ex5(b: Build) -> None:
         f"{ctx['n_partial']:,}, {mad['partial']:.5f} ({level[ch16.conformity(mad['partial'])]}).",
         f"(2) The first character of the amount as text fails on the {ctx['small']} payments below $1, whose text "
         "begins with 0; scientific notation always starts with the first significant digit.",
-        "(5) Only invoices of $1,000 or more are paid in parts, so the partial payments' digits follow the payment "
-        "policy, not fraud: the departure is an anomaly to look at (which invoices, which suppliers), not an exception "
-        "that breaks a rule."], size=10))
+        "(5) Only invoices of $1,000 or more are paid in parts, a selection by size that can distort the digits and "
+        "plausibly explains the departure. It is an anomaly to look at (which invoices, which suppliers), not an "
+        "exception that breaks a rule, and a digit test cannot show that the payments are genuine."], size=10))
     page.expect = ["Observed Share", "Benford MAD", f"{mad['all']:.5f}", f"{mad['partial']:.5f}", "Model answer"]
 
     t = "Exercise 16.5"
@@ -473,6 +480,8 @@ def ex5(b: Build) -> None:
     for k, label in (("all", "all payments"), ("full", "full payments"), ("partial", "partial payments")):
         f = "" if k == "all" else f", Payments[PaymentKind] = \"{k.title()}\""
         b.check(t, f"MAD, {label}", round(mad[k], 7), f"CALCULATE ( [Benford MAD]{f} )", 0.0000005)
+    b.check(t, "MAD, all payments, with digit 1 selected (all nine digits kept)", round(mad["all"], 7),
+            "CALCULATE ( [Benford MAD], Digits[Digit] = 1 )", 0.0000005)
     b.check(t, "payments with a first digit of 0", 0, "CALCULATE ( [Payments Counted] + 0, Payments[FirstDigit] = 0 )", 0)
     b.check(t, "payments whose text begins with 0 (below $1)", ctx["small"],
             "COUNTROWS ( FILTER ( Payments, LEFT ( Payments[Amount], 1 ) = \"0\" ) )", 0)
@@ -528,7 +537,7 @@ def ex6(b: Build) -> None:
     cfo, ctl, mgr = ctx["cfo"], ctx["controller"], ctx["manager"]
     page.add(answer("ex166Answer", 20, 400, 1240, 310, [
         f"(2) {ctx['pairs']} supplier-and-amount pairs on different dates among the payments through {ctx['asof']}, "
-        f"{ctx['within30']} within 30 days, none paying the same invoice.",
+        f"{ctx['within30']} within 30 days, none referring to the same recorded invoice.",
         f"(4) {cfo['name']} ({cfo['title']}) approved {cfo['n']:,} orders ({pct(cfo['share'], 2)}) and "
         f"{ctx['cfo_entries']['n']} entries ({pct(ctx['cfo_entries']['share'], 2)}); {ctl['name']} ({ctl['title']}) "
         f"{ctl['n']:,} entries ({pct(ctl['share'], 2)}); {mgr['name']} ({mgr['title']}) {mgr['n']:,} registers "
@@ -537,7 +546,8 @@ def ex6(b: Build) -> None:
         f"Account Executive ({ctx['executive']}). The bar chart of exceptions by approver puts {mgr['name']} first "
         f"({ctx['first']}) and {cfo['name']} second ({ctx['second']}).",
         "(5) A pair on different invoices is two payments that happen to match, which two invoices of the same amount "
-        "explain; it is an anomaly to look at, not a duplicate payment, until an invoice is found paid twice. The "
+        "could explain. It is an anomaly to look at, not a duplicate payment, until the documents show one bill paid "
+        "twice, which two invoice records of the same bill would hide from this test. The "
         "shares show that each of three processes rests on one approver, a design question no exception shows: "
         "segregation of duties, who approves when that person is away, and who approves that person's own documents."],
         size=10))

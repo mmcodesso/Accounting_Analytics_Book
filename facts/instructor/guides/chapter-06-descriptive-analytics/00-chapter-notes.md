@@ -41,7 +41,7 @@ figures:
 The chapter depends on these conditions of the data:
 
 - InvoiceLines holds {{ t1.lines|count }} lines for fiscal {{ y }}, billing ${{ t1.revenue|money }}, in five item groups. {{ t1.groups[4].group }} is billed by the hour ({{ t1.groups[4].lines|count }} lines) and its items carry a standard cost of 0, so its margin at standard cost is 100 percent.
-- The lines are skewed to the right: the average line (${{ t1.mean|money }}) is {{ t1.ratio|num(2) }} times the median (${{ t1.median|money }}), and the largest line is a design service.
+- The lines are skewed to the right, as the histogram of Tutorial 6.1 shows, and the average line (${{ t1.mean|money }}) is {{ t1.ratio|num(2) }} times the median (${{ t1.median|money }}). The largest line is a design service.
 - The Furniture margin at standard cost falls from {{ t2.margin_q[0][2]|pct(2) }} in the third quarter to {{ t2.margin_q[0][3]|pct(2) }} in the fourth, while the other product lines stay within a point of their level. Promotional discounts more than double ({{ t3.disc_ratio|num(1) }} times) while quantity, list price and standard cost per unit barely move.
 - The ledger has {{ ch06_ex1.accounts }} accounts with a pre-closing balance. Three invoices numbered for fiscal {{ y }} are dated in fiscal {{ p }}, and the ledger holds supplier payments dated after the fiscal year-end, so a trial balance needs a date filter.
 - The prior-year expectation of Exercise 6.5 flags {{ ch06_g5.both|length }} of {{ ch06_g5.n_cells }} differences and misses the largest, which are Furniture's. Each exercise guide lists its own conditions.
@@ -59,7 +59,7 @@ The chapter depends on these conditions of the data:
 
 **Before the first class**
 
-- Students need desktop Excel with Power Query (on a Mac, Excel for Microsoft 365). FILTER needs Microsoft 365 or Excel 2021 or later. The model answers also use CHOOSECOLS, HSTACK, TAKE and SORTBY, so open them in Microsoft 365 or Excel 2024.
+- Students need a supported desktop Excel with Power Query, Microsoft 365 recommended, as the Preface's What You Need says. On a Mac the Power Query Editor needs Excel for Microsoft 365. FILTER is in Excel for Microsoft 365, Excel 2024 and Excel 2021, whose support ended in October 2026. The model answers also use CHOOSECOLS, HSTACK, TAKE and SORTBY, so open them in Microsoft 365 or Excel 2024.
 - Each tutorial begins from the previous one's workbook. A late student takes the start file from Chapter06-companion.zip, points its queries at their copy of CharlesRiver.xlsx (**Data > Get Data > Data Source Settings**, **Change Source**) and chooses **Data > Refresh All**.
 - Do the three tutorials yourself and time them. Tutorials 6.2 and 6.3 build several PivotTables on the InvoiceLines Table of {{ lines_all|count }} rows, so time the refreshes on your students' machines.
 - Get the PowerPoint deck from the Downloads page; its modules follow the chapter's sections.
@@ -71,7 +71,7 @@ The chapter depends on these conditions of the data:
 - **The shared pivot cache.** Calculated fields belong to the pivot cache, so MarginPct appears in every PivotTable built from the InvoiceLines Table. A PivotTable built from a pasted range does not have it, and a student who lacks it recreates the field.
 - **Σ Values.** A second value field sends **Σ Values** to the Columns area. Dragging it to Rows is a step the tutorials give once, and students forget it in the exercises.
 - **GETPIVOTDATA reads what the PivotTable shows.** The Bridge returns Furniture totals only while the ItemGroup filter says Furniture.
-- **Refresh twice.** A new query column may need a second **Refresh All**, because background refresh can update a PivotTable before its query ends.
+- **Refresh after the query.** A new query column may need a second **Refresh All** once the query has finished loading, because background refresh can update a PivotTable before its query ends. A second click while the query still runs repeats the problem.
 - **Load To.** In Exercise 6.1 **Only Create Connection** applies to both new queries, so TrialBalance is loaded afterward from **Data > Queries & Connections**.
 
 ## Teaching approaches
@@ -174,6 +174,7 @@ Plan A is the safest. Plan B trades the lecture for ownership of the workbook an
 - Step 3: Σ Values left in Columns, so the margin sits beside the revenue and not under it.
 - Step 5: % Difference From with the wrong base. Period is the base field and (previous) the base item.
 - Step 6: the first year left in the Column Labels, so the change column also compares the middle year with it.
+- Step 4: margins that differ slightly from the Part I case's. The case measured the posted accounts, whose cost is the standard cost of the goods shipped less the goods returned, and this PivotTable the standard cost of the quantities invoiced. Both fall.
 - Step 7: MarginPct missing from the field list because the PivotChart was built from a copied range.
 
 **The checkpoint to look for.** The five bullets. A strong student explains the 100 percent Services margin as an absence of standard cost, not as a finding, and says that the other product lines held steady.
@@ -212,7 +213,7 @@ Plan A is the safest. Plan B trades the lecture for ownership of the workbook an
 
 {{ figure('IF-06-0-B') }}
 
-**A control total shows coverage, not accuracy.** A difference of zero means the parts add up to the whole of the same source, not that the source is right, and a SUM range that does not grow after a row is inserted defeats it (Step 7). Question 4's option D is the silent zero, and question 14's rising margin before discounts shows the discounts offset every other effect.
+**A control total shows coverage, not accuracy.** A difference of zero means the parts add up to the whole of the same source, not that the source is right, and a SUM range that does not grow after a row is inserted defeats it (Step 7). Question 4's option D is the silent zero, and question 14's rising margin before discounts shows that the larger discounts more than offset the other effects, which on balance raised the margin.
 
 **A PivotTable summarizes a copy, with its own filters.** Question 10 and the two-filters pitfall have one cause: the pivot cache refreshes only on request, and its FiscalYear filter is not ReportYear.
 
@@ -235,7 +236,7 @@ Plan A is the safest. Plan B trades the lecture for ownership of the workbook an
 3. **The Furniture volume was steady, so why did the margin fall?** It reaches price, promotions and the margin before discounts, and the bridge as the control total of the explanation.
 4. **The bridge says the promotions cost ${{ (t3.effects.promotions|abs)|money }} of margin. Was it a mistake?** It reaches the bridge measuring cost and not benefit, the lift the promotion may have produced, and Chapter 7's break-even analysis.
 5. **Which date should decide the period of the three invoices dated in fiscal {{ p }}?** It reaches transfer of control, delivery as evidence and the shipment records.
-6. **You present the bridge for Furniture, and the sales team wants it by product type. Which goes in the report?** It reaches stating the level, a headline at the level where each effect has one meaning, and detail for the people who plan the assortment.
+6. **You present the bridge for Furniture, and the sales team wants it by product type. Which goes in the report?** It reaches stating the level and its convention, a headline at the level where cost is zero and mix works item by item, and detail for the people who plan the assortment.
 7. **When is last year a good expectation for this year?** A stable business with known changes adjusted, and never when a promotion or a price change falls in only one of the years.
 8. **A PivotTable shows Services at 100 percent. What do you tell the vice president of sales?** It reaches the missing standard cost, the two possible cost definitions of Exercise 6.3, and stating the definition.
 

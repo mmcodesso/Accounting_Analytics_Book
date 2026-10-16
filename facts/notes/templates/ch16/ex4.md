@@ -9,7 +9,9 @@
      would say so; KEEPFILTERS keeps a filter on a test or a disposition intersected rather than replaced, and without it the
      Process-by-Year matrix gives the same values): journal entries {{ unexplained.JE|map('num', 2)|join(', ') }} (the two closes a year removed); payroll {{ unexplained.PR|map('num', 2)|join(', ') }};
      purchase orders unchanged. (4) the count rose by {{ rose }} ({{ po_n[1] }} to {{ po_n[2] }}) while the rate {{ moved }} ({{ po_r[1]|num(2) }} to {{ po_r[2]|num(2) }}), because the
-     number of orders grew by about {{ growth|pct(0) }}; from {{ d.F }} the rate fell by {{ fell }} while orders more than doubled. (5) Journal
+     number of orders grew by about {{ growth|pct(0) }}; from {{ d.F }} the rate fell by {{ fell }} while orders more than doubled. (5) A lower rate
+     under the same tests and coverage is not by itself better controls: the mix of documents and the causes of the exceptions
+     would show whether a control changed. Journal
      entries are the process to watch: their unexplained rate fell in {{ d.P }} and rose in {{ d.C }}, mostly because of single
      documents that fail several tests (the opening entry's {{ opening }} in {{ opening_year }}, the debt reclassifications' {{ reclass }} each in {{ reclass_years|join(' and ') }}),
      while {% for name, v in stable %}{{ name }} ({{ v|join(', ') }}){% if loop.revindex == 2 %}, and {% elif not loop.last %}, {% endif %}{% endfor %} {{ still }}; payroll's unexplained

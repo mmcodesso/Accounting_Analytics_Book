@@ -31,7 +31,7 @@ By the end, students can:
 
 ## Before you assign
 
-- **Files and software.** The Supplier Table from Exercise 5.5 with every column, and a copy of the analysis workbook for the item tests. The model answer keeps them in one file. XLOOKUP, COUNTIFS and MAXIFS are used throughout; the model answer's lists also use FILTER and HSTACK, which need Microsoft 365.
+- **Files and software.** The workbook of Exercise 5.5, whose Supplier Table keeps every column, for requirements (1) to (4), and a copy of the analysis workbook for the item tests of requirement (5). The model answer keeps them in one file, so its supplier columns sit on Ex 5.5 Supplier, its purchase orders on Ex 5.6 PurchaseOrder, its item master on Ex 5.6 ItemMaster, and the results of both reviews on Ex 5.6. XLOOKUP, COUNTIFS and MAXIFS are used throughout. The model answer's lists also use FILTER and HSTACK, and HSTACK needs a newer Excel than XLOOKUP does, as the chapter note says.
 - **Load time.** PurchaseOrder holds {{ g.n_po|count }} rows. Load it to a worksheet.
 - **Data conditions.** {{ g.n_names|count }} suppliers; {{ g.n_items|count }} items, of which {{ g.n_blank_price|count }} have no list price and are not in the analysis workbook's Item Table. The Discontinued items that are still active, and the items sold before launch, all have a list price, so the filtered Item Table would find them too; the exercise loads the full item master so that the test does not depend on that filter.
 - **Where the new columns go.** On SalesInvoiceLine the lookup columns of Tutorial 5.2 end at column {{ g.letters.ProductType }}, so LaunchDate is in {{ g.letters.LaunchDate }} and BeforeLaunch in {{ g.letters.BeforeLaunch }}.

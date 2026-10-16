@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import re
 from collections import defaultdict
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
 from guide_contexts import context
@@ -48,8 +49,11 @@ from notes import appendix_c as nc
 
 REPO = Path(__file__).resolve().parents[3]
 APPENDIX = REPO / "appendices" / "c-power-bi-browser"
-LOG = REPO / "drafts" / "appendix-c-service-results.md"
-READ_ON = "6 October 2026"          # the day the author's service account was read (CLAUDE.md, the author's log)
+# The author keeps the log in drafts/ (moved to drafts/old/ on 2026-10-14); read whichever exists.
+LOG = next((path for path in (REPO / "drafts" / "appendix-c-service-results.md",
+                              REPO / "drafts" / "old" / "appendix-c-service-results.md") if path.exists()),
+           REPO / "drafts" / "appendix-c-service-results.md")
+READ_ON = "October 6, 2026"          # the day the author's service account was read (CLAUDE.md, the author's log)
 CHOOSE_DATA_ITEMS = 164             # the items Choose data listed in the author's test: each Table and its worksheet
 UPLOAD_MB = 123                     # what the service reported for the workbook ("Upload successful (123 MB)")
 SMALL_SEGMENT = "Design Services"   # the segment that buys only Services
@@ -171,6 +175,10 @@ def g1(d, claim):
     rounded_sum = round(sum(round(q["disc_cents"], 2) for q in quarters), 2)
     cent = round(round(year_disc, 2) - rounded_sum, 2)
     claim(abs(cent) == 0.01, "the four quarters' discounts, each rounded to the cent, differ from the year's rounded discounts by one cent")
+    line_rounded = float(sum(Decimal(repr(r["disc"])).quantize(Decimal("0.01"), ROUND_HALF_UP) for r in rows))
+    claim(abs(line_rounded - round(year_disc, 2)) >= 0.005 and abs(line_rounded - rounded_sum) >= 0.005,
+          "rounding every line's discount to the cent first gives a total that matches neither the year nor the rounded quarters")
+    claim(abs(sum(q["disc_cents"] for q in quarters) - year_disc) < 1e-6, "unrounded, the four quarters' discounts add up to the year's")
     for field in ("rev", "list"):
         claim(abs(round(sum(round(c13.total([r for r in rows if r["quarter"] == q], field), 2) for q in range(1, 5)), 2)
                   - round(c13.total(rows, field), 2)) < 0.005,
@@ -209,6 +217,7 @@ def g1(d, claim):
         "ORDER BY SalesInvoice[FiscalYear], SalesInvoice[Period]"])
     return dict(y=y, m_list=m_list, m_disc=m_disc, m_lines=m_lines, m_rev=m_rev, query=query, n_rows=len(periods), n_cols=6,
                 quarters=quarters, q1=quarters[0], q4=quarters[3], rounded_sum=rounded_sum, cent=abs(cent), by_q=by_q,
+                line_rounded=line_rounded,
                 q1_old=and_list(q1_old), n_q1_old=len(q1_old), dax_disc=dax_disc, dax_lines=dax_lines,
                 autumn_start=c13.MONTHS[int(c13.autumn_promotion(d)["start"][5:7]) - 1],
                 autumn_end=c13.MONTHS[int(c13.autumn_promotion(d)["end"][5:7]) - 1],
@@ -273,6 +282,12 @@ def g2(d, claim):
           "no segment's revenue peaks in the promotion months, so a matrix of LineTotal shows no autumn pattern")
     total = sum(r["disc"] for r in rows)
     shares = {s: sum(cell[(s, m)] for m in range(1, 13)) / total for s in segs}
+    # the matrix rounds each cell for display and computes each total from the unrounded amounts
+    ws_total = sum(cell[(ws, m)] for m in range(1, 13))
+    ws_cells = round(sum(round(cell[(ws, m)], 2) for m in range(1, 13)), 2)
+    months_cells = round(sum(round(by_month[m], 2) for m in range(1, 13)), 2)
+    claim(0.005 <= abs(round(ws_total, 2) - ws_cells) < 0.05 and 0.005 <= abs(round(total, 2) - months_cells) < 0.05,
+          "Wholesale's displayed months and the displayed monthly totals add to a few cents off their unrounded totals")
     dax_trade = check_expr(claim, "2026-11 discounts, Design Trade selected")
     return dict(y=y, m_disc=measure(claim, "Discounts"), w_segs=c13.word(len(segs)),
                 w_trade_segs=c13.word(len(reach[trade["id"]])), w_autumn_segs=c13.word(len(reach[autumn["id"]])),
@@ -281,7 +296,8 @@ def g2(d, claim):
                 last_month=c13.MONTHS[ranked[-1] - 1], rev_peaks=[(s, c13.MONTHS[m - 1]) for s, m in sorted(rev_peaks.items())],
                 autumn=autumn["name"], trade=trade["name"], n_autumn_segs=len(reach[autumn["id"]]), n_trade_segs=len(reach[trade["id"]]),
                 shares={s: v for s, v in shares.items()}, ws_share=shares[ws], dax_trade=dax_trade,
-                services_only=sorted(groups)[0], n_zero_months=len(zero_months), total=total)
+                services_only=sorted(groups)[0], n_zero_months=len(zero_months), total=total,
+                ws_total=ws_total, ws_cells=ws_cells, months_cells=months_cells)
 
 
 # --- Exercise C.3 ----------------------------------------------------------------------------------------------------

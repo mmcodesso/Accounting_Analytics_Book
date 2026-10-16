@@ -214,7 +214,23 @@ def ex4(d, claim):
           "every past-due Released work order with activity has material issues, completions, and started operations")
     claim(0 < len(active) < released / 2, "some, far fewer than half, of the past-due Released work orders have activity")
     named_active = all(r[0] in active for r in due[:3])
+    # The cost flow of an open work order (R9-01 of the second review): completed output has already moved its standard
+    # cost to finished goods, so only the unrelieved cost stays in work in process and 1090 until the close.
+    completed_out = {r[0]: r[1] for r in d.q(
+        "SELECT w.WorkOrderNumber, w.Status FROM WorkOrder w WHERE w.ClosedDate IS NULL "
+        "AND EXISTS (SELECT 1 FROM ProductionCompletion p WHERE p.WorkOrderID = w.WorkOrderID)")}
+    claim(sum(1 for s in completed_out.values() if s == "Completed") == status["Completed"],
+          "every open work order marked Completed has production completions")
+    claim(0 < len(completed_out) < len(rows), "some, not all, of the open work orders have production completions")
+    released_to_fg = d.one(
+        "SELECT COUNT(*) FROM GLEntry g JOIN ProductionCompletion p ON g.SourceDocumentType = 'ProductionCompletion' "
+        "AND g.SourceDocumentID = p.ProductionCompletionID JOIN WorkOrder w ON w.WorkOrderID = p.WorkOrderID "
+        "WHERE w.ClosedDate IS NULL AND g.AccountID = ? AND g.Debit > 0", d.account("1040"))
+    claim(released_to_fg > 0, "the completions of open work orders debit finished goods (1040) at standard cost")
+    claim(d.one("SELECT COUNT(*) FROM WorkOrderClose c JOIN WorkOrder w ON w.WorkOrderID = c.WorkOrderID "
+                "WHERE w.ClosedDate IS NULL") == 0, "no open work order has a WorkOrderClose record")
     return dict(end=end, n=len(rows), status=status, not_completed=status["Released"] + status["In Progress"], by_year=by_year,
+                completed_out=len(completed_out),
                 released_low=min(r[2] for r in rows), released_high=max(r[2] for r in rows),
                 due=len(due), due_status=due_status,
                 active=dict(n=len(active), labor=sum(1 for k in active if activity[k][3])), named_active=named_active,
@@ -265,6 +281,25 @@ def ex6(d, claim):
     claim(all(r[3] == "Pending" for r in missing), "the entries with no ClockOutTime are Pending")
     claim(sorted(r[0] for r in missing) == anomalies(d, "missing_clock_out"),
           "the entries with no ClockOutTime are the planted missing clock-outs")
+    # The labor records linked to the missing clock-outs (R9-02 of the second review): non-manufacturing time with no work
+    # order, so the tests show a gap in the time support, not a cost charged to manufacturing.
+    linked = d.q("SELECT LaborType, WorkOrderID, WorkOrderOperationID FROM LaborTimeEntry WHERE TimeClockEntryID IN "
+                 "(SELECT TimeClockEntryID FROM TimeClockEntry WHERE ClockOutTime IS NULL)")
+    claim(len(linked) == len(missing) and all(r[0] == "NonManufacturing" and r[1] is None and r[2] is None for r in linked),
+          "each clock entry with no clock-out links to one NonManufacturing labor record with no work order or operation")
+    # The direct rows with no operation are charged to their work orders: each close's direct labor variance equals the
+    # work order's direct labor cost (these rows included) less the standard direct labor its completions released.
+    closes = d.q(
+        "SELECT c.DirectLaborVarianceAmount, "
+        "(SELECT SUM(x.ExtendedLaborCost) FROM LaborTimeEntry x WHERE x.WorkOrderID = c.WorkOrderID "
+        "AND x.LaborType = 'Direct Manufacturing'), "
+        "(SELECT SUM(l.ExtendedStandardDirectLaborCost) FROM ProductionCompletionLine l JOIN ProductionCompletion p "
+        "ON p.ProductionCompletionID = l.ProductionCompletionID WHERE p.WorkOrderID = c.WorkOrderID) "
+        "FROM WorkOrderClose c WHERE c.WorkOrderID IN (SELECT WorkOrderID FROM LaborTimeEntry "
+        "WHERE LaborType = 'Direct Manufacturing' AND WorkOrderOperationID IS NULL)")
+    claim(len(closes) == len({r["work_order"] for r in labor})
+          and all(abs(v - (actual - std)) < 0.02 for v, actual, std in closes),
+          "the work orders of the unlinked direct rows are closed, and their closes count those rows in actual direct labor")
     staff = d.q("SELECT TerminationDate IS NOT NULL, EmploymentStatus, IsActive, COUNT(*) FROM Employee GROUP BY 1, 2, 3")
     terminated = sum(r[3] for r in staff if r[0])
     claim(all(r[1] == "Terminated" and r[2] == 0 for r in staff if r[0]),

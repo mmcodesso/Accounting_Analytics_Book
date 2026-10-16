@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will examine the Charles River O2C tables in Excel and identify specific data quality problems across several worksheets. The goal is to practice applying the four quality dimensions (accuracy, completeness, consistency, and timeliness) and the tests in @tbl-02-03 to a real dataset, and to document what you find. This tutorial connects to the opening scenario by showing you how a data quality assessment works in practice.
 
-**Prerequisites.** You need Microsoft Excel installed on your computer and the CharlesRiver.xlsx file provided with this textbook. This tutorial adds columns to a worksheet, so work in a copy: copy CharlesRiver.xlsx in its folder, name the copy CharlesRiver_Work.xlsx, and use it for the rest of Part I. The downloaded workbook then stays as provided for Parts II and IV, whose tutorials read it with Power Query.
+**Prerequisites.** You need a desktop version of Microsoft Excel (see [What You Need](#sec-what-you-need) in the Preface) and the CharlesRiver.xlsx file provided with this textbook. This tutorial adds columns to a worksheet, so work in a copy: copy CharlesRiver.xlsx in its folder, name the copy CharlesRiver_Work.xlsx, and use it for the rest of Part I. The downloaded workbook then stays as provided for Parts II and IV, whose tutorials read it with Power Query.
 
 **Step-by-step instructions.**
 
@@ -24,13 +24,13 @@ These missing values represent a completeness problem: shipments recorded withou
 ![The Shipment Worksheet Filtered to Blank Tracking Numbers.](/visuals/svg/fig-02-04-shipment-blank-tracking.svg){#fig-02-04 fig-alt="A mock of the Charles River Shipment worksheet in Excel, filtered to shipments whose TrackingNumber is blank. The visible rows show shipments from early 2024 with their carriers and statuses, most of them Delivered and a few In Transit, and the row numbers are blue because the Table is filtered. The empty TrackingNumber column and the status bar, which reports how many of the records match the filter, are outlined."}
 
 
-**Step 3. Find shipments whose status conflicts with their delivery date.**
+**Step 3. Find shipments still marked In Transit after their delivery date.**
 
 a. Still on the Shipment worksheet, filter the Status column to show only "In Transit."
 b. Look at the ShipmentDate and DeliveryDate columns for these rows.
 c. Record how many shipments are affected, then clear the filter.
 
-You will find shipments from every year of the data, many of them from 2024, that are still marked "In Transit" even though their DeliveryDate has already passed. The Status and DeliveryDate columns describe the same fact, whether the goods have arrived, and they disagree. This is a consistency problem. If the DeliveryDate records the actual delivery, the status was not updated when the goods arrived, which makes it a timeliness problem as well; confirming what the DeliveryDate means comes first.
+You will find shipments from every year of the data still marked "In Transit," and every one of them has a DeliveryDate on or before the year-end under review. What that means depends on what the DeliveryDate records, so confirm it before you judge the rows. If it records the actual delivery, the Status and DeliveryDate columns describe the same fact, whether the goods have arrived, and they disagree. That is a consistency problem, and a timeliness problem as well, because the status was not updated when the goods arrived. If it records the expected delivery, the shipments are overdue, and the date alone does not show that they arrived. Record them for follow-up with the carrier or the customer.
 
 **Step 4. Look for duplicate customers.**
 
@@ -83,7 +83,7 @@ The blank list prices belong to items that Charles River buys rather than sells:
 **Checkpoint.** At this point, you should have identified several data quality findings in the Charles River O2C and Item tables:
 
 - shipments with no TrackingNumber (completeness);
-- shipments whose Status conflicts with their DeliveryDate (consistency and timeliness);
+- shipments still marked In Transit after their DeliveryDate (consistency and timeliness, if that date records the delivery);
 - invoices dated before any shipment on their order (accuracy).
 
 You should also have assessed three findings that require judgment:

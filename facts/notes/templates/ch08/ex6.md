@@ -21,6 +21,7 @@
      price list lines and price nothing. Customer lists: {% if customers|length == 1 %}customer{% else %}customers{% endif %} {% for c in customers %}{{ c.id }} ({{ c.name }}, {{ c.segment }}, list {{ c.list }}){{ sep(loop) }}{% endfor %} {{ 'has' if customers|length == 1 else 'have' }} {{ n_own }}
      order lines under {{ method }} that cite list {{ cited }}: SalesOrderLineIDs {% for o in own %}{{ o.line }} ({{ o.date }}){{ sep(loop) }}{% endfor %}. Their UnitPrice equals {{ 'the' if customers|length == 1 else 'each' }} customer's own list ({% for o in own %}{{ o.price|money }}{{ ', ' if not loop.last }}{% endfor %}), not list {{ cited }} ({% for o in own %}{{ o.cited|money }}{{ ', ' if not loop.last }}{% endfor %}): {{ 'the' if customers|length == 1 else 'each' }}
      order line carries the customer's contract price, but the record names the wrong{% if stale %}, and in {% for y in stale %}{{ y }}{{ sep(loop) }}{% endfor %} expired,{% endif %} list. No other customer with its
-     own list has {{ method }} lines. Design (provisional until the system's configuration is seen): the records hold end dates before start dates, order lines
-     carrying a pending price, and lines citing expired lists, which suggests that nothing validates them. Operation: the
-     approvals did not prevent the discounts, and the {{ renewed }} were not renewed. -->
+     own list has {{ method }} lines. The classification stays provisional until the system's configuration, the approval history and the pricing policy are seen.
+     The records hold end dates on or before start dates, order lines carrying a pending price, and lines citing expired lists,
+     with no check in the records that would stop them (a possible design weakness), and the approvals did not stop the discounts
+     while the {{ renewed }} have no successor in the extract (a possible operating failure). -->

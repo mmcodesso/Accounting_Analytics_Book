@@ -29,6 +29,7 @@ pasted blocks come from GROUP BY queries).
 
 from __future__ import annotations
 
+import math
 import sqlite3
 import statistics as st
 from collections import defaultdict
@@ -1302,6 +1303,42 @@ def autofit(ws, cols: str, width: float | None = None) -> None:
         ws.Columns(cols).AutoFit()
 
 
+def tidy_layout(b: ExerciseBuild) -> None:
+    """A last pass once every column has its final width. A model answer's merged row was sized when it was written, often
+    before its sheet's columns were widened, so it is sized again for its text; a long label in column A beside a value
+    is wrapped and its row made tall enough, so that no label is cut at the column's edge."""
+    for ws in list(b.wb.Worksheets):
+        if ws.Name in (NOTES, "ItemCosts", "RoutingHours"):
+            continue
+        wait_idle(ws.Application)
+        used = ws.UsedRange
+        last = used.Row + used.Rows.Count - 1
+        if last < 2:
+            continue
+        values = xl.retry(lambda: ws.Range(f"A1:B{last}").Value)
+        width_a = ws.Columns("A").ColumnWidth
+        for r, (a, value) in enumerate(values, start=1):
+            if not isinstance(a, str) or not a.strip():
+                continue
+            cell = ws.Cells(r, 1)
+            if cell.MergeCells:
+                area = cell.MergeArea
+                if area.Row != r or area.Rows.Count != 1 or area.Columns.Count < 2 or len(a) < 100:
+                    continue                                 # a paragraph of a model answer, not a short merged heading
+                end = area.Column + area.Columns.Count
+                beside = ws.Range(ws.Cells(r, end), ws.Cells(r, end + 12)).Value[0]
+                if any(x not in (None, "") for x in beside):
+                    continue
+                width = sum(ws.Columns(c).ColumnWidth for c in range(area.Column, area.Column + area.Columns.Count))
+                lines = sum(max(1, math.ceil(len(part) * 1.15 / max(width, 20))) for part in a.split("\n"))
+                xl.retry(lambda: setattr(ws.Rows(r), "RowHeight", min(409, 15 * lines + 4)))
+            elif value not in (None, "") and len(a) > width_a * 1.1 and not cell.HasFormula and not cell.WrapText:
+                xl.retry(lambda: setattr(cell, "WrapText", True))
+                xl.retry(lambda: setattr(ws.Range(f"A{r}:B{r}"), "VerticalAlignment", TOP))
+                lines = math.ceil(len(a) * 1.1 / max(width_a, 8))
+                xl.retry(lambda: setattr(ws.Rows(r), "RowHeight", max(ws.Rows(r).RowHeight, 15 * lines + 1)))
+
+
 def fam_lookup(table: str, column: str, family: str) -> str:
     return f'=XLOOKUP("{family}",{table}[Family],{table}[{column}])'
 
@@ -1329,9 +1366,9 @@ def documentation(b: ExerciseBuild) -> None:
         ("Prepared by", "Instructor solution (the companion builder), " + date.today().isoformat()),
         ("Base year", f"Fiscal {d.C}, the last year of the records (tbl-18-02)."),
         ("Data through", '="The base year\'s sales invoices and completions run through "&TEXT(MAX(DataThrough[LastInvoice],'
-                         'DataThrough[LastCompletion]),"d mmmm yyyy")&"; the last work order close of the year is dated "'
-                         '&TEXT(DataThrough[LastClose],"d mmmm yyyy")&", and the time records end "&TEXT('
-                         'DataThrough[LastTimeRecord],"d mmmm yyyy")&" (pay periods after that are open)."'),
+                         'DataThrough[LastCompletion]),"mmmm d, yyyy")&"; the last work order close of the year is dated "'
+                         '&TEXT(DataThrough[LastClose],"mmmm d, yyyy")&", and the time records end "&TEXT('
+                         'DataThrough[LastTimeRecord],"mmmm d, yyyy")&" (pay periods after that are open)."'),
         ("Sources: CharlesRiver.xlsx", "Power Query (Data > Refresh All): ItemCosts (Item finished goods with their "
                                        "routing hours, the base year's sales by item, and the base year's completions by "
                                        "item, from the queries RoutingTotals, Invoices, ItemSales, Completions, and "
@@ -1352,7 +1389,9 @@ def documentation(b: ExerciseBuild) -> None:
                                "tooling; the plan the supplier would accept (columns N and P of each growth sheet) was "
                                "found by solving it for every choice of families, and is written as values too."),
         ("Refresh order", "1. Rerun MakeBuy.sql on the capstone copy and paste each result over its Table (Copy with "
-                          "Headers): Refresh All does not rerun them. 2. Data > Refresh All (ItemCosts and RoutingHours; "
+                          "Headers): Refresh All does not rerun them. The queries return their hours, quantities and "
+                          "ratios unrounded, as the checks need them, and the Tables' formats round them for display. "
+                          "2. Data > Refresh All (ItemCosts and RoutingHours; "
                           "ItemSales and ItemCompletions keep the base year in their Filtered Rows step, so change it "
                           "there with BaseYear). 3. Rerun Goal Seek on Make or Buy and Prices and, for the optional test, "
                           "Solver on each growth sheet; the Data Tables recalculate by themselves. 4. Save, then refresh "
@@ -1766,7 +1805,7 @@ def r2(b: ExerciseBuild) -> None:
     ws.Range(f"C{rows['payroll']}").Formula = f"=SUM(C{p0}:C{p1})"
     ws.Cells(rows["foh"], 1).Value = "Factory Overhead entries"
     ws.Range(f"C{rows['foh']}").Formula = '=SUMIFS(Debits1090[Debits],Debits1090[Source],"Factory Overhead")'
-    ws.Range(f"E{rows['foh']}").Value = "Varies with output, at about the rate the standards apply"
+    ws.Range(f"E{rows['foh']}").Value = "Moves with output at about the applied rate (what it buys is to confirm)"
     ws.Cells(rows["dep"], 1).Value = "Depreciation entries"
     ws.Range(f"C{rows['dep']}").Formula = '=SUMIFS(Debits1090[Debits],Debits1090[Source],"Depreciation")'
     ws.Range(f"E{rows['dep']}").Value = "Committed: the equipment, on the asset schedule"
@@ -2090,9 +2129,11 @@ def r3(b: ExerciseBuild) -> None:
         f"had ended (Part III). Run hours on the year's completions equal the standard labor hours ({m['run_total']:,.2f}); "
         f"setup adds {m['setup_total']:,.2f}, and Furniture's small batches carry about twice the setup per unit of the "
         "other groups.",
-        "What routing time leaves out is the indirect time and the hours paid beyond the work that Part III found. The plant "
+        "Routing time leaves out the indirect activity routings do not list (maintenance, training, rework, scheduling) "
+        "and the hours recorded above the routings that Part III found, and it takes the routings as right. The plant "
         f"used {m['used'] / m['pract']:.1%} of its practical capacity ({m['used'] / m['avail']:.1%} of the available "
-        "hours) on routing time; the rest is unused capacity, which is exactly where those hours belong in Requirement 4."],
+        "hours) on routing time. The rest is Requirement 4's unused capacity, an estimate from standard times on the "
+        "case's practical share, not a finding that those hours went unworked."],
         last_col="H")
     ws.Columns("A").ColumnWidth = 30
     ws.Columns("B:Z").ColumnWidth = 13
@@ -2339,9 +2380,11 @@ def r4(b: ExerciseBuild) -> None:
         f"{m['setup_total'] - m['alloc_setup']:,.2f} hours at the rate, "
         f"{m['used'] * m['td_rate'] + m['foh'] - m['item_conv']:,.2f}, are a line of their own in the reconciliation, "
         "not rounding.",
-        "Time-driven cost lies between standard and actual absorption for every family: the products cost more than "
+        "Time-driven cost lies between standard and the absorption proxy for every family: the products cost more than "
         "their standards say (the standards miss the labor rate's increase, supervision, and depreciation) but less than "
-        "absorption says, because idle capacity is not theirs. It sits nearer standard for "
+        "the proxy says, because it charges them the year's closed variance, idle capacity included. The gap between the "
+        "two margins is not the measured cost of unused capacity, which the reconciliation above gives. It sits nearer "
+        "standard for "
         f"{series(near_std) or 'no group'} and nearer absorption for {series(near_abs) or 'no group'}. Group margins on "
         + ", ".join(f"{g['name']} {g['m_td']:.2%}" for g in m["groups"]) + " time-driven.",
         f"The top fifth of the {e['n_items']} finished goods sold ({e['top_n']} items) earns {tops_m['std']['share']:.1%} "
@@ -2447,14 +2490,14 @@ def r5(b: ExerciseBuild) -> None:
         ("Revenue", '=SUMIFS(ItemCosts[Revenue],ItemCosts[Units],">0")', MONEY, "ExplorerRevenue"),
         ("Standard cost of the units sold", "=SUMPRODUCT(ItemCosts[Units],ItemCosts[StandardCost])", MONEY),
         ("Margin at standard", "=SUM(ItemCosts[MarginStandard])", MONEY, "ExplorerMarginStandard"),
-        ("Margin, actual absorption", "=SUM(ItemCosts[MarginAbsorption])", MONEY, "ExplorerMarginAbsorption"),
+        ("Margin, absorption proxy", "=SUM(ItemCosts[MarginAbsorption])", MONEY, "ExplorerMarginAbsorption"),
         ("Margin, time-driven", "=SUM(ItemCosts[MarginTimeDriven])", MONEY, "ExplorerMarginTimeDriven"),
         ("Margin, time-driven, after the unused capacity", "=ExplorerMarginTimeDriven-UnusedCost", MONEY),
         ("Margin at standard with the year's variance charged (the ledger's view)",
          "=ExplorerMarginStandard-SUM(FamilyResults[TotalVariance])", MONEY),
         ("What the standards miss: standard less time-driven margin",
          "=ExplorerMarginStandard-ExplorerMarginTimeDriven", MONEY),
-        ("The idle capacity absorption charges: time-driven less absorption margin",
+        ("Time-driven less absorption-proxy margin (not the measured cost of unused capacity, which is UnusedCost)",
          "=ExplorerMarginTimeDriven-ExplorerMarginAbsorption", MONEY)])
     e = m["explorer"]
     answer(ws, r + 11, [
@@ -2763,7 +2806,8 @@ def r7(b: ExerciseBuild) -> None:
         ("Practical hours already unused (Costs)", "=UnusedHours", HOURS),
         ("  in positions of the Assumptions' practical hours", "=UnusedHours/PositionHours", "0.00", "UnusedPositions"),
         ("Hours buying would free (the base year's completions, above)", f"=C{rp}", COUNT),
-        ("Positions buying would free (the base year's sales, Make or Buy)", "=BuyPositions", "0.00")])
+        ("  in positions on the same base (Make or Buy's severance counts the base year's sales)",
+         f"=C{rp}/PositionHours", "0.00", "FreedPositions")])
     r += 6
     heading(ws, r, "If the crew is kept")
     total_route = sum(f["unit"]["time"] * f["units"] for f in m["fam"].values())
@@ -2775,7 +2819,8 @@ def r7(b: ExerciseBuild) -> None:
         ("Routing hours of the remaining families (the base year's sales)",
          '=SUMPRODUCT((ItemCosts[SupplyMode]="Manufactured")*ItemCosts[Units],ItemCosts[RoutingTime])-BuyHours', COUNT),
         ("Added to each of their routing hours if it is spread over them (absorption)", f"=B{r + 4}/B{r + 5}", MONEY),
-        ("Time-driven: unused capacity cost after buying", f"=UnusedCost+B{r + 4}", COUNT)])
+        ("Time-driven: unused capacity cost after buying (the base year's completions, as the table above)",
+         f"=(UnusedHours+C{rp})*TDRate", COUNT, "UnusedCostAfter")])
     r += 9
     heading(ws, r, "Headroom for growth: practical capacity against the routing time the base year's sales need")
     header(ws, r + 1, ["Work center", "Practical capacity", "Load of the base year's sales", "Practical / load"])
@@ -2801,19 +2846,25 @@ def r7(b: ExerciseBuild) -> None:
         + ", ".join(f"{c['short']} {m['freed'][c['id']]:,.0f}" for c in m["centers"] if m["freed"][c["id"]] > 0.5)
         + f"), and the plant's use of its practical capacity would fall from {m['used'] / m['pract']:.1%} to "
         f"{(m['used'] - freed_total) / m['pract']:.1%}.",
-        f"The plant already leaves {m['unused_h']:,.1f} practical hours unused, {m['unused_h'] / m['pos_hours']:.2f} "
-        f"positions, more than buying would free ({m['positions']:.2f} positions), so fitting the crew to the work is a "
-        "larger question than outsourcing; the two reductions add up only if both can be made. The production manager "
-        "is right that idle capacity is not the products' fault, but the point cuts both ways: it is still a cost, and "
-        "keeping the crew while buying adds to it.",
-        f"If the crew is kept, the families bought take with them only materials and the overhead that varies; the crew's "
-        f"time and the supervision and equipment that time carried (about {m['supervision']:,.0f}) stay. Under absorption "
-        "they spread over the remaining families, whose cost per unit rises; under time-driven costing the remaining "
-        "families' costs do not change and the unused capacity grows by the same amount.",
+        f"The routings leave {m['unused_h']:,.1f} practical hours unused, {m['unused_h'] / m['pos_hours']:.2f} "
+        f"position-equivalents, more than buying would free on the same base ({freed_total / m['pos_hours']:.2f}; the "
+        f"{m['positions']:.2f} of Make or Buy count the base year's sales). Fitting the crew to the work is therefore a "
+        "larger question than outsourcing, and the two reductions add up only if both can be made. These are annual "
+        "hours from standard times. They do not show that anyone did no work, and an hour spare over the year may not be "
+        "spare in every week, work center, or skill. The rough-cut plan has weeks planned above the available hours, so "
+        "a crew plan is checked week by week before any position goes. The production manager is right that idle "
+        "capacity is not the products' fault, but it is still a cost, and keeping the crew while buying adds to it.",
+        f"If the crew is kept, the families bought take with them only materials and the overhead that varies. The crew's "
+        f"time and the supervision and equipment that time carried (about {m['supervision']:,.0f} on the base year's "
+        "sales) stay. Under absorption they spread over the remaining families, whose cost per unit rises. Under "
+        "time-driven costing the remaining families' costs do not change, and the unused capacity cost rises, on the "
+        f"base year's completions as in the table above, from {m['unused_h'] * m['td_rate']:,.0f} to "
+        f"{(m['unused_h'] + freed_total) * m['td_rate']:,.0f}.",
         "Optional growth test (Solver, sheets " + growth_name(GROWTH[0]) + " and " + growth_name(GROWTH[1]) + "): "
         f"practical capacity covers the base year's sales {min(m['headroom'].values()):.2f} times at the tightest work "
         f"center, so growth of about {min(m['headroom'].values()) - 1:.0%} reaches the first limit. Solver's model, as "
-        "the case states it, leaves out the quote's minimum volume and tooling, so its answer is a relaxed benchmark. "
+        "the case states it, leaves out the quote's minimum volume and tooling, so its answer is a relaxed benchmark, "
+        "and an annual one, not a production schedule. "
         f"At +{GROWTH[0]:.0%}, {bind(lp0)} binds (an hour is worth about {lp0['shadow'][lp0['binding'][0]] * -1:.2f} in "
         "that model) and it buys "
         + series([f"{x:,.0f} {short(q['name'])}" for q, x in zip(m["quoted"], lp0["bought"]) if x > 0.5])
@@ -2847,8 +2898,12 @@ def r7(b: ExerciseBuild) -> None:
             f"=Capacity!G{rp}", 1e-9, PCT1)
     b.check(t, "practical hours already unused, in positions", round(m["unused_h"] / m["pos_hours"], 9),
             "=UnusedPositions", 1e-9, "0.00")
+    b.check(t, "hours freed, in positions on the same base (the base year's completions)",
+            round(freed_total / m["pos_hours"], 9), "=FreedPositions", 1e-9, "0.00")
     b.check(t, "supervision and equipment the families bought carried", round(m["supervision"], 2), "=BuySupport", 0.01,
             COUNT)
+    b.check(t, "unused capacity cost after buying, on the base year's completions",
+            round((m["unused_h"] + freed_total) * m["td_rate"], 2), "=UnusedCostAfter", 0.01, COUNT)
     b.check(t, "routing hours of the remaining families", round(total_route - m["hours"], 4), "=" + kept[list(kept)[4]],
             0.0005, COUNT)
     for c in m["centers"]:
@@ -3056,7 +3111,7 @@ def r8(b: ExerciseBuild) -> None:
             "Increase", "Relevant cost, crew kept", "Contribution per unit at today's price",
             "Volume the increase can lose before contribution falls", "Revenue a year if volume holds"]
     header(ws, 4, cols)
-    ws.Rows(4).RowHeight = 60
+    ws.Rows(4).RowHeight = 90                      # six lines: the longest heading wraps to six in its column
     fams = sorted(m["fam"])
     rows = {}
     below = {r_["name"] for r_ in m["reprice"]}
@@ -3174,7 +3229,8 @@ def r8(b: ExerciseBuild) -> None:
         "family can absorb is a threshold, not a forecast. The prices customers pay come from price lists: the active "
         f"lists run at {pe['low']:.2f} to {pe['high']:.2f} of list and every one ends on {', '.join(pe['ends'])}, lists "
         f"{series([str(x) for x in pe['expired_used']])} had expired and were still used, and the "
-        f"{', '.join(pe['approvers'])} approves the overrides, so an increase reaches the invoices only through the lists.",
+        f"{', '.join(pe['approvers'])} approves the overrides, so an increase reaches the invoices only through the lists "
+        "and the overrides, and the floor is a price realized after them, not a list price.",
         "Recommendation: raise the families below the floor to it (and the families bought, if they are kept) through new, "
         "approved price lists for 2028 with stated end dates; renegotiate the customer-specific lists rather than "
         "inheriting them; and stage the increases, watching the volume of each family against the loss it can afford."]
@@ -3371,8 +3427,8 @@ def r9(b: ExerciseBuild) -> None:
         f"{m['parts']['supervision']:.2f} + depreciation {m['parts']['depreciation']:.2f} = {m['new_rate']:.2f} a standard "
         f"hour, against {m['conversion'] / m['stdh']:.2f} today, {m['td_std']:.2f} time-driven, and "
         f"{m['actual_rate']:.2f} actual. A standard built on the base year's actual cost would carry the idle capacity "
-        "and the hours paid beyond the work into inventory; ASC Topic 330 allocates fixed overhead on normal capacity "
-        "and charges abnormal costs, such as idle facility expense, to the period.",
+        "and the hours recorded above the routings into inventory; ASC Topic 330 allocates fixed overhead on normal "
+        "capacity and charges abnormal costs, such as idle facility expense, to the period.",
         f"Revalued at the proposed rate, the manufactured finished goods made since the opening and on hand, as the "
         "movements can rebuild them, rise by "
         f"{sf['plan']:,.0f}, {sp['plan']:,.0f}, and {sc['plan']:,.0f} at the {F_}, {P}, and {C} year-ends: retained "
@@ -3398,9 +3454,11 @@ def r9(b: ExerciseBuild) -> None:
         f"item-level opening balances). If a material prior-period error is established, the fiscal {P} and {C} "
         "statements should be revised (inventories, retained earnings, and income corrected, with the correction "
         "disclosed) and the CFO should tell the shareholders what was wrong; if the difference is a change in estimate, "
-        "the new standard applies from now on; if an error is established but immaterial, it is corrected in the next "
-        f"statements with disclosure. The decision is the CFO's. The opening {m['opening_fg']:,.2f} of finished goods "
-        "has no item detail and is left out."]
+        "the new standard applies from now on (ASC Topic 250). If an error is established but is immaterial to those "
+        "years, it can be corrected in the next statements only if recording it there would not itself materially "
+        "misstate that year, judged on amount and nature. Otherwise the comparatives are revised. The decision is the "
+        f"CFO's. Only manufactured finished goods revalue, because purchased ones are carried at their receipt cost. The "
+        f"opening {m['opening_fg']:,.2f} of finished goods has no item detail and is left out."]
     answer(ws, r, paras, last_col="H")
     ws.Columns("A").ColumnWidth = 60
     ws.Columns("B:D").ColumnWidth = 15
@@ -3509,6 +3567,7 @@ def r10(b: ExerciseBuild) -> None:
     buy, lose = m["buy"], m["lose"]
     need = [x["short"] for x in m["reprice"] if x["name"] not in m["buy_names"]]
     unused_pos = m["unused_h"] / m["pos_hours"]
+    freed_pos = sum(m["freed"].values()) / m["pos_hours"]
     sp, sc = (next(x for x in m["stock"] if x["year"] == y) for y in (d.P, d.C))
     make_path = sum(x["revenue"] for x in m["reprice"])
     buy_path = m["gain"] + sum(x["revenue"] for x in m["reprice"] if x["name"] not in m["buy_names"])
@@ -3516,16 +3575,19 @@ def r10(b: ExerciseBuild) -> None:
     paras = [
         "To: the CFO and the production manager. From: the staff accountant. Subject: make, buy, or reprice; and the "
         "standards.",
-        f"The plant already pays for about {unused_pos:.1f} positions of capacity it does not use ({m['unused_h']:,.0f} "
-        f"practical hours, {m['unused_h'] * m['td_rate']:,.0f} a year), a larger question than any outsourcing decision; "
-        "fitting the crew to the work and buying a family save money only as far as the production manager can make "
-        "those reductions, and the two add up only if both are made. Both of you are right about part of the cost. The CFO is right that the products cost "
+        f"On the routings, the plant supplied about {unused_pos:.1f} position-equivalents of practical hours more than "
+        f"its {d.C} completions needed ({m['unused_h']:,.0f} hours, {m['unused_h'] * m['td_rate']:,.0f} a year), more "
+        f"than buying would free on the same base ({freed_pos:.1f}). That is an estimate from standard times over a "
+        "year, not a finding that anyone did no work, and some weeks were planned above capacity, so fitting the crew to "
+        "the work is a larger question than any outsourcing decision and one to answer week by week. Fitting the crew "
+        "and buying a family save money only as far as the production manager can make those reductions, and the two "
+        "add up only if both are made. Both of you are right about part of the cost. The CFO is right that the products cost "
         f"more than their standards say ({m['new_rate']:.2f} a standard hour on normal capacity against "
         f"{m['conversion'] / m['stdh']:.2f}); the production manager is right that idle capacity is not the products' "
         "fault, and should be reported as a cost of the plant, not spread over the products.",
         f"Make {series([x['short'] for x in lose])}: buying them loses money whatever happens to the crew. Buy "
         f"{series([x['short'] for x in buy])} only with a committed plan to reduce the crew in step, about "
-        f"{m['positions']:.1f} positions: that saves {m['gain']:,.0f} a year, about "
+        f"{m['positions']:.1f} position-equivalents on the base year's sales: that saves {m['gain']:,.0f} a year, about "
         f"{2 * m['gain'] - m['positions'] * m['severance'] - m['tooling']:,.0f} over the two years the prices are fixed "
         f"after severance and tooling (before taxes, undiscounted). With the crew kept, buying them costs "
         f"{sum(-x['a_kept'] for x in buy):,.0f} a year, so if the crew stays, keep making them and reprice them. Compare "
@@ -3548,12 +3610,15 @@ def r10(b: ExerciseBuild) -> None:
         "and opening balances): revised statements if a material error is established, the new standard from now on if "
         "the difference is a change in estimate.",
         "The one decision only the production manager can make: whether, and how fast, to reduce the crew to the work "
-        "the plant has. Every saving above depends on it."]
+        f"the plant has. Every saving above depends on it. The figures rest on fiscal {d.C} for decisions that take "
+        f"effect in {d.N + 1}, so the {d.N} records so far (demand, staffing, and costs) should confirm them before the "
+        "quote is accepted."]
     answer(ws, last + 4, paras, last_col="E")
     ws.Columns("A").ColumnWidth = 14
     ws.Columns("B").ColumnWidth = 48
     ws.Columns("C:D").ColumnWidth = 14
     ws.Columns("E").ColumnWidth = 60
+    xl.retry(lambda: ws.Range(f"A4:A{last}").EntireRow.AutoFit())   # the decision table, sized after the widths
 
     t = "Requirement 10"
     q = {x["name"]: x for x in m["quoted"]}
@@ -3641,6 +3706,7 @@ def m3(b: ExerciseBuild) -> None:
 def m4(b: ExerciseBuild) -> None:
     m, d = ms(b), data(b)
     t = "Milestone 4"
+    tidy_layout(b)                                   # the last step: every sheet has its final column widths
     tp = typed_plan(m)
     b.check(t, "proposed rate", round(tp["new_rate"], 9), "=NewRate", 1e-9)
     b.check(t, "with no indirect hours (labor content)", round(tp["one_rate"], 9), "=OneRate", 1e-9)

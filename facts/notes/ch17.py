@@ -2,7 +2,7 @@
 states, and the claims its wording makes.
 
 The case is set in July of d.N. The staff accountant prepares statements for fiscal d.C with d.P as the comparative
-year, so the three year-ends of the window are d.F, d.P, and d.C, and "1 January" of the comparative year is the start
+year, so the three year-ends of the window are d.F, d.P, and d.C, and "January 1" of the comparative year is the start
 of d.P. Trial balances follow Requirement 1 (postings on or before the as-of date, a year-end close left out only when
 it is dated on the as-of date), and flows leave the closes out. Amounts are rounded half away from zero.
 
@@ -61,8 +61,8 @@ def ye(year: int) -> str:
 
 
 def day_month(day: str) -> str:
-    """'2027-02-23' -> '23 February'."""
-    return f"{int(day[8:10])} {MONTHS[int(day[5:7]) - 1]}"
+    """'2027-02-23' -> 'February 23'."""
+    return f"{MONTHS[int(day[5:7]) - 1]} {int(day[8:10])}"
 
 
 def month_of(day: str) -> str:
@@ -625,7 +625,7 @@ def m4(d, claim):
     after = ye(d.C)
     payments, amount = d.q("SELECT COUNT(*), SUM(Amount) FROM DisbursementPayment WHERE PaymentDate > ?", after)[0]
     claim(d.one("SELECT COUNT(*) FROM PurchaseInvoice WHERE ReceivedDate > ?", after) == 0,
-          f"no supplier invoice was received after {d.C}, so no unrecorded liability is found")
+          f"no supplier invoice was received after {d.C}, so the search of the later payments identifies no unrecorded liability")
     claim(no_tax_account(d), "there is no income tax account")
     stax = xr(-bal(d, SALES_TAX, after))
     equity = xr(sum(opening_line(d, n) for n in ("2010", "2030", "2040")) - sum(opening_line(d, n) for n in ("1020", "1050")))
@@ -898,18 +898,37 @@ def allowance(d) -> float:
 
 
 @lru_cache(maxsize=None)
+def posted_open_invoices(d, year: int) -> list[tuple[str, float]]:
+    """The open invoices the ledger records at a year-end, as (due date, balance): each invoice whose first SalesInvoice
+    posting is dated on or before the year-end (the population account 1020 holds; an invoice dated in one year and posted in
+    the next belongs to the next), less the receipts applied and the credit memos dated on or before it, rounded and kept if
+    greater than zero, as Tutorial 8.2 keeps them."""
+    asof = ye(year)
+    rows = d.q("SELECT si.DueDate, si.GrandTotal - COALESCE((SELECT SUM(a.AppliedAmount) FROM CashReceiptApplication a "
+               "WHERE a.SalesInvoiceID = si.SalesInvoiceID AND a.ApplicationDate <= ?1), 0) - COALESCE((SELECT "
+               "SUM(c.GrandTotal) FROM CreditMemo c WHERE c.OriginalSalesInvoiceID = si.SalesInvoiceID AND "
+               "c.CreditMemoDate <= ?1), 0) FROM SalesInvoice si JOIN (SELECT SourceDocumentID AS id, MIN(PostingDate) AS pd "
+               "FROM GLEntry WHERE SourceDocumentType = 'SalesInvoice' GROUP BY SourceDocumentID) p ON p.id = si.SalesInvoiceID "
+               "WHERE p.pd <= ?1", asof)
+    return [(due, xr(balance)) for due, balance in rows if xr(balance) > 0]
+
+
+@lru_cache(maxsize=None)
 def allowance_at(d, year: int) -> float:
-    """P1's allowance at another year-end: Tutorial 8.2's open invoices (invoices less the receipts applied and the credit
-    memos dated on or before the year-end, rounded, kept if greater than zero), aged by due date at Exercise 8.1's rates."""
+    """P1's allowance at a year-end: the open invoices the ledger records then (posted_open_invoices), aged by due date at
+    Exercise 8.1's rates."""
     asof = ye(year)
     amounts = [0.0] * len(BUCKETS)
-    for due, balance in d.q("SELECT si.DueDate, si.GrandTotal - COALESCE((SELECT SUM(a.AppliedAmount) FROM CashReceiptApplication a "
-                            "WHERE a.SalesInvoiceID = si.SalesInvoiceID AND a.ApplicationDate <= ?1), 0) - COALESCE((SELECT "
-                            "SUM(c.GrandTotal) FROM CreditMemo c WHERE c.OriginalSalesInvoiceID = si.SalesInvoiceID AND "
-                            "c.CreditMemoDate <= ?1), 0) FROM SalesInvoice si WHERE si.InvoiceDate <= ?1", asof):
-        if xr(balance) > 0:
-            amounts[bucket_of(days(due, asof))] += xr(balance)
+    for due, balance in posted_open_invoices(d, year):
+        amounts[bucket_of(days(due, asof))] += balance
     return xr(sum(xr(xr(a) * rate_) for a, (_, rate_) in zip(amounts, BUCKETS)))
+
+
+def dated_not_posted(d, year: int) -> list[str]:
+    """The invoices dated on or before a year-end whose first posting falls after it."""
+    return [r[0] for r in d.q("SELECT si.InvoiceNumber FROM SalesInvoice si JOIN (SELECT SourceDocumentID AS id, MIN(PostingDate) "
+                              "AS pd FROM GLEntry WHERE SourceDocumentType = 'SalesInvoice' GROUP BY SourceDocumentID) p ON "
+                              "p.id = si.SalesInvoiceID WHERE si.InvoiceDate <= ?1 AND p.pd > ?1 ORDER BY 1", ye(year))]
 
 
 @lru_cache(maxsize=None)
@@ -979,6 +998,12 @@ def r5(d, claim):
     claim(abs(statement(d, d.C)["recv"] - aging - opening_line(d, "1020") - adj["cut"][d.C]) < 0.005,
           "the adjusted receivables are the invoice aging plus the opening line plus the unbilled deliveries")
     claim(abs(allowance_at(d, d.C) - allowance(d)) < 0.005, "the allowance at the end of each year is measured as Exercise 8.1 measures it")
+    aging_p = xr(sum(b for _, b in posted_open_invoices(d, d.P)))
+    claim(all(abs(xr(sum(b for _, b in posted_open_invoices(d, y))) - (bal(d, ["1020"], ye(y)) - opening_line(d, "1020"))) < 0.005
+              for y in (d.P, d.C)), "the open invoices by posting date are 1020 less its opening line at both year-ends")
+    late_posted = dated_not_posted(d, d.P)
+    claim(bool(late_posted) and not dated_not_posted(d, d.C),
+          f"some invoices dated by the end of {d.P} were posted after it, and none at the end of {d.C}")
     p1_prior = -allowance_at(d, d.P)
     ra = returns_across(d)
     claim(sorted(ra["pairs"]) == [(d.P, d.F), (d.C, d.P)], "every return in a later year is returned the year after its delivery")
@@ -1013,7 +1038,8 @@ def r5(d, claim):
                 p2=dict(n=rc["n"], rev=rc["rev"], cost=rc["cost"], n_prior=rp["n"], rev_prior=rp["rev"], cost_prior=rp["cost"],
                         effect=p2, income=xr(p2 - p2_prior)),
                 p3=dict(effect=p3, total=xr(sum(p3_years)), years=p3_years), aggregate=aggregate, agg_income=agg_income,
-                agg_share=-aggregate / mat_c, residual=residual, aging=aging, opening_ar=opening_line(d, "1020"),
+                agg_share=-aggregate / mat_c, residual=residual, aging=aging, aging_p=aging_p, late_posted=late_posted,
+                opening_ar=opening_line(d, "1020"),
                 keep=kept_income(d))
 
 
@@ -1233,7 +1259,7 @@ def r7(d, claim):
     claim(d.one("SELECT COUNT(*) FROM ServiceBillingLine b JOIN SalesInvoiceLine sil ON sil.SalesInvoiceLineID = b.SalesInvoiceLineID "
                 "JOIN SalesInvoice si ON si.SalesInvoiceID = sil.SalesInvoiceID WHERE substr(b.BillingPeriodEndDate, 1, 7) = ? "
                 "AND si.InvoiceDate <> ?", f"{C}-12", ye(C)) == 0
-          and d.one("SELECT MAX(WorkDate) FROM ServiceTimeEntry") <= ye(C), "December's work was billed on 31 December")
+          and d.one("SELECT MAX(WorkDate) FROM ServiceTimeEntry") <= ye(C), "December's work was billed on December 31")
     # the engagements not Billed by status: each must have billed every hour worked, so there is no unbilled work
     engs = []
     for eid, status, end, planned in d.q("SELECT ServiceEngagementID, Status, EndDate, PlannedHours FROM ServiceEngagement "
@@ -1253,6 +1279,18 @@ def r7(d, claim):
     claim(d.one("SELECT COUNT(*) FROM ShipmentLine sl JOIN Item i ON i.ItemID = sl.ItemID "
                 "WHERE ABS(sl.ExtendedStandardCost - ROUND(sl.QuantityShipped * i.StandardCost, 2)) > 0.011") == 0,
           "finished goods leave inventory at standard cost")
+    # finished goods as the ledger records them: purchased goods enter 1040 at the receipt line's purchase-order cost,
+    # manufactured goods at standard through completions, on an opening line with no item detail
+    n_gr, at_receipt, off_standard = d.q(
+        "SELECT COUNT(*), SUM(CASE WHEN ABS(gl.Debit - grl.ExtendedStandardCost) > 0.005 THEN 1 ELSE 0 END), "
+        "SUM(CASE WHEN ABS(gl.Debit - ROUND(grl.QuantityReceived * i.StandardCost, 2)) > 0.005 THEN 1 ELSE 0 END) FROM GLEntry gl "
+        "JOIN GoodsReceiptLine grl ON grl.GoodsReceiptLineID = gl.SourceLineID JOIN Item i ON i.ItemID = grl.ItemID "
+        "WHERE gl.SourceDocumentType = 'GoodsReceipt' AND gl.AccountID = ?", d.account("1040"))[0]
+    claim(n_gr > 0 and at_receipt == 0 and off_standard > 0,
+          "purchased finished goods enter 1040 at their receipt line's purchase-order cost, not at standard cost")
+    claim(opening_line(d, "1040") > 0 and d.one("SELECT COUNT(*) FROM GLEntry WHERE AccountID = ? AND SourceDocumentType = "
+                                               "'ProductionCompletion'", d.account("1040")) > 0,
+          "1040 holds an opening line and the manufactured goods completed at standard")
     s_c, s_p = statement(d, C), statement(d, P)
     opening_2030 = opening_line(d, "2030")
     # withholdings and benefits of the last payroll not yet remitted at the year-end (2031-2033)
@@ -1409,6 +1447,15 @@ def r9(d, claim):
     o = dict(ar=opening_line(d, "1020"), prepaid=opening_line(d, "1050"), ap=opening_line(d, "2010"),
              payroll=opening_line(d, "2030"), accrued=opening_line(d, "2040"))
     assets, liabilities = xr(o["ar"] + o["prepaid"]), xr(o["ap"] + o["payroll"] + o["accrued"])
+    # the opening inventories, outside the five lines' equity figure: an aggregate with no item detail
+    o_inv = xr(opening_line(d, "1040") + opening_line(d, "1045"))
+    claim(opening_line(d, "1040") > 0 and opening_line(d, "1045") > 0, "the opening entry holds finished goods and materials")
+    # 2050 is tax billed: taxable invoices with no payment and no credit memo at the year-end still hold part of it
+    unpaid_n, unpaid_tax = d.q("SELECT COUNT(*), COALESCE(SUM(si.TaxAmount), 0) FROM SalesInvoice si WHERE si.InvoiceDate <= ?1 "
+                               "AND si.TaxAmount > 0 AND NOT EXISTS (SELECT 1 FROM CashReceiptApplication a WHERE a.SalesInvoiceID "
+                               "= si.SalesInvoiceID AND a.ApplicationDate <= ?1) AND NOT EXISTS (SELECT 1 FROM CreditMemo c WHERE "
+                               "c.OriginalSalesInvoiceID = si.SalesInvoiceID AND c.CreditMemoDate <= ?1)", ye(d.C))[0]
+    claim(unpaid_n > 0 and unpaid_tax > 0, "some taxable invoices have no payment at the year-end, so the payable is not all tax collected")
     tables = [t.lower() for (t,) in d.q("SELECT name FROM sqlite_master WHERE type = 'table'")]
     claim(not any("bank" in t or "reconcil" in t for t in tables), "no bank reconciliation in the records")
     claim(not any(w in t for t in tables for w in ("opening", "stock", "onhand", "inventorybalance", "inventorycount")),
@@ -1420,5 +1467,5 @@ def r9(d, claim):
     claim(reval[d.C] > 0 and reval[d.P] > 0, "the finished goods would be higher at a standard rebuilt on normal capacity")
     return dict(years=word(len(d.years)), adj_ni=adj_ni, provision=provision, rent=rent, stax=stax, memo_debits=memo_debits,
                 provision_keep=provision_keep,
-                o=o, equity=xr(liabilities - assets), assets=assets, liabilities=liabilities,
-                reval_c=round(reval[d.C], -3), reval_p=round(reval[d.P], -3))
+                o=o, equity=xr(liabilities - assets), assets=assets, liabilities=liabilities, o_inv=o_inv,
+                unpaid_n=unpaid_n, unpaid_tax=xr(unpaid_tax), reval_c=round(reval[d.C], -3), reval_p=round(reval[d.P], -3))

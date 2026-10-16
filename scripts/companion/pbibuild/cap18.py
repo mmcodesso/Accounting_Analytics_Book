@@ -36,7 +36,7 @@ from pbibuild.ex13 import expand_all
 from pbibuild.model import MEASURES_TABLE, Column, Measure, Model, Query, Table, query_table
 from pbibuild.pbir import Page, Report, Visual, agg, col, lit, meas, textbox
 from pbibuild.project import Project
-from pbibuild.reports import COUNT, MONEY, card, claim, entered, hide, keep, money, slicer
+from pbibuild.reports import COUNT, MONEY, card, claim, entered, grow, hide, keep, money, slicer
 from xlbuild import pq
 from xlbuild.expected import Expected
 
@@ -393,7 +393,8 @@ def r5(b: Build) -> None:
         f"fiscal {y}.",
         "Views: Standard is each item's standard cost. Absorption is the case's proxy for actual absorption: the "
         "standard cost plus the family's variance per unit completed in the year (the year's close variance over the "
-        "year's completions), which spreads the plant's idle time over the units made. Time-driven charges material at "
+        "year's completions), an approximation of spreading the year's cost over the units made, not the measured cost "
+        "of unused capacity. Time-driven charges material at "
         "the year's "
         "actual rate, the Factory Overhead entries per standard hour, and the committed cost of the crew, supervision, "
         "and equipment per hour of practical capacity times the item's routing time; the capacity left unused is a "
@@ -409,7 +410,7 @@ def r5(b: Build) -> None:
         "reconcile.",
         "Checks: the Validation page reproduces control totals of Chapters 6, 10, 13, and 14 and compares each view "
         "with the workbook; the Tests tab in DAX query view tests the same totals."], size=12))
-    about.add(card("lastInvoice", 20, 510, 300, 90, [(M("Last Invoice"), "Last invoice")]))
+    about.add(card("lastInvoice", 20, 510, 300, 90, [(M("Last Invoice"), "Last invoice")], size=20))
     about.add(Visual("pageNavigator", "pageNavigator", 340, 520, 920, 60, objects={"pages": [{"properties": {
         "showHiddenPages": lit(False), "showTooltipPages": lit(False)}}]}))
     about.expect = [FILE, "Families", "Capacity", "Validation", last_invoice]
@@ -422,7 +423,7 @@ def r5(b: Build) -> None:
     v_col, fam_col, grp_col = col("Costing View", "View"), col("ItemCosts", "Family"), col("ItemCosts", "ItemGroup")
     page.add(slicer("viewSlicer", 20, 20, 360, 80, v_col, ["Time-driven"], style="tile", single=True, title="Costing view"))
     page.add(card("viewCards", 400, 20, 860, 80, [M("Revenue"), M("Product Cost"), M("Margin"), M("Margin %")],
-                  units_none=True))
+                  units_none=True, size=16))
     levels = [grp_col, fam_col]
     page.add(Visual("familyMatrix", "pivotTable", 20, 115, 700, 590,
                     {"Rows": levels, "Columns": [v_col], "Values": [M("Margin %"), M("Cost per Unit")]},
@@ -440,6 +441,7 @@ def r5(b: Build) -> None:
                              "in the slicer, from the largest."))
     page.expect = ["Margin %", "Cost per Unit", money(exact["std"]), money(exact["absorp"]), money(exact["td"]),
                    money(e["rev"]), ctx["example"], f"{example['unit']['m_td']:.1%}", f"{example['unit']['td']:,.2f}"]
+    grow(page, "viewCards", 16)                       # the labels under the values need the room
 
     # Concentration (the optional curve of the note)
     conc = b.report.add(Page("concentration", "Concentration"))
@@ -465,7 +467,7 @@ def r5(b: Build) -> None:
     cap.add(card("capacityCards", 20, 20, 1240, 90, [M("Practical Capacity"), M("Routing Time Used"),
                                                      M("Unused Capacity"), M("Share of Practical"), M("Committed Cost"),
                                                      M("Capacity Cost Rate"), M("Unused Capacity Cost")],
-                 units_none=True))
+                 units_none=True, size=16))
     cap.add(Visual("capacityTable", "tableEx", 20, 125, 800, 230,
                    {"Values": [wn, M("Available Hours"), M("Practical Capacity"), M("Routing Time Used"),
                                M("Share of Available"), M("Share of Practical"), M("Unused Capacity")]},

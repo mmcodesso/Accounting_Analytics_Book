@@ -338,7 +338,7 @@ ORDER BY c.WorkYear;""",
             [Check(f"{y} full cost, rounded as the note gives it", thousands, lambda r, y=y:
                    int(round(r.where(WorkYear=str(y))["FullCost"], -3)))
              for y, thousands in zip((d.F, d.P), v["full"])])
-    s.query("Exercise 12.1, test C9: the payroll cost of 14-31 December 2026, which has no registers",
+    s.query("Exercise 12.1, test C9: the payroll cost of December 14-31, 2026, which has no registers",
             "Population: the last eight processed pay periods; expected: an estimate to accrue",
             f"""\
 WITH Params AS (
@@ -427,8 +427,9 @@ All {pi_count:,} supplier invoices are posted on their ReceivedDate (test C5): C
 invoice when it receives it, not on the date the supplier wrote on it (the two dates are the same for
 {on_invoice_date:,} of them).
 Only {crossing['number']} (supplier {crossing['id']}, dated {crossing['date']}, received {crossing['received']},
-{money(crossing['total'])}) crosses a year-end. Its line refers to the accrual entry {accrual}, so the liability for
-the service was carried in accrued expenses at the end of {d.P}; it is not an unrecorded liability.""")
+{money(crossing['total'])}) crosses a year-end. Its line refers to the accrual entry {accrual}, so an estimate of the
+liability for the service was carried in accrued expenses at the end of {d.P}, and the invoice is not an unrecorded
+liability, although the accrual's amount and its clearing are still to be reviewed.""")
     s.answer("Requirement (5), memo to the controller", f"""\
 To: the controller. Subject: cutoff at each year-end.
 
@@ -443,13 +444,14 @@ C2), {len(before)} were posted in the year of delivery, an invoice-dating failur
 error, and {' and '.join(both)} {'is' if len(both) == 1 else 'are'} also among the cutoff errors above.
 
 Supplier invoices are posted on the date received, and the one invoice that crosses a year-end was accrued, so the
-payables cutoff holds.
+supplier-invoice cutoff test finds no exception. It is not a search for liabilities recorded nowhere, which takes the
+invoices and supplier statements received after the year-end.
 
 Payroll. Wages are recorded only when paid, and account 2030 holds the opening {money(v['opening'])} at every
 year-end, so no year-end accrues the wages earned in late December. The work of late December cost about
 {v['full'][0]:,} in {d.F} and {v['full'][1]:,} in {d.P} (hourly labor by work date of
 {money(v['hourly'][0]['total'])} and {money(v['hourly'][1]['total'])}, plus salaries by working day and employer
-taxes and benefits), and the {v['days']} working days of 14-31 December {d.C} are estimated at {money(estimate)}
+taxes and benefits), and the {v['days']} working days of December 14-31, {d.C}, are estimated at {money(estimate)}
 (the cost of periods {v['first']}-{v['last']}, {money(v['avg'])} a period on average, per working day; spreading
 salaries over weekdays instead gives about {v['high']:,}). Each year-end's liability is understated by these amounts, and each year's expense by the change
 between them.
@@ -646,7 +648,8 @@ SELECT COUNT(*) AS Invoices, ROUND(SUM(n.OpenBalance), 2) AS Balance,
 FROM Negative AS n;""",
             [Check("invoices with a negative balance", v["n_negative"], lambda r: r.value("Invoices")),
              Check("their balance", round(v["negative"], 2), lambda r: r.value("Balance")),
-             Check("paid in full before the credit", v["paid_in_full"], lambda r: r.value("PaidInFull")),
+             Check("paid in full by the as-of date (not necessarily before the credit)", v["paid_in_full"],
+                   lambda r: r.value("PaidInFull")),
              Check("credits refunded by the as-of date", v["refunded"], lambda r: r.value("Refunded"))])
     s.query("Exercise 12.2, test A5: customers stratified by open balance",
             f"Population: customers with a positive balance; expected: {v['customers']} customers",
@@ -698,7 +701,9 @@ SELECT ReceiptNumber, ReceiptDate, SupplierID, QuantityReceived,
 FROM NotInvoiced
 ORDER BY ReceiptDate, ReceiptNumber;""",
             [Check("receipt lines", v["grni_lines"], len),
-             Check("value not invoiced (the rounded lines added up)", v["grni"],
+             Check("the displayed lines, each rounded to the cent, added up", round(v["grni_shown"], 2),
+                   lambda r: round(r.total("ValueNotInvoiced"), 2)),
+             Check("within ten cents of the unrounded total of test A8", v["grni"],
                    lambda r: round(r.total("ValueNotInvoiced"), 2), tolerance=0.10)])
     s.query("Exercise 12.2, test A8: the receipts not invoiced against account 2020",
             "Population: the lines of test A7 and the ledger; expected: no difference",
@@ -758,9 +763,11 @@ LIMIT 5;""",
 The open invoices total {money(v['total'])}, and account 1020 shows {money(v['ledger'])} at {v['asof']}. The
 difference of {money(opening)} is exactly the receivables line of the opening entry {v['entry']}, which no invoice
 supports (the finding of Chapter 8). The {v['n_negative']} invoices with a negative balance ({money(v['negative'])})
-are invoices credited after they were paid ({v['paid_in_full']} of them in full): the credit memo posts to account
-2060, not to receivables, and the credit is refunded ({v['refunded']} of the {v['n_negative']} by the as-of date), so
-they are amounts owed to customers, not negative receivables, and are left out of the aging.""")
+are invoices whose receipts and credits together exceed their total: {v['paid_in_full']} were paid in full by the
+as-of date, but only {v['full_before']} of them in full before their first credit, so the dates do not show that each
+credit came after the payment. The credit memo posts to account 2060, not to receivables, and the credit is refunded
+({v['refunded']} of the {v['n_negative']} by the as-of date), so they are amounts owed to customers, not negative
+receivables, and are left out of the aging.""")
     s.answer("Requirement (5), memo to the controller", f"""\
 To: the controller. Subject: the open balances at {v['asof']}.
 
@@ -779,10 +786,12 @@ Most are December receipts, which are normal; {old_lines} lines received in {v['
 disputed or lost invoices, or receipts recorded against the wrong order.""")
     s.answer("Dispositions", f"""\
 A1-A2: no exception; the aging is the basis for the allowance and the confirmations. A3 ({money(opening)}): the
-unsupported opening line, reported as a finding. A4 ({v['n_negative']} invoices): credits on paid invoices, refunded
-through account 2060; no exception for receivables, and the {v['n_negative'] - v['refunded']} not yet refunded are
+unsupported opening line, reported as a finding. A4 ({v['n_negative']} invoices): credits on invoices that receipts also
+paid, refunded through account 2060; no exception for receivables, and the {v['n_negative'] - v['refunded']} not yet refunded are
 liabilities to customers. A5-A6: the {strata['50,000 and over']['n']} key items are selected for confirmation. A7-A8:
-agrees with account 2020 within {money(v['rounding'])}, rounding; no exception. A9-A10: the {old_lines} lines older than
+agrees with account 2020 within {money(v['rounding'])}, the rounding of the clearing amounts; the total of A8 adds the
+unrounded values and rounds once, while the A7 lines, each rounded to the cent, add to {money(v['grni_shown'])}, which is
+display rounding; no exception. A9-A10: the {old_lines} lines older than
 two months are referred to purchasing for follow-up.""")
 
 
@@ -792,12 +801,14 @@ FLAGGED = """\
 WITH Flagged AS (
     SELECT lt.LaborTimeEntryID, lt.WorkDate, op.ActualEndDate,
         lt.RegularHours + lt.OvertimeHours AS Hours,
+        CASE WHEN op.WorkOrderOperationID IS NULL THEN 1 ELSE 0 END
+            AS NoOperation,
         CASE WHEN lt.WorkDate <= op.ActualEndDate THEN 1 ELSE 0 END
             AS WhileOpen,
         CASE WHEN lt.WorkDate < op.ActualStartDate THEN 1 ELSE 0 END
             AS BeforeStart
     FROM LaborTimeEntry AS lt
-        INNER JOIN WorkOrderOperation AS op
+        LEFT JOIN WorkOrderOperation AS op
             ON op.WorkOrderOperationID = lt.WorkOrderOperationID
     WHERE lt.LaborType = 'Direct Manufacturing'
 )"""
@@ -838,8 +849,11 @@ def ex3(b):
         "op.ActualEndDate THEN lt.RegularHours + lt.OvertimeHours ELSE 0 END) FROM LaborTimeEntry lt JOIN "
         "WorkOrderOperation op ON op.WorkOrderOperationID = lt.WorkOrderOperationID "
         "WHERE lt.LaborType = 'Direct Manufacturing' GROUP BY 1")}
-    entries = d.one("SELECT COUNT(*) FROM LaborTimeEntry lt JOIN WorkOrderOperation op ON op.WorkOrderOperationID = "
-                    "lt.WorkOrderOperationID WHERE lt.LaborType = 'Direct Manufacturing'")
+    entries = d.one("SELECT COUNT(*) FROM LaborTimeEntry WHERE LaborType = 'Direct Manufacturing'")
+    by_year_none = {int(y): (n, h) for y, n, h in d.q(
+        "SELECT substr(lt.WorkDate, 1, 4), COUNT(*), SUM(lt.RegularHours + lt.OvertimeHours) FROM LaborTimeEntry lt "
+        "LEFT JOIN WorkOrderOperation op ON op.WorkOrderOperationID = lt.WorkOrderOperationID "
+        "WHERE lt.LaborType = 'Direct Manufacturing' AND op.WorkOrderOperationID IS NULL GROUP BY 1")}
     late = dict(d.q("SELECT substr(lt.WorkDate, 1, 7), SUM(CASE WHEN lt.WorkDate > op.ActualEndDate THEN "
                     "lt.RegularHours + lt.OvertimeHours ELSE 0 END) / SUM(lt.RegularHours + lt.OvertimeHours) "
                     "FROM LaborTimeEntry lt JOIN WorkOrderOperation op ON op.WorkOrderOperationID = "
@@ -851,24 +865,34 @@ def ex3(b):
     months = [f"{d.F}-{m:02d}" for m in range(1, MONTHS.index(v["months_to"]) + 2)]
     centers = [c + " Work Center" for c in v["centers"]]
     s = b.script("Ex 12.3.sql", "direct time recorded while each operation was open, by work center",
-                 "the flag covers every direct entry with an operation; ratios by work center and year; "
+                 "the flag covers every direct entry, those with no operation apart; ratios by work center and year; "
                  "the first months of 2024")
     s.query("Exercise 12.3, test T1: direct labor time flagged as recorded while the operation was open",
-            "Population: direct labor time with an operation; expected: recorded by the operation's end",
+            "Population: all direct labor time; expected: every entry with an operation, recorded by its end",
             f"""\
 {FLAGGED}
 SELECT strftime('%Y', WorkDate) AS WorkYear, COUNT(*) AS Entries,
+    SUM(NoOperation) AS NoOperation,
+    ROUND(SUM(CASE WHEN NoOperation = 1 THEN Hours ELSE 0 END), 2)
+        AS HoursNoOperation,
     SUM(WhileOpen) AS EntriesWhileOpen, SUM(BeforeStart) AS BeforeStart,
-    ROUND(SUM(Hours), 0) AS DirectHours,
+    ROUND(SUM(CASE WHEN NoOperation = 0 THEN Hours ELSE 0 END), 0)
+        AS DirectHours,
     ROUND(SUM(CASE WHEN WhileOpen = 1 THEN Hours ELSE 0 END), 0)
         AS HoursWhileOpen,
-    ROUND(SUM(CASE WHEN WhileOpen = 0 THEN Hours ELSE 0 END)
-        / SUM(Hours), 3) AS ShareAfterEnd
+    ROUND(SUM(CASE WHEN NoOperation = 0 AND WhileOpen = 0
+        THEN Hours ELSE 0 END)
+        / SUM(CASE WHEN NoOperation = 0 THEN Hours ELSE 0 END), 3)
+        AS ShareAfterEnd
 FROM Flagged
 GROUP BY WorkYear
 ORDER BY WorkYear;""",
-            [Check("entries flagged", entries, lambda r: r.total("Entries")),
+            [Check("entries flagged (every direct entry)", entries, lambda r: r.total("Entries")),
+             Check("entries with no operation", v["no_op"], lambda r: r.total("NoOperation")),
+             Check("their hours", round(v["no_op_hours"], 2), lambda r: round(r.total("HoursNoOperation"), 2)),
              Check("entries dated before their operation's start", 0, lambda r: r.total("BeforeStart"))] +
+            [Check(f"{y} entries with no operation", n, lambda r, y=y: r.where(WorkYear=str(y))["NoOperation"])
+             for y, (n, _) in sorted(by_year_none.items())] +
             [c for y, (h, lt) in by_year.items() for c in (
                 Check(f"{y} direct hours (test H9)", round(h), lambda r, y=y: r.where(WorkYear=str(y))["DirectHours"]),
                 Check(f"{y} share recorded after the end (test H9)", round(lt / h, 3),
@@ -971,6 +995,7 @@ SELECT strftime('%Y-%m', WorkDate) AS WorkMonth,
         / SUM(Hours), 3) AS ShareAfterEnd
 FROM Flagged
 WHERE WorkDate BETWEEN '2024-01-01' AND '2024-12-31'
+    AND NoOperation = 0
 GROUP BY WorkMonth
 ORDER BY WorkMonth;""",
             [Check("months", 12, len),
@@ -987,21 +1012,36 @@ ORDER BY WorkMonth;""",
     assert rank_all[0] == packing and rank_open[-1] == packing and rank_open[0] == qa, "the answer's ranking wording"
     assert min(planned, key=planned.get) == centers[qa], "Quality Assurance has the smallest planned hours"
     assert all(x < 1 for x in v["now"]), "every work center below plan while open"
+    assert v["above"], "an earlier year above plan while open"
+    above = "; ".join(f"{a['center']} was above plan, " + " and ".join(f"{y['ratio']:.2f} in {y['year']}" for y in a["years"])
+                      for a in v["above"])
+    above_years = " and ".join(str(y["year"]) for y in v["above"][0]["years"])
+    n_none, h_none = v["no_op"], v["no_op_hours"]
+    s.answer("Requirement (1)", f"""\
+Every direct labor entry stays in test T1: the LEFT JOIN keeps the {n_none} entries ({h_none:.2f} hours) whose
+WorkOrderOperationID is NULL or matches no operation, and NoOperation counts them as a group of their own, to repair
+from the original records. The timing flags and the share recorded after the end cover the entries with an operation,
+none of which is dated before its operation's ActualStartDate.""")
     s.answer("Requirement (3)", f"""\
 On all direct hours, {d.C} ranks {', '.join(short[i] for i in rank_all)} ({', '.join(f'{v["now_all"][i]:.2f}' for i
 in rank_all)}): Packing and Quality Assurance record about four times their planned hours. Counting only the time
 recorded while each operation was open (on or before its ActualEndDate; test T1 finds no time dated before an
 operation's start), the order becomes {', '.join(short[i] for i in rank_open)}
-({', '.join(f'{v["now"][i]:.2f}' for i in rank_open)}): every work center is below plan, and Packing falls from first
-to last. The Packing excess was time charged after the operation had ended; Packing is the last operation of every
-routing, so time recorded late lands there. Quality Assurance ranks first while open, but its planned hours are
-the smallest of any work center, so a few hours move its ratio.
-In {d.F} the in-window ratios were {', '.join(f'{short[i]} {v["then"][i]:.2f}' for i in range(len(short)))}.""")
+({', '.join(f'{v["now"][i]:.2f}' for i in rank_open)}): every work center is below plan in {d.C}, and Packing falls
+from first to last. Most of the Packing excess was time dated after the operation had ended; Packing is the last
+operation of every routing, so time recorded late lands there. Quality Assurance ranks first while open, but its
+planned hours are the smallest of any work center, so a few hours move its ratio.
+In {d.F} the in-window ratios were {', '.join(f'{short[i]} {v["then"][i]:.2f}' for i in range(len(short)))}, and on
+that time {above}, so the reading below plan holds for {d.C} only. A ratio below plan on the dated time does not show
+efficiency by itself: the hours left out may still be work that needs reassigning or redating.""")
     s.answer("Requirement (4)", f"""\
 From {v['build_from']} to {v['build_to']} {d.F} the plant completed far more units than it shipped (test T4), about
-{v['surplus']:,} units of stock in all: an inventory build that kept every hour on work orders, so almost no time was
-recorded as indirect. When releases and completions fell to the rate of shipments in {v['after']}, the same
-{v['staff']} employees kept their hours, and the days with no work order to charge became indirect time. The share of
+{v['surplus']:,} units of stock in all. The build is consistent with the little indirect time recorded from
+{v['quiet_from']} to {v['quiet_to']}, if it kept most hours on work orders, although {v['build_to']} already had
+{v['build_end_indirect']:,.0f} indirect hours. When releases and completions fell to the rate of shipments in
+{v['after']}, the same {v['staff']} employees kept recording their hours, and more of them were recorded as indirect
+time. The build is a plausible explanation of the mix, to be confirmed with the production schedules and the way the
+hours were assigned. The share of
 direct time recorded after its operation ended stayed between {v['late_low']:.2f} and {v['late_high']:.2f} a month
 through {v['before']} {v['before_year']} and first passed a quarter in {v['first']} {v['first_year']}
 ({v['late_first']:.2f}), the month surge days began in earnest.""")
@@ -1012,18 +1052,22 @@ Much of the direct time is recorded after the operation it is charged to has end
 of the direct hours of {d.C}, against {by_year[d.F][1] / by_year[d.F][0]:.0%} in {d.F}. Counted only while the
 operations were open, every work center used less time than planned in {d.C}, and the apparent excess at Packing
 and Quality Assurance disappears. The comparison of work centers against plan therefore cannot be relied on: it
-measures where late time is parked, not how efficiently each work center works. The plant-level measure of
-Chapter 11 (all manufacturing hours against the standard hours of output) does not depend on which operation the time
-is charged to and is unaffected.
+measures where late time is parked, not how efficiently each work center works, and in {above_years} {v['above'][0]['center']} was
+above plan even on the time recorded while open. The plant-level measure of Chapter 11 (all manufacturing hours
+against the standard hours of output) does not depend on which operation the time is charged to, although its hours
+and the standards still need corroboration. The {v['no_op']} direct entries with no operation need repair from the
+original records.
 
 What should change: time should be recorded against an operation only while it is open, with the system rejecting
 entries after the ActualEndDate; time with no open operation should be recorded as indirect time with a reason, and
 supervisors should review late entries weekly. Until then, efficiency should be reported at the plant level only.""")
     s.answer("Dispositions", f"""\
 T1 and T5: direct time recorded after the operation ended ({by_year[d.C][1] / by_year[d.C][0]:.1%} of {d.C}'s hours),
-a recording deficiency reported to the plant manager. T2 and T3: no work center exceeds plan on the time recorded
-while open; the Packing and Quality Assurance excess is explained by late recording, not by inefficiency. T4: the
-{d.F} stock build explains the months with little indirect time; no exception.""")
+reported to the plant manager for reassignment or redating, not as hours shown to be unworked; the {v['no_op']} entries
+with no operation are linkage exceptions to repair. T2 and T3: in {d.C} no work center exceeds plan on the time
+recorded while open, so the ranking depends on how time is dated; operation-level efficiency conclusions wait for
+reliable coding. T4: the {d.F} stock build is a plausible explanation of the months with little indirect time, to
+corroborate with the production schedules.""")
 
 
 # --- Exercise 12.4 ---------------------------------------------------------------------------------------------------
@@ -1037,7 +1081,7 @@ SurgeDays AS (
     WHERE cc.CostCenterName = 'Manufacturing'
     GROUP BY tc.WorkDate
     HAVING COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1
-        AND COUNT(*) > 1
+        AND COUNT(DISTINCT tc.EmployeeID) > 1
 )"""
 
 
@@ -1150,28 +1194,32 @@ ORDER BY WorkYear;""",
     growth_surge, growth_other = v["surge"][-1] - v["surge"][0], v["other"][-1] - v["other"][0]
     s.answer("Requirement (5)", f"""\
 The approval looks like a record of overtime rather than an authorization of it. The {v['n_reasons']} reason codes ({', '.join(v['reasons'])})
-each hold about a quarter of the approvals in every year, so the reasons say nothing about why overtime grew. The
+each hold about a quarter of the approvals in every year, so the mix of reasons does not explain why overtime grew,
+although it does not show that the reasons are false. The
 Production Manager approved {v['manager_n']:,} of the {v['n']:,} approvals ({100 * v['manager_share']:.1f}%), every
 approval grants exactly the hours requested, and every one is dated on the work date itself: no recorded request was
-reduced, and none was approved on an earlier day. A date cannot show whether approval came before the overtime within
-the day, so the requests, their timestamps, and any evidence of review should be inspected before the control is
-judged. All {v['entries']:,} clock entries of the {v['days']} surge days were
+reduced, and none was approved on an earlier day. A sound request need not be reduced, and a date cannot show whether
+approval came before the overtime within the day, so the requests, their timestamps, any evidence of review, and the
+policy that applies should be inspected before the control is judged. All {v['entries']:,} clock entries of the {v['days']} surge days were
 approved by the Production Manager on the work date. Overtime on other days {v['other_trend']}
 ({', '.join(f'{x:,.0f}' for x in v['other'])} hours), while overtime on surge days grew from {v['surge'][0]:,.0f} to
 {v['surge'][1]:,.0f} and {v['surge'][2]:,.0f} hours ({growth_surge:+,.0f}, against {growth_other:+,.0f} on other
-days): all the growth sits on days the same manager scheduled and approved.
+days): all the growth sits on days whose overtime the same manager approved. Who scheduled those days is a separate
+question, which the shift rosters answer.
 
-Two changes would make it a control: approval in advance of the shift, with a limit of overtime per employee and
-week above which a second approver outside production (such as the controller) must agree; and
-reason codes tied to a work order or a documented backlog, reviewed monthly by someone independent of the person who
-schedules the surge days.""")
+Two changes would make it a stronger control: approval in advance of the shift, with a limit of overtime per employee
+and week above which a second approver outside production (such as the controller) must agree; and reason codes tied
+to a work order or a documented backlog, reviewed monthly by someone independent of the person who approves the
+surge-day overtime.""")
     s.answer("Dispositions", f"""\
-O1: the reason codes carry no information, a design deficiency. O2: concentration of approval in the Production
-Manager ({100 * v['manager_share']:.1f}%), a segregation-of-duties finding. O3: no approval reduces hours or is dated before
-the work day, so the approval appears to record rather than authorize the overtime; reported as a design deficiency,
-subject to the requests and their timestamps. O4 and O5: the surge-day
-overtime ({v['surge'][-1]:,.0f} hours in {d.C}) was scheduled and approved by one person on the day; referred to the
-controller for review of the surge days' business need.""")
+O1: the mix of reason codes does not move with the overtime; inspect the underlying reasons and requests before
+deciding whether they inform the approval. O2: approval concentrated in the Production Manager
+({100 * v['manager_share']:.1f}%); assess the review capacity, the policy, and any independent oversight before
+classifying it. O3: no approval reduces hours or is dated before the work day, so the approval appears to record rather
+than authorize the overtime; a possible design deficiency, to confirm with the requests, their timestamps, and the
+evidence of review. O4 and O5: the surge-day overtime ({v['surge'][-1]:,.0f} hours in {d.C}) was approved by one person
+on the work date; referred to the controller for review of the surge days' business need and for corroboration of the
+hours.""")
 
 
 # --- Exercise 12.5 ---------------------------------------------------------------------------------------------------
@@ -1312,13 +1360,17 @@ amount. The chief executive has a register in every other pay period, at the sam
 these three (test R2), so the chief executive's pay for those periods appears to have been recorded under employee
 {v['emp']}; {' and '.join(str(x) for x in v['unpaid'])} have no payment record (Tutorial 12.1).
 
-Isolated exceptions or a pattern: the post-termination and unpaid registers are isolated exceptions (three registers,
-one employee) to be traced to the bank records. The approval results are a pattern: one person, the {own_title}
+Isolated exceptions or a pattern: the three post-termination registers are few, but they recur in three pay years
+under the same former employee and the {v['charged']} cost center, and {' and '.join(str(x) for x in v['unpaid'])} have
+no payment record, so they may share a cause in how pay is mapped to employees. They call for an investigation of the
+common cause and a trace to the bank records, and a reasoned answer either way is acceptable. The approval results are a
+pattern: one person, the {own_title}
 (employee {v['approver']}), approved all {v['registers']:,} registers, each on its pay date, including the
 {v['own']} that pay the {own_title.lower()} ({money(v['own_net'])} net), and {v['n_early']} payments
 ({', '.join(str(x) for x in v['early'])}, {money(v['early_net'])} net) paid the chief financial officer the day before
-the register was approved. A single approver who approves their own pay, on the day of payment, is a weakness in the
-design of the control, not an occasional lapse.""")
+the register was approved. A single approver who approves their own pay, on the day of payment, points to a weakness
+in the design of the control rather than an occasional lapse, unless an independent review that these records do not
+show makes up for it.""")
     s.answer("Requirement (5), findings and recommendations", f"""\
 1. Pay after termination: registers {', '.join(str(x['id']) for x in a)} pay a former {v['title']} the chief
 executive's amount; trace them to the bank, confirm with the chief executive, and correct the payroll master data.
@@ -1335,10 +1387,11 @@ payments only after the register is approved, enforced by the system.
 
 5. Add tests R1 to R5 to the query library and run them every pay period.""")
     s.answer("Dispositions", f"""\
-R1 and R2 ({len(a)} registers): deficiency, pay recorded under a terminated employee; referred to the chief audit
-executive for investigation. R3 and R4 ({v['registers']:,} registers, {v['own']} self-approved): design deficiency of
-the payroll approval. R5 ({v['n_early']} payments): deficiency, follow up with the chief financial officer and the
-bank records.""")
+R1 and R2 ({len(a)} registers): pay recorded under a terminated employee, a recurring set referred to the chief audit
+executive to find the common cause and trace to the bank. R3 and R4 ({v['registers']:,} registers, {v['own']}
+self-approved): a pattern that points to the design of the payroll approval, to confirm against the policy and any
+independent review. R5 ({v['n_early']} payments): payment before approval, follow up with the chief financial officer
+and the bank records.""")
 
 
 # --- Exercise 12.6 ---------------------------------------------------------------------------------------------------
@@ -1564,8 +1617,9 @@ ORDER BY PaymentGroup;""",
     partial_min = int(partial_min // 1000 * 1000)
     s.answer("Requirement (6), results and dispositions", f"""\
 D1, duplicate supplier invoice numbers: {v['n_dupes']} numbers appear twice for the same supplier; each pair has
-different amounts and each invoice was paid once (Exercise 2.6). Disposition: obtain both invoices of each pair from
-the suppliers to confirm they are distinct bills; no invoice was paid twice.
+different amounts and each recorded invoice was paid once (Exercise 2.6). Disposition: obtain both invoices of each
+pair from the suppliers to confirm they are distinct bills; one payment per record does not exclude two records of one
+bill.
 
 D2, standardized numbers: the same {v['n_dupes']} pairs and no others; the numbers are entered consistently.
 Disposition: no exception.
@@ -1575,18 +1629,21 @@ supplier {v['check_supplier']} (the AnomalyLog lists {v['n_logged']} duplicate r
 {v['n_with_check']} carry check numbers). Disposition: trace both payments of each check to the bank statement.
 
 D4 and D5, near-duplicate payments: {v['pairs']} pairs share supplier and amount on different dates, {v['within30']}
-within 30 days ({v['within14']} within 14, the chapter's example), and none pays the same recorded invoice.
-Disposition: no invoice was paid twice, but a duplicate bill entered under another number would pass this test, so
-review the invoices, purchase orders, and receipts behind the pairs within 30 days before treating them as distinct
-purchases.
+within 30 days ({v['within14']} within 14, the chapter's example), and none of them refers to the same recorded
+invoice. Disposition: the test covers pairs of the same supplier and amount on different dates, so it does not exclude
+a duplicate bill entered under another number, paid on the same date, or paid at another amount; review the invoices,
+purchase orders, and receipts behind the pairs within 30 days before treating them as distinct purchases.
 
 S1 and S2, document series: no gaps. Sales invoices, purchase orders, and cash receipts continue across years, and
 journal entries restart each year ({', '.join(f'1-{hi:,}' for _, hi in js)}). Disposition: no exception.
 
 B1, first digits: MAD {v['mad_all']:.5f} for all payments, {v['mad_full']:.5f} for full payments, and
-{v['mad_partial']:.5f} for partial payments, the values of Tutorial 8.1. Disposition: the partial payments'
-nonconformity is explained by how invoices are paid in parts (Chapter 8): only invoices of {money(partial_min)} or
-more are paid in installments, so the partial amounts cluster; no further work.
+{v['mad_partial']:.5f} for partial payments, the values of Tutorial 8.1. Every group has all nine digits (the Digits
+column), so the average over the digits observed is the MAD over all nine; a quarter with a digit missing would need
+the nine digits listed and joined to the counts. Disposition: the partial payments' nonconformity has a plausible cause
+in how invoices are paid in parts (Chapter 8): only invoices of {money(partial_min)} or more are paid in installments,
+a selection by size, so the partial amounts cluster. Document that selection and corroborate the installment practice;
+a conforming result for the full payments is not proof that the payments are genuine.
 
 Why the near-duplicate test needs a self-join: GROUP BY finds rows with identical values, but a near duplicate is a
 pair of different payments whose dates fall within a range of each other, so each payment must be compared with the

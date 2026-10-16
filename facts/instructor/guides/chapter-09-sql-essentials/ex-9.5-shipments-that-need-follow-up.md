@@ -37,7 +37,7 @@ By the end, students can:
 
 ## How to run it
 
-Individual, about 45 minutes: 10 for requirement (1), 10 for (2), 10 for (3), 15 for (4) and (5). The routine of Exercise 9.1 applies: type the comment lines and query at the end of the script, select it, click **Execute all/selected SQL** and read the message pane. Hold back the boundary hint until a student's count in (3) differs from the Excel filter. Collect the script and the comparison.
+Individual, about 45 minutes: 10 for requirement (1), 10 for (2), 10 for (3), 15 for (4) and (5). The routine of Exercise 9.1 applies: type the comment lines and query at the end of the script, select it, click **Execute all/selected SQL** and read the message pane. Hold back the boundary hint until a student asks why the count in (3) is one short of the In Transit rows of the Excel filter, or reports all of them. Collect the script and the comparison.
 
 ## Step-by-step solution
 
@@ -116,7 +116,7 @@ WHERE Status = 'In Transit' AND DeliveryDate < '2026-12-31'
 ORDER BY DeliveryDate;
 ```
 
-**Check:** {{ transit }} rows, the oldest delivery date {{ oldest }} in the first row. **Watch for:** `<=` returns {{ g.le }}, adding {{ g.last_number }}, shipped on the last day of the data with a DeliveryDate of the same day, which cannot yet be late. Without the Status condition the date test keeps {{ g.no_status|count }} rows, almost every shipment.
+**Check:** {{ transit }} rows, the oldest delivery date {{ oldest }} in the first row. **Watch for:** `<=` returns {{ g.le }}, adding {{ g.last_number }}, shipped on {{ end }}, the last shipment date in the data, with a DeliveryDate of the same day, which cannot yet be late. Without the Status condition the date test keeps {{ g.no_status|count }} rows, almost every shipment.
 
 **Step 6. Look at the one that is left.** The exercise does not ask for this query; the model answer uses it to account for every In Transit shipment.
 
@@ -132,7 +132,7 @@ WHERE Status = 'In Transit' AND DeliveryDate >= '2026-12-31';
 
 ### Requirement (4): The comparison with Tutorial 2.1
 
-**Step 7. Compare the counts and the method.** The counts should equal the Excel results; the answer is about why the SQL version reruns more easily. See "What a strong answer says".
+**Step 7. Compare the counts and the method.** The counts should reproduce the Excel results, the blank tracking numbers and the {{ status[1][1]|count }} In Transit shipments of the Status filter, {{ transit }} of them dated before the cutoff. The answer is about why the SQL version reruns more easily. See "What a strong answer says".
 
 ### Requirement (5): Dimensions and questions
 
@@ -145,14 +145,14 @@ WHERE Status = 'In Transit' AND DeliveryDate >= '2026-12-31';
 | Shipments by status | {{ status[0][0] }} {{ status[0][1]|count }}; {{ status[1][0] }} {{ status[1][1]|count }} | 2 |
 | Carriers | {{ carriers|length }} | 3 |
 | No tracking number, and the dates | {{ n }}; {{ low }} to {{ high }} | 4 |
-| In Transit before the last day, and the oldest | {{ transit }}; {{ oldest }} | 5 |
-| In Transit on or after the last day | {{ later }} | 6 |
+| In Transit before {{ end }}, and the oldest | {{ transit }}; {{ oldest }} | 5 |
+| In Transit on or after {{ end }} | {{ later }} | 6 |
 
 {{ expected() }}
 
 ## What a strong answer says
 
-- **Requirement (4).** The SQL counts equal the Excel filters of Tutorial 2.1. Both tests are written as conditions that a reviewer reads in plain text, so the same script runs on a later extract once its cutoff date is changed, and the results are checked again. An Excel filter stays with its workbook too, but its conditions sit in each column's filter menu and apply to whatever rows the sheet holds.
+- **Requirement (4).** The SQL counts reproduce the Excel filters of Tutorial 2.1, with the one In Transit shipment dated on the cutoff accounted for. Both tests are written as conditions that a reviewer reads in plain text, so the same script runs on a later extract once its cutoff date is changed, and the results are checked again. An Excel filter stays with its workbook too, but its conditions sit in each column's filter menu and apply to whatever rows the sheet holds.
 - **Requirement (5).** The blank tracking number is a completeness test: ask why the number was not recorded and whether the carrier's records hold it. The status after the delivery date is a consistency, or timeliness, test: ask who updates the status on delivery, whether DeliveryDate records the delivery or the date expected, and what evidence of delivery exists. A DeliveryDate does not prove delivery.
 
 A weak answer calls the blanks inaccurate, or gives a test but no question for the process owner.
@@ -161,7 +161,7 @@ A weak answer calls the blanks inaccurate, or gives a test but no question for t
 
 - **`= NULL` or `= ''`.** *Symptom:* no rows for a test that must find rows. *Response:* ask how the blank is stored.
 - **A status typed from memory.** *Symptom:* no rows. *Response:* run DISTINCT first, as in Step 1.
-- **`<=` on the cutoff.** *Symptom:* {{ g.le }} rows against Tutorial 2.1's {{ transit }}. *Response:* ask which shipments can already be late on the last day.
+- **`<=` on the cutoff.** *Symptom:* {{ g.le }} rows, every In Transit shipment, against the {{ transit }} expected. *Response:* ask which shipments can already be late on the cutoff date.
 - **No status condition.** *Symptom:* {{ g.no_status|count }} rows. *Response:* ask what the test is meant to find.
 - **A cutoff typed in two places without a note.** *Symptom:* a rerun that changes one date and not the other. *Response:* record the date in the header comment.
 - **The wrong dimension.** *Symptom:* "accuracy" for a missing value. *Response:* ask whether the value is wrong or absent.

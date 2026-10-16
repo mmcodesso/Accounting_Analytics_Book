@@ -1,4 +1,4 @@
-# Comprehensive Case, Part 4: Finding the Cash Behind the Profit
+# Comprehensive Case, Part IV: Finding the Cash Behind the Profit
 
 | | |
 |---|---|
@@ -14,7 +14,7 @@
 | Part | Part IV, Accounting Analytics with Power BI. The case closes the Part and integrates Chapters 13 to 16 |
 | Analytics types | The case text does not label them. Read together: descriptive (Requirements 1 and 2), diagnostic (Requirements 3 to 5), prescriptive (Requirements 4 and 6) |
 | Tools | Power BI Desktop only: Power Query (merges, Group By, custom columns), a star model with DAX (CALCULATE, KEEPFILTERS, trailing windows), report pages (waterfall, matrices, field parameter, what-if, drill-through, tooltip) and DAX query view for tests |
-| Components | Six requirements, no tutorials, milestones or multiple-choice questions; the deck has 34 slides; the model answer has 12 pages (2 hidden), 120 measures and a Checks tab of 470 rows |
+| Components | Six requirements, no tutorials, milestones or multiple-choice questions; the deck has 34 slides; the model answer has 12 pages (2 hidden), 120 measures and a Checks tab of 483 rows |
 | Files students need | CharlesRiver.xlsx and the file they build, Charles River Cash Case.pbix. Charles River Reports.pbix and Audit Monitoring.pbix stay as they are. The solution is PartIV-case.zip |
 | Deliverable | A memo of at most two pages to the controller, a one-page appendix of five exhibits, and the .pbix with its About page, Validation page, Tests tab and Data Through card |
 | Time | Class: about 150 minutes in Plan A. Students: about 15 hours, from 90 minutes for Requirement 6 to 180 for each of Requirements 2 and 3 |
@@ -22,9 +22,9 @@
 The case depends on these conditions of the data, all visible in the file students build:
 
 - Net income was $4,503,611.24 in 2026 while cash fell $941,310.30, after rising $3,494,591.86 the year before. Inventories absorbed $8,754,515.25.
-- Three dates differ: the last payroll posting (2026-12-18), Data Through (2026-12-31) and the ledger's last posting (2027-02-23), which holds only supplier payments of the year's invoices.
-- The opening entry JE-2024-000001 of the first fiscal year brings in receivables of $380,000.00, payables of $2,096,371.12 and materials of $3,587,025.70 that no document supports.
-- Sales tax payable of $5,620,840.66 has no remittance recorded. The notes, $389,304.68, all sit in a long-term account although $147,503.76 falls due in the next year.
+- Three dates differ: the last payroll posting (2026-12-18), Data Through (2026-12-31) and the ledger's last posting (2027-02-23), which holds only supplier payments of the year's invoices. Data Through is a bound observed in the extract, not proof that the data are complete.
+- The opening entry JE-2024-000001 of the first fiscal year brings in receivables of $380,000.00, payables of $2,096,371.12, materials of $3,587,025.70 and finished goods of $4,111,795.76 that no document in the extract supports.
+- Sales tax payable of $5,620,840.66, the tax billed less credit memos, has no remittance recorded. The notes, $389,304.68, all sit in a long-term account although $147,503.76 falls due in the next year.
 - One employee, the Production Manager, approved every work-order shortfall requisition, and every inventory policy ends at the current year-end.
 
 ## What students should be able to do afterward
@@ -42,7 +42,7 @@ The case depends on these conditions of the data, all visible in the file studen
 
 - Check the software. Students need Power BI Desktop at the release the Part IV chapters use (Windows only) and CharlesRiver.xlsx where the queries expect it. Charles River Cash Case.pbix is a new file, so the package and the monitoring file stay as they are.
 - Open the model answer as Opening a Companion File on the Downloads page describes: copy the .pbip with its two folders, open it, use **Change Source** and refresh. GLEntry is large, so refresh once before class and note how long it takes.
-- In **DAX query view**, run the Checks tab. All 470 rows should agree; the Tests tab holds the five tests students write.
+- In **DAX query view**, run the Checks tab. All 483 rows should agree; the Tests tab holds the five tests students write.
 - Open the deck. Slides 5 to 6 set out the criteria, which are the six bullets of "What a Strong Submission Includes"; read them at kickoff.
 
 **Pitfalls that cost class time**
@@ -101,9 +101,9 @@ The case depends on these conditions of the data, all visible in the file studen
 - **A flow is not a difference of balances.** A bridge from differences of Balance gives a net income step of -$630,743.47, because the prior close sits in retained earnings. Ask what a close does at two dates.
 - **The first year starts at zero.** The opening entry makes the first year's bridge show $5,888,974.24 and its DSO and DPO rest on balances no document supports. Ask what the opening line stands for.
 - **A ratio needs a definition.** DSO on revenue reads differently from DSO on billing, and a quarter's flow overstates every measure about fourfold. Ask what each balance is compared with.
-- **Data Through is not the last posting.** The last posting is supplier payments. Ask what the report would claim if it ran to the last date.
+- **Data Through is not the last posting.** The last posting is supplier payments. Nor does Data Through prove the data complete, because it is a bound observed in the extract. Ask what the report would claim if it ran to the last date, and what would show that no document is missing.
 - **A difference is not an error.** Each difference equals recorded items to the cent: $380,000.00 and $1,456,371.12. Ask which items and what disposition each earns.
-- **Describe, do not accuse.** The records show no remittance of $5,620,840.66; they do not show anyone withholding it. Ask what evidence outside the database would settle it.
+- **Describe, do not accuse.** The records show no remittance of $5,620,840.66, which is tax billed rather than tax collected, and they do not show anyone withholding it. Ask what evidence outside the database would settle it.
 - **An estimate is not a forecast.** The excess at the year's rate of issue is $10,972,164.25 at 28 days. Ask what the estimate assumes and leaves out.
 
 ## Discussion prompts
@@ -164,7 +164,7 @@ Each requirement guide has its own grading table out of 100; scale it by the wei
 
 ## Connections
 
-**Builds on.** Chapter 13 supplies the loading options, the profiles and the honest visuals. Chapter 14 supplies the Date table, the ledger star with its flagged closes, Exercise 14.1's Balance measure and the DAX of CALCULATE and KEEPFILTERS. Chapter 15 supplies the waterfall, the drill-through and tooltip pages, the trailing twelve-month measure with its guard, the field parameter and the what-if. Chapter 16 supplies the document key, the Tests tab, the dispositions table and Data Through. Chapter 8 supplies the dispositions and the unsupported opening balances, Chapter 6 and Chapter 12 the cutoff findings, and the Part III case the payroll accrual that belongs in the findings ($383,044.82). The Part I to Part III cases supply the memo form. The finished guides for Chapters 13 to 16 hold the detail each requirement relies on.
+**Builds on.** Chapter 13 supplies the loading options, the profiles and the honest visuals. Chapter 14 supplies the Date table, the ledger star with its flagged closes, Exercise 14.1's Balance measure and the DAX of CALCULATE and KEEPFILTERS. Chapter 15 supplies the waterfall, the drill-through and tooltip pages, the trailing twelve-month measure with its guard, the field parameter and the what-if. Chapter 16 supplies the document key, the Tests tab, the dispositions table and Data Through. Chapter 8 supplies the dispositions and the unsupported opening balances, Chapter 6 and Chapter 12 the cutoff findings, and the Part III case the payroll accrual it proposed ($383,044.82), carried into the findings as a proposal, not posted. The Part I to Part III cases supply the memo form. The finished guides for Chapters 13 to 16 hold the detail each requirement relies on.
 
 **What builds on it.** Part V offers capstone cases that are independent final projects: each states the methods it needs and asks students to choose the tool for every step. This case is the last one that fixes the tool; those cases ask students to choose it.
 

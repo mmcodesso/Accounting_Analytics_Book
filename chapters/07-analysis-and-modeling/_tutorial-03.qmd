@@ -15,7 +15,7 @@ d. Type `0.1` in B2 and `0` in B3, format both as percentages, and color them bl
 e. Using the **Name Box**, name B2 through B7 `Discount`, `Lift`, `PromoUnits`, `PriceBeforeDiscount`, `VariableCost`, and `CommissionRate`.
 f. Name B9 through B11 `ContributionWithout`, `ContributionWith`, and `Difference` in the same way.
 g. Type each name in column C beside its cell, as documentation.
-h. In D2:D7, type the sources `PromotionProgram, promotion 8`, `Assumption; no increase in orders`, `InvoiceLines, promotion 8`, `InvoiceLines, promotion 8`, `Standard cost per unit`, and `Tutorial 7.2, actual 2026`, and type `Formula` in D9:D11.
+h. In D2:D7, type the sources `PromotionProgram, promotion 8`, `Assumption, not a measured lift`, `InvoiceLines, promotion 8`, `InvoiceLines, promotion 8`, `Standard cost per unit`, and `Tutorial 7.2, actual 2026`, and type `Formula` in D9:D11.
 
 Every input and result of the model now has a label, a name, and a source, and the two inputs you will change stand out in blue.
 
@@ -116,7 +116,7 @@ c. Drag ItemGroup to **Filters**, and select Furniture.
 d. Drag Quantity to **Values**.
 e. Compare the units from orders placed in September and October 2026, the promotion's months, with the other months of 2026 and with September and October of 2024 and 2025.
 
-The Furniture units from orders placed in the promotion's months were in line with the other months of the year and with the same months of earlier years, with no sign of an increase near the one the promotion needed. The comparison describes the orders; it cannot show how many would have been placed without the promotion, so it supports the zero-lift case rather than proving it. Because the PivotTable sums invoice lines, it counts only the part of each order already invoiced: November and especially December 2026 look low because some orders placed then were not yet invoiced when the data ends, which is a reason to read those months with care.
+The Furniture units from orders placed in the promotion's months were close to the other months of the year and a few percent above the same months of earlier years, far short of the increase the promotion needed. The comparison describes the orders; it cannot show how many would have been placed without the promotion, so it supports the zero-lift case rather than proving it. Because the PivotTable sums invoice lines, it counts only the part of each order already invoiced: November and especially December 2026 look low because some orders placed then were not yet invoiced when the data ends, which is a reason to read those months with care.
 
 **Step 8. Document the assumptions and the recommendation.** The assumption documentation belongs next to the model it describes, so that a reviewer reads both together.
 
@@ -129,7 +129,7 @@ e. Save the workbook.
 | Assumption | Value used | Basis | Sensitivity |
 |---|---|---|---|
 | Discount rate | 10% | The promotion's DiscountPct in the PromotionProgram Table | A 5% discount would need a much smaller lift to break even |
-| Volume lift | 0% | Furniture orders in the promotion's months were in line with other months | The break-even lift is almost a third of the promotion's volume |
+| Volume lift | 0% | A scenario, because orders in the promotion's months rose only slightly and cannot show the promotion's effect | The break-even lift is almost a third of the promotion's volume |
 | Orders without the promotion | Same orders at the price before discount | Promotion lines carry the customer's usual price, with the discount applied on top | If some orders would have been lost without it, the promotion's cost is lower |
 | Variable cost per unit | Standard cost per unit | Item standard costs of the promotion's items | Treating the fixed overhead in standard cost as fixed lowers the break-even lift slightly |
 | Commission rate | 2026 actual rate | Commission expense over all 2026 revenue, including design services, which earn a higher rate | Small; commissions fall with the discount |
@@ -143,6 +143,6 @@ The Model worksheet now carries its own documentation: a reviewer can see each a
 - the Model worksheet's inputs are calculated from the data and its results use the named cells;
 - the Scenario Summary shows a negative difference for every scenario with a discount;
 - the data table and Goal Seek agree on the break-even lift at a 10 percent discount;
-- the order data shows no increase in Furniture orders during the promotion's months.
+- the Furniture units ordered in the promotion's months show no increase near the break-even lift.
 
 The recommendation follows from the model and its assumptions. If the same orders would otherwise have been placed at the usual prices, the promotion, repeated as it ran in 2026, would cost Charles River margin unless it lifted volume by roughly a third, and the 2026 orders show no increase anywhere near that. If the sales team wants a promotion, a smaller discount, or one limited to the items and customers most likely to respond, has a far lower bar to clear, and the model shows exactly how low.

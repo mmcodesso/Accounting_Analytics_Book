@@ -34,7 +34,7 @@ Students can:
 - tie the quarters to the Validation page and explain a one-cent difference (Requirement 3);
 - find the quarter that holds the discounts and name the promotions behind it (Requirement 4).
 
-**Competencies practiced.** Appendix D maps this exercise to CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and M8 T2 (extracting, transforming and cleansing financial data); to the IMA competencies for financial recordkeeping, financial statement preparation and data tools and techniques; to IFAC IES 2 (a) and (i); and to AACSB A5 parts 5.1 and 5.3.
+**Competencies practiced.** Appendix D maps this exercise to CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and M8 T2 (extracting, transforming and cleansing financial data); to the IMA competency data tools and techniques; to IFAC IES 2 (a) and (i); and to AACSB A5 part 5.1, with part 5.3 when the instructor adds an independent-learning task.
 
 ## Before you assign
 
@@ -95,14 +95,14 @@ c. Copy the query into Tests.dax, under a comment line that names the exercise.
 a. Add the four quarters' lines, revenue, list amount and discounts.
 b. Open the report's **Validation** page (Reading view is enough) and read its fiscal {{ y }} row.
 
-**Check:** lines, revenue and list amount agree exactly. The discounts differ by ${{ g.cent|money }}: the rounded quarters add to ${{ g.rounded_sum|money }}, and the page shows ${{ year.disc|money }}. The cause is rounding, not an error, because the discount of each line is unrounded and each quarter was rounded on its own. The instructor check reads the year straight from the lines:
+**Check:** lines, revenue and list amount agree exactly. The discounts differ by ${{ g.cent|money }}: the rounded quarters add to ${{ g.rounded_sum|money }}, and the page shows ${{ year.disc|money }}. The cause is rounding, not an error, because the discount of each line is unrounded and each quarter was rounded on its own. Unrounded, the four quarters add to the year exactly. Rounding every line to the cent first would give ${{ g.line_rounded|money }}, a different calculation from the book's unrounded DiscountAmount, so neither the query nor the data is changed. The instructor check reads the year straight from the lines:
 
 ```dax jinja
 EVALUATE
 ROW ( "Discounts, current fiscal year", ROUND ( {{ g.dax_disc }}, 2 ) )
 ```
 
-**Watch for:** a student who adjusts a quarter to force agreement, or reports the cent as unexplained.
+**Watch for:** a student who adjusts a quarter to force agreement, rounds the lines to make the cent disappear, or reports the cent as unexplained.
 
 ### Requirement (4): The quarter that holds the discounts
 
@@ -112,7 +112,7 @@ ROW ( "Discounts, current fiscal year", ROUND ( {{ g.dax_disc }}, 2 ) )
 
 ### Requirement (5): Why a query remains evidence
 
-**Step 6. Write the explanation.** The model answer has four points: a query reads the model, not any visual, so a page edit cannot change it; a changed measure or relationship will change it, which is what the test detects; DAX query view in the browser discards its tabs on close, so the file is the record; and the comment line says which exercise and which question the query answers.
+**Step 6. Write the explanation.** The model answer has four points: a query reads the model, not any visual, so a page edit cannot change it; a changed measure or relationship will change it, which is what the test detects; DAX query view in the browser discards its tabs on close, so the file is the record; and the comment line says which exercise and which question the query answers. The query alone shows which test was specified, and the result and date written under it show that the model passed it on that day.
 
 ## Expected results
 

@@ -144,7 +144,7 @@ a. Type and run the test below.
 
 b. Read the number of orders and their value for each test.
 
-The summary, shown in @fig-12-06, flags between three and thirteen orders for each test, the exceptions that Exercise 8.5 found in Excel. Most of their value is in a few large orders.
+The summary, shown in @fig-12-06, flags between three and thirteen orders for each test, the exceptions that Exercise 8.5 found in Excel. Most of their value is in a few large orders. An order with no approver, or whose approver is missing from Employee or has no limit recorded, passes the tests that need those values, because the join or the comparison finds nothing. No order here lacks that data, and on new data such orders are counted apart, as not testable rather than passed.
 
 ![Approval Exceptions in the Purchase Orders.](/visuals/svg/fig-12-06-approval-exceptions.svg){#fig-12-06 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Audit.sql, shows a test whose CTE combines three approval tests on purchase orders with UNION ALL: self-approved, above the approver's limit, and dated after the approver's termination. The summary grid shows each test with its number of orders and their total value, between three and thirteen orders for each test. The grid is outlined."}
 
@@ -209,7 +209,7 @@ a. Type and run the test below.
 
 b. Read the share of orders approved by the first employee.
 
-The chief financial officer approved nearly every purchase order in the three years, and the other approvers only a few each. With one approver, the approval is effectively the whole purchasing control, and it would be hard for one person to review so many orders with care. That concentration can indicate a weakness in the design of the control, rather than an exception in any one order.
+The chief financial officer approved nearly every purchase order in the three years, and the other approvers only a few each. With one approver, the purchasing control depends heavily on one person's review, and it would be hard for one person to review so many orders with care. That concentration can indicate a weakness in the design of the control, rather than an exception in any one order, depending on whether other controls, such as budget reviews or reconciliations, would detect an error the approver missed.
 
 **Checkpoint.** Check that:
 
@@ -219,4 +219,4 @@ The chief financial officer approved nearly every purchase order in the three ye
 - the approval tests flag fourteen orders, among them two large self-approved orders and three dated after their approver's termination, and one person approved almost all the others;
 - Audit.sql holds this tutorial's six tests under their comments.
 
-The purchasing chain holds together in the records tested: no line was billed for more than was received, prices were close to the orders, and the liability for unbilled receipts agrees with the ledger. Its approval control has exceptions and a single point of failure, which the chief audit executive will want in the report.
+The purchasing chain holds together in the records tested: no line was billed for more than was received, prices were close to the orders, and the liability for unbilled receipts agrees with the ledger. Its approval control has exceptions and depends on one approver, which the chief audit executive will want in the report once the policy, the approvers' authority at the time, and any compensating review have been examined.

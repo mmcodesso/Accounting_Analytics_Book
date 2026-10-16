@@ -148,7 +148,7 @@ The chapter depends on these conditions of the data, all visible in the workbook
 
 ## Discussion prompts
 
-1. **A test of every transaction cannot miss an exception the way a sample can. What can it still miss?** A good discussion reaches the chapter's own limit: testing a whole population does not show that the records are complete or genuine.
+1. **A test of every recorded transaction removes the risk that a sample misses an exception. What can it still miss?** A good discussion reaches the chapter's own limits: an exception the test was not designed to find, records that are incomplete or not genuine, and results that are misread.
 2. **If software drafts analyses and flags unusual transactions, what is left for the accountant?** Framing the question, judging whether the data is reliable, and professional judgment; and why understanding the data helps in spotting a wrong classification.
 3. **The controller asks why Furniture margin fell. Which type is that, and what do you need before you start?** Diagnostic, after a descriptive summary, with the data of the opening scenario: invoiced sales, product costs and the revenue and cost ledger accounts.
 4. **Pick a cell of Table 1.1 and say how the same technique serves another perspective.** The In Practice example is duplicate payments: controls assurance, vendor management and cash review use the same method.
@@ -194,7 +194,7 @@ Key: 1 D, 2 A, 3 C, 4 D, 5 A, 6 C, 7 B, 8 A, 9 C, 10 D, 11 B, 12 A, 13 C, 14 B, 
 | 6 | C | Accounting Core holds the chart of accounts, journal entries, and ledger detail. |
 | 7 | B | SQL queries relational databases directly. |
 | 8 | A | the book builds from the most accessible table groups to the more complex ones. |
-| 9 | C | the IMA competency framework includes technology and analytics as a core domain. |
+| 9 | C | the IMA's competency framework, expanded in 2025, includes the Data Analytics and Insights and Emerging Technologies in Accounting domains. |
 | 10 | D | Power BI builds interactive dashboards with filters and drill-down. |
 | 11 | B | SourceDocumentType, SourceDocumentID, and SourceLineID trace a ledger row to its source. |
 | 12 | A | data preparation and cleaning usually takes the most time. |
@@ -207,11 +207,9 @@ Key: 1 D, 2 A, 3 C, 4 D, 5 A, 6 C, 7 B, 8 A, 9 C, 10 D, 11 B, 12 A, 13 C, 14 B, 
 - **Questions 2, 3, 4 and 15 (the types)** carry most of the chapter's concept. Ask students to underline the verb of the scenario (calculates and compares, builds an expected range, determines the best combination, breaks down and traces) before they choose. Use the decision aid above.
 - **Question 6.** Master Data tempts because a chart of accounts feels like reference data. The chapter places Account, JournalEntry and GLEntry in the Accounting Core.
 - **Question 7.** Students who have used Excel's data connections choose Excel. The question asks which tool is most appropriate for extracting data directly from a relational database, which the chapter says is SQL.
-- **Question 9.** The FASB and the SEC tempt students who read "professional organization" as "standard setter". The chapter names the IMA for the framework of management accountants.
+- **Question 9.** The FASB and the SEC tempt students who read "professional organization" as "standard setter". The chapter names the IMA's framework for management accountants and its two domain titles.
 - **Question 11.** AccountID and CostCenterID tempt students who think of keys in general. Only the three source columns name the document.
 - **Question 13.** Accounting Core tempts because variances reach the ledger, but the Manufacturing group is where production variances are computed.
-- **Questions 1, 8 and 14.** The correct option is also the fullest sentence, so a test-wise student can guess it. If you grade with these, ask students to explain their answer or reword the options.
-
 Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 2, 3, 4, 11 and 15 make a good quiz of the types and the source columns. Questions 5 and 12 test the workflow, 7 and 10 the tools, and 6 and 13 the table groups.
 
 ## Connections

@@ -10,7 +10,7 @@ Domino, M. A., Schrag, D., Webinger, M., & Troy, C. (2021). Linking data analyti
 
 Microsoft. (2026a). *Calculate values in a PivotTable*. Microsoft Support. <https://support.microsoft.com/en-us/office/calculate-values-in-a-pivottable-11f41417-da80-435c-a5c6-b0185e59da77> Microsoft's reference for summary functions, calculated fields, and calculated items in PivotTables. It explains why a calculated field works on the sums of its fields while a calculated item works on individual records, with examples.
 
-Microsoft. (2026b). *Show different calculations in PivotTable value fields*. Microsoft Support. <https://support.microsoft.com/en-us/office/show-different-calculations-in-pivottable-value-fields-014d2777-baaf-480b-a32b-98431f48bfec> A description of every Show Values As option, from % of Grand Total to Index, with the base field and base item each one needs.
+Microsoft. (2026c). *Show different calculations in PivotTable value fields*. Microsoft Support. <https://support.microsoft.com/en-us/office/show-different-calculations-in-pivottable-value-fields-014d2777-baaf-480b-a32b-98431f48bfec> A description of every Show Values As option, from % of Grand Total to Index, with the base field and base item each one needs.
 
 Palocsay, S. W., Markham, I. S., & Markham, S. E. (2010). Utilizing and teaching data tools in Excel for exploratory analysis. *Journal of Business Research*, *63*(2), 191–206. <https://doi.org/10.1016/j.jbusres.2009.03.008> An article that presents Excel as an introductory tool for business intelligence and exploratory analysis, covering Excel as a database, PivotTables and PivotCharts, and importing data. It was written for an older version of Excel, but its approach to exploring business data carries over.
 

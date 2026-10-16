@@ -12,7 +12,7 @@
 
 ## Purpose and learning outcomes
 
-Tutorial 8.3 tested journal entries with flags, a score and dispositions. This exercise applies the same method to purchase orders and supplier invoices, then adds the three tests the chapter only describes: threshold bands, near-duplicates and a gap test. It ends where an auditor's report ends: weakness in the design of a control or failure in its operation, and the clean results recorded with the exceptions. The analytics type is diagnostic, with recommendations.
+Tutorial 8.3 tested journal entries with flags, a score and dispositions. This exercise applies the same method to purchase orders and supplier invoices, then adds the three tests the chapter only describes: threshold bands, near-duplicates and a gap test. It ends where an auditor's report ends: possible weakness in the design of a control or failure in its operation, with the evidence that would settle each, and the clean results recorded with the exceptions. The analytics type is diagnostic, with recommendations.
 
 By the end, students can:
 
@@ -61,13 +61,13 @@ c. Merge Approvers again on CreatedByEmployeeID, expand EmployeeName and rename 
 
 **Check:** 9 self-approved orders, 13 above the limit and 3 approved after termination; 11 orders score 2 and 3 score 1. **Watch for:** the blank guard left out of AfterTermination. An empty cell compares as earlier than any date, so the flag is TRUE for nearly every order.
 
-**Step 3. Record a disposition for each flagged order.** Sort by RiskScore, filter to 1 or more, paste the rows as values with **Paste Special > Values** and add a `Disposition` column and a `Design or operation` column, as in Tutorial 8.3 Step 5. The model answer's groups:
+**Step 3. Record a disposition for each flagged order.** Sort by RiskScore, filter to 1 or more, paste the rows as values with **Paste Special > Values** and add a `Disposition` column and a provisional `Design or operation` column, as in Tutorial 8.3 Step 5. The model answer's groups:
 
-- 2 note-financed capital purchases, created and approved by the purchasing manager (limit $25,000.00): follow up, design and operation; ask for the board's approval.
-- 6 orders created and approved by the same person, among the buyers and procurement analysts, whose limit is $0: follow up, design and operation.
+- 2 note-financed capital purchases, created and approved by the purchasing manager (limit $25,000.00): follow up, possibly design and operation; ask for the board's approval.
+- 6 orders created and approved by the same person, among the buyers and procurement analysts, whose limit is $0: follow up, possibly design and operation.
 - 3 orders approved under the ID of Daniel Diaz, account executive, terminated on 2024-04-26: follow up; ask for the approval timestamp and the access log.
-- 1 order created and approved by the purchasing manager within the limit: follow up at low risk, a design gap in segregation of duties.
-- 2 orders approved above the approver's limit by someone with a limit above $0: follow up, operation.
+- 1 order created and approved by the purchasing manager within the limit: follow up at low risk, a possible design gap in segregation of duties.
+- 2 orders approved above the approver's limit by someone with a limit above $0: follow up, possibly operation.
 
 ![A mock of the flagged purchase orders pasted as values with their dispositions, as the model answer lays them out.](../figures/chapter-08-audit-analytics/IF-08-5-B.pdf)
 
@@ -75,9 +75,9 @@ c. Merge Approvers again on CreatedByEmployeeID, expand EmployeeName and rename 
 
 **Step 4. Build InvoiceApprovals.** Import **T37_PurchaseInvoice** as `InvoiceApprovals`, merge Approvers on ApprovedByEmployeeID, expand the name, title and limit, add `AboveLimit` as `=[@GrandTotal]>[@ApproverLimit]` and list the invoices whose ApproverTitle is not Chief Financial Officer. **Check:** 8 of 40,204 invoices have another approver (40,196 were approved by the chief financial officer), together $646,691.67. They fall into three groups:
 
-- Melinda Murphy, Product Analyst, limit $0.00: 4 invoices. No: a role with no approval authority.
-- Daniel Odom, Production Supervisor, limit $5,000.00: 2 invoices, within the limit. No: a role outside purchasing and accounting can confirm receipt, not approve payment.
-- Jennifer Cole, Purchasing Manager, limit $25,000.00: 2 invoices, above the limit. No: the same person created and approved their orders.
+- Melinda Murphy, Product Analyst, limit $0.00: 4 invoices. Not on the records: a role with no recorded approval authority, so request the delegation policy.
+- Daniel Odom, Production Supervisor, limit $5,000.00: 2 invoices, within the limit. Not without the policy: a role outside purchasing and accounting usually confirms receipt, so request the policy that says who may approve invoices.
+- Jennifer Cole, Purchasing Manager, limit $25,000.00: 2 invoices, above the limit. Not for these: the same person created and approved their orders, so the records show no independent check.
 
 ### Requirement (4): Requisitions near an approval limit
 
@@ -116,7 +116,7 @@ Each year starts where the year before ended, which a reader of the prefix might
 
 ### Requirement (7): The memo
 
-**Step 9. Outline the memo.** To the chief audit executive: the exceptions with counts; design weaknesses (self-approval, a terminated employee's ID and unapproved requisitions were all accepted) against operation failures (managers approving above their limits); the clean results with what they exclude; follow-up requests; and a note that the classification is provisional until the policy, the configuration and the access logs are seen.
+**Step 9. Outline the memo.** To the chief audit executive: the exceptions with counts; possible design weaknesses (self-approval, a terminated employee's ID and unapproved requisitions were all accepted) against possible operation failures (managers approving above their limits), with the evidence that would settle each; the clean results with what they exclude; follow-up requests; and a note that the classification is provisional until the policy, the configuration and the access logs are seen.
 
 ## Expected results
 
@@ -129,13 +129,13 @@ Each year starts where the year before ended, which a reader of the prefix might
 | Requisitions in the band, and without an approver | 18; 6 | 6 |
 | SameAmount payments, pairs, pairs within 30 days, SameInvoice | 226; 113; 13; 0 | 7 |
 
-> **Instructor notes, Exercise 8.5:** 18,832 purchase orders; the CFO approved 99.9% of them. SelfApproved: 9 (PO-2024-000001, -000002, -000003, PO-2024-001942 for 360,000.00, PO-2025-003923, -003924, PO-2026-010468, -010469, and PO-2026-011104 for 280,000.00; the two large ones were created and approved by the Purchasing Manager, limit 25,000, and are the note-financed capital purchases of Exercise 8.2). AboveLimit: 13, including orders approved by Buyers and Procurement Analysts with a limit of 0, PO-2024-000040 (Production Manager, 26,027.28 against 25,000) and PO-2024-000042 (Production Supervisor, 13,737.60 against 5,000). AfterTermination: 3 (PO-2024-000474, PO-2025-003922, PO-2026-010467), all approved by Daniel Diaz, an Account Executive terminated on 2024-04-26. Risk scores: 11 orders score 2 and 3 score 1. Requisition bands from 4,800: 7, 8, 4, 18, 9, 4, 9, 4, so the 4,950-4,999.99 band has twice the count of any neighbor. Its 18 requisitions were all converted to POs; 6 have no approver (PR-2024-000001, -000002, PR-2025-004714, -004715, PR-2026-013258, -013259, the requisitions of Exercise 2.5). PR-2025-004714 to -004716 and PR-2026-013258 to -013260 are three consecutive requisitions each, dated January 1, all for 627 units at 7.96 (4,990.92), for different items and mostly different requesters. Two employees have a 5,000 limit (a Production Supervisor and a Production Planner). Supplier invoices: the CFO approved 40,196 of 40,204; the other 8 are PI 7038, 7047, 20345, and 20399 (200.69, 3,102.49, 794.96, 23.20), approved by Melinda Murphy, a Product Analyst with a limit of 0; PI 7122 and 20452 (1,301.21, 1,269.12), approved by Daniel Odom, a Production Supervisor, within the 5,000 limit but outside the purchasing and accounting roles; and PI 3160 and 21692 (360,000.00 and 280,000.00), approved by Jennifer Cole, the Purchasing Manager, above the 25,000 limit, the note-financed capital invoices of Exercise 8.2. Near-duplicates, payments dated before 2027-01-01: SameAmount flags 226 payments in 113 pairs (no group larger than two; 13 pairs at most 30 days apart); SameInvoice flags none, so every pair pays two different invoices; the test does not exclude a bill entered under two invoice numbers or an invoice overpaid in unequal parts, which are other tests. Gap test: PO-2024 runs 1 to 3,921 (3,921 orders), PO-2025 3,922 to 10,466 (6,545), PO-2026 10,467 to 18,832 (8,366); the numbers are unique, none is missing, and the sequence continues across years rather than restarting.
+> **Instructor notes, Exercise 8.5:** 18,832 purchase orders; the CFO approved 99.9% of them. SelfApproved: 9 (PO-2024-000001, -000002, -000003, PO-2024-001942 for 360,000.00, PO-2025-003923, -003924, PO-2026-010468, -010469, and PO-2026-011104 for 280,000.00; the two large ones were created and approved by the Purchasing Manager, limit 25,000, and are the note-financed capital purchases of Exercise 8.2). AboveLimit: 13, including orders approved by Buyers and Procurement Analysts with a limit of 0, PO-2024-000040 (Production Manager, 26,027.28 against 25,000) and PO-2024-000042 (Production Supervisor, 13,737.60 against 5,000). AfterTermination: 3 (PO-2024-000474, PO-2025-003922, PO-2026-010467), all approved by Daniel Diaz, an Account Executive terminated on 2024-04-26. Risk scores: 11 orders score 2 and 3 score 1. Requisition bands from 4,800: 7, 8, 4, 18, 9, 4, 9, 4, so the 4,950-4,999.99 band has twice the count of any neighbor. Its 18 requisitions were all converted to POs; 6 have no approver (PR-2024-000001, -000002, PR-2025-004714, -004715, PR-2026-013258, -013259, the requisitions of Exercise 2.5). PR-2025-004714 to -004716 and PR-2026-013258 to -013260 are three consecutive requisitions each, dated January 1, all for 627 units at 7.96 (4,990.92), for different items and mostly different requesters. Two employees have a 5,000 limit (a Production Supervisor and a Production Planner). Supplier invoices: the CFO approved 40,196 of 40,204; the other 8 are PI 7038, 7047, 20345, and 20399 (200.69, 3,102.49, 794.96, 23.20), approved by Melinda Murphy, a Product Analyst with a limit of 0; PI 7122 and 20452 (1,301.21, 1,269.12), approved by Daniel Odom, a Production Supervisor, within the 5,000 limit but outside the purchasing and accounting roles, so the delegation policy decides whether the role may approve invoices; and PI 3160 and 21692 (360,000.00 and 280,000.00), approved by Jennifer Cole, the Purchasing Manager, above the 25,000 limit, the note-financed capital invoices of Exercise 8.2. Near-duplicates, payments dated before 2027-01-01: SameAmount flags 226 payments in 113 pairs (no group larger than two; 13 pairs at most 30 days apart); SameInvoice flags none, so every pair pays two different invoices; the test does not exclude a bill entered under two invoice numbers or an invoice overpaid in unequal parts, which are other tests. Gap test: PO-2024 runs 1 to 3,921 (3,921 orders), PO-2025 3,922 to 10,466 (6,545), PO-2026 10,467 to 18,832 (8,366); the numbers are unique, none is missing, and the sequence continues across years rather than restarting.
 
 ## What a strong answer says
 
 - **Requirements (2) and (3).** Each flagged order with the evidence that would clear it, never "expected" without evidence; the capital orders singled out; the terminated approver's orders called provisional.
-- **Requirement (4).** The band's count against its neighbors, the unapproved requisitions tied to Exercise 2.5, the identical consecutive requisitions and the limit just above the band, read together as a possible split to stay under a review level.
-- **Requirement (7).** Design and operation separated, the clean results recorded with what they exclude, and follow-up that names a document or a log.
+- **Requirement (4).** The band's count against its neighbors, the unapproved requisitions tied to Exercise 2.5, the identical consecutive requisitions and the limit just above the band, read together as a possible split to stay under a review level, once the threshold that governs requisitions is confirmed (their own approvers have higher limits).
+- **Requirement (7).** Possible design and operation failures separated and called provisional, the clean results recorded with what they exclude, and follow-up that names a document or a log.
 
 A weak answer lists counts without a classification, treats every exception as fraud, or leaves out the clean tests.
 

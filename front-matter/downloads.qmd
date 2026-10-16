@@ -15,7 +15,7 @@ This page provides access to the book, its slides and companion files, and the r
 
 ## Latest Book Version
 
-This is revision {{< var book.revision >}} of the {{< var book.edition >}} edition of the book. Its PDF, EPUB, and DOCX files, the PowerPoint slides, and the companion and solution files in the table below are published together on the [release page of the revision]({{< var book.release >}}), and each new revision of the book gets a release of its own.
+This is revision {{< var book.revision >}} of the {{< var book.edition >}} edition of the book. Its PDF, EPUB, and DOCX files, the PowerPoint slides, and the companion and solution files in the table below are published together on the [release page of the revision]({{< var book.release >}}), and each new revision of the book gets a release of its own. A revision's files can be replaced to correct them. Its release page names the commit and the date of the latest update and lists the checksum of every file.
 
 - [Download PDF](/downloads/book-latest.pdf)
 - [Download EPUB](/downloads/book-latest.epub)
@@ -52,7 +52,7 @@ This edition of the book is verified against release {{< var dataset.version >}}
 ## Supplementary Material {#sec-companion-files}
 
 ::: {.content-visible unless-meta="print"}
-Each chapter's slides, companion files, and solutions are in the table below. **Slides** are the PowerPoint deck of the chapter or case; its page also lets you view them in the browser. **Companion files** are the start files of the tutorials: each holds the work as it stands at the end of the previous tutorial, and a chapter-end file closes the set, so you can begin a tutorial without the one before it or check your own work. **Solutions** cover the exercises, the comprehensive cases, and the capstone cases, so try the work first. Every file explains itself, in a **Solution Notes** worksheet, a Power BI **Notes** page with a **Checks** query, or a SQL script's header and notes block.
+Each chapter's slides, companion files, and solutions are in the table below. **Slides** are the PowerPoint deck of the chapter or case; its page also lets you view them in the browser. **Companion files** are the start files of the tutorials: each holds the work as it stands at the end of the previous tutorial, and a chapter-end file closes the set, so you can begin a tutorial without the one before it or check your own work. **Solutions** cover the exercises, the comprehensive cases, and the capstone cases, so try the work first. A dash means there is no file of that kind. The exercises and case of Part I, for example, have no solution file, and the instructor notes below answer them. Some Excel solutions use newer functions, such as HSTACK and VSTACK, that need Excel for Microsoft 365 or Excel 2024. Every file explains itself, in a **Solution Notes** worksheet, a Power BI **Notes** page with a **Checks** query, or a SQL script's header and notes block.
 
 | Chapter | Slides | Companion files | Solutions |
 |:--------------------------------------------|:------------|:--------------|:--------------------------|
@@ -82,7 +82,7 @@ Each chapter's slides, companion files, and solutions are in the table below. **
 | Appendix: Publishing, Securing, and Sharing Reports | — | [Start files](/supplementary/start-files/AppendixB-companion.zip) | [Power BI](/supplementary/solutions/AppendixB-exercises-pbi.zip) |
 | Appendix: Power BI in the Browser | — | — | — |
 
-For instructors, [Instructor-Notes.zip](/supplementary/solutions/Instructor-Notes.zip) holds PDF files for every chapter, case, and appendix with exercises: a note on how to teach it, with a guide to each tutorial and the answer key of the multiple-choice questions, and a file for each exercise or requirement with its purpose, a step-by-step solution, the expected values, common mistakes, and a grading guide, illustrated with mock screens and diagrams.
+For instructors, [Instructor-Notes.zip](/supplementary/solutions/Instructor-Notes.zip) holds a folder of PDF files for each chapter, case, and appendix with exercises. Each folder opens with a teaching note, with a guide to each tutorial or milestone and the answer key of the multiple-choice questions, and has a file for each exercise or requirement with a worked solution, the expected values, common mistakes, and a grading rubric, illustrated with mock screens and diagrams.
 :::
 
 ::: {.content-visible when-meta="print"}

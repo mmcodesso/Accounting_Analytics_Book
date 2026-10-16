@@ -24,7 +24,7 @@ By the end, students can:
 
 ## Before you assign
 
-- **Files and software.** The analysis workbook at the end of Chapter 7's tutorials, including the CommissionRate name of Tutorial 7.3, and the Solver add-in loaded and checked on every machine. The model answer saves its Solver model with the worksheet: **Data > Solver** opens it ready to solve.
+- **Files and software.** The analysis workbook at the end of Chapter 7's tutorials, including the CommissionRate name of Tutorial 7.3, and the Solver add-in loaded and checked on every machine. The model answer saves its Solver model with the worksheet: **Data > Solver** opens it ready to solve. Its list of reduced items uses HSTACK, which needs a newer Excel than the tutorials do, as the chapter note says.
 - **Data conditions.** 88 items are manufactured, 83 of them sold in 2026 and 5 not; every one sold has a routing. The routings give run hours for 5 work centers. In 2026 the plant used well under its capacity, so half of the hours is an assumption.
 - **Verify first.** Solve it yourself. The model has 83 variable cells and 88 constraints counting the demand limits, and solves instantly. The Answer and Sensitivity reports in the solution file were written in Solver's layout by the builder, not by Solver, so your own reports will differ in names and formatting but not in numbers.
 

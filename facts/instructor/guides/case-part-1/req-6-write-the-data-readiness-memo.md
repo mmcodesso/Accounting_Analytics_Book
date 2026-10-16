@@ -38,7 +38,7 @@ By the end, students can:
 ## Before you assign
 
 - Students need the results of Requirements 2 to 5: the data map, the choice of quarters, the reconciliation table and the margins. Students who skipped one should not start the memo.
-- The requirement relies on one condition that earlier steps established and that a student might forget to mention: the Furniture margin falls from the third to the fourth quarter of fiscal {{ m.year }} whichever way it is measured (from the ledger, or at standard cost from the invoice lines).
+- The requirement relies on one condition that earlier steps established and that a student might forget to mention. The Furniture margin falls from the third to the fourth quarter of fiscal {{ m.year }} in every measure these guides compute (from the ledger, net of the traced credit memo lines, or at standard cost from the invoice lines).
 - Decide the length rule in advance. Two pages of 11-point text hold about 800 to 900 words with the header, so the model budget below keeps to about 700.
 
 ## How to run it
@@ -60,7 +60,7 @@ The model memo follows a fixed order, and its parts take these words:
 
 ### Phase 1: The opening
 
-**Step 1. Write the bottom line first.** One paragraph. A model: the data can support a comparison of the Furniture gross margin of {{ m.ql3 }} and {{ m.ql4 }} once the year-end close ({{ m.close }}) is excluded; on that basis the margin fell from {{ m.m3|pct(2) }} to {{ m.m4|pct(2) }}, {{ m.drop|num(2) }} points; the main limits are the revenue side of returns and the year-end cutoff; the recommendation is a diagnostic analysis in Part II.
+**Step 1. Write the bottom line first.** One paragraph. A model says that the data can support a comparison of the Furniture gross margin of {{ m.ql3 }} and {{ m.ql4 }} once the year-end close ({{ m.close }}) is excluded. On that basis the margin fell from {{ m.m3|pct(2) }} to {{ m.m4|pct(2) }}, {{ m.drop|num(2) }} points. The main limits are the treatment of returns, the different dates of revenue and cost, and the unbilled December shipments. The recommendation is a diagnostic analysis in Part II.
 
 **Check:** the paragraph answers "can I use this data, and for what?" before any detail. **Watch for:** an opening that says what the student did ("I examined the data") instead of what the controller needs.
 
@@ -71,7 +71,7 @@ The model memo follows a fixed order, and its parts take these words:
 **Step 2. Report the reconciliation and the cutoff findings.** Model content:
 
 - The Furniture invoice lines (${{ m.lines3|money }} in {{ m.ql3 }} and ${{ m.lines4|money }} in {{ m.ql4 }}) equal the sales invoice credits to account {{ a.close_rows[0].number }} (${{ r.recon[0].ledger_revenue|money }} and ${{ r.recon[1].ledger_revenue|money }}), and the standard cost on the shipment lines equals the shipment postings to account {{ a.close_rows[1].number }} in both quarters, to the cent.
-- Agreement shows that the documents reached the ledger in full. It does not show that every sale was invoiced: {{ r.recon[1].uninvoiced.lines }} Furniture shipment lines of {{ m.ql4 }} have no invoice line, ${{ r.recon[1].uninvoiced.cost|money }} at standard cost.
+- Agreement supports the consistency of these recorded totals. It does not show that every line posted once or that every sale was invoiced, since {{ r.recon[1].uninvoiced.lines }} Furniture shipment lines of {{ m.ql4 }} have no invoice line, ${{ r.recon[1].uninvoiced.cost|money }} at standard cost.
 - Of the {{ t.n_nine }} invoices dated before their first shipment, {{ t.n_furniture }} hold Furniture lines; none is dated, shipped or posted in either quarter, so they do not touch this comparison. They matter for annual revenue and the year-end cutoff.
 
 **Check:** a number is always followed by what it means for this quarter. **Watch for:** "the totals agree, so the data is reliable", and the cutoff finding presented as a defect of the margin.
@@ -80,8 +80,8 @@ The model memo follows a fixed order, and its parts take these words:
 
 **Step 3. State the measure and what it shows.** Model content:
 
-- The measure is revenue less cost of goods sold, over revenue, from the ledger: credits less debits on account {{ a.close_rows[0].number }} and debits less credits on account {{ a.close_rows[1].number }}, including the postings of invoices, shipments and returns and excluding the year-end close; the quarters are {{ m.ql3 }} and {{ m.ql4 }}, the latest two complete ones.
-- It shows {{ m.m3|pct(2) }} falling to {{ m.m4|pct(2) }}. Revenue fell {{ (-a.rev_change)|num(1) }}% while cost rose {{ a.cogs_change|num(1) }}%. At standard cost, from the invoice lines, the margin falls from {{ m.s3|pct(2) }} to {{ m.s4|pct(2) }}, so the two views agree.
+- The measure is revenue less cost of goods sold, over revenue, from the ledger. Revenue is credits less debits on account {{ a.close_rows[0].number }} and cost is debits less credits on account {{ a.close_rows[1].number }}, with the postings of invoices, shipments and returns and without the year-end close, so revenue is before customer credits and cost is after the returned goods. The quarters are {{ m.ql3 }} and {{ m.ql4 }}, the latest two complete ones.
+- It shows {{ m.m3|pct(2) }} falling to {{ m.m4|pct(2) }}. Revenue fell {{ (-a.rev_change)|num(1) }}% while cost rose {{ a.cogs_change|num(1) }}%. At standard cost, from the invoice lines before returns, the margin falls from {{ m.s3|pct(2) }} to {{ m.s4|pct(2) }}. That separate measure supports the direction of the change, not the level.
 - For the diagnosis, the invoice lines already hold the fields it needs: {% for c in m.fields.line %}{{ c }}{{ ', ' if not loop.last else '' }}{% endfor %}, and the item master holds {% for c in m.fields.item %}{{ c }}{{ ', ' if not loop.last else '' }}{% endfor %}.
 
 **Check:** another analyst could reproduce the number from the memo's definition. **Watch for:** a margin given with no accounts, no quarters or no statement about the closing entry.
@@ -90,15 +90,15 @@ The model memo follows a fixed order, and its parts take these words:
 
 **Step 4. Give the evidence, the closing-entry problem and the limits.** Model content:
 
-- Evidence for reliance: both reconciliations agree; every account number the ledger refers to exists in the chart; every posting names its document, so a number can be traced from the ledger back to its source.
+- The evidence for reliance is that both reconciliations agree, that every AccountID the ledger uses exists in the chart, and that every posting to the two Furniture accounts names a source document that exists, so a number can be traced from the ledger back to its source.
 - The closing-entry problem: all rows give a {{ m.ql4 }} margin of {{ m.naive_q4|pct(1) }}, a plausible percentage on negative totals, because {{ m.close }} debits revenue and credits cost by the year's balances. The measure excludes it by entry type, so a later quarter-end that is also a year-end is handled the same way.
-- Limits: the revenue side of returns posts to a shared account, so the margin is before it; the traced Furniture credit memo lines were ${{ a.ret3|money }} in {{ m.ql3 }} and ${{ a.ret4|money }} in {{ m.ql4 }}, and netting them leaves the fall in place. The unbilled shipments are a cutoff question. A blank tracking number weakens the evidence that a shipment took place.
+- The limits come with their consequences. The measure takes revenue before customer credits, which post to a shared account, and cost after the returned goods, so it overstates the margin. The traced Furniture credit memo lines were ${{ a.ret3|money }} in {{ m.ql3 }} and ${{ a.ret4|money }} in {{ m.ql4 }}, and netting them gives {{ a.net3|pct(2) }} and {{ a.net4|pct(2) }}, so the fall remains. Revenue follows the invoice date and cost the shipment date, so a few lines fall in different quarters. The unbilled December shipments need follow-up. A blank tracking number weakens the evidence that a shipment took place.
 
 **Check:** the memo says what the data can support and what it cannot. **Watch for:** a limitation list with no consequence for the controller's decision.
 
 ### Phase 5: The recommendation and the appendix
 
-**Step 5. End with the next analysis.** A model: perform the diagnostic analysis in Part II, decomposing the change between {{ m.ql3 }} and {{ m.ql4 }} into volume, mix, price and cost effects by product, from the invoice lines and the item master, using the measure above. First agree two treatments: whether to net the revenue side of returns, and whether to count the unbilled shipments. State the decision the controller needs to make.
+**Step 5. End with the next analysis.** A model recommends the diagnostic analysis of Part II, decomposing the change between {{ m.ql3 }} and {{ m.ql4 }} into volume, mix, price and cost effects by product, from the invoice lines and the item master, on the measure above. It asks the controller to settle three treatments first, the revenue side of returns, the lines invoiced in one quarter and shipped in another, and the unbilled shipments. State the decision the controller needs to make.
 
 **Step 6. Assemble the one-page appendix.** The data map of Requirement 2 and the reconciliation table of Requirement 4, on one page, readable on their own.
 

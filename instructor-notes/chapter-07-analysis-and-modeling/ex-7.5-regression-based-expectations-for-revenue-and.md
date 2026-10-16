@@ -110,7 +110,7 @@ b. Compute the accrual rate and the lowest-rate segment's share of the commissio
 ## What a strong answer says
 
 - **Requirement (2).** The fit looks good with the first month and much worse without it. The standard error is larger than five percent of an average month, so differences of that size are lost in the scatter. The expectation is not precise enough for a substantive procedure at that level.
-- **Requirement (4).** The commission expectation fits closely, so a three percent threshold flags few months. For each flagged month the evidence is the accrual dates, the rates applied (the customer mix) and the credit-memo adjustments. The offsetting pair is explained by mix, not timing, and a stronger expectation would multiply each segment's revenue by its rate.
+- **Requirement (4).** The commission expectation fits closely, so a three percent threshold flags few months. For each flagged month the evidence is the accrual dates, the rates applied (the customer mix) and the credit-memo adjustments. The accrual dates do not explain the offsetting pair, the customer mix is consistent with it, and recomputing a sample of accruals would test that. A stronger expectation would multiply each segment's revenue by its rate.
 - **The memo.** It reports flags as items to follow up, not as misstatements, and says how the reconciliation to the source documents closes.
 
 A weak answer calls the offsetting pair "timing" without looking at the dates, or concludes that the commission is misstated because two months are flagged.

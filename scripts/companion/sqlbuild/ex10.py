@@ -660,6 +660,36 @@ def ex4(b: Build) -> None:
              Check("recalculated variance", n["lines"], lambda r: r.value("PriceVariance")),
              Check("gap to the ledger", n["gap"], lambda r: round(abs(n["gl"] - r.value("PriceVariance")), 2))])
 
+    s.query("Requirement (2): the ledger's basis, the invoice line totals less the GRNI they clear",
+            f"Population: the {num(n['n_lines'])} lines of (2) with their GRNI postings; expected: "
+            f"{money(n['stored'])} less {money(n['cleared'])}, the ledger's {money(n['gl'])}",
+            f"""
+            SELECT COUNT(*) AS InvoiceLines,
+                ROUND(SUM(pil.LineTotal), 2) AS LineTotals,
+                ROUND(SUM(gr.Cleared), 2) AS GRNICleared,
+                ROUND(SUM(pil.LineTotal) - SUM(gr.Cleared), 2)
+                    AS PriceVariance
+            FROM PurchaseInvoiceLine AS pil
+                INNER JOIN PurchaseInvoice AS pi
+                    ON pi.PurchaseInvoiceID = pil.PurchaseInvoiceID
+                INNER JOIN (
+                    SELECT gl.SourceDocumentID, gl.SourceLineID,
+                        SUM(gl.Debit) - SUM(gl.Credit) AS Cleared
+                    FROM GLEntry AS gl
+                        INNER JOIN Account AS a ON a.AccountID = gl.AccountID
+                    WHERE a.AccountNumber = 2020
+                        AND gl.SourceDocumentType = 'PurchaseInvoice'
+                    GROUP BY gl.SourceDocumentID, gl.SourceLineID
+                ) AS gr ON gr.SourceDocumentID = pi.PurchaseInvoiceID
+                    AND gr.SourceLineID = pil.PILineID
+            WHERE pi.InvoiceDate {year_range(year)}
+                AND pil.POLineID IS NOT NULL;
+            """,
+            [Check("invoice lines", n["n_lines"], lambda r: r.value("InvoiceLines")),
+             Check("line totals", round(n["stored"], 2), lambda r: r.value("LineTotals")),
+             Check("GRNI cleared", round(n["cleared"], 2), lambda r: r.value("GRNICleared")),
+             Check("ledger variance reproduced", n["gl"], lambda r: r.value("PriceVariance"))])
+
     s.query("Requirement (2): the ledger and the lines by supplier",
             f"Population: every supplier with variance postings; expected: {len(ledger_suppliers)} suppliers, "
             f"largest difference {money(n['supplier_gap'])}",
@@ -780,12 +810,16 @@ def ex4(b: Build) -> None:
              f"({money(top[0]['amount'])}), {top[1]['id']} {top[1]['name']} ({money(top[1]['amount'])}) and "
              f"{top[2]['id']} {top[2]['name']} ({money(top[2]['amount'])}), but the five largest hold only "
              f"{num(100 * sum(x['amount'] for x in top) / n['gl'], 1)}% of the total among {len(ledger_suppliers)} "
-             f"suppliers, so billing above the order price is widespread rather than concentrated. Of "
-             f"{num(n['n_lines'])} invoice lines, {num(n['above'])} are billed above the order price, "
-             f"{num(n['below'])} below and {num(n['at'])} at it, within "
+             f"suppliers, so billing above the order price is widespread rather than concentrated. Of the "
+             f"{num(n['n_lines'])} invoice lines linked to purchase-order lines, {num(n['above'])} are billed above "
+             f"the order price, {num(n['below'])} below and {num(n['at'])} at it, within "
              f"{num(100 * n['low'], 1)}% below to {num(100 * n['high'], 1)}% above. Recalculated from the documents, "
-             f"the variance is {money(n['lines'])}, {money(n['gap'])} from the ledger because each posting is "
-             f"rounded (by supplier, within {money(n['supplier_gap'])}).\n\n"
+             f"the variance is {money(n['lines'])}, {money(n['gap'])} below the ledger, because the ledger posts each "
+             f"line's stored total less the GRNI it clears, both rounded to the cent. Against the unrounded quantity "
+             f"times unit cost, the line totals add {money(n['inv_round'])} and the GRNI cleared "
+             f"{money(n['grni_round'])}, and the stored totals less the GRNI cleared reproduce the ledger exactly "
+             f"(by supplier, the recalculation is within {money(n['supplier_gap'])}). The {num(n['unlinked'])} invoice "
+             f"lines of the year without an order line are outside this test.\n\n"
              f"Did the account grow because prices rose or because we bought more? The variance is a near-steady "
              f"share of what we buy: {rates}. Both the amount invoiced and the variance grew each year while the rate "
              f"stayed near half a percent: of the variance's growth from {bridge['first']} to {bridge['last']}, "
@@ -976,7 +1010,9 @@ def ex5(b: Build) -> None:
              f"records, and confirm that they stay inactive.\n\n"
              f"3. Work orders without operations: {wording(wo)}, all Closed, yet {n['wo_labor']} direct time entries "
              f"were recorded on them. Process exception: a closed work order should have operations. Follow-up: ask "
-             f"production how they were closed without a routing, and what the time recorded on them was for.\n\n"
+             f"production why these closed work orders have no work order operation records, although their routing "
+             f"references resolve, inspect their operation history, and establish what the time recorded on them was "
+             f"for.\n\n"
              f"4. Orphaned operation keys: {n['orphans']} Direct Manufacturing entries "
              f"({num(n['orphan_hours'], 2)} hours) carry a WorkOrderOperationID that matches no operation, "
              + ", ".join(f"{k} on {w}" for w, k in n["orphan_by_wo"])

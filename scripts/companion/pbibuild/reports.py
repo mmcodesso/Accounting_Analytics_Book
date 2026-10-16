@@ -65,8 +65,9 @@ class Build:
     def report(self) -> Report:
         return self.project.report
 
-    def check(self, section: str, label: str, expected, dax: str, tolerance: float = 0.005) -> None:
-        self.project.check(section, label, expected, dax, tolerance)
+    def check(self, section: str, label: str, expected, dax: str, tolerance: float = 0.005,
+              percent: bool = False) -> None:
+        self.project.check(section, label, expected, dax, tolerance, percent)
 
     @cached_property
     def data(self) -> Data:
@@ -251,12 +252,48 @@ def slicer(name: str, x, y, w, h, f: dict, selected: list = (), style: str = "li
 
 
 def card(name: str, x, y, w, h, fields: list, units_none: bool = False, title: str | None = None,
-         filters: list | None = None, alt_text: str | None = None) -> Visual:
-    """The card visual, one card for each value; Callout values > Display units None shows whole amounts."""
-    objects = ({"value": [{"properties": {"labelDisplayUnits": lit(1)}, "selector": {"id": "default"}}]}
-               if units_none else None)
+         filters: list | None = None, alt_text: str | None = None, size: int | None = None) -> Visual:
+    """The card visual, one card for each value; Callout values > Display units None shows whole amounts, and `size`
+    sets the callout values' font size in points, for many exact amounts side by side (at the default size Desktop
+    cuts them short with an ellipsis)."""
+    props = ({"labelDisplayUnits": lit(1)} if units_none else {}) | ({"fontSize": lit(size)} if size else {})
+    objects = {"value": [{"properties": props, "selector": {"id": "default"}}]} if props else None
     return Visual(name, "cardVisual", x, y, w, h, {"Data": fields}, title=title, objects=objects, filters=filters,
                   alt_text=alt_text)
+
+
+def grow(page, name: str, dy: float) -> None:
+    """Make one visual dy taller and move every visual below it down as far, the page growing with them: a card under
+    its own title needs about 150 px for the values and the labels under them, or Desktop cuts the labels off."""
+    v = next(x for x in page.visuals if x.name == name)
+    bottom = v.y + v.h
+    v.h += dy
+    for x in page.visuals:
+        if x is not v and x.y >= bottom - 1:
+            x.y += dy
+    page.height += dy
+
+
+def relayout(page, heights: dict) -> None:
+    """Give visuals new heights and move the visuals under each one down as far as it grew, column by column: a visual
+    moves by the most that any visual above it and overlapping it horizontally moved and grew, and the page grows by as
+    much as its lowest visual moved. Used where a table showed fewer rows than it holds (Desktop scrolls a table that is
+    too short for its rows, which hides them on the page)."""
+    old = {v.name: (v.y, v.h) for v in page.visuals}
+    bottom = max(v.y + v.h for v in page.visuals)
+    shift: dict[str, float] = {}
+    for v in sorted(page.visuals, key=lambda x: x.y):
+        y0, h0 = old[v.name]
+        s = 0.0
+        for u in page.visuals:
+            uy, uh = old[u.name]
+            if u is not v and u.name in shift and uy + uh <= y0 + 1 and u.x < v.x + v.w and v.x < u.x + u.w:
+                s = max(s, shift[u.name] + (heights.get(u.name, uh) - uh))
+        shift[v.name] = s
+    for v in page.visuals:
+        v.y = old[v.name][0] + shift[v.name]
+        v.h = heights.get(v.name, v.h)
+    page.height += max(0, max(v.y + v.h for v in page.visuals) - bottom)
 
 
 def value_axis(**props) -> dict:
@@ -469,6 +506,7 @@ def t13_3(b: Build) -> None:
     claim(peak == f"{y}-10", "October is the month of the largest discounts")
     claim(current[peak][1] < 0.1 * current[peak][0], "even in October, discounts were a small fraction of revenue")
     claim(abs(years[y] / years[y - 1] - 1) < 0.02, f"almost no growth from fiscal {y - 1} to fiscal {y}")
+    claim(years[first + 1] > years[first] and years[y] > years[y - 1], "revenue rose in both whole-year comparisons")
     claim((current[high][0] - current[low][0]) < 0.25 * sum(v[0] for v in current.values()) / len(current),
           "the gap between the weakest and the strongest month is a small fraction of a month's revenue")
     page.add(Visual("monthlyRevenue", "lineChart", 20, TOP, 610, 300, {"Category": [month], "Y": [lt]},
@@ -479,8 +517,10 @@ def t13_3(b: Build) -> None:
     page.add(Visual("revenueByYear", "clusteredColumnChart", 650, TOP, 610, 300, {"Category": [fy], "Y": [lt]},
                     title=f"Revenue by fiscal year, {first} to {y}",
                     objects={"labels": [{"properties": {"show": lit(True)}}]},
-                    alt_text=f"Revenue by fiscal year from {first} to {y}. Revenue grew from {first} to {first + 1}, "
-                             f"a year that includes the start-up month, and almost not at all from {y - 1} to {y}."))
+                    alt_text=f"Revenue by fiscal year from {first} to {y}. Revenue rose "
+                             f"{years[first + 1] / years[first] - 1:.1%} from {first} to {first + 1}, measured from a "
+                             f"{first} that includes the small start-up month of January {first}, and "
+                             f"{years[y] / years[y - 1] - 1:.1%} from {y - 1} to {y}."))
     page.add(Visual("revenueAndDiscounts", "lineChart", 20, 366, 1240, 170, {"Category": [month], "Y": [lt, da]},
                     title=f"Revenue and promotional discounts by month, fiscal {y}",
                     filters=[keep("revenueAndDiscountsYear", fy, [y])],
@@ -623,12 +663,14 @@ DESCRIPTIONS_15 = {
     "Overtime Hours": "Overtime hours of direct and indirect manufacturing time.",
     "Standard Hours": "The labor hours the standards allow for the units completed: quantity completed times the item's "
                       "standard hours per unit.",
-    "Standard Hours to Cut-off": "Standard hours of the output completed up to the last day with time records, so that "
-                                 "hours and output cover the same days.",
+    "Standard Hours to Cut-off": "Standard hours of the output completed up to the last day with time records, the "
+                                 "last day of direct time; indirect time can end earlier, so the latest month is "
+                                 "provisional.",
     "Hours per Standard Hour": "Manufacturing hours divided by standard hours to the cut-off.",
     "Hours per Standard Hour TTM": "Hours per standard hour over the twelve months ending with the current month, blank "
-                                   "until twelve months exist; for the whole plant, because work centers and job titles "
-                                   "do not filter the output.",
+                                   "until the window holds twelve months of the Date table and the month has "
+                                   "manufacturing hours; for the whole plant, because work centers and job titles do not "
+                                   "filter the output.",
     "Hours per Standard Hour 2024": "Hours per standard hour of the first year of the data, whatever the date filter: "
                                     "the comparison for the trailing figure.",
     "Overtime Share": "Overtime hours as a share of manufacturing hours.",
@@ -656,10 +698,16 @@ def t14_2(b: Build) -> None:
     page = b.report.add(Page("margins", "Margins"))
     page.add(slicer("marginsYear", 20, TOP, 180, 150, col("Date", "Year"), [y]))
     page.add(Visual("groupShares", "tableEx", 220, TOP, 640, 220, {"Values": [
-        col("Item", "ItemGroup"), M("Revenue"), M("Furniture Revenue"), M("Share of Revenue")]}))
+        col("Item", "ItemGroup"), M("Revenue"), M("Furniture Revenue"), M("Share of Revenue")]},
+        alt_text="Revenue, Furniture Revenue and Share of Revenue by item group for the year selected in the slicer. "
+                 "Furniture Revenue is the same on every row, and Furniture holds more than half of the year's "
+                 "revenue."))
     page.add(Visual("marginMatrix", "pivotTable", 20, 300, 1240, 260, {
         "Rows": [col("Item", "ItemGroup")], "Columns": [col("Date", "YearQuarter")], "Values": [M("Margin %")]},
-        filters=[keep("marginMatrixYears", col("Date", "Year"), [y - 1, y])]))
+        filters=[keep("marginMatrixYears", col("Date", "Year"), [y - 1, y])],
+        alt_text=f"Margin at standard cost by item group and quarter, fiscal {y - 1} and {y}, which the year slicer "
+                 f"does not filter. Furniture's margin falls in the third quarter of {y} and again in the fourth, "
+                 "to its lowest of the eight quarters."))
     page.extra = {"visualInteractions": [{"source": "marginsYear", "target": "marginMatrix", "type": "NoFilter"}]}
     furniture_share = dict(ctx["shares"])["Furniture"]
     page.expect = ["Furniture Revenue", "Share of Revenue", money(ctx["furniture"]), f"{furniture_share:.2%}",
@@ -682,27 +730,29 @@ def t14_2(b: Build) -> None:
                                  ("Gross Margin", "gm", "[Gross Margin]", 0.01)]:
         b.check(t, f"{y} {label}", round(ctx[key], 2), f"CALCULATE ( {dax}, {cy} )", tol)
     for yr, pct in ctx["pct"].items():
-        b.check(t, f"{yr} Margin %", round(pct, 6), f"CALCULATE ( [Margin %], 'Date'[Year] = {yr} )", 0.000005)
-    b.check(t, f"{y} Discount Rate", round(ctx["rate"], 6), f"CALCULATE ( [Discount Rate], {cy} )", 0.000005)
-    b.check(t, f"{y} average of the Discount column (Chapter 13)", round(ctx["average"], 6),
-            f"CALCULATE ( AVERAGE ( SalesInvoiceLine[Discount] ), {cy} )", 0.000005)
+        b.check(t, f"{yr} Margin %", round(pct, 6), f"CALCULATE ( [Margin %], 'Date'[Year] = {yr} )", 0.000005,
+                percent=True)
+    b.check(t, f"{y} Discount Rate (weighted by the price before discount)", round(ctx["rate"], 6),
+            f"CALCULATE ( [Discount Rate], {cy} )", 0.000005, percent=True)
+    b.check(t, f"{y} average of the Discount column (Chapter 13, each line weighted equally)", round(ctx["average"], 6),
+            f"CALCULATE ( AVERAGE ( SalesInvoiceLine[Discount] ), {cy} )", 0.000005, percent=True)
     for g, share in ctx["shares"]:
         b.check(t, f"{y} Share of Revenue, {g}", round(share, 6),
-                f"CALCULATE ( [Share of Revenue], {cy}, 'Item'[ItemGroup] = \"{g}\" )", 0.000005)
-    b.check(t, f"{y} shares add up to 100%", 1, f"CALCULATE ( SUMX ( VALUES ( 'Item'[ItemGroup] ), [Share of Revenue] ), "
-                                                f"{cy} )", 0.000001)
+                f"CALCULATE ( [Share of Revenue], {cy}, 'Item'[ItemGroup] = \"{g}\" )", 0.000005, percent=True)
+    b.check(t, f"{y} shares add up to 100% (unrounded)", 1.0,
+            f"CALCULATE ( SUMX ( VALUES ( 'Item'[ItemGroup] ), [Share of Revenue] ), {cy} )", 0.000001, percent=True)
     b.check(t, f"{y} Furniture Revenue on the Lighting row", round(ctx["furniture"], 2),
             f"CALCULATE ( [Furniture Revenue], {cy}, 'Item'[ItemGroup] = \"Lighting\" )")
     b.check(t, f"{y} Furniture share with ALL ( SalesInvoiceLine ) instead", round(ctx["all_share"], 6),
             f"CALCULATE ( DIVIDE ( [Revenue], CALCULATE ( [Revenue], ALL ( SalesInvoiceLine ) ) ), {cy}, {furn} )",
-            0.000005)
+            0.000005, percent=True)
     for i, x in enumerate(q):
         yq = f"{y - 1 + i // 4}-Q{i % 4 + 1}"
         b.check(t, f"Furniture Margin % {yq}", round(x["pct"], 6),
-                f"CALCULATE ( [Margin %], 'Date'[YearQuarter] = \"{yq}\", {furn} )", 0.000005)
+                f"CALCULATE ( [Margin %], 'Date'[YearQuarter] = \"{yq}\", {furn} )", 0.000005, percent=True)
     for i, rate in enumerate(ctx["rates"]):
         b.check(t, f"Furniture Discount Rate {y}-Q{i + 1}", round(rate, 6),
-                f"CALCULATE ( [Discount Rate], 'Date'[YearQuarter] = \"{y}-Q{i + 1}\", {furn} )", 0.000005)
+                f"CALCULATE ( [Discount Rate], 'Date'[YearQuarter] = \"{y}-Q{i + 1}\", {furn} )", 0.000005, percent=True)
 
 
 def t14_3(b: Build) -> None:
@@ -743,15 +793,24 @@ def t14_3(b: Build) -> None:
                     extra={"expansionStates": [{"roles": ["Rows"], "levels": [
                         {"queryRefs": ["Account.AccountType"], "isCollapsed": False, "identityKeys": [levels[0]],
                          "isPinned": True}, {"queryRefs": ["Account.AccountSubType"], "isCollapsed": True,
-                                             "isPinned": True}]}]}, active=("Rows",)))
+                                             "isPinned": True}]}]}, active=("Rows",),
+                    alt_text=f"Income statement by account type and subtype, fiscal {years[0]} to {y}, without the "
+                             "closing entries. Revenue reads positive and expenses negative, so each year's total is "
+                             "that year's net income."))
     page.add(card("netIncomeCard", 800, TOP, 220, 110, [M("Net Income")],
-                  filters=[keep("netIncomeCardYear", col("Date", "Year"), [y])]))
+                  filters=[keep("netIncomeCardYear", col("Date", "Year"), [y])],
+                  alt_text=f"Net income of fiscal {y}, equal to the {y} total of the income statement."))
     page.add(Visual("expenseLine", "lineChart", 20, 400, 760, 310,
                     {"Category": [col("Date", "YearMonth")], "Y": [M("Operating Expense"), M("Expected Operating Expense")]},
-                    filters=[keep("expenseLineYears", col("Date", "Year"), years)]))
+                    filters=[keep("expenseLineYears", col("Date", "Year"), years)],
+                    alt_text=f"Operating expense by month, fiscal {years[0]} to {y}, against the average of the months "
+                             f"before it. The expense is more than a fifth above it in the second month of the data "
+                             f"and in the {ctx['n_paydays']} months with three pay dates."))
     page.add(Visual("deviationTable", "tableEx", 800, 180, 460, 530,
                     {"Values": [col("Date", "YearMonth"), M("Operating Expense Deviation")]},
-                    sort=[(M("Operating Expense Deviation"), "Descending")]))
+                    sort=[(M("Operating Expense Deviation"), "Descending")],
+                    alt_text="Each month's operating expense deviation from its expectation, largest first. The "
+                             "largest are the second month of the data and the months with three pay dates."))
     ni = dict(ctx["ni"])
     page.expect = ["Contra Revenue", "Net Income", money(ni[y]), "Operating Expense Deviation",
                    f"{ctx['first_spike']['dev']:.1%}"]
@@ -778,7 +837,8 @@ def t14_3(b: Build) -> None:
         b.check(t, f"{yr} Operating Expense", round(v, 2), f"CALCULATE ( [Operating Expense], 'Date'[Year] = {yr} )", 0.01)
     for x in [ctx["first_spike"]] + ctx["paydays"]:
         b.check(t, f"Operating Expense Deviation {x['month']}", round(x["dev"], 6),
-                f"CALCULATE ( [Operating Expense Deviation], 'Date'[YearMonth] = \"{x['month']}\" )", 0.000005)
+                f"CALCULATE ( [Operating Expense Deviation], 'Date'[YearMonth] = \"{x['month']}\" )", 0.000005,
+                percent=True)
     b.check(t, f"Expected Operating Expense {ctx['blank']} (blank)", "blank",
             f"IF ( ISBLANK ( CALCULATE ( [Expected Operating Expense], 'Date'[YearMonth] = \"{ctx['blank']}\" ) ), "
             "\"blank\", \"not blank\" )")
@@ -992,7 +1052,7 @@ def t15_2(b: Build) -> None:
         b.check(t, f"{name}: Budget", round(c["budget"], 2), f"CALCULATE ( [Budget], {cy}, {ox}, {where} )", 0.01)
         b.check(t, f"{name}: Actual", round(c["actual"], 2), f"CALCULATE ( [Actual], {cy}, {ox}, {where} )", 0.01)
         b.check(t, f"{name}: Variance %", round(c["pct"], 6), f"CALCULATE ( [Variance %], {cy}, {ox}, {where} )",
-                0.000005)
+                0.000005, percent=True)
         b.check(t, f"{name}: Flexed Budget", round(c["flexed"], 2),
                 f"CALCULATE ( [Flexed Budget], {cy}, {ox}, {where} )", 0.01)
         b.check(t, f"{name}: Classification Effect", round(c["cls"], 2),
@@ -1013,10 +1073,12 @@ def t15_2(b: Build) -> None:
         ym = f"{y}-{i + 1:02d}"
         b.check(t, f"Variance to Flexed {ym}", round(v, 2),
                 f"CALCULATE ( [Variance to Flexed], 'Date'[YearMonth] = \"{ym}\", {ox} )", 0.01)
-    for i in (5, 6, 11):                         # the year to date the visual calculation shows in June, July, December
+    # the year to date the visual calculation shows in June, July, December: the months flexed one at a time and
+    # added, as the running sum adds the table's rows (the year's context differs by a fraction of a cent)
+    for i in (5, 6, 11):
         b.check(t, f"{ytd_name} through {y}-{i + 1:02d}", round(ctx["ytd"][i], 2),
-                f"CALCULATE ( [Variance to Flexed], DATESBETWEEN ( 'Date'[Date], DATE ( {y}, 1, 1 ), "
-                f"EOMONTH ( DATE ( {y}, {i + 1}, 1 ), 0 ) ), {ox} )", 0.01)
+                f"CALCULATE ( SUMX ( VALUES ( 'Date'[YearMonth] ), [Variance to Flexed] ), DATESBETWEEN ( 'Date'[Date], "
+                f"DATE ( {y}, 1, 1 ), EOMONTH ( DATE ( {y}, {i + 1}, 1 ), 0 ) ), {ox} )", 0.01)
 
 
 def t15_3(b: Build) -> None:
@@ -1095,7 +1157,8 @@ def t15_3(b: Build) -> None:
         "hours, each with its comparison and its detail.",
         "Readers: the sales manager (Promotions), the department managers (Budget), and the production manager (Plant).",
         "Source: CharlesRiver.xlsx, refreshed through Power Query. Period: fiscal years "
-        f"{years[0]} to {y}; the time records end on {last}, because the last pay periods are still open.",
+        f"{years[0]} to {y}; the last time records are dated {last}, and the last indirect time {ctx['indirect_end']}, "
+        "because the last two pay periods are marked Open in the data, so the plant's latest month is provisional.",
         f"Definitions: every measure of the {MEASURES_TABLE} table has a description; point at it in the Data pane. The "
         "trailing hours per standard hour, for the whole plant, is Hours per Standard Hour TTM.",
         "Checks: the Validation page reconciles the model to the control totals, and the Tests tab in DAX query view "
@@ -1161,10 +1224,11 @@ def t15_3(b: Build) -> None:
     for title, first, current in ctx["titles"]:
         for yr, v in ((years[0], first), (y, current)):
             b.check(t, f"Overtime Share {title} {yr}", round(v, 6),
-                    f"CALCULATE ( [Overtime Share], 'Date'[Year] = {yr}, Employee[JobTitle] = \"{title}\" )", 0.000005)
+                    f"CALCULATE ( [Overtime Share], 'Date'[Year] = {yr}, Employee[JobTitle] = \"{title}\" )", 0.000005,
+                    percent=True)
     for yr, v in zip(years, ctx["plant"]):
         b.check(t, f"Overtime Share, plant, {yr}", round(v, 6), f"CALCULATE ( [Overtime Share], 'Date'[Year] = {yr} )",
-                0.000005)
+                0.000005, percent=True)
 
 
 def labor_type(kind: str) -> str:
@@ -1280,7 +1344,8 @@ def ta_1(b: Build) -> None:
     claim(ctx["w"]["ni"] < 0, "the Warehouse Manager's income statement is a loss")
 
     # The real roles, run by the engine on a connection that applies them: with the Windows sign-in, which the
-    # security table does not list, Cost Center Managers shows nothing (deny by default); Finance shows everything.
+    # security table does not list, Cost Center Managers shows no cost center, item, employee or security row (deny by
+    # default), while Customer, which no rule reaches, keeps its rows; Finance shows everything.
     deny = [("Guided Tutorial B.1", c) for c in [
         Check("cost centers visible", 0, "COUNTROWS ( CostCenter )", 0),
         Check("items visible", 0, "COUNTROWS ( 'Item' )", 0),

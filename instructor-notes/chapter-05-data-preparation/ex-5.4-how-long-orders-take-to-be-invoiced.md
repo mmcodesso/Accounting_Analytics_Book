@@ -65,7 +65,7 @@ Individual or pairs, about 75 minutes: 10 on the lag column (requirement 1), 20 
 
 **Check:** the Expected results. **Watch for:** a quarter taken from the order date. The model answer uses the invoice's period, as the memo recommends for recorded revenue, and a student who uses the order date should say so.
 
-**Step 4. Interpret.** The average, 21.3 days, is above the median, 12. A minority of orders take much longer, so a long right tail pulls the average up and leaves the median alone; the 90th percentile is 52 days. Across the four quarters of the year the averages run from 20.5 to 23.1 days, a spread of 2.6, so the lag is fairly stable.
+**Step 4. Interpret.** The average, 21.3 days, is above the median, 12. A minority of orders take much longer, so a long right tail pulls the average up and leaves the median alone; the 90th percentile is 52 days. Across the four quarters of the year the averages, which count each invoice once, run from 20.5 to 23.1 days, a spread of 2.6, so the lag is fairly stable.
 
 ### Requirement (3): The promotions
 
@@ -83,7 +83,7 @@ A student without dynamic arrays fills the same three formulas down with a row r
 
 ### Requirement (4): The recommendation
 
-**Step 6. Write three to five sentences.** Assign promotional revenue by invoice date. The ledger records revenue on the invoice, so for recorded revenue the invoice date ties the analysis to it. Use the order date to explain the price, because a promotional price is set when the order is placed. Promotion 8, the Furniture Seasonal Promotion, had 160 of its 576 lines invoiced after its end date, which is not an error. Because the lag is stable, the share of orders invoiced in the next quarter is predictable. Promotions 1, 4, and 7 are the exception, and the dates are for the data owner.
+**Step 6. Write three to five sentences.** Assign promotional revenue by invoice date. The ledger records revenue on the invoice, so for recorded revenue the invoice date ties the analysis to it. Use the order date to explain the price, because a promotional price is set when the order is placed. Promotion 8, the Furniture Seasonal Promotion, had 160 of its 576 lines invoiced after its end date, which is not an error. The averages are similar from quarter to quarter, but that does not make the share of a promotion's orders invoiced in the next quarter predictable, because it also depends on when in the promotion the orders were placed. Promotions 1, 4, and 7 are the exception, and the dates are for the data owner.
 
 **Check:** the memo recommends one date for revenue and one for price, and states the limit: the invoice date is not proof of delivery.
 
@@ -117,7 +117,7 @@ A student without dynamic arrays fills the same three formulas down with a row r
 ## What a strong answer says
 
 - **Requirement (2).** A skewed distribution, with the average above the median and the long tail named. Stability is a claim about the quarterly averages, with the range.
-- **Requirement (3).** Before the counts, the dates. Three promotions fail a simple test of their own dates, so their late lines say nothing about billing. The other six have between a quarter and a half of their lines invoiced after the end date, which is what a stable lag produces for orders placed in the last weeks of a promotion.
+- **Requirement (3).** Before the counts, the dates. Three promotions fail a simple test of their own dates, so their late lines say nothing about billing. The other six have between a quarter and a half of their lines invoiced after the end date, which is consistent with the usual lag for orders placed in the last weeks of a promotion.
 - **Requirement (4).** A split recommendation, with the reason for each date and the limit of the invoice date.
 
 A weak answer calls the three promotions "billed late", or recommends the order date for revenue because the price follows it.

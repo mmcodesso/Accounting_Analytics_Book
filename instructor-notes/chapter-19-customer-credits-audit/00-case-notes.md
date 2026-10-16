@@ -224,7 +224,7 @@ The check slides suit class discussion. Requirements 1 and 2 grade from the scri
 | 7. The balances | 10 | Recomputed credits, restocking by reason, lapping tests, the first-digit reasoning, the largest refund's timeline and its disposition |
 | 8. Deficiencies | 10 | A matrix against the threshold cells, design or operation, exposure, likelihood, compensating controls, a classification with what could change it |
 | 9. The report | 13 | Page limits, a bounded conclusion, findings with condition, criteria, cause, effect, rating and recommendation, action plans, the expected pushback |
-| 10. Continuing tests | 7 | Four rule tests and two processes in the register, anomalies kept outside, one design finding, the data-through date rechecked and the change recorded |
+| 10. Continuing tests | 7 | Four rule tests and two processes in the register, anomalies kept outside, findings linked by supported cause, the data-through date rechecked and the change recorded |
 | Total | 100 | |
 
 Four criteria run through every requirement.

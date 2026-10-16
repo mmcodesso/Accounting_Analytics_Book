@@ -290,13 +290,15 @@ def g1(d, claim):
                "Credited AS (SELECT OriginalSalesInvoiceID AS SalesInvoiceID, SUM(GrandTotal) AS Credited FROM CreditMemo "
                "WHERE CreditMemoDate <= ?1 GROUP BY OriginalSalesInvoiceID) "
                "SELECT ROUND(si.GrandTotal - COALESCE(a.Applied, 0) - COALESCE(c.Credited, 0), 2), "
-               "julianday(?1) - julianday(si.DueDate), a.Applied IS NULL AND c.Credited IS NULL FROM SalesInvoice si "
+               "julianday(?1) - julianday(si.DueDate), a.Applied IS NULL AND c.Credited IS NULL, "
+               "a.Applied IS NOT NULL AND c.Credited IS NOT NULL FROM SalesInvoice si "
                "LEFT JOIN Applied a ON a.SalesInvoiceID = si.SalesInvoiceID LEFT JOIN Credited c ON c.SalesInvoiceID = si.SalesInvoiceID "
                "WHERE si.InvoiceDate <= ?1", end)
     positive = [r for r in rows if r[0] > 0]
     negative = [r for r in rows if r[0] < 0]
-    kept = [r for r in positive if not r[2]]
-    claim(len(kept) < len(positive) / 2, "most open invoices have no application and no credit memo, so a null total drops most of the aging")
+    # with both merged totals left null, a null in either drops the row, so only the invoices with both survive
+    kept = [r for r in positive if r[3]]
+    claim(len(kept) < len(positive) / 2, "few open invoices have both an application and a credit memo, so leaving the nulls drops most of the aging")
     due_today = [r for r in positive if r[1] == 0]
     claim(bool(due_today), "some open invoices fall due on the as-of date itself")
     ledger = d.balance(["1020"], end)
@@ -487,12 +489,14 @@ def g5(d, claim):
     differs = sum(1 for a, b in zip(sci, whole) if a != b)
     claim(differs > 0, "rounding the amount to a whole number before taking the first digit changes the digit of some payments")
     claim(abs(mad(sci) - n16.ex5(d, lambda c, t: None)["mad"]["all"]) < 1e-9, "the guide's MAD agrees with the note's")
+    digit1 = abs(sum(1 for k in sci if k == 1) / len(sci) - math.log10(2))
+    claim(digit1 > mad(sci), "one digit's deviation, read without REMOVEFILTERS, differs from the nine-digit MAD")
     after = d.one("SELECT COUNT(*) FROM DisbursementPayment WHERE PaymentDate > ?", end)
     claim(after > 0, "some payments are dated after the as-of date, so the date filter matters")
     ranges = n16.MAD_RANGES
     wrong_text = mad(text, len(amounts))
     claim(n16.conformity(wrong_text) == n16.conformity(mad(sci)), "the text-based first digit lands in the same conformity class, so only the digit-0 payments show the error")
-    return dict(below=below, share_text=sum(1 for t in text if t > 0) / len(amounts), mad_text=wrong_text, differs=differs,
+    return dict(mad_digit1=digit1, below=below, share_text=sum(1 for t in text if t > 0) / len(amounts), mad_text=wrong_text, differs=differs,
                 zeros_whole=sum(1 for w in whole if w == 0), mad_related=sum(1 - math.log10(1 + 1 / k) for k in range(1, 10)) / 9,
                 after=after, all_payments=len(amounts) + after, ranges=ranges,
                 m_pay=steps(claim, table_m("Payments"), "Filtered Rows", "Added Custom"),

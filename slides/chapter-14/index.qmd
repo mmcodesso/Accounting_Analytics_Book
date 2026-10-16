@@ -137,7 +137,7 @@ The fourth is the invoice count of Tutorial 13.2, which the star of Tutorial 14.
 - One row for every day, with year, quarter and month columns
 - Unique dates, no blanks, no missing days, and full years
 - Built in DAX with CALENDAR, inside ADDCOLUMNS
-- Marked as the date table, so time intelligence can rely on it
+- Marked as the date table, which classic time intelligence needs
 
 ::: {.notes}
 The ledger runs into the year after the latest, so the table covers four full years. Charles River's fiscal year is the calendar year, so a date's year is its fiscal year. A month name such as Jan sorts alphabetically, so MonthName is sorted by MonthNumber with Sort by column; YearMonth sorts correctly as text.
@@ -196,7 +196,7 @@ A measure is the counterpart of Chapter 6's calculated field, which also works o
 ## Column or measure?
 
 - A calculated column is evaluated once per row at refresh, and stored
-- A measure is evaluated when a visual asks for it, never stored
+- A measure is evaluated when a visual asks, and its result is not stored
 - A row's own value to slice by is a column; a total or ratio, a measure
 - A column computable from its own row belongs in Power Query
 
@@ -302,7 +302,7 @@ Furniture Revenue shows Furniture's revenue even in a visual filtered to Lightin
 {{< book-figure fig-14-05 crop="0,0,1,0.8563" >}}
 
 ::: {.notes}
-Furniture Revenue is the same on every row, because its filter replaces the row's item group. Share of Revenue divides by all items in the selected year. Removing the filters from the whole invoice line table with ALL would remove the year as well, because the dimension filters reach the fact table through it, and Furniture's share would read as about a fifth instead of more than half.
+Furniture Revenue is the same on every row, because its filter replaces the row's item group. Share of Revenue divides by all items in the selected year. Removing the filters from the whole invoice line table with ALL would remove the year as well, because inside CALCULATE, ALL on a fact table also removes the filters on the dimension tables it relates to. Furniture's share would then read as about a fifth instead of more than half.
 :::
 
 ## Habits that make measures reliable
@@ -313,7 +313,7 @@ Furniture Revenue is the same on every row, because its filter replaces the row'
 - KEEPFILTERS combines a filter with the existing one
 
 ::: {.notes}
-A group with no sales in a period has a zero denominator. A column filter such as a condition on GLEntry's Debit is evaluated quickly on one column, while the older table form is slower and can produce unexpected results; Microsoft's guidance is to use the column form whenever possible.
+A group with no sales in a period has a zero denominator. In an Import model such as this one, a filter on one column, such as a condition on GLEntry's Debit, is the efficient form, while FILTER over a whole fact table does the same job with more work. Microsoft's guidance is to use the column form whenever it can express the condition, and FILTER when the condition needs it, for example to test a measure.
 :::
 
 ## The DAX functions of this chapter
@@ -339,7 +339,7 @@ These change the filter context or name intermediate results. USERELATIONSHIP is
 - DAX query view runs queries and shows the result in a grid
 - A query is EVALUATE and a table, such as SUMMARIZECOLUMNS
 - The grid ignores formats, so tests round amounts to the cent
-- A Tests tab, saved with the report, reruns every check
+- A Tests tab, saved with the report in Desktop, reruns every check
 
 ::: {.notes}
 SUMMARIZECOLUMNS groups by columns and calculates measures for each group, much like SQL's GROUP BY. A query can define a measure for its own use with DEFINE MEASURE and test it before it joins the model, and right-clicking a table or measure offers quick queries. A Tests tab with one query per control total, each with a comment saying what it should return, is the Power BI counterpart of Chapter 4's control totals and Chapter 12's audit query library.
@@ -544,7 +544,7 @@ On the report page, a card above the matrix, filtered to the latest year, shows 
 {{< book-figure fig-14-11 crop="0,0,1,0.8453" >}}
 
 ::: {.notes}
-Expected Operating Expense averages the three months before each month with DATESBETWEEN, guarded by HASONEVALUE so it is blank unless the context is one month. The expectation excludes the month itself, so a spike cannot raise its own expectation. Apart from the second month, whose expectation rests on the start-up month alone, the months well above it are the six with three pay dates, which Chapter 11 traced to payroll recorded when paid. After every refresh the measure is evaluated against the new data, which turns a one-time check into a monitoring tool.
+Expected Operating Expense averages the three months before each month with DATESBETWEEN, guarded by HASONEVALUE so it is blank unless the context is one month. The expectation excludes the month itself, so a spike cannot raise its own expectation. Apart from the second month, whose expectation rests on the start-up month alone, the months well above it are the six with three pay dates, which Chapter 11 traced to payroll recorded when paid. The first of them stands out most, because its expectation averages only the two months before it. After every refresh the measure is evaluated against the new data, which turns a one-time check into a monitoring tool.
 :::
 
 ## Checkpoint

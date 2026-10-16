@@ -61,7 +61,7 @@ SUM(CASE WHEN ABS(TaxAmount - ROUND((SubTotal + FreightCreditAmount)
         AS TaxOff,
 ```
 
-**Check:** {{ n_cm }} credits on as many invoices, none above its invoice, each subtotal equal to its lines, tax at {{ rate|pct(1) }} on every credit, no freight credit above the invoice's. The rate is read from the data, so the test is a diagnostic; the freight test is an upper bound. **Watch for:** tax tested on the subtotal alone, which flags {{ g.tax_alone }} credits, exactly those with freight.
+**Check:** {{ n_cm }} credits on as many invoices, none above its invoice, each subtotal equal to its lines, tax at {{ rate|pct(1) }} on every credit, no freight credit above the invoice's. The rate is read from the credits, a diagnostic that every invoice's tax at the same rate corroborates. The freight test is only an upper bound, so the answer asks for the freight policy for partial returns. **Watch for:** tax tested on the subtotal alone, which flags {{ g.tax_alone }} credits, exactly those with freight.
 
 **Step 3. List the open items in 2060 (S3).** The credits whose part posted to 2060 is not refunded by the last year-end.
 
@@ -88,7 +88,7 @@ SUM(CASE WHEN ABS(srl.ExtendedStandardCost
         THEN 1 ELSE 0 END) FROM Applied) AS OtherCustomersInvoice,
 ```
 
-**Check:** no application to another customer's invoice, deposits {{ lap.dep_lo }} to {{ lap.dep_hi }} days after receipt, each application within {{ lap.lag_hi }} days of the later of receipt and invoice date, every receipt fully applied. {{ g.early_r }} receipts (${{ g.early_amt|money }}) were applied to invoices dated after them: deposits held in 2060, not lapping, as far as these tests reach. **Watch for:** the delay measured from the receipt date alone, which reads up to {{ g.lag_receipt|num(0) }} days and flags {{ g.lag_receipt_n }} applications.
+**Check:** no application to another customer's invoice, deposits {{ lap.dep_lo }} to {{ lap.dep_hi }} days after receipt, applications {{ lap.raw_lo }} to {{ lap.raw_hi }} days after their receipt (those over two days all of receipts dated before their invoice) and within {{ lap.lag_hi }} days of the later of receipt and invoice date, every receipt fully applied. {{ g.early_r }} receipts (${{ g.early_amt|money }}) were applied to invoices dated after them: deposits held in 2060, not lapping, as far as these tests reach. **Watch for:** either delay shown alone. The raw delay, up to {{ g.lag_receipt|num(0) }} days on {{ g.lag_receipt_n }} applications, is the observation, and the receipts dated before their invoice explain it, so the answer shows both.
 
 **Step 6. Explain why a first-digit test does not suit these populations.** Use Chapter 8's criteria for populations that suit the test: the credits and refunds are subsets selected by an event, and their amounts follow the invoice lines they reverse, so they cannot spread across the digits as the law expects.
 

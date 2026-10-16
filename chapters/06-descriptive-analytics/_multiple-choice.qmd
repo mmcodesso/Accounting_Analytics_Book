@@ -13,7 +13,7 @@ D.  It contains errors, because the average and the median of accounting data sh
 
 A.  STDEV.S measures the spread around the median, while STDEV.P measures the spread around the mean.
 B.  STDEV.S ignores blank cells in the range, while STDEV.P counts every blank cell as a zero.
-C.  STDEV.S treats the values as a sample and divides by n − 1; STDEV.P treats them as a population and divides by n.
+C.  STDEV.S divides by n − 1, for a sample, and STDEV.P by n, for a whole population.
 D.  STDEV.S works only on the columns of Excel Tables, while STDEV.P works on any range of cells.
 
 **3.** An analyst wants the median line total of fiscal 2026 invoice lines only, and enters this formula:
@@ -24,7 +24,7 @@ D.  STDEV.S works only on the columns of Excel Tables, while STDEV.P works on an
 
 Why does the formula use FILTER?
 
-A.  MEDIAN accepts no criteria, so FILTER supplies only the rows of fiscal 2026.
+A.  MEDIAN takes no criteria, so FILTER supplies the fiscal 2026 rows.
 B.  FILTER converts the line totals from text into numbers first.
 C.  FILTER removes the outliers that would otherwise distort the median.
 D.  FILTER sorts the line totals into order, which MEDIAN requires.
@@ -40,11 +40,11 @@ What does the formula return?
 A.  The error #N/A, because no row of the Table matches the criterion
 B.  The Furniture total, because SUMIFS corrects near matches in text
 C.  The total of every row, because an invalid criterion is ignored
-D.  Zero, without an error, which a comparison with a control total would reveal
+D.  Zero, without an error, which a control total would reveal
 
 **5.** In Tutorial 6.1, the revenue of the four product lines falls short of the fiscal 2026 control total by exactly the revenue of the Services item group. What does the difference show?
 
-A.  The summary leaves out a category, and it is complete only when the category is added.
+A.  The summary leaves out a category and is incomplete until it is added.
 B.  The SUMIFS formulas of the four product lines contain a spelling error.
 C.  The control total double-counts some invoice lines of the Services group.
 D.  Services revenue should be excluded from the control total of the year.
@@ -54,7 +54,7 @@ D.  Services revenue should be excluded from the control total of the year.
 A.  A pie chart of revenue by item group
 B.  A line chart of the line totals in invoice order
 C.  A histogram of the line totals, in bins of equal width
-D.  A stacked column chart of revenue by quarter
+D.  A stacked column chart of each quarter's revenue by item group
 
 **7.** An analyst defines a PivotTable calculated field with the formula `=Quantity*UnitPrice` to show revenue. What does the field return for each cell of the PivotTable?
 
@@ -80,13 +80,13 @@ What is its advantage over a cell address such as `=Drivers!B5`?
 
 A.  GETPIVOTDATA reads the value from the source Table, so the PivotTable can be deleted.
 B.  GETPIVOTDATA refreshes the PivotTable every time the formula recalculates.
-C.  It names the value by field and item, so it survives changes to the PivotTable's layout.
+C.  It names the value by field and item, so layout changes do not break it.
 D.  GETPIVOTDATA rounds the value to the number format shown in the PivotTable.
 
 **10.** An analyst adds a custom column to the InvoiceLines query and loads the query, but the new field does not appear in a PivotTable built from InvoiceLines. What is the most likely explanation?
 
-A.  A PivotTable summarizes its own copy of the data, which updates only when it is refreshed.
-B.  The custom column must first be converted to values in the Table.
+A.  A PivotTable reads a copy of the data that only a refresh updates.
+B.  The new custom column must first be converted to values in the Table.
 C.  PivotTables cannot use any of the columns that Power Query adds.
 D.  The PivotTable must be deleted and built again from the Table.
 
@@ -95,12 +95,12 @@ D.  The PivotTable must be deleted and built again from the Table.
 A.  Credit memos issued in the fourth quarter exceeded the invoices of the quarter.
 B.  The Furniture Seasonal Promotion reduced the quarter's revenue below zero.
 C.  The PivotTable sums the debits and the credits in the wrong columns.
-D.  The year-end closing entry, which debits every revenue account, is included.
+D.  The year-end closing entry, which debits the Furniture account, is included.
 
 **12.** An analyst builds a trial balance at December 31, 2026, from GLEntry and leaves out the two 2026 closing entries. Why are they left out?
 
 A.  The closing entries do not balance, so the trial balance would not balance.
-B.  The closing entries zero the revenue and expense accounts, so the income statement could not be prepared from the balances.
+B.  The closing entries zero the accounts the income statement is built from.
 C.  The closing entries are posted in fiscal 2027, after the cutoff.
 D.  The closing entries hold the opening balances of the balance sheet accounts.
 
@@ -108,12 +108,12 @@ D.  The closing entries hold the opening balances of the balance sheet accounts.
 
 A.  The Furniture product line has no cost of goods sold in the ledger.
 B.  Costs are excluded from the bridge because they are recorded only in the ledger.
-C.  Each item has one standard cost, so the same items cost the same in both quarters.
+C.  Each item has one standard cost, the same in both quarters.
 D.  The cost effect is always combined with the volume effect in a bridge.
 
 **14.** From the third quarter to the fourth, the Furniture margin at standard cost falls, while the margin before promotional discounts rises slightly. What can you conclude?
 
-A.  The larger discounts more than offset the other effects, which on balance raised the margin.
+A.  The larger discounts more than offset other effects that on balance raised the margin.
 B.  The decline comes from higher standard costs of the Furniture items in the fourth quarter.
 C.  The decline comes from a fall in the number of Furniture units sold in the fourth quarter.
 D.  The two margins are calculated inconsistently, so no conclusion is possible.

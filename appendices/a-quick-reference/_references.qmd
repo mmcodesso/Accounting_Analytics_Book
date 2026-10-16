@@ -12,10 +12,14 @@ Microsoft. (2026). *Visual calculations overview*. Microsoft Learn. <https://lea
 
 SQLite. (n.d.-a). *Built-in aggregate functions*. <https://www.sqlite.org/lang_aggfunc.html>
 
-SQLite. (n.d.-b). *Built-in scalar SQL functions*. <https://www.sqlite.org/lang_corefunc.html>
+SQLite. (n.d.-b). *Built-in mathematical SQL functions*. <https://www.sqlite.org/lang_mathfunc.html>
 
-SQLite. (n.d.-c). *Date and time functions*. <https://www.sqlite.org/lang_datefunc.html>
+SQLite. (n.d.-c). *Built-in scalar SQL functions*. <https://www.sqlite.org/lang_corefunc.html>
 
-SQLite. (n.d.-d). *Quirks, caveats, and gotchas in SQLite*. <https://www.sqlite.org/quirks.html>
+SQLite. (n.d.-d). *Datatypes in SQLite*. <https://www.sqlite.org/datatype3.html>
 
-SQLite. (n.d.-e). *Window functions*. <https://www.sqlite.org/windowfunctions.html>
+SQLite. (n.d.-e). *Date and time functions*. <https://www.sqlite.org/lang_datefunc.html>
+
+SQLite. (n.d.-f). *Quirks, caveats, and gotchas in SQLite*. <https://www.sqlite.org/quirks.html>
+
+SQLite. (n.d.-g). *Window functions*. <https://www.sqlite.org/windowfunctions.html>

@@ -35,7 +35,7 @@ By the end, students can:
 
 ## Before you assign
 
-- **Files and software.** The analysis workbook at the end of Chapter 7's tutorials, with the Item and SalesOrder queries of Chapter 5 and the InvoiceLines and BudgetLine Tables. The model answer uses FILTER and XLOOKUP (Microsoft 365).
+- **Files and software.** The analysis workbook at the end of Chapter 7's tutorials, with the Item and SalesOrder queries of Chapter 5 and the InvoiceLines and BudgetLine Tables. The model answer uses FILTER and XLOOKUP, which every supported desktop Excel has.
 - **Data conditions.** DemandForecast holds {{ rows|count }} rows, all in the current version ({{ version }}), with the methods {{ methods|join(", ") }}. The weeks run into {{ d.N }}, which have no orders to compare with. Services is forecast and ordered in hours of design work, and its forecast is the smaller of the two. Only the Planner Adjusted method has forecasts without an approver, {{ g.unapproved }} of {{ g.planner_adjusted|count }}.
 - **Verify first.** A forecast that differs a little from its baseline is normal: {{ g.n_off|count }} rows do, by about ten percent at most, apart from the {{ g.n_big }} that students will find. A threshold of half of the baseline isolates them.
 
@@ -121,8 +121,8 @@ The control tested is the approval of planners' adjustments. The three are the o
 ## What a strong answer says
 
 - **Requirement (3).** Not consistent: more than twice the orders in every product group and year, and the bias grows. Services runs the other way and needs its own explanation.
-- **Requirement (5).** The list tests the approval of planner adjustments. The three are small in quantity but are an unapproved override by a buyer who plans most forecasts ({{ g.planner_adjusted|count }} Planner Adjusted rows in all) and also creates purchase orders: a segregation-of-duties exception.
-- **Requirement (6).** Consequences for purchasing and production plans, for an inventory reserve and for a budget whose volume cannot judge performance; the evidence to request: the method and its inputs, the comparisons management made, the reasons for the three overrides, how the forecast feeds the plans, and inventory levels and aging.
+- **Requirement (5).** The list tests the approval of planner adjustments. The three are small in quantity but are an unapproved override by a buyer who plans most forecasts ({{ g.planner_adjusted|count }} Planner Adjusted rows in all) and also creates purchase orders. It is an authorization exception, and the buyer's two roles make an independent review more important.
+- **Requirement (6).** Consequences whose direction depends on the estimate: plans that buy and build too much, a reserve understated if it relies on the forecast, and a budget that shows the gap from the plan but is a poor measure of performance. Services is assessed separately. The evidence to request: the method and its inputs, the comparisons management made, the reasons for the three overrides, how the forecast feeds the plans, and inventory levels and aging.
 
 A weak answer says the forecast is "high" without the ratios, or treats a recorded approval as proof of a review.
 

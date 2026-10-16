@@ -14,9 +14,9 @@ What the builder decides where the text leaves a choice (cell notes in the workb
   - Exercise 5.5 asks for a new workbook. The solution keeps one workbook for all six exercises, so its Supplier,
     Employee, and DisbursementPayment Tables are worksheets of this file (Exercise 5.6 says "the workbook of
     Exercise 5.5", and it is this one).
-  - Exercise 5.5's Supplier query keeps the identifying columns (SupplierID, SupplierName, TaxID, BankAccount) and the
-    address columns, and also IsApproved and SupplierRiskRating, which Exercise 5.6 uses on the same Table. Its
-    Employee query also keeps JobTitle, which requirement (3) brings onto the Supplier Table.
+  - Exercise 5.5's Supplier query keeps every column of the Supplier master file, as requirement (1) asks, because
+    Exercise 5.6 uses the same Table. Its Employee query keeps the five columns the requirement names, including
+    JobTitle, which requirement (3) brings onto the Supplier Table.
   - Exercise 5.1 uses lookups (XLOOKUP with "No match", as in Tutorial 5.2), not merges, and assigns the credits to
     the quarter of the CreditMemoDate. Requirement (4)'s comparison adds two rows: the Furniture credits of the year
     for invoices of earlier years, and the net revenue with those credits moved to the original invoice's year.
@@ -495,11 +495,12 @@ def ex5_1(b: ExerciseBuild) -> None:
         f"{word(f['earlier_memos']).capitalize()} credit memos dated in fiscal {y} ({f['earlier_lines']} lines, "
         f"{f['earlier_furniture_lines']} of them Furniture, {moved:,.2f}) reverse invoices issued in an earlier year: "
         f"the memos are dated {long_date(memo_dates[0], False)} to {long_date(memo_dates[-1])}, and their invoices "
-        f"{long_date(inv_dates[0], False)} to {long_date(inv_dates[-1])}. For this analysis, assign each credit to the "
-        "quarter of the credit memo: that is how the ledger records it, and it leaves the closed periods of the earlier "
-        "year unchanged. Assigning credits to the original invoice's quarter measures the net sale more precisely, but "
-        "it restates periods already closed; either is defensible if the schedule says which it uses. Here the choice "
-        f"moves only {moved:,.2f} out of {q1}. The credits are small (at most {share:.1%} of the Furniture revenue billed in "
+        f"{long_date(inv_dates[0], False)} to {long_date(inv_dates[-1])}. For this schedule of recorded activity, assign "
+        "each credit to the quarter of the credit memo, because that is the date on which the ledger records it. "
+        "Assigning credits to the original invoice's quarter answers a different question, the net result of each "
+        "quarter's sales, and belongs in a separate schedule, labeled as such and reconciled to this one. Neither "
+        "schedule changes the ledger, and an adjustment to an earlier period would need the return, posting, and "
+        f"accounting evidence. Here the choice moves only {moved:,.2f} out of {q1}. The credits are small (at most {share:.1%} of the Furniture revenue billed in "
         f"any quarter) and do not explain the change between {q3} and {q4}: net revenue falls by "
         f"{net[q3] - net[q4]:,.2f}, against {gross[q3] - gross[q4]:,.2f} billed.")
     model_answer(ws, top + n + 2, "Model answer, requirement (4)", answer, last="F")
@@ -598,7 +599,8 @@ def ex5_2(b: ExerciseBuild) -> None:
         "with invoices created after the year began and dated back into the earlier period, a revenue cutoff risk, "
         "although neither test shows who dated them or why; the "
         f"{word(len(o))} are dated before the order was even placed. Sales order numbers always carry the year of their "
-        "date, so the problem lies with how these invoices were dated, not with the numbering.")
+        "date, so the exceptions are concentrated in the invoices. That does not rule out a problem in how invoices "
+        "are numbered, so the invoice creation logs and the numbering policy are the evidence to request.")
     memo = (
         "To: Controller. From: Financial reporting analyst. Re: Invoices whose numbers or dates are inconsistent.\n"
         f"I tested all {f['invoices']:,} sales invoices two ways. First, I compared the year in each invoice number with "
@@ -611,10 +613,10 @@ def ex5_2(b: ExerciseBuild) -> None:
         f"Effect on cutoff: the {word(len(p))} year-end invoices ({sum(r['subtotal'] for r in p):,.2f} of subtotal) "
         "are dated in one fiscal year and numbered in the next, and all of the flagged invoices are dated before their "
         "goods shipped, so their revenue may sit in the wrong period, whichever date the ledger follows. The amounts are "
-        "small, but invoices dated ahead of the shipment at year-end are a cutoff control weakness. I would compare "
+        "small, but invoices dated ahead of the shipment at year-end point to a possible weakness in the cutoff control. I would compare "
         "each invoice's posting date in the ledger with the shipment of its goods, and request from the billing team "
         "the invoice creation logs (who created each invoice and when), the shipping documents for the related orders, "
-        "and the customers' acknowledgments of receipt, together with an explanation of how invoice dates are assigned.")
+        "and the customers' acknowledgments of receipt, together with an explanation of how invoice numbers and dates are assigned.")
     r = top + rows + 2
     r = model_answer(ws, r, "Model answer, requirement (4)", answer4, last="G")
     model_answer(ws, r, "Model answer, requirement (5): memo to the controller", memo, last="G")
@@ -774,7 +776,8 @@ def ex5_4(b: ExerciseBuild) -> None:
         f"The median lag is {fmt(f['median'])} days and the average {f['mean']:.1f}. The average is higher because the "
         "distribution is skewed to the right: most orders are invoiced within a few weeks, but a minority take much "
         f"longer (the 90th percentile is {fmt(f['p90'])} days), and those long lags pull the average up while the median "
-        f"is unaffected. The lag is fairly stable: in fiscal {y} the quarterly averages run from {min(means):.1f} to "
+        f"is unaffected. The lag is fairly stable. In fiscal {y} the quarterly averages, which count each invoice once, "
+        f"run from {min(means):.1f} to "
         f"{max(means):.1f} days and the medians from {fmt(min(medians))} to {fmt(max(medians))}. "
         f"{word(f['negative']).capitalize()} invoices have a negative lag: they are dated before their order "
         "(Exercise 5.2).")
@@ -790,9 +793,10 @@ def ex5_4(b: ExerciseBuild) -> None:
         "The order date explains the "
         "price: a promotional price is set when the order is placed, so promotion lines invoiced after a promotion ends "
         f"(for example {top['after']} of the {top['lines']} lines of {top['code']}) are not errors, and the order date "
-        "should be used only to attribute those discounts to the promotion that caused them. Because the lag is fairly stable "
-        "from quarter to quarter, the share of a promotion's orders invoiced in the following quarter is predictable "
-        "rather than a distortion of the comparison. "
+        "should be used only to attribute those discounts to the promotion that caused them. The quarterly averages are "
+        "similar, but that does not make the share of a promotion's orders invoiced in the following quarter "
+        "predictable, because it also depends on when in the promotion the orders were placed, so read each "
+        "promotion's own order and invoice dates. "
         f"Promotions {series(p['code'][-3:] for p in every)} have every line invoiced after the end date because "
         f"their recorded dates do not span their sales ({one_day_text} and {word(backwards)} whose end date precedes "
         "the start date), a master-data question left for the audit analytics chapter (Chapter 8).")
@@ -1081,7 +1085,8 @@ def ex5_6(b: ExerciseBuild) -> None:
         f"its status history. {word(len(prelaunch)).capitalize()} items were invoiced before their "
         f"LaunchDate ({prelaunch_text}; "
         f"{sum(p['lines'] for p in prelaunch)} lines and {sum(p['amount'] for p in prelaunch):,.2f} in all), so the "
-        "launch dates are wrong or sales were recorded before launch. Together, the findings mean the status and launch "
+        "launch dates or the invoice dates need corroboration, since a relaunch or a later change to the item master "
+        "could also explain them. Together, the findings mean the status and launch "
         "fields, as they stand, are not evidence that sales of inactive or unlaunched items are blocked; the item "
         "master needs a review of who maintains these fields, and the sales tests should not use them to define "
         "their populations.")

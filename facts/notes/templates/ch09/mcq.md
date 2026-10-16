@@ -14,5 +14,5 @@
      12 C: the clauses must be written as SELECT, FROM, WHERE, ORDER BY, LIMIT.
      13 A: % matches any run of characters; = compares the pattern literally, _ matches exactly one character, and IN needs an exact value.
      14 D: documentation lets another person understand, rerun, and review the queries; the data release and cutoff make it stronger.
-     15 B: two whole numbers divide as whole numbers, a decimal keeps the fraction, and text never equals a number when
+     15 B: two INTEGER values divide as integers, a REAL operand keeps the fraction, and text never equals a number when
      neither side has an affinity (a column or a CAST); SELECT needs no FROM. -->

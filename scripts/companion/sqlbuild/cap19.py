@@ -109,8 +109,10 @@ def r1(b):
             "SalesCommissionAdjustment": (v["cb"]["n"], None, None, None, v["cb"]["total"]),
             "CashReceipt": (v["receipts"], None, None, None, v["receipt_total"]),
             "CashReceiptApplication": (v["apps"], None, None, None,
-                                       d.one("SELECT ROUND(SUM(AppliedAmount), 2) FROM CashReceiptApplication"))}
-    checks = [Check("tables profiled", 11, len)]
+                                       d.one("SELECT ROUND(SUM(AppliedAmount), 2) FROM CashReceiptApplication")),
+            "SalesCommissionPaymentLine": (d.one("SELECT COUNT(*) FROM SalesCommissionPaymentLine"), None, None, None,
+                                           d.one("SELECT ROUND(SUM(NetPaymentAmount), 2) FROM SalesCommissionPayment"))}
+    checks = [Check("tables profiled", 12, len)]
     for t, (k, first, last, cust, amt) in rows.items():
         checks.append(Check(f"{t} rows", k, lambda r, t=t: r.where(TableName=t)["Records"]))
         checks.append(Check(f"{t} keys unique", k, lambda r, t=t: r.where(TableName=t)["DistinctKeys"]))
@@ -123,7 +125,7 @@ def r1(b):
             checks.append(Check(f"{t} amount", round(amt, 2), lambda r, t=t: r.where(TableName=t)["Amount"]))
     checks.append(Check("missing keys, dates, or people", 0, lambda r: r.total("Missing")))
     s.query("Requirement 1, test M1: a data profile of each of the cycle's tables (Chapter 10)",
-            "Population: every row of the eleven tables; expected: unique keys, dates in the window, nothing missing",
+            "Population: every row of the twelve tables; expected: unique keys, dates in the window, nothing missing",
             """\
 SELECT 'SalesReturn' AS TableName, COUNT(*) AS Records,
     COUNT(DISTINCT ReturnNumber) AS DistinctKeys,
@@ -178,6 +180,16 @@ SELECT 'SalesCommissionPayment', COUNT(*), COUNT(DISTINCT PaymentNumber),
     ROUND(SUM(NetPaymentAmount), 2),
     SUM(CASE WHEN ApprovedByEmployeeID IS NULL THEN 1 ELSE 0 END)
 FROM SalesCommissionPayment
+UNION ALL
+SELECT 'SalesCommissionPaymentLine', COUNT(*),
+    COUNT(DISTINCT SalesCommissionPaymentLineID), NULL, NULL, NULL,
+    ROUND(SUM(Amount), 2),
+    SUM(CASE WHEN SalesCommissionPaymentID IS NULL OR SourceDocumentID IS NULL
+        OR SalesRepEmployeeID IS NULL OR Amount IS NULL
+        OR SourceDocumentType IS NULL
+        OR SourceDocumentType NOT IN ('SalesCommissionAccrual',
+            'SalesCommissionAdjustment') THEN 1 ELSE 0 END)
+FROM SalesCommissionPaymentLine
 UNION ALL
 SELECT 'SalesCommissionRate', COUNT(*),
     COUNT(DISTINCT SalesCommissionRateID), MIN(EffectiveStartDate),
@@ -330,6 +342,16 @@ FROM CustomerRefund;""",
          "y.CreditMemoLineID = x.CreditMemoLineID", "y.SalesCommissionAdjustmentID"),
         ("Clawbacks without an accrual", "SalesCommissionAdjustment AS x", "SalesCommissionAccrual AS y",
          "y.SalesCommissionAccrualID = x.SalesCommissionAccrualID", "y.SalesCommissionAccrualID"),
+        ("Payment lines without a payment", "SalesCommissionPaymentLine AS x", "SalesCommissionPayment AS y",
+         "y.SalesCommissionPaymentID = x.SalesCommissionPaymentID", "y.SalesCommissionPaymentID"),
+        ("Payments without a line", "SalesCommissionPayment AS x", "SalesCommissionPaymentLine AS y",
+         "y.SalesCommissionPaymentID = x.SalesCommissionPaymentID", "y.SalesCommissionPaymentLineID"),
+        ("Payment lines without their accrual", "SalesCommissionPaymentLine AS x", "SalesCommissionAccrual AS y",
+         "y.SalesCommissionAccrualID = x.SourceDocumentID", "y.SalesCommissionAccrualID",
+         "x.SourceDocumentType = 'SalesCommissionAccrual'"),
+        ("Payment lines without their clawback", "SalesCommissionPaymentLine AS x", "SalesCommissionAdjustment AS y",
+         "y.SalesCommissionAdjustmentID = x.SourceDocumentID", "y.SalesCommissionAdjustmentID",
+         "x.SourceDocumentType = 'SalesCommissionAdjustment'"),
         ("Applications without a receipt", "CashReceiptApplication AS x", "CashReceipt AS y",
          "y.CashReceiptID = x.CashReceiptID", "y.CashReceiptID"),
         ("Applications without an invoice", "CashReceiptApplication AS x", "SalesInvoice AS y",
@@ -592,14 +614,26 @@ ORDER BY c.FiscalYear;""", checks)
               Check("differences", [0.0] * len(yrs), lambda r: r.col("Difference"))]
     checks += [Check(f"Cr {a} by year", [round(x, 2) for x in want], lambda r, a=a: r.col(f"Cr{a}"))
                for a, want in cogs.items()]
-    s.query("Requirement 2, test G2: the returns' standard cost reconciled to inventory and cost of goods sold",
-            "Population: every return line and the returns' GLEntry rows; expected: no difference in any year",
-            """\
+    checks += [Check(f"return cost by item to {a} by year", [round(x, 2) for x in want],
+                     lambda r, a=a: r.col(f"Cost{a}")) for a, want in cogs.items()]
+    checks += [Check(f"differences on {a}", [0.0] * len(yrs), lambda r, a=a: r.col(f"Diff{a}")) for a in cogs]
+    src = ",\n".join(f"        SUM(CASE WHEN a.AccountNumber = {a}\n"
+                     f"            THEN srl.ExtendedStandardCost ELSE 0 END) AS Cost{a}" for a in cogs)
+    by_acct = ",\n".join(f"    ROUND(r.Cost{a}, 2) AS Cost{a}, ROUND(l.Cr{a}, 2) AS Cr{a},\n"
+                         f"    ROUND(r.Cost{a} - l.Cr{a}, 2) AS Diff{a}" for a in cogs)
+    s.query("Requirement 2, test G2: the returns' standard cost reconciled to inventory and to each cost of goods "
+            "sold account",
+            "Population: every return line, by its item's COGS account, and the returns' GLEntry rows; expected: "
+            "no difference",
+            f"""\
 WITH Returns AS (
     SELECT CAST(strftime('%Y', sr.ReturnDate) AS INTEGER) AS FiscalYear,
-        SUM(srl.ExtendedStandardCost) AS AtStandard
+        SUM(srl.ExtendedStandardCost) AS AtStandard,
+{src}
     FROM SalesReturnLine AS srl
         INNER JOIN SalesReturn AS sr ON sr.SalesReturnID = srl.SalesReturnID
+        INNER JOIN Item AS i ON i.ItemID = srl.ItemID
+        INNER JOIN Account AS a ON a.AccountID = i.COGSAccountID
     GROUP BY FiscalYear
 ),
 Ledger AS (
@@ -620,10 +654,9 @@ Ledger AS (
     GROUP BY gl.FiscalYear
 )
 SELECT r.FiscalYear, ROUND(r.AtStandard, 2) AS AtStandard,
-    ROUND(l.Dr1040, 2) AS Dr1040, ROUND(l.Cr5010, 2) AS Cr5010,
-    ROUND(l.Cr5020, 2) AS Cr5020, ROUND(l.Cr5030, 2) AS Cr5030,
-    ROUND(l.Cr5040, 2) AS Cr5040,
-    ROUND(r.AtStandard - l.Dr1040, 2) AS Difference
+    ROUND(l.Dr1040, 2) AS Dr1040,
+    ROUND(r.AtStandard - l.Dr1040, 2) AS Difference,
+{by_acct}
 FROM Returns AS r
     LEFT JOIN Ledger AS l ON l.FiscalYear = r.FiscalYear
 ORDER BY r.FiscalYear;""", checks)
@@ -947,16 +980,16 @@ ORDER BY FiscalYear;""",
              Check(f"{d.C} expectation at the {d.P} rate", round(v["exp"], 2),
                    lambda r: r.where(FiscalYear=d.C)["ExpectedAtPriorRate"]),
              Check("difference", round(v["diff"], 2), lambda r: r.where(FiscalYear=d.C)["Difference"]),
-             Check("difference as a share of the expectation", round(v["diff_pct"], 3),
-                   lambda r: round(r.where(FiscalYear=d.C)["Returns4060"]
-                                   / r.where(FiscalYear=d.C)["ExpectedAtPriorRate"] - 1, 3), 0.0006),
+             Check("difference as a share of the expectation, percent", round(100 * v["diff_pct"], 1),
+                   lambda r: round(100 * (r.where(FiscalYear=d.C)["Returns4060"]
+                                          / r.where(FiscalYear=d.C)["ExpectedAtPriorRate"] - 1), 1), 0.06),
              Check(f"{d.C} expectation at the {d.F} rate", round(v["exp_f"], 2),
                    lambda r: round(r.where(FiscalYear=d.F)["Returns4060"] / r.where(FiscalYear=d.F)["Revenue"]
                                    * r.where(FiscalYear=d.C)["Revenue"], 2)),
-             Check(f"{d.C} returns over the {d.F}-rate expectation", round(v["f_pct"], 3),
-                   lambda r: round(r.where(FiscalYear=d.C)["Returns4060"]
-                                   / (r.where(FiscalYear=d.F)["Returns4060"] / r.where(FiscalYear=d.F)["Revenue"]
-                                      * r.where(FiscalYear=d.C)["Revenue"]) - 1, 3), 0.0006)])
+             Check(f"{d.C} returns over the {d.F}-rate expectation, percent", round(100 * v["f_pct"], 1),
+                   lambda r: round(100 * (r.where(FiscalYear=d.C)["Returns4060"]
+                                          / (r.where(FiscalYear=d.F)["Returns4060"] / r.where(FiscalYear=d.F)["Revenue"]
+                                             * r.where(FiscalYear=d.C)["Revenue"]) - 1), 1), 0.06)])
     s.query("Requirement 3, test P2: income before income taxes as recorded (the base of materiality)",
             "Population: revenue and expense postings, closes left out (no tax account); expected: one row a year",
             f"""\
@@ -1010,7 +1043,11 @@ def r4(b):
                          lambda r, doc=doc, ti=title: r.where(Document=doc, JobTitle=ti)["AboveLimit"]),
                    Check(f"{doc} by {title}, amount above the limit", round(above_amt, 2),
                          lambda r, doc=doc, ti=title: r.where(Document=doc, JobTitle=ti)["AboveLimitAmount"])]
-    checks += [Check("credits above the limit", v["cm_above"]["n"],
+    checks += [Check("documents whose approver has no recorded limit (missing data, not a limit of 0)",
+                     d.one("SELECT COUNT(*) FROM (SELECT ApprovedByEmployeeID AS e FROM CreditMemo UNION ALL "
+                           "SELECT ApprovedByEmployeeID FROM CustomerRefund) JOIN Employee ON EmployeeID = e "
+                           "WHERE MaxApprovalAmount IS NULL"), lambda r: r.total("LimitMissing")),
+               Check("credits above the limit", v["cm_above"]["n"],
                      lambda r: sum(x["AboveLimit"] for x in dicts(r) if x["Document"] == "CreditMemo")),
                Check("credits above the limit, amount", v["cm_above"]["amt"],
                      lambda r: round(sum(x["AboveLimitAmount"] for x in dicts(r) if x["Document"] == "CreditMemo"), 2)),
@@ -1028,7 +1065,8 @@ def r4(b):
                Check("the Accounting Manager's refunds, amount", v["within"]["amt"],
                      lambda r: r.where(Document="CustomerRefund", JobTitle="Accounting Manager")["Amount"])]
     s.query("Requirement 4, test T1: authority for credits and refunds against the approver's limit, by job title",
-            "Population: every credit and refund (MaxApprovalAmount, blank as 0); expected: none above the limit",
+            "Population: every credit and refund (MaxApprovalAmount, a blank counted apart); expected: none above "
+            "the limit",
             """\
 WITH Approvals AS (
     SELECT 'CreditMemo' AS Document, cm.GrandTotal AS Amount,
@@ -1040,10 +1078,12 @@ WITH Approvals AS (
 )
 SELECT ap.Document, e.JobTitle, COUNT(*) AS Documents,
     ROUND(SUM(ap.Amount), 2) AS Amount,
-    MAX(COALESCE(e.MaxApprovalAmount, 0)) AS HighestLimit,
-    SUM(CASE WHEN ap.Amount > COALESCE(e.MaxApprovalAmount, 0)
+    MAX(e.MaxApprovalAmount) AS HighestLimit,
+    SUM(CASE WHEN e.MaxApprovalAmount IS NULL
+        THEN 1 ELSE 0 END) AS LimitMissing,
+    SUM(CASE WHEN ap.Amount > e.MaxApprovalAmount
         THEN 1 ELSE 0 END) AS AboveLimit,
-    ROUND(SUM(CASE WHEN ap.Amount > COALESCE(e.MaxApprovalAmount, 0)
+    ROUND(SUM(CASE WHEN ap.Amount > e.MaxApprovalAmount
         THEN ap.Amount ELSE 0 END), 2) AS AboveLimitAmount
 FROM Approvals AS ap
     INNER JOIN Employee AS e ON e.EmployeeID = ap.EmployeeID
@@ -1084,7 +1124,8 @@ ORDER BY p.DocumentDate;""",
             [Check("documents outside employment", 0, len)])
     cc_ids = {m["id"] for m in t.cash_credit}
     early_ids = {m["id"] for m in t.cc_early}
-    s.query("Requirement 4, test T3: separation of duties: the credit's approver handled the invoice's cash",
+    s.query("Requirement 4, test T3: separation of duties: the credit's approver applied the invoice's cash "
+            "(AppliedCash, the rule; RecordedCash, an extension)",
             "Population: every credit and the receipts applied to its invoice; expected: no rows",
             """\
 WITH Handled AS (
@@ -1266,7 +1307,7 @@ ORDER BY rf.RefundNumber;""",
              Check("most days until paid", v["wait"]["hi"], lambda r: max(r.col("DaysUntilPaid"))),
              Check("mean days until paid", round(v["wait"]["mean"], 1),
                    lambda r: round(sum(r.col("DaysUntilPaid")) / len(r), 1), 0.051)])
-    s.query("Requirement 4, test T7: the cause of T6: credits posted to 2060 while nothing was paid",
+    s.query("Requirement 4, test T7: the cause of T6: credits posted to 2060 before any cash was applied to the invoice",
             "Population: the credits' postings to 1020 and 2060; expected: credits on unpaid invoices reduce 1020",
             """\
 WITH Parts AS (
@@ -1289,13 +1330,24 @@ SELECT COUNT(*) AS Credits,
             FROM CashReceiptApplication AS cra
             WHERE cra.SalesInvoiceID = cm.OriginalSalesInvoiceID
                 AND cra.ApplicationDate <= cm.CreditMemoDate)
-        THEN 1 ELSE 0 END) AS To2060WithNothingPaid
+        THEN 1 ELSE 0 END) AS To2060NothingApplied,
+    SUM(CASE WHEN p.To2060 > 0 AND NOT EXISTS (
+            SELECT 1
+            FROM CashReceiptApplication AS cra
+                INNER JOIN CashReceipt AS cr
+                    ON cr.CashReceiptID = cra.CashReceiptID
+            WHERE cra.SalesInvoiceID = cm.OriginalSalesInvoiceID
+                AND cr.ReceiptDate <= cm.CreditMemoDate)
+        THEN 1 ELSE 0 END) AS To2060NothingReceived
 FROM Parts AS p
     INNER JOIN CreditMemo AS cm ON cm.CreditMemoID = p.CreditMemoID;""",
             [Check("credits", len(c.cm), lambda r: r.value("Credits")),
              Check("credits to 2060", v["to_2060"], lambda r: r.value("CreditsTo2060")),
              Check("credits to both", context(b, "r1")["both"], lambda r: r.value("CreditsToBoth")),
-             Check("credits to 2060 with nothing paid", v["unpaid_2060"], lambda r: r.value("To2060WithNothingPaid"))])
+             Check("credits to 2060 with no application by the credit date", v["unpaid_2060"],
+                   lambda r: r.value("To2060NothingApplied")),
+             Check("credits to 2060 with no receipt dated by the credit date", v["unrcpt_2060"],
+                   lambda r: r.value("To2060NothingReceived"))])
     cb = n.clawbacks(d)
     off = sorted(a["num"] for a in cb["off"])
     s.query("Requirement 4, test T8: the clawbacks tested for completeness and accuracy",
@@ -1520,9 +1572,12 @@ FROM PayrollRegister;""",
                    lambda r: [r.where(Activity="Payroll registers approved")[k]
                               for k in ("Documents", "ByAccountingManager")])])
     s.answer("Requirement 4", f"""\
-Definitions used. Authority: a document above its approver's MaxApprovalAmount (a blank limit read as 0), the only
-authority the records hold; a delegation of authority for credits and refunds, if one exists, is outside them. Cash and
-credit: the credit's approver applied a receipt to the credited invoice (T3; recorded or applied, {v['cc_rec']['n']}).
+Definitions used. Authority: a document above its approver's MaxApprovalAmount, the only
+authority the records hold, with a blank limit counted apart as missing data rather than read as a limit of zero (none is blank); a
+delegation of authority for credits and refunds, if one exists, is outside the records. Cash and credit: the credit's
+approver applied a receipt to the credited invoice (T3), the rule Requirement 4 states; testing the people who recorded
+the receipts as well, an accepted extension when stated, gives {v['cc_rec']['n']} credits
+({money(v['cc_rec']['amt'])}), {v['rec_only']['n']} of them recorded only.
 Before payment: the refund is dated before the last application of the customer's payments to the credited invoice
 (T6), the case's definition; the receipts' own dates are the alternative T6 reports beside it. Past due: on the refund
 date, an invoice of the customer dated by then, less the applications and credits dated by then, still open with its
@@ -1540,8 +1595,9 @@ approved the credit, and every return was received in the warehouse by someone o
 {v['nothing_rcpt']['n']} of them before any receipt, and the {v['same']['n']} the definitions part on are dated the day
 of the last receipt, whose order on that day the records cannot show; neither date shows when the cash cleared the
 bank (T6). The cause is in
-T7: {v['unpaid_2060']} of the {v['to_2060']} credits posted to 2060 were posted when nothing had been applied to the
-invoice, so a refundable balance appeared in 2060 before the cash that supports it. {v['pd2']['n']} refunds were
+T7: {v['unpaid_2060']} of the {v['to_2060']} credits posted to 2060 were posted before any cash had been applied to the
+invoice ({v['unrcpt_2060']} before any receipt was dated), so a refundable balance appeared in 2060 before the cash that
+supports it. {v['pd2']['n']} refunds were
 paid to customers whose past-due balance was at least the refund ({money(v['pd2']['amt'])}), and {v['mism']['n']} went
 by a method none of the invoice's receipts used, an anomaly to follow up (T10). The clawbacks are complete and at the
 accrual's rate; the {len(off)} amounts T8 lists are exact half-cent products that SQLite's ROUND, in binary floating
@@ -1720,7 +1776,7 @@ SELECT COUNT(*) AS Credits,
 FROM Credits;""",
             [Check("credits", v["n_cm"], lambda r: r.value("Credits")),
              Check("distinct invoices", sub["distinct_inv"], lambda r: r.value("Invoices")),
-             Check("tax rate", sub["rate"], lambda r: r.value("TaxRate")),
+             Check("tax rate, percent", round(100 * sub["rate"], 1), lambda r: round(100 * r.value("TaxRate"), 1), 0.05),
              Check("above the invoice", sub["above_invoice"], lambda r: r.value("AboveInvoice")),
              Check("SubTotal not the lines", v["n_cm"] - sub["sub_ok"], lambda r: r.value("SubTotalNotLines")),
              Check("tax off", v["n_cm"] - sub["tax_ok"], lambda r: r.value("TaxOff")),
@@ -1800,7 +1856,8 @@ ORDER BY Restocked DESC;""",
                    lambda r: round(sum(r.where(ReasonCode=x)["BelowStandard"] for x in ("Damaged", "Quality Concern")),
                                    2)),
              Check("all returns restocked", round(context(b, "r1")["sr_dr"], 2), lambda r: r.total("Restocked"))])
-    s.query("Requirement 7, test S5: lapping: receipts against invoices, deposits, and applications",
+    s.query("Requirement 7, test S5: lapping: receipts against invoices, deposits, and applications (the raw lag, "
+            "then the lag after the later of receipt and invoice)",
             "Population: every receipt and application; expected: own customer's invoices, short delays, fully applied",
             """\
 WITH Applied AS (
@@ -1824,6 +1881,18 @@ SELECT
      FROM CashReceipt) AS MinDepositDays,
     (SELECT MAX(julianday(DepositDate) - julianday(ReceiptDate))
      FROM CashReceipt) AS MaxDepositDays,
+    (SELECT MIN(julianday(ApplicationDate) - julianday(ReceiptDate))
+     FROM Applied) AS MinReceiptToApplication,
+    (SELECT MAX(julianday(ApplicationDate) - julianday(ReceiptDate))
+     FROM Applied) AS MaxReceiptToApplication,
+    (SELECT COUNT(*)
+     FROM Applied
+     WHERE julianday(ApplicationDate) - julianday(ReceiptDate) > 2)
+        AS AppliedAfterTwoDays,
+    (SELECT COUNT(*)
+     FROM Applied
+     WHERE julianday(ApplicationDate) - julianday(ReceiptDate) > 2
+        AND ReceiptDate < InvoiceDate) AS AfterTwoDaysReceiptFirst,
     (SELECT MIN(julianday(ApplicationDate) - julianday(
         CASE WHEN InvoiceDate > ReceiptDate THEN InvoiceDate
             ELSE ReceiptDate END)) FROM Applied) AS MinApplicationLag,
@@ -1848,8 +1917,16 @@ SELECT
             [Check("applications to another customer's invoice", lap["other"], lambda r: r.value("OtherCustomersInvoice")),
              Check("fewest days to deposit", lap["dep_lo"], lambda r: r.value("MinDepositDays")),
              Check("most days to deposit", lap["dep_hi"], lambda r: r.value("MaxDepositDays")),
-             Check("fewest days to application", lap["lag_lo"], lambda r: r.value("MinApplicationLag")),
-             Check("most days to application", lap["lag_hi"], lambda r: r.value("MaxApplicationLag")),
+             Check("fewest days from receipt to application", lap["raw_lo"], lambda r: r.value("MinReceiptToApplication")),
+             Check("most days from receipt to application", lap["raw_hi"], lambda r: r.value("MaxReceiptToApplication")),
+             Check("applications more than two days after the receipt", lap["raw_over"],
+                   lambda r: r.value("AppliedAfterTwoDays")),
+             Check("... of receipts dated before their invoice", lap["raw_over_early"],
+                   lambda r: r.value("AfterTwoDaysReceiptFirst")),
+             Check("fewest days from the later of receipt and invoice to application", lap["lag_lo"],
+                   lambda r: r.value("MinApplicationLag")),
+             Check("most days from the later of receipt and invoice to application", lap["lag_hi"],
+                   lambda r: r.value("MaxApplicationLag")),
              Check("receipts not fully applied", lap["not_full"], lambda r: r.value("NotFullyApplied")),
              Check("receipts applied to later invoices", lap["early_receipts"], lambda r: r.value("ReceiptsBeforeInvoice")),
              Check("those applications", lap["early_apps"], lambda r: r.value("ApplicationsBeforeInvoice")),
@@ -2022,16 +2099,20 @@ twice, and price and discount equal the invoice line's (S1); LineTotal is ROUND(
 half-cent on line {', '.join(str(x) for x in v['half'])}, an exact half-cent product, while by exact decimal rounding
 half up lines {', '.join(str(x) for x in v['half_up'])} are a cent lower: rounding, not errors. The {v['n_cm']} credits
 are on as many invoices, none above its invoice, with SubTotal equal to the lines and tax at {sub['rate']:.1%} of
-SubTotal plus freight on all of them (S2), a rate read from the credits' own totals, so a diagnostic the invoices'
-tax treatment would confirm; a test on SubTotal alone would flag the {v['with_freight']} credits with freight. No
-freight credit exceeds the invoice's freight, an upper bound, since no freight policy is in the records. 2060 holds {len(items)} Issued credits at the year-end
-(S3). Returned goods go back at standard cost, with no write-down for damaged goods: Damaged
+SubTotal plus freight on all of them (S2), a rate read from the credits' own totals, which every invoice's tax
+corroborates (the same rate on SubTotal plus freight), though whether it is right in law lies outside the records; a test
+on SubTotal alone would flag the {v['with_freight']} credits with freight. No freight credit exceeds the invoice's
+freight, an upper bound and not a recomputation, since no freight policy for partial returns is in the records: the
+answer reports that limit and asks for the policy. 2060 holds {len(items)} Issued credits at the year-end
+(S3). Returned goods go back at standard cost, and the chart has no write-down account: Damaged
 {money(v['dmg_total'])}, Damaged and Quality Concern {money(v['both'])} ({money(v['both_c'])} in {d.C}), a valuation
-follow-up (S4); {v['n_frac']} lines of less than one unit sit {money(v['frac_gap'])} below standard.
+follow-up, since these are flows and not the stock still held (S4); {v['n_frac']} lines of less than one unit sit
+{money(v['frac_gap'])} below standard.
 
 Lapping (S5): no receipt is applied to another customer's invoice, deposits follow receipts within {lap['dep_hi']}
-days, every application falls within {lap['lag_hi']} days of the later of the receipt and invoice dates, and every
-receipt is fully applied; the {lap['early_receipts']} receipts applied to invoices dated after them are deposits held
+days, and every receipt is fully applied. Applications come {lap['raw_lo']} to {lap['raw_hi']} days after their receipt,
+and the {lap['raw_over']} that come more than two days after it are all of receipts dated before their invoice: allowing
+for those, every application falls within {lap['lag_hi']} days of the later of the receipt and invoice dates; the {lap['early_receipts']} receipts applied to invoices dated after them are deposits held
 in 2060, not lapping, as far as these tests reach. A first-digit test is a weak procedure here, on Chapter 8's
 criteria, though no minimum count rules it out: the credits and refunds are subsets selected by events (a return, then
 the part of a credit posted to customer deposits), their amounts follow the invoice lines they reverse, and each

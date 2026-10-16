@@ -19,6 +19,7 @@ dates:
   2026-12-07: date.time_records_end.monday
   2026-12-04: date.time_records_end.indirect
   2026-12-18: date.payroll.last_pay
+  2026-12-14: date.payroll.open_start
   2027-02-23: date.gl.end
   2024-01-06: date.je.backdated_created
   2025-03-05: date.trace.invoice
@@ -35,6 +36,12 @@ files:
   # --- the book ---------------------------------------------------------------------------------
   chapters/01-role-of-analytics/chapter.qmd:
     - {rx: 'on or after {Y}', class: real, why: "effective date of the PCAOB amendments"}
+    - {rx: 'effective from {Y}', class: real, why: "IES 2 (2026) is effective from July 1, 2026"}
+  front-matter/preface.qmd:
+    - {rx: 'effective from {Y}', class: real, why: "IES 2 (2026) is effective from July 1, 2026"}
+    - {rx: 'Excel 2021 on {Y}', class: real, why: "Microsoft's support for Excel 2021 ended on October 13, 2026 (Microsoft Lifecycle)"}
+  appendices/d-competencies/appendix.qmd:
+    - {rx: 'effective from {Y}', class: real, why: "IES 2, 3 and 4 (2026) are effective from July 1, 2026"}
   chapters/02-understanding-data/_multiple-choice.qmd:
     - {rx: '(?:on|posted on) {Y}', class: constant, why: "a generic scenario (an ERP extract in March)"}
   chapters/02-understanding-data/_tutorial-01.qmd:
@@ -60,15 +67,19 @@ files:
     - {rx: '*', class: constant, why: "worked examples of SQLite's date functions"}
   chapters/11-analytical-queries/_tutorial-03.qmd:
     - {rx: 'stops on {Y}', key: date.time_records_end}
+  chapters/12-sql-audit-analytics/_exercises.qmd:
+    - {rx: 'work of {Y} to 31', key: date.payroll.open_start}
   chapters/12-sql-audit-analytics/_multiple-choice.qmd:
     - {rx: '(?:on|posted to the ledger on) {Y}', class: shift, why: "a hypothetical cutoff scenario across the year-end of the story"}
   chapters/16-audit-monitoring/_multiple-choice.qmd:
     - {rx: 'after {Y} were backdated|ends on {Y}', key: date.payroll.last_pay}
     - {rx: 'shows {Y}', key: date.payroll.last_pay}
   chapters/16-audit-monitoring/chapter.qmd:
-    - {rx: 'paid on {Y}', key: date.payroll.last_pay}
+    - {rx: 'payroll register is {Y}', key: date.payroll.last_pay}
   chapters/18-make-buy-or-reprice/chapter.qmd:
-    - {rx: '*', class: constant, why: "the story's calendar (a quote that expires on 15 September), with no year"}
+    - {rx: '*', class: constant, why: "the story's calendar (a quote that expires on September 15), with no year"}
+  cases/part-3-case.qmd:
+    - {rx: 'work of {Y} to 31', key: date.payroll.open_start}
   appendices/b-publishing-security/_tutorial-02.qmd:
     - {rx: '*', class: real, why: "Microsoft Learn page dates"}
   appendices/b-publishing-security/_exercises.qmd:

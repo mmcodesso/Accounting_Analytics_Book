@@ -51,7 +51,7 @@ Individual work, or pairs for requirements (2) and (4). For about 75 minutes: 15
 | ProductionCompletion and its lines | Finished units received, valued at standard material and conversion cost | 17,352; 17,352 |
 | WorkOrderClose | The variances posted when a work order closes | 12,998 |
 
-**Check:** each description ties the table to cost analysis (the recipe, the cost of materials, the output, the variance). A strong student adds that Routing, RoutingOperation and WorkCenter plan the steps and capacity, and that LaborTimeEntry, in the Payroll and Time group, holds the actual hours by work order.
+**Check:** each description ties the table to cost analysis (the recipe, the cost of materials, the output, the variance). The requirement then asks for the Manufacturing tables that the focused diagram leaves out. They are Routing, RoutingOperation, WorkCenter, WorkCenterCalendar, and WorkOrderOperationSchedule, which hold the routes, the work centers and their capacity. A strong student adds that LaborTimeEntry, in the Payroll and Time group, holds the actual hours by work order.
 
 ### Requirement (2): Follow the path from product to components
 
@@ -98,7 +98,7 @@ c. On **WorkOrderClose**, read the variance columns of one row.
 
 For the model product, the 175 closes total $50,342.64: material $3,818.85, direct labor -$10,744.73 and overhead $57,268.52, with conversion $46,523.79. A negative amount is a favorable variance. The completions behind them are 1,490.56 units, so the variance is $33.77 a unit, against a standard cost of $300.15.
 
-**Check:** a positive amount is an unfavorable variance, because a close's total is the net debit that it posts to the manufacturing variance account. The total is the material part plus the conversion part, and the conversion part is labor plus overhead, on every close. The material variance is the material issued at standard cost less the standard material of the units completed, so it measures usage and not price. The data do not store an actual cost per unit. The close gives the differences from standard for materials used, labor and overhead; price differences on purchased materials are posted separately, so an actual cost per unit has to be assembled from them. The hours behind the labor variance are in LaborTimeEntry (the model product's work orders have 714 entries), joined by WorkOrderID, a bridge key to the Payroll and Time group.
+**Check:** a positive amount is an unfavorable variance, because a close's total is the net debit that it posts to the manufacturing variance account. The total is the material part plus the conversion part, and the conversion part is labor plus overhead, on every close. The material variance is the material issued at standard cost less the standard material of the units completed, so it measures usage and not price. The data do not store an actual cost per unit. The close gives the differences from standard for materials used, labor and overhead; price differences on purchased materials are posted separately, so an actual cost per unit has to be assembled from them. The hours behind the labor variance are in LaborTimeEntry (the model product's work orders have 714 entries), joined by WorkOrderID, a bridge key to the Payroll and Time group. **Watch for:** the conversion variance added to the labor and overhead variances, which counts them twice.
 
 ### Requirement (5): Write the memo
 
@@ -120,7 +120,7 @@ For the model product, the 175 closes total $50,342.64: material $3,818.85, dire
 
 ## What a strong answer says
 
-- **Requirement (1).** Each table with what a row records, and the two tables outside the diagram that matter for actual hours and capacity.
+- **Requirement (1).** Each table of the diagram with what a row records, the 5 Manufacturing tables the diagram leaves out, and LaborTimeEntry for the actual hours.
 - **Requirement (2).** The path in order, the bill reconciled to the standard cost with the scrap factor, and Item named as a parent and a component.
 - **Requirement (3).** Planned and completed quantities that agree, completions in parts, and the variance columns of the close as the place where plan and result differ.
 - **Requirement (4).** The join path, the sign convention, and what is derived and what is stored.
@@ -142,7 +142,7 @@ A weak answer lists tables, looks for a component table, or says that the databa
 
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
-| Requirement 1: the tables | 15 | Every production table with what a row records | Names without roles |
+| Requirement 1: the tables | 15 | Every table of the diagram with what a row records, and the tables it leaves out | Names without roles |
 | Requirement 2: the path | 25 | The keys in order, the roll-up with the scrap factor, and Item at both ends explained | The path without the roll-up |
 | Requirement 3: the records | 20 | Plan and result tables, partial completions, the variance columns | Tables without the comparison |
 | Requirement 4: the variance | 25 | The join, the sign, and what is derived | The variance without the path |

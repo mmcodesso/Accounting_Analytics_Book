@@ -91,7 +91,7 @@ b. Read the message pane.
 
 The query runs without errors and returns no rows. An empty result is a finding here: no work order close records a total that differs from the sum of its parts, so the parts account for the whole variance of every close. A close with a missing part would not appear either, because its calculation would be NULL; none of the three amounts is NULL in the Charles River data. The check shows that the records are consistent, not that each amount is right.
 
-**Step 6. Find the work orders that have not yet closed.** A work order's variance is recorded only when it closes, so any variance on the work orders open at year-end is not yet in the ledger.
+**Step 6. Find the work orders that have not yet closed.** A work order's variance is recorded only when it closes, so the variance of a work order still open at year-end, if it has one, is not in the ledger.
 
 a. Type and run the query below.
 
@@ -107,7 +107,7 @@ b. Read the number of rows and the Status values in the result.
 c. Change `IS NULL` to `= NULL`, run the query again, and read the message pane.
 d. Change `= NULL` back to `IS NULL`.
 
-The query with IS NULL returns several hundred work orders that were released, in progress, or completed but not closed by the end of the data. Any variance they carry will be recorded when they close, after the data ends; the open status alone does not say how much that will be. The query with `= NULL` returns no rows at all, because a comparison with NULL is never true.
+The query with IS NULL returns several hundred work orders that were released, in progress, or completed, but have no ClosedDate in the records. A variance would be recorded for one of them only if and when it closes, and the open status does not say whether it will close, or how large its variance would be or in which direction. The query with `= NULL` returns no rows at all, because an ordinary comparison with NULL is never true.
 
 **Step 7. Label the open work orders with functions.** Functions can replace a missing value with a label and take a code apart.
 

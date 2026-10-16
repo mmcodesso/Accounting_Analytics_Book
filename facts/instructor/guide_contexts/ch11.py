@@ -238,7 +238,7 @@ def tutorial_111(d, claim) -> dict:
     claim(short > 0 and month_end[:7] == last[:7], "the time records end before the last day of their month")
     claim(no_start > month_end, "without 'start of month' the date lands in the next month")
     jan31 = d.one("SELECT date('2026-01-31', '+1 month')")
-    claim(jan31 == "2026-03-03", "adding a month to 31 January lands on 3 March")
+    claim(jan31 == "2026-03-03", "adding a month to January 31 lands on March 3")
     n_text = d.one("SELECT COUNT(*) FROM WorkOrder WHERE strftime('%Y', ClosedDate) = ?", str(d.C))
     n_num = d.one("SELECT COUNT(*) FROM WorkOrder WHERE strftime('%Y', ClosedDate) = ?", d.C)
     claim(n_text > 0 and n_num == 0, "a strftime year compared with a number finds no rows, and compared with text finds the year's closes")
@@ -261,7 +261,17 @@ def tutorial_111(d, claim) -> dict:
         ROUND(AVG(julianday(ClosedDate) - julianday(CompletedDate)), 1) FROM WorkOrder WHERE ClosedDate IS NOT NULL GROUP BY 1 ORDER BY 1""")
     claim(len(lead) == len(d.years) and lead[-1][2] > 2 * lead[0][2] and max(r[3] for r in lead) < 1.1 * min(r[3] for r in lead),
           "release to completion more than doubles across the window while completion to close stays about the same")
-    return dict(
+    # Step 5's dates checked before the averages are read (review SQL D): one closed work order is completed before its
+    # release, and leaving it out does not move its year's average at one decimal.
+    neg = d.q("SELECT strftime('%Y', ClosedDate), julianday(CompletedDate) - julianday(ReleasedDate) FROM WorkOrder "
+              "WHERE ClosedDate IS NOT NULL AND (CompletedDate < ReleasedDate OR ClosedDate < CompletedDate)")
+    no_dates = d.one("SELECT COUNT(*) FROM WorkOrder WHERE ClosedDate IS NOT NULL AND (ReleasedDate IS NULL OR CompletedDate IS NULL)")
+    neg_year = neg[0][0] if neg else None
+    without = d.one("SELECT ROUND(AVG(julianday(CompletedDate) - julianday(ReleasedDate)), 1) FROM WorkOrder "
+                    "WHERE strftime('%Y', ClosedDate) = ? AND CompletedDate >= ReleasedDate", neg_year) if neg else None
+    claim(len(neg) == 1 and no_dates == 0 and without == next(r[2] for r in lead if r[0] == neg_year),
+          "one closed work order has a completion date before its release date, none lacks a date, and leaving it out does not move its year's average")
+    return dict(neg_days=int(neg[0][1]) if neg else 0, neg_year=neg_year,
         hourly=good["Hourly pay"], salaries=good["Salaries"], employer=good["Employer taxes and benefits"],
         deductions=good["Employee deductions"], ledger=ledger, null_group=no_else[None], broad_hourly=broad["Hourly pay"],
         broad_n=len(broad), n_months=len(pivot), first=pivot[0], quiet=quiet, quiet_low=min(q[3] for q in quiet),
@@ -345,9 +355,19 @@ def tutorial_112(d, claim) -> dict:
     after_cut = d.one("SELECT COUNT(*) FROM WorkOrderOperation WHERE ActualEndDate > (SELECT MAX(WorkDate) FROM LaborTimeEntry)")
     claim(n_null_year > 0 and after_cut > 0 and pk_nocut != last[0][3],
           "without the cut-off, operations with no end date form a group of their own and the last year's ratio moves")
+    # The cohort's record quality (review SQL C): operations counted with no direct time, and with direct time dated after
+    # the operation ended (the late time Chapter 12 tests).
+    quality = d.q("""SELECT strftime('%Y', op.ActualEndDate), COUNT(*), SUM(CASE WHEN lab.Last IS NULL THEN 1 ELSE 0 END),
+        SUM(CASE WHEN lab.Last > op.ActualEndDate THEN 1 ELSE 0 END)
+        FROM WorkOrderOperation AS op LEFT JOIN (SELECT WorkOrderOperationID, MAX(WorkDate) AS Last FROM LaborTimeEntry
+            WHERE LaborType = 'Direct Manufacturing' GROUP BY WorkOrderOperationID) AS lab ON lab.WorkOrderOperationID = op.WorkOrderOperationID
+        WHERE op.ActualEndDate <= (SELECT MAX(WorkDate) FROM LaborTimeEntry) GROUP BY 1 ORDER BY 1""")
+    q_last = quality[-1]
+    claim(all(r[2] > 0.25 * r[1] and 0 < r[3] < r[2] for r in quality),
+          "in every year many counted operations have no direct time and some have direct time dated after they ended")
     firsts = [(t[0], MONTHS[t[1] - 1], t[2], t[3]) for t in top if t[4] == 1]
     three_text = [f"{y}: {and_list(m)}" for y, m in three.items()]
-    return dict(firsts=firsts, three_text=three_text, ytd=[(y, by[(y, 12)][2], by[(y, 12)][3]) for y in d.years], jul=jul, jul_ratio=jul_ratio, aug_ratio=aug_ratio,
+    return dict(ops_last=q_last[1], ops_no_time=q_last[2], ops_late=q_last[3], firsts=firsts, three_text=three_text, ytd=[(y, by[(y, 12)][2], by[(y, 12)][3]) for y in d.years], jul=jul, jul_ratio=jul_ratio, aug_ratio=aug_ratio,
                 prev_jul=jul[5], prev_jan=by[(d.C, 1)][5], msg_alias=rank_msgs[0], msg_direct=rank_msgs[1], top=top, three=three,
                 totals=totals, wc=wc, last=last, plant=[(y, next(r[5] for r in wc if r[0] == str(y))) for y in d.years],
                 packing_inner=pk, qa_inner=qa, packing_fan=pk_fan, qa_fan=qa_fan, packing_nocut=pk_nocut,
@@ -394,6 +414,22 @@ def tutorial_113(d, claim) -> dict:
         d.con.execute("DROP VIEW IF EXISTS temp.MonthlyLaborEfficiency")
     claim("already exists" in again, "creating the view a second time without a DROP fails with 'already exists'")
     claim(via_view == 12, "the view returns the twelve months of the last year")
+    # Coverage (decision N3): the last row's direct time and output end on the last day with time records, its indirect
+    # time a week earlier. The labeled sensitivity stops hours and output alike at the last day of indirect time; the
+    # tutorial keeps its view and calls the row provisional.
+    cut_day = d.one("SELECT MAX(WorkDate) FROM LaborTimeEntry")
+    ind_end = d.one("SELECT MAX(WorkDate) FROM LaborTimeEntry WHERE LaborType = ?", INDIRECT)
+    claim(d.one("SELECT MAX(WorkDate) FROM LaborTimeEntry WHERE LaborType = ?", DIRECT) == cut_day and ind_end < cut_day
+          and ind_end[:7] == cut_day[:7], "direct time ends on the last day with time records and indirect time earlier in the same month")
+    common = measure(d, cut=f"WHERE pc.CompletionDate <= '{ind_end}'",
+                     hours=HOURS.replace("WHERE LaborType <> 'NonManufacturing'",
+                                         f"WHERE LaborType <> 'NonManufacturing' AND WorkDate <= '{ind_end}'"))
+    c_last = common[-1]
+    claim(common[:-1] == view[:-1] and c_last[0] == last[0], "counting both sides to the last day of indirect time changes only the last row")
+    claim(c_last[2] < last[2] and c_last[3] >= last[3] and c_last[4] < last[4],
+          "counted to that day, the last row's direct ratio is lower, its indirect ratio no lower and its total lower")
+    n_round = sum(1 for r in view if abs(r[2] + r[3] - r[4]) > 0.001)
+    claim(0 < n_round < len(view), "in some rows the two rounded ratios do not add to the rounded total")
     first_partial = partial[0]
     comma_msg = error_of(d, "WITH MonthlyOutput AS (SELECT 1 AS Month) MonthlyHours AS (SELECT 1 AS Month) SELECT * FROM MonthlyHours")
     claim(comma_msg.startswith("near"), "a missing comma between two CTEs ends in a syntax error that begins 'near'")
@@ -401,7 +437,8 @@ def tutorial_113(d, claim) -> dict:
     return dict(n_out=n_out, n_hours=n_hours, n_monthly=n_monthly, n_view=len(view), n_partial=len(partial), first_full=view[0][0],
                 first_partial=first_partial, decs=decs, peak=peak, settled_low=min(settled), settled_high=max(settled), last=last,
                 nc_last=nc_last, sep_monthly=sep_monthly, sep_view=len(sep), sep_first=sep[0][0], f13_rows=len(f13),
-                avg_last=avg_last, again=again, via_view=via_view, comma_msg=comma_msg)
+                avg_last=avg_last, again=again, via_view=via_view, comma_msg=comma_msg,
+                cut_day=cut_day, ind_end=ind_end, c_last=c_last, n_round=n_round)
 
 
 # --- the chapter note --------------------------------------------------------------------------------------------------
@@ -671,9 +708,21 @@ def g4(d, claim):
     entries = d.q("""SELECT e.JobTitle, ROUND(AVG(lt.OvertimeHours), 2) FROM LaborTimeEntry lt JOIN Employee e ON e.EmployeeID = lt.EmployeeID
         WHERE lt.LaborType <> 'NonManufacturing' AND lt.WorkDate BETWEEN ? AND ? GROUP BY 1 ORDER BY 1""", lo, hi)
     claim(all(e[1] < 2 for e in entries), "the average overtime of a time entry is about an hour, which is not the figure per employee")
+    # Coverage (decision N3): indirect time ends a week before direct time, so the sensitivity stops both at the earlier day.
+    ind_end = d.one("SELECT MAX(WorkDate) FROM LaborTimeEntry WHERE LaborType = ? AND WorkDate BETWEEN ? AND ?", INDIRECT, lo, hi)
+    common = [r[2] for r in d.q(f"""{OVERTIME.format(types="<> 'NonManufacturing'", dates=f"BETWEEN '{lo}' AND '{ind_end}'",
+                                                      having=having)} ORDER BY OT DESC, lt.EmployeeID""")]
+    c_total, c_run = sum(common), 0.0
+    for c_half, h in enumerate(common, 1):
+        c_run += h
+        if c_run >= c_total / 2:
+            break
+    claim(c_total < total and len(common) == n and abs(c_half - half) <= 1,
+          "counted to the last day of indirect time, the year has fewer overtime hours, the same employees, and reaches half within one rank of the model")
     return dict(n=n, total=total, no_having=no_having, direct_n=direct_n, direct_total=direct_total, all_n=all_n, all_total=all_total,
                 n_num=num, top5=share[4], top10=share[9], at_half=share[half - 1], before_half=share[half - 2], asc_half=asc_half,
-                ties=ties, entry_low=min(e[1] for e in entries), entry_high=max(e[1] for e in entries))
+                ties=ties, entry_low=min(e[1] for e in entries), entry_high=max(e[1] for e in entries),
+                ind_end=ind_end, c_total=c_total, c_half=c_half)
 
 
 # --- Exercise 11.5: journal entry tests ------------------------------------------------------------------------------------
@@ -681,7 +730,7 @@ def g4(d, claim):
 FLAGS = """SELECT je.EntryNumber, je.EntryType, je.PostingDate, je.TotalAmount,
     {weekend} AS Weekend, {backdated} AS Backdated,
     CASE WHEN je.CreatedByEmployeeID = je.ApprovedByEmployeeID THEN 1 ELSE 0 END AS SelfApproved,
-    CASE WHEN je.TotalAmount > COALESCE(e.MaxApprovalAmount, 0) THEN 1 ELSE 0 END AS AboveLimit,
+    CASE WHEN je.TotalAmount > {limit} THEN 1 ELSE 0 END AS AboveLimit,
     {round} AS RoundAmount
 FROM JournalEntry AS je {join} Employee AS e ON e.EmployeeID = je.ApprovedByEmployeeID"""
 WEEKEND = "CASE WHEN strftime('%w', je.CreatedDate) IN ('0', '6') THEN 1 ELSE 0 END"
@@ -694,7 +743,7 @@ def g5(d, claim):
     need(d, claim, "JournalEntry", "Employee")
 
     def counts(**kw):
-        a = dict(weekend=WEEKEND, backdated=BACKDATED, round=ROUNDED, join="LEFT JOIN")
+        a = dict(weekend=WEEKEND, backdated=BACKDATED, round=ROUNDED, join="LEFT JOIN", limit="e.MaxApprovalAmount")
         a.update(kw)
         return d.q(f"SELECT COUNT(*), SUM(Weekend), SUM(Backdated), SUM(SelfApproved), SUM(AboveLimit), SUM(RoundAmount) FROM ({FLAGS.format(**a)})")[0]
 
@@ -710,9 +759,13 @@ def g5(d, claim):
     trunc = d.one("SELECT 5000.5 % 1000")
     claim(trunc == 0, "the % operator truncates 5000.5 to 5000 before dividing, so it reports a remainder of zero")
     inner = counts(join="INNER JOIN")
+    zero_limit = counts(limit="COALESCE(e.MaxApprovalAmount, 0)")
     missing = d.one("SELECT COUNT(*) FROM JournalEntry WHERE ApprovedByEmployeeID IS NULL")
-    claim(missing == 0 and inner == model, "every entry has an approver, so an inner join and the COALESCE change nothing here")
-    scored = f"SELECT *, Weekend + Backdated + SelfApproved + AboveLimit + RoundAmount AS RiskScore FROM ({FLAGS.format(weekend=WEEKEND, backdated=BACKDATED, round=ROUNDED, join='LEFT JOIN')})"
+    data_missing = d.one("SELECT COUNT(*) FROM JournalEntry AS je LEFT JOIN Employee AS e ON e.EmployeeID = je.ApprovedByEmployeeID "
+                         "WHERE e.EmployeeID IS NULL OR e.MaxApprovalAmount IS NULL")
+    claim(missing == 0 and data_missing == 0 and inner == model == zero_limit,
+          "every entry has an approver with a recorded limit, so an inner join, or a missing limit read as zero, would change nothing here")
+    scored = f"SELECT *, Weekend + Backdated + SelfApproved + AboveLimit + RoundAmount AS RiskScore FROM ({FLAGS.format(weekend=WEEKEND, backdated=BACKDATED, round=ROUNDED, join='LEFT JOIN', limit='e.MaxApprovalAmount')})"
     ranked = d.q(f"""SELECT RANK() OVER (ORDER BY RiskScore DESC, TotalAmount DESC), EntryNumber, EntryType, TotalAmount, RiskScore FROM ({scored}) WHERE RiskScore >= 2 ORDER BY 1""")
     claim([r[0] for r in ranked] == list(range(1, len(ranked) + 1)), "ranking by score and then amount gives every entry its own rank")
     by_score = d.q(f"SELECT RANK() OVER (ORDER BY RiskScore DESC), COUNT(*) FROM ({scored}) WHERE RiskScore >= 2 GROUP BY RiskScore ORDER BY 1")
@@ -721,7 +774,7 @@ def g5(d, claim):
     claim(outer == (1, len(ranked)), "filtering on the score before or after the ranking gives the same ranks, because the score is not the ranking")
     approvers = d.q("SELECT e.JobTitle, e.MaxApprovalAmount, COUNT(*) FROM JournalEntry je JOIN Employee e ON e.EmployeeID = je.ApprovedByEmployeeID GROUP BY 1, 2 ORDER BY 3 DESC")
     return dict(model=model, ints=ints, nodate=nodate, n_time=n_time, trunc=trunc, modulo=modulo, ranked=ranked, n_ranked=len(ranked),
-                tied=by_score[1][1], missing=missing, n_entries=model[0], approvers=approvers)
+                tied=by_score[1][1], missing=missing, data_missing=data_missing, n_entries=model[0], approvers=approvers)
 
 
 # --- Exercise 11.6: requisitions just under the limit ------------------------------------------------------------------------

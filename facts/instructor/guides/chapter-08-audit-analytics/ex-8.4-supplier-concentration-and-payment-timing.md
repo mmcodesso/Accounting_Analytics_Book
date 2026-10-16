@@ -95,7 +95,7 @@ d. Drag Amount to the **Values** area again, open its **Value Field Settings**, 
 
 ### Requirement (4): The memo
 
-**Step 7. Outline the memo.** To the treasurer. Concentration: no supplier is large in dollars, but spending depends on a category, and a disruption there would reach many suppliers at once; a low-spend supplier can still be critical, which dollars do not show. Timing: most payments are late, a tail is more than a month late, and no supplier's recorded terms offer an early-payment discount, so paying early is a free loan unless a contract says otherwise. Recommendation: pay by due date, ask why so many payments are late, and negotiate discounts or longer terms with the largest suppliers if cash is tight.
+**Step 7. Outline the memo.** To the treasurer. Concentration: no supplier is large in dollars, and the weight lies in categories, but dollars do not measure operational dependence. A low-spend supplier can still be critical, and whether one disruption could reach many suppliers of a category is a question the data cannot answer. Timing: most payments are late, a tail is more than a month late, and no supplier's recorded terms offer an early-payment discount, so paying early is a free loan unless a contract says otherwise. Recommendation: pay by due date, ask why so many payments are late, and negotiate discounts or longer terms with the largest suppliers if cash is tight.
 
 ## Expected results
 
@@ -115,7 +115,7 @@ d. Drag Amount to the **Values** area again, open its **Value Field Settings**, 
 
 ## What a strong answer says
 
-- **Requirement (2).** The three marks read as concentration in dollars, with the largest supplier's share, and the finding that dependence is on categories more than on single suppliers.
+- **Requirement (2).** The three marks read as concentration in dollars, with the largest supplier's share, and the finding that spending is spread across suppliers and weighted by category, which dollars alone do not turn into a measure of dependence.
 - **Requirement (4).** Both findings in the first paragraph, with numbers. The gains and losses of paying late (cash kept longer; late fees, credit holds, worse prices, strained relationships) and of paying early (cash used sooner, a free loan to the supplier without a discount), and a recommendation to schedule runs by due date and to find out why payments are late.
 
 A weak answer calls the company healthy because it pays late, or concentrated because a category is large.

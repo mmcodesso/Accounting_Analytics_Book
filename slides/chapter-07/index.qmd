@@ -68,7 +68,7 @@ Datar and Rajan treat regression as one of the quantitative methods for estimati
 {{< book-figure fig-07-02 >}}
 
 ::: {.notes}
-R Square is the share of the variation the line explains, and Significance F the chance of a fit this good if there were no relationship. The slope's p-value below the conventional five percent threshold marks it as statistically significant, and with one x variable it equals Significance F.
+R Square is the share of the variation the line explains, and Significance F the chance of a fit at least this good if the true slope were zero and the regression's assumptions held. The slope's p-value below the conventional five percent threshold marks it as statistically significant, and with one x variable it equals Significance F.
 :::
 
 ## One start-up month makes a trend look significant
@@ -286,7 +286,7 @@ The budget planned the promotion's lower prices in September and October. The ac
 {{< book-checkpoint 7.2 lead="true" >}}
 
 ::: {.notes}
-The static budget cannot judge the year because its volume was far from reality. Flexed, the plan's prices were slightly optimistic in every line, and the operating expenses were close once the burden rate and the flexed commission are corrected.
+The static budget shows the gap from the plan, but its volume was so far from reality that it is a poor measure of the year's performance. Flexed, the plan's prices were slightly optimistic in every line, and the operating expenses were close once the burden rate and the flexed commission are corrected.
 :::
 
 # Cost-Volume-Profit Analysis and What-If Tools

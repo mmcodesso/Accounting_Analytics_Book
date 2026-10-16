@@ -37,7 +37,7 @@ Students can:
 ## Before you assign
 
 - **Files.** CharlesRiver.xlsx in the folder where students save Charles River Cash Case.pbix, and Power BI Desktop at the release the Part IV chapters use. The model answer is the project in PartIV-case.zip; open it as Opening a Companion File on the Downloads page describes (copy the .pbip and its two folders, open the .pbip, **Change Source**, refresh).
-- **Data conditions.** PurchaseRequisition.Justification names the channel; the order header's RequisitionID is blank on many orders; InventoryPolicy has one row for each item and warehouse; the ledger's last posting date is not the date the data are complete.
+- **Data conditions.** PurchaseRequisition.Justification names the channel; the order header's RequisitionID is blank on many orders; InventoryPolicy has one row for each item and warehouse; the ledger's last posting date is not Data Through, and Data Through itself is a bound observed in the extract, not proof that the data are complete.
 - **Verify first.** After a refresh, the {{ g.n_checks }} Requirement 1 rows of the Checks tab all agree.
 
 ## How to run it
@@ -118,7 +118,7 @@ c. Read Justification, Status and ApprovedByEmployeeID in Requisitions.
 {{ g.d_through }}
 ```
 
-**Check:** Data Through reads {{ g.through }} under any slicer, because `REMOVEFILTERS ()` clears every filter. The ledger runs to {{ g.last }} only because {{ n_pay|count }} supplier payments of {{ d.C }} invoices (${{ pay_amount|money }}, {{ rows_after|count }} rows) follow the year. **Watch for:** two wrong answers. The last posting date puts cash at ${{ cash_last|money }}, and a bridge for {{ d.N }} shows a fall of ${{ fall|money }} that only means the data stop. Adding payroll puts Data Through at {{ g.pay_end }}, and the last quarter goes blank: the last {{ n_open }} pay periods are open.
+**Check:** Data Through reads {{ g.through }} under any slicer, because `REMOVEFILTERS ()` clears every filter. The ledger runs to {{ g.last }} only because {{ n_pay|count }} supplier payments of {{ d.C }} invoices (${{ pay_amount|money }}, {{ rows_after|count }} rows) follow the year. **Watch for:** two wrong answers. The last posting date puts cash at ${{ cash_last|money }}, and a bridge for {{ d.N }} shows a fall of ${{ fall|money }} that only means the data stop. Adding payroll puts Data Through at {{ g.pay_end }}, and the last quarter goes blank, because the last {{ n_open }} pay periods are marked Open in the data and are scheduled to pay in {{ open_pay_year }}. The About page states what Data Through does not show, that no document before it is missing.
 
 **Instructor check.** In **DAX query view**, run this and compare it with the Expected results.
 
@@ -145,7 +145,7 @@ c. Read Justification, Status and ApprovedByEmployeeID in Requisitions.
 - **Model.** Closes flagged and left out of every flow, the channel carried through the order line, the policy grouped before it is merged, every measure defined.
 - **Profiles and links.** Entire data set, each link tested, isolated exceptions recorded.
 - **Validation.** Totals that agree with Tutorial 14.3 and Exercise 14.1, and the new tables tied to account `1045` in a Tests tab.
-- **Data Through.** The earliest of the last posting dates of the documents behind the working-capital accounts, with the reason: supplier payments follow the year, and payroll ends before it.
+- **Data Through.** The earliest of the last posting dates of the documents behind the working-capital accounts, with the reason (supplier payments follow the year, and payroll ends before it) and the limit, a bound observed in the extract rather than proof of completeness.
 
 A weak submission says the totals "look right" and has no Tests tab.
 

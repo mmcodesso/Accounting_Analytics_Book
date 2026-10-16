@@ -1,7 +1,8 @@
 <!-- Instructor notes, Exercise 16.6 (SQL; Chapter 8 and Exercise 12.6; the measures checked in Desktop 2.158's engine on the AM16
      reference model): {{ pairs }} supplier-and-amount pairs on different dates among the payments through {{ asof }} (the self-merge pairs each
      payment with itself and every pair twice, so the filter keeps a DisbursementID below its partner's), {{ within30 }} within 30
-     days, none paying the same invoice (Chapter 8: near-duplicates, not duplicates). Orders Approved = CALCULATE ( COUNTROWS (
+     days, none referring to the same recorded invoice within the test's scope (Chapter 8: near-duplicates, not proven
+     duplicates; one payment per invoice record does not exclude two records of one bill). Orders Approved = CALCULATE ( COUNTROWS (
      PurchaseOrder ), TREATAS ( VALUES ( Employee[EmployeeID] ), PurchaseOrder[ApprovedByEmployeeID] ) ); Registers Approved the
      same on PayrollRegister; Entries Approved = COUNTROWS ( JournalEntry ); the entries' share divides by CALCULATE ( COUNTROWS (
      JournalEntry ), REMOVEFILTERS ( Employee ) ), while the other two divide by COUNTROWS of their table, which Employee does not

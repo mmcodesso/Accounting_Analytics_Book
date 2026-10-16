@@ -77,25 +77,26 @@ a. Add the second query below the first, and run it.
 ```dax
 // (3): users mapped to more than one cost center
 EVALUATE
-FILTER ( ADDCOLUMNS ( VALUES ( Security[UserPrincipalName] ), "CostCenters", CALCULATE ( COUNTROWS ( Security ) ) ), [CostCenters] > 1 )
+FILTER ( ADDCOLUMNS ( VALUES ( Security[UserPrincipalName] ), "CostCenters", CALCULATE ( DISTINCTCOUNT ( Security[CostCenterID] ) ) ), [CostCenters] > 1 )
 ```
 
-**Check:** no rows, because the table has nine users and nine cost centers. **Watch for:** an empty result that is empty because the query is wrong. Add a second row for one user in the Security table of a copy, and the query lists that user with a count of 2.
+**Check:** no rows, because the table has nine users and nine cost centers. **Watch for:** an empty result that is empty because the query is wrong. In a copy of the Security table, add a second row for one user with another cost center, and the query lists that user with 2. A row that repeats an existing mapping exactly is not listed, because the query counts each user's distinct cost centers, not rows.
 
 ### Requirement (4): The matching and the flag
 
 **Step 4. Build the review in three layers.**
 
 a. Add the third query below the second.
-b. Read it from the inside out: Users adds the EmployeeID whose Email matches, Matched looks up five more columns by that ID, and the last layer adds the flag.
+b. Read it from the inside out. Users lists each user once, with the cost centers mapped to the user and the EmployeeID whose Email matches, Matched looks up five more columns by that ID, and the last layer adds the flag, which marks a user if any of those cost centers is not the employee's own.
 c. Choose **Run**.
 
 ```dax
-// (4): each user, the employee whose Email matches, and a flag
+// (4): one row per user, the employee whose Email matches, and a flag
 EVALUATE
 VAR Users =
     ADDCOLUMNS (
-        Security,
+        VALUES ( Security[UserPrincipalName] ),
+        "CostCenterIDs", CALCULATE ( CONCATENATEX ( VALUES ( Security[CostCenterID] ), Security[CostCenterID], ", ", Security[CostCenterID], ASC ) ),
         "EmployeeID", LOOKUPVALUE ( AccessEmployees[EmployeeID], AccessEmployees[Email], Security[UserPrincipalName] )
     )
 VAR Matched =
@@ -111,13 +112,18 @@ RETURN
     ADDCOLUMNS (
         Matched,
         "Flag",
-            SWITCH (
-                TRUE (),
-                ISBLANK ( [EmployeeID] ), "No matching employee",
-                [EmploymentStatus] <> "Active" || NOT ISBLANK ( [TerminationDate] ), "Terminated",
-                [OwnCostCenterID] <> Security[CostCenterID], "Mapped to another cost center",
-                BLANK ()
-            )
+            VAR ThisUser = Security[UserPrincipalName]
+            VAR OwnCenter = [OwnCostCenterID]
+            VAR OtherCenters =
+                COUNTROWS ( FILTER ( Security, Security[UserPrincipalName] = ThisUser && Security[CostCenterID] <> OwnCenter ) )
+            RETURN
+                SWITCH (
+                    TRUE (),
+                    ISBLANK ( [EmployeeID] ), "No matching employee",
+                    [EmploymentStatus] <> "Active" || NOT ISBLANK ( [TerminationDate] ), "Terminated",
+                    OtherCenters > 0, "Mapped to another cost center",
+                    BLANK ()
+                )
     )
 ```
 
@@ -143,7 +149,7 @@ c. Read the table, then choose **Stop viewing**.
 
 ![A mock of the page Ex B.2 viewed as the Sales Manager, the leak that requirement (5) asks students to find.](../figures/appendix-b-publishing-security/IF-AB-2-B.pdf)
 
-**Check:** all 120 employees appear, with their termination dates, while Employee itself shows only the 8 of the Sales cost center. No rule filters a table that no relationship reaches. In **Manage roles**, a rule of `FALSE ()` on AccessEmployees for Cost Center Managers closes it, or the table is kept out of the published file. **Watch for:** the review run under a manager's role. It sees one cost center and one row of Security, so Requirement (2) returns nothing and the gap disappears. Run the review as the file's author.
+**Check:** all 120 employees appear, with their termination dates, while Employee itself shows only the 8 of the Sales cost center. No rule filters a table that no relationship reaches. In **Manage roles**, a rule of `FALSE ()` on AccessEmployees for Cost Center Managers empties it for the role, though its name and columns stay visible, which object-level security would hide too. Keeping the table out of the published file removes it. **Watch for:** the review run under a manager's role. It sees one cost center and one row of Security, so Requirement (2) returns nothing and the gap disappears. Run the review as the file's author.
 
 ### Requirement (6): The note
 
@@ -171,12 +177,12 @@ EVALUATE ROW ( "Unmapped", CONCATENATEX ( FILTER ( CostCenter, ISEMPTY ( FILTER 
 | AccessEmployees rows a manager sees; terminated among them | 120; 13 | 5 |
 | Employee rows the Sales Manager sees | 8 | 5 |
 
-> **Instructor notes, Exercise B.2 (SQL twins; the CR16 reference model):** (2) one cost center, Research and Development (8), whose manager of record is a Product Analyst. Security is unrelated, so RELATEDTABLE cannot be used; EXCEPT ( VALUES ( CostCenter\[CostCenterID\] ), VALUES ( Security\[CostCenterID\] ) ), or a FILTER on CostCenter with a COUNTROWS ( FILTER ( Security, ... ) ) = 0 test, finds it. (3) none: nine users, nine cost centers. (4) all nine names match the Email of an active employee (1 Chief Executive Officer, 6 Sales Manager, 7 Warehouse Manager, 4 Production Manager, 10 Purchasing Manager, 5 Accounting Manager, 11 Customer Service Manager, 12 Marketing Manager, 14 Design Services Manager), each in the cost center the table gives them, so no user is flagged; LOOKUPVALUE ( AccessEmployees\[EmployeeID\], AccessEmployees\[Email\], Security\[UserPrincipalName\] ) inside ADDCOLUMNS. (5) every row of AccessEmployees, all 120 employees with their addresses and termination dates, because no rule filters an unrelated table (the same reason the Customer table still lists every customer for a user missing from the security table). A rule of FALSE () on the table for Cost Center Managers, or keeping the table out of the published file, closes it. Run the review whenever the table changes and at least quarterly, with the controller's approval recorded.
+> **Instructor notes, Exercise B.2 (SQL twins; the CR16 reference model):** (2) one cost center, Research and Development (8), whose manager of record is a Product Analyst. Security is unrelated, so RELATEDTABLE cannot be used; EXCEPT ( VALUES ( CostCenter\[CostCenterID\] ), VALUES ( Security\[CostCenterID\] ) ), or a FILTER on CostCenter with a COUNTROWS ( FILTER ( Security, ... ) ) = 0 test, finds it. (3) none: nine users, nine cost centers. Counting each user's distinct cost centers keeps a mapping typed twice from reading as two. (4) all nine names match the Email of an active employee (1 Chief Executive Officer, 6 Sales Manager, 7 Warehouse Manager, 4 Production Manager, 10 Purchasing Manager, 5 Accounting Manager, 11 Customer Service Manager, 12 Marketing Manager, 14 Design Services Manager), each in the cost center the table gives them, so no user is flagged. One row per user starts from VALUES ( Security\[UserPrincipalName\] ), with LOOKUPVALUE ( AccessEmployees\[EmployeeID\], AccessEmployees\[Email\], Security\[UserPrincipalName\] ) inside ADDCOLUMNS, and flags a user when any of their cost centers is not their own. (5) every row of AccessEmployees, all 120 employees with their addresses and termination dates, because no rule filters an unrelated table (the same reason the Customer table still lists every customer for a user missing from the security table). A rule of FALSE () on the table for Cost Center Managers empties it for the role, though its name and columns stay visible (object-level security hides them too), and keeping the table out of the published file removes it. Run the review whenever the table changes and at least quarterly, with the controller's approval recorded.
 
 ## What a strong answer says
 
-- **(2) to (4)** The review found one cost center without a user, Research and Development, which agrees with Tutorial B.1: nobody sees it until the controller names its manager. It found no user mapped twice and no user who is unmatched, terminated or in another cost center.
-- **(5)** A manager sees every row of AccessEmployees, including the e-mail addresses and termination dates of 120 employees, because no rule or relationship filters it. The fix is a rule of `FALSE ()` for the role, or leaving the table out of the published file.
+- **(2) to (4)** The review found one cost center without a user, Research and Development, which agrees with Tutorial B.1, where no department manager sees it until the controller names its manager. It found no user mapped twice and no user who is unmatched, terminated or in another cost center.
+- **(5)** A manager sees every row of AccessEmployees, including the e-mail addresses and termination dates of 120 employees, because no rule or relationship filters it. The fix is leaving the table out of the published file, or a rule of `FALSE ()` for the role, which empties the table but leaves its name and columns visible.
 - **(6)** Run the review whenever the security table changes and at least quarterly, with the controller's approval recorded, and by someone other than the person who maintains the table.
 - The limits: the review tests status and cost center on the day it runs, and Email stands in for the sign-in name, which the service may spell differently.
 
@@ -187,6 +193,7 @@ A strong answer reports a clean review without calling it proof, and ties the fr
 - **`RELATEDTABLE`.** *Symptom:* the query fails. *Response:* ask whether Security is related to CostCenter.
 - **A flag nobody tested.** *Symptom:* "zero flagged, so it works". *Response:* ask for the test rows and their flags.
 - **The wrong order.** *Symptom:* the unmatched test row reads Terminated. *Response:* ask what a missing employee's status is.
+- **Rows counted, not cost centers.** *Symptom:* a user whose mapping was typed twice is listed in (3), or appears twice in (4). *Response:* ask what (3) and (4) ask about, a cost center or a row.
 - **An auto-created relationship.** *Symptom:* the Sales Manager sees 8 employees of the 120, and the student reports no leak. *Response:* ask Model view what reaches the table.
 - **The review run under a role.** *Symptom:* an empty list of unmapped cost centers. *Response:* ask which rows the role hides.
 - **Findings ignored.** *Symptom:* a table typed in sequence, 2 users flagged, and a note that says all is well. *Response:* ask who sees what.

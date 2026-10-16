@@ -367,7 +367,10 @@ def g3(d, claim):
     scale = wrong[-1]["right"] / share
     param = source_of(claim, "Plant Measure")
     claim(param.count("NAMEOF") == 3, "the Plant Measure parameter lists three measures")
-    return dict(y=y, last=last, wrong=wrong, nonman=nonman, scale=scale, last_share=share, param=param, m_cost=measure(claim, "Labor Cost per Standard Hour"),
+    indirect_end = d.one("SELECT MAX(WorkDate) FROM LaborTimeEntry WHERE LaborType = ? AND substr(WorkDate, 1, 4) = ?",
+                         INDIRECT, str(y))
+    claim(indirect_end < last, "indirect time ends before the cut-off, so the latest year's measures are provisional")
+    return dict(y=y, last=last, indirect_end=indirect_end, wrong=wrong, nonman=nonman, scale=scale, last_share=share, param=param, m_cost=measure(claim, "Labor Cost per Standard Hour"),
                 m_hours=measure(claim, "Manufacturing Hours"), t_chart=visual_title(claim, "ex153", "plantMeasureChart"),
                 t_slicer=visual_title(claim, "ex153", "plantMeasureSlicer"), t_table=visual_title(claim, "ex153", "plantMeasureTable"),
                 dax_cost=check_expr(claim, f"{y} Labor Cost per Standard Hour"),
@@ -411,7 +414,7 @@ def g4(d, claim):
     pw = source_of(claim, "Discount")
     claim("GENERATESERIES ( 0, 20, 1 )" in pw, "the Discount table is GENERATESERIES ( 0, 20, 1 )")
     claim("SELECTEDVALUE ( 'Discount'[Discount], 12 )" in measure(claim, "Discount Value"), "Discount Value falls back to the default of 12")
-    return dict(y=y, name="Design Trade Customer Promotion", n_lines=n_lines, disc=disc, wrong_scale=wrong_scale, no_com_5=no_com[0.05], no_com_12=no_com[0.12], net_price=net_price, net_lift=net_lift,
+    return dict(y=y, version=version(), name="Design Trade Customer Promotion", n_lines=n_lines, disc=disc, wrong_scale=wrong_scale, no_com_5=no_com[0.05], no_com_12=no_com[0.12], net_price=net_price, net_lift=net_lift,
                 n_decimal=len(values), last_decimal=round(values[-1], 2), contrib_without=price * (1 - n15.CASE_RATE) - cost,
                 contrib_with=price * (1 - disc) * (1 - n15.CASE_RATE) - cost, series=pw, m_value=measure(claim, "Discount Value"),
                 m_units=measure(claim, "Design Trade Units"), m_price=measure(claim, "Design Trade Price per Unit"),
@@ -448,6 +451,13 @@ def g5(d, claim):
     cols = _visual("ex155", "forecastFromJanuary")["visual"]["objects"]["forecast"][0]["properties"]["transform"]["parameters"]
     prm = {c["Name"]: c["Literal"]["Value"] for c in cols}
     claim(prm["ForecastLength"] == "3L" and prm["ConfidenceLevel"] == "0.95D", "the Ex 15.5 charts forecast three points at a 95 percent confidence level")
+    answer = json.dumps(_visual("ex155", "ex155Answer"))
+    recorded = [(float(q), float(m)) for q, m in re.findall(r"quarter [\d,.]+, error (-?[\d.]+)% \(monthly ([\d.]+)%\)", answer)]
+    claim(len(recorded) == 2, "the model answer records the quarter and monthly error of both forecasts")
+    claim(all(abs(q) > 100 * abs(note["errors"]["mean"]["quarter"]) for q, _ in recorded),
+          "the mean benchmark has a smaller quarter error than both recorded forecasts")
+    claim(all(m < 100 * note["errors"]["mean"]["monthly"] for _, m in recorded),
+          "both recorded forecasts have a smaller average monthly error than the mean benchmark")
     return dict(y=y, first=first, q4=q4, with_start=with_start, n_all=len(months), n_date=12 * (d.N - d.F + 1),
                 col=column_line(claim, "Date", "MonthStart"),
                 t_jan=visual_title(claim, "ex155", "forecastFromJanuary"), t_feb=visual_title(claim, "ex155", "forecastFromFebruary"),

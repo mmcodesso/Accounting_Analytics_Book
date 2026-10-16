@@ -28,7 +28,7 @@ b. Name B4 `LargeLineThreshold` in the **Name Box**, and format it as currency.
 c. In C4, type `Line total above which a line counts as large`.
 d. Leave B4 in black font, because it is a formula.
 
-The function returns the amount below which 90 percent of the line totals fall. The threshold is a few thousand dollars: well above the median line total, the middle value when the lines are sorted by amount (Chapter 6 returns to it), but far below the largest lines.
+The function returns the amount below which 90 percent of the line totals fall. The threshold is several thousand dollars, well above the median line total, the middle value when the lines are sorted by amount (Chapter 6 returns to it), but far below the largest lines.
 
 **Step 3. Count the large lines and measure their share.**
 
@@ -93,6 +93,6 @@ The absolute reference `$F$20` keeps every copy pointed at the grand total. @fig
 **Checkpoint.** Before moving on, check that:
 
 - the grand total of the grid equals the number of invoice lines;
-- the share block adds up to 100 percent.
+- the share block adds up to 100 percent, which `=SUM(B23:E26)` confirms, because the rounded percentages on display can add up to slightly more.
 
 Then read the grid. Most lines are billed at a segment price list with no discount. Discounts of 8, 10, and 12 percent, the rates of the promotion programs, appear alongside every pricing method except Base List, which Charles River uses only for its hourly design services, such as Design Consultation. A promotion is therefore not a separate way of pricing a line. It is a discount applied on top of the line's price, whichever way that price was set. That is why a slicer on the PromotionID column, which you will add in Tutorial 4.3, is the way to find out which promotions were used.

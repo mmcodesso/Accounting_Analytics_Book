@@ -62,7 +62,7 @@ The proposed promotions are the Harbor Collection Promotion on the items of the 
 - Both are claims the data can test
 
 ::: {.notes}
-Your analysis in Chapter 7 showed that the Furniture Seasonal Promotion would have needed about a third more orders to pay for itself, and that the orders showed no increase at all. The team's answer is that one promotion in one year is not the whole story. Requirement 3 tests both arguments across every promotion and every year in the data.
+Your analysis in Chapter 7 showed that the Furniture Seasonal Promotion would have needed about a third more orders to pay for itself, and that orders in its months rose only slightly, far short of that. The comparison could not show what would have sold without the promotion. The team's answer is that one promotion in one year is not the whole story. Requirement 3 tests both arguments across every promotion and every year in the data.
 :::
 
 ## Four questions from the controller
@@ -113,15 +113,15 @@ OrderLines is built from the order lines and merged with the lookups and Promoti
 Check the data types in each Changed Type step: Discount in OrderLines and BilledLines must be a decimal number, or the rates round to zero. GLEntry is far too large to load before it is filtered. In Excel, a query that only feeds others is loaded with Close & Load To and Only Create Connection; Enable load is Power BI's name for the same idea.
 :::
 
-## Watch out: names that collide, and two kinds of date {.watch-out}
+## Watch out: names that collide, and three dates {.watch-out}
 
 - PromotionProgram repeats three column names of Item and Customer
 - Rename them in Promotions before you merge it into OrderLines
 - A promotion applies by order date: timing and volume use OrderLines
-- Revenue and the ledger follow the invoice date in BilledLines
+- Billed revenue follows the invoice date, the ledger its posting date
 
 ::: {.notes}
-The three columns are ItemGroup, CollectionName and CustomerSegment; rename them, for example to PromoItemGroup, PromoCollection and PromoSegment, because two columns in one query cannot share a name. Chapter 5 showed why the order date and the invoice date must be kept apart.
+The three columns are ItemGroup, CollectionName and CustomerSegment; rename them, for example to PromoItemGroup, PromoCollection and PromoSegment, because two columns in one query cannot share a name. Chapter 5 showed why the order date and the invoice date must be kept apart. The ledger records each invoice on its posting date, which can fall in a later period, as Exercise 6.1 showed, so the tie to the ledger in Requirement 2 reconciles the two.
 :::
 
 ## Check your understanding {.check}
@@ -129,23 +129,23 @@ The three columns are ItemGroup, CollectionName and CustomerSegment; rename them
 Order date or invoice date?
 
 1. Whether a line falls within a promotion's dates
-2. The quarter in which a discount reaches revenue
+2. The quarter in which a discount was billed
 3. The volume ordered in a promotion's months
 4. Tying billed revenue to the ledger
 
 ::: {.notes}
-Ask students which query each question belongs in, OrderLines or BilledLines.
+Ask students which query each question belongs in, OrderLines or BilledLines, and whether one date is enough.
 :::
 
 ## Each question has its date {.answer}
 
 1. Order date: a promotion applies when the order is placed
-2. Invoice date: revenue is recognized when billed
+2. Invoice date, in BilledLines
 3. Order date, in OrderLines
-4. Invoice date, in BilledLines
+4. Both: the invoice date of the lines, the posting date of the ledger
 
 ::: {.notes}
-The two dates can fall in different months, and even in different years. Using the wrong one misplaces both the promotion's months and its cost.
+The dates can fall in different months, and even in different years. Using the wrong one misplaces both the promotion's months and its cost. The ledger has a third date, the posting date, so the tie in Requirement 2 explains the invoices dated in one year and posted in the next.
 :::
 
 # Requirements
@@ -168,7 +168,7 @@ The requirements follow the controller's questions: build and validate the workb
 - **Check:** each control total agrees, and the checks are documented
 
 ::: {.notes}
-Start with a Documentation sheet as in Tutorial 4.3, and a Parameters sheet holding the proposal's three rates and the commission rate of Tutorial 7.3 as named cells, with the inputs in blue. Build OrderLines and BilledLines with their three amounts. Then show the queries are complete: row counts against their sources, what the filters keep, the order lines against the orders, and no discount without a PromotionID.
+Start with a Documentation sheet as in Tutorial 4.3, and a Parameters sheet holding the proposal's three rates and the commission rate of Tutorial 7.3 as named cells, with the inputs in blue. Build OrderLines and BilledLines with their three amounts. Then check the queries against their sources: row counts against the source Tables, what the filters keep, the order lines against the orders, and no discount without a PromotionID.
 :::
 
 ## Measure what the promotions cost
@@ -181,7 +181,7 @@ Start with a Documentation sheet as in Tutorial 4.3, and a Parameters sheet hold
 - **Check:** the net billed ties to the ledger, with any difference explained
 
 ::: {.notes}
-Express each year's discount as a share of that year's billed revenue. For the latest year, the gross-to-net schedule runs from the list amount through the price lists and approved overrides, then the promotional discounts, to the net billed. Find the account where discounts could be recorded, and explain what the income statement shows about the cost. Then show in which quarters the proposed promotions' discounts were billed.
+Express each year's discount as a share of that year's billed revenue. For the latest year, the gross-to-net schedule runs from the list amount through the price reductions of the price lists and overrides, then the promotional discounts, to the net billed. The schedule measures the reductions, but it does not show that each was approved. Find the account where discounts could be recorded, and explain what the income statement shows about the cost. Then show in which quarters the proposed promotions' discounts were billed.
 :::
 
 ## Test whether the promotions brought in sales
@@ -194,7 +194,7 @@ Express each year's discount as a share of that year's billed revenue. For the l
 - **Check:** each difference is judged against the scope's normal variation
 
 ::: {.notes}
-Find the months each promotion actually ran from its lines' order dates, and compare them with its recorded dates. Measure volume at list amount, and say why. Compare each promotion's months with the average of the other months of its year and with the same months a year earlier. Then test the claim about new customers from each customer's first order, and say what the first months of the data cannot tell you.
+Find the months each promotion actually ran from its lines' order dates, and compare them with its recorded dates. Measure volume at list amount, and say why. Compare each promotion's months with the average of the other months of its year and with the same months a year earlier. Then test the claim about new customers from each customer's first order, and say what the first months of the data cannot tell you. The comparisons describe the orders, so they cannot show what would have been ordered without a promotion.
 :::
 
 ## Model the proposed calendar
@@ -207,7 +207,7 @@ Find the months each promotion actually ran from its lines' order dates, and com
 - **Check:** you state the volume basis, and why it is not the budget's
 
 ::: {.notes}
-Extend the model to the three proposed promotions, one column each, from their latest-year billed lines. Build the data table of the Furniture promotion's contribution over discount rates and increases in volume, and use Goal Seek for the discount at which your largest measured increase would just pay. Show how the budgets planned promotions, and estimate the calendar's cost against a budget without them, by quarter.
+Extend the model to the three proposed promotions, one column each, from their latest-year billed lines. Build the data table of the Furniture promotion's contribution over discount rates and increases in volume, and use Goal Seek for the discount at which your largest measured increase would just pay, a sensitivity rather than a recommended rate. Show how the budgets planned promotions, and estimate the calendar's cost against a budget without them, by quarter, as a sensitivity on the latest year's billed volume and mix.
 :::
 
 ## Check your understanding {.check}
@@ -238,13 +238,13 @@ The break-even lift is the margin before the discount divided by the margin afte
 
 {{< book-requirement 5 >}}
 
-- **Produce:** four tests on every promotion line, with causes and dispositions
+- **Produce:** the four tests, the likely causes, and the dispositions
 - **Tool:** custom columns and PivotTables on OrderLines
 - **Revisit:** Exercise 8.6's pricing tests, and Chapter 8's dispositions
 - **Check:** each exception has evidence from outside the record it tests
 
 ::: {.notes}
-Test that each promotion line was ordered within the recorded dates, falls within the scope, carries the promotion's rate, and that every line in scope during the promotion carries it. Where recorded dates fail, look for other evidence of when a promotion was meant to run. Investigate lines outside scope in the item master, review who approved promotions and overrides, and list the conditions for running any promotion.
+Test that each promotion line was ordered within the recorded dates, falls within the scope and carries the promotion's rate. For completeness, start from all order lines, because every line in scope during the promotion should carry it. Where recorded dates fail, look for other evidence of when a promotion was meant to run, keep the result on the recorded dates, and label a test on other dates provisional. Investigate lines outside scope in the item master, review who approved promotions and overrides, and list the conditions for running any promotion.
 :::
 
 ## Check your understanding {.check}
@@ -268,7 +268,7 @@ Ask students whether the control is missing or badly designed, or whether a soun
 4. Operation: the report is sound, but it is not used
 
 ::: {.notes}
-A design weakness needs a new or changed control; an operating failure needs the existing control to be performed. Requirement 5 asks you to make this call for each exception the case's own tests find.
+A design weakness needs a new or changed control; an operating failure needs the existing control to be performed. Requirement 5 asks you to make this call provisionally for each exception the case's own tests find, and to name the evidence that would confirm it.
 :::
 
 ## Write the decision memo

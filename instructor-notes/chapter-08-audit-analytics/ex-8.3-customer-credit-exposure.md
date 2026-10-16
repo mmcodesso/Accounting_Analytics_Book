@@ -112,7 +112,7 @@ d. For each, total the invoices that are past due.
 ## What a strong answer says
 
 - **Requirement (2).** The customers over their limits, the limit and the balance of each, and the observation that nothing is past due: the excess comes from current billing, so the question is who approved the orders and whether the limits are right, not collection.
-- **Requirement (4).** Concentration described as low, with the largest customer's share, the segments and terms with the most past due, and recommendations that follow from the evidence: review limits before stopping shipments, make the system enforce limits, concentrate collection effort where past-due shares are highest. It notes that a snapshot says nothing about how customers have paid in the past.
+- **Requirement (4).** Concentration described by the observed shares and judged against the risk the company accepts, with the largest customer's share, the segments and terms with the most past due, and recommendations that follow from the evidence: review limits before stopping shipments, make the system enforce limits, concentrate collection effort where past-due shares are highest. It notes that a snapshot says nothing about how customers have paid in the past.
 
 A weak answer recommends stopping shipments to the customers over their limits, or reads concentration from the number of customers and not the dollars.
 

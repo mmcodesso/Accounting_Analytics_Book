@@ -82,7 +82,7 @@ D.  Ask the payroll department to remove the short entries from the payroll
 **12.** Of the direct labor hours recorded against work order operations, the share recorded after the operation had ended rose to about two-thirds in fiscal 2026. What does this mean for the controller's analysis?
 
 A.  The manufacturing variance is overstated by about two-thirds of its amount
-B.  The operation records cannot show which operations the direct time belongs to
+B.  The records cannot reliably tie the late hours to their operations
 C.  The employees were paid for about two-thirds more time than they worked
 D.  The standard costs were set too high and should be reduced for fiscal 2027
 

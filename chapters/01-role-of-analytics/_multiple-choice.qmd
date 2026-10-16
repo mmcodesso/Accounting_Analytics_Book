@@ -7,7 +7,7 @@
 A.  Accounting standards now require the use of data visualization tools in all financial reports.
 B.  Analytics skills have replaced the need for accountants to understand generally accepted accounting principles.
 C.  Employers prefer to hire data scientists rather than accountants for financial reporting roles.
-D.  The volume and complexity of financial and operational data have grown beyond what traditional manual methods can effectively analyze.
+D.  The volume and complexity of data have outgrown what manual methods can analyze effectively.
 
 **2.** A management accountant prepares a report showing total manufacturing costs by product line for the past four quarters and calculates the percentage change from quarter to quarter. This activity is best classified as which type of analytics?
 
@@ -32,7 +32,7 @@ D.  Prescriptive analytics
 
 **5.** Which of the following is the correct sequence of stages in the accounting analytics workflow as described in this chapter?
 
-A.  Define the question, access data, clean and prepare data, analyze, visualize, communicate
+A.  Define the question, access data, prepare data, analyze, visualize, communicate
 B.  Access data, define the question, analyze, clean, visualize, communicate
 C.  Analyze data, define the question, visualize, clean, communicate, access data
 D.  Define the question, visualize, access data, analyze, clean, communicate
@@ -53,12 +53,12 @@ D.  The Data Analysis ToolPak
 
 **8.** The book introduces the Order-to-Cash and Accounting Core table groups before the Manufacturing and Payroll and Time groups primarily because:
 
-A.  The O2C and Accounting Core tables are the most accessible starting point for students who are new to analytics tools, and the book builds from simpler to more complex table groups.
+A.  The book starts with the most accessible table groups and builds toward the more complex ones.
 B.  Manufacturing and payroll data is less important for accounting analysis than sales and ledger data.
 C.  Manufacturing and payroll tables use a different database format that requires advanced SQL skills.
 D.  Students must complete all O2C exercises before the Manufacturing tables become available in the dataset.
 
-**9.** Which professional organization made technology and analytics one of the core domains of its competency framework for management accountants?
+**9.** Which professional organization's competency framework, expanded in 2025, includes domains titled Data Analytics and Insights and Emerging Technologies in Accounting?
 
 A.  The Financial Accounting Standards Board (FASB)
 B.  The Securities and Exchange Commission (SEC)
@@ -96,7 +96,7 @@ D.  Master Data
 **14.** Which of the following best describes why this book uses a single dataset in every chapter rather than multiple separate databases?
 
 A.  A single database requires less storage space on student computers than multiple databases.
-B.  Students learn one company's data deeply rather than multiple companies superficially, and a customer order analyzed in Excel appears in the general ledger queried in SQL and surfaces in a Power BI dashboard built later.
+B.  Students learn one business in depth and meet the same transactions in every tool.
 C.  The Charles River database is the only dataset available in both Excel and SQLite formats.
 D.  Using a single dataset allows the book to avoid teaching SQL joins, which require multiple tables.
 

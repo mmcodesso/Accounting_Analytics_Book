@@ -2,8 +2,6 @@
 
 ## References
 
-American Institute of Certified Public Accountants & Chartered Institute of Management Accountants. (2025). *Future-ready finance: Technology, productivity, and skills survey report*. <https://www.aicpa-cima.com/resources/download/future-ready-finance-technology-productivity-and-skills-survey-report>
-
 American Institute of Certified Public Accountants & National Association of State Boards of Accountancy. (2021). *CPA Evolution model curriculum*. <https://www.thiswaytocpa.com/collectedmedia/files/cpa-evolution-model-curriculum-update.pdf>
 
 Appelbaum, D., Kogan, A., Vasarhelyi, M., & Yan, Z. (2017). Impact of business analytics and enterprise systems on managerial accounting. *International Journal of Accounting Information Systems*, *25*, 29–44. <https://doi.org/10.1016/j.accinf.2017.03.003>
@@ -43,6 +41,8 @@ Public Company Accounting Oversight Board. (2024). *Amendments related to aspect
 Richins, G., Stapleton, A., Stratopoulos, T. C., & Wong, C. (2017). Big data analytics: Opportunity or threat for the accounting profession? *Journal of Information Systems*, *31*(3), 63–79. <https://doi.org/10.2308/isys-51805>
 
 Spraakman, G., Sanchez-Rodriguez, C., & Tuck-Riggs, C. A. (2021). Data analytics by management accountants. *Qualitative Research in Accounting & Management*, *18*(1), 127–147. <https://doi.org/10.1108/QRAM-11-2019-0122>
+
+Stroe, R., & Teneva, I. (2025). *Future-ready finance: Technology, productivity, and skills survey report*. Association of International Certified Professional Accountants. <https://www.aicpa-cima.com/resources/download/future-ready-finance-technology-productivity-and-skills-survey-report>
 
 Suarta, I. M., Suwintana, I. K., Sudiadnyani, I. G. A. O., & Sintadevi, N. P. R. (2024). Employability and digital technology: What skills employers want from accounting workers? *Accounting Education*, *33*(3), 274–295. <https://doi.org/10.1080/09639284.2023.2196665>
 

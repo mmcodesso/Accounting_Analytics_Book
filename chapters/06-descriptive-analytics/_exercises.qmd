@@ -78,7 +78,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 (2) Add each product line's share of revenue and share of margin, excluding Services, and identify the product lines whose share of margin is larger than their share of revenue.
 
-(3) Filter the PivotTable to Furniture and replace ItemGroup with ProductType. Identify the two product types with the highest margin percentage and the two with the lowest, and name them with the product type codes from Chapter 5.
+(3) Copy the PivotTable, filter the copy to Furniture, and replace ItemGroup with ProductType in it. Identify the two product types with the highest margin percentage and the two with the lowest, and name them with the product type codes from Chapter 5.
 
 (4) Explain in three to five sentences why the Services margin cannot be read from this PivotTable, and describe the data you would need to measure it.
 

@@ -276,7 +276,7 @@ def if_18_0_b() -> Diagram:
         d.box(label, x, y, wd(value), BAR_H, fill=fill, stroke=stroke or fill, color=color, size=SMALL, rounded=False, stroke_width=1.5)
 
     rows = [("Standard", "What the standards release to the products"),
-            ("Actual absorption", "The case's proxy: every dollar of the inputs on the units made"),
+            ("Actual absorption", "In concept, every dollar of the inputs on the units made"),
             ("Time-driven", "What the products' routing time used, and the capacity left over")]
     pitch = 120.0
     tops = [50.0 + i * pitch for i in range(3)]
@@ -292,7 +292,7 @@ def if_18_0_b() -> Diagram:
     # actual absorption
     y = tops[1]
     seg(X0, y, inputs, f"<b>Every dollar spread over the units made</b><br>${_money(inputs)}, or ${r2['actual_rate']:.2f} a standard hour over {r2['stdh']:,.0f} standard hours completed", BLUE)
-    d.text("<i>Nothing is left over, so the idle capacity, the crew's hours beyond the work and the supervision all sit in the products' cost.</i>",
+    d.text("<i>In concept nothing is left over, so the idle capacity and the supervision sit in the products' cost. The case approximates it with each family's closed variance per unit completed.</i>",
            X0, y + BAR_H + 4, BAR_W, 34, size=SMALL, color=GRAY)
     # time-driven
     y = tops[2]
@@ -911,8 +911,8 @@ def if_18_4_a() -> Diagram:
     bottom = _tabs(d, bottom + 8, "Costs", ["Activities", "Costs", "Make or Buy"])
     _note(d, "Outlined in teal: the products' conversion and the unused capacity cost, the two parts of the inputs to 1090. Outlined in coral: the two differences, "
              "both zero: products plus unused capacity against the inputs (B30, whose formula is in the bar) and, after the setup-allocation bridge in rows "
-             "31 to 34, the item costs' conversion plus the setup difference plus the unused capacity against the same inputs. Column A is widened here to show its "
-             "labels in full; in the workbook a long label is cut at the column's edge.", bottom + 4)
+             "31 to 34, the item costs' conversion plus the setup difference plus the unused capacity against the same inputs. Column A is widened here to show each "
+             "label on one line; in the workbook a long label wraps within the column.", bottom + 4)
     return d
 
 
@@ -1782,8 +1782,8 @@ def if_18_9_a() -> Diagram:
     lo, hi = m["normal"]
     _note(d, f"Outlined in teal: the five components. Outlined in coral: the proposed rate, B10, their sum (its formula is in the bar). Below it come the labor-content case with no indirect "
              f"hours, the current standard (the conversion released per standard hour), the time-driven rate, the base year's actual cost per standard hour, and the proposed rate "
-             f"with supervision and depreciation spread over {lo['share']:.0%} and {hi['share']:.0%} of the plan volume, the ends of the normal-capacity range. Labels are wrapped here; in "
-             f"the workbook a long label is cut at column B. Columns J to Q hold the Table OnHand and are not shown.", bottom + 4)
+             f"with supervision and depreciation spread over {lo['share']:.0%} and {hi['share']:.0%} of the plan volume, the ends of the normal-capacity range. Labels are wrapped here, "
+             f"as the workbook wraps a long label within column A. Columns J to Q hold the Table OnHand and are not shown.", bottom + 4)
     return d
 
 
@@ -1943,14 +1943,15 @@ def if_18_10_b() -> Diagram:
     assert "no more than two pages" in text and "no more than three pages" in text and "decision table" in text, "the page limits are the case's"
     wb = _cached().sheetnames
     memo = _book("Memo")
-    for key, row_start, needle in (("finding", "The plant already pays", "positions of capacity it does not use"), ("views", "The plant already pays", "Both of you are right"),
+    finding = ("On the routings, the plant supplied", "position-equivalents of practical hours")
+    for key, row_start, needle in (("finding", *finding), ("views", finding[0], "Both of you are right"),
                                    ("decisions", "Make ", "only with a committed plan to reduce the crew"), ("paths", "Make ", "Compare the whole paths"),
                                    ("prices", "Raise ", "price lists"), ("standards", "Standards:", "normal capacity"), ("manager", "The one decision only the production manager can make", "")):
         row = _row_of(memo, row_start, 1)
         assert needle in memo.cell(row, 1).value, (key, memo.cell(row, 1).value[:80])
-    assert m["unused_h"] / m["pos_hours"] > m["positions"], "the plant's unused capacity is larger than what buying would free"
+    assert m["unused_h"] > sum(m["freed"].values()), "on the same base, the plant's unused capacity is larger than what buying would free"
     sections = [
-        ("The finding that changes the question", "The plant already pays for more positions than buying would free: fitting the crew to the work is the larger question.", "Requirements<br>3, 4 and 7"),
+        ("The finding that changes the question", "On the routings the plant leaves more hours unused than buying would free, so fitting the crew to the work, week by week, is the larger question.", "Requirements<br>3, 4 and 7"),
         ("The two views of the cost", "The CFO is right that the products cost more than their standards say; the production manager is right that idle capacity belongs to the plant.", "Requirement 4"),
         ("Each decision with its condition", "Make, buy only with a committed plan to reduce the crew, or raise the price, with the decision table of every quoted family and every family below the floor.", "Requirements<br>6 and 8"),
         ("The whole paths compared", "Make and reprice against buy and reprice the rest, with the one-time costs shown.", "The Memo sheet and<br>Requirement 8"),

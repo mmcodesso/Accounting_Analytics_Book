@@ -2,7 +2,7 @@
 
 ## Applied Exercises
 
-Work on the exercises in the Charles River Reports semantic model and report you built in the browser, after Guided Tutorial C.3. Build each exercise on its own report page, named after it (such as `Ex C.2`), and keep each query you write in your Tests.dax file, under a comment line that names the exercise.
+Work on the exercises in the Charles River Reports semantic model and report you built in the browser, after Guided Tutorial C.3 and before Tutorial 14.1, which removes the SalesInvoice fields they use. Build the visuals an exercise asks for on a report page named after it (such as `Ex C.2`), and keep each query you write in your Tests.dax file, under a comment line that names the exercise, with the result it gave.
 
 ### Financial Accounting Exercises
 
@@ -18,7 +18,7 @@ Work on the exercises in the Charles River Reports semantic model and report you
 
 (2) In DAX query view, write a query that returns, for each FiscalYear and Period of SalesInvoice, the invoice lines, revenue, list amount, and discounts, with the amounts rounded to the cent. Run it, and record the four rows of fiscal 2026.
 
-(3) Add up the four quarters of fiscal 2026, and compare the sums with the fiscal 2026 row of the Validation page. Record any difference.
+(3) Add up the four quarters of fiscal 2026, and compare the sums with the fiscal 2026 row of the Validation page. Record any difference, and explain it.
 
 (4) Say which quarter of fiscal 2026 carries the largest share of the year's discounts, give the share, and name the promotions behind it.
 
@@ -54,7 +54,7 @@ Work on the exercises in the Charles River Reports semantic model and report you
 
 **Table group:** Order-to-Cash
 
-**Scenario.** Internal audit wants evidence that the model built in the browser can be returned to a known state after a mistake. The exercise needs a Pro license, because version history does; without one, do requirements (2), (3), and (5), and restore the formula by hand from your notes.
+**Scenario.** Internal audit wants evidence that the model built in the browser can be returned to a known state after a mistake. The exercise needs a Pro license, because version history does, and a model that only you are editing. Do requirements (1) to (4) in one sitting. Without a Pro license, do requirements (2), (3), and (5), restore the formula by hand from your notes, and run the test a third time.
 
 **Requirements.**
 

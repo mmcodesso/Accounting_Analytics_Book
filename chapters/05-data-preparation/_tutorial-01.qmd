@@ -33,7 +33,7 @@ a. Add another column, `CodeCheck`, with this formula:
 
 b. On the **Analysis** worksheet, type `Item codes failing the check` in A40 and enter `=COUNTIF(Item[CodeCheck],FALSE)` in B40.
 
-Every item Charles River sells passes the check, so B40 shows zero: every code has its hyphens in the expected places, so MID takes the product type from the same position in every code. The check cannot show that the three letters it takes are a real product type; for that, read the values in the ProductType column's filter list against @tbl-05-03, which lists the Furniture codes.
+Every item Charles River sells passes the check, so B40 shows zero: every code has its hyphens in the expected places, so MID takes the product type from the same position in every code. The check cannot show that the three letters it takes are a real product type. For that, filter ItemGroup to Furniture, read the values in the ProductType column's filter list against @tbl-05-03, which lists the Furniture codes, and clear the filter.
 
 @fig-05-02 shows the Item Table with both new columns.
 

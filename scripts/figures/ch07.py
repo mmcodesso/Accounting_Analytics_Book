@@ -17,6 +17,7 @@ from drawio import (BLUE, BLUE_TINT, CORAL, GRAY, GRAY_TINT, INK, ROW_H, RULE, S
 GROUPS = ["Furniture", "Lighting", "Textiles", "Accessories"]
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 CLOSE_2026 = "JE-2026-000296"
+DOTTED = "1 2"                                  # Draw.io dash pattern of a dotted chart line
 
 
 # -- statistics without third-party packages ------------------------------------------
@@ -54,11 +55,14 @@ def promotion_model() -> dict:
 # -- drawing helpers --------------------------------------------------------------------
 
 def seg(d: Diagram, x1: float, y1: float, x2: float, y2: float, color: str, width: float = 2,
-        dashed: bool = False) -> None:
-    """A straight line between two points (charts need diagonal segments, not routed edges)."""
+        dashed: bool | str = False) -> None:
+    """A straight line between two points (charts need diagonal segments, not routed edges).
+
+    `dashed` is True for the usual dashes, or a Draw.io dash pattern such as "1 3" for a dotted line."""
     d._track(min(x1, x2), min(y1, y2), abs(x2 - x1), abs(y2 - y1))
+    pattern = dashed if isinstance(dashed, str) else "6 4"
     style = (f"endArrow=none;startArrow=none;html=1;strokeColor={color};strokeWidth={width:g};"
-             f"{'dashed=1;dashPattern=6 4;' if dashed else ''}")
+             f"{f'dashed=1;dashPattern={pattern};' if dashed else ''}")
     d.cells.append(
         f'<mxCell id="{d._id("s")}" value="" style="{style}" edge="1" parent="1">'
         f'<mxGeometry relative="1" as="geometry"><mxPoint x="{x1:g}" y="{y1:g}" as="sourcePoint"/>'
@@ -82,7 +86,7 @@ def axis(d: Diagram, left: float, right: float, top: float, height: float, lo: f
     return y_of
 
 
-def legend(d: Diagram, x: float, y: float, items: list[tuple[str, bool, str]], gap: float = 280) -> None:
+def legend(d: Diagram, x: float, y: float, items: list[tuple[str, bool | str, str]], gap: float = 280) -> None:
     for color, dashed, label in items:
         seg(d, x, y + 12, x + 36, y + 12, color, 2.5, dashed)
         d.text(esc(label), x + 44, y, gap - 50, 24, size=SMALL, valign="middle")
@@ -130,7 +134,9 @@ def fig_07_01() -> Diagram:
 def fig_07_02() -> Diagram:
     d = Diagram("Regression Output from the Data Analysis ToolPak")
     ys = [v for _, v in monthly_revenue()]
-    r = regression(list(range(1, 37)), ys)
+    xs = list(range(1, 37))
+    r, trimmed = regression(xs, ys), regression(xs[1:], ys[1:])
+    assert r["p_b"] < 0.05 < trimmed["p_b"], (r["p_b"], trimmed["p_b"])   # marker 4: significant only with January
     rows = [("1", ["SUMMARY OUTPUT", "", "", "", "", "", ""]),
             ("2", ["", "", "", "", "", "", ""]),
             ("3", ["Regression Statistics", "", "", "", "", "", ""]),
@@ -170,11 +176,11 @@ def fig_07_02() -> Diagram:
         d.marker(num, x0 + 2, y0 + 1, size=20)
     bottom = 22 + 22 * len(rows)
     legend_rows = [
-        ("1", f"R Square: the month index explains about {100 * r['r2']:.0f} percent of the month-to-month "
-              "variation in revenue."),
+        ("1", f"R Square: the month index explains about {100 * r['r2']:.0f} percent of the variation in "
+              "monthly revenue."),
         ("2", "Significance F: with one X variable, the same p-value as the slope."),
         ("3", "The slope: the average change in revenue from one month to the next along the fitted line."),
-        ("4", "The slope's p-value, below 0.05 here, but only because of the start-up month."),
+        ("4", "The slope's p-value, below 0.05 here. Without the start-up month it rises above 0.05."),
     ]
     y = bottom + 14
     for i, (num, text) in enumerate(legend_rows):
@@ -244,7 +250,7 @@ def fig_07_04() -> Diagram:
         seg(d, x + span, top + 154, x + span, top + 216, GRAY, 1.5)
         seg(d, x, top + 216, x + 20, top + 216, GRAY, 1.5)
         seg(d, x + span - 20, top + 216, x + span, top + 216, GRAY, 1.5)
-    d.text("<b>Measures the effect of volume:</b> what the plan's volume assumption was worth. At Charles "
+    d.text("<b>Measures the effect of volume and mix:</b> what the plan's volume assumption was worth. At Charles "
            "River, the planned volume was several times what was sold.", 0, top + 260, 400, 60, size=SMALL)
     d.text("<b>Measures the effect of prices:</b> actual revenue against the plan's prices for the same "
            "units. Costs are at standard in both, so no cost effect appears here.", 440, top + 260, 420, 60,
@@ -328,7 +334,8 @@ def fig_07_06() -> Diagram:
     left, right, top, height = 96, 846, 20, 360
     y_of = axis(d, left, right, top, height, 0.80, 0.96, 0.04, lambda v: f"{100 * v:.0f}%")
     x_of = lambda i: left + 30 + i * (right - left - 60) / 11
-    for series, color, dashed in ((planned, GRAY, True), (before, TEAL, False), (actual, CORAL, False)):
+    # three line styles, so the series do not differ by color alone: dashed, solid and dotted
+    for series, color, dashed in ((planned, GRAY, True), (before, TEAL, False), (actual, CORAL, DOTTED)):
         for i in range(11):
             seg(d, x_of(i), y_of(series[i]), x_of(i + 1), y_of(series[i + 1]), color, 2.5, dashed)
         for i, v in enumerate(series):
@@ -339,7 +346,7 @@ def fig_07_06() -> Diagram:
     y = top + height + 34
     legend(d, 0, y, [(GRAY, True, "Planned net price (budget)"),
                      (TEAL, False, "Actual price before promotions"),
-                     (CORAL, False, "Actual price after promotions")], gap=285)
+                     (CORAL, DOTTED, "Actual price after promotions")], gap=285)
     d.text("<i>Each point is revenue divided by the list value of the Furniture units invoiced in the "
            "month of fiscal 2026. The budget lowered its planned price in September and October; the large "
            "autumn discounts began in September and continued into November and December, and smaller "
@@ -353,7 +360,7 @@ def fig_07_07() -> Diagram:
     rows = [
         ("1", ["Input or result", "Value", "Name", "Source"]),
         ("2", ["Discount rate", "10.00%", "Discount", "PromotionProgram, promotion 8"]),
-        ("3", ["Volume lift", "0.00%", "Lift", "Assumption; no increase in orders"]),
+        ("3", ["Volume lift", "0.00%", "Lift", "Assumption, not a measured lift"]),
         ("4", ["Units on promotion lines", xl.num(m["units"]), "PromoUnits", "InvoiceLines, promotion 8"]),
         ("5", ["Price before discount per unit", xl.num(m["price"]), "PriceBeforeDiscount",
                "InvoiceLines, promotion 8"]),

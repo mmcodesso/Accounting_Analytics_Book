@@ -53,7 +53,7 @@ c. In B9, enter:
 
 d. Format B3 through B9 as numbers with two decimals and a thousands separator.
 
-Compare the average in B4 with the median in B5. The average is about half again as large as the median, and the standard deviation is almost as large as the average: the lines are widely spread and skewed to the right, with a long tail of large lines.
+Compare the average in B4 with the median in B5. The average is about half again as large as the median, and the standard deviation is almost as large as the average. The lines are widely spread, and the gap between the average and the median suggests a right skew, a long tail of large lines, which the histogram of Step 9 will show.
 
 **Step 5. Look at the extremes.**
 
@@ -118,7 +118,7 @@ a. Select G1:G17 and choose **Insert > Insert Column or Bar Chart > Clustered Co
 b. Right-click the chart, choose **Select Data**, click **Edit** under **Horizontal (Category) Axis Labels**, select F2:F17, and click **OK** twice.
 c. Right-click a bar, choose **Format Data Series**, and set **Gap Width** to 0%.
 
-The chart in @fig-06-02 rises to its highest bar at the left and trails off to the right: most lines are under a few thousand dollars, and a thin tail reaches far beyond them. That is the right skew that the average and the median described in Step 4, now visible at a glance.
+The chart in @fig-06-02 rises to its highest bar at the left and trails off to the right: most lines are under a few thousand dollars, and a thin tail reaches far beyond them. That is the right skew that the average and the median suggested in Step 4, now visible at a glance. Excel labels each bar with its lower bound from column F, so your last bar reads 15000, the open-ended bin that the figure labels 15k+.
 
 ![The Distribution of Fiscal 2026 Line Totals.](/visuals/svg/fig-06-02-line-total-histogram.svg){#fig-06-02 fig-alt="A mock of columns F and G of the Profile worksheet and a chart beside them. The table lists the lower bound of each 1,000-dollar bin, from 0 to 15,000, with the number of fiscal 2026 invoice lines in each and a total that equals the year's line count; the formula bar shows the COUNTIFS formula of the first bin. The chart is a histogram of the counts: the first bins are the tallest, and the bars generally fall toward the right into a long, thin tail of large lines, ending in an open-ended last bin, labeled 15k+, for lines of 15,000 dollars or more."}
 

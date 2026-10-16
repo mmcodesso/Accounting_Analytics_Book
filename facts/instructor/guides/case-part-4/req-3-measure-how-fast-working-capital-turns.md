@@ -79,7 +79,7 @@ The Checks tab proves every value; the icons, the tooltip and the parameter slic
 
 **Step 3. Compare with the targets.** Add the target measures and their ratios to the days of supply, then read raw materials at {{ raw }} days, packaging at {{ pack }}, and finished goods at {{ made[0] }} to {{ made[1] }} (manufactured) and {{ bought[0] }} to {{ bought[1] }} (purchased).
 
-**Check:** materials stand at {{ q1.mat|num(1) }} days in {{ q1.label }}, against {{ q0.mat|num(1) }} in {{ q0.label }}, and finished goods at {{ q1.fg|num(1) }} against {{ q0.fg|num(1) }}. Every policy ends at the current year-end, so targets for the next year need approval.
+**Check:** materials stand at {{ q1.mat|num(1) }} days in {{ q1.label }}, against {{ q0.mat|num(1) }} in {{ q0.label }}, and finished goods at {{ q1.fg|num(1) }} against {{ q0.fg|num(1) }}. The model answer's target measures take the largest target of each class, a benchmark for the company-level days, which cannot show whether each item meets its own policy. Every policy ends at the current year-end, so targets for the next year need approval.
 
 ### Part 3: The page
 
@@ -130,7 +130,7 @@ d. Add a **Matrix** titled "{{ g.t_matrix }}", with **Conditional formatting > I
 ## What a strong answer says
 
 - **Definitions.** Each flow named: billing with tax and freight, cost of goods sold without the closes, issues, shipments, supplier invoices.
-- **Movement.** Receivables and payables barely move, and the cycle grows through inventory, materials above all, far beyond the targets; the apparent fall of DPO is the unsupported opening payables diluted by purchases.
+- **Movement.** Receivables and payables barely move, and the cycle grows mainly through inventory, materials above all, far beyond the benchmarks. The apparent fall of DPO is the unsupported opening payables diluted by purchases.
 - **Which version.** The quarter-end versions on full windows, without the opening lines where they distort; {{ d.F }} shows only its last quarter, and the average lags a fast build.
 
 A weak answer reports the numbers without saying which flow each uses.

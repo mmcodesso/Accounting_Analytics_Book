@@ -230,11 +230,12 @@ def fig_03_06() -> Diagram:
                                       ("", "AccountName"), ("", "AccountType")], w=220)
     relate(d, "Account", "AccountID", "GLEntry", "AccountID", acc.rows["AccountID"],
            gl.rows["AccountID"], exit=RIGHT, entry=LEFT)
-    d.box("<b>The source-document trace.</b> SourceDocumentType names the table a posting came "
-          "from, and SourceDocumentID holds the key of the row in that table. Because one column "
-          "can point to several different tables, no single foreign key can describe the link. It "
-          "is a logical link that analysts test.", 600, 0, 260, 142, fill=AMBER_TINT, stroke=AMBER,
-          align="left", valign="top")
+    d.box("<b>The source-document trace.</b> For the sources shown, SourceDocumentType names the "
+          "table a posting came from, and SourceDocumentID holds the key of the row in that table "
+          "(payroll summary postings carry a code instead). Because one column can point to several "
+          "tables, no single foreign key can describe the link. It is a logical link that analysts "
+          "test. A few PayrollPayment rows point to payments that do not exist.", 600, 0, 260, 214,
+          fill=AMBER_TINT, stroke=AMBER, align="left", valign="top")
     sources = [("SalesInvoice", "SalesInvoiceID", "Order-to-Cash", ["InvoiceNumber", "GrandTotal"]),
                ("PurchaseInvoice", "PurchaseInvoiceID", "Procure-to-Pay",
                 ["InvoiceNumber", "GrandTotal"]),
@@ -270,18 +271,23 @@ def fig_03_07() -> Diagram:
     shl = table(d, "ShipmentLine", C2, 344, [("PK", "ShipmentLineID"), ("FK", "ShipmentID"),
                                              ("FK", "SalesOrderLineID"), ("", "QuantityShipped")],
                 w=W)
-    si = table(d, "SalesInvoice", C1, 530, [("PK", "SalesInvoiceID"), ("", "InvoiceNumber"),
-                                            ("FK", "SalesOrderID"), ("", "InvoiceDate"),
-                                            ("", "GrandTotal")], w=W)
-    sil = table(d, "SalesInvoiceLine", C2, 506, [("PK", "SalesInvoiceLineID"),
-                                                 ("FK", "SalesInvoiceID"), ("FK", "ShipmentLineID"),
-                                                 ("FK", "SalesOrderLineID"), ("", "LineTotal")], w=W)
-    cra = table(d, "CashReceiptApplication", C1, 716, [("PK", "CashReceiptApplicationID"),
-                                                       ("FK", "CashReceiptID"),
+    # The invoice half sits LOW px lower than the order half, so that the zero-or-one markers at
+    # both ends of the ShipmentLine to SalesInvoiceLine line read apart (the deck's crops follow).
+    LOW = 36
+    si = table(d, "SalesInvoice", C1, LOW + 530, [("PK", "SalesInvoiceID"),
+                                                  ("", "InvoiceNumber"), ("FK", "SalesOrderID"),
+                                                  ("", "InvoiceDate"), ("", "GrandTotal")], w=W)
+    sil = table(d, "SalesInvoiceLine", C2, LOW + 506, [("PK", "SalesInvoiceLineID"),
                                                        ("FK", "SalesInvoiceID"),
-                                                       ("", "AppliedAmount")], w=W)
-    cr = table(d, "CashReceipt", C0, 740, [("PK", "CashReceiptID"), ("", "ReceiptNumber"),
-                                           ("", "ReceiptDate"), ("", "Amount")], w=W)
+                                                       ("FK", "ShipmentLineID"),
+                                                       ("FK", "SalesOrderLineID"),
+                                                       ("", "LineTotal")], w=W)
+    cra = table(d, "CashReceiptApplication", C1, LOW + 716, [("PK", "CashReceiptApplicationID"),
+                                                             ("FK", "CashReceiptID"),
+                                                             ("FK", "SalesInvoiceID"),
+                                                             ("", "AppliedAmount")], w=W)
+    cr = table(d, "CashReceipt", C0, LOW + 740, [("PK", "CashReceiptID"), ("", "ReceiptNumber"),
+                                                 ("", "ReceiptDate"), ("", "Amount")], w=W)
     relate(d, "Customer", "CustomerID", "SalesOrder", "CustomerID", cu.id, so.id, exit=BOTTOM,
            entry=TOP)
     relate(d, "Item", "ItemID", "SalesOrderLine", "ItemID", it.id, sol.id, color=AMBER,

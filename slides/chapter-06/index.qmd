@@ -53,7 +53,7 @@ Descriptive analytics is not a warm-up: it is much of what accountants produce, 
 
 - AVERAGE is pulled up by a few very large values
 - MEDIAN is the middle value, whatever the extremes
-- A mean well above the median means a right skew, common in accounting data
+- A mean well above the median suggests a right skew, which a histogram shows
 - The average invoice line is about half again as large as the median line
 
 ::: {.notes}
@@ -247,7 +247,7 @@ The numbers behind the cells do not change; only their display does. The book's 
 ## Watch out: a PivotTable sums every source row {.watch-out}
 
 - In the Part I case, a ledger summary by quarter showed nonsense in the fourth quarter
-- The year-end close debits revenue and credits cost of goods sold on the last day
+- The year-end close debits sales revenue and credits cost of goods sold on the last day
 - Filter out the closing entries, or filter the source document types you need
 - Know which rows a source contains before you trust its totals
 
@@ -289,7 +289,7 @@ Tutorial 6.2 adds the extended cost to the query for exactly this reason, and Tu
 Students add the extended standard cost to InvoiceLines, build a PivotTable of revenue and margin by item group and quarter, read it as shares and as changes, compare the segments with the previous year, and chart the margins.
 :::
 
-## Every line held its margin but Furniture
+## Furniture fell most while the other lines barely moved
 
 {{< book-figure fig-06-06 >}}
 
@@ -302,7 +302,7 @@ Accessories, Lighting and Textiles barely move from quarter to quarter. Services
 {{< book-figure fig-06-06 crop="0,0,1,0.579" >}}
 
 ::: {.notes}
-Furniture's margin is lower than the other product lines' in every quarter, and it falls further in the fourth. The grand total of the PivotTable equals the control total on the Profile worksheet.
+Furniture's margin is lower than the other product lines' in every quarter, and it falls further in the fourth. The grand total of the PivotTable equals the control total on the Profile worksheet. The Part I case measured the posted accounts, whose cost is the standard cost of the goods shipped less the goods returned, so its margins differ slightly from these but fall the same way.
 :::
 
 ## Checkpoint
@@ -310,7 +310,7 @@ Furniture's margin is lower than the other product lines' in every quarter, and 
 {{< book-checkpoint 6.2 lead="true" >}}
 
 ::: {.notes}
-The PivotTable has described the problem precisely: the Furniture margin fell, the other lines did not, and the business as a whole kept growing. Why it fell is a diagnostic question.
+The PivotTable has described the problem precisely. Furniture has by far the largest fall in margin, the other lines barely move, and total revenue for the year grew. Why the Furniture margin fell is a diagnostic question.
 :::
 
 # From the Ledger to the Financial Statements
@@ -360,10 +360,10 @@ The closing entry independently checks net income, but an entry missing from the
 - Drill down: double-click a value for its rows, or add a finer field to Rows
 - Compare: the previous period, the same period last year, a budget or peers
 - Decompose: split the change into parts that add up exactly to it
-- Each part can then be assigned a cause
+- Each part can then be investigated on its own
 
 ::: {.notes}
-Tutorial 6.2's finding is descriptive: the Furniture margin fell and the other lines held. Management accountants measure the same effects against a budget as sales variances (Datar and Rajan); here the benchmark is the previous quarter.
+Tutorial 6.2's finding is descriptive. The Furniture margin fell and the other lines barely moved. Management accountants measure the same effects against a budget as sales variances (Datar and Rajan); here the benchmark is the previous quarter.
 :::
 
 ## A bridge splits the change into effects that add up
@@ -382,7 +382,7 @@ In the formulas, U is units sold, M the margin per unit, LM the list margin per 
 - Calculated by product type, the same change divides differently; state the level
 
 ::: {.notes}
-If a cost effect were the suspected cause, the manufacturing variance account is where you would look next. Neither level is wrong, and Exercise 6.4 compares them; a report that states its level can be checked.
+The price effects measure the change in the average reduction per unit, so a shift toward items with larger reductions moves them too, and a bridge assigns the change by a stated convention. If a cost effect were the suspected cause, the manufacturing variance account is where you would look next. Neither level is wrong, and Exercise 6.4 compares them; a report that states its level can be checked.
 :::
 
 ## Check your understanding {.check}
@@ -419,7 +419,7 @@ Only the promotions effect is large for Furniture, as Tutorial 6.3 shows; the ot
 Students add the list amount and the discount to InvoiceLines, build a driver PivotTable of Furniture totals for the two quarters with per-unit calculated fields, calculate the bridge, chart it, and drill into the discounts by promotion.
 :::
 
-## Promotions account for the whole decline
+## Promotions are the largest component of the decline
 
 {{< book-figure fig-06-09 >}}
 

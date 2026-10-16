@@ -273,9 +273,10 @@ def tutorial_103(d, claim) -> dict:
                   f"{d.C}-12-01")
     claim([p[4] for p in periods] == ["Processed", "Open", "Open"] and periods[1][1] > cut,
           "the time records end in the last processed pay period, and the two periods after it are Open")
-    step6 = ("SELECT h.WorkYear, h.LaborType, ROUND(h.Hours / o.StandardHours, 2), o.StandardHours FROM (SELECT SUBSTR(lt.WorkDate, 1, 4) AS WorkYear, "
-             "lt.LaborType, ROUND(SUM(lt.RegularHours + lt.OvertimeHours), 0) AS Hours FROM LaborTimeEntry lt WHERE lt.LaborType <> 'NonManufacturing' "
-             "GROUP BY 1, 2) h JOIN (SELECT SUBSTR(pc.CompletionDate, 1, 4) AS WorkYear, ROUND(SUM(pcl.QuantityCompleted * i.StandardLaborHoursPerUnit), 0) "
+    # Step 6 as the tutorial writes it: unrounded sums in the derived tables, rounded only in the outer SELECT.
+    step6 = ("SELECT h.WorkYear, h.LaborType, ROUND(h.Hours / o.StandardHours, 2), ROUND(o.StandardHours, 0) FROM (SELECT SUBSTR(lt.WorkDate, 1, 4) AS WorkYear, "
+             "lt.LaborType, SUM(lt.RegularHours + lt.OvertimeHours) AS Hours FROM LaborTimeEntry lt WHERE lt.LaborType <> 'NonManufacturing' "
+             "GROUP BY 1, 2) h JOIN (SELECT SUBSTR(pc.CompletionDate, 1, 4) AS WorkYear, SUM(pcl.QuantityCompleted * i.StandardLaborHoursPerUnit) "
              "AS StandardHours FROM ProductionCompletionLine pcl JOIN ProductionCompletion pc ON pc.ProductionCompletionID = pcl.ProductionCompletionID "
              "JOIN Item i ON i.ItemID = pcl.ItemID {cut} GROUP BY 1) o ON o.WorkYear = h.WorkYear ORDER BY 1, 2")
     with_cut = d.q(step6.format(cut=f"WHERE pc.CompletionDate <= '{cut}'"))
@@ -288,6 +289,38 @@ def tutorial_103(d, claim) -> dict:
           [r[2] for r in with_cut if r[0] == str(d.C)] != [r[2] for r in without if r[0] == str(d.C)],
           "counting the output only to the last day with time records changes only the last year")
     no_cut = {r[1]: r[2] for r in without if r[0] == str(d.C)}
+    # Coverage (decision N3): each year's last date by kind of time, and the sensitivity that stops both the hours and
+    # the output at the earlier of the direct and indirect endpoints. The tutorial keeps its cut-off at the last day with
+    # time records and calls the comparison an observed-records diagnostic; these figures are the labeled sensitivity.
+    ends = {(y, k): e for y, k, e in d.q("SELECT SUBSTR(WorkDate, 1, 4), LaborType, MAX(WorkDate) FROM LaborTimeEntry "
+                                         "WHERE LaborType <> 'NonManufacturing' GROUP BY 1, 2")}
+    last_year = str(d.C)
+    claim(ends[(last_year, DIRECT)] == cut and ends[(last_year, INDIRECT)] < cut,
+          "in the last year direct time ends on the last day with time records, and indirect time earlier")
+    claim(all(ends[(y, INDIRECT)] <= ends[(y, DIRECT)] for y, _ in ends), "indirect time never ends after direct time in a year")
+    sens = []
+    for y in sorted({y for y, _ in ends}):
+        stop = min(ends[(y, DIRECT)], ends[(y, INDIRECT)])
+        dh, ih = d.q("SELECT SUM(CASE WHEN LaborType = ? THEN RegularHours + OvertimeHours END), "
+                     "SUM(CASE WHEN LaborType = ? THEN RegularHours + OvertimeHours END) FROM LaborTimeEntry "
+                     "WHERE WorkDate BETWEEN ? AND ?", DIRECT, INDIRECT, f"{y}-01-01", stop)[0]
+        sh = d.one("SELECT SUM(pcl.QuantityCompleted * i.StandardLaborHoursPerUnit) FROM ProductionCompletionLine pcl "
+                   "JOIN ProductionCompletion pc ON pc.ProductionCompletionID = pcl.ProductionCompletionID "
+                   "JOIN Item i ON i.ItemID = pcl.ItemID WHERE pc.CompletionDate BETWEEN ? AND ?", f"{y}-01-01", stop)
+        sens.append(dict(year=y, stop=stop, direct=dh, indirect=ih, standard=sh, d_ratio=round(dh / sh, 2),
+                         i_ratio=round(ih / sh, 2), total=round((dh + ih) / sh, 2)))
+    common = sens[-1]
+    claim(all((s["d_ratio"], s["i_ratio"]) == (direct[i], indirect[i]) for i, s in enumerate(sens[:-1])),
+          "stopping the earlier years at their own earlier endpoint changes none of their rounded ratios")
+    claim(common["d_ratio"] < direct[-1] and common["i_ratio"] >= indirect[-1] and common["d_ratio"] < 1 and common["i_ratio"] > 0.5,
+          "counted to the last day of indirect time on both sides, the last year's direct ratio is lower, the indirect "
+          "ratio no lower, and the pattern of the years (direct below one, indirect above half) holds")
+    late_kinds = {r[0] for r in d.q("SELECT DISTINCT LaborType FROM LaborTimeEntry WHERE WorkDate > ? AND WorkDate <= ?",
+                                    common["stop"], cut)}
+    claim(late_kinds == {DIRECT, NONMFG}, "between the last day of indirect time and the cut-off, only direct and non-manufacturing time is recorded")
+    late_direct = d.one("SELECT SUM(RegularHours + OvertimeHours) FROM LaborTimeEntry WHERE LaborType = ? AND WorkDate > ? "
+                        "AND WorkDate <= ?", DIRECT, common["stop"], cut)
+    plant = [round(a + b, 2) for a, b in zip(direct, indirect)]
     n_lte = dict(d.q("SELECT SUBSTR(WorkDate, 1, 4), COUNT(*) FROM LaborTimeEntry WHERE LaborType <> 'NonManufacturing' GROUP BY 1"))
     n_pcl = dict(d.q("SELECT SUBSTR(pc.CompletionDate, 1, 4), COUNT(*) FROM ProductionCompletionLine pcl "
                      "JOIN ProductionCompletion pc ON pc.ProductionCompletionID = pcl.ProductionCompletionID GROUP BY 1"))
@@ -303,6 +336,7 @@ def tutorial_103(d, claim) -> dict:
           "the unmatched time is direct, indirect and non-manufacturing, and the entries with a filled key and no operation are all direct")
     claim(is_null[DIRECT] < dict((u[0], u[1]) for u in unmatched)[DIRECT], "a test on the entry's key alone finds fewer direct entries than the anti-join")
     return dict(cut=cut, out=out, pay=pay, people=people, lte=lte, pc=pc, periods=periods, with_cut=with_cut, no_cut=no_cut,
+                ends=ends, sens=sens, common=common, late_direct=late_direct, plant=plant, indirect_end=ends[(last_year, INDIRECT)],
                 direct=direct, indirect=indirect, product=product, unmatched=unmatched, orphan=orphan[0][1], is_null=is_null,
                 overtime=overtime, regular=regular)
 

@@ -12,17 +12,17 @@
 
 ## Purpose and learning outcomes
 
-Requirement 5 left a schedule of entries; this requirement turns it into the four statements the bank reads and shows that the package agrees with itself. The cash flow statement is where a reviewer looks hardest: no adjustment moves cash, so they may change lines of the reconciliation but no total. The workbook builds the statements; the Review file tests them by recomputing the balances from the ledger. The analytics type is descriptive, with a diagnostic test.
+Requirement 5 left a schedule of entries; this requirement turns it into the four statements the bank reads and shows that the package agrees with itself. The cash flow statement is where a reviewer looks hardest: no adjustment moves cash or changes how a cash flow is classified, so they may change lines of the reconciliation but no total. The workbook builds the statements; the Review file tests them by recomputing the balances from the ledger. The analytics type is descriptive, with a diagnostic test.
 
 Students can prepare classified balance sheets and statements of income from the adjusted balances (Part 1), roll equity forward with the corrected year labeled restated (Part 2), prepare cash flows by the indirect method while disclosing what moved no cash (Part 3), and test the package against the ledger in a second tool (Part 4).
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts, and transactions); IMA Reporting and Control (financial recordkeeping; financial statement preparation); IFAC IES 2 (a); AACSB A5 part 5.1 (technology integration: Excel with Power Query and data models).
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts, and transactions); IMA Reporting and Control (financial statement preparation); IFAC IES 2 (a); AACSB A5 part 5.1 (technology integration: Excel).
 
 ## Before you assign
 
 - **Files.** The workbook with Requirements 1 to 5 done (WorkingTB, the AdjustmentLines Table), the Review project of Requirement 2, `LenderPackage.sql` and CharlesRiver.xlsx.
 - **Data conditions.** No income tax account exists and no distribution was posted (`3040` is unused); depreciation is charged partly to `1090`, so it never reaches an expense line; in the two years presented, equipment financed by a note and a disposal with no proceeds occur only in 2026.
-- **Verify first.** Every entry balances and none touches `1010`. The AdjustmentLines Table holds 109 lines in 16 entries, with a totals row below.
+- **Verify first.** Every entry balances and none touches `1010`. The AdjustmentLines Table holds 111 lines in 17 entries, with a totals row below.
 
 ## How to run it
 
@@ -32,7 +32,7 @@ Pairs, about 180 minutes: 50 for the balance sheets and income statements, 15 fo
 
 ### Part 1: Balance sheets and statements of income
 
-**Step 1. Build the adjusted balance sheets.** On a worksheet named **Statements** give each year-end a column: 2026, 2025 (restated) and, as the model does, 2024 (restated), the opening balances of 2025. Each line adds what WorkingTB records under its StatementLine to what the adjustment lines add at that year-end; liabilities and equity take the opposite sign. The model's formula for cash:
+**Step 1. Build the adjusted balance sheets.** On a worksheet named **Statements** give each year-end a column: 2026, 2025 (restated) and, as the model does, 2024 (restated), the opening balances of 2025, which as a classified column also needs R1's current portion at that year-end. Each line adds what WorkingTB records under its StatementLine to what the adjustment lines add at that year-end; liabilities and equity take the opposite sign. The model's formula for cash:
 
 ```
 =(SUMIFS(WorkingTB[Recorded2026],WorkingTB[StatementLine],"Cash")+SUMIFS(AdjustmentLines[Amount],AdjustmentLines[StatementLine],"Cash",AdjustmentLines[YearEnd],YE_2026))
@@ -40,13 +40,13 @@ Pairs, about 180 minutes: 50 for the balance sheets and income statements, 15 fo
 
 **Check:** total assets $39,373,005.22 and $31,858,224.86, equal to total liabilities and equity, so each check row is zero. **Watch for:** a retained earnings line without the year's net income, which the ledger has not closed. The check row then reads the income, $4,572,087.08 for 2026.
 
-**Step 2. Build the statements of income by function.** Lay out operating revenue to net income by function, with the loss on disposals and an income taxes line of zero (the ledger records none).
+**Step 2. Build the statements of income by function.** Lay out operating revenue to net income by function, with the loss on disposals and an income taxes line of zero (the ledger records none, so the net income below it is provisional until the tax expense is determined).
 
 **Check:** income before income taxes $4,572,087.08 and $5,057,894.81, the recorded income plus the schedule's effect. **Watch for:** the loss on a disposal, a debit on a revenue-type account. Adding it instead of subtracting it overstates income by $185,000.00 in 2026.
 
 ### Part 2: Changes in stockholders' equity
 
-**Step 3. Roll equity forward from 1 January 2025.** Columns for common stock, retained earnings and total. Start from retained earnings as previously reported: the 2024 trial balance leaves out its own close, so that is `3030` plus 2024 net income. Add the correction, then each year's net income and distributions (none). The model's first row:
+**Step 3. Roll equity forward from January 1, 2025.** Columns for common stock, retained earnings and total. Start from retained earnings as previously reported: the 2024 trial balance leaves out its own close, so that is `3030` plus 2024 net income. Add the correction, then each year's net income and distributions (none). The model's first row:
 
 ```
 =RecRE_2024+RecNI_2024
@@ -89,7 +89,7 @@ Read it by its financing column. In 2026 a $280,000.00 acquisition was financed 
 
 **Step 6. Load the adjustment lines beside the ledger.** In the Review file choose **Home > Get data > Excel workbook**, select the package workbook, choose the AdjustmentLines Table and **Transform Data**. Keep the columns the file reads, filter out the totals row, type YearEnd as a date and **Close & Apply**. In **Model view** relate AdjustmentLines[Account] to Account[AccountNumber] and AdjustmentLines[YearEnd] to Date[Date], Many to one, **Single**.
 
-**Check:** 109 lines. **Watch for:** the totals row, which Power Query reads as one more row. The count reads 110, an entry named Total with no year appears in the matrix, and debits and credits each gain $1,910,328.20: they still equal each other, so only the count and the matrix catch it.
+**Check:** 111 lines. **Watch for:** the totals row, which Power Query reads as one more row. The count reads 112, an entry named Total with no year appears in the matrix, and debits and credits each gain $1,993,762.48: they still equal each other, so only the count and the matrix catch it.
 
 **Step 7. Add the measures and the Package Tests page.** Under **Modeling > New measure**:
 
@@ -117,17 +117,17 @@ ROW (
 )
 ```
 
-**Check:** zero, zero, zero and zero; the 42 Checks rows of this requirement all agree. The project proves these numbers; how the page renders is visible only in Desktop.
+**Check:** zero, zero, zero and zero; the 42 Checks rows of this requirement all agree. The project tests these numbers; how the page renders is visible only in Desktop.
 
 ## Expected results
 
 | Quantity | Value | Step |
 |---|---|---|
 | Income before income taxes, 2025; 2026 | $5,057,894.81; $4,572,087.08 | 2 |
-| Retained earnings, 1 January 2025, restated | $15,118,889.61 | 3 |
+| Retained earnings, January 1, 2025, restated | $15,118,889.61 | 3 |
 | Operating cash flow, 2025; 2026 | $3,975,026.14; -$807,189.75 | 4 |
 
-> **Instructor notes, Requirement 6:** balance sheets, 2026 / 2025: cash 8,442,255.80 / 9,383,566.10; receivables 4,843,285.43 / 4,755,337.09; inventories 23,935,720.45 / 15,178,832.94; prepaid 60,000.00 / 60,000.00; current assets 37,281,261.68 / 29,377,736.13; property and equipment, net 2,091,743.54 / 2,480,488.73; total assets 39,373,005.22 / 31,858,224.86; accounts payable 6,237,466.66 / 5,467,809.52; goods received not invoiced 1,020,992.06 / 969,574.35; accrued liabilities 852,116.20 / 811,301.30; sales tax payable 5,620,840.66 / 3,688,321.37; customer credits (2060) 3,413.46 / 1,008.67; current portion of notes 147,503.76 / 89,243.61; current liabilities 13,882,332.80 / 11,027,258.82; notes payable less current portion 241,800.92 / 154,181.62; total liabilities 14,124,133.72 / 11,181,440.44; common stock 500,000.00; retained earnings 24,748,871.50 / 20,176,784.42; total equity 25,248,871.50 / 20,676,784.42. Working capital 23,398,928.88 / 18,350,477.31; current ratio 2.69 / 2.66; quick ratio (cash and receivables) 0.957 / 1.28; cash net of sales tax 2,821,415.14. Income, 2025 / 2026: operating revenue 29,515,670.85 / 29,998,762.73; returns 201,104.38 / 242,764.56; net revenue 29,314,566.47 / 29,755,998.17; cost of goods sold 17,881,630.40 / 18,651,599.17; gross margin 11,432,936.07 / 11,104,399.00; operating expense 6,313,997.45 / 6,410,227.46; operating income 5,118,938.62 / 4,694,171.54; interest 19,043.81 / 29,584.46; loss on disposal 42,000.00 / 92,500.00; income before income taxes 5,057,894.81 / 4,572,087.08 (net income only if no income tax is owed, which Requirement 9 leaves to the CFO). With the old accruals kept (A3 held for evidence), 2026 / 2025: accrued liabilities 1,009,462.99 / 907,350.88; current liabilities 14,039,679.59 / 11,123,308.40; retained earnings 24,591,524.71 / 20,080,734.84; current ratio 2.66 / 2.64; quick ratio 0.946 / 1.27; income before income taxes 5,000,873.66 (2025) / 4,510,789.87 (2026); retained earnings at 1 January 2025 as restated 15,079,861.18; total assets and the cash flow totals as above. Retained earnings: 1 January 2025 as previously reported 15,294,129.73, correction -175,240.12, as restated 15,118,889.61; plus 2025 net income, 20,176,784.42; plus 2026, 24,748,871.50; no distributions. Cash flows, 2026 / 2025: net income 4,572,087.08 / 5,057,894.81; depreciation 576,245.19 / 542,423.80; loss on disposal 92,500.00 / 42,000.00; receivables -87,948.34 / +324,845.74; inventories, with 1090, -8,756,887.51 / -5,043,043.30; payables (2010, 2020) +821,074.85 / +1,087,218.19; sales tax +1,932,519.29 / +1,910,036.22; accrued and other +43,219.69 / +53,650.68; operating -807,189.75 / 3,975,026.14; investing 0.00 / -397,000.00 (425,000.00 paid, 28,000.00 of proceeds); financing -134,120.55 / -83,434.28; change in cash -941,310.30 / +3,494,591.86, which none of these adjustments changes, since none moves cash. Interest paid 28,946.47 / 19,513.12; income taxes paid: none recorded (a matter for the CFO); noncash: 280,000.00 of equipment financed by a note in 2026. Review tests: every entry nets to zero, none posts to 1010, adjusted net income equals the workbook's, and recorded total assets equal Requirement 1's.
+> **Instructor notes, Requirement 6:** balance sheets, 2026 / 2025: cash 8,442,255.80 / 9,383,566.10; receivables 4,843,285.43 / 4,755,337.09; inventories 23,935,720.45 / 15,178,832.94; prepaid 60,000.00 / 60,000.00; current assets 37,281,261.68 / 29,377,736.13; property and equipment, net 2,091,743.54 / 2,480,488.73; total assets 39,373,005.22 / 31,858,224.86; accounts payable 6,237,466.66 / 5,467,809.52; goods received not invoiced 1,020,992.06 / 969,574.35; accrued liabilities 852,116.20 / 811,301.30; sales tax payable 5,620,840.66 / 3,688,321.37; customer credits (2060) 3,413.46 / 1,008.67; current portion of notes 147,503.76 / 89,243.61; current liabilities 13,882,332.80 / 11,027,258.82; notes payable less current portion 241,800.92 / 154,181.62; total liabilities 14,124,133.72 / 11,181,440.44; common stock 500,000.00; retained earnings 24,748,871.50 / 20,176,784.42; total equity 25,248,871.50 / 20,676,784.42. Working capital 23,398,928.88 / 18,350,477.31; current ratio 2.69 / 2.66; quick ratio (cash and receivables) 0.957 / 1.28; cash net of sales tax 2,821,415.14. Income, 2025 / 2026: operating revenue 29,515,670.85 / 29,998,762.73; returns 201,104.38 / 242,764.56; net revenue 29,314,566.47 / 29,755,998.17; cost of goods sold 17,881,630.40 / 18,651,599.17; gross margin 11,432,936.07 / 11,104,399.00; operating expense 6,313,997.45 / 6,410,227.46; operating income 5,118,938.62 / 4,694,171.54; interest 19,043.81 / 29,584.46; loss on disposal 42,000.00 / 92,500.00; income before income taxes 5,057,894.81 / 4,572,087.08 (net income only if the current and deferred income tax expense is determined to be zero, which Requirement 9 leaves to the CFO, so the net income that the statements of equity and cash flows start from is provisional until then). With the old accruals kept (A3 held for evidence), 2026 / 2025: accrued liabilities 1,009,462.99 / 907,350.88; current liabilities 14,039,679.59 / 11,123,308.40; retained earnings 24,591,524.71 / 20,080,734.84; current ratio 2.66 / 2.64; quick ratio 0.946 / 1.27; income before income taxes 5,000,873.66 (2025) / 4,510,789.87 (2026); retained earnings at January 1, 2025, as restated 15,079,861.18; total assets and the cash flow totals as above. Retained earnings: January 1, 2025, as previously reported 15,294,129.73, correction -175,240.12, as restated 15,118,889.61; plus 2025 net income, 20,176,784.42; plus 2026, 24,748,871.50; no distributions. Cash flows, 2026 / 2025: net income 4,572,087.08 / 5,057,894.81; depreciation 576,245.19 / 542,423.80; loss on disposal 92,500.00 / 42,000.00; receivables -87,948.34 / +324,845.74; inventories, with 1090, -8,756,887.51 / -5,043,043.30; payables (2010, 2020) +821,074.85 / +1,087,218.19; sales tax +1,932,519.29 / +1,910,036.22; accrued and other +43,219.69 / +53,650.68; operating -807,189.75 / 3,975,026.14; investing 0.00 / -397,000.00 (425,000.00 paid, 28,000.00 of proceeds); financing -134,120.55 / -83,434.28; change in cash -941,310.30 / +3,494,591.86, which none of these adjustments changes, since none moves cash. Interest paid 28,946.47 / 19,513.12; income taxes paid: none recorded (a matter for the CFO); noncash: 280,000.00 of equipment financed by a note in 2026. Review tests: every entry nets to zero, none posts to 1010, adjusted net income equals the workbook's, and recorded total assets equal Requirement 1's.
 
 ## What a strong answer says
 

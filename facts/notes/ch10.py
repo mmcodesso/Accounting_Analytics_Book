@@ -191,7 +191,33 @@ def ex4(d, claim):
         f"SUM(l.UnitCost < pol.UnitCost), SUM(l.UnitCost = pol.UnitCost), MIN(l.UnitCost / pol.UnitCost - 1), "
         f"MAX(l.UnitCost / pol.UnitCost - 1) {LINES} WHERE pi.InvoiceDate BETWEEN ? AND ?", first, last)[0]
     gap = round(gl - lines, 2)
-    claim(0 < abs(gap) < 1, "the line-level total differs from the ledger by cents (rounding of each posting)")
+    claim(0 < abs(gap) < 1, "the line-level total differs from the ledger by cents (the rounding of the amounts the ledger posts)")
+    claim(gl > lines, "the recalculation from the unit costs is below the ledger")
+    # The ledger's basis: each linked line posts its stored LineTotal less the GRNI it clears (account 2020), so the
+    # variance is that difference, line by line. The two stored amounts are rounded to the cent, and against the
+    # unrounded quantity times unit cost they add these amounts, whose difference is the gap above.
+    grni_id = d.account("2020")
+    basis = d.q(f"SELECT COUNT(*), SUM(l.LineTotal), SUM(l.Quantity * l.UnitCost), SUM(l.Quantity * pol.UnitCost), "
+                f"SUM(gr.Cleared), SUM(CASE WHEN ABS(l.LineTotal - gr.Cleared - COALESCE(v.Variance, 0)) > 0.005 THEN 1 ELSE 0 END) "
+                f"{LINES} JOIN (SELECT SourceDocumentID, SourceLineID, SUM(Debit) - SUM(Credit) AS Cleared FROM GLEntry "
+                f"WHERE SourceDocumentType = 'PurchaseInvoice' AND AccountID = ? GROUP BY 1, 2) gr "
+                f"ON gr.SourceDocumentID = pi.PurchaseInvoiceID AND gr.SourceLineID = l.PILineID "
+                f"LEFT JOIN (SELECT SourceDocumentID, SourceLineID, SUM(Debit) - SUM(Credit) AS Variance FROM GLEntry "
+                f"WHERE SourceDocumentType = 'PurchaseInvoice' AND AccountID = ? AND {VARIANCE} GROUP BY 1, 2) v "
+                f"ON v.SourceDocumentID = pi.PurchaseInvoiceID AND v.SourceLineID = l.PILineID "
+                f"WHERE pi.InvoiceDate BETWEEN ? AND ?", grni_id, ppv, first, last)[0]
+    n_cleared, stored, model_inv, model_po, cleared, mismatched = basis
+    claim(n_cleared == n, "every invoice line linked to an order line clears GRNI on the ledger")
+    claim(mismatched == 0, "on every linked line, the stored LineTotal less the GRNI cleared equals the line's variance posting")
+    claim(abs(round(stored - cleared, 2) - gl) < 0.005, "the stored line totals less the GRNI cleared reproduce the ledger's variance")
+    inv_round, grni_round = round(stored - model_inv, 2), round(cleared - model_po, 2)
+    claim(abs(round(inv_round - grni_round, 2) - (gl - lines)) < 0.015, "the two roundings account for the gap")
+    each_line = d.one(f"SELECT ROUND(SUM(ROUND(l.Quantity * (l.UnitCost - pol.UnitCost), 2)), 2) {LINES} "
+                      f"WHERE pi.InvoiceDate BETWEEN ? AND ?", first, last)
+    claim(abs(each_line - gl) > 0.005, "rounding each line's price difference to the cent does not reproduce the ledger")
+    n_all, unlinked = d.q("SELECT COUNT(*), SUM(l.POLineID IS NULL) FROM PurchaseInvoiceLine l JOIN PurchaseInvoice pi "
+                          "ON pi.PurchaseInvoiceID = l.PurchaseInvoiceID WHERE pi.InvoiceDate BETWEEN ? AND ?", first, last)[0]
+    claim(unlinked > 0 and n_all == n + unlinked, "some of the year's invoice lines have no order line, and the rest are linked")
     claim(low < 0 < high, "some lines are billed below and some above the order price")
     years = []
     for y in d.years:
@@ -220,14 +246,15 @@ def ex4(d, claim):
                 gl=gl, top=[dict(id=s, name=nm, amount=a) for s, nm, a in suppliers[:5]], lines=lines, gap=abs(gap),
                 supplier_gap=supplier_gap, n_lines=n, above=above, below=below, at=at, low=-low, high=high, years=years,
                 line_gap_low=min(y["line_gap"] for y in years), line_gap_high=max(y["line_gap"] for y in years),
-                tax=others.get("Record nonrecoverable purchase tax", 0.0))
+                tax=others.get("Record nonrecoverable purchase tax", 0.0), stored=stored, cleared=cleared,
+                inv_round=inv_round, grni_round=grni_round, each_line=each_line, n_all=n_all, unlinked=unlinked)
 
 
 # --- Exercise 10.5 -------------------------------------------------------------------------------
 
 def long_date(iso: str) -> str:
     x = date.fromisoformat(iso)
-    return f"{x.day} {MONTHS[x.month - 1]} {x.year}"
+    return f"{MONTHS[x.month - 1]} {x.day}, {x.year}"
 
 
 @note("ch10.ex5", EXERCISES)
@@ -282,6 +309,9 @@ def ex5(d, claim):
     work_orders = d.q("SELECT wo.WorkOrderID, wo.WorkOrderNumber, wo.Status FROM WorkOrder wo WHERE NOT EXISTS "
                       "(SELECT 1 FROM WorkOrderOperation op WHERE op.WorkOrderID = wo.WorkOrderID) ORDER BY wo.WorkOrderNumber")
     claim(all(r[2] == "Closed" for r in work_orders), "every work order without operations is Closed")
+    claim(d.one("SELECT COUNT(*) FROM WorkOrder wo WHERE NOT EXISTS (SELECT 1 FROM WorkOrderOperation op "
+                "WHERE op.WorkOrderID = wo.WorkOrderID) AND NOT EXISTS (SELECT 1 FROM Routing r WHERE r.RoutingID = wo.RoutingID)") == 0,
+          "the work orders without operations have routing references that resolve (operations are missing, not routings)")
     claim(anomalies(d, "missing_work_order_operations") == {r[0] for r in work_orders},
           "the work orders without operations are the AnomalyLog's missing_work_order_operations items")
     wo_ids = ",".join(str(r[0]) for r in work_orders)

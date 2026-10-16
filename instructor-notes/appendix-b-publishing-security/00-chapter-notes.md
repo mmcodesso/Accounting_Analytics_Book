@@ -16,7 +16,7 @@
 | Tools | Power BI Desktop 2.158 on Windows: **Modeling > Manage roles**, **Modeling > View as**, TMDL view, DAX query view and **Optimize > Review > Performance analyzer**. The Power BI service, for Steps 1 to 4 of Tutorial B.2 only |
 | Components | Two guided tutorials (B.1 has eleven steps and B.2 has five), two exercises (one managerial, one auditing), and eight multiple-choice questions. There is no slide deck |
 | Files students need | CharlesRiver.xlsx. AppendixB-companion.zip holds Charles River Reports and Audit Monitoring at the start of Tutorial B.1 and Charles River Reports at the start of B.2. AppendixB-exercises-pbi.zip holds the model answer |
-| License | Tutorial B.1 and both exercises need no license. Steps 1 to 4 of Tutorial B.2 need a Pro or Premium Per User license for the student and for a colleague. Step 5 needs none |
+| License | Tutorial B.1 and both exercises need no license. Steps 1 to 4 of Tutorial B.2 need a work or school account, a workspace where the student is Admin, and a Pro or Premium Per User license for the student and for a colleague in the same organization (both Premium Per User in a Premium Per User workspace). Step 5 needs none |
 | Time | Class: about 150 minutes (Plan A below). Students: about 60 minutes of reading, 75 to 90 for Tutorial B.1, 45 to 60 for B.2 (about 20 without a license), and about 75 for each exercise. The times are estimates: time them yourself |
 
 The appendix depends on these conditions of the data:
@@ -46,7 +46,7 @@ The appendix depends on these conditions of the data:
 - Open the **View as** window once on a lab machine. This guide names its fields as the tutorial does (**Other user**, a role check box, **OK**, **Stop viewing**), and they are not verified here for your build.
 - Decide the scope (see Teaching approaches). If you want Steps 1 to 4 of B.2, ask the institution whether students may publish to a shared workspace, and pair students so that each has a colleague.
 
-**Checking a student's roles.** The Checks tab has 33 rows for Tutorial B.1, 8 for Exercise B.1 and 6 for Exercise B.2. It runs in DAX query view as the file's author, so no role applies. Of the 33, 27 are role rows: each repeats the role's rules as filters with the user's name typed in, so they prove the rules' logic and the numbers, not that a student's saved role is right. The model answer was also run through Desktop's engine under copies of the role with the name typed in, which is the same idea. Only **View as** shows what a student's own role does. The row below is the Sales Manager's.
+**Checking a student's roles.** The Checks tab has 33 rows for Tutorial B.1, 8 for Exercise B.1 and 7 for Exercise B.2. It runs in DAX query view as the file's author, so no role applies. Of the 33, 27 are role rows: each repeats the role's rules as filters with the user's name typed in, so they prove the rules' logic and the numbers, not that a student's saved role is right. The model answer was also run through Desktop's engine under copies of the role with the name typed in, which is the same idea. Only **View as** shows what a student's own role does. The row below is the Sales Manager's.
 
 ```dax
 EVALUATE
@@ -67,7 +67,7 @@ Use these rows to read what a correct role shows. To grade a student's role, ask
 
 **Pitfalls that cost class time**
 
-- **Viewing as yourself.** Choosing a role in **View as** without **Other user** evaluates the rules for your own sign-in, which is not in the security table, so every page is empty. Who Am I in Desktop without View as shows the computer's name and yours.
+- **Viewing as yourself.** Choosing a role in **View as** without **Other user** evaluates the rules for your own sign-in, which is not in the security table, so every page built on the protected tables is empty. Who Am I in Desktop without View as shows the computer's name and yours.
 - **A rule on CostCenter only.** Without the rule on Employee, the Sales Manager's Plant page shows the plant's 101,237 hours instead of an empty page.
 - **No rule on Item.** A person added to the role by mistake, or the former employee of Step 8, sees every sale: $29,756,420.08 of revenue. The ledger pages are empty, because their lines reach CostCenter.
 - **IDs typed in sequence.** In the security table the cost center IDs are 1 to 7, 9 and 10. Typed as 1 to 9, the Marketing Manager sees Research and Development and the Design Services Manager sees Marketing. Exercise B.2's review catches both.
@@ -150,7 +150,7 @@ What each user sees in Steps 7 and 8, and what to look for on the screen:
 **Stumbles to expect**
 
 - Step 1: EmploymentStatus and TerminationDate left out of the expansion, so the table shows the manager's name but not that the manager left, which is the finding.
-- Step 3: a typo in an address. A user typed wrongly sees nothing in Step 8, like the former employee. Compare with the Email column before moving on.
+- Step 3: a typo in an address. A user typed wrongly sees none of the protected data in Step 8, like the former employee. Compare with the Email column before moving on.
 - Step 5: a rule typed on one table only (see the pitfalls). The Employee rule is the one students forget.
 - Step 6: the rule on Item is the deny-by-default rule, and students read it as filtering items. Ask: what is it true for?
 - Step 7: **View as** with the role but no **Other user**, and a page that looks empty.
@@ -173,12 +173,12 @@ What each user sees in Steps 7 and 8, and what to look for on the screen:
 **Stumbles to expect**
 
 - Steps 1 to 4 with a free license: publishing works to **My workspace**, where nothing can be shared.
-- Step 3: expecting Test as role to show the colleague's view. It evaluates the rules with your own identity, so only the colleague signed in can see their own.
+- Step 3: expecting Test as role to show the colleague's view. Even set to a specific person, it may evaluate the dynamic rule with your own identity, so the Who Am I card shows which name was compared, and only the colleague signed in shows their own view for certain.
 - Step 3: as the workspace Admin you see every row when you open the report normally. Row-level security does not apply to the editing roles.
 - Step 4: the colleague does not see the change until the next sign-in.
-- After Step 4: the test rows stay in the table. Remove them and publish again.
+- Step 4: a cleanup that stops at the rows. The colleague's workspace access, both role memberships and the two Security rows are separate grants, so each is removed, and only what the test created.
 
-**The memo to look for.** Managers as Viewers or app readers; the controller's staff as Members or Contributors, who bypass the rules, so the list of editors is itself reviewed; the Income Statement and Validation pages in a separate report on the same semantic model, for the controller's audience only; a gateway, or the workbook moved to OneDrive or SharePoint, with failure notifications to the package's owner; Publish to web disabled by the administrator; a Confidential label where labels are enabled, noting that .pbip projects do not support them.
+**The memo to look for.** Managers as readers of the app with no workspace role, because an audience cannot hide an item from someone with a workspace role, who opens every item; the controller's staff as Members or Contributors, who bypass the rules, so the list of editors is itself reviewed; the Income Statement and Validation pages in a separate report on the same semantic model, hidden from the managers' audience; a gateway, or the queries connected to the workbook's address in OneDrive or SharePoint (a copy in a synced local folder still needs the gateway), with failure notifications to the package's owner; Publish to web disabled by the administrator; a Confidential label where labels are enabled, noting that .pbip projects do not support them.
 
 ## Difficult ideas and misconceptions
 
@@ -186,7 +186,7 @@ What each user sees in Steps 7 and 8, and what to look for on the screen:
 
 **A rule filters through relationships, and only through them.** Question 1, Exercise B.2 (5). The rule on CostCenter reaches the ledger and the budget; an unrelated table is never filtered. The Customer table still lists 220 customers for the former employee, and AccessEmployees lists all 120 employees. Ask: which tables does the rule reach?
 
-**Deny by default is a rule, not a setting.** Tutorial B.1 Step 6, Question 4. The role has no row for a person missing from the table until the rule on Item says so. Ask: what does the former employee see if the Item rule is removed?
+**Deny by default is a rule, not a setting.** Tutorial B.1 Step 6, Question 4. The role has no row for a person missing from the table until the rule on Item says so, and even then it denies the protected tables only. Customer still lists its 220 customers. Ask: what does the former employee see if the Item rule is removed, and what does the former employee still see with it?
 
 **A partial page looks whole.** Tutorial B.1 Steps 7 and 10, Question 8. The Sales Manager's income statement shows $11,306,186.32, 2.51 times the company's, and nothing says why. Ask: how would the reader know?
 
@@ -194,7 +194,9 @@ What each user sees in Steps 7 and 8, and what to look for on the screen:
 
 **Rows are not columns.** Exercise B.1, Question 5. Row-level security keeps the Production Manager's rows and cannot hide their pay. Object-level security hides the column, and every visual that reads it fails. Ask: what should the controller do about the failure?
 
-**Testing as yourself is not testing as them.** Tutorial B.2 Step 3. **Test as role** uses your identity. Ask: how do you learn what the colleague sees?
+**Testing as yourself is not testing as them.** Tutorial B.2 Step 3. **Test as role** may evaluate a dynamic rule with your identity even when set to a person, and the Who Am I card shows which. Ask: how do you learn what the colleague sees?
+
+**An audience is not a permission.** Tutorial B.2 Step 5, Question 8. An app audience chooses what the app shows. It cannot take away a workspace role, whose holders open every item in the workspace, a Viewer included. Ask: who can open the finance report if the managers are made workspace Viewers?
 
 **A security table is a control that needs a control.** Tutorial B.1 Steps 4 and 11, Exercise B.2. Someone maintains it, someone approves it, someone reviews it. Ask: who may do two of the three?
 
@@ -232,13 +234,13 @@ Key: 1 D, 2 B, 3 C, 4 D, 5 A, 6 C, 7 A, 8 B.
 | Question | Answer | Rationale |
 |---:|:---:|---|
 | 1 | D | a rule filters its table and, through active relationships, the tables on the many side. |
-| 2 | B | row-level security applies to Viewers and app readers, not to Admin, Member, or Contributor. |
+| 2 | B | row-level security applies to Viewers and app readers, not to Admin, Member, or Contributor, and a person in several groups gets the highest role any of them holds. |
 | 3 | C | managers of record 81, 83, 85 are terminated; the Sales and Warehouse Managers are not recorded. |
-| 4 | D | deny by default; a user in the role but missing from the table sees no sales (and no cost centers). |
+| 4 | D | the rule is true for every item or for none, so a user in the role but missing from the table sees no sales and no cost centers, while a table no rule reaches, such as Customer, stays readable. |
 | 5 | A | object-level security hides tables and columns from a role; row-level security hides rows. |
 | 6 | C | Publish to web needs no sign-in, exposes all the model's data, and does not support row-level security. |
-| 7 | A | a local file is an on-premises source; a gateway (or moving the file to OneDrive or SharePoint) is needed. |
-| 8 | B | no setting secures a page by role, and app audiences show whole reports, so finance's pages go in a separate report; on the pages managers keep, a card naming the cost centers shown tells them what they see. A hidden page can still be reached, so hiding it is not security. |
+| 7 | A | a local file is an on-premises source, so the service needs a gateway that can reach it (queries connected to the workbook's address in OneDrive or SharePoint need none, but a copy in a synced local folder is still a local file). |
+| 8 | B | no setting secures a page by role, and app audiences show whole reports, so finance's pages go in a separate report, hidden from the managers' audience, with the managers reading the app without a workspace role, because an audience cannot hide an item from someone who holds one. On the pages managers keep, a card naming the cost centers shown tells them what they see. A hidden page can still be reached, so hiding it is not security. |
 
 **Questions where a wrong option tempts**
 

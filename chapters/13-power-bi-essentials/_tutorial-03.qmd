@@ -1,6 +1,6 @@
 ## Guided Tutorial 13.3: Correcting Three Misleading Charts
 
-**Context and objective.** Before the report goes to the managers, the controller asks you to review the charts a colleague drafted for the next sales meeting. Each one is built from correct numbers, and each one invites a wrong conclusion. In this tutorial, you will rebuild the three charts on a review page, see how each misleads, correct it, and make the corrected page accessible.
+**Context and objective.** Before the report goes to the managers, the controller asks you to review the charts a colleague drafted for the next sales meeting. Each one is built from correct numbers, and each one invites a wrong conclusion. In this tutorial, you will rebuild the three charts on a review page, see how each misleads, correct it, and describe the corrected charts for readers who use a screen reader.
 
 **Prerequisites.** You need Charles River Reports.pbix from Tutorials 13.1 and 13.2. If you start here, download Charles River Reports as it stands at the end of Tutorial 13.2 from [Companion Files](#sec-companion-files): a Power BI project that you point at your copy of CharlesRiver.xlsx, refresh, and save as Charles River Reports.pbix, as that page explains.
 
@@ -39,7 +39,7 @@ a. Add a **Clustered column chart** with FiscalYear in **X-axis** and LineTotal 
 b. Turn on **Data labels** in **Format visual**.
 c. Record the change from fiscal 2025 to fiscal 2026.
 
-The three columns show growth from fiscal 2024 to fiscal 2025, which still includes the start-up month, and almost none from fiscal 2025 to fiscal 2026. A whole fiscal year against a whole fiscal year is the comparison the reader can rely on. Delete the table visual from Step 3 when you have recorded its values.
+The three columns show growth from fiscal 2024, a year that still includes the start-up month, to fiscal 2025, and almost none from fiscal 2025 to fiscal 2026. A whole fiscal year against a whole fiscal year is the comparison the reader can rely on. Delete the table visual from Step 3 when you have recorded its values.
 
 **Step 5. Build the third draft chart: revenue and discounts on two axes.**
 
@@ -66,15 +66,15 @@ d. Place the copy directly below the chart from Step 6, at the same width.
 
 The lower half of @fig-13-09 shows the corrected pair: revenue and discounts at their true relative size above, and the pattern of the discounts on their own labeled scale below.
 
-![Revenue and Discounts on Two Axes and Corrected.](/visuals/svg/fig-13-09-dual-axis.svg){#fig-13-09 fig-alt="Mocks of three Power BI charts of fiscal 2026 by month. The upper chart, a line and clustered column chart, shows revenue as columns on the left axis and discounts as a line on a second axis on the right, and the discount line climbs to the top of the revenue columns in September and October. Below it, the corrected pair: a line chart with revenue and discounts on one shared axis, where the discount line stays close to the bottom, and a separate line chart of discounts alone on its own labeled scale, with the autumn peak in September and October."}
+![Revenue and Discounts on Two Axes and Corrected.](/visuals/svg/fig-13-09-dual-axis.svg){#fig-13-09 fig-alt="Mocks of three Power BI charts of fiscal 2026 by month. The upper chart, a line and clustered column chart, shows revenue as columns on the left axis and discounts as a line on a second axis on the right, and the discount line climbs to the top of the revenue columns in September and October. Below it, the corrected pair: a line chart with revenue and discounts on one shared axis, where the discount line stays close to the bottom, and a separate line chart of discounts alone on its own scale, in thousands, with an axis title, and the autumn peak in September and October."}
 
-**Step 8. Make the review page accessible.**
+**Step 8. Describe the charts and check their titles.**
 
 a. Select each chart in turn, and under **Format visual > General**, type alternative text in **Alt text** that says what the chart shows and what it means, such as `Monthly revenue in fiscal 2026 on an axis from zero. Revenue varied little from month to month.`
 b. Check that every title says what the chart shows and over which period.
 c. Save the report.
 
-A screen reader now announces each chart by what it shows and what it means, and every title names its period.
+Each chart now has a description that a screen reader can announce, and every title names its period.
 
 
 

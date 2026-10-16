@@ -79,6 +79,8 @@ a. On the Item worksheet select A2 and extend the selection to the last data row
 b. Choose **Home > Conditional Formatting > New Rule**, select **Use a formula to determine which cells to format**, and enter `=$M2<MarginTarget`.
 c. Click **Format**, choose a light fill, and click **OK** twice.
 
+A rule that also tests the item type, `=AND($E2="Finished Good",$M2<MarginTarget)`, is equally right and shades the same rows here.
+
 **Step 7. Count them.** On `Ex 4.3` enter:
 
 ```

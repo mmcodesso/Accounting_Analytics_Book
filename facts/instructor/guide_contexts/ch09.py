@@ -353,7 +353,7 @@ def g4(d, claim):
     claim(lower == 0, "'In progress' with a small p matches no work order (the status is In Progress)")
     lt = d.one(f"SELECT COUNT(*) {base} AND DueDate < ?", end)
     le = d.one(f"SELECT COUNT(*) {base} AND DueDate <= ?", end)
-    claim(lt == le, "no open work order is due on the last day of the data, so < and <= return the same rows here (not in general)")
+    claim(lt == le, "no open work order is due on the year-end itself, so < and <= return the same rows here (not in general)")
     slashed = d.one(f"SELECT COUNT(*) {base} AND DueDate <= '12/31/{d.C}'")
     claim(slashed == 0, "a date written as 12/31 in the year-first stored form compares after every stored date, so the filter keeps nothing")
     claim(d.one(f"SELECT COUNT(*) {base} AND Status = 'Completed' AND CompletedDate IS NULL") == 0, "every Completed work order has a CompletedDate")
@@ -384,7 +384,7 @@ def g5(d, claim):
     lt = d.one("SELECT COUNT(*) FROM Shipment WHERE Status = 'In Transit' AND DeliveryDate < ?", end)
     last = d.q("SELECT ShipmentNumber, ShipmentDate, DeliveryDate FROM Shipment WHERE Status = 'In Transit' AND DeliveryDate >= ?", end)
     claim(len(last) == 1 and last[0][1] == end and last[0][2] == end and le == lt + 1,
-          "one In Transit shipment was shipped and is due on the last day of the data, so <= adds it and < leaves it out")
+          "one In Transit shipment was shipped and is due on the last shipment date, so <= adds it and < leaves it out")
     no_status = d.one("SELECT COUNT(*) FROM Shipment WHERE DeliveryDate < ?", end)
     claim(no_status > 10 * lt, "without the Status condition the date test keeps nearly every shipment, mostly delivered ones")
     carriers = [r[1] for r in d.q("SELECT ShippedBy, COUNT(*) FROM Shipment WHERE TrackingNumber IS NULL GROUP BY 1")]

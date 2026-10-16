@@ -84,7 +84,7 @@ c. Drag LineTotal, Margin and MarginPct to **Values**, rename them `Revenue`, `M
 ## What a strong answer says
 
 - **Requirement (2).** {{ more }} contribute more margin than revenue, because their margins are above Furniture's. The shares exclude Services, whose margin percentage is an artifact.
-- **Requirement (3).** The two highest types are {{ high[0][1] }}s and {{ high[1][1] }}s and the two lowest are {{ low[0][1] }}s and {{ low[1][1] }}s, with the margin spread across types small.
+- **Requirement (3).** The two highest types are {{ high[0][0] }} ({{ high[0][1] }}) and {{ high[1][0] }} ({{ high[1][1] }}) and the two lowest {{ low[0][0] }} ({{ low[0][1] }}) and {{ low[1][0] }} ({{ low[1][1] }}), with the margin spread across types small.
 - **Requirement (4).** The missing standard cost, the two cost definitions with their margins, and a statement that the report must say which one it uses.
 
 A weak answer calls Services the most profitable line, or gives a cost number without a source.

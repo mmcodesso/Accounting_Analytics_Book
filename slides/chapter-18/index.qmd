@@ -81,7 +81,7 @@ The CFO asks the first three questions, and the production manager adds the last
 - Decisions about positions belong to the production manager
 
 ::: {.notes}
-The costs that flow into the clearing account are the payroll, the Factory Overhead entries and the depreciation charged to it, not the debits that favorable closes post back to it. The products Charles River buys in the same families are different products, not substitutes for the ones it makes. The memo states what a change in the crew would save and what it would cost, and leaves the decision there.
+The costs that flow into the clearing account are the payroll, the Factory Overhead entries and the depreciation charged to it, not the debits that favorable closes post back to it. The base year is the last year of the records, even though the decisions take effect two years later. The products Charles River buys in the same families are different products, not substitutes for the ones it makes. The memo states what a change in the crew would save and what it would cost, and leaves the decision there.
 :::
 
 ## A quote for six families
@@ -150,7 +150,7 @@ Material is standard cost less conversion cost. PayrollRegisterLine tells regula
 {{< book-table tbl-18-03 widths="12,32,31,25" >}}
 
 ::: {.notes}
-Each tool hands its results to the next in the ways the book has taught: Copy with Headers or Export to CSV from DB Browser, and Power Query in both Excel and Power BI. The workbook's Table of item costs is what the explorer loads.
+Each tool hands its results to the next in the ways the book has taught: Copy with Headers or Export to CSV from DB Browser, unrounded, so that the workbook's checks hold, and Power Query in both Excel and Power BI. The workbook's Table of item costs is what the explorer loads.
 :::
 
 ## Watch out: units and populations need care {.watch-out}
@@ -311,7 +311,7 @@ Phase 2 builds the costs the decisions use. The workbook's item costs feed the e
 {{< book-figure fig-18-01 crop="0,0,1,0.6200" >}}
 
 ::: {.notes}
-Standard costing charges each product a rate per standard hour. Actual absorption charges all of the year's cost divided by the units made. Time-driven costing charges each product for the capacity it uses at the cost of practical capacity, plus the factory overhead. Kaplan and Anderson suggest, as a rule of thumb, that practical capacity is about four-fifths of theoretical capacity, or a little more. All three are views for managers; what inventory may carry is the question of Requirement 9.
+Standard costing charges each product a rate per standard hour. Actual absorption, in concept, charges all of the year's cost divided by the units made, and the case can only approximate it. Time-driven costing charges each product for the capacity it uses at the cost of practical capacity, plus the factory overhead. Kaplan and Anderson suggest, as a rule of thumb, that practical capacity is about four-fifths of theoretical capacity, or a little more. All three are views for managers; what inventory may carry is the question of Requirement 9.
 :::
 
 ## What each view leaves out of product cost
@@ -319,7 +319,7 @@ Standard costing charges each product a rate per standard hour. Actual absorptio
 {{< book-figure fig-18-01 crop="0,0.6200,1,0.3800" >}}
 
 ::: {.notes}
-Read the columns in the same order. Standard costing sends everything else to the variance, which Charles River charges to cost of goods sold; actual absorption leaves nothing out, so idle time is spread into every unit and unit cost rises whenever volume falls; time-driven costing reports unused capacity as a cost of the plant. Cooper and Kaplan argued that the resources supplied but not used should appear as that cost, visible to the managers who can act on it.
+Read the columns in the same order. Standard costing sends everything else to the variance, which Charles River charges to cost of goods sold; actual absorption, in concept, leaves nothing out, so idle time is spread into every unit and unit cost rises whenever volume falls; time-driven costing reports unused capacity as a cost of the plant. Cooper and Kaplan argued that the resources supplied but not used should appear as that cost, visible to the managers who can act on it.
 :::
 
 ## Compute three costs for each family
@@ -453,7 +453,7 @@ The remaining families' higher costs invite the next decision to buy: the spiral
 - **Check:** the freed hours are set against capacity already unused
 
 ::: {.notes}
-Compare the freed hours with the capacity the plant already leaves unused, in hours and in positions, and say what that comparison means for the decision. Show what happens to the cost of the remaining families if the crew is kept. The optional part asks Solver which families to buy if volume grew, minimizing the added cost with the crew kept and each work center's practical capacity as the limit, and which work center binds, at what shadow price. That model leaves out the quote's minimum volume and tooling, so its answer is a benchmark: check each family it buys against the minimum, and cost a plan the supplier would accept.
+Measure the freed hours on the year's completions, the base of the capacity table, and compare them with the capacity the plant already leaves unused, in hours and in positions on the same base, and say what that comparison means for the decision. Hours spare over a year may not be spare in every week, work center or skill, so a crew plan needs more than the annual total. Show what happens to the cost of the remaining families if the crew is kept. The optional part asks Solver which families to buy if volume grew, minimizing the added cost with the crew kept and each work center's practical capacity as the limit, and which work center binds, at what shadow price. That model leaves out the quote's minimum volume and tooling, and it plans a year, not a production schedule, so its answer is a benchmark: check each family it buys against the minimum, and cost a plan the supplier would accept.
 :::
 
 ## Reprice the families below the floor
@@ -574,7 +574,7 @@ These are self-checks, not answers. Each recommendation should say what it depen
 - Each file opens and refreshes on another computer
 
 ::: {.notes}
-This case brought back earlier answers. Chapters 10 to 12 found that the plant pays for hours beyond its work; here those hours became the unused capacity that no product should carry. Chapter 7 found that a promotion needed more lift than the orders showed, which is part of the evidence the price increases rest on. And the base year's statements came back too, because a cost study can raise the question of what the statements should have said.
+This case brought back earlier answers. Chapters 10 to 12 found more hours paid and recorded than the plant's output needed at standard. Here the routings estimated the capacity left unused, which no product should carry, and that estimate is not a finding that anyone did no work or that every hour could be removed. Chapter 7 found that a promotion needed more lift than the orders showed, which is part of the evidence the price increases rest on. And the base year's statements came back too, because a cost study can raise the question of what the statements should have said.
 :::
 
 # Looking Ahead

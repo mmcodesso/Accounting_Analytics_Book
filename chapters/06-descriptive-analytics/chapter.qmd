@@ -24,7 +24,7 @@ After completing this chapter, you will be able to:
 
 InvoiceLines is ready, and the controller has three requests for the quarterly management meeting. First, she wants a profile of what Charles River billed in fiscal 2026: how many invoice lines, how large they were, how widely they varied, and a total that ties to the figures she already trusts. Second, she wants revenue and gross margin by product line and quarter, so that the management team can see how the Furniture decline compares with the company's other lines, together with the year's income statement from the ledger. Third, and most important, she wants the answer to the question she asked in your first week: why did the Furniture margin fall from the third quarter to the fourth?
 
-The earlier chapters gave you a clean, reconciled table and a clue, the Furniture Seasonal Promotion, whose orders were still being invoiced after it ended. This chapter gives you the tools to describe what happened and then to explain why: statistical functions, conditional aggregation, PivotTables, and a margin bridge that breaks a change into its causes.
+The earlier chapters gave you a clean, reconciled table and a clue, the Furniture Seasonal Promotion, whose orders were still being invoiced after it ended. This chapter gives you the tools to describe what happened and then to explain why: statistical functions, conditional aggregation, PivotTables, and a margin bridge that breaks a change into defined components.
 
 
 
@@ -43,7 +43,7 @@ A statistical function reduces a column of values to one number that describes t
 
 `AVERAGE(range)` returns the arithmetic mean, the sum of the values divided by their number. It is the most familiar summary measure, but a few very large values pull it upward. `MEDIAN(range)` returns the middle value when the values are sorted, or the average of the two middle values when their number is even. Because it depends only on position, the median is not affected by how extreme the largest values are.
 
-The gap between the two is informative. When the mean is well above the median, the distribution is skewed to the right: most values are moderate, and a minority of large values pulls the average up. Accounting populations are usually shaped this way. For the Charles River invoice lines of fiscal 2026, the average line is about half again as large as the median line, so the typical line is smaller than the average suggests, and a relatively small share of large lines carries a large share of the revenue. When you report a "typical" transaction, the median is usually the better measure, and when you report a total or plan a test of dollar amounts, the mean and the large values matter more.
+The gap between the two is informative. A mean well above the median often comes from a distribution skewed to the right, in which most values are moderate and a minority of large values pulls the average up, but it is a clue to look at the distribution, not proof of its shape. Accounting populations are usually shaped this way. For the Charles River invoice lines of fiscal 2026, the average line is about half again as large as the median line, and the histogram in Tutorial 6.1 shows a long tail of large lines. The typical line is smaller than the average suggests, and a relatively small share of large lines carries a large share of the revenue. When you report a "typical" transaction, the median is usually the better measure, and when you report a total or plan a test of dollar amounts, the mean and the large values matter more.
 
 ### Dispersion and Extremes
 
@@ -64,7 +64,7 @@ Most questions concern part of a table, such as one fiscal year or one product l
 =MEDIAN(FILTER(InvoiceLines[LineTotal],InvoiceLines[FiscalYear]=2026))
 ```
 
-FILTER is available in Microsoft 365 and Excel 2021 or later, the same versions the Power Query tutorials already require. If no row meets the condition, FILTER returns the error #CALC!, which is a signal to check the condition before trusting the result.
+FILTER is available in Excel for Microsoft 365, Excel 2024, and Excel 2021, so every desktop version of Excel that Microsoft still supports has it. Without its optional third argument, which these formulas leave out, FILTER returns the error #CALC! when no row meets the condition, a signal to check the condition before trusting the result.
 
 
 ## Conditional Aggregation and Control Totals
@@ -99,7 +99,7 @@ A table of statistics describes a distribution in numbers. A chart shows its sha
 
 ### Histograms
 
-A histogram divides the range of a measure into bins of equal width, such as line totals from $0 to $1,000, from $1,000 to $2,000, and so on, and draws a bar for the number of values in each bin. It is the chart that shows the shape of a distribution, such as the right skew of the invoice lines. Excel draws one directly from a column of values with Insert > Insert Statistic Chart > Histogram, and the bin width can be set on the horizontal axis with Format Axis (Microsoft, 2026c). That chart counts every value in the range it is given, however. To count only the lines of one fiscal year, you can instead build a frequency table with COUNTIFS, one row for each bin, and chart it as a column chart with no gap between the bars, which is what Tutorial 6.1 does.
+A histogram divides the range of a measure into bins of equal width, such as line totals from $0 to $1,000, from $1,000 to $2,000, and so on, and draws a bar for the number of values in each bin. It is the chart that shows the shape of a distribution, such as the right skew of the invoice lines. Excel draws one directly from a column of values with Insert > Insert Statistic Chart > Histogram, and the bin width can be set on the horizontal axis with Format Axis (Microsoft, 2026b). That chart counts every value in the range it is given, however. To count only the lines of one fiscal year, you can instead build a frequency table with COUNTIFS, one row for each bin, and chart it as a column chart with no gap between the bars, which is what Tutorial 6.1 does.
 
 ### PivotCharts
 
@@ -137,7 +137,7 @@ PivotTables can group a date field into months, quarters, and years: right-click
 
 A calculated field is a field you define inside a PivotTable with a formula that uses other fields. It is how a PivotTable shows a measure that is not a column of the source, such as a margin percentage. Choose PivotTable Analyze > Fields, Items, & Sets > Calculated Field, give the field a name, and write its formula using the field names. The essential point is how the formula is evaluated. Microsoft's documentation explains that a calculated field's formula operates on the sums of the fields it uses, not on individual records (Microsoft, 2026a). For each cell of the PivotTable, Excel first sums each field over the rows behind the cell and then applies the formula to those sums. A margin percentage defined as `=(LineTotal-StdCostAmount)/LineTotal` is therefore the total margin divided by the total revenue of each cell, which is exactly the weighted margin an accountant wants.
 
-The same rule explains why a margin needs a cost column that is already extended. InvoiceLines carries each item's StandardCost, the cost of one unit, and summing a unit cost over many lines produces a meaningless number. Tutorial 6.2 therefore adds StdCostAmount, the quantity multiplied by the standard cost, to the query, and the calculated field uses that.
+The same rule explains why a margin needs a cost column that is already extended. InvoiceLines carries each item's StandardCost, the cost of one unit, and summing a unit cost over many lines produces a meaningless number. Tutorial 6.2 therefore adds StdCostAmount, the quantity multiplied by the standard cost, to the query, and the calculated field uses that. The result is a margin on the invoice lines at standard cost, a related but different measure from the Part I case's margin on the posted accounts, and Tutorial 6.2 compares the two.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
@@ -146,7 +146,7 @@ Because a calculated field works on sums, a formula that multiplies two fields g
 
 ### Show Values As
 
-The same value field can be displayed in different ways without changing the numbers behind it. Right-click a value in the PivotTable, choose Show Values As, and pick a calculation. @tbl-06-02 lists the options accountants use most, with the descriptions Microsoft gives for them (Microsoft, 2026b), and @fig-06-04 shows one PivotTable displayed three ways.
+The same value field can be displayed in different ways without changing the numbers behind it. Right-click a value in the PivotTable, choose Show Values As, and pick a calculation. @tbl-06-02 lists the options accountants use most, with the descriptions Microsoft gives for them (Microsoft, 2026c), and @fig-06-04 shows one PivotTable displayed three ways.
 
 | Show Values As option | What it displays | Accounting use |
 |---|---|---|
@@ -167,7 +167,7 @@ A PivotTable summarizes a copy of its source, called the pivot cache, so it does
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
-A PivotTable reports what is in its source, including rows that should not be in the analysis. In the Part I case, you found that a summary of the general ledger by quarter shows nonsensical fourth-quarter revenue and cost of goods sold, because the year-end closing entry debits the revenue accounts and credits the cost of goods sold accounts on the last day of the year. Before you summarize GLEntry by period, filter out the JournalEntry rows of the closing entries, or place SourceDocumentType in the Filters area and select the source documents your question concerns. The same caution applies to any source: know which rows it contains before you trust its totals.
+A PivotTable reports what is in its source, including rows that should not be in the analysis. In the Part I case, you found that a summary of the general ledger by quarter shows nonsensical fourth-quarter revenue and cost of goods sold, because the year-end closing entry debits the sales revenue accounts and credits the cost of goods sold accounts on the last day of the year. Before you summarize GLEntry by period, filter out the JournalEntry rows of the closing entries, or place SourceDocumentType in the Filters area and select the source documents your question concerns. The same caution applies to any source: know which rows it contains before you trust its totals.
 :::
 
 ::: {.callout-tip .in-practice icon=false}
@@ -211,7 +211,7 @@ A trial balance built from a ledger extract is only as complete as the extract. 
 
 ## From Description to Diagnosis
 
-Tutorial 6.2 confirms what the Part I case found for Furniture, whose margin fell from the third quarter of fiscal 2026 to the fourth, and it adds that the other product lines held steady. That is a descriptive finding. The diagnostic question is why, and three moves answer it. The first is to drill down, from a total into its parts. Double-clicking a value in a PivotTable opens a new worksheet with the rows behind it, and moving a more detailed field, such as ProductType, into the Rows area splits a total into its components. The second is to compare, with the previous period, the same period a year earlier, a budget, or a peer group. The third is to decompose the change into components that add up exactly to it, so that each component can be assigned a cause.
+Tutorial 6.2 finds on the invoice lines the decline that the Part I case found on the posted accounts, a Furniture margin that fell from the third quarter of fiscal 2026 to the fourth, and it adds that the other product lines held steady. That is a descriptive finding. The diagnostic question is why, and three moves answer it. The first is to drill down, from a total into its parts. Double-clicking a value in a PivotTable opens a new worksheet with the rows behind it, and moving a more detailed field, such as ProductType, into the Rows area splits a total into its components. The second is to compare, with the previous period, the same period a year earlier, a budget, or a peer group. The third is to decompose the change into components that add up exactly to it, so that each component can be investigated on its own.
 
 ### Explaining a Change in Margin
 
@@ -229,7 +229,7 @@ The Charles River data lets you measure price precisely, because every invoice l
 
 : The effects of a margin bridge. U is units sold, M the margin per unit, LM the list margin per unit, K the price-list reduction per unit, and D the promotional discount per unit, with 3 and 4 marking the quarters {#tbl-06-03}
 
-The effects add up exactly to the fourth quarter's margin minus the third's, and checking that they do is the bridge's control total. The mix effect deserves a word. Because each item's list price and standard cost stay the same from one quarter to the next, the list margin per unit of a product line can change only when the items sold change, so its change isolates mix. The cost effect is zero for a related reason. InvoiceLines values every quantity at the item's standard cost, and each item has a single standard cost, so a margin at standard cost cannot move because of cost. Differences between actual and standard costs are recorded separately in the ledger, in variance accounts such as Manufacturing Variance, when work orders close. If a cost effect were the suspected cause, that is where you would look next.
+The effects add up exactly to the fourth quarter's margin minus the third's, and checking that they do is the bridge's control total. The mix effect deserves a word. Because each item's list price and standard cost stay the same from one quarter to the next, the list margin per unit of a product line can change only when the items sold change, so its change comes only from mix. The two price effects measure the change in the average reduction per unit over all the items sold, so a shift toward items with larger reductions moves them too. A bridge therefore assigns a change to its effects by a stated convention, not by isolating each cause. The cost effect is zero for a related reason. InvoiceLines values every quantity at the item's standard cost, and each item has a single standard cost, so a margin at standard cost cannot move because of cost. Differences between actual and standard costs are recorded separately in the ledger, in variance accounts such as Manufacturing Variance, when work orders close. If a cost effect were the suspected cause, that is where you would look next.
 
 A decomposition also depends on the level at which it is calculated. The bridge in @tbl-06-03 treats Furniture as a whole, so its mix effect captures every shift between Furniture items. Calculated product type by product type, the same change divides differently, because each type contains items with different prices and costs, and part of what looks like a change in price or cost at that level is really a change in the items sold within each type. Neither calculation is wrong, but a report should state its level, and Exercise 6.4 asks you to compare the two.
 

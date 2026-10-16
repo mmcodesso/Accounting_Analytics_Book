@@ -10,7 +10,7 @@ note describes: for BeforePayment the applications are grouped by invoice for th
 CashAndCredit they are grouped by invoice and applier and merged on the credit's invoice and approver. The two new
 exception queries are appended to the Exceptions query's Source step, and the Tests table gains four rows.
 
-The historical exceptions of the new tests get one design-finding treatment: a Design Findings table (Enter data, one
+The historical exceptions of the new tests that share a supported cause are linked to a finding: a Design Findings table (Enter data, one
 row per new test, naming the finding, the period it covers, through the end of the audited year, and the date by which
 its design is to be fixed) is merged into the register by TestID; an exception dated within the period is covered by
 the finding and stays in the register, and Open Exceptions leaves the covered exceptions out, so the review sees every
@@ -31,7 +31,7 @@ from collections import Counter
 from pbibuild.audit_monitoring import COUNT, MEASURES, MONEY, REGISTER, Build, exceptions, flags
 from pbibuild.ex16 import group
 from pbibuild.model import Column, Measure, Query, Table, query_table
-from pbibuild.pbir import Page, Visual, col, meas, textbox
+from pbibuild.pbir import Page, Visual, col, lit, meas, textbox
 from pbibuild.reports import card, claim, keep, money
 
 from notes import ch16, ch19  # noqa: E402  (facts/ is on sys.path through pbibuild.audit_monitoring)
@@ -45,9 +45,10 @@ NEW_TESTS = [("CM AboveLimit", "Credit above its approver's limit", "Credit memo
 FIX_BY = "2027-12-31"           # the action plans' date (Requirement 9): the delegation of authority and the refund rule
 # the findings cover the exceptions dated through the end of the audited year (ch19.year_end(d.C)); a later exception, before
 # the fix as well as after it, stays open for review, and a finding closes on a retest, not on FIX_BY
-FINDINGS = {"CM": "Credits approved without a delegation of authority, by customer service staff who also apply the cash",
-            "RF": "Refunds approved without a delegation of authority, and dated before the customer's payments were "
-                  "applied to the credited invoice"}
+FINDINGS = {"CM": "Credits approved above the recorded general limits (no delegation of authority in the records), by "
+                  "customer service staff who also apply the cash",
+            "RF": "Refunds approved above the recorded limits (no delegation of authority in the records), and dated "
+                  "before the customer's payments were applied to the credited invoice"}
 CHANGE_DATE = "2027-09-30"      # the end of the audit's fieldwork (the case is set in September 2027)
 
 POPULATION = """SWITCH (
@@ -312,36 +313,42 @@ def r10(b: Build) -> None:
         "CM AboveLimit", f"{months[1]:,}", names[approvers[0][0]]]
 
     # the Credits Cycle page
-    page = b.report.add(Page("creditsCycle", "Credits Cycle"))
+    page = b.report.add(Page("creditsCycle", "Credits Cycle", height=1060, display_option="FitToWidth"))
     test_col, year_col = col("Tests", "TestID"), col("Date", "Year")
     new_ids = [tid for tid, *_ in NEW_TESTS]
-    page.add(Visual("newTests", "pivotTable", 20, 20, 820, 200, {
+    page.add(Visual("newTests", "pivotTable", 20, 20, 1240, 200, {
         "Rows": [test_col], "Columns": [year_col], "Values": [M("Exceptions"), M("Population"), M("Rate per 1,000")]},
         title="The credits cycle's tests by year", filters=[keep("newTestIds", test_col, new_ids)]))
-    page.add(card("registerCards", 860, 20, 400, 200, [M("Exceptions"), M("Reviewed Exceptions"),
-                                                       M("Design Finding Exceptions"), M("Open Exceptions")]))
-    page.add(Visual("findings", "tableEx", 20, 235, 1240, 130, {"Values": [
+    page.add(card("registerCards", 20, 235, 1240, 110, [M("Exceptions"), M("Reviewed Exceptions"),
+                                                        M("Design Finding Exceptions"), M("Open Exceptions")]))
+    page.add(Visual("findings", "tableEx", 20, 360, 1240, 260, {"Values": [
         col("Exceptions", "TestID"), col("Exceptions", "Finding"), col("Exceptions", "CoversThrough"),
         col("Exceptions", "FixBy"), M("Design Finding Exceptions"), M("Open Exceptions")]},
         title="Design findings: reported once; later exceptions stay open for review",
-        filters=[keep("findingTests", col("Exceptions", "TestID"), new_ids)]))
+        filters=[keep("findingTests", col("Exceptions", "TestID"), new_ids)],
+        objects={"columnWidth": [{"properties": {"value": lit(560)}, "selector": {"metadata": "Exceptions.Finding"}}],
+                 "values": [{"properties": {"wordWrap": lit(True)}}]}))      # each finding wraps in its column
     tests_ = {x_["name"]: x_ for x_ in ctx["tests"]}
-    page.add(answer("cycleAnswer", 20, 380, 1240, 330, "the continuing tests", [
+    page.add(answer("cycleAnswer", 20, 635, 1240, 400, "the continuing tests", [
         "Four rule tests join the register: " + "; ".join(
             f"{x_['name']} {x_['n']} ({' / '.join(str(v) for v in x_['years'])}; per 1,000 "
             f"{' / '.join(f'{v:.1f}' for v in x_['rates'])}, {x_['rate']:.1f} over the three years)" for x_ in ctx["tests"]) +
         f". Populations: credits {' / '.join(str(v) for v in ctx['pop_c'])}, refunds {' / '.join(str(v) for v in ctx['pop_r'])}. "
         f"The register grows from {ctx['old']} to {ctx['new']} rows, and each test and document pair is still unique.",
-        f"Design findings: the {len(new)} historical exceptions of the new tests are reported once, as two findings about "
-        f"the design of the controls (credits and refunds approved without a delegation of authority), each kept in the "
-        f"register with its document. The findings cover the exceptions dated through {covers} and are to be fixed by "
+        f"Findings: the {len(new)} historical exceptions of the new tests share the causes Requirement 8 supports, so they "
+        "are linked to two findings, one for credits and one for refunds (approvals above the recorded general limits, "
+        "with no delegation of authority in the records), and each stays in the register with its document. The "
+        "findings record Requirement 8's provisional evaluation, which looked past the register to the records behind "
+        "it, as Tutorial 16.3 assumed for its dispositions. The flags alone would support only a follow-up. The "
+        f"findings cover the exceptions dated through {covers} and are to be fixed by "
         f"{FIX_BY}; Open Exceptions leaves the covered ones out and stays at {sum(1 for e in old if not e['disposition'])}, "
         "so the new tests do not flood the review, while any later exception, before the fix as well as after it, stays "
         "open for review. A finding closes when a retest after the fix shows the control works, not on its planned date; "
         "after the fix, the two authority tests should fall to zero, and CashAndCredit and BeforePayment are the ones that "
         f"would catch the next case. The Date table ends {date_end}: extend it before exceptions after that date arrive.",
-        f"Data Through stays {ctx['through']}, set by payroll's last pay date: the earliest of the processes' last dates, "
-        "which bounds what the tests can have seen but does not show that every record through it was loaded. The "
+        f"Data Through stays {ctx['through']}, set by payroll's last pay date (the rest of December's work belongs to the "
+        f"two pay periods marked Open, scheduled to pay in January {d.C + 1}). It is the earliest of the processes' last "
+        "dates, which bounds what the tests can have seen but does not show that every record through it was loaded. The "
         f"credits run to {ctx['cm_last']} and the refunds to {ctx['rf_last']}. The refund method and the missing offset stay anomaly tests, outside the register "
         "(the Anomalies page), because they are reasons to look rather than rule failures. The Change Log page records "
         "the change, and Tests 5 and 6 in the Tests tab are rerun with Tests 1 to 4 before the file is used."]))
@@ -369,9 +376,12 @@ def r10(b: Build) -> None:
 
     # the Change Log page
     page = b.report.add(Page("changeLog", "Change Log"))
-    page.add(Visual("log", "tableEx", 20, 20, 1240, 300, {"Values": [
-        col("Change Log", k) for k in ("Date", "Object", "Change", "Reason")]}, title="Changes to this file"))
-    page.add(answer("logAnswer", 20, 340, 1240, 200, "the change under change control", [
+    page.add(Visual("log", "tableEx", 20, 20, 1240, 400, {"Values": [
+        col("Change Log", k) for k in ("Date", "Object", "Change", "Reason")]}, title="Changes to this file",
+        objects={"columnWidth": [{"properties": {"value": lit(w)}, "selector": {"metadata": f"Change Log.{k}"}}
+                                 for k, w in (("Change", 470), ("Reason", 420))],
+                 "values": [{"properties": {"wordWrap": lit(True)}}]}))     # the long texts wrap in their columns
+    page.add(answer("logAnswer", 20, 440, 1240, 200, "the change under change control", [
         "The change was made in the Power BI project under version control, on its own branch, and the reviewer approves "
         "it from the list of changed lines before it is merged: the queries CreditMemo, CustomerRefund, CM Exceptions, "
         "RF Exceptions and their inputs, the Exceptions query's Source step and its Design Findings merge, the Tests, "

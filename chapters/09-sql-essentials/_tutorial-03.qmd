@@ -77,7 +77,7 @@ a. Type and run the query below.
 b. Read the number of rows in the message pane.
 c. Scroll through the first rows, which the ascending sort puts at the favorable end.
 
-The query keeps every close whose variance is more than a thousand dollars in either direction, the kind of threshold an analyst might set for review. It returns several hundred closes, about a quarter of the year's closes. Only about a tenth of them are favorable, at the top of the result. The variance of fiscal 2026 is therefore the result of many unfavorable closes, partly offset by fewer and smaller favorable ones.
+The query keeps every close whose variance is more than a thousand dollars in either direction, the kind of threshold an analyst might set for review. It returns several hundred closes, about a quarter of the year's closes. Only about a tenth of them are favorable, at the top of the result. Among the closes above this threshold, unfavorable variances are far more numerous. The mix of the whole year and its net total take every close into account, which Chapter 10 summarizes.
 
 **Step 5. Copy a result into Excel.** A query result can move into a workbook to be charted or formatted for a report.
 

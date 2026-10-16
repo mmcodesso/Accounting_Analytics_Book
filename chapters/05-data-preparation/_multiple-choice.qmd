@@ -11,8 +11,8 @@ D.  DSK
 
 **2.** An analyst applies PROPER to a list of supplier names to standardize them for a report. What happens to the name Donaldson LLC?
 
-A.  It stays Donaldson LLC, because PROPER leaves words in capitals unchanged.
-B.  It becomes Donaldson Llc, because PROPER lowers every letter after the first in each word.
+A.  It stays Donaldson LLC, because PROPER leaves any word in capital letters unchanged.
+B.  It becomes Donaldson Llc, because PROPER lowers each letter after a word's first.
 C.  It becomes DONALDSON LLC, because PROPER converts names to capitals.
 D.  It returns an error, because PROPER cannot process abbreviations.
 
@@ -27,7 +27,7 @@ D.  The first quarter
 
 A.  TODAY cannot be used in a calculated column of an Excel Table.
 B.  TODAY returns the date on which the workbook was first created.
-C.  TODAY changes each day, so the results cannot be reproduced; an as-of date does not change.
+C.  A later recalculation changes TODAY, but not an as-of date.
 D.  An as-of date makes the calculation of each age run faster.
 
 **5.** Consider this formula:
@@ -39,9 +39,9 @@ D.  An as-of date makes the calculation of each age run faster.
 What does its fourth argument do?
 
 A.  It names the column that holds the key.
-B.  It supplies the value returned when the SalesInvoiceID is not found.
+B.  It supplies the value returned when the key is not found.
 C.  It forces an approximate match.
-D.  It limits the search to the first matching row.
+D.  It limits the search to the first row that matches the key.
 
 **6.** Each invoice line carries a SalesInvoiceID, and each invoice carries a SalesOrderID. How can you bring the order date onto each invoice line?
 
@@ -54,8 +54,8 @@ D.  Look up the invoice's SalesOrderID first, and then use it to look up the ord
 
 A.  XLOOKUP cannot return dates from another Table; use VLOOKUP instead.
 B.  XLOOKUP returns the sum of the shipment dates; use AVERAGEIFS instead.
-C.  XLOOKUP returns the first match, which may not be the earliest; use MINIFS instead.
-D.  There is no problem, because XLOOKUP always returns the earliest date.
+C.  XLOOKUP returns the first match, not always the earliest; use MINIFS instead.
+D.  There is no problem, because XLOOKUP always returns the earliest shipment date.
 
 **8.** A cell contains a formula that returns an empty text value, so the cell looks blank. What does the ISBLANK function return for that cell?
 
@@ -69,7 +69,7 @@ D.  TRUE, because the cell looks blank
 A.  A blank CustomerID on a sales order
 B.  A blank TrackingNumber on a shipment that was delivered
 C.  A blank InvoiceDate on an invoice
-D.  A blank PromotionID on an invoice line that carried no promotion
+D.  A blank PromotionID on a line that had no promotion
 
 **10.** An analyst wants a list of the invoice lines whose ItemID does not appear in the Item query. Which Power Query join kind returns exactly those lines?
 
@@ -95,8 +95,8 @@ D.  Power Query counts the hyphens in a code differently from Excel.
 **13.** What is the main advantage of building InvoiceLines as a reference query instead of adding merge steps to the SalesInvoiceLine query itself?
 
 A.  Reference queries cannot be refreshed, so their results are fixed.
-B.  Reference queries run without needing CharlesRiver.xlsx to be available.
-C.  The original query stays unchanged, and the new one is rebuilt from its result on every refresh.
+B.  Reference queries run even when the source workbook, CharlesRiver.xlsx, is not available.
+C.  The original query is unchanged, and the new one uses its result on refresh.
 D.  A reference query copies the worksheet formulas of the original Table.
 
 **14.** A calculated column on the invoice lines uses this formula, where PromoEnd is a named cell that holds the date 2026-10-31:
@@ -107,7 +107,7 @@ D.  A reference query copies the worksheet formulas of the original Table.
 
 What does it return for a line with a 10 percent discount that was invoiced on 2026-10-15?
 
-A.  "OK", because both tests must be true to return "Late"
+A.  "OK", since AND needs both tests true
 B.  "Late", because the line carries a discount
 C.  TRUE, because AND returns TRUE or FALSE
 D.  An error, because AND cannot compare dates
@@ -115,6 +115,6 @@ D.  An error, because AND cannot compare dates
 **15.** A validity check finds that most invoice lines for items sold by the unit carry fractional quantities. What is the most appropriate response?
 
 A.  Round every quantity to the nearest whole number before analyzing any of the lines.
-B.  Record it as a limitation, raise it with the system's owners, and avoid relying on whole units.
+B.  Record it as a limitation, ask the system's owners, and avoid relying on whole units.
 C.  Delete the lines with fractional quantities from the analysis so that the totals are clean.
 D.  Ignore the finding, because quantities do not affect the revenue recorded on each line.

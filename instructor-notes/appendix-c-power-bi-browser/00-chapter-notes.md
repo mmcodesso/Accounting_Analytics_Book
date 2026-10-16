@@ -37,11 +37,11 @@ The appendix depends on these conditions of the data:
 
 ## Preparing to teach
 
-**Accounts and licenses.** Students sign in with a school account; a personal address does not work. A free license builds models and reports in My workspace, a private area, which is all the appendix needs. A Pro license adds shared workspaces and version history, and only Exercise C.3 uses version history.
+**Accounts and licenses.** Students sign in with a school account; a personal address does not work. A free license builds models and reports in My workspace, a personal area, which is all the tutorials and Exercises C.1 and C.2 need. A Pro license adds sharing, shared workspaces and version history. Exercise C.3 uses version history, and Guided Tutorial B.2 of the publishing appendix needs the model in a shared workspace, which a student chooses at Step 7 of C.1.
 
 **What can block the work.** The appendix names one tenant setting, *Users can edit semantic models in the Power BI service*, and says a feature turned off there is unavailable whatever the license. The steps may also depend on the **Get Data** tile, on permission to create a semantic model, and on OneDrive for work or school, because the upload goes there. The book does not say which other settings an administrator may have changed. Before the term, have a student-licensed test account do Step 2 of C.1 (Choose data), Step 7 (**Create a semantic model only**) and Step 3 of C.3 (**New measure**): if one stops, ask the administrator to allow a group that holds your students. If the answer is no, use Plan C, or send students to Desktop in a lab or a Windows virtual machine, as the appendix advises.
 
-**What was read, where and when.** The service steps were read in one account, the author's school account, in My workspace, on 6 October 2026, in one browser session. The account showed the two version history commands, so it holds a Pro license or its equivalent; the license itself was not read. The service changes without notice, so labels and timings in your tenant may differ. Of the author's timings, the upload took under a minute and the model editor opened in under a minute. Confirm these before class:
+**What was read, where and when.** The service steps were read in one account, the author's school account, in My workspace, on October 6, 2026, in one browser session. The account showed the two version history commands, so it holds a Pro license or its equivalent; the license itself was not read. The service changes without notice, so labels and timings in your tenant may differ. Of the author's timings, the upload took under a minute and the model editor opened in under a minute. Confirm these before class:
 
 | Not confirmed | Why |
 |---|---|
@@ -50,8 +50,10 @@ The appendix depends on these conditions of the data:
 | The matrix, clustered bar chart and dropdown slicers (Tutorial C.2 Step 7, Exercise C.2) | The test did not build them, and the line chart with a legend |
 | The query of Exercise C.1 and the DAX checks in the exercise guides | Built from the book's test and from Desktop-verified expressions, not run in a service |
 | A relationship to a Table added later (Exercise C.1 extension) | The test added T7_PromotionProgram and stopped at Save |
+| A change to an Enter data table saved in Power Query Online | The test reopened **Create table** from the Source step and saved nothing, and Microsoft's Enter data page documents such changes only in Desktop, so a browser reader reads Guided Tutorial B.2, Steps 1 and 4 |
+| Test as role for Guided Tutorial B.1's checks as a manager, and from My workspace | Not run; Test as role views a role or a person of the organization, and the security table's addresses belong to no one there |
 
-**What the book rests on.** The statements that cite Microsoft Learn are the upload through OneDrive, the type detection from the first rows, the column profile, the report editor, version history (the license and the limit of five versions), DAX query view, the editing setting and the free license. The other differences the tutorials meet (dates read as numbers, the missing card, display units set card by card, a month axis sorted by value, the model editor's commands) rest on the author's test alone, so no Learn page confirms them.
+**What the book rests on.** The statements that cite Microsoft Learn are the upload through OneDrive, the type detection from the first rows, the column profile, the report editor, version history (the license, the five versions and the 14-day restore), DAX query view, the editing setting, the saves of the model editor and Power Query Online, and the free license. The other differences the tutorials meet (dates read as numbers, the missing card, display units set card by card, a month axis sorted by value, the model editor's commands) rest on the author's test alone, and two of them differ from Learn. Learn's upload page has the student change Anonymous to Organizational account and sign in, where the test found it set already, and Learn's card page puts the display units under Callout values > Values for all cards. The tutorials now say what the test saw and what to do when a tenant shows the other state.
 
 **The week before.**
 
@@ -99,7 +101,7 @@ The appendix depends on these conditions of the data:
 | 15 | Assign the exercises, and the rules of Exercise C.3 |
 | 75 | Total |
 
-**Plan C: instructor demonstration (60 minutes).** It fits a tenant that blocks student editing, or a class with few accounts. Students then do the exercises in Desktop.
+**Plan C: instructor demonstration (60 minutes).** It fits a tenant that blocks student editing, or a class with few accounts. Students then do the exercises in Desktop, Exercise C.3 by hand, as without a Pro license, because Desktop has no version history.
 
 | Minutes | Activity |
 |---:|---|
@@ -128,7 +130,7 @@ Plan A is the safest and the longest. Plan B is the cheapest in class time, and 
 | 8 | **Manage relationships** reads "There are no relationships defined yet." | the defaults created none |
 | 11 | Fiscal 2026 row | 9,522 lines, $29,756,420.08, $33,589,137.45, $362,110.75 |
 
-**Stumbles.** Step 1: a personal account, or a slow upload. Step 3: **Add new step** in place of **Replace current**, which rounds every rate to zero before the fix. Step 4: the date left as a number, so the custom columns of Step 5 cannot take a year from it. Step 5: the **Data type** box is set in the dialog, so no separate typing step follows. Step 6: the profile options stay unavailable until **Enable column profile** is on. Step 9: the column is chosen by clicking it in the preview. **Checkpoint to look for.** The four items of the tutorial's checkpoint, and an item group table with 5 rows and no (Blank).
+**Stumbles.** Step 1: a personal account, or a slow upload. Step 3: **Add new step** in place of **Replace current**, which rounds every rate to zero before the fix. Step 4: the date left as a number, so the custom columns of Step 5 cannot take a year from it. Step 5: the **Data type** box is set in the dialog, so no separate typing step follows. Step 6: the profile options stay unavailable until **Enable column profile** is on. Step 9: the column is chosen by clicking it in the preview. Step 11: SalesInvoiceLineID left at the visual's default, which can be Sum, so the table shows a sum of IDs instead of the line count. **Checkpoint to look for.** The four items of the tutorial's checkpoint, and an item group table with 5 rows and no (Blank).
 
 ### Guided Tutorial C.2: Building the Sales and Discounts Page in the Browser
 
@@ -230,6 +232,6 @@ Use the questions as a ten-minute quiz or as clickers after each tutorial.
 
 **Builds on.** Chapter 13, whose model and Sales and Discounts page the tutorials rebuild; Chapter 14, whose Key Measures table and Revenue measure Tutorial C.3 starts; Chapter 4, which taught the first-rows rule; and Chapter 6, which the Validation page reconciles to.
 
-**Later.** Students who continue Part IV in the browser use the appendix's last section and its table of command names. The appendix on publishing and securing reports: Test as role replaces **View as**, and publishing is skipped. Chapter 16's change control is what Exercise C.3 compares with. The Part II case and Chapter 15 use the promotions that Exercise C.2 reads.
+**Later.** Students who continue Part IV in the browser use the appendix's last section and its table of command names. It sends them through Tutorial 13.3 before Chapter 14, has them keep the Key Measures table, Revenue and Exercise C.1's measures when Tutorial 14.2 creates them, and has them rewrite their saved tests on the Date table's fields after Tutorial 14.1. Chapter 16's Audit Monitoring is a second model, read from the uploaded copy. In the appendix on publishing and securing reports, Test as role takes the place of **View as**. For a model in a shared workspace, Guided Tutorial B.2 skips Publish, and the student reads Steps 1 and 4, which change the security table in Desktop, and does the rest. A student whose model is in My workspace reads its Steps 1 to 4 and does Step 5. Chapter 16's change control is what Exercise C.3 compares with. The Part II case and Chapter 15 use the promotions that Exercise C.2 reads.
 
 **Appendix D.** It maps each exercise to the professional frameworks, and each exercise guide names the competencies it practices.

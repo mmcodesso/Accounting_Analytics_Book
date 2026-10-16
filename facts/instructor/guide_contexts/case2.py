@@ -246,6 +246,12 @@ def g2(d, claim):
     q4_ordered = ordered.get(4, 0.0) / sum(ordered.values())
     claim(q4_ordered < q4_invoiced, "by order date a smaller share of the proposal's discount falls in the fourth quarter than by invoice date")
     promo_billed = d.one("SELECT COUNT(*) FROM SalesInvoiceLine WHERE PromotionID IS NOT NULL")
+    moved = d.q("SELECT i.InvoiceDate, p.posted FROM SalesInvoice i JOIN (SELECT SourceDocumentID AS id, MIN(PostingDate) AS posted, "
+                "MAX(PostingDate) AS last FROM GLEntry WHERE SourceDocumentType = 'SalesInvoice' GROUP BY 1) p ON p.id = i.SalesInvoiceID "
+                "WHERE substr(p.posted, 1, 4) = ? AND (p.posted <> p.last OR substr(i.InvoiceDate, 1, 4) <> substr(p.posted, 1, 4) "
+                "OR (CAST(substr(i.InvoiceDate, 6, 2) AS INTEGER) + 2) / 3 <> (CAST(substr(p.posted, 6, 2) AS INTEGER) + 2) / 3)", str(d.C))
+    claim(all(dt[:4] == str(d.P) for dt, _ in moved),
+          "in the report year an invoice posts in a quarter other than its invoice quarter only when it is dated in the prior year")
     after = {p["id"]: d.one(f"SELECT COUNT(*) {n2.BILLED} WHERE l.PromotionID = ? AND i.InvoiceDate > ?", p["id"], p["end"])
              for p in n2.proposal(d).values()}
     fall = n2.proposal(d)["ItemGroup"]
@@ -295,7 +301,7 @@ def g3(d, claim):
         if abs(z1) >= 2:
             naive.append(p["id"])
         rows.append(dict(id=p["id"], label=p["label"], kind=KIND[p["scope"]], ran=months_text(months), n_months=len(months),
-                         lift=v["lift"], sd=v["sd"], py=v["py"], z=v["z"], net_lift=net_lift, naive_z=z1,
+                         lift=v["lift"], sd=v["sd"], py=v["py"], z=v["z"], month_z=v["lift"] / v["sd"], net_lift=net_lift, naive_z=z1,
                          be=be[p["id"]], lines=p["lines"], recorded_start=p["start"], recorded_end=p["end"],
                          first=p["lo"], last=p["hi"]))
     bad = [p for p in n2.promotions(d) if d.one(f"SELECT COUNT(*) {n2.ORDERS} WHERE l.PromotionID = ? AND o.OrderDate BETWEEN ? AND ?",
@@ -305,6 +311,7 @@ def g3(d, claim):
           "the promotions whose recorded dates fail contain none of their lines")
     claim(all(abs(r["z"]) < 2 for r in rows), "no promotion's difference is beyond two standard deviations of its months' total")
     claim(len(naive) == 1, "read against one month's standard deviation, exactly one promotion would look unusual")
+    claim(all(abs(r["month_z"]) < 2 for r in rows), "compared month for month, no promotion's difference is beyond two standard deviations")
     claim(sum(1 for r in rows if r["net_lift"] > 0) <= 1, "at net amounts at most one promotion shows a difference above zero")
     no_py = [r["id"] for r in rows if r["py"] is None]
     claim(all(p["year"] == d.F for p in n2.promotions(d) if p["id"] in no_py), "the promotions with no earlier year are those of the first year")
@@ -317,7 +324,8 @@ def g3(d, claim):
     return dict(rows=rows, n_rows=len(rows), naive_flagged=n2.series(naive), no_py=n2.series(no_py), first_year=d.F,
                 net_low=min(r["net_lift"] for r in rows), net_high=max(r["net_lift"] for r in rows),
                 n_net_up=sum(1 for r in rows if r["net_lift"] > 0), early=early, jan=in_jan, never=never,
-                cmp=r3_rows(len(rows)), lift_low=min(r["lift"] for r in rows), lift_high=max(r["lift"] for r in rows))
+                cmp=r3_rows(len(rows)), lift_low=min(r["lift"] for r in rows), lift_high=max(r["lift"] for r in rows),
+                top_month_z=max(rows, key=lambda r: r["lift"])["month_z"])
 
 
 # --- requirement 4: the model ----------------------------------------------------------------------------------------
@@ -352,6 +360,15 @@ def g4(d, claim):
                          be=be[p["id"]], lift=vol[p["id"]]["lift"], share=vol[p["id"]]["lift"] / be[p["id"]]))
     claim(max(x["share"] for x in nine) < 0.5, "no promotion's measured difference reached half of its break-even increase")
     best = max(nine, key=lambda x: x["lift"])
+    own, own_discount = n2.own_goal_seek(d)
+    best_year = next(p["year"] for p in n2.promotions(d) if p["id"] == best["id"])
+    unbilled = []
+    for scope in ("Collection", "ItemGroup", "Segment"):
+        p = prop[scope]
+        o = d.one(f"SELECT SUM(l.Quantity * l.UnitPrice * l.Discount) {n2.ORDERS} WHERE l.PromotionID = ?", p["id"])
+        b_ = d.one(f"SELECT SUM(l.Quantity * l.UnitPrice * l.Discount) {n2.BILLED} WHERE l.PromotionID = ?", p["id"])
+        unbilled.append(dict(id=p["id"], label=p["label"], amount=o - b_))
+    claim(sum(u["amount"] for u in unbilled) > 0.005, "some of the proposal's discount was ordered but not yet billed in the data")
     # the data table: the Furniture promotion's difference at each rate and volume increase
     base = fur["without"]
     first_positive = {}
@@ -393,6 +410,8 @@ def g4(d, claim):
     cfo_name = d.one("SELECT EmployeeName FROM Employee WHERE EmployeeID = (SELECT DISTINCT ApprovedByEmployeeID FROM BudgetLine WHERE FiscalYear = ?)", d.N)
     return dict(
         cols=cols, nine=nine, c=c, fur=fur, best=best, positives=[dict(rate=r, lift=v) for r, v in first_positive.items()],
+        best_year=best_year, cross=best["id"] != fur["id"], own_lift=own["lift"], own_discount=max(own_discount, 0.0),
+        unbilled=[u for u in unbilled if u["amount"] > 0.005], unbilled_total=sum(u["amount"] for u in unbilled),
         swap=swap, corner=corner, whole_march=whole[3], whole_jan=whole[1],
         promoted=promoted, promoted_low=min(x["other"] for x in promoted), promoted_high=max(x["other"] for x in promoted),
         plan_dev=max(abs(r - plan_all) for r in plan_months), plan_all=plan_all,
@@ -439,6 +458,14 @@ def g5(d, claim):
                                  last=p["hi"], ran=months_text(p["months"]), lines=p["lines"],
                                  high=max(ratios[m] for m in p["months"]), low=min(ratios[m] for m in n2.PLAIN_MONTHS)))
     failing = [t for t in tests if t["fails"]]
+    by_id = {p["id"]: p for p in promos}
+    same_day = [t["id"] for t in failing if by_id[t["id"]]["end"] == by_id[t["id"]]["start"]]
+    reversed_ = [t["id"] for t in failing if by_id[t["id"]]["end"] < by_id[t["id"]]["start"]]
+    claim(len(same_day) + len(reversed_) == len(failing), "each failing promotion ends on or before its start date")
+    provisional = [dict(id=t["id"], label=t["label"], lines=d.one(
+        f"SELECT COUNT(*) {n2.ORDERS} WHERE {n2.SCOPE_SQL[by_id[t['id']]['scope']]} = ? AND o.OrderDate BETWEEN ? AND ?",
+        t["label"], t["window"][0], t["window"][1])) for t in failing]
+    claim(all(x["lines"] > 0 for x in provisional), "the provisional windows of the failing promotions hold lines of their scopes")
     claim(all(t["recorded_in_scope"] == 0 for t in failing),
           "no in-scope line of a failing promotion was ordered inside its recorded dates, so a completeness test on those dates passes with nothing to test")
     claim(all(t["bad_rate"] == 0 for t in tests) and all(t["missing"] == 0 for t in tests),
@@ -465,6 +492,8 @@ def g5(d, claim):
     return dict(tests=tests, evidence=evidence, collection_lines=collection_lines, non_promo=non_promo,
                 unguarded=non_promo + sum(t["out_dates"] for t in tests), blank=blank, n_blank=len(blank),
                 total_lines=sum(t["lines"] for t in tests), n_failing=len(failing), failing_ids=n2.series(t["id"] for t in failing),
+                same_day_ids=n2.series(same_day), n_same_day=len(same_day), reversed_ids=n2.series(reversed_),
+                n_reversed=len(reversed_), provisional=provisional,
                 overrides=d.one("SELECT COUNT(*) FROM PriceOverrideApproval"),                 approver_id=mgr, n_pending=len(pending), plan_year=d.N,
                 other_kinds=sum(t["lines"] for t in tests if t["kind"] != "item group"))
 

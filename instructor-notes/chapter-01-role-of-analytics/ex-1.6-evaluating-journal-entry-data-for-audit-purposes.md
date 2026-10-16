@@ -25,7 +25,7 @@ By the end, students can:
 ## Before you assign
 
 - Students need CharlesRiver.xlsx. Exercise 1.5 (the source columns) is a good lead-in but not required.
-- The exercise relies on these conditions, which you can see on the worksheets: JournalEntry has no lines, which are the GLEntry rows of type JournalEntry; JournalEntry.CreatedDate carries a time of day, and the times vary very little; amounts are in TotalAmount, and the approver's limit is not in JournalEntry but in Employee (MaxApprovalAmount); and ReversesJournalEntryID is filled for only one kind of entry.
+- The exercise relies on these conditions, which you can see on the worksheets: JournalEntry has no lines, which are the GLEntry rows of type JournalEntry; JournalEntry.CreatedDate and ApprovedDate carry a time of day, and the times vary very little; amounts are in TotalAmount, and the approver's limit is not in JournalEntry but in Employee (MaxApprovalAmount); and ReversesJournalEntryID is filled for only one kind of entry.
 - Do requirement 3 yourself on the worksheets before class. If you scan the time part of CreatedDate, you will see why the first indicator is not simple.
 - Do not ask for queries or calculations. This exercise is a data assessment.
 
@@ -65,11 +65,11 @@ b. Click the **GLEntry** worksheet tab. It has 16 columns: GLEntryID, PostingDat
 
 **Step 3. Take the indicators one at a time.** A model assessment in three to five sentences covers these points.
 
-**Outside normal business hours.** CreatedDate carries a time of day, so the field exists. In this dataset the times barely vary: 845 entries at 08:00:00, and 6 entries at 10:00:00. No entry is created before 08:00 or after 17:00, so a time-of-day test with those hours would flag 0. PostingDate has no time. The date part of CreatedDate still gives the day of the week, and 17 entries were created on a weekend (Chapter 8 tests that). What would be needed for a real after-hours test: the system's entry log with true timestamps.
+**Outside normal business hours.** CreatedDate carries a time of day, so the field exists. In this dataset the times barely vary: 845 entries at 08:00:00, and 6 entries at 10:00:00. No entry is created before 08:00 or after 17:00, so a time-of-day test with those hours would flag 0. ApprovedDate is no better, because every entry is approved exactly one hour after it is created, at 09:00:00 or 11:00:00. PostingDate has no time. The date part of CreatedDate still gives the day of the week, and 17 entries were created on a weekend (Chapter 8 tests that). A real after-hours test would need the system's entry log with true timestamps, and a stated definition of business hours, time zone and holidays.
 
 **Round-dollar amounts.** TotalAmount, and Debit and Credit on the lines, are enough. How many entries are round depends on the definition: 17 entries have a whole-dollar amount, and 4 are exact multiples of 1,000.
 
-**Just below an approval threshold.** JournalEntry holds no threshold. The limit sits in Employee, by approver, so the test needs ApprovedByEmployeeID joined to MaxApprovalAmount. With that, 9 entries are above their approver's limit and 2 are within ten percent below it, and the near ones are ordinary rent entries. The data are sufficient once Employee is added, and the written authority policy should be confirmed.
+**Just below an approval threshold.** JournalEntry holds no threshold. The limit sits in Employee, by approver, so the test needs ApprovedByEmployeeID joined to MaxApprovalAmount. With that, 9 entries are above their approver's limit and 2 are within ten percent below it, and the near ones are ordinary rent entries. Adding Employee makes a screen possible, but MaxApprovalAmount is a field on the approver's record, not proof of the limit that governs journal entries or of when it applied, so the written authority policy is the missing item.
 
 ![A mock of What the CreatedDate and ReversesJournalEntryID columns look like in JournalEntry, the evidence for requirements 3 and 4.](../figures/chapter-01-role-of-analytics/IF-01-6-A.pdf)
 
@@ -116,7 +116,7 @@ The entries that are exact multiples of 1,000:
 
 - **Requirement (1).** Complete column lists, and the observation that the lines are in GLEntry.
 - **Requirement (2).** Columns grouped by who, when, how much and what, each with a use.
-- **Requirement (3).** A verdict for each indicator: after-hours has the field but little variation, round amounts are testable, and the threshold needs the approver's limit from Employee. Missing items are named.
+- **Requirement (3).** A verdict for each indicator: after-hours has the field but little variation, round amounts are testable, and the threshold needs the approver's limit from Employee and the written policy behind it. Missing items are named.
 - **Requirement (4).** A test design: what to select, what to compare, what to flag, and a limit.
 
 A weak answer says that the data are sufficient because the columns exist, never opens the time part of CreatedDate, or defines reversals without a test.

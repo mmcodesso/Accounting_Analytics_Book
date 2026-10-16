@@ -96,11 +96,13 @@ ORDER BY p.TimeClockEntryID;
     CASE
         WHEN tc.TimeClockEntryID IS NULL
             THEN 'No clock entry: investigate'
+        WHEN ae.WorkDate <> tc.WorkDate
+            THEN 'Dated differently: correct the report'
         WHEN ae.EmployeeID <> tc.EmployeeID
             THEN 'Names another employee: correct the report'
         WHEN ae.ExceptionType = 'Paid Without Approved Clock'
             THEN 'Paid on a Pending entry (test H1): follow up'
-        ELSE 'Isolated: record and close'
+        ELSE 'Isolated: logged, not pursued in this case'
     END AS Disposition
 FROM AttendanceException AS ae
     LEFT JOIN TimeClockEntry AS tc
@@ -110,7 +112,7 @@ ORDER BY ae.AttendanceExceptionID;
 
 ![A mock of the dispositions of the attendance exceptions, where the misattributed rows stand out.](../figures/case-part-3/IF-C3-1-B.pdf)
 
-**Check:** 18 rows: Isolated, 11; Names another employee, 4; Paid on a Pending entry (test H1), 3. Exceptions 2, 3, 8, 9 name employee 86 on entries that belong to employee 85, so the exception report misattributes its own rows. The order of the first two tests does not change a count here, because no exception is both. The isolated rows are recorded and closed, not pursued.
+**Check:** 18 rows: Isolated, 11; Names another employee, 4; Paid on a Pending entry (test H1), 3. Exceptions 2, 3, 8, 9 name employee 86 on entries that belong to employee 85, so the exception report misattributes its own rows. No exception carries another date than its entry, so the date test returns none, and the order of the employee and Pending tests does not change a count, because no exception is both. The isolated rows are logged and not pursued, which does not clear them.
 
 ### Part 4: The views
 
@@ -126,7 +128,7 @@ FROM TimeClockEntry AS tc
 WHERE cc.CostCenterName = 'Manufacturing'
 GROUP BY tc.WorkDate
 HAVING COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1
-    AND COUNT(*) > 1;
+    AND COUNT(DISTINCT tc.EmployeeID) > 1;
 ```
 
 ```sql
@@ -150,7 +152,7 @@ WHERE cc.CostCenterName = 'Manufacturing'
 
 - Without the Manufacturing filter SurgeDays is empty (0 days): across the company the hours are never one pattern.
 - An `INNER JOIN` to SurgeDays leaves 5,952 entries, all surge, so Requirement 2 has no ordinary days.
-- A second run without `DROP VIEW IF EXISTS` fails with "view SurgeDays already exists". The `PayClass` filter and the test for more than one entry remove nothing here; keep them, because they state who the plant is.
+- A second run without `DROP VIEW IF EXISTS` fails with "view SurgeDays already exists". The `PayClass` filter and the test for more than one employee remove nothing here. Keep them, because they state who the plant is, and count employees rather than rows, as H9 does, so two entries of one person cannot make a surge day.
 
 **Step 7. Reconcile the views to Tutorial 12.3.**
 
@@ -175,7 +177,7 @@ ORDER BY WorkYear;
 
 ![A mock of the reconciliation of the two views to Tutorial 12.3, the check students must pass before Requirement 2.](../figures/case-part-3/IF-C3-1-A.pdf)
 
-**Check:** three rows (year, surge days, surge entries, ordinary days, ordinary entries): 2024, 12, 768, 235, 15,033; 2025, 32, 2,048, 223, 14,145; 2026, 49, 3,136, 194, 11,796. The surge figures are those of Tutorial 12.3's test H8.
+**Check:** three rows (year, surge days, surge entries, ordinary days, ordinary entries): 2024, 12, 768, 235, 15,033; 2025, 32, 2,048, 223, 14,145; 2026, 49, 3,136, 194, 11,796. The surge figures are those of Tutorial 12.3's test H8, and a count against Employee shows that each surge day holds one entry for each of the 64 hourly employees.
 
 ## Expected results
 
@@ -189,7 +191,7 @@ ORDER BY WorkYear;
 | Punches dated differently; entries | 18; 6 | 4 |
 | Surge days; surge entries; plant entries | 12, 32, 49; 768, 2,048, 3,136; 46,926 | 6, 7 |
 
-> **Instructor notes, Requirement 1:** TimeClockPunch holds 165,137 punches of 76 employees, 2024-01-01 to 2026-12-11, all with PunchSource Badge: Clock In 52,967, Clock Out 52,964 (the three missing belong to employee 85's January 1 entries), Meal Start and Meal End 29,603 each; no punch lacks its clock entry, and no clock entry has two punches of one type. EmployeeShiftRoster has 53,002 rows (Scheduled 44,728, Reassigned 8,236, Absent 38), no employee rostered twice on one date, created by the department managers 4 (Production Manager), 5, 7, and 11. AttendanceException has 18 rows, three each of Duplicate Clock Day, Labor After Close, Missing Clock Out, Missing Final Punch, Off Shift Clocking, and Paid Without Approved Clock, all Open and never reviewed (ReviewedByEmployeeID is NULL on every row). WorkCenterCalendar has 5,900 rows, five work centers, 2024-01-01 to 2027-03-25; in 2026, 256 working days, with maintenance at some work center on 19 dates and reduced capacity on 53, and 128,833.25 available hours. Links: 18 punches carry a different date from their clock entry, the punches of the six clock entries behind the Duplicate Clock Day and Labor After Close exceptions (142, 289, 17855, 17926, 36082, 36149), whose roster dates also differ; 3 clock-in punches (1, 52951, 109493, employee 85 on each January 1) are detached from their roster; every clock entry has a roster of the same employee; exceptions 2, 3, 8, and 9 name employee 86, although their clock entries (17846 and 36072) belong to employee 85, so the exception report itself misattributes. SurgeDays: 12, 32, and 49 days, with 768, 2,048, and 3,136 hourly manufacturing entries (5,952), as in Tutorial 12.3. The isolated exceptions are the generator's planted anomalies; they need a disposition, not the memo's attention.
+> **Instructor notes, Requirement 1:** TimeClockPunch holds 165,137 punches of 76 employees, 2024-01-01 to 2026-12-11, all with PunchSource Badge: Clock In 52,967, Clock Out 52,964 (the three missing belong to employee 85's January 1 entries), Meal Start and Meal End 29,603 each; no punch lacks its clock entry, and no clock entry has two punches of one type. An entry has two punches (23,364 entries), three (3) or four (29,600). EmployeeShiftRoster has 53,002 rows (Scheduled 44,728, Reassigned 8,236, Absent 38), no employee rostered twice on one date, created by the department managers 4 (Production Manager), 5, 7, and 11. AttendanceException has 18 rows, three each of Duplicate Clock Day, Labor After Close, Missing Clock Out, Missing Final Punch, Off Shift Clocking, and Paid Without Approved Clock, all Open and never reviewed (ReviewedByEmployeeID is NULL on every row). WorkCenterCalendar has 5,900 rows, five work centers, 2024-01-01 to 2027-03-25; in 2026, 256 working days, with maintenance at some work center on 19 dates and reduced capacity on 53, and 128,833.25 available hours. Links: 18 punches carry a different date from their clock entry, the punches of the six clock entries behind the Duplicate Clock Day and Labor After Close exceptions (142, 289, 17855, 17926, 36082, 36149), whose roster dates also differ; 3 clock-in punches (1, 52951, 109493, employee 85 on each January 1) are detached from their roster; every clock entry has a roster of the same employee; exceptions 2, 3, 8, and 9 name employee 86, although their clock entries (17846 and 36072) belong to employee 85, so the exception report itself misattributes. Every exception carries its clock entry's date. SurgeDays: 12, 32, and 49 days, with 768, 2,048, and 3,136 hourly manufacturing entries (5,952), as in Tutorial 12.3. A count against Employee shows that each surge day holds one entry for each of the 64 hourly manufacturing employees. The isolated exceptions are the generator's planted anomalies. They are logged with a disposition and not pursued in this case, which does not clear them.
 
 ## What a strong answer says
 
@@ -222,5 +224,5 @@ A strong script separates what needs follow-up (the exceptions on Pending entrie
 
 - Find the clock entries that carry two or more exceptions (3 entries, 10 exceptions) and say what the pattern suggests about how the exceptions were raised.
 - Write the same link test from OvertimeApproval to its clock entry, and say what a break would mean for Requirement 2.
-- Discuss: "Isolated: record and close" is a decision to stop looking. What would you want to know before you made it for a real company?
+- Discuss: "Isolated: logged, not pursued in this case" is a decision to stop looking. What would you want to know before you closed such an item for a real company?
 - Discuss: what must a reviewer see in Case.sql before they trust a number in the memo?

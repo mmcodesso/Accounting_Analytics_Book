@@ -50,14 +50,15 @@ def fig_09_01() -> Diagram:
     d.text("<b>Importing tables into a workbook (Part II)</b>", 0, 0, 860, 22, size=14, color=INK)
     src1 = d.box("<b>CharlesRiver.xlsx</b><br>every table, every row", xs[0], 34, w, 70,
                  fill=GRAY_TINT, stroke=GRAY)
-    wb = d.box("<b>Analysis workbook</b><br>the chosen tables copied in", xs[1], 34, w, 70,
+    wb = d.box("<b>Analysis workbook</b><br>the chosen rows copied in", xs[1], 34, w, 70,
                fill=GRAY_TINT, stroke=GRAY)
-    out1 = d.box("<b>Result</b><br>merged and summarized from the copies", xs[2], 34, w, 70,
+    out1 = d.box("<b>Result</b><br>analyzed from the imported data", xs[2], 34, w, 70,
                  fill=GRAY_TINT, stroke=GRAY)
     d.arrow(src1, wb, label="Power Query")
-    d.arrow(wb, out1, label="merge, then analyze")
-    d.text("The steps are recorded and can be refreshed, but every table is copied into the "
-           "workbook, and each question across tables needs a merge first.",
+    d.arrow(wb, out1, label="combine, then analyze")
+    d.text("In this Part II workflow, the chosen rows are copied into the workbook. Power Query "
+           "records the steps so they can be refreshed, and related tables are combined through "
+           "merges or lookups.",
            0, 112, 860, 40, size=SMALL, color=INK)
     # Lower path: a saved query.
     d.text("<b>Querying the database (Part III)</b>", 0, 170, 860, 22, size=14, color=INK)
@@ -221,7 +222,8 @@ def fig_09_06() -> Diagram:
            "each</b>", 0, 0, 860, 20, size=SMALL)
     d.grid(0, 24, headers, widths, rows)
     y = 24 + ROW_H * (len(rows) + 1) + 12
-    note(d, "A comparison with NULL is never true, so = NULL keeps no row, closed or open. IS NULL "
+    note(d, "An ordinary comparison with NULL, such as =, is never true, so = NULL keeps no row, "
+            "closed or open. IS NULL "
             "is true for the work orders with no ClosedDate, and COALESCE shows a stand-in value "
             "where the date is missing.", y, 40)
     return d

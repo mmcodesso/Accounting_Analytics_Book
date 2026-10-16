@@ -26,7 +26,7 @@ D.  SourceDocumentType is declared as INTEGER, so no text value can match it
 **4.** PostingDate is stored as text in the form year-month-day. Which condition selects every posting dated in fiscal 2026?
 
 A.  `PostingDate = 2026`
-B.  `PostingDate BETWEEN '1/1/2026' AND '12/31/2026'`
+B.  `PostingDate BETWEEN '01/01/2026' AND '12/31/2026'`
 C.  `PostingDate BETWEEN '2026-01-01' AND '2026-12-31'`
 D.  `PostingDate LIKE '12/31/2026'`
 

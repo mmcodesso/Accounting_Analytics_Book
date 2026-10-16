@@ -46,6 +46,8 @@ def t1(d, claim):
     rows = c13.lines(d)
     n = d.one("SELECT COUNT(*) FROM SalesInvoiceLine")
     claim(len(rows) == n, "every invoice line finds its invoice, item, and customer")
+    ids = d.q("SELECT COUNT(DISTINCT SalesInvoiceLineID), COUNT(SalesInvoiceLineID) FROM SalesInvoiceLine")[0]
+    claim(ids[0] == ids[1] == n, "every invoice line has its own, non-null SalesInvoiceLineID, so Count of it gives the lines")
     first_invoice = d.q("SELECT InvoiceNumber, InvoiceDate FROM SalesInvoice ORDER BY SalesInvoiceID LIMIT 1")[0]
     first = rows[:TOP_ROWS]
     claim(len({r["rate"] for r in first}) == 1, "the first 1,000 lines have a single Discount value")
@@ -144,7 +146,14 @@ def ex2(d, claim):
     others = {s: m for s, m in peaks.items() if s != "Design Trade"}
     start, end = int(autumn["start"][5:7]), int(autumn["end"][5:7])
     claim(all(start <= m <= end for m in others.values()), "the other segments peak within the autumn promotion's months")
+    peak_promos = defaultdict(float)
+    for r in rows:
+        if r["segment"] == "Design Trade" and r["m"] == trade_month and r["promo"] is not None:
+            peak_promos[r["promo"]] += r["disc"]
+    claim(set(peak_promos) == {trade["id"], autumn["id"]} and peak_promos[trade["id"]] > peak_promos[autumn["id"]],
+          "Design Trade's peak month holds discounts of its own promotion, the larger part, and of the autumn promotion's lines invoiced then")
     return dict(C=d.C, trade=trade["name"], trade_month=c13.MONTHS[trade_month - 1], autumn=autumn["name"],
+                trade_own=peak_promos[trade["id"]], trade_rest=peak_promos[autumn["id"]],
                 autumn_months=f"{c13.MONTHS[start - 1]} and {c13.MONTHS[end - 1]}",
                 peaks=[(s, c13.MONTHS[peaks[s] - 1], by[s][peaks[s]], totals[s]) for s in segs if s not in none],
                 others=[(s, c13.MONTHS[m - 1]) for s, m in sorted(others.items())], no_discount=none)

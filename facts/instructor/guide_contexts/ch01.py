@@ -387,6 +387,8 @@ def ex4(d, claim):
     schema(d, claim, EX4_SCHEMA)
     in_group(claim, {"DemandForecast": "Demand Planning", "RoughCutCapacityPlan": "Demand Planning", "WorkOrderClose": "Manufacturing",
                      "LaborTimeEntry": "Payroll and Time", "Item": "Master Data"})
+    claim(d.one("SELECT COUNT(*) FROM Item WHERE SupplyMode = 'Manufactured' AND COALESCE(StandardFixedOverheadCost, 0) <= 0") == 0,
+          "the standard cost of every manufactured item includes fixed overhead")
     last_day = d.one("SELECT MAX(CompletionDate) FROM ProductionCompletion")
     label, start, end = quarter_bounds(last_day)
     claim(last_day == end, "the completion records run to the end of a quarter, so the last quarter is a whole one")
@@ -491,6 +493,10 @@ def ex6(d, claim):
     claim(len(times) <= 3, "journal entries are created at only a few distinct clock times")
     after_hours = d.one("SELECT COUNT(*) FROM JournalEntry WHERE substr(CreatedDate, 12, 5) < '08:00' OR substr(CreatedDate, 12, 5) > '17:00'")
     claim(after_hours == 0, "no journal entry is created before 08:00 or after 17:00")
+    approved_times = [r[0] for r in d.q("SELECT substr(ApprovedDate, 12) FROM JournalEntry GROUP BY 1 ORDER BY COUNT(*) DESC")]
+    claim(len(approved_times) <= 3, "journal entries are approved at only a few distinct clock times")
+    claim(d.one("SELECT COUNT(*) FROM JournalEntry WHERE ROUND((julianday(ApprovedDate) - julianday(CreatedDate)) * 24, 6) <> 1") == 0,
+          "every journal entry is approved exactly one hour after it is created")
     gl_times = d.q("SELECT substr(CreatedDate, 12), COUNT(*) FROM GLEntry GROUP BY 1")
     claim(len(gl_times) == 2, "ledger rows carry one clock time for journal entries and one for every other source")
     weekend = d.one("SELECT COUNT(*) FROM JournalEntry WHERE strftime('%w', substr(CreatedDate, 1, 10)) IN ('0', '6')")
@@ -520,6 +526,7 @@ def ex6(d, claim):
                 "'JournalEntry' AND g.CreatedByEmployeeID <> j.CreatedByEmployeeID") == 0,
           "the ledger rows of a journal entry name the entry's own creator")
     return dict(entries=entries, je_rows=je_rows, times=[(t, n) for t, n in times], n_times=len(times), after_hours=after_hours,
+                approved_times=approved_times,
                 gl_je_time=d.one("SELECT substr(CreatedDate, 12) FROM GLEntry WHERE SourceDocumentType = 'JournalEntry' LIMIT 1"),
                 gl_other_time=d.one("SELECT substr(CreatedDate, 12) FROM GLEntry WHERE SourceDocumentType <> 'JournalEntry' LIMIT 1"),
                 weekend=weekend, round_unit=1000, whole=whole, thousands=thousands, n_thousands=len(thousands), approvers=approvers, above=above, near=near,

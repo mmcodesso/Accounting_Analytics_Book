@@ -2,7 +2,7 @@
 
 ## Key Terms
 
-**As-of date.** A fixed date, usually stored in a named parameter cell, from which ages and elapsed times are measured. Unlike TODAY, an as-of date gives the same result every time the workbook is opened, so the calculation can be reproduced and reviewed.
+**As-of date.** A fixed date, usually stored in a named parameter cell, from which ages and elapsed times are measured. Unlike TODAY, an as-of date does not change when the workbook recalculates on a later day, so the calculation can be reproduced and reviewed.
 
 **Custom column.** A column added to a Power Query query and calculated with a formula in Power Query's formula language, M. Custom columns are recorded as applied steps and recalculated on every refresh.
 
@@ -32,4 +32,4 @@
 
 **Validity check.** A test that each value has the form or range it should for its purpose, such as an item code of the expected length or a quantity that is a whole number. A validity check can fail even when the value is present and accurately recorded.
 
-**XLOOKUP.** An Excel function that searches one column for a key and returns the value in the same position of another column, with an optional value to return when the key is not found. It is available in Microsoft 365 and Excel 2021 or later.
+**XLOOKUP.** An Excel function that searches one column for a key and returns the value in the same position of another column, with an optional value to return when the key is not found. It is available in Excel for Microsoft 365, Excel 2024, and Excel 2021.

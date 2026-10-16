@@ -23,7 +23,7 @@ The chapter depends on these conditions of the data:
 - No foreign keys are declared, so a bad join raises no error; it returns more or fewer rows. Every key of Tutorial 10.1 matches: the joins return 12,998 rows, one for each close.
 - The ledger reaches its documents through SourceDocumentType and SourceDocumentID, and the ID that numbers the traced sale also numbers ledger rows of 11 kinds of document.
 - PurchaseRequisition has NULL approvers, so NOT IN returns 0 employees where NOT EXISTS finds 117 of 120. Two different customers share the name Brown LLC.
-- The labor time records end before the year does, because the last pay periods are Open, while the completions run to the last day. Tutorial 10.3 depends on the cut-off.
+- The labor time records end before the year does, because the last pay periods are Open, while the completions run to the last day. Tutorial 10.3 depends on the cut-off. Indirect time ends earlier still (2026-12-04), so the tutorial calls its ratio an observed-records diagnostic.
 - The exercises rest on planted conditions (ledger rows with no payroll payment, work orders without operations, labor entries whose operation key matches nothing, suppliers that share an employee's address) and on tests that are clean on purpose.
 
 ## What students should be able to do afterward
@@ -163,7 +163,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 | 3 | Registers and people | 1,675, 1,742, 1,742 registers; the same 67 employees each year |
 | 4 | Two profiles | 68,859 entries, 51,114 with an operation, to 2026-12-11; 17,352 completions, to 2026-12-31 |
 | 5 | The last pay periods | Processed, then Open and Open |
-| 6 | Hours per standard hour | direct `0.85`, `0.87`, `0.94`; indirect `0.33`, `0.54`, `0.57` |
+| 6 | Hours per standard hour | direct `0.85`, `0.87`, `0.94`; indirect `0.33`, `0.54`, `0.57`; the two rows of a year add to 1.18, 1.41, 1.51 |
 | 7 | Time with no operation | 3 rows; the direct row holds 20 entries |
 | 8 | The saved script | a header with its checks and a comment above each query |
 
@@ -172,9 +172,10 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 - Step 3: `COUNT(*)` read as the number of people.
 - Step 4: the profiles skipped, so the last day of the time records goes unnoticed.
 - Step 6: without the cut-off the last year reads `0.91` and `0.56`, which flatters the plant; a join of the raw tables first asks for 366,690,316 rows.
+- Step 6, coverage: direct and non-manufacturing time end on 2026-12-11, indirect time on 2026-12-04, and the days between hold 3,631.51 direct hours and no indirect time. The sensitivity the text describes stops the hours and the output at 2026-12-04. It gives direct `0.89`, indirect `0.58` and a total of `1.48` from the unrounded hours (59,132.60 and 38,472.89 over 66,119.82 standard hours). Stopping each earlier year at its own last day of indirect time (2024-12-27 and 2025-12-29) leaves its rounded ratios as printed. A student who reports the sensitivity, or separate ratios for each kind of time, has read the coverage correctly. Two rounded ratios add up to the total only to within rounding.
 - Step 7: a test on the entry's key alone finds 3 direct entries and misses the 17 whose key is filled in and matches nothing.
 
-**The checkpoint to look for.** The seven bullets. A strong student says that output was about the same and direct labor stayed within its standards, while indirect time, which is overhead, grew, so the answer to the volume question is mostly no.
+**The checkpoint to look for.** The seven bullets. A strong student says that output was about the same and the direct hours recorded stayed below the standard hours, while indirect time, which is overhead, grew, so the records point to the cost of production rather than volume. The strongest add that the ratio is an observed-hours diagnostic, with indirect time ending a week before the cut-off, not a labor efficiency variance or a measure of the production-volume variance.
 
 ![A mock of the in-class demonstration of fan-out, one total summed over a join and again from the header table alone.](../figures/chapter-10-joining-and-summarizing/IF-10-0-B.pdf)
 
@@ -202,7 +203,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 2. **An anti-join from the ledger to its documents returns no rows. What did you prove?** It reaches existence against completeness: the test in the other direction asks whether every document was posted.
 3. **NOT IN returned no one. Does every employee approve requisitions?** It reaches the NULL in the list and the control query that shows a test can find something.
 4. **Two customers share a name. Which report misleads the sales manager, and how does the controller find out?** It reaches grouping by key, the row counts and the master-data question of duplicates.
-5. **Direct labor stayed within its standard while the variance grew. What data would split the overhead part by cause?** It reaches indirect time, overtime, the calendar and Chapter 11's monthly measure.
+5. **The direct hours recorded stayed below the standard hours while the variance grew. What data would split the overhead part by cause?** It reaches indirect time, overtime, the calendar and Chapter 11's monthly measure.
 6. **A join beats comparing two lists by eye. What can it not tell you?** It reaches exact matches only, addresses written differently, and a coincidence of data that is not a relationship.
 
 ## Using the exercises
@@ -241,12 +242,12 @@ Key: 1 C, 2 A, 3 D, 4 B, 5 B, 6 D, 7 A, 8 C, 9 D, 10 B, 11 A, 12 C, 13 A, 14 D, 
 | 7 | A | grouping by name merges different customers that share it; group by the key. |
 | 8 | C | fan-out repeats the header amount on each line. |
 | 9 | D | a subquery in WHERE supplies the average to compare with. |
-| 10 | B | a NULL in the NOT IN list makes every comparison unknown, so no row qualifies; use NOT EXISTS or an anti-join. |
+| 10 | B | with a NULL in the NOT IN list, a matching employee gives false and every other employee unknown, and WHERE keeps only true, so no row qualifies (use NOT EXISTS or an anti-join). |
 | 11 | A | a condition on the second table in WHERE removes the NULL rows; put it in ON. |
 | 12 | C | SQLite allows a bare column in a grouped query but returns an arbitrary row's value. |
 | 13 | A | when all balances net to zero, the debit balances equal the credit balances (not proof that the entries are right). |
 | 14 | D | amounts at different levels are summarized to a common level (the year) before joining. |
-| 15 | C | indirect labor is overhead, applied at a standard rate per unit, so extra indirect time raises the overhead variance. |
+| 15 | C | indirect labor is overhead, which Charles River charges at a standard amount per unit, so the cost of extra indirect time can raise the overhead part of the variance. |
 
 **Questions where a wrong option tempts**
 

@@ -23,7 +23,7 @@ A note is a schedule that the records can produce and that must agree with a lin
 
 Students can roll property and equipment forward and reconcile it (Part 1), state the notes' terms, maturities and current portion (Part 2), disaggregate revenue on the adjusted basis (Part 3), break accrued liabilities and inventories into components (Part 4), and write the notes (Part 5).
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 and BAR M10 (advanced data analytics: data models and joins); IMA Reporting and Control (financial recordkeeping; financial statement preparation); IFAC IES 2 (a); AACSB A5 part 5.1 (technology integration: Excel with Power Query and data models; SQL).
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 and BAR M10 (advanced data analytics: data models and joins); IMA Reporting and Control (financial statement preparation); IFAC IES 2 (a); AACSB A5 part 5.1 (technology integration: Excel and SQL).
 
 ## Before you assign
 
@@ -96,11 +96,11 @@ The workbook reads the adjusted trial balance by revenue account and, for the se
 
 **Step 5. Show the contract balances and test the services.** Receivables are ${{ recv_p|money }} and ${{ recv_c|money }}, each including the opening line that no document supports; no contract asset or liability is recorded; customer credits awaiting refund (`2060`) are ${{ credits[1]|money }} and ${{ credits[2]|money }}, {{ issued }} Issued credit memos at the last year-end. The services query compares hours worked with hours billed, engagement by engagement.
 
-**Check:** all {{ billable|num(2) }} billable hours were billed, so no service work was done and not billed. **Watch for:** reading engagement {{ engs[0].id }}'s planned hours less its billed hours as unbilled work: {{ g.short_hours|num(2) }} hours that were never worked.
+**Check:** all {{ billable|num(2) }} billable hours were billed, so the records show no recorded service work left unbilled. They cannot show that every hour worked was recorded. **Watch for:** reading engagement {{ engs[0].id }}'s planned hours less its billed hours as unbilled work: {{ g.short_hours|num(2) }} hours that were never worked.
 
 ### Part 4: Accrued liabilities and inventories
 
-**Step 6. Break each line into its components.** Accrued liabilities: payroll and related, commissions, accrued expenses after A3 and interest; inventories: finished goods at standard cost, materials and packaging at purchase-order cost (price variances go to cost of goods sold) and work in process net of the `1090` credit. Each total must equal its balance sheet line.
+**Step 6. Break each line into its components.** Accrued liabilities: payroll and related, commissions, accrued expenses after A3 and interest; inventories: finished goods as recorded (purchased goods at receipt cost, manufactured goods at standard), materials and packaging at purchase-order cost (price variances go to cost of goods sold) and work in process net of the `1090` credit. Each total must equal its balance sheet line.
 
 **Check:** accrued liabilities ${{ s_c.accrued|money }}, of which payroll ${{ s_c.payroll|money }}; inventories ${{ s_c.inv|money }}, of which materials ${{ s_c.mat|money }}. **Watch for:** showing only the wages owed, ${{ g.payroll_only|money }}. The total misses the balance sheet by the ${{ opening_2030|money }} opening line.
 
@@ -112,7 +112,7 @@ The workbook reads the adjusted trial balance by revenue account and, for the se
 |---|---|---|
 | Property and equipment | Method and lives; additions, disposals, the noncash acquisition | The roll-forward |
 | Notes payable | Terms, linked asset, maturities, current portion, interest paid | `2110` |
-| Revenue | Timing; disaggregation; contract balances; no unbilled service work | The income statement |
+| Revenue | Timing and its assumption; disaggregation; contract balances; no recorded service work unbilled | The income statement |
 | Accrued liabilities | Components, the opening line named | The balance sheet |
 | Correction of {{ d.P }} | What changed; effect on opening equity and income; none on cash | The equity statement |
 
@@ -132,7 +132,7 @@ Notes still to be written (policies, inventories, Requirement 9's matters) go on
 ## What a strong answer says
 
 - **Property and equipment and notes.** Method, lives, both disposals, the noncash acquisition; the asset each note financed, with no security interest claimed.
-- **Revenue.** The adjusted basis, and the assumption that control passes on delivery stated.
+- **Revenue.** The adjusted basis, with the assumptions stated that control of the goods passes on delivery and that the service contracts support recognition over time.
 - **Accrued liabilities and the correction.** The opening line named; no effect on cash.
 
 A weak answer lists balances without reconciling them to the statements.

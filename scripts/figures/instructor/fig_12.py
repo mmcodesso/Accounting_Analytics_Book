@@ -446,7 +446,7 @@ def if_12_6_a() -> Diagram:
     a, f, p = rows
     _note(d, f"Outlined: the MAD column (teal) and the partial-payment row (coral). The values are Tutorial 8.1's: all payments {a[3]:.5f}, "
              f"{_reading(a[3])}; full payments (Amount = GrandTotal) {f[3]:.5f}, {_reading(f[3])}; partial payments {p[3]:.5f}, {_reading(p[3])}, "
-             f"because only invoices of $1,000 or more are paid in parts (the smallest, {_money(smallest)}). Each group has {a[2]} digits, so none is missing. "
+             f"plausibly because only invoices of $1,000 or more are paid in parts (the smallest, {_money(smallest)}), a selection by size. Each group has {a[2]} digits, so none is missing. "
              f"The editor is scrolled to the last branch of the Groups CTE, the Observed CTE and the final SELECT.", mock["bottom"])
     return d
 
@@ -701,9 +701,12 @@ def if_12_3_b() -> Diagram:
     quiet = [i for i in build if indirect[i] < 0.05 * direct[i]]
     assert quiet == list(range(quiet[0], quiet[-1] + 1)) and names[quiet[0]] == "February" and names[quiet[-1]] == "May", quiet
     q = months.index(quarter)
-    _note(d, f"From {names[build[0]]} to {names[build[-1]]} the plant completed {stock:,.0f} more units than it shipped, an inventory build that kept the hours on "
-             f"work orders: from {names[quiet[0]]} to {names[quiet[-1]]} indirect time was {', '.join(f'{indirect[i]:,.0f}' for i in quiet[:-1])} and "
-             f"{indirect[quiet[-1]]:,.0f} hours against {sum(direct[i] for i in quiet):,.0f} direct (test T4). In {names[q]} completions "
+    last_build = build[-1]
+    assert indirect[last_build] > 0.2 * direct[last_build], "the last month of the build already had much indirect time"
+    _note(d, f"From {names[build[0]]} to {names[build[-1]]} the plant completed {stock:,.0f} more units than it shipped, an inventory build consistent with "
+             f"the little indirect time from {names[quiet[0]]} to {names[quiet[-1]]}, {', '.join(f'{indirect[i]:,.0f}' for i in quiet[:-1])} and "
+             f"{indirect[quiet[-1]]:,.0f} hours against {sum(direct[i] for i in quiet):,.0f} direct (test T4), although {names[last_build]} already had "
+             f"{indirect[last_build]:,.0f}. A plausible explanation, to confirm with the production schedules. In {names[q]} completions "
              f"({completed[q]:,.0f}) fell below shipments ({shipped[q]:,.0f}) and the share of direct time recorded after its operation ended rose "
              f"from {share[before_q]:.2f} in {names[q - 1]} to {share[quarter]:.2f}, the first month above a quarter.", ly + 20)
     return d

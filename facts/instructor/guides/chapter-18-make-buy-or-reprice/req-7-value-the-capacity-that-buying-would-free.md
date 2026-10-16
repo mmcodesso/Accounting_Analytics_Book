@@ -70,7 +70,7 @@ Use before       {{ g.f.use }}
 Use after        {{ g.f.use_after }}
 ```
 
-**Check:** the sheet agrees with Q23 center by center: {% for x in freed %}{{ x.short }} {{ x.hours|num(0) }}{{ ", " if not loop.last else "" }}{% endfor %}, and nothing at Quality Assurance. The hours freed here use the year's completions; Requirement 6's positions use the routing time of the year's sales ({{ crew_hours|num(0) }} hours), a different base, so both numbers are right.
+**Check:** the sheet agrees with Q23 center by center: {% for x in freed %}{{ x.short }} {{ x.hours|num(0) }}{{ ", " if not loop.last else "" }}{% endfor %}, and nothing at Quality Assurance. The hours freed here use the year's completions, the base of the capacity table. Requirement 6's positions use the routing time of the year's sales ({{ crew_hours|num(0) }} hours), a different base, so both numbers are right as long as each is labeled and neither is mixed with the other.
 
 {{ figure('IF-18-7-A') }}
 
@@ -82,7 +82,7 @@ Use after        {{ g.f.use_after }}
 Unused, in positions   {{ g.f.unused_pos }}
 ```
 
-**Check:** the plant leaves {{ unused_h|num(1) }} practical hours unused, {{ unused_positions|num(2) }} positions, against {{ g.positions|num(2) }} positions freed by buying. So fitting the crew to the work is the larger question, and the two reductions add up only if both can be made. The production manager is right that idle capacity is not the products' fault, but it is still a cost.
+**Check:** on the completions basis the plant leaves {{ unused_h|num(1) }} practical hours unused, {{ unused_positions|num(2) }} position-equivalents, against {{ freed_positions|num(2) }} freed by buying ({{ sales_positions|num(2) }} on Requirement 6's sales basis). So fitting the crew to the work is the larger question, and the two reductions add up only if both can be made. The production manager is right that idle capacity is not the products' fault, but it is still a cost. **Watch for:** the hours read as a staffing plan. They are annual hours from standard times, and the year's rough-cut plan puts {{ weeks.plant }} of its {{ weeks.weeks }} weeks above the plant's available hours and {{ weeks.centers }} work-center weeks above their own (up to {{ weeks.center_peak.share|pct(1) }} at {{ weeks.center_peak.name }}), so a position-equivalent is not a removable job until the weeks, skills and coverage are checked.
 
 ### Part 3: If the crew is kept
 
@@ -93,7 +93,7 @@ Crew's cost of that time   {{ g.f.crew_cost }}
 Supervision and equipment  {{ g.f.support }}
 ```
 
-**Check:** the crew's cost of the {{ crew_hours|num(0) }} hours is ${{ crew_cost|num(0) }} and the supervision and equipment ${{ supervision|num(0) }}. Spread over the remaining families' {{ g.remain_h|num(0) }} routing hours, absorption cost rises ${{ g.spread|num(2) }} an hour; time-driven costs do not move, and the unused capacity grows to ${{ g.unused_after|num(0) }}.
+**Check:** on the sales basis, the crew's cost of the {{ crew_hours|num(0) }} hours is ${{ crew_cost|num(0) }} and the supervision and equipment ${{ supervision|num(0) }}. Spread over the remaining families' {{ g.remain_h|num(0) }} routing hours, absorption cost rises ${{ g.spread|num(2) }} an hour. Time-driven costs do not move, and on the completions basis of the capacity table the unused capacity cost grows from ${{ unused|num(0) }} to ${{ unused_after|num(0) }}. **Watch for:** ${{ g.mixed_after|num(0) }}, the unused hours of the completions basis plus the hours freed on the sales basis, two populations in one figure.
 
 ### Part 4: The optional growth test
 
@@ -120,7 +120,8 @@ Hours used after buying      {{ g.f.used }}
 | Quantity | Value | Step |
 |---|---|---|
 | Hours freed; use of practical capacity before and after | {{ total|num(0) }}; {{ use_before|pct(1) }} and {{ use_after|pct(1) }} | 1 |
-| Unused hours; positions unused and freed | {{ unused_h|num(1) }}; {{ unused_positions|num(2) }} and {{ g.positions|num(2) }} | 3 |
+| Unused hours; position-equivalents unused and freed (completions basis) | {{ unused_h|num(1) }}; {{ unused_positions|num(2) }} and {{ freed_positions|num(2) }} | 3 |
+| Unused capacity cost before and after buying (completions basis) | ${{ unused|num(0) }}; ${{ unused_after|num(0) }} | 4 |
 | Crew's cost kept; supervision and equipment | ${{ crew_cost|num(0) }}; ${{ supervision|num(0) }} | 4 |
 | Solver: binding center, added cost | {{ lp[0].binding[0].short }}, ${{ lp[0].cost|num(0) }}; {{ lp[1].binding[0].short }}, ${{ lp[1].cost|num(0) }} | 5 |
 
@@ -128,9 +129,9 @@ Hours used after buying      {{ g.f.used }}
 
 ## What a strong answer says
 
-- **Freed hours are not a saving.** Buying frees {{ total|num(0) }} hours and lowers the plant's use, but the plant already leaves more hours unused. The comparison moves the decision from outsourcing to fitting the crew to the work, which is the production manager's.
+- **Freed hours are not a saving.** Buying frees {{ total|num(0) }} hours and lowers the plant's use, but the plant already leaves more hours unused, on the same base. The comparison moves the decision from outsourcing to fitting the crew to the work, which is the production manager's, week by week and work center by work center.
 - **If the crew is kept,** the products bought take only materials and the overhead that varies; the crew's time, supervision and equipment stay. Under absorption they land on the families that remain.
-- **The growth test is a benchmark.** Capacity binds only after growth of about {{ (headroom|map(attribute='ratio')|min - 1)|pct(0) }}; Solver's plan ignores the minimum and the tooling, so cost the plan the supplier would accept.
+- **The growth test is a benchmark.** Capacity binds only after growth of about {{ (headroom|map(attribute='ratio')|min - 1)|pct(0) }}; Solver's plan ignores the minimum and the tooling, so cost the plan the supplier would accept. An annual model is not a production schedule.
 
 A weak answer reports the freed hours without the comparison, or presents Solver's plan as the decision.
 

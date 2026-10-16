@@ -14,9 +14,9 @@
 
 An audit that ends with a report tests the past. The register of Chapter 16 already runs the rule tests of earlier chapters with every refresh, and adding this cycle's rules to it, under the change control that chapter described, turns the audit into monitoring. Two judgments carry the requirement. A rule test, where a document either passes or fails, belongs in the register; an anomaly, a reason to look, stays outside it. And the historical exceptions of the new tests are recorded once, as a finding about the control's design, so that they do not flood the review. The analytics type is prescriptive: the tests are the action that outlasts the report.
 
-Students can add rule tests and their populations to a register (Part 1), keep anomalies outside it (Part 2), treat historical exceptions as one design finding and close it on a retest (Part 3), build the small alternative when no register exists (Part 4), and recheck the date the data run through and record the change (Part 5).
+Students can add rule tests and their populations to a register (Part 1), keep anomalies outside it (Part 2), link the historical exceptions that share a supported cause to a finding and close it on a retest (Part 3), build the small alternative when no register exists (Part 4), and recheck the date the data run through and record the change (Part 5).
 
-**Competencies practiced.** CPA Evolution ISC M2 (tests of internal controls, logical access and change management) and Core S2 M9; IMA Reporting and Control (internal control); IFAC IES 2 (g) and (i); AACSB A5 parts 5.1 (Power BI) and 5.3 (learning to learn).
+**Competencies practiced.** CPA Evolution ISC M2 (tests of internal controls, logical access and change management) and Core S2 M9; IMA Reporting and Control (internal control); IFAC IES 2 (g) and (i); AACSB A5 part 5.1 (Power BI).
 
 ## Before you assign
 
@@ -26,7 +26,7 @@ Students can add rule tests and their populations to a register (Part 1), keep a
 
 ## How to run it
 
-Pairs, about 90 minutes: 35 for the flags and the exception queries, 10 for the tests and the populations, 15 for the anomalies, 15 for the design finding, 15 for Data Through and the change log. Hold back the design finding until the register shows the flood, then ask what the committee would do with it. **Collect** the project and a screenshot of the Tests tab.
+Pairs, about 90 minutes: 35 for the flags and the exception queries, 10 for the tests and the populations, 15 for the anomalies, 15 for the findings, 15 for Data Through and the change log. Hold back the design finding until the register shows the flood, then ask what the committee would do with it. **Collect** the project and a screenshot of the Tests tab.
 
 ## Step-by-step solution
 
@@ -100,9 +100,9 @@ SWITCH (
 
 **Check:** 153 refunds by a method no receipt on the invoice used, and 124 paid while the customer's past-due balance was at least the refund. They stay out because no customer pays by one method only and a method chosen at random would mismatch about as often, and because the records hold no policy that requires an offset. **Watch for:** adding them to the register, which makes it 1,269 rows and buries the rule failures.
 
-### Part 3: Give the historical exceptions one design-finding treatment
+### Part 3: Link the historical exceptions to findings by supported cause
 
-**Step 5. Record the finding once and keep every exception.** A Design Findings table (**Home > Enter data**) holds, for each new test, the finding, the date it covers through and the date it is to be fixed. Merge it into the register by TestID and add a Covered column, then measure the open exceptions without the covered ones.
+**Step 5. Link each exception to its finding and keep every exception.** The model links each test's historical exceptions to one of two findings, credits and refunds, the causes Requirement 8 supports. A Design Findings table (**Home > Enter data**) holds, for each new test, the finding, the date it covers through and the date it is to be fixed. Merge it into the register by TestID and add a Covered column, then measure the open exceptions without the covered ones.
 
 ```
     #"Added Custom" = Table.AddColumn(#"Expanded Design Findings", "Covered", each if [CoversThrough] <> null and [EventDate] <= [CoversThrough] then 1 else 0)
@@ -162,14 +162,14 @@ ROW (
 | Anomalies: method mismatch; missed offset | 153; 124 | 4 |
 | Data Through; Change Log rows | 2026-12-18; 5 | 7 |
 
-> **Instructor notes, Requirement 10:** exceptions and rates per 1,000 (2024 / 2025 / 2026; three years): CM AboveLimit 414 (104 / 157 / 153; 658.2 / 676.7 / 689.2; 676.5); CM CashAndCredit 206 (60 / 77 / 69; 379.7 / 331.9 / 310.8; 336.6); RF AboveLimit 163 (43 / 61 / 59; 781.8 / 726.2 / 710.8; 734.2); RF BeforePayment 58 (10 / 29 / 19; 181.8 / 345.2 / 228.9; 261.3). Populations: credits 158 / 232 / 222, refunds 55 / 84 / 83. The register grows from 151 to 992 rows, (TestID, DocumentNumber) still unique. For BeforePayment, group the applications by invoice for the last ApplicationDate and merge it (by the receipts' ReceiptDate instead, RF BeforePayment has 51 exceptions, 9 / 24 / 18, per 1,000 163.6 / 285.7 / 216.9, and the register 985 rows: accepted with the definition stated); for CashAndCredit, merge the applications and test whether the credit's approver is among their appliers. Design findings: record the historical exceptions once, as findings about the controls' design, keeping each exception and its document in the register; review the exceptions dated after the period the findings cover as they arrive, and close a finding only when a retest after the fix shows the control works, not on its planned date. Data Through stays 2026-12-18 (payroll), the earliest of the processes' last dates: what the tests can have seen, not proof that every record through it was loaded; credits end 2026-12-26 and refunds 2026-12-22. After remediation, the two authority tests should fall to zero; the other two are the ones that would catch the next case.
+> **Instructor notes, Requirement 10:** exceptions and rates per 1,000 (2024 / 2025 / 2026; three years): CM AboveLimit 414 (104 / 157 / 153; 658.2 / 676.7 / 689.2; 676.5); CM CashAndCredit 206 (60 / 77 / 69; 379.7 / 331.9 / 310.8; 336.6); RF AboveLimit 163 (43 / 61 / 59; 781.8 / 726.2 / 710.8; 734.2); RF BeforePayment 58 (10 / 29 / 19; 181.8 / 345.2 / 228.9; 261.3). Populations: credits 158 / 232 / 222, refunds 55 / 84 / 83. The register grows from 151 to 992 rows, (TestID, DocumentNumber) still unique. For BeforePayment, group the applications by invoice for the last ApplicationDate and merge it (by the receipts' ReceiptDate instead, RF BeforePayment has 51 exceptions, 9 / 24 / 18, per 1,000 163.6 / 285.7 / 216.9, and the register 985 rows: accepted with the definition stated); for CashAndCredit, merge the applications and test whether the credit's approver is among their appliers, the rule Requirement 4 states (testing the people who recorded the receipts too, an accepted extension when stated, gives 356 exceptions, 102 / 132 / 122, and a register of 1,142 rows). Findings: link the historical exceptions that share a supported cause to a finding (the model links each test's to one of two findings, credits and refunds, rated provisionally in Requirement 8, which looked past the register to the records behind it), keeping each exception, its document, amount, and disposition in the register; record whether the finding concerns design or operation, the period it covers, the date the fix is due, the date it is made, and the retest; review the exceptions dated after the covered period as they arrive, and close a finding only when a retest after the fix shows the control works, not on its planned date. Data Through stays 2026-12-18 (payroll, whose last two pay periods are open and scheduled to pay in January 2027), the earliest of the processes' last dates: what the tests can have seen, not proof that every record through it was loaded; credits end 2026-12-26 and refunds 2026-12-22. After remediation, the two authority tests should fall to zero; the other two are the ones that would catch the next case.
 
 ## What a strong answer says
 
 - **The four tests use Requirement 4's definitions,** and the definition of "before the payment" is stated.
 - **The processes are in the populations,** so each rule has a `Rate per 1,000` by year.
 - **Anomalies stay outside the register,** with the reason.
-- **The historical exceptions are one design finding with a fix-by date,** each kept in the register, later exceptions reviewed, and the finding closed on a retest.
+- **The historical exceptions are linked to findings by supported cause,** design or operation stated, with the covered period, the fix-by date, the date of the fix and the retest kept apart, each exception kept in the register, later exceptions reviewed, and a finding closed on a retest.
 - **Data Through is rechecked and the change is logged.**
 
 A weak answer floods the register with the anomalies or the history, or closes the finding on the date.
@@ -180,7 +180,7 @@ A weak answer floods the register with the anomalies or the history, or closes t
 - **A same-day refund flagged.** *Symptom:* 64 refunds. *Response:* ask what the records say about the order within a day.
 - **A process label that does not match.** *Symptom:* a blank rate beside a count. *Response:* compare the Tests table with the measure.
 - **The anomalies in the register.** *Symptom:* 1,269 rows. *Response:* ask which of them is a rule failure.
-- **No design finding.** *Symptom:* 977 open exceptions. *Response:* ask who reviews that many.
+- **No finding.** *Symptom:* 977 open exceptions. *Response:* ask who reviews that many.
 - **The finding closed on the date.** *Symptom:* a status of closed with no retest. *Response:* ask what shows the control works.
 - **The latest date as Data Through.** *Symptom:* 2026-12-31. *Response:* ask which process ends first.
 
@@ -191,7 +191,7 @@ A weak answer floods the register with the anomalies or the history, or closes t
 | Four rule tests with Requirement 4's definitions | 30 | All four, counts agreeing | Three, or a changed definition unstated |
 | Two processes in the populations | 15 | A `Rate per 1,000` by year | Counts only |
 | Anomalies kept outside | 10 | Columns, measures and a page, with the reason | In the register |
-| One design finding | 20 | Covered period, fix-by date, later exceptions open | History left open |
+| Findings by supported cause | 20 | Covered period, fix-by date, later exceptions open | History left open |
 | Data Through rechecked | 10 | The earliest date, with the reason | Latest date |
 | Change recorded | 15 | Log with object, change and reason | No record |
 
@@ -200,4 +200,4 @@ A weak answer floods the register with the anomalies or the history, or closes t
 - Record a disposition for the largest refund's exception with Chapter 16's Dispositions merge, and watch Reviewed Exceptions rise by one.
 - Add the anomaly tests to the register once a refund policy exists, and say what the policy must state.
 - Discuss: after the fix, which two tests should fall to zero, and which two would catch the next case?
-- Discuss: how long should a design finding stay open when the retest keeps failing?
+- Discuss: how long should a finding stay open when the retest keeps failing?

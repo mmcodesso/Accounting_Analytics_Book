@@ -33,7 +33,7 @@ Students can:
 
 ## How to run it
 
-Individually, about 75 minutes: 10 for Requirement (1), 20 for (2), 15 for (3), 10 for (4), 15 for (5), 5 spare. Give the TMDL lines after students have opened the script and seen `createOrReplace`, and not before. Collect the .pbix, the script, the comparison and the note.
+Individually, about 75 minutes: 10 for Requirement (1), 20 for (2), 15 for (3), 10 for (4), 15 for (5), 5 spare. The exercise points students to the syntax on Microsoft's object-level security page. Show your own copy of the lines only after students have opened the script and seen `createOrReplace`. Collect the .pbix, the script, the comparison and the note.
 
 ## Step-by-step solution
 
@@ -94,7 +94,7 @@ c. Choose **Stop viewing**, and repeat with **Finance** selected in place of the
 
 ![A mock of the same page viewed as the Production Manager after the column permission is applied, so an instructor knows what a correct failure looks like.](../figures/appendix-b-publishing-security/IF-AB-1-B.pdf)
 
-**Check:** as the Production Manager the table and the card of Labor Cost fail, the table as a whole with its hours column. The Plant page works: 101,237 hours and 1.51 hours per standard hour, because no measure on it reads the cost. With Finance the table shows all seven titles, $3,344,393.44. **Watch for:** the wording of the error. The model answer's note records that the field cannot be found; this guide has not verified the text in your build, so ask students to quote what they see. A student who selects the role without **Other user** sees an empty Plant page, because their own sign-in is not in the security table.
+**Check:** as the Production Manager the table and the card of Labor Cost fail, the table as a whole with its hours column. The Plant page works, with 101,237 hours and 1.51 hours per standard hour, because no measure on it reads the cost. With Finance the table shows all seven titles, $3,344,393.44. **Watch for:** the wording of the error. The model answer's note records the engine's message, that the column cannot be found or may not be used in this expression. This guide has not verified the visual's wording in your build, so ask students to quote what they see. A student who selects the role without **Other user** sees an empty Plant page, because their own sign-in is not in the security table.
 
 ### Requirement (4): Performance analyzer
 
@@ -104,7 +104,7 @@ a. Open the Budget page, choose **Optimize > Review > Performance analyzer**, an
 b. Choose **Modeling > View as**, view as the Sales Manager, and record the same visuals again.
 c. Compare the durations of the matrix, the tables and the card by name.
 
-**Check:** the note's expectation is that durations are slightly longer under **View as**, because every query carries the role's filters. **Watch for:** exact times. Durations vary by machine, so grade the comparison and not the milliseconds. The label for starting a recording is not verified here.
+**Check:** durations can be longer under **View as**, because every query carries the role's filters, or shorter, because the role leaves fewer rows. Ask for two recordings of each, so the cache does not decide the comparison. **Watch for:** exact times or a required direction. Durations vary by machine and from run to run, so grade the comparison and not the milliseconds. The label for starting a recording is not verified here.
 
 ### Requirement (5): The note
 
@@ -131,7 +131,7 @@ c. Compare the durations of the matrix, the tables and the card by name.
 
 - **(2)** The script keeps the four row rules and adds one column permission, and it was applied.
 - **(3)** The table and card fail for the manager; the hours and the Plant page work; finance sees all of it. The student names the cause: a visual that reads a hidden column cannot be built for the role.
-- **(4)** A comparison of the same visuals, with the direction of the difference and the reason (the role's filters travel with every query).
+- **(4)** A comparison of the same visuals over repeated recordings, with the difference observed and a reason (the role's filters travel with every query, and the fewer rows it leaves can make a query faster).
 - **(5)** Row-level security removes rows, and the manager needs the plant's rows. Pay is a column, so object-level security is the tool, and it hides the column from the role as if it did not exist. The failures are not a bug: the controller keeps cost measures off the pages managers read, or puts them in a finance report on the same semantic model, and tests each role with **View as** before release. Neither security layer limits the people who can edit the model, so the list of editors is part of the control.
 
 A strong answer ends with a recommendation. A weak one proposes a rule on Employee, which hides people and not pay.
@@ -153,7 +153,7 @@ A strong answer ends with a recommendation. A weak one proposes a rule on Employ
 | Requirement 1 | 15 | Measure, page, year filter and all 7 titles | A table of three titles, or all years |
 | Requirement 2 | 25 | Script keeps the rules, adds the permission, applied | Permission added to a role that lost its rules, or not applied |
 | Requirement 3 | 20 | Both views recorded, with the cause of the failure | One view, or the failure without a cause |
-| Requirement 4 | 10 | The same visuals compared, direction stated | One recording |
+| Requirement 4 | 10 | The same visuals compared over repeated recordings, the observed difference stated | One recording |
 | Requirement 5 | 30 | Rows against columns, the cost of the failure, a recommendation | One of the three |
 
 ## Extensions and discussion questions

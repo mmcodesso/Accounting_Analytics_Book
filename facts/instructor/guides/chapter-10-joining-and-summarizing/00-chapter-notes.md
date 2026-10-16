@@ -38,7 +38,7 @@ The chapter depends on these conditions of the data:
 - No foreign keys are declared, so a bad join raises no error; it returns more or fewer rows. Every key of Tutorial 10.1 matches: the joins return {{ t1.n_close|count }} rows, one for each close.
 - The ledger reaches its documents through SourceDocumentType and SourceDocumentID, and the ID that numbers the traced sale also numbers ledger rows of {{ ch10_ex2.trap_types }} kinds of document.
 - PurchaseRequisition has NULL approvers, so NOT IN returns {{ not_in }} employees where NOT EXISTS finds {{ not_exists }} of {{ n_employees }}. Two different customers share the name Brown LLC.
-- The labor time records end before the year does, because the last pay periods are Open, while the completions run to the last day. Tutorial 10.3 depends on the cut-off.
+- The labor time records end before the year does, because the last pay periods are Open, while the completions run to the last day. Tutorial 10.3 depends on the cut-off. Indirect time ends earlier still ({{ t3.indirect_end }}), so the tutorial calls its ratio an observed-records diagnostic.
 - The exercises rest on planted conditions (ledger rows with no payroll payment, work orders without operations, labor entries whose operation key matches nothing, suppliers that share an employee's address) and on tests that are clean on purpose.
 
 ## What students should be able to do afterward
@@ -178,7 +178,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 | 3 | Registers and people | {{ t3.people[0][1]|count }}, {{ t3.people[1][1]|count }}, {{ t3.people[2][1]|count }} registers; the same {{ t3.people[0][2] }} employees each year |
 | 4 | Two profiles | {{ t3.lte[0]|count }} entries, {{ t3.lte[1]|count }} with an operation, to {{ t3.lte[4] }}; {{ t3.pc[0]|count }} completions, to {{ t3.pc[2] }} |
 | 5 | The last pay periods | {{ t3.periods[0][4] }}, then {{ t3.periods[1][4] }} and {{ t3.periods[2][4] }} |
-| 6 | Hours per standard hour | direct `{{ t3.direct[0] }}`, `{{ t3.direct[1] }}`, `{{ t3.direct[2] }}`; indirect `{{ t3.indirect[0] }}`, `{{ t3.indirect[1] }}`, `{{ t3.indirect[2] }}` |
+| 6 | Hours per standard hour | direct `{{ t3.direct[0] }}`, `{{ t3.direct[1] }}`, `{{ t3.direct[2] }}`; indirect `{{ t3.indirect[0] }}`, `{{ t3.indirect[1] }}`, `{{ t3.indirect[2] }}`; the two rows of a year add to {{ t3.plant[0] }}, {{ t3.plant[1] }}, {{ t3.plant[2] }} |
 | 7 | Time with no operation | 3 rows; the direct row holds {{ t3.unmatched[0][1] }} entries |
 | 8 | The saved script | a header with its checks and a comment above each query |
 
@@ -187,9 +187,10 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 - Step 3: `COUNT(*)` read as the number of people.
 - Step 4: the profiles skipped, so the last day of the time records goes unnoticed.
 - Step 6: without the cut-off the last year reads `{{ t3.no_cut["Direct Manufacturing"] }}` and `{{ t3.no_cut["Indirect Manufacturing"] }}`, which flatters the plant; a join of the raw tables first asks for {{ t3.product|count }} rows.
+- Step 6, coverage: direct and non-manufacturing time end on {{ t3.cut }}, indirect time on {{ t3.indirect_end }}, and the days between hold {{ t3.late_direct|num(2) }} direct hours and no indirect time. The sensitivity the text describes stops the hours and the output at {{ t3.common.stop }}. It gives direct `{{ t3.common.d_ratio }}`, indirect `{{ t3.common.i_ratio }}` and a total of `{{ t3.common.total }}` from the unrounded hours ({{ t3.common.direct|num(2) }} and {{ t3.common.indirect|num(2) }} over {{ t3.common.standard|num(2) }} standard hours). Stopping each earlier year at its own last day of indirect time ({% for s in t3.sens[:-1] %}{{ s.stop }}{{ " and " if not loop.last else "" }}{% endfor %}) leaves its rounded ratios as printed. A student who reports the sensitivity, or separate ratios for each kind of time, has read the coverage correctly. Two rounded ratios add up to the total only to within rounding.
 - Step 7: a test on the entry's key alone finds {{ t3.is_null["Direct Manufacturing"] }} direct entries and misses the {{ t3.orphan }} whose key is filled in and matches nothing.
 
-**The checkpoint to look for.** The seven bullets. A strong student says that output was about the same and direct labor stayed within its standards, while indirect time, which is overhead, grew, so the answer to the volume question is mostly no.
+**The checkpoint to look for.** The seven bullets. A strong student says that output was about the same and the direct hours recorded stayed below the standard hours, while indirect time, which is overhead, grew, so the records point to the cost of production rather than volume. The strongest add that the ratio is an observed-hours diagnostic, with indirect time ending a week before the cut-off, not a labor efficiency variance or a measure of the production-volume variance.
 
 {{ figure('IF-10-0-B') }}
 
@@ -217,7 +218,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 2. **An anti-join from the ledger to its documents returns no rows. What did you prove?** It reaches existence against completeness: the test in the other direction asks whether every document was posted.
 3. **NOT IN returned no one. Does every employee approve requisitions?** It reaches the NULL in the list and the control query that shows a test can find something.
 4. **Two customers share a name. Which report misleads the sales manager, and how does the controller find out?** It reaches grouping by key, the row counts and the master-data question of duplicates.
-5. **Direct labor stayed within its standard while the variance grew. What data would split the overhead part by cause?** It reaches indirect time, overtime, the calendar and Chapter 11's monthly measure.
+5. **The direct hours recorded stayed below the standard hours while the variance grew. What data would split the overhead part by cause?** It reaches indirect time, overtime, the calendar and Chapter 11's monthly measure.
 6. **A join beats comparing two lists by eye. What can it not tell you?** It reaches exact matches only, addresses written differently, and a coincidence of data that is not a relationship.
 
 ## Using the exercises

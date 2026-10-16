@@ -88,7 +88,7 @@ Individual, about 90 minutes: 15 on requirement 1, 20 on requirement 2, 15 on re
 
 ## What a strong answer says
 
-- **Population.** A normal line is a few thousand dollars and depends on the group. Design services are fewer and larger. In every group the average exceeds the median, so a sample should cover the large lines.
+- **Population.** A normal line is a few thousand dollars and depends on the group. Design services are fewer and larger. In every group the average exceeds the median, consistent with a right tail of large lines. The largest lines can be tested on their own, with procedures for the rest designed for the audit objective, so the profile alone does not set a sample.
 - **Concentration.** Revenue is concentrated in Furniture, not in customers, and the ten largest customers are modest in share. The profile does not infer risk from the share alone.
 - **Pricing.** Segment price lists carry most of the revenue, and approved overrides, the one manual path, are small.
 - **Matters for the audit.** Discounts are billed after promotions ended, one promotion's dates are inconsistent, and overrides are natural targets. The profile names them as questions, not conclusions.

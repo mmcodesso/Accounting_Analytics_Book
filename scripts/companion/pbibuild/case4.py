@@ -11,7 +11,10 @@ facts/notes/case4.py (or by SQL here).
 
 Two tables go beyond the queries the case lists, because the notes' findings need them: OrderLines (the purchase order
 lines, which Receipts reaches its requisitions through, loaded so that the order lines still open at the year-end can
-be measured), and Components, an Enter data table that lets the tooltip page list each balance beside its flow.
+be measured), and Components, an Enter data table that lets the tooltip page list each balance beside its flow. Two
+queries that only feed others also go beyond the list: DebtAgreement gives DebtSchedule each note's OriginationDate, so
+that the principal at an earlier year-end counts only the notes outstanding then, and WorkOrder gives Issues the work
+order's number, so that the link test finds every issue line's work order rather than only a filled-in key.
 """
 
 from __future__ import annotations
@@ -212,7 +215,8 @@ def r1(b: Build) -> None:
               .select(["ItemID", "TargetDaysSupply", "EffectiveEndDate"]).types({"EffectiveEndDate": "type date"}))
     group(policy, ["ItemID"], [("TargetDaysSupply", "List.Max([TargetDaysSupply])", "Int64.Type"),
                                ("PolicyEnd", "List.Max([EffectiveEndDate])", "type date")])
-    item = (Query.navigator("Item", x, 44, "Item").select(["ItemID", "ItemCode", "ItemName", "ItemGroup", "ItemType", "SupplyMode"])
+    item = (Query.navigator("Item", x, 44, "Item").select(["ItemID", "ItemCode", "ItemName", "ItemGroup", "ItemType", "SupplyMode",
+                                                           "UnitOfMeasure"])
             .merge(policy, "ItemID", "ItemID", ["TargetDaysSupply", "PolicyEnd"]))
     # Receipts: receipt lines with the receipt date, the order line's requisition, and the requisition's channel
     receipt = (Query.navigator("GoodsReceipt", x, 35, "GoodsReceipt").select(["GoodsReceiptID", "ReceiptDate"])
@@ -233,7 +237,8 @@ def r1(b: Build) -> None:
              .types({"IssueDate": "type date"}))
     issues = (Query.navigator("Issues", x, 55, "MaterialIssueLine")
               .select(["MaterialIssueLineID", "MaterialIssueID", "ItemID", "QuantityIssued", "ExtendedStandardCost"])
-              .merge(issue, "MaterialIssueID", "MaterialIssueID", ["IssueDate", "WorkOrderID"]))
+              .merge(issue, "MaterialIssueID", "MaterialIssueID", ["IssueDate", "WorkOrderID"])
+              .merge(work, "WorkOrderID", "WorkOrderID", ["WorkOrderNumber"]))
     issues.custom("PairKey", '"WO-COMPONENT-SHORTFALL | WO=" & Text.From([WorkOrderID]) & " | ITEM=" & Text.From([ItemID])',
                   "type text")
     # Requirement 4's groups: shortfall requisitions by justification, with what was issued to the same work order and item
@@ -281,11 +286,14 @@ def r1(b: Build) -> None:
     ap.custom("BucketOrder", 'if [DaysPastDue] <= 0 then 1 else if [DaysPastDue] <= 30 then 2 else if [DaysPastDue] <= 60 '
                              'then 3 else if [DaysPastDue] <= 90 then 4 else 5', "Int64.Type")
     ap.custom("MovedToNotes", f"List.Contains({{{notes_ids}}}, [PurchaseInvoiceID])", "type logical")
+    agreement = (Query.navigator("DebtAgreement", x, 42, "DebtAgreement").select(["DebtAgreementID", "OriginationDate"])
+                 .types({"OriginationDate": "type date"}))
     debt = (Query.navigator("DebtSchedule", x, 43, "DebtScheduleLine")
             .select(["DebtScheduleLineID", "DebtAgreementID", "PaymentDate", "PrincipalAmount", "InterestAmount",
-                     "EndingPrincipal", "Status"]).types({"PaymentDate": "type date"}))
+                     "EndingPrincipal", "Status"]).types({"PaymentDate": "type date"})
+            .merge(agreement, "DebtAgreementID", "DebtAgreementID", ["OriginationDate"]))
     # the queries that only feed others, then the loaded tables
-    for q in (employee, work, policy, receipt, order, issue, issued, apps, credits, paid):
+    for q in (employee, work, policy, receipt, order, issue, issued, apps, credits, paid, agreement):
         m.stage(q)
     keys = lambda *names: {n: "none" for n in names}        # noqa: E731
     t = m.add(query_table(req, formats={"EstimatedUnitCost": MONEY, "EstimatedValue": MONEY},
@@ -312,10 +320,10 @@ def r1(b: Build) -> None:
     t = m.add(query_table(ap, formats={"GrandTotal": MONEY, "Paid": MONEY, "OpenBalance": MONEY},
                           summarize=keys("PurchaseInvoiceID", "SupplierID", "DaysPastDue", "BucketOrder"),
                           sort_by={"Bucket": "BucketOrder"}))
-    hide(t, "SupplierID", "BucketOrder")
+    hide(t, "PurchaseInvoiceID", "SupplierID", "BucketOrder")
     t = m.add(query_table(debt, formats={"PrincipalAmount": MONEY, "InterestAmount": MONEY, "EndingPrincipal": MONEY},
                           summarize=keys("DebtScheduleLineID", "DebtAgreementID", "EndingPrincipal")))
-    hide(t, "DebtScheduleLineID")
+    hide(t, "DebtScheduleLineID", "DebtAgreementID")
     for many, one_ in [("GLEntry.AccountID", "Account.AccountID"), ("GLEntry.PostingDate", "Date.Date"),
                        ("Requisitions.ItemID", "Item.ItemID"), ("Requisitions.RequestDate", "Date.Date"),
                        ("Receipts.ItemID", "Item.ItemID"), ("Receipts.ReceiptDate", "Date.Date"),
@@ -360,8 +368,9 @@ def r1(b: Build) -> None:
     b.measure(V, "Receipts without a Requisition", "COUNTROWS ( FILTER ( Receipts, ISBLANK ( Receipts[RequisitionID] ) ) ) + 0",
               COUNT, "Receipt lines whose order line names no requisition (the link test of Requirement 1).")
     b.measure(V, "Issue Lines", "COUNTROWS ( Issues )", COUNT, "The number of material issue lines.")
-    b.measure(V, "Issues without a Work Order", "COUNTROWS ( FILTER ( Issues, ISBLANK ( Issues[WorkOrderID] ) ) ) + 0",
-              COUNT, "Issue lines whose issue names no work order (the link test of Requirement 1).")
+    b.measure(V, "Issues without a Work Order", "COUNTROWS ( FILTER ( Issues, ISBLANK ( Issues[WorkOrderNumber] ) ) ) + 0",
+              COUNT, "Issue lines whose work order is not found in WorkOrder, whether the issue names none or names one that "
+                     "does not exist (the link test of Requirement 1).")
     b.measure(V, "Requisition Count", "COUNTROWS ( Requisitions )", COUNT, "The number of purchase requisitions.")
     DT = "Data currency"
     sources = ["SalesInvoice", "CashReceiptApplication", "PurchaseInvoice", "DisbursementPayment", "GoodsReceipt",
@@ -369,12 +378,14 @@ def r1(b: Build) -> None:
     claim(sources == list(case4.DATA_SOURCES), "Data Through takes the documents the note names")
     lasts = ",\n".join(f'            CALCULATE ( MAX ( GLEntry[PostingDate] ), GLEntry[SourceDocumentType] = "{s}" )'
                        for s in sources)
-    b.measure(DT, "Data Through", f"CALCULATE (\n    MINX (\n        {{\n{lasts}\n        }},\n        [Value]\n    ),\n"
-              "    REMOVEFILTERS ()\n)", DAY,
+    b.measure(DT, "Data Through", f"CALCULATE (\n    VAR LastDates =\n        {{\n{lasts}\n        }}\n    RETURN\n"
+              "        IF (\n            COUNTROWS ( FILTER ( LastDates, ISBLANK ( [Value] ) ) ) > 0,\n            BLANK (),\n"
+              "            MINX ( LastDates, [Value] )\n        ),\n    REMOVEFILTERS ()\n)", DAY,
               "The earliest of the last posting dates of the documents behind the working-capital accounts (sales "
               "invoices, cash applications, supplier invoices and payments, goods receipts, material issues, "
-              "shipments): the date through which every one of them is complete. Payroll is left out: its last two "
-              "pay periods are open, so it ends in mid-December.")
+              "shipments), whatever the filters, and blank if any of them has no posting. It is a bound observed in "
+              "the extract, not proof that no document before it is missing. Payroll is reported apart, because its "
+              "last two pay periods are marked Open in the data, so its records end in mid-December.")
     b.measure(DT, "Last Ledger Posting", "CALCULATE ( MAX ( GLEntry[PostingDate] ), REMOVEFILTERS () )", DAY,
               "The last posting date in the ledger, whatever the filters: not the date through which the report runs.")
     b.measure(DT, "Rows after Data Through", "VAR ThroughDate = [Data Through]\nRETURN\n    CALCULATE ( COUNTROWS ( GLEntry ), "
@@ -387,7 +398,8 @@ def r1(b: Build) -> None:
     # About page
     y, P, F = d.C, d.P, d.F
     about = b.report.add(Page("about", "About"))
-    about.add(card("dataThrough", 880, 20, 380, 110, [M("Data Through"), M("Last Ledger Posting")], title="Data currency"))
+    about.add(card("dataThrough", 880, 20, 380, 110, [M("Data Through"), M("Last Ledger Posting")], title="Data currency",
+                   size=18))
     about.add(textbox("aboutText", 20, 20, 840, 680, [
         (FILE, True),
         f"Purpose: to show the audit committee where the cash went in fiscal {y}: the bridge from net income to the "
@@ -399,16 +411,20 @@ def r1(b: Build) -> None:
         "requisitions, the items with their policy targets, the open sales and supplier invoices at the year-end, and "
         "the debt schedule.",
         f"Period: fiscal {F} to {y}. Data Through: {c1['thru']}, the earliest of the last posting dates of the sales "
-        "invoices, cash applications, supplier invoices and payments, goods receipts, material issues, and shipments.",
+        "invoices, cash applications, supplier invoices and payments, goods receipts, material issues, and shipments. "
+        "It is a bound observed in the extract. It does not show that no document before it is missing, which the "
+        "reconciliations and the source systems' own counts would show.",
         f"Why not the last posting date: the ledger runs to {c1['last']}, but only because {c1['n_pay']} supplier "
         f"payments of {y} invoices ({money(c1['pay_amount'])}, {c1['rows_after']} rows) were posted after the year. "
         f"A balance taken on {c1['last']} shows cash of {money(c1['cash_last'])} and payables of "
         f"{money(c1['ap_last'])}, and a bridge for {d.N} shows a fall in cash of {money(c1['fall'])} that only "
         "means the data stop.",
-        f"Payroll is left out of Data Through: payroll summaries and payments end on {c1['payroll_end']} (the last "
-        f"{c1['n_open']} pay periods are open), so including them would date the report {c1['payroll_end']} and blank "
-        f"the last quarter of {y}.",
-        "Definitions: every measure is in the Key Measures table with its definition as its description. Balances "
+        f"Payroll is reported apart from Data Through: payroll summaries and payments end on {c1['payroll_end']}, "
+        f"because the last {c1['n_open']} pay periods are marked Open in the data and are scheduled to pay in "
+        f"{c1['open_pay_year']}. Including them would date the report {c1['payroll_end']} and blank the last quarter of "
+        f"{y}, and the payroll accrual the Part III case proposed for that work is listed among the findings.",
+        "Definitions: every measure is in the Key Measures table with its definition as its description, except the "
+        "value of the what-if parameter, which stays in its Target Days table. Balances "
         "follow Exercise 14.1 (closes left out only on the as-of date); flows leave the closes out; the "
         "working-capital measures divide a quarter-end balance by the ledger flow of the twelve months that end on "
         "that date, times 365, and are blank before a full twelve months and after Data Through.",
@@ -424,9 +440,9 @@ def r1(b: Build) -> None:
     page.add(Visual("controlTotals", "tableEx", 20, 20, 1240, 150, {"Values": [
         yr, M("Net Income"), M("Total Assets"), M("Materials Received"), M("Receipts to 1045"), M("Materials Issued"),
         M("Issues from 1045")]}, title="Control totals by fiscal year", filters=[keep("ctYears", yr, years)]))
-    page.add(card("linkCards", 20, 190, 1240, 110, [M("Receipt Lines"), M("Receipts without a Requisition"),
+    page.add(card("linkCards", 20, 190, 1240, 120, [M("Receipt Lines"), M("Receipts without a Requisition"),
                                                     M("Issue Lines"), M("Issues without a Work Order"),
-                                                    M("Requisition Count")], title="Links tested"))
+                                                    M("Requisition Count")], units_none=True, size=20, title="Links tested"))
     r4c = b.ctx["r4"]
     page.add(answer("profileAnswer", 20, 320, 1240, 380, [
         f"Profiles on the entire data set (Column profiling based on entire data set): Requisitions {c1['requisitions']:,} "
@@ -568,26 +584,31 @@ def r2(b: Build) -> None:
         ("Current Ratio", "DIVIDE ( [Current Assets], [Current Liabilities] )", RATIO,
          "Current assets divided by current liabilities."),
         ("Quick Ratio", "DIVIDE ( CALCULATE ( [Balance], Account[AccountNumber] IN { 1010, 1020 } ), [Current Liabilities] )",
-         RATIO, "Cash (1010) and receivables (1020) divided by current liabilities: the current ratio without the inventories."),
+         RATIO, "Cash (1010) and receivables (1020) divided by current liabilities. It leaves out the inventories and the "
+                "other current assets, so it is not current assets less inventories. The allowance account 1030 has no balance."),
         ("Cash", "CALCULATE ( [Balance], Account[AccountNumber] = 1010 )", MONEY, "Balance of 1010 Cash and Cash Equivalents."),
         ("Inventories", "CALCULATE ( [Balance], Account[AccountNumber] IN { 1040, 1045, 1046 } )", MONEY,
          "Balance of the inventory accounts: finished goods (1040), materials and packaging (1045), work in process (1046)."),
         ("Inventories Share", "DIVIDE ( [Inventories], [Current Assets] )", PCT, "Inventories as a share of current assets."),
         ("Cash Net of Sales Tax", "CALCULATE ( [Balance], Account[AccountNumber] IN { 1010, 2050 } )", MONEY,
-         "Cash less the sales tax collected and not remitted (the credit balance of 2050)."),
+         "Cash (1010) less the recorded credit balance of Sales Tax Payable (2050), a liquidity sensitivity, not the tax "
+         "collected or cash restricted by law."),
         ("Sales Tax Payable", "- CALCULATE ( [Balance], Account[AccountNumber] = 2050 )", MONEY,
-         "Balance of 2050 Sales Tax Payable, as a positive amount."),
+         "Balance of 2050 Sales Tax Payable, as a positive amount. It is the tax billed on sales invoices less the tax on "
+         "credit memos, with no remittance recorded."),
         ("Notes Payable", "- CALCULATE ( [Balance], Account[AccountNumber] = 2110 )", MONEY,
          "Balance of 2110 Notes Payable, as a positive amount."),
         ("Scheduled Principal Outstanding", "VAR AsOf = MAX ( 'Date'[Date] )\nRETURN\n    CALCULATE (\n"
-         "        SUM ( DebtSchedule[PrincipalAmount] ),\n        REMOVEFILTERS ( 'Date' ),\n        DebtSchedule[PaymentDate] > AsOf\n    )",
-         MONEY, "The principal of the scheduled payments after the last date in the filter context: the notes "
-                "outstanding by the debt schedule, filtered on PaymentDate because the schedule runs past the Date table."),
+         "        SUM ( DebtSchedule[PrincipalAmount] ),\n        REMOVEFILTERS ( 'Date' ),\n        DebtSchedule[PaymentDate] > AsOf,\n"
+         "        DebtSchedule[OriginationDate] <= AsOf\n    )",
+         MONEY, "The principal of the scheduled payments after the last date in the filter context, on the notes "
+                "originated by that date, which is the notes outstanding by the debt schedule. It filters PaymentDate because the "
+                "schedule runs past the Date table, and OriginationDate so that an earlier date leaves out a later note."),
         ("Principal Due within a Year", "VAR AsOf = MAX ( 'Date'[Date] )\nRETURN\n    CALCULATE (\n"
          "        SUM ( DebtSchedule[PrincipalAmount] ),\n        REMOVEFILTERS ( 'Date' ),\n        DebtSchedule[PaymentDate] > AsOf,\n"
-         "        DebtSchedule[PaymentDate] <= EDATE ( AsOf, 12 )\n    )", MONEY,
-         "The principal the debt schedule pays in the twelve months after the last date in the filter context: the "
-         "current portion of the notes.")]:
+         "        DebtSchedule[PaymentDate] <= EDATE ( AsOf, 12 ),\n        DebtSchedule[OriginationDate] <= AsOf\n    )", MONEY,
+         "The principal the debt schedule pays in the twelve months after the last date in the filter context, on the "
+         "notes originated by that date, which is the current portion of the notes.")]:
         b.measure(BS, name, dax, f, desc)
     for name, dax, f, desc in [
         ("Cash Effect", 'CALCULATE ( - [GL Amount], KEEPFILTERS ( Account[Step] <> "Cash" ) )', MONEY,
@@ -625,7 +646,8 @@ def r2(b: Build) -> None:
          "financed equipment."),
         ("Operating Cash Flow without Sales Tax", 'CALCULATE ( [Restated Cash Flow], Account[Activity] = "Operating" )'
          ' - CALCULATE ( [Cash Effect], Account[Step] = "Sales tax" )', MONEY,
-         "The restated operating cash flow without the sales tax collected and not remitted.")]:
+         "The restated operating cash flow had the period's increase in the recorded sales tax payable been paid within "
+         "it, a sensitivity, not a cash flow.")]:
         b.measure(BR, name, dax, f, desc)
 
     # the Balance Sheet page
@@ -642,13 +664,15 @@ def r2(b: Build) -> None:
         filters=[keep("ratioYears", yr, years)]))
     page.add(answer("bsAnswer", 800, 20, 460, 520, [
         f"Working capital grew every year ({', '.join(money(v['wc']) for v in ye)}), and the current ratio barely "
-        f"moved ({', '.join(f'{v['current']:.2f}' for v in ye)}): it hides the change. The quick ratio, which leaves the "
-        f"inventories out, fell from {ye[0]['quick']:.2f} to {ye[1]['quick']:.2f} and {ye[2]['quick']:.2f}: at the end "
-        f"of {y} cash and receivables no longer covered the current liabilities.",
+        f"moved ({', '.join(f'{v['current']:.2f}' for v in ye)}): it hides the change. The quick ratio, cash and "
+        f"receivables over current liabilities, fell from {ye[0]['quick']:.2f} to {ye[1]['quick']:.2f} and "
+        f"{ye[2]['quick']:.2f}: at the end of {y} cash and receivables no longer covered the current liabilities.",
         f"Inventories were {pct(c['inv_share'], 0)} of current assets at the end of {y}. Account 1090 Manufacturing Cost "
         f"Clearing has a credit balance of {money(c['a1090'])} and sits, with 8020, among the other current assets.",
-        f"Sales tax payable of {money(c['tax_c'])} is a current liability that no remittance has reduced: cash net of it "
-        f"was {money(c['net'][-1])} at the end of {y} ({money(c['net'][1])} a year earlier).",
+        f"Sales tax payable of {money(c['tax_c'])}, the tax billed less the tax on credit memos, is a current liability "
+        f"that no recorded remittance has reduced. It is not all tax collected, since {c['unpaid_n']:,} taxable invoices "
+        f"unpaid at the year-end hold {money(c['unpaid_tax'])} of it. Cash net of it was {money(c['net'][-1])} at the "
+        f"end of {y} ({money(c['net'][1])} a year earlier), a liquidity sensitivity rather than restricted cash.",
         f"The notes payable ({money(c['outstanding'])}, equal to the debt schedule) sit entirely in 2110, a Long-Term "
         f"Liability, although {money(c['due_next'])} of principal is due in {d.N}: reclassified to current, it lowers "
         f"working capital by that amount."], size=10))
@@ -658,12 +682,16 @@ def r2(b: Build) -> None:
     # the Cash Bridge page and its drill-through page
     step, act = col("Account", "Step"), col("Account", "Activity")
     page = b.report.add(Page("cashBridge", "Cash Bridge", height=1000))
-    page.add(slicer("bridgeYear", 20, 20, 400, 64, yr, [y], style="tile", single=True, title="Fiscal year"))
+    years_slicer = slicer("bridgeYear", 20, 20, 400, 64, yr, [y], style="tile", single=True, title="Fiscal year")
+    years_slicer.filters = [keep("byYears", yr, years)]       # complete years only: a later year holds a few payments
+    page.add(years_slicer)
     page.add(Visual("waterfall", "waterfallChart", 20, 100, 760, 380, {"Category": [step], "Y": [M("Cash Effect")]},
                     title="From net income to the change in cash, in the year selected",
-                    filters=[keep("wfNoCash", step, ["Cash"], exclude=True)], sort=[(step, "Ascending")],
+                    filters=[keep("wfNoCash", step, ["Cash"], exclude=True), keep("wfYears", yr, years)],
+                    sort=[(step, "Ascending")],
                     alt_text="A waterfall from net income to the change in cash: the inventories absorb far more cash "
-                             "than the year earned, and the unremitted sales tax and the payables hold some of it back."))
+                             "than the year earned, and the growth of the recorded sales tax payable and of the payables "
+                             "holds some of it back."))
     page.add(Visual("bridgeMatrix", "pivotTable", 800, 20, 460, 460, {"Rows": [step], "Columns": [yr], "Values": [M("Cash Effect")]},
                     title="The bridge by year (drill through on a step to its postings)",
                     filters=[keep("bmYears", yr, years), keep("bmNoCash", step, ["Cash"], exclude=True)]))
@@ -673,14 +701,14 @@ def r2(b: Build) -> None:
                     filters=[keep("rsYears", yr, [P, y]), keep("rsActivities", act, ["Operating", "Investing", "Financing"])]))
     page.add(card("cashCards", 20, 720, 760, 110, [M("Cash Net of Sales Tax"), M("Sales Tax Payable"), M("Notes Payable"),
                                                    M("Principal Due within a Year"), M("Financed by Notes")],
-                  units_none=True, title=f"At the end of fiscal {y}", filters=[keep("ccYear", yr, [y])]))
+                  units_none=True, size=14, title=f"At the end of fiscal {y}", filters=[keep("ccYear", yr, [y])]))
     page.add(Visual("cashByYear", "tableEx", 20, 850, 760, 130, {"Values": [yr, M("Cash"), M("Change in Cash"), M("Cash Effect")]},
                     title="Cash at each year-end, its change, and the sum of the steps", filters=[keep("cbyYears", yr, years)]))
     rc, rp, disp, dp = c["rc"], c["rp"], c["disp"], c["disp_p"]
     page.add(answer("bridgeAnswer", 800, 500, 460, 480, [
         f"Fiscal {y}: net income {money(cur['net_income'])} and depreciation {signed(cur['depreciation'])}, but "
-        f"inventories absorbed {money(-cur['inventories'])}; payables ({signed(cur['payables'])}) and the unremitted "
-        f"sales tax ({signed(cur['sales_tax'])}) held cash up, and cash fell {money(-cur['cash'])} "
+        f"inventories absorbed {money(-cur['inventories'])}; payables ({signed(cur['payables'])}) and the growth of the "
+        f"recorded sales tax payable ({signed(cur['sales_tax'])}) held cash up, and cash fell {money(-cur['cash'])} "
         f"({money(c['cash_from'])} to {money(c['cash_to'])}). Fiscal {P}: the inventories took {money(-pri['inventories'])} "
         f"and cash rose {money(pri['cash'])}.",
         f"Fiscal {F} cannot be read the same way: the opening entry {c['entry']} ({c['entry_lines']} lines) is a {F} "
@@ -699,7 +727,9 @@ def r2(b: Build) -> None:
         f"acquired by a note is disclosed apart (ASC Topic 230). Restated {P}: operating {money(rp['operating'])}, "
         f"investing {money(rp['investing'])} ({money(c['capex_total'])} of equipment paid in cash less proceeds of "
         f"{money(dp['proceeds'])} on {dp['entry']}), financing {money(rp['financing'])}.",
-        f"Without the unremitted tax, the operating cash flow of {y} would have been {money(c['without_tax'])}."], size=9))
+        f"Had the year's increase in the recorded sales tax payable been paid within the year, the operating cash flow "
+        f"of {y} would have been {money(c['without_tax'])}, a sensitivity, not a cash flow. The fiscal year slicer lists "
+        f"{F} to {y} only, because the ledger's later postings are a few supplier payments, not a year."], size=9))
     page.extra = {"visualInteractions": [{"source": "bridgeYear", "target": t, "type": "NoFilter"}
                                          for t in ("bridgeMatrix", "restated", "cashCards", "cashByYear")]}
     page.expect = ["Cash Effect", "Restated Cash Flow", money(cur["net_income"]), money(cur["inventories"]),
@@ -795,7 +825,7 @@ def r2(b: Build) -> None:
             f"Account[AccountSubType] IN {{ \"Fixed Asset\", \"Noncurrent Asset\" }}, 'Date'[Year] = {P} )", 0.01)
     for yy, v, tax in zip(years, c["net"], c["tax_steps"]):
         b.check(s, f"{yy} cash net of sales tax payable", v, f"CALCULATE ( [Cash Net of Sales Tax], 'Date'[Year] = {yy} )", 0.01)
-        b.check(s, f"{yy} unremitted sales tax added to cash", tax,
+        b.check(s, f"{yy} sales tax step (the growth of the recorded payable)", tax,
                 f"CALCULATE ( [Cash Effect], 'Date'[Year] = {yy}, Account[Step] = \"Sales tax\" )", 0.01)
     b.check(s, f"sales tax payable at the end of {y}", c["tax_c"], f"CALCULATE ( [Sales Tax Payable], 'Date'[Year] = {y} )", 0.01)
     b.check(s, f"{y} operating cash flow without the sales tax", c["without_tax"],
@@ -808,6 +838,17 @@ def r2(b: Build) -> None:
                 f"CALCULATE ( [Scheduled Principal Outstanding], 'Date'[Year] = {y}, DebtSchedule[DebtAgreementID] = {agreement} )",
                 0.01)
     b.check(s, f"principal due in {d.N}", c["due_next"], f"CALCULATE ( [Principal Due within a Year], 'Date'[Year] = {y} )", 0.01)
+    for h in c["debt_hist"][:-1]:                 # an earlier year-end counts only the notes originated by then
+        cy = f"'Date'[Year] = {h['year']}"
+        b.check(s, f"notes outstanding by the schedule at the end of {h['year']}", h["outstanding"],
+                f"CALCULATE ( [Scheduled Principal Outstanding], {cy} )", 0.01)
+        b.check(s, f"... equal to 2110 at the end of {h['year']}", h["gl"], f"CALCULATE ( [Notes Payable], {cy} )", 0.01)
+        b.check(s, f"principal due within a year at the end of {h['year']}", h["due"],
+                f"CALCULATE ( [Principal Due within a Year], {cy} )", 0.01)
+    unpaid = ("FILTER ( ARInvoices, ISBLANK ( ARInvoices[Applied] ) && ISBLANK ( ARInvoices[Credited] ) "
+              "&& ARInvoices[TaxAmount] > 0 )")
+    b.check(s, f"taxable invoices with no payment or credit at the end of {y}", c["unpaid_n"], f"COUNTROWS ( {unpaid} )", 0)
+    b.check(s, "... the tax they hold (billed, not collected)", c["unpaid_tax"], f"SUMX ( {unpaid}, ARInvoices[TaxAmount] )", 0.01)
 
 
 # --- Requirement 3: the working-capital measures ----------------------------------------------------------------
@@ -824,8 +865,9 @@ def r3(b: Build) -> None:
     b.measure(W, "Full Twelve Months", "VAR Window =\n    " + window + "\nVAR MonthsInWindow =\n"
               "    COUNTROWS ( CALCULATETABLE ( VALUES ( 'Date'[YearMonth] ), Window ) )\nRETURN\n"
               "    MonthsInWindow = 12 && MAX ( 'Date'[Date] ) <= [Data Through]", None,
-              "TRUE when the twelve months that end on the last date in the filter context all lie in the Date table and "
-              "end by Data Through (Tutorial 15.3's guard).")
+              "TRUE when the twelve months that end on the last date in the filter context hold twelve calendar months of "
+              "the Date table and end by Data Through (Tutorial 15.3's guard). It counts months, so it is exact at the "
+              "month-ends the report uses, not at any day.")
     flow("Billing TTM", "SUM ( GLEntry[Debit] )", ["Account[AccountNumber] = 1020", 'GLEntry[SourceDocumentType] = "SalesInvoice"'],
          "What was billed in the twelve months that end on the last date in the filter context: SalesInvoice debits to "
          "1020, tax and freight included, as the receivables are.")
@@ -901,11 +943,11 @@ def r3(b: Build) -> None:
         ("Materials Target Days", "IF (\n    [Full Twelve Months],\n    CALCULATE ( MAX ( 'Item'[TargetDaysSupply] ), "
                                   f"KEEPFILTERS ( 'Item'[ItemGroup] IN {{ \"{MATERIALS[0]}\", \"{MATERIALS[1]}\" }} ) )\n)",
          "The largest TargetDaysSupply of the materials items (raw materials 28 days, packaging 24), shown where the "
-         "days of supply are."),
+         "days of supply are: a benchmark for the whole balance, not each item's policy."),
         ("Finished Goods Target Days", "IF (\n    [Full Twelve Months],\n    CALCULATE ( MAX ( 'Item'[TargetDaysSupply] ), "
                                        "KEEPFILTERS ( 'Item'[ItemType] = \"Finished Good\" ) )\n)",
          "The largest TargetDaysSupply of the finished goods (12-16 days manufactured, 24-28 purchased), shown where the "
-         "days of supply are."),
+         "days of supply are: a benchmark for the whole balance, not each item's policy."),
         ("Materials Days to Target", "DIVIDE ( [Materials Days], [Materials Target Days] )",
          "Days of materials supply as a multiple of the target: the basis of the matrix's icons."),
         ("Finished Goods Days to Target", "DIVIDE ( [Finished Goods Days], [Finished Goods Target Days] )",
@@ -950,7 +992,7 @@ def r3(b: Build) -> None:
     icons = (icon_rules(M("Materials Days to Target"), f"{KM}.Materials Days", 1.25, 0.8)["values"] +
              icon_rules(M("Finished Goods Days to Target"), f"{KM}.Finished Goods Days", 1.25, 0.8)["values"])
     page.add(Visual("wcMatrix", "pivotTable", 20, 340, 1240, 330, {"Rows": [yq], "Values": [M(n) for n in shown]},
-                    title="The measures at each quarter-end (icons: days of supply against the policy target)",
+                    title="The measures at each quarter-end (icons: days of supply against the largest item target)",
                     filters=[keep("wcMatrixYears", yr, d.years)], objects={"values": icons}))
     page.add(Visual("wcAverage", "tableEx", 20, 690, 1240, 150, {"Values": [
         yr, M("DSO"), M("DSO on Average Balance"), M("DIO"), M("DIO on Average Balance"), M("Materials Days"),
@@ -959,9 +1001,10 @@ def r3(b: Build) -> None:
     ends = c["ends"]
     page.add(answer("wcAnswer", 20, 860, 1240, 300, [
         f"From {first_q['label']} to {last['label']} the cycle grew from {first_q['ccc']:.1f} to {last['ccc']:.1f} days "
-        f"({first_q['ccc_x']:.1f} to {last['ccc_x']:.1f} without the opening entry), and it grew entirely through "
+        f"({first_q['ccc_x']:.1f} to {last['ccc_x']:.1f} without the opening entry), and it grew mainly through "
         f"inventory: DIO {first_q['dio']:.1f} to {last['dio']:.1f}, materials {first_q['mat']:.1f} to {last['mat']:.1f} "
-        f"days against a target of {c['raw']} (packaging {c['pack']}), finished goods {first_q['fg']:.1f} to "
+        f"days against the largest materials target of {c['raw']} (packaging's is {c['pack']}), a benchmark for the "
+        f"whole balance, finished goods {first_q['fg']:.1f} to "
         f"{last['fg']:.1f} against {c['made'][0]}-{c['made'][1]} days (manufactured, lot-for-lot) and "
         f"{c['bought'][0]}-{c['bought'][1]} (purchased). Every policy ends {d.C}-12-31.",
         f"Receivables and payables barely moved: DSO {first_q['dso']:.1f} to {last['dso']:.1f} ({first_q['dso_x']:.1f} "
@@ -1075,8 +1118,11 @@ def r4(b: Build) -> None:
          "The most shortfall requisitions raised for one work order and item."),
         ("Pairs with Issues", "COUNTROWS ( FILTER ( ShortfallPairs, NOT ISBLANK ( ShortfallPairs[IssuedQty] ) ) )", COUNT,
          "Pairs whose work order was issued the item."),
-        ("Requisitioned Units", "SUM ( ShortfallPairs[RequisitionedQty] )", UNITS, "Units the shortfall requisitions asked for."),
-        ("Issued Units", "SUM ( ShortfallPairs[IssuedQty] )", UNITS, "Units issued to the same work orders and items."),
+        ("Requisitioned Units", "IF ( HASONEVALUE ( 'Item'[UnitOfMeasure] ), SUM ( ShortfallPairs[RequisitionedQty] ) )", UNITS,
+         "Units the shortfall requisitions asked for, in one unit of measure at a time, and blank where rolls and "
+         "boxes would be added together."),
+        ("Issued Units", "IF ( HASONEVALUE ( 'Item'[UnitOfMeasure] ), SUM ( ShortfallPairs[IssuedQty] ) )", UNITS,
+         "Units issued to the same work orders and items, in one unit of measure at a time, and blank across units."),
         ("Issued Cost", "SUM ( ShortfallPairs[IssuedCost] )", MONEY, "The issues to the same pairs at standard cost."),
         ("Pair Estimated Value", "SUM ( ShortfallPairs[EstimatedValue] )", MONEY, "The estimated value of the pairs' requisitions."),
         ("Open Order Lines", "VAR AsOf = [Data Through]\nRETURN\n    COUNTROWS (\n        FILTER (\n"
@@ -1095,8 +1141,10 @@ def r4(b: Build) -> None:
     b.model.add(Table(TD, [Column(TD, "int64", "[Value]", fmt="0", summarize="none",
                                   extra=('extendedProperty ParameterMetadata = {"version":0}',))],
                       measures=[Measure(f"{TD} Value", f"SELECTEDVALUE ( '{TD}'[{TD}], {c3['raw']} )", "0",
-                                        "The target days of materials supply chosen on the slider; the policy target "
-                                        f"({c3['raw']} days) until one is chosen.")],
+                                        "The target days of materials supply chosen on the slider. Until one is chosen, "
+                                        f"the largest materials target ({c3['raw']} days), a benchmark for the whole "
+                                        "balance. Every policy ends with the fiscal year, so the controller approves the "
+                                        "next year's.")],
                       dax="GENERATESERIES ( 7, 120, 1 )"))
     for name, dax, f, desc in [
         ("Allowed Materials", f"DIVIDE ( [Issues TTM], 365 ) * [{TD} Value]", MONEY,
@@ -1151,16 +1199,20 @@ def r4(b: Build) -> None:
         f"{c['repeated']:,} were requisitioned more than once, holding {c['in_repeated']:,} requisitions; the most for one "
         f"pair is {c['most']} ({c['wo']} and {c['item']}), every month from {c['first_request']} to {c['last_request']}, "
         f"though the work order was due {c['due']} and completed {c['completed']}.",
-        f"Against the issues: {c['matched']:,} pairs matched and {c['unmatched']} with nothing issued; {c['units']:,.1f} "
-        f"units requisitioned (estimated {money(c['estimated'])}) against {c['units_issued']:,.1f} issued to the same "
-        f"pairs ({money(c['issued_cost'])} at standard). Receipts from shortfall requisitions over the three years: "
-        f"{money(c['short_receipts'])}.",
+        f"Against the issues: {c['matched']:,} pairs matched and {c['unmatched']} with nothing issued. Quantities add "
+        "only within a unit of measure: " + " and ".join(
+            f"{u['req']:,.1f} {u['plural']} requisitioned against {u['issued']:,.1f} issued" for u in c["by_unit"]) +
+        " to the same pairs. Even within a unit they add different items, and the pair table compares one item at a "
+        f"time. In value, the requisitions were estimated at {money(c['estimated'])} at their own unit costs, against "
+        f"{money(c['issued_cost'])} issued at standard, two different bases. Receipts from shortfall requisitions over "
+        f"the three years: {money(c['short_receipts'])}.",
         f"Approvals: every shortfall requisition ({c['n_short']:,}) was approved by employee {c['approver']}, the "
         f"{c['approver_title']}, who also requested {c['self_requested']} of them; production staff requested the rest ("
         + ", ".join(f"{t_} {n:,}" for t_, n in c["requester_titles"]) + f"). The CFO approved {c['cfo_plan']:,} supply-plan "
         f"requisitions and {c['no_plan']} have no approver; the capital requests were approved by "
         + " and ".join(f"the {t_} ({n})" for t_, n in c["other_app"]) + ". One manager both runs production and approves "
-        "every purchase it asks for, with no check against stock on hand or open orders."], size=9))
+        "every purchase it asks for, and the records do not show whether stock on hand or open orders were checked "
+        "before an approval."], size=9))
     page.expect = ["Shortfall Receipts", money(by[y]["short"][1]), top[0]["code"], money(top[0]["amount"]),
                    c["approver_title"], "Model answer"]
 
@@ -1168,25 +1220,28 @@ def r4(b: Build) -> None:
     td = col(TD, TD)
     page = b.report.add(Page("materialsTarget", "Materials Target", height=1100))
     page.add(card("pairCards", 20, 20, 820, 110, [M("Pairs"), M("Repeated Pairs"), M("Requisitions in Repeated Pairs"),
-                                                  M("Most Requisitions for a Pair"), M("Pairs with Issues"),
-                                                  M("Requisitioned Units"), M("Issued Units")], units_none=True,
+                                                  M("Most Requisitions for a Pair"), M("Pairs with Issues")], units_none=True,
                   title="Shortfall requisitions by work order and item"))
     rc = col("ShortfallPairs", "RequisitionCount")
     page.add(Visual("topPairs", "tableEx", 20, 150, 820, 300, {"Values": [
         col("ShortfallPairs", "WorkOrderNumber"), code, rc, col("ShortfallPairs", "FirstRequest"),
         col("ShortfallPairs", "LastRequest"), col("ShortfallPairs", "DueDate"), col("ShortfallPairs", "RequisitionedQty"),
         col("ShortfallPairs", "IssuedQty")]}, title="The pairs requisitioned most often", sort=[(rc, "Descending")]))
-    page.add(Visual("targetSlider", "slicer", 20, 470, 400, 100, {"Values": [td]}, title="Target days of materials supply",
+    page.add(Visual("targetSlider", "slicer", 20, 470, 240, 100, {"Values": [td]}, title="Target days of materials supply",
                     objects={"data": [{"properties": {"mode": lit("Single")}}]}))
-    page.add(card("whatIfCards", 440, 470, 400, 100, [meas(TD, f"{TD} Value"), M("Allowed Materials"), M("Excess Materials"),
-                                                      M("Months of Issues in Excess")], units_none=True,
+    page.add(card("whatIfCards", 280, 470, 560, 100, [meas(TD, f"{TD} Value"), M("Allowed Materials"), M("Excess Materials"),
+                                                      M("Months of Issues in Excess")], units_none=True, size=12,
                   filters=[keep("wicYear", yr, [y])]))
     page.add(Visual("whatIfTable", "tableEx", 20, 590, 820, 160, {"Values": [
         td, M("Allowed Materials"), M("Excess Materials"), M("Months of Issues in Excess")]},
         title=f"Targets tested at the end of fiscal {y}", filters=[keep("witYear", yr, [y]), keep("witDays", td, [28, 60, 90])]))
     page.add(card("leftOut", 20, 770, 820, 110, [M("Finished Goods"), M("Finished Goods at Target"), M("Open Requisitions"),
                                                  M("Open Requisition Value"), M("Open Order Lines"), M("Open Order Value")],
-                  units_none=True, title="What the estimate leaves out", filters=[keep("loYear", yr, [y])]))
+                  units_none=True, size=12, title="What the estimate leaves out", filters=[keep("loYear", yr, [y])]))
+    page.add(Visual("pairUnits", "tableEx", 20, 900, 820, 120, {"Values": [
+        col("Item", "UnitOfMeasure"), M("Requisitioned Units"), M("Issued Units")]},
+        title="Units requisitioned and issued to the same pairs, by unit of measure (rolls and boxes do not add)",
+        objects={"total": [{"properties": {"totals": lit(False)}}]}))
     page.extra = {"visualInteractions": [{"source": "targetSlider", "target": "whatIfTable", "type": "NoFilter"}]}
     wi = c["whatif"]
     fall = -b.ctx["r2"]["cur"]["cash"]
@@ -1195,9 +1250,11 @@ def r4(b: Build) -> None:
             f"{w['days']} days {money(w['allowed'])}, an excess of {money(w['excess'])} ({w['months']:.2f} months of "
             "issues)" for w in wi) + f". Even at {wi[-1]['days']} days the excess is about {c['multiple']} times the "
         f"year's fall in cash ({money(fall)}).",
-        f"A 2027 target: the policy's {c3['raw']} days for raw materials ({c3['pack']} for packaging), reached by "
-        "buying less than production uses until the stock falls to it, with an interim target (60 or 90 days) for the "
-        "audit committee to follow each quarter.",
+        f"A 2027 target: the largest materials target, {c3['raw']} days (raw materials, while packaging's is {c3['pack']}), as "
+        "a benchmark for the whole balance, reached by buying less than production uses until the stock falls to it, "
+        "with an interim target (60 or 90 days) for the audit committee to follow each quarter. Every policy ended with "
+        f"{d.C}, so the controller approves the 2027 target. Each class at its own target allows "
+        f"{money(c['policy_allowed'])}, a defensible alternative.",
         "What the estimate assumes: issues continue at the year's rate, the stock is usable and valued at standard, "
         "and purchases can fall below use without stopping production. What it leaves out: "
         f"finished goods, which at {FG(c)} days of shipments would be {money(c['fg_target'])} against "
@@ -1242,11 +1299,14 @@ def r4(b: Build) -> None:
                                       ("requisitions in repeated pairs", "in_repeated", "Requisitions in Repeated Pairs", 0),
                                       ("most requisitions for a pair", "most", "Most Requisitions for a Pair", 0),
                                       ("pairs matched to issues", "matched", "Pairs with Issues", 0),
-                                      ("units requisitioned", "units", "Requisitioned Units", 0.05),
                                       ("estimated value", "estimated", "Pair Estimated Value", 0.01),
-                                      ("units issued to the same pairs", "units_issued", "Issued Units", 0.05),
                                       ("issued at standard", "issued_cost", "Issued Cost", 0.01)]:
         b.check(s, label, c[key], f"[{measure_}]", tol)
+    for u in c["by_unit"]:                        # quantities add only within a unit of measure
+        uf = f"'Item'[UnitOfMeasure] = \"{u['unit']}\""
+        b.check(s, f"units requisitioned, {u['plural']}", u["req"], f"CALCULATE ( [Requisitioned Units], {uf} )", 0.05)
+        b.check(s, f"units issued to the same pairs, {u['plural']}", u["issued"], f"CALCULATE ( [Issued Units], {uf} )", 0.05)
+    b.check(s, "requisitioned units across units of measure (blank)", "blank", blank("[Requisitioned Units]"))
     b.check(s, "pairs with nothing issued", c["unmatched"], "[Pairs] - [Pairs with Issues]", 0)
     claim(c["n_top"] == "one", "one pair has the most requisitions")
     top_pair = f"FILTER ( ShortfallPairs, ShortfallPairs[RequisitionCount] = {c['most']} )"
@@ -1294,7 +1354,7 @@ def r4(b: Build) -> None:
                 f"Requisitions[ApproverTitle] = \"{full.get(t_, t_)}\" )", 0)
     b.check(s, f"{y} materials issued in the twelve months", c["ttm"], f"CALCULATE ( [Issues TTM], {cy} )", 0.01)
     b.check(s, "Target Days rows", 114, f"COUNTROWS ( '{TD}' )", 0)
-    b.check(s, "the slider's default (the policy target)", c3["raw"], f"[{TD} Value]", 0)
+    b.check(s, "the slider's default (the largest materials target)", c3["raw"], f"[{TD} Value]", 0)
     for w in wi:
         f_ = f"{cy}, '{TD}'[{TD}] = {w['days']}"
         b.check(s, f"{w['days']} days: allowed", w["allowed"], f"CALCULATE ( [Allowed Materials], {f_} )", 0.01)
@@ -1378,10 +1438,13 @@ def r5(b: Build) -> None:
         ["2010", f"Opening payables with no invoice ({c['entry']})", c["opening_ap"], "Follow up", "Payables"],
         ["2010", "Invoices moved to notes payable still open in the subledger (PI " +
          " and ".join(str(x["id"]) for x in cap) + "); close them against the notes", -c["notes_total"], "Expected", "Payables"],
+        ["1045", f"Opening materials with no item or cost detail ({c['entry']})", c["opening_materials"], "Follow up", ""],
+        ["1040", f"Opening finished goods with no item or cost detail ({c['entry']})", c["opening_fg"], "Follow up", ""],
         ["2050", "No remittance of the sales tax recorded", c["tax_balance"], "Follow up", ""],
         ["2110", f"Current portion of the notes classified as long-term (due {d.N})", c["current_portion"], "Misstatement", ""],
         ["1010 and 2010", "Supplier payments posted after Data Through", c["after_amount"], "Expected", ""],
-        ["2030", "Payroll accrual not recorded at the year-end (Part III case)", c["accrual"], "Misstatement", ""]]
+        ["2030", "Payroll accrual not recorded at the year-end, an estimate the Part III case proposed and did not post",
+         c["accrual"], "Misstatement", ""]]
     b.model.add(entered_table("Findings", [("Account", "string"), ("Finding", "string"), ("Amount", "double"),
                                            ("Disposition", "string"), ("Reconciles", "string")],
                               [[a, f_, f"{amt:.2f}", disp, rec] for a, f_, amt, disp, rec in findings], fmts={"Amount": MONEY}))
@@ -1396,7 +1459,8 @@ def r5(b: Build) -> None:
         filters=[keep("rfYear", yr, [y]), keep("rfAccounts", num, [int(n) for n in ROLL])]))
     page.add(card("reconCards", 20, 340, 820, 110, [M("Receivables"), M("Open Receivables"), M("Receivables Difference"),
                                                     M("Payables"), M("Open Payables"), M("Payables Difference")],
-                  units_none=True, title=f"Ledger against open items at the end of fiscal {y}", filters=[keep("rcYear", yr, [y])]))
+                  units_none=True, size=12, title=f"Ledger against open items at the end of fiscal {y}",
+                  filters=[keep("rcYear", yr, [y])]))
     page.add(Visual("billing", "tableEx", 20, 470, 400, 160, {"Values": [
         yr, M("Billing by Invoice Date"), M("Billing in Ledger"), M("Billing Difference")]},
         title="Billing by invoice date against the ledger", filters=[keep("blYears", yr, d.years)]))
@@ -1416,8 +1480,10 @@ def r5(b: Build) -> None:
     page.add(answer("reconAnswer", 860, 340, 400, 840, [
         f"Roll-forward at {year_end(y)}: " + "; ".join(
             f"{n} " + ", ".join(f"{k} {money(v)}" for k, v in roll[n]["parts"].items()) + f" ({money(roll[n]['total'])})"
-            for n in ROLL) + ". The JournalEntry parts are the balances no subledger document supports: the opening "
-        "entry's lines (and, in 2010, the two reclassifications to notes).",
+            for n in ROLL) + ". The matrix decomposes the ledger and corroborates nothing by itself. Its JournalEntry "
+        "parts are the opening entry's lines, which no subledger document in the extract supports, and, in 2010, the two "
+        "reclassifications to notes. Receivables and payables are reconciled to their documents below, and the "
+        "materials flows tie to 1045 on the Validation page.",
         f"Receivables: {c['n_ar']:,} open invoices, {money(c['open_ar'])}, against 1020 {money(roll['1020']['total'])}; "
         f"the difference, {money(c['ar_diff'])}, is the opening line of {c['entry']}. The {c['n_neg']} negative balances "
         f"({money(c['neg'])}) are credit memos on paid invoices, credited to 2060 and refunded, except "
@@ -1429,15 +1495,18 @@ def r5(b: Build) -> None:
         " and ".join(x["due"] for x in cap) + f"). Past due: {money(c['past_due'])} with them, {money(c['past_due_x'])} of "
         f"{money(c['total_x'])} ({pct(c['past_due_share'])}) without them.",
         "Billing by invoice date less the ledger: " + "; ".join(f"{x['year']} {signed(x['diff'])}" for x in bill) +
-        f". Invoices dated in one year and posted on 1 January of the next; only {c['shipped']} shipped in "
+        f". Invoices dated in one year and posted on January 1 of the next explain them, and only {c['shipped']} shipped in "
         f"{c['shipped_year']} (Chapter 6's cutoff error), so the other dates are wrong, not the ledger.",
         "Sales tax: 2050 receives credits only from SalesInvoice (" + ", ".join(money(v) for v in c["tax"]) +
         ", equal to the invoices' TaxAmount) and debits only from CreditMemo; no payment and no journal entry ever posts "
         "to it. Evidence outside the database: the sales tax returns filed, the tax authority's account, the bank "
         "statements, and a bank reconciliation.",
-        "Each finding carries a disposition in Chapter 8's terms. The Tests tab shows both differences equal their "
-        f"findings to the cent, the bridge equal to the change in cash in {P} and {y}, {c['after_rows']} rows after "
-        f"Data Through, and every measure blank in {d.N}."], size=9))
+        "Each finding carries a disposition in Chapter 8's terms. The opening inventories "
+        f"({money(c['opening_inv'])}) need the prior system's stock and costing schedules and a count. They reconcile no "
+        "difference, so Test 4 leaves them out, and the findings are not "
+        "added into one total, because they answer different questions. The Tests tab shows both differences equal "
+        f"their findings to the cent, the bridge equal to the change in cash in {P} and {y}, {c['after_rows']} rows after "
+        f"Data Through, and every working-capital measure blank in the quarters of {d.N}."], size=9))
     page.expect = ["SourceDocumentType", money(roll["1020"]["total"]), money(c["ar_diff"]), money(c["ap_diff"]),
                    "Misstatement", "Over 90 days", "Model answer"]
 
@@ -1449,7 +1518,7 @@ def r5(b: Build) -> None:
                "        \"Payables Findings\", ROUND ( [Payables Findings], 2 )\n    ),\n    'Date'[Year] = " + str(y) + "\n)")
     tests = " || ".join(f"NOT ISBLANK ( [{n}] )" for n in GUARDED)
     later = ("VAR ThroughDate = [Data Through]\nVAR LaterQuarters =\n    FILTER ( VALUES ( 'Date'[YearQuarter] ), "
-             "CALCULATE ( MIN ( 'Date'[Date] ) ) > ThroughDate )\nRETURN\n")
+             "CALCULATE ( MAX ( 'Date'[Date] ) ) > ThroughDate )\nRETURN\n")
     b.add_test("Test 5: every working-capital measure is blank after Data Through",
                "EVALUATE\n" + later + "    ROW (\n        \"Quarters after Data Through\", COUNTROWS ( LaterQuarters ),\n"
                f"        \"Quarters with a value\", COUNTROWS ( FILTER ( LaterQuarters, {tests} ) ) + 0\n    )")
@@ -1515,7 +1584,8 @@ def r5(b: Build) -> None:
     b.check(s, f"sales tax payable at {year_end(y)}", c["tax_balance"], f"CALCULATE ( [Sales Tax Payable], {cy} )", 0.01)
     b.check(s, "Findings rows", len(findings), "COUNTROWS ( Findings )", 0)
     for a, f_, amt, disp, rec in findings:
-        b.check(s, f"finding: {f_[:60]}", round(amt, 2), f"CALCULATE ( [Findings Amount], Findings[Finding] = \"{f_}\" )", 0.005)
+        short = f_ if len(f_) <= 60 else f_[:60].rsplit(" ", 1)[0].rstrip(",") + " ..."      # cut at a word
+        b.check(s, f"finding: {short}", round(amt, 2), f"CALCULATE ( [Findings Amount], Findings[Finding] = \"{f_}\" )", 0.005)
     b.check(s, "Test 4: the receivables difference equals its findings", 0, f"CALCULATE ( [Unexplained Receivables], {cy} )", 0.005)
     b.check(s, "Test 4: the payables difference equals its findings", 0, f"CALCULATE ( [Unexplained Payables], {cy} )", 0.005)
     for yy in (P, y):
@@ -1547,31 +1617,36 @@ def r6(b: Build) -> None:
         "To: the Controller. From: the staff accountant. Subject: where the cash went in fiscal " + str(y) +
         f" (data through {c1['thru']}).",
         ("Financial reporting", True),
-        f"The profit was real but went into inventories. Net income was {money(cur['net_income'])}, yet cash fell "
-        f"{money(-cur['cash'])}, from {money(c2['cash_from'])} to {money(c2['cash_to'])}, after rising "
-        f"{money(c2['pri']['cash'])} in {P}. The inventories absorbed {money(-cur['inventories'])}, while unremitted "
-        f"sales tax ({signed(cur['sales_tax'])}) and growing payables ({signed(cur['payables'])}) held cash up.",
+        f"The recorded profit went into inventories. Net income as recorded was {money(cur['net_income'])}, before the "
+        f"adjustments and support questions below, yet cash fell {money(-cur['cash'])}, from {money(c2['cash_from'])} to "
+        f"{money(c2['cash_to'])}, after rising {money(c2['pri']['cash'])} in {P}. The inventories absorbed "
+        f"{money(-cur['inventories'])}, while the growth of the recorded sales tax payable ({signed(cur['sales_tax'])}) "
+        f"and of the payables ({signed(cur['payables'])}) held cash up.",
         f"Restated by the indirect method, operating activities used {money(-rc['operating'])}, investing used none, "
         f"and financing used {money(-rc['financing'])} in principal payments; {money(rc['notes_financed'])} of "
         f"equipment acquired by a note ({c2['reclass']}) and the disposal {c2['disp']['entry']} moved no cash and are "
-        f"disclosed apart. Without the unremitted tax, operating cash flow would have been {money(c2['without_tax'])}.",
-        f"The balance sheet needs three things. Sales tax payable of {money(c2['tax_c'])} has no remittance recorded "
-        f"in the ledger, so the cash on the balance sheet overstates what the company can use: net of it, cash was "
-        f"{money(c2['net'][-1])}. {money(c2['due_next'])} of the notes is due in {d.N} but classified as long-term; "
-        f"reclassified, it lowers working capital. And the opening receivables ({money(c5['opening_ar'])}) and "
-        f"payables ({money(c5['opening_ap'])}) are balances that no document supports.",
+        f"disclosed apart. Had the year's increase in the recorded sales tax payable been paid within the year, "
+        f"operating cash flow would have been {money(c2['without_tax'])}.",
+        f"The balance sheet needs three things. Sales tax payable of {money(c2['tax_c'])}, the tax billed less credit "
+        "memos, has no remittance recorded in the ledger, so the cash on the balance sheet may overstate what the "
+        f"company can use until the tax position is settled. Net of it, cash was {money(c2['net'][-1])}. "
+        f"{money(c2['due_next'])} of the notes is due in {d.N} but classified as long-term; reclassified, it lowers "
+        f"working capital. And no document in the extract supports the opening receivables ({money(c5['opening_ar'])}), "
+        f"payables ({money(c5['opening_ap'])}), materials ({money(c5['opening_materials'])}) and finished goods "
+        f"({money(c5['opening_fg'])}).",
         ("Managerial accounting", True),
-        f"Receivables and payables barely moved (DSO {firstq['dso']:.1f} to {last['dso']:.1f} days; DPO without the "
-        f"opening line {firstq['dpo_x']:.1f} to {last['dpo_x']:.1f}). The cash conversion cycle grew from "
-        f"{firstq['ccc']:.1f} to {last['ccc']:.1f} days entirely through inventory: materials stood at "
-        f"{last['mat']:.1f} days of issues against a policy target of {c3['raw']}, and finished goods at "
+        f"Receivables and payables barely moved (DSO {firstq['dso']:.1f} to {last['dso']:.1f} days as recorded; DPO "
+        f"{firstq['dpo']:.1f} to {last['dpo']:.1f} as recorded and {firstq['dpo_x']:.1f} to {last['dpo_x']:.1f} without "
+        "the opening line, whose constant payables the growing purchases dilute). The cash conversion cycle grew from "
+        f"{firstq['ccc']:.1f} to {last['ccc']:.1f} days as recorded, mainly through inventory: materials stood at "
+        f"{last['mat']:.1f} days of issues against the largest materials target of {c3['raw']}, and finished goods at "
         f"{last['fg']:.1f} days.",
         f"The build came through the work-order shortfall channel: receipts from shortfall requisitions rose to "
         f"{money(c4['by_year'][-1]['short'][1])} in {y} while issues held near {round(c4['ttm'] / 1e6):.0f} million. "
         f"Requisitions were repeated for one work order and item ({c4['repeated']:,} of {c4['pairs']:,} pairs, up to "
-        f"{c4['most']} for {c4['wo']} and {c4['item']}), and {c4['units']:,.1f} units were requisitioned against "
-        f"{c4['units_issued']:,.1f} issued to the same pairs.",
-        f"A 2027 target: at {wi[0]['days']} days the materials allowed are {money(wi[0]['allowed'])} and the excess "
+        f"{c4['most']} for {c4['wo']} and {c4['item']}).",
+        f"A 2027 target: at {wi[0]['days']} days, the largest materials target and a benchmark for the whole balance "
+        f"that the controller must approve, the materials allowed are {money(wi[0]['allowed'])} and the excess "
         f"{money(wi[0]['excess'])} ({wi[0]['months']:.2f} months of issues); even at {wi[-1]['days']} days the excess "
         f"({money(wi[-1]['excess'])}) is about {c4['multiple']} times the year's fall in cash. The estimate assumes "
         "issues continue at the year's rate and the stock is usable; it leaves out the finished goods, the "
@@ -1581,13 +1656,16 @@ def r6(b: Build) -> None:
         ("Auditing", True),
         f"Receivables reconcile to the open invoices except the {money(c5['ar_diff'])} opening line; payables except "
         f"{money(c5['ap_diff'])}, the opening payables less the two note invoices still open in the subledger. "
-        "Dispositions: the opening balances, follow up (supporting schedules from the prior system and confirmations); "
-        "the note invoices, expected (close them against the notes); the sales tax, follow up (the returns filed, the "
-        "tax authority's account, the bank statements and reconciliation); the current portion and the unrecorded "
-        f"payroll accrual ({money(c5['accrual'])}), misstatements; the supplier payments after Data Through, expected.",
+        "Dispositions: the opening balances, follow up (the prior system's schedules and confirmations, and for the "
+        "inventories the stock and costing records and a count); the note invoices, expected (close them against the "
+        "notes); the sales tax, follow up (the returns filed, the tax authority's account, the bank statements and "
+        f"reconciliation); the current portion and the unrecorded payroll accrual ({money(c5['accrual'])}, an estimate "
+        "the Part III case proposed), misstatements; the supplier payments after Data Through, expected.",
         f"Controls over requisitions: one manager, the {c4['approver_title']}, approved every shortfall requisition, "
-        f"{c4['self_requested']} of them his or her own, with no check against stock on hand or open orders.",
-        "Controls over the report: the Tests tab and the Data Through card must be rerun on every refresh, the "
+        f"{c4['self_requested']} of them his or her own, and the records do not show whether stock on hand or open "
+        "orders were checked.",
+        "Controls over the report: the Tests tab, the reconciliations and the Data Through card must be rerun on every "
+        "refresh, because Data Through is a bound observed in the extract, not proof that the data are complete. The "
         "Validation totals must agree with the ledger, and changes to the file should be reviewed before the committee "
         "relies on it each quarter.",
         ("Recommendation", True),

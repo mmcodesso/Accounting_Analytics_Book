@@ -10,7 +10,12 @@
 -- (styles/book-pdf.tex) asks for room: a block of up to KEEP_LINES lines moves whole to the next page when the page
 -- cannot hold it, and a longer block starts only where at least MIN_LINES lines fit. The short paragraph that
 -- introduces a block ("a. Type and run the query below.", or the short last items of a list just before it) moves
--- with it, and so does a heading right before them, which would otherwise sit alone at the foot. Lines are counted
+-- with it, and so does a heading right before them, which would otherwise sit alone at the foot. When a tutorial
+-- step's whole list of actions, or the one paragraph after its label, moves with the block, the step's label
+-- ("**Step 5. ...**") moves too, so it never sits alone at the foot of a page either. So it does when the block sits
+-- inside one of the step's first actions ("a. Type this formula in B28:" and the formula), where the room is asked
+-- for before the label. Any other step label asks for room for itself and the first lines of its step
+-- (\aaKeepLabel), so a label never ends a page with its actions on the next. Lines are counted
 -- as printed: a code line longer than WRAP characters wraps (breaklines), a paragraph line holds about TEXT_LINE
 -- characters, and PADDING_LINES lines are added for the shading's padding and the space around the block (the
 -- lead-in adds one for the space after it), so the estimate errs on the side of moving the block.
@@ -97,6 +102,45 @@ local function is_lead(block)
     and length(pandoc.utils.stringify(block)) <= LEAD_CHARS
 end
 
+-- a tutorial step's label ("**Step 5. Create the role.**", with at most a short sentence after it)
+local function is_step_label(block)
+  return block ~= nil and block.t == 'Para' and #block.content > 0 and block.content[1].t == 'Strong'
+    and pandoc.utils.stringify(block.content[1]):match('^Step %d+%.') ~= nil
+    and length(pandoc.utils.stringify(block)) <= LEAD_CHARS
+end
+
+-- the bold line that opens a tutorial's steps ("**Step-by-step instructions.**")
+local function is_instructions(block)
+  return block ~= nil and block.t == 'Para' and #block.content > 0 and block.content[1].t == 'Strong'
+    and pandoc.utils.stringify(block):match('^Step%-by%-step instructions%.$') ~= nil
+end
+
+-- the printed lines from the start of a step's list of actions to the first lines of a code block inside one of
+-- its first actions ("a. On the Analysis worksheet, enter this formula in B28:" and the formula), when the text
+-- before the block is short (LEAD_CHARS); nil when no such block opens the list
+local function nested_code_lines(list)
+  if list == nil or (list.t ~= 'OrderedList' and list.t ~= 'BulletList') then return nil end
+  local lines, chars = 0, 0
+  for k, item in ipairs(list.content) do
+    if k > 3 then return nil end
+    for _, inner in ipairs(item) do
+      if inner.t == 'CodeBlock' then
+        local n = code_lines(inner.text)
+        return lines + (n <= KEEP_LINES and n or MIN_LINES) + PADDING_LINES
+      elseif inner.t ~= 'RawBlock' then
+        if not is_lead(inner) then return nil end
+        local text = length(pandoc.utils.stringify(inner))
+        chars = chars + text
+        if chars > LEAD_CHARS then return nil end
+        lines = lines + math.ceil(text / TEXT_LINE) + 1
+      end
+    end
+  end
+  return nil
+end
+
+local LABEL_FOLLOW = 3   -- lines of a step's first action that must fit on the page with its label
+
 function Blocks(blocks)
   if not FORMAT:match('latex') then return nil end
   local result, changed, i = {}, false, 1
@@ -130,7 +174,13 @@ function Blocks(blocks)
             chars, first_item = chars + text, k
           end
         end
-        if first_item ~= nil then
+        if first_item == 1 and is_step_label(blocks[i - 2]) and is_step_label(result[#result - 1]) then
+          -- the whole list moves with the code, so the tutorial step's label just before it moves too, rather
+          -- than sit alone at the foot of the page
+          wanted = wanted + #previous.content + math.ceil(chars / TEXT_LINE) + 1
+                   + math.ceil(length(pandoc.utils.stringify(blocks[i - 2])) / TEXT_LINE) + 1
+          table.insert(result, #result - 1, pandoc.RawBlock('latex', '\\aaNeedspace{' .. wanted .. '\\baselineskip}'))
+        elseif first_item ~= nil then
           -- ask for the room at the start of the first of those items, so they move with the code
           wanted = wanted + (#previous.content - first_item + 1) + math.ceil(chars / TEXT_LINE) + 1
           local item = previous.content[first_item]
@@ -143,6 +193,11 @@ function Blocks(blocks)
           if is_lead(previous) then
             back = 1
             wanted = wanted + math.ceil(length(pandoc.utils.stringify(previous)) / TEXT_LINE) + 1
+            if not is_step_label(previous) and is_step_label(blocks[i - 2]) then
+              -- a step whose only action is the lead-in: its label moves with it
+              back = 2
+              wanted = wanted + math.ceil(length(pandoc.utils.stringify(blocks[i - 2])) / TEXT_LINE) + 1
+            end
           end
           if blocks[i - back - 1] ~= nil and blocks[i - back - 1].t == 'Header' then
             back = back + 1
@@ -151,6 +206,23 @@ function Blocks(blocks)
           table.insert(result, #result - back + 1,
                        pandoc.RawBlock('latex', '\\aaNeedspace{' .. wanted .. '\\baselineskip}'))
         end
+        changed = true
+      elseif is_step_label(block) and blocks[i + 1] ~= nil and blocks[i + 1].t ~= 'CodeBlock' then
+        -- a step label (a label right before a code block is handled with the block): room for the label and
+        -- the start of its step, or, when a code block sits in its first actions, for everything up to the block
+        local wanted = math.ceil(length(pandoc.utils.stringify(block)) / TEXT_LINE) + 1
+        local nested = nested_code_lines(blocks[i + 1])
+        local macro = nested ~= nil and 'aaNeedspace' or 'aaKeepLabel'
+        wanted = wanted + (nested or LABEL_FOLLOW)
+        local back = 0
+        local before = blocks[i - 1]
+        if before ~= nil and before.t == 'Header' then
+          back, wanted = 1, wanted + HEADER_LINES
+        elseif is_instructions(before) then
+          back, wanted = 1, wanted + 2
+        end
+        table.insert(result, #result - back + 1,
+                     pandoc.RawBlock('latex', '\\' .. macro .. '{' .. wanted .. '\\baselineskip}'))
         changed = true
       elseif is_callout(block) then
         local wanted = math.ceil(text_lines(block.content)) + CALLOUT_PADDING

@@ -4,7 +4,7 @@
 :::
 
 ::: {.notes}
-This chapter prepares the invoice lines for the analysis the rest of Part II performs. Each module follows a section of the chapter, and the three guided tutorials build the prepared table step by step.
+This chapter prepares the invoice lines for the Furniture analysis of Chapters 6 and 7. Each module follows a section of the chapter, and the three guided tutorials build the prepared table step by step.
 :::
 
 ## Learning objectives
@@ -63,7 +63,7 @@ The checks apply the quality dimensions of Chapter 2: accuracy, completeness, co
 {{< book-figure fig-05-01 >}}
 
 ::: {.notes}
-By the end of Tutorial 5.3, every invoice line carries its invoice date and fiscal period, its item's group and product type, and its customer's segment and region. The rest of Part II analyzes that table. The next two slides enlarge each half.
+By the end of Tutorial 5.3, every invoice line carries its invoice date and fiscal period, its item's group and product type, and its customer's segment and region. Chapters 6 and 7 analyze that table. The next two slides enlarge each half.
 :::
 
 ## Each line gains its invoice's date and customer
@@ -281,7 +281,7 @@ Keeping each step in its own column makes the chain easy to check. Exercise 5.5 
 - SUMIFS and COUNTIFS for totals and counts
 
 ::: {.notes}
-Chapter 3's cardinality tells you which side of a relationship you are on. Following a key is a join in SQL and a relationship in Power BI, so this question carries into Parts III and IV.
+Chapter 3's cardinality tells you which side of a relationship you are on. A SQL join combines tables in a query result, and a Power BI relationship keeps them separate and passes filters between them. Both need the same question, so it carries into Parts III and IV.
 :::
 
 ## Check your understanding {.check}
@@ -400,7 +400,7 @@ The tutorials clear "Use original column name as prefix", so each column keeps i
 {{< book-table tbl-05-05 >}}
 
 ::: {.notes}
-Left outer is right for enriching the invoice lines, because every line must stay; a left anti merge on the same keys returns the lines that failed to match, which should be none. An unchanged row count is the first test of any merge.
+Left outer is right for enriching the invoice lines, because every line must stay; a left anti merge on the same keys returns the lines that failed to match, which should be none. An unchanged row count shows that no line was repeated, not that every line matched.
 :::
 
 ## Custom columns calculate inside the query
@@ -429,7 +429,7 @@ Students import the customers, start InvoiceLines as a reference to the invoice 
 {{< book-figure fig-05-06 >}}
 
 ::: {.notes}
-The upper table is the query being built and the lower one the Table merged into it, with the key column selected in each. The dialog's message estimates that every invoice line finds a match; the row count after loading is the check that confirms it.
+The upper table is the query being built and the lower one the Table merged into it, with the key column selected in each. The dialog's message estimates that every invoice line finds a match. The row count after loading shows that no line was repeated, and a left anti merge that returns no rows shows that every line matched.
 :::
 
 ## Five custom columns finish InvoiceLines
@@ -453,7 +453,7 @@ InvoiceLines has as many rows as SalesInvoiceLine and the same line total, and i
 {{< book-checkpoint 5.3 lead="true" >}}
 
 ::: {.notes}
-From here on the analysis uses InvoiceLines, one recorded procedure that repeats itself on every refresh. The lookup columns on SalesInvoiceLine stay in the workbook as the check that confirmed it.
+From here on the analysis uses InvoiceLines, one recorded procedure that runs again on every refresh. The lookup columns on SalesInvoiceLine stay in the workbook as its cross-check.
 :::
 
 # Looking Ahead
@@ -466,7 +466,7 @@ From here on the analysis uses InvoiceLines, one recorded procedure that repeats
 - Chapter 6 summarizes it to explain the change in the Furniture margin
 
 ::: {.notes}
-The preparation has sharpened the question: revenue follows the invoice date, while the promotion's price follows the order date. The rest of Part II builds on InvoiceLines.
+The preparation has sharpened the question: revenue follows the invoice date, while the promotion's price follows the order date. Chapters 6 and 7 build on InvoiceLines.
 :::
 
 ## Summary

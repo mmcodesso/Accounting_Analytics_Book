@@ -477,10 +477,10 @@ def if_15_0_b() -> Diagram:
     return d
 
 
-# -- IF-15-0-C: what the Checks tab proves and what only Desktop shows ----------------------------------------------------------------
+# -- IF-15-0-C: what the Checks tab tests and what only Desktop shows ----------------------------------------------------------------
 
 def if_15_0_c() -> Diagram:
-    """A two-column board: the results of each exercise that a row of the Checks tab proves, and what only Desktop shows."""
+    """A two-column board: the results of each exercise that a row of the Checks tab tests, and what only Desktop shows."""
     d = Diagram("What the Checks Tab Proves and What Only Desktop Shows")
     c = ctx.values("ch15.chapter")
     sections = _g15().check_sections()
@@ -523,7 +523,7 @@ def if_15_0_c() -> Diagram:
         "<br><i>Exercise 15.5</i>",
     ]
     col_w, gap = 422, 16
-    d.box("<b>Proved by the Checks tab</b>", 0, 0, col_w, 32, fill=TEAL, stroke=TEAL, color=WHITE, size=14, rounded=False)
+    d.box("<b>Tested by the Checks tab</b>", 0, 0, col_w, 32, fill=TEAL, stroke=TEAL, color=WHITE, size=14, rounded=False)
     d.box("<b>Visible only in Desktop</b>", col_w + gap, 0, col_w, 32, fill=AMBER, stroke=AMBER, color=WHITE, size=14, rounded=False)
     bottoms = []
     for x0, items, fill, stroke, badge in ((0, left, TEAL_TINT, TEAL, True), (col_w + gap, right, AMBER_TINT, AMBER, False)):
@@ -538,7 +538,7 @@ def if_15_0_c() -> Diagram:
         bottoms.append(cy - 8)
     board = {"bottom": max(bottoms)}
     _note(d, f"The Checks tab of the model answer holds {mine} rows for the tutorials and exercises of the chapter ({c['n_checks']} with the sections "
-             "of Chapters 13 and 14). Choose Home > Refresh, then Run. A row is proof of a value, not of how a visual looks: the right-hand column "
+             "of Chapters 13 and 14). Choose Home > Refresh, then Run. A row tests a value, not how a visual looks, so the right-hand column "
              "is for the instructor to open the pages.", board["bottom"] + 12)
     return d
 
@@ -788,7 +788,9 @@ def if_15_2_a() -> Diagram:
     assert cols == ["YearMonth", "Net Income", "YTD", "Change", "Net Income YTD"], cols
     calcs = _g15().calcs(lambda ok, text: None, "ex152", "netIncomeByMonth")
     assert calcs == {"YTD": g["c_ytd"], "Change": g["c_change"]}
-    assert g["c_ytd"] == "YTD = RUNNINGSUM ( [Net Income] )" and g["c_change"] == "Change = [Net Income] - PREVIOUS ( [Net Income] )"
+    # Change is guarded so that January, which has no row above it, is blank (round 2 of the review)
+    assert g["c_ytd"] == "YTD = RUNNINGSUM ( [Net Income] )" and g["c_change"] == (
+        "Change = IF ( ISBLANK ( PREVIOUS ( [Net Income] ) ), BLANK (), [Net Income] - PREVIOUS ( [Net Income] ) )")
     assert "TOTALYTD" in g["m_ytd"]
     t_top, t_half = _title("ex152", "netIncomeByMonth"), _title("ex152", "secondHalf")
     assert t_top == g["t_table"] and t_half == g["t_half"]

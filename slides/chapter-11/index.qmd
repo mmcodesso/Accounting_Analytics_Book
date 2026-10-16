@@ -26,7 +26,7 @@ The last three cover common table expressions, views, and the monthly measure th
 ## When did it start, and is it still growing?
 
 - Output was flat, but the plant recorded far more hours than its standards allow
-- Direct labor stayed within the standard; indirect time and overtime grew
+- Recorded direct hours stayed within the standard; indirect time and overtime grew
 - The plant manager will ask: when did it start, and is it still getting worse?
 - How much is overtime, and is it spread across the plant or concentrated?
 
@@ -176,7 +176,7 @@ The payroll categories other than deductions tie to the ledger's charge to the c
 {{< book-checkpoint 11.1 4-6 >}}
 
 ::: {.notes}
-CASE, conditional aggregation and the date functions have given three views of the same change: indirect time that appears in the middle of the first year, more overtime on direct labor, and work orders that take longer to finish.
+CASE, conditional aggregation and the date functions have given three views of the same change: indirect time that becomes a large part of the records from the middle of the first year, more overtime on direct labor, and work orders that take longer to finish.
 :::
 
 # Window Functions
@@ -230,7 +230,7 @@ The year-to-date total restarts in January because each fiscal year is its own p
 - `LAG(x)` partitioned by month: the latest earlier year with that month
 
 ::: {.notes}
-Check that a query relying on a frame has one row for every month. COUNT over the window shows where it holds fewer than twelve months. A frame shapes only the aggregates: LAG, LEAD and the ranking functions read the whole partition. LAG partitioned by month returns the previous year only when no year is missing that month. An alias of the SELECT list cannot be used inside OVER, so the window repeats the expression; SQLite answers "no such column".
+Check that a query relying on a frame has one row for every month. COUNT over the window shows where it holds fewer than twelve rows, which are twelve months only when no month is missing. Of this chapter's functions, a frame shapes only the aggregates. LAG, LEAD and the ranking functions read the whole partition. LAG partitioned by month returns the previous year only when no year is missing that month. An alias of the SELECT list cannot be used inside OVER, so the window repeats the expression; SQLite answers "no such column".
 :::
 
 ## The window functions of this chapter
@@ -253,7 +253,7 @@ These clauses combine: a partition, an order within it, and a frame of the order
 
 - After WHERE, GROUP BY and HAVING; before DISTINCT, ORDER BY and LIMIT
 - So a window can work on grouped totals: a running total of monthly sums
-- But WHERE and HAVING cannot filter on its result: "misuse of window function"
+- But WHERE and HAVING cannot filter on its result ("misuse of …")
 - To keep the top-ranked rows, filter the window's result in an outer query
 
 ::: {.notes}
@@ -352,7 +352,7 @@ The chapter's example totals the monthly gap in one CTE, and the outer query add
 - A one-row CTE can hold a parameter, such as an as-of date
 - A scalar subquery reads it wherever it is needed, so one change updates the query
 - SQLite may calculate a CTE once or treat it as a derived table
-- So the choice is about readability: for more than one step, use CTEs
+- So choose for readability, and time the query if its speed matters
 
 ::: {.notes}
 The SQLite documentation describes a CTE as working like a view that exists for the length of one statement. Tutorial 11.3 chains four CTEs into the monthly measure.
@@ -391,11 +391,11 @@ That is why Chapter 9 made a working copy: the view lives in CharlesRiver_Work.s
 
 - A view depends on the tables and columns it uses
 - Remove or change one, and the view can fail or change its meaning
-- The error appears only when someone queries the view
+- SQLite may refuse the change, or the view fails when next queried
 - Document every view: purpose, source tables, and the checks its results pass
 
 ::: {.notes}
-SQLite carries a renamed table or column into the views that use it, but test a view again after any change to its tables. Document a view in its script just as you document any other query.
+SQLite refuses to drop a column that a view uses, while a dropped table leaves the view failing the next time it is queried. SQLite carries a renamed table or column into the views that use it, but test a view again after any change to its tables. Document a view in its script just as you document any other query.
 :::
 
 ## Check your understanding {.check}
@@ -414,12 +414,12 @@ Ask students which of the four would surprise someone else who uses the view.
 ## Each case has its consequence {.answer}
 
 1. DB Browser asks; Discard removes the view
-2. The view fails, but only when it is queried
+2. SQLite refuses to drop it while the view uses it
 3. Leave it out: the query using the view sorts
 4. Use CREATE TEMP VIEW
 
 ::: {.notes}
-The second is the reason for documenting a view's source tables and checks.
+The second is the reason for documenting a view's source tables and checks. A dropped table, by contrast, shows up only when the view is next queried.
 :::
 
 # Guided Tutorial 11.3: Building the Monthly Measure and Saving It as a View
@@ -437,7 +437,7 @@ Students build the output step and the hours step, join them, add the trailing t
 {{< book-figure fig-11-08 >}}
 
 ::: {.notes}
-Output counts standard hours only up to the last day with time records, so the last month compares hours and output up to the same day, although indirect time ends a week earlier. The Trailing step calculates the trailing ratios over the named window, and the final SELECT keeps the months whose window holds twelve months.
+Output counts standard hours only up to the last day with time records, so the output does not run on after the hours stop, although indirect time ends a week earlier. The Trailing step calculates the trailing ratios over the named window, and the final SELECT keeps the months whose window holds twelve monthly rows.
 :::
 
 ## The saved view in the database
@@ -450,10 +450,10 @@ After Write Changes, the view appears under Views on the Database Structure tab 
 
 ## The measure for the year, queried from the view
 
-{{< book-figure fig-11-10 crop="0,0,1,0.7876" >}}
+{{< book-figure fig-11-10 crop="0,0,1,0.7637" >}}
 
 ::: {.notes}
-The monthly ratio swings from month to month, while the trailing figures change slowly. Each trailing figure pools twelve months' hours and standard hours, and the December row covers only the days to the last time record, so it is provisional. Indirect hours per standard hour have levelled off, while the trailing direct figure creeps up and the trailing total peaks in the tenth month.
+The monthly ratio swings from month to month, while the trailing figures change slowly. Each trailing figure pools twelve months' hours and standard hours, and the December row covers only the days to the last time record, with its indirect time ending a week before its direct time, so it is provisional. Counted to the last day of indirect time on both sides, its total is a little lower. Indirect hours per standard hour have levelled off, while the trailing direct figure creeps up and the trailing total peaks in the tenth month.
 :::
 
 ## Checkpoint
@@ -469,14 +469,14 @@ The partial windows before the twelfth month, led by the start-up month, are why
 {{< book-checkpoint 11.3 5-7 >}}
 
 ::: {.notes}
-The controller now has a measure smoothed enough to show a trend, split into the kinds of labor that explain it, and saved so that it runs again every month.
+The controller now has a measure smoothed enough to show a trend, split into the kinds of labor that make it up, and saved so that it runs again every month. Its parts are recorded hours. Activity, staffing, how time is classified and how complete the records are need checking before they are read as time away from the work orders.
 :::
 
 # Looking Ahead
 
 ## Back to the plant manager's questions
 
-- When: in the middle of the first year, when indirect time appears and overtime climbs
+- When: in the records, mid-way through the first year, as indirect time and overtime grow
 - Still worse? Indirect time has been flat since mid-way through the second year; direct time crept up
 - Overtime: about a fifth of all hours, and more than a quarter of direct hours
 - Where: Packing and QA record several times their plan; other centers record less

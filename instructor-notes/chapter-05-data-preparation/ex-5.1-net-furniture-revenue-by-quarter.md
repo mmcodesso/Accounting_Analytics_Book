@@ -24,7 +24,7 @@ By the end, students can:
 
 ## Before you assign
 
-- **Files and software.** The copy of Charles River Furniture Analysis.xlsx made after Tutorial 5.3, so that InvoiceLines, the Item Table and SalesInvoice exist. XLOOKUP needs Excel for Microsoft 365 or a recent perpetual version.
+- **Files and software.** The copy of Charles River Furniture Analysis.xlsx made after Tutorial 5.3, so that InvoiceLines, the Item Table and SalesInvoice exist. XLOOKUP is in every desktop Excel that Microsoft still supports.
 - **Data conditions.** The CreditMemo and CreditMemoLine Tables hold 612 memos and 637 lines, all years. Every credit memo line is for an item the workbook's Item Table keeps, so no lookup fails. Some memos hold lines of Furniture and of another item group, which matters for the header-total shortcut below.
 - **Check the Tutorial 5.3 workbook first.** The grid reads the Period and ItemGroup columns of InvoiceLines. A student who skipped Tutorial 5.3 needs the start or end file in Chapter05-companion.zip.
 - **Where the new columns go.** CreditMemoLine has its database columns first. The three new columns are CreditMemoDate in column O, Period in P and ItemGroup in Q.
@@ -93,7 +93,7 @@ Bring the flag to CreditMemoLine with an XLOOKUP on CreditMemoID, then count the
 
 **Check:** 14 memos dated 2026-01-03 to 2026-01-31, for invoices dated 2025-11-27 to 2025-12-31; 10 of their lines are Furniture, $13,289.90, all in 2026-Q1.
 
-**Step 7. Write the note.** Two or three sentences. The model answer assigns each credit to the quarter of its credit memo, because the ledger records it there and the closed periods stay as reported. It names the alternative, the quarter of the original invoice, which measures the net sale better but restates closed periods, and says the choice moves only $13,289.90 out of 2026-Q1. It adds that the credits are small and do not explain the change between the third and fourth quarters.
+**Step 7. Write the note.** Two or three sentences. The model answer assigns each credit to the quarter of its credit memo, because the ledger records it on that date and the schedule is one of recorded activity. It names the alternative, the quarter of the original invoice, which answers a different question, the net result of each quarter's sales, and belongs in a separate schedule, labeled and reconciled to this one. It says that neither choice changes the ledger and that the choice moves only $13,289.90 out of 2026-Q1. It adds that the credits are small and do not explain the change between the third and fourth quarters.
 
 **Check:** the note states which assignment the schedule uses.
 
@@ -112,12 +112,12 @@ Bring the flag to CreditMemoLine with an XLOOKUP on CreditMemoID, then count the
 
 ![A mock of the quarterly grid of Exercise 5.1 with its check row and the earlier-year credits beneath it.](../figures/chapter-05-data-preparation/IF-05-1-A.pdf)
 
-> **Instructor notes, Exercise 5.1:** billed Furniture revenue (after line discounts, before credit memos) 2026 Q1-Q4 4,354,122.83 / 4,600,820.85 / 4,283,322.86 / 4,156,787.84. Furniture credit memo lines by CreditMemoDate: Q1 30 lines 42,139.69; Q2 15 lines 23,789.08; Q3 28 lines 55,437.94; Q4 25 lines 39,719.44 (98 lines, 161,086.15). Net: 4,311,983.14 / 4,577,031.77 / 4,227,884.92 / 4,117,068.40. No unmatched rows. 14 credit memo lines dated in 2026 reverse invoices from earlier years. For a margin comparison by quarter, assigning credits to the credit memo's date matches how the ledger records them; assigning them to the original invoice's quarter measures the net sale, but restates closed periods. Either is defensible if stated. The credits are small relative to revenue and do not explain the change between Q3 and Q4.
+> **Instructor notes, Exercise 5.1:** billed Furniture revenue (after line discounts, before credit memos) 2026 Q1-Q4 4,354,122.83 / 4,600,820.85 / 4,283,322.86 / 4,156,787.84. Furniture credit memo lines by CreditMemoDate: Q1 30 lines 42,139.69; Q2 15 lines 23,789.08; Q3 28 lines 55,437.94; Q4 25 lines 39,719.44 (98 lines, 161,086.15). Net: 4,311,983.14 / 4,577,031.77 / 4,227,884.92 / 4,117,068.40. No unmatched rows. 14 credit memo lines dated in 2026, across the item groups and 10 of them Furniture, reverse invoices from earlier years. For this schedule of recorded activity, assigning credits to the credit memo's date matches how the ledger records them. Assigning them to the original invoice's quarter answers a different question, the net result of each quarter's sales, and belongs in a separate schedule, labeled and reconciled to this one. Neither changes the ledger, and an adjustment to an earlier period would need accounting and transaction evidence. The credits are small relative to revenue and do not explain the change between Q3 and Q4.
 
 ## What a strong answer says
 
 - **Requirement (3).** The grid ties: billed revenue agrees with the earlier tutorial, credits are summed by credit memo date, and net is billed less credits.
-- **Requirement (4).** A stated choice with its reason. The ledger records a credit when the memo is issued, so the credit memo's quarter keeps the closed periods unchanged. The invoice's quarter is a measure of the net sale, and it restates periods already reported. Either is defensible if the schedule says which.
+- **Requirement (4).** A stated choice with its reason. The ledger records a credit on the credit memo's date, so the credit memo's quarter suits a schedule of recorded activity. The invoice's quarter answers a different question, the net result of each quarter's sales, and goes in a separate schedule, labeled and reconciled to this one. Neither changes the ledger, and an adjustment to an earlier period would need accounting and transaction evidence, not a choice of schedule.
 - **The comparison.** Credits are at most 1.3% of billed revenue in any quarter, and net revenue still falls from the third to the fourth quarter under either assignment. The credits are not the story of the quarter, and the note should say so.
 
 A weak answer chooses an assignment without a reason, or concludes that the credits explain the fall.
@@ -129,7 +129,7 @@ A weak answer chooses an assignment without a reason, or concludes that the cred
 - **A header total for the Furniture credit.** *Symptom:* credits above the line total, by $4,236.59 in the year. *Cause:* 8 memos hold Furniture and other lines, so a memo's SubTotal is not Furniture. *Response:* sum the lines.
 - **Credits added to revenue.** *Response:* ask whether a credit memo increases or decreases revenue.
 - **Mismatched labels.** *Symptom:* zero credits, no error. *Response:* click one Period cell and one header label and compare them character by character.
-- **A bare assertion about timing.** *Response:* ask what the controller would restate if the other assignment were used.
+- **A bare assertion about timing.** *Response:* ask which question each assignment answers, and which one this schedule is for.
 
 ## Grading guide
 

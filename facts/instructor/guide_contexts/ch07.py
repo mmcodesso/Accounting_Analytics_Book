@@ -237,7 +237,9 @@ def operating_expenses(d, claim, product_revenue: float, static_revenue: float) 
     claim(rows[-1]["number"] == 7030 and names[7030].startswith("Interest"), "the list of budgeted accounts ends with 7030, interest expense")
     burden_b, burden_a = budget[6060] / salaries_b, actual[6060] / salaries_a
     claim(burden_b > burden_a, "the budgeted burden rate is higher than the actual rate")
-    claim(0.85 < actual[6290] / flexed < 0.95, "the flexed commission budget is within about a tenth of what was paid")
+    claim(abs(salaries_a / salaries_b - 1) < 0.01 and abs((salaries_a - salaries_b) * burden_b) < 0.05 * abs(actual[6060] - budget[6060]),
+          "salaries were close to budget, so the 6060 variance comes almost entirely from the rate")
+    claim(0.85 < actual[6290] / flexed < 0.95, "the flexed commission budget is within about a tenth of the commission expense")
     exact = [r for r in rows if abs(r["variance"]) < 0.005]
     claim(len(exact) >= 3, "several accounts match their budget exactly")
     return dict(accounts=rows, n_accounts=len(rows), burden_b=burden_b, burden_a=burden_a, rate_b=rate_b, flexed=flexed,
@@ -284,7 +286,9 @@ def tutorial_73(d, claim, commission: tuple) -> dict:
     promo_avg = statistics.mean(orders[m] for m in promo_months)
     other_avg = statistics.mean(orders[f"{d.C}-{k:02d}"] for k in range(1, 9))
     prior_avg = statistics.mean(orders[f"{y}-{k:02d}"] for y in (d.F, d.P) for k in (9, 10))
-    claim(abs(promo_avg / other_avg - 1) < 0.1 and abs(promo_avg / prior_avg - 1) < 0.15 * 2, "the Furniture units from orders placed in the promotion's months are in line with the other months and the same months of earlier years")
+    claim(abs(promo_avg / other_avg - 1) < 0.05 and 0 < promo_avg / prior_avg - 1 < 0.1,
+          "the Furniture units from orders placed in the promotion's months are close to the other months and a few percent above the same months of earlier years")
+    claim(max(promo_avg / other_avg, promo_avg / prior_avg) - 1 < 0.5 * lift, "the increase is far short of the break-even lift")
     claim(orders[f"{d.C}-12"] < 0.8 * other_avg, "December's orders look low because some were not yet invoiced when the data ends")
     return dict(promo=pid, discount=discount, units=units, price=price, cost=cost, rate=rate, without=without, with_=contribution(discount, 0),
                 difference=contribution(discount, 0) - without, scenarios=scen, lift=lift, lift5=be5, lift15=be15,

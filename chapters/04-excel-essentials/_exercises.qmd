@@ -70,7 +70,7 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 
 (3) Sort the Table by ItemGroup from A to Z and then by MarginPct from largest to smallest. Apply a color scale to the MarginPct column.
 
-(4) Create a named parameter cell, MarginTarget, set to 0.45 and validated to allow decimals between 0 and 1. Add a formula-based conditional formatting rule that highlights the items whose MarginPct is below MarginTarget, and use COUNTIFS to count them. A filter hides rows from view but not from COUNTIFS, so give the formula an ItemType condition rather than relying on the filter of requirement (2).
+(4) Create a named parameter cell, MarginTarget, set to 0.45 and validated to allow decimals between 0 and 1. Add a formula-based conditional formatting rule that highlights the items whose MarginPct is below MarginTarget, applied to the columns left of MarginPct so that its fill does not hide the color scale, and use COUNTIFS to count them. A filter hides rows from view but not from COUNTIFS, so give the formula an ItemType condition rather than relying on the filter of requirement (2).
 
 (5) Create a parameter cell with a List validation rule that offers the four product groups Accessories, Furniture, Lighting, and Textiles. Use AVERAGEIFS, with the same ItemType condition, to calculate the average UnitMargin and MarginPct of the finished goods in the selected group, and record the results for each group.
 
@@ -120,7 +120,7 @@ Work on these exercises in a copy of your analysis workbook, made after you fini
 
 (1) Use Power Query to load the Shipment Table from CharlesRiver.xlsx into a new workbook, with ShipmentDate and DeliveryDate set to the Date type.
 
-(2) On a Parameters worksheet, create a named cell ReviewDate, validated to accept only dates, and set it to the last day of the extract, December 31, 2026. Explain in a note beside the cell why the report uses a fixed review date rather than the TODAY function.
+(2) On a Parameters worksheet, create a named cell ReviewDate, validated to accept only dates, and set it to December 31, 2026, the year-end under review and the last shipment date in the extract. Explain in a note beside the cell why the report uses a fixed review date rather than the TODAY function.
 
 (3) Add two formula-based conditional formatting rules to the Shipment Table: one that highlights rows with a blank TrackingNumber, and a second, in a different color, that highlights rows whose Status is In Transit and whose DeliveryDate is before ReviewDate. Remember that conditional formatting formulas use cell references, and that a formula rule can refer to a named cell.
 

@@ -32,7 +32,7 @@ By the end, students can:
 - draft the adjusting entry and say how the credit loss standard bears on the rates (outcome 3);
 - write a one-page memo that separates what the data support from what they do not (outcome 6).
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and Core S2 M9 (audit procedures, analytical procedures and data analytics); IMA Reporting and Control (financial recordkeeping, statement preparation and statement analysis); IFAC IES 2 (a) and (f); AACSB A5 part 5.1.
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and Core S2 M9 (audit procedures, analytical procedures and data analytics); IMA Reporting and Control (financial recordkeeping and statement analysis); IFAC IES 2 (a) and (f); AACSB A5 part 5.1.
 
 ## Before you assign
 
@@ -117,7 +117,7 @@ To list the invoices without disturbing the Table, the model answer spills them,
 
 **Check:** the count is {{ g.gl_rows }}, so this would be the first allowance in the extract. If the {{ g.n_old }} old balances are then written off under a small-balance policy, the write-off is charged to the allowance (debit 1030, credit 1020, ${{ g.old_total|money }}), which leaves ${{ g.remaining|money }}. The invoices that remain need ${{ g.after_old|money }}, so ${{ g.topup|money }} more is debited to 6170. Accept either order if the ending allowance is right.
 
-**Step 8. Tie the rates to the standard.** The FASB standard (2016) accepts an aging schedule and requires the estimate to reflect the risk of loss even when it is remote. Its illustration starts from historical loss rates for each bucket and adjusts them for current conditions and reasonable and supportable forecasts. The data hold no write-off history, so the proposed rates are not Charles River's own experience: they should be documented, raised if customers' conditions or the forecast worsen, lowered only with evidence, and revisited at each reporting date.
+**Step 8. Tie the rates to the standard.** The FASB standard (2016) accepts an aging schedule and requires the estimate to reflect the risk of loss even when it is remote. It requires no estimate only where the adjusted information gives an expectation of no nonpayment, which the absence of write-offs does not show. Its illustration starts from historical loss rates for each bucket and adjusts them for current conditions and reasonable and supportable forecasts. The data hold no write-off history, so the proposed rates are not Charles River's own experience: they should be documented, raised if customers' conditions or the forecast worsen, lowered only with evidence, and revisited at each reporting date. The practical expedient for current receivables (FASB, 2025), which holds the year-end conditions constant, and the private-company election to consider later collections are not elected, as the exercise assumes.
 
 ### Requirement (5): The memo
 

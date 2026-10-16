@@ -96,9 +96,9 @@ def ex1(b: Build) -> None:
         [("Contra Accounts", f"COUNTROWS (\n    FILTER (\n        Account,\n        {CONTRA}\n    )\n)", COUNT)])
     types = [col("Account", "AccountType"), col("Account", "AccountSubType")]
     page = b.report.add(Page("ex141", "Ex 14.1", height=820))
-    page.add(slicer("monthEnd", 20, 20, 220, 64, col("Date", "YearMonth"), [f"{y}-12"], style="dropdown", single=True,
+    page.add(slicer("monthEnd", 20, 20, 220, 96, col("Date", "YearMonth"), [f"{y}-12"], style="dropdown", single=True,
                     title="Month-end"))
-    page.add(Visual("balanceMatrix", "pivotTable", 20, 100, 600, 340, {"Rows": types, "Values": [M("Balance")]},
+    page.add(Visual("balanceMatrix", "pivotTable", 20, 124, 600, 316, {"Rows": types, "Values": [M("Balance")]},
                     title="Balance at the selected month-end, before that day's closing entries",
                     extra=matrix_rows_expanded(types), active=("Rows",)))
     page.add(Visual("variantsMatrix", "pivotTable", 640, 20, 620, 200,
@@ -331,9 +331,9 @@ def ex3(b: Build) -> None:
     month = lambda i, yy=y: f"'Date'[YearMonth] = \"{yy}-{i + 1:02d}\""
     for i, x in enumerate(ctx["months"]):
         b.check(t, f"Furniture Revenue YoY % {y}-{i + 1:02d}", round(x["yoy"], 6),
-                f"CALCULATE ( [Revenue YoY %], {month(i)}, {furn} )", 0.000005)
+                f"CALCULATE ( [Revenue YoY %], {month(i)}, {furn} )", 0.000005, percent=True)
         b.check(t, f"Furniture YTD Change % {y}-{i + 1:02d}", round(ytd[i], 6),
-                f"CALCULATE ( [YTD Change %], {month(i)}, {furn} )", 0.000005)
+                f"CALCULATE ( [YTD Change %], {month(i)}, {furn} )", 0.000005, percent=True)
         if x["detail"]:
             b.check(t, f"Furniture Revenue {y}-{i + 1:02d}", round(x["now"], 2),
                     f"CALCULATE ( [Revenue], {month(i)}, {furn} )", 0.01)
@@ -347,7 +347,7 @@ def ex3(b: Build) -> None:
                              f"{yy}-{i + 1:02d}")
         b.check(t, f"Furniture {x['name']} {y} from the ledger (4010, Exercise 11.2)", round(led(y) / led(y - 1) - 1, 6),
                 f"DIVIDE ( CALCULATE ( [P&L Amount], Account[AccountNumber] = 4010, {month(i)} ), CALCULATE ( "
-                f"[P&L Amount], Account[AccountNumber] = 4010, {month(i, y - 1)} ) ) - 1", 0.000005)
+                f"[P&L Amount], Account[AccountNumber] = 4010, {month(i, y - 1)} ) ) - 1", 0.000005, percent=True)
     dec = month(11)
     for g in ctx["by_group"]:
         gf = f"'Item'[ItemGroup] = \"{g['group']}\""
@@ -362,7 +362,7 @@ def ex3(b: Build) -> None:
         for which in ("low", "high"):
             i = MONTHS.index(s[f"{which}_month"])
             b.check(t, f"{name} Revenue YoY % {y}-{i + 1:02d} ({which})", round(s[which], 6),
-                    f"CALCULATE ( [Revenue YoY %], {month(i)}, {gf} )", 0.000005)
+                    f"CALCULATE ( [Revenue YoY %], {month(i)}, {gf} )", 0.000005, percent=True)
     svc = f"'Date'[Year] = {y}, 'Item'[ItemGroup] = \"Services\""
     each = "VALUES ( 'Date'[YearMonth] )"
     b.check(t, "Services Group Lines, fewest in a month", ctx["lines_low"], f"CALCULATE ( MINX ( {each}, [Group Lines] ), {svc} )", 0)
@@ -521,15 +521,15 @@ def ex5(b: Build) -> None:
     for s in ctx["shares"]:
         g = f"'Item'[ItemGroup] = \"{s['group']}\""
         b.check(t, f"{s['group']}: share with REMOVEFILTERS", round(s["rf"], 6),
-                f"CALCULATE ( [Share of Revenue], {cy}, {g} )", 0.000005)
+                f"CALCULATE ( [Share of Revenue], {cy}, {g} )", 0.000005, percent=True)
         b.check(t, f"{s['group']}: share with ALL ( SalesInvoiceLine )", round(s["all"], 6),
                 f"CALCULATE ( DIVIDE ( [Revenue], CALCULATE ( [Revenue], ALL ( SalesInvoiceLine ) ) ), {cy}, {g} )",
-                0.000005)
+                0.000005, percent=True)
     b.check(t, "shares with ALL ( SalesInvoiceLine ) add up to", round(ctx["all_total"], 6),
             f"CALCULATE ( SUMX ( VALUES ( 'Item'[ItemGroup] ), DIVIDE ( [Revenue], CALCULATE ( [Revenue], "
-            f"ALL ( SalesInvoiceLine ) ) ) ), {cy} )", 0.000005)
-    b.check(t, "shares with REMOVEFILTERS add up to", 1,
-            f"CALCULATE ( SUMX ( VALUES ( 'Item'[ItemGroup] ), [Share of Revenue] ), {cy} )", 0.000001)
+            f"ALL ( SalesInvoiceLine ) ) ) ), {cy} )", 0.000005, percent=True)
+    b.check(t, "shares with REMOVEFILTERS add up to (unrounded)", 1.0,
+            f"CALCULATE ( SUMX ( VALUES ( 'Item'[ItemGroup] ), [Share of Revenue] ), {cy} )", 0.000001, percent=True)
 
 
 def _wrap(text: str, width: int) -> list[str]:

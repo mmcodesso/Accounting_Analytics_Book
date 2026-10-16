@@ -102,7 +102,7 @@ c. Compute each value as Quantity times EstimatedUnitCost.
 | PR-2026-013258 | 2026-01-01 | $4,990.92 |
 | PR-2026-013259 | 2026-01-01 | $4,990.92 |
 
-The values lie between $4,990.92 and $4,993.92, just under $5,000, which is the approval limit of some roles, and every one is dated January 1. A requisition with no approver should not have become a purchase order, so the finding is a control matter. A field test finds it, and Chapter 8 follows it. The other requisitions show the status Approved or Converted to PO, and each of those has an approver.
+The values lie between $4,990.92 and $4,993.92, just under $5,000, which is the approval limit of some roles, and every one is dated January 1. A purchase order cites each of them, which is stronger evidence of the conversion than the status. A requisition converted with no approver recorded is a possible authorization failure, so the finding is a control matter as well as a blank field. Before concluding that no one approved it, ask for the approval log or a policy that allows the exception, because an approval can sit outside the extract. A field test finds it, and Chapter 8 follows it. The other requisitions show the status Approved or Converted to PO, and each of those has an approver.
 
 **Watch for:** a memo that calls these a "missing value" and stops. The missing value is the symptom, and the approval is the point.
 

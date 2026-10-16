@@ -9,9 +9,9 @@ format:
 ::: {.chapter-slides data-chapter="case-part-4"}
 :::
 
-This case closes Part IV. It asks you to use the four Power BI chapters together on a question the audit committee has put to the controller: how a year with a profit of several million dollars ended with less cash than it began. You will build, profile, and validate a model of your own, as in Chapters 13 and 14, and measure balances, their changes, and how fast they turn with the DAX of Chapter 14. You will build pages that the committee can explore with the drill-through pages, tooltips, and parameters of Chapter 15, and you will test your own report before anyone relies on it, as the internal auditor tested the package in Chapter 16. The Part III case ended with a plan for the plant's hours and the entries that close fiscal 2026. This one ends with a recommendation on the cash that Charles River holds in its working capital.
+This case closes Part IV. It asks you to use the four Power BI chapters together on a question the audit committee has put to the controller: how a year with a profit of several million dollars ended with less cash than it began. You will build, profile, and validate a model of your own, as in Chapters 13 and 14, and measure balances, their changes, and how fast they turn with the DAX of Chapter 14. You will build pages that the committee can explore with the drill-through pages, tooltips, and parameters of Chapter 15, and you will test your own report before anyone relies on it, as the internal auditor tested the package in Chapter 16. The Part III case ended with a plan for the plant's hours and the year-end adjustments it proposed for fiscal 2026. Those proposals are not posted to CharlesRiver.xlsx, so this case starts from the unchanged data. It ends with a recommendation on the cash that Charles River holds in its working capital.
 
-The case works in a new file, Charles River Cash Case.pbix, built in Power BI Desktop from CharlesRiver.xlsx, so that the package of Chapters 13 to 15 and internal audit's monitoring file stay as they are. Every requirement can be completed with techniques you have already practiced.
+The case works in a new file, Charles River Cash Case.pbix, built in Power BI Desktop from CharlesRiver.xlsx, so that the package of Chapters 13 to 15 and internal audit's monitoring file stay as they are. The requirements use the techniques of the Part IV tutorials and of Exercises 8.2, 14.1, 15.1, 15.3, 15.4, and 16.1, so review any of those exercises you have not done before you start.
 
 
 ## The Situation
@@ -44,7 +44,7 @@ Follow the conventions of Part IV. Open T3_GLEntry with Transform Data and keep 
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
-The ledger holds rows that a working-capital report must treat apart. The year-end closes must be left out of every flow, as in Tutorial 14.3. The opening entry of 1 January 2024 brings in balances that no document supports, and fiscal 2024 was the ledger's first year, so a 2024 figure built on an average balance or on the change from the opening says little. Supplier payments are the only postings after fiscal 2026, so the last posting date in the ledger is not the date through which your report runs. Some journal entries move a balance from one account to another without any cash changing hands. And the inventory policies hold one row for each item and warehouse, so group them by item before you merge them, or every item will appear twice.
+The ledger holds rows that a working-capital report must treat apart. The year-end closes must be left out of every flow, as in Tutorial 14.3. The opening entry of January 1, 2024, brings in balances that no document in the extract supports, such as receivables without their invoices and inventories without their items. The missing schedules are evidence to request, not proof that the balances are wrong. Fiscal 2024 was the ledger's first year, so a 2024 figure built on an average balance or on the change from the opening says little. Supplier payments are the only postings after fiscal 2026, so the last posting date in the ledger is not the date through which your report runs. Some journal entries move a balance from one account to another without any cash changing hands. And the inventory policies hold one row for each item and warehouse, so group them by item before you merge them, or every item will appear twice.
 :::
 
 ::: {.callout-warning .watch-out icon=false}
@@ -60,18 +60,18 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
 - Build the queries and the model. In Requisitions, add a column that names the channel behind each requisition from its justification: the supply plan, a work-order shortfall, or another request. Carry the channel into Receipts through the merge.
 - Profile the Tables the chapters did not load on the entire data set, with the column profiles of Chapter 13, and test the links the later requirements rely on: every receipt line to its order line and its requisition, and every issue line to its issue and its work order. Record what you find, but do not pursue isolated exceptions.
 - Start a Validation page that reproduces control totals you already trust and ties the new tables to the ledger: net income by fiscal year, total assets at each year-end with the Balance measure of Exercise 14.1, and the materials received and issued each year against the postings to account 1045. Put the queries behind them in a Tests tab in DAX query view.
-- Add a measure `Data Through` that returns the earliest of the last posting dates of the documents behind the working-capital accounts, as Tutorial 16.3 did for its populations, and show it on an About page that states the report's purpose, sources, and definitions. Explain why the last posting date in the ledger is the wrong answer.
+- Add a measure `Data Through` that returns the earliest of the last posting dates of the documents behind the working-capital accounts (the sales invoices, cash applications, supplier invoices and payments, goods receipts, material issues, and shipments), as Tutorial 16.3 did for its populations, and show it on an About page that states the report's purpose, sources, and definitions. Like Tutorial 16.3's card, it is a bound observed in the extract, not proof that every document up to that date is present. Explain why the last posting date in the ledger is the wrong answer, and why the payroll records, which end earlier, are reported apart.
 
 
 
 
 **Requirement 2: Explain where the cash went (Chapters 14 and 15; financial reporting).**
 
-- Show the balance sheet at each fiscal year-end with the Balance measure, signed by account type as in Exercise 14.1, with the working capital, the current ratio, and the quick ratio, which leaves the inventories out.
+- Show the balance sheet at each fiscal year-end with the Balance measure, signed by account type as in Exercise 14.1, with the working capital, the current ratio, and the quick ratio, defined here as cash (1010) and receivables (1020) over current liabilities, which leaves out the inventories and the other current assets.
 - Add two columns to Account in Power Query. The first assigns each account, from its AccountSubType, to a step of a bridge from net income to the change in cash, with receivables, inventories, payables, and sales tax separated by account number; the second assigns each step to operating, investing, or financing activities. Write a measure for each step's effect on cash from the year's postings without the closing entries, not from the difference between two balances, which treat the closing entries differently at two dates. Use KEEPFILTERS wherever the measure filters a column that the visual groups by, as in Tutorial 15.3.
 - Chart fiscal 2026 as a waterfall with a year slicer, the steps in their order through a sort column, as the Steps table of Tutorial 15.1 was sorted, and compare fiscal 2025. Explain why fiscal 2024 cannot be read the same way.
 - From a matrix of the bridge, drill through from the investing and financing steps to their postings, as in Exercise 15.1, and find the entries that moved no cash. Restate the operating, investing, and financing sections as the indirect method requires. The standard on the statement of cash flows (FASB Accounting Standards Codification Topic 230) reports only cash receipts and payments in the statement, and requires investing and financing activities that involve no cash to be disclosed separately.
-- Measure the cash the company holds net of the sales tax it has collected and not remitted, and find in DebtSchedule the principal of the notes due within a year. Explain what each means for the balance sheet and for the committee's view of the company's cash.
+- Measure the cash the company holds net of the recorded sales tax payable, the tax billed on its invoices less the tax on credit memos, which is not the same as the tax collected. Find in DebtSchedule the principal of the notes due within a year, counting only the notes outstanding at the date measured. Explain what each means for the balance sheet and for the committee's view of the company's cash.
 
 
 
@@ -79,8 +79,8 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
 **Requirement 3: Measure how fast working capital turns (Chapters 14 and 15; managerial accounting).**
 
 - Write measures for days sales outstanding (receivables in days of billing), days inventory outstanding (inventories in days of cost of goods sold), days payables outstanding (payables in days of supplier invoices), and the cash conversion cycle (the first two less the third). Each divides a balance at the end of the period by the ledger flow of the twelve months that end on that date, times 365, and each is blank until the twelve months exist and after Data Through, as Tutorial 15.3 guarded its trailing measure.
-- Add days of supply for materials, against what production issued, and for finished goods, against what was shipped, so that each can be compared with the TargetDaysSupply of its items.
-- On one page, let a field parameter switch a line chart among the measures by quarter, as in Exercise 15.3, and add a report-page tooltip that shows the balance and the twelve-month flow behind each point. Add a matrix of all the measures at each quarter-end, with icons that compare the days of supply with the policy targets.
+- Add days of supply for materials, against what production issued, and for finished goods, against what was shipped, so that each can be compared with the TargetDaysSupply of its items. The items' targets differ, so for these company-level measures use the largest target of each class as a benchmark, label it as one, and list the targets behind it. A company-level comparison cannot show whether each item meets its own policy.
+- On one page, let a field parameter switch a line chart among the measures by quarter, as in Exercise 15.3, and add a report-page tooltip that shows the balance and the twelve-month flow behind each point. Add a matrix of all the measures at each quarter-end, with icons that compare the days of supply with those benchmarks.
 - Recompute days sales outstanding and days payables outstanding without the lines of the opening entry, and compare each measure at the end of 2024 with a version on the average balance of the year. Explain which version the committee should see, what 2024 can and cannot show, and which component moved the cycle.
 
 
@@ -88,9 +88,9 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
 
 **Requirement 4: Trace the materials build and set a target for 2027 (Chapters 13 to 15; managerial accounting).**
 
-- Chart the materials received and issued by month, with the receipts split by channel, and the build of fiscal 2026 by item group and item. Explain which channel and which items carry the build.
+- Chart the materials received and issued by month, with the receipts split by channel, and the build of fiscal 2026 by item group and item. Explain which channel and which items carry the build. The item chart shows receipts less issues during the year, not each item's stock, because the opening materials carry no item detail.
 - Reference Requisitions in a query that keeps the work-order shortfall requisitions and groups them by their justification, which names one work order and one item: the number of requisitions, their quantity and estimated value, and their first and last dates. Build the same text for each issue line from its work order and item with Text.From, as Tutorial 16.2 built a document number, group the issues by it, and merge the issued quantity into the groups. Compare what was requisitioned with what those work orders used, count the work order and item pairs requisitioned more than once, and show who approved the requisitions of each channel.
-- Add a what-if parameter for the target days of materials supply, as in Exercise 15.4, with the policy target as its default, and measures for the materials that the target allows at the current rate of issue, the excess above it, and the months of issues the excess represents. Test targets of 28, 60, and 90 days, and compare the excess with the year's fall in cash.
+- Add a what-if parameter for the target days of materials supply, as in Exercise 15.4, with the largest materials target as its default, a benchmark for the whole balance, and measures for the materials that the target allows at the current rate of issue, the excess above it, and the months of issues the excess represents. Test targets of 28, 60, and 90 days, and compare the excess with the year's fall in cash. Every policy in the data ends with fiscal 2026, so the target for 2027 is the controller's to approve.
 - State what the estimate assumes and leaves out, among them the finished goods and the requisitions approved but not yet ordered at year-end, and how quickly the cash could come back.
 
 
@@ -98,17 +98,17 @@ A ratio of a balance to a flow is only as good as its definition, and none is st
 
 **Requirement 5: Test the balances behind the report (Chapters 14 to 16; auditing).**
 
-- Roll each working-capital account forward from its sources: a matrix of the balance at the end of fiscal 2026 by account and SourceDocumentType. Identify the parts of each balance that no subledger document supports.
+- In a matrix, break down by SourceDocumentType the balances at the end of fiscal 2026 of receivables (1020), finished goods and materials (1040 and 1045), payables (2010 and 2020), and sales tax payable (2050). The matrix only decomposes the ledger. Trace each part posted by a journal entry to its entry, and tell the opening balances that no subledger document in the extract supports from the reclassifications.
 - Reconcile receivables and payables to their open items at the end of fiscal 2026, and explain each difference. Compare what the ledger billed each year with the invoices dated in that year, and explain the differences with the cutoff findings of Chapters 6 and 12. Age the open payables, leaving out the invoices that the ledger has already moved to notes payable.
 - Test account 2050 Sales Tax Payable: what posts to it, what never does, and what evidence outside the database would show whether the tax was remitted.
-- Record each reconciling item and finding in a `Findings` table, entered with Enter data, with its account, amount, and disposition in Chapter 8's terms, as Chapter 16 kept its dispositions. Add tests to the Tests tab: each difference equals the items recorded for it, the bridge ends at the change in cash, and every measure is blank after Data Through.
+- Record each reconciling item and finding in a `Findings` table, entered with Enter data, with its account, amount, and disposition in Chapter 8's terms, as Chapter 16 kept its dispositions. If you worked the Part III case, carry the adjustments it proposed into the table as proposals, without posting them to this file. Add tests to the Tests tab: each difference equals the items recorded for it, the bridge ends at the change in cash, and each working-capital measure of Requirement 3 is blank for the quarters after Data Through.
 
 
 
 
 **Requirement 6: Write the decision memo.** Write a memorandum of no more than two pages to the controller, for her meeting with the audit committee, organized in the order of her questions:
 
-- **Financial reporting:** where the cash went, the restated sections with their noncash disclosure, and what the balance sheet needs: the sales tax, the notes due within a year, and the balances that no document supports.
+- **Financial reporting:** where the cash went, the restated sections with their noncash disclosure, and what the balance sheet needs: the sales tax, the notes due within a year, and the balances that no document in the extract supports.
 - **Managerial accounting:** which balances absorbed the cash and how fast each turns, what drove the materials build, and a 2027 target with its cash effect and its assumptions.
 - **Auditing:** the reconciliations and findings with their dispositions, the evidence outside the database that would settle each, the controls over requisitions that the build points to, and the controls the report itself needs before the committee relies on it every quarter.
 
@@ -126,7 +126,7 @@ Close the memo with your recommendation.
 - A cash bridge that ends exactly at the change in cash, with the entries that moved no cash found and presented as the standard requires.
 - Working-capital measures with stated definitions, computed on full twelve-month windows, and honest about what fiscal 2024 and the unsupported balances do to them.
 - A materials build traced to the documents behind the receipts, and a 2027 target with its cash effect and its assumptions.
-- Every working-capital balance reconciled to its detail or to recorded reconciling items, each with a disposition worded as a finding.
+- Receivables and payables reconciled to their open items, the materials flows tied to the ledger, every difference explained by recorded reconciling items, and each balance without support recorded with a disposition worded as a finding.
 - A memo written for the controller and the committee: concise, organized by perspective, careful with its words, and ending with a recommendation she can act on.
 
 ::: {.callout-note .connecting-dots icon=false}

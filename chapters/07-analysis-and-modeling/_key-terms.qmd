@@ -32,7 +32,7 @@
 
 **Master budget.** The complete budget of an organization for a period, combining the operating budgets for sales, production, purchasing, and expenses with the financial budgets for cash and the balance sheet.
 
-**P-value.** In regression, the probability of estimating a coefficient at least as far from zero as the one observed if the true coefficient were zero. A p-value below 0.05 is the conventional threshold for statistical significance.
+**P-value.** In regression, the probability of a t statistic at least as far from zero as the one observed if the true coefficient were zero and the regression's assumptions held. A p-value below 0.05 is the conventional threshold for statistical significance. It is not the probability that the coefficient is zero.
 
 **R Square.** The share of the variation in the dependent variable that a regression line explains, from 0 to 1.
 

@@ -29,7 +29,7 @@ By the end, students can:
 - **A new workbook.** Students start a new workbook, so their names are Shipment, Parameters and Analysis. The solution file already holds Exercise 4.4's Shipment query, so its names differ: the query is ShipmentReview, and the sheets are Ex 4.5 Parameters, Ex 4.5 Analysis and Ex 4.5 Shipment. The steps below use a student's names.
 - **Date types.** Power Query may read ShipmentDate and DeliveryDate as date and time, and the exercise has students set the Date type with **Replace current**, as Tutorial 4.1, Step 6 does.
 - **Data conditions.** The extract has 9,707 shipments. 392 have no TrackingNumber (368 Delivered and 24 In Transit). 740 are In Transit, from every year of the data, and 739 have a DeliveryDate before the review date, 2026-12-31. No ShipmentDate or DeliveryDate is blank.
-- **Software.** Desktop Excel with Power Query. The workbook is too large for Excel for the web.
+- **Software.** Desktop Excel with Power Query. Excel for the web limits the size of the workbooks it opens and the features it offers.
 
 ## How to run it
 
@@ -56,7 +56,7 @@ a. Insert a worksheet named `Parameters`. In A4 type `ReviewDate` and in B4 ente
 b. Choose **Data > Data Validation**, allow a **Date** with only a lower bound (the model answer uses `=DATE(1900,1,1)`, so any date passes), add an input message, and choose the **Stop** style.
 c. In C4 write why the report uses a fixed date and not `TODAY()`.
 
-**Check:** text typed into B4 is refused. A model note: the review date is the last day of the extract, so the counts are the same every time the report is refreshed or re-performed, while `TODAY()` changes the result daily and, long after the extract, flags every In Transit shipment as late. The date is changed when the next extract arrives.
+**Check:** text typed into B4 is refused. A model note: the review date is the year-end under review, which is also the last shipment date in the extract, so the counts are the same every time the report is refreshed or re-performed, while `TODAY()` changes the result daily and, long after the extract, flags every In Transit shipment as late. The date is changed when the next extract arrives.
 
 ### Requirement (3): Two highlight rules
 
@@ -106,7 +106,7 @@ c. Set ReviewDate back to December 31, 2026.
 
 ### Requirement (6): The memo
 
-**Step 7. Outline the half page.** Each exception gets what it is, the likely cause and the evidence to request. Blank tracking number: a completeness problem; the cause may be manual entry or pickups; ask for carrier documents and proof of delivery for a sample. Stale In Transit status: a consistency and timeliness problem (Chapter 2); the status is not updated on delivery; ask for carrier tracking and the status history. Both: the 24 In Transit shipments with no tracking number are past due, so they are the first to confirm with customers. Neither exception proves that goods were lost.
+**Step 7. Outline the half page.** Each exception gets what it is, the likely cause and the evidence to request. Blank tracking number: a completeness problem; the cause may be manual entry or pickups; ask for carrier documents and proof of delivery for a sample. In Transit after the DeliveryDate: if DeliveryDate records the delivery, the two fields conflict, a consistency and timeliness problem (Chapter 2), and the status was not updated on delivery. If it is an expected date, the shipments are overdue and need follow-up. Either way, ask for carrier tracking and the status history. Both: the 24 In Transit shipments with no tracking number are past their DeliveryDate, so they are the first to confirm with customers. Neither exception proves that goods were lost.
 
 **Check:** the memo does not call either exception fraud or a misstatement.
 
@@ -123,7 +123,7 @@ c. Set ReviewDate back to December 31, 2026.
 
 ![A mock of the shipment exception report with its two highlight colors, the counts and the Status slicer set to In Transit.](../figures/chapter-04-excel-essentials/IF-04-5-A.pdf)
 
-> **Instructor notes, Exercise 4.5:** 9,707 shipments. Blank TrackingNumber: 392 (368 Delivered, 24 In Transit). In Transit: 740 shipments from every year of the data (2024: 234, 2025: 254, 2026: 252). With ReviewDate 2026-12-31, 739 In Transit shipments have a DeliveryDate before the review date (the other is due on the review date itself); with ReviewDate 2026-12-01 the count is 722. A slicer on Status shows all 740 In Transit shipments, so it confirms the late count only together with a filter on DeliveryDate before the review date. All 24 In Transit shipments with a blank tracking number are in both categories. No ShipmentDate or DeliveryDate is blank. The Status conflict is a consistency and timeliness problem (Chapter 2); the blank tracking numbers are a completeness problem.
+> **Instructor notes, Exercise 4.5:** 9,707 shipments. Blank TrackingNumber: 392 (368 Delivered, 24 In Transit). In Transit: 740 shipments from every year of the data (2024: 234, 2025: 254, 2026: 252). With ReviewDate 2026-12-31, 739 In Transit shipments have a DeliveryDate before the review date (the other is due on the review date itself); with ReviewDate 2026-12-01 the count is 722. A slicer on Status shows all 740 In Transit shipments, so it confirms the late count only together with a filter on DeliveryDate before the review date. All 24 In Transit shipments with a blank tracking number are in both categories. No ShipmentDate or DeliveryDate is blank. If DeliveryDate records the delivery, Status and DeliveryDate conflict, a consistency and timeliness problem (Chapter 2). If it is an expected date, the shipments are overdue and need follow-up. The blank tracking numbers are a completeness problem.
 
 ## What a strong answer says
 

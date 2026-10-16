@@ -608,3 +608,13 @@ body.welcome-page main#quarto-document-content > section#welcome > h1,
 body.welcome-page main#quarto-document-content > section#welcome > .unnumbered {
   display: none !important;
 }
+
+/* The landing page's edition line takes the edition and revision from _variables.yml,
+   so "first edition, revision 2027.1" reads "First Edition, Revision 2027.1". */
+body.welcome-page .edition-line {
+  display: block;
+  margin: -0.25rem 0 1rem;
+  color: $primary-blue;
+  font-weight: 600;
+  text-transform: capitalize;
+}

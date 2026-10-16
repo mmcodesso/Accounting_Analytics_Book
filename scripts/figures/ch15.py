@@ -459,13 +459,15 @@ def fig_15_12() -> Diagram:
     d = Diagram("The About Page With Its Page Navigator")
     first, last = one("SELECT MIN(InvoiceDate), MAX(InvoiceDate) FROM SalesInvoice WHERE InvoiceDate < '2027-01-01'")
     work_last = one("SELECT MAX(WorkDate) FROM LaborTimeEntry")[0]
-    assert first == "2024-01-01" and work_last == "2026-12-11"
+    indirect_last = one("SELECT MAX(WorkDate) FROM LaborTimeEntry WHERE LaborType = 'Indirect Manufacturing'")[0]
+    assert first == "2024-01-01" and work_last == "2026-12-11" and indirect_last == "2026-12-04"
     pbi.canvas(d, 0, 0, 860, 420)
     text = ("<b>Charles River Reports: the monthly reporting package</b><br>"
             "<b>Purpose.</b> Fiscal 2026 results for three readers: the sales manager (Promotions), the "
             "department managers (Budget), and the production manager (Plant).<br>"
             "<b>Source.</b> CharlesRiver.xlsx, fiscal years 2024 to 2026; time records end on December 11, 2026, "
-            "while the last pay periods are open.<br>"
+            "and indirect time on December 4, 2026, because the last pay periods are marked Open, so the plant's "
+            "December figures are provisional.<br>"
             "<b>Definitions.</b> Every measure has a description: point at it in the Data pane.<br>"
             "<b>Validation.</b> The Validation page and the Tests tab in DAX query view reproduce the control "
             "totals of the earlier chapters.")

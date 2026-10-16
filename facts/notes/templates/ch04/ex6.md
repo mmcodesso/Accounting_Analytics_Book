@@ -7,5 +7,5 @@
      requester's ID also counts the {{ pending|count }} Pending requests, whose approver is blank, as approvals by someone else. Follow-up
      for the pending requests: their SalesOrderLineIDs ({{ lines|join(', ') }}) were invoiced at the pending ApprovedUnitPrice under a price-list
      PricingMethod (AnomalyLog sale_below_price_floor_without_approval), which students can find by filtering SalesInvoiceLine on
-     SalesOrderLineID; the full test is part of the audit analytics later in Part II. The self-approval pattern is a design issue:
-     the only approver is also a requester. -->
+     SalesOrderLineID; the full test is part of the audit analytics later in Part II. The self-approval pattern is a design question
+     for the authorization policy, because the only approver in the records is also a requester. -->

@@ -672,8 +672,10 @@ time by work date; the payroll year of Chapter 10 gives {v['payroll']:,.0f}). Th
 almost straight line, which is what an even spread looks like; a concentrated pattern would reach half within a
 handful of names.
 
-By job title: {by_title}. The averages are nearly the same, about {v['weekly']} hours for every week of the year (the
-year's total divided by 52) for every employee who recorded overtime.
+By job title: {by_title}. The averages are nearly the same. Each employee who recorded overtime averages
+{v['mean']:,.1f} hours over the year's records, about {v['weekly']} hours a week if spread over 52 weeks. That is an
+equivalent, not a measured weekly average, because the direct records end on {v['direct_end']} and the indirect
+records on {v['indirect_end']}.
 
 The plant manager's claim is not supported by these totals: recorded overtime is spread across the plant's hourly
 employees rather than held by a few people. The totals do not show the cause. Before naming one, examine staffing
@@ -692,10 +694,12 @@ WITH Flags AS (
             THEN 1 ELSE 0 END AS Backdated,
         CASE WHEN je.CreatedByEmployeeID = je.ApprovedByEmployeeID
             THEN 1 ELSE 0 END AS SelfApproved,
-        CASE WHEN je.TotalAmount > COALESCE(e.MaxApprovalAmount, 0)
+        CASE WHEN je.TotalAmount > e.MaxApprovalAmount
             THEN 1 ELSE 0 END AS AboveLimit,
         CASE WHEN je.TotalAmount = ROUND(je.TotalAmount / 1000, 0) * 1000
-            THEN 1 ELSE 0 END AS RoundAmount
+            THEN 1 ELSE 0 END AS RoundAmount,
+        CASE WHEN e.EmployeeID IS NULL OR e.MaxApprovalAmount IS NULL
+            THEN 1 ELSE 0 END AS ApprovalDataMissing
     FROM JournalEntry AS je
         LEFT JOIN Employee AS e ON e.EmployeeID = je.ApprovedByEmployeeID
 )"""
@@ -715,17 +719,22 @@ def ex5(b):
     scores = dict(v["scores"])
     high = sum(n for s_, n in scores.items() if s_ >= 2)
     s = b.script("Ex 11.5.sql", "the five journal entry tests of Tutorial 8.3 and their risk score",
-                 f"{v['entries']} entries; the counts by test and by score equal Tutorial 8.3's")
+                 f"{v['entries']} entries; the counts by test and by score equal Tutorial 8.3's; "
+                 f"{v['data_missing']} entries missing approval data")
     s.query("Requirements (1) and (2), step 1: the entries flagged by each test",
-            f"Population: all {v['entries']} journal entries; expected: Tutorial 8.3's counts",
+            f"Population: all {v['entries']} journal entries; expected: Tutorial 8.3's counts, "
+            f"{v['data_missing']} entries missing approval data",
             f"""\
 {FLAGS}
 SELECT COUNT(*) AS Entries, SUM(Weekend) AS Weekend,
     SUM(Backdated) AS Backdated, SUM(SelfApproved) AS SelfApproved,
-    SUM(AboveLimit) AS AboveLimit, SUM(RoundAmount) AS RoundAmount
+    SUM(AboveLimit) AS AboveLimit, SUM(RoundAmount) AS RoundAmount,
+    SUM(ApprovalDataMissing) AS ApprovalDataMissing
 FROM Flags;""",
             [Check("entries", v["entries"], lambda r: r.value("Entries"))] +
-            [Check(f"{f} flags", n, lambda r, f=f: r.value(f)) for f, n in counts.items()])
+            [Check(f"{f} flags", n, lambda r, f=f: r.value(f)) for f, n in counts.items()] +
+            [Check("entries with no approver or no approval limit", v["data_missing"],
+                   lambda r: r.value("ApprovalDataMissing"))])
     s.query("Requirement (2), step 2: the entries at each risk score",
             f"Population: all journal entries; expected: {len(scores)} scores, as Tutorial 8.3",
             f"""\
@@ -761,7 +770,8 @@ CREATE VIEW Ex11_5_JournalEntryTests AS
 {FLAGS},
 {SCORED}
 SELECT EntryNumber, EntryType, PostingDate, TotalAmount, Weekend,
-    Backdated, SelfApproved, AboveLimit, RoundAmount, RiskScore
+    Backdated, SelfApproved, AboveLimit, RoundAmount, RiskScore,
+    ApprovalDataMissing
 FROM Scored;""")
     s.query("Requirement (5), step 2: the view rerun, by test",
             "Population: the view; expected: the counts of step 1",
@@ -769,12 +779,18 @@ FROM Scored;""")
 SELECT COUNT(*) AS Entries, SUM(Weekend) AS Weekend,
     SUM(Backdated) AS Backdated, SUM(SelfApproved) AS SelfApproved,
     SUM(AboveLimit) AS AboveLimit, SUM(RoundAmount) AS RoundAmount,
-    SUM(CASE WHEN RiskScore >= 2 THEN 1 ELSE 0 END) AS ScoreTwoOrMore
+    SUM(CASE WHEN RiskScore >= 2 THEN 1 ELSE 0 END) AS ScoreTwoOrMore,
+    SUM(ApprovalDataMissing) AS ApprovalDataMissing
 FROM Ex11_5_JournalEntryTests;""",
             [Check("entries in the view", v["entries"], lambda r: r.value("Entries"))] +
             [Check(f"{f} flags in the view", n, lambda r, f=f: r.value(f)) for f, n in counts.items()] +
-            [Check("entries scoring 2 or more in the view", high, lambda r: r.value("ScoreTwoOrMore"))])
+            [Check("entries scoring 2 or more in the view", high, lambda r: r.value("ScoreTwoOrMore")),
+             Check("entries missing approval data in the view", v["data_missing"],
+                   lambda r: r.value("ApprovalDataMissing"))])
     missing = ", ".join(str(m) for m in v["missing"])
+    data_missing_text = ("Every entry here has an approver with a recorded limit, so none is missing approval data."
+                         if v["data_missing"] == 0 else
+                         f"{v['data_missing']} entries are missing approval data and need review on their own.")
     flag_text = ", ".join(f"{f} {n}" for f, n in counts.items())
     score_text = ", ".join(f"{k}: {n:,}" for k, n in scores.items())
     s.answer("Requirement (3)", f"""\
@@ -782,7 +798,12 @@ The SQL tests give the counts of Tutorial 8.3 on all {v['entries']} journal entr
 (no entry scores {missing}, so that row does not appear). The highest score, {v['top_score']}, belongs to
 {v['top_entry']}, the opening balance entry created by the chief financial officer. Weekend and Backdated read the
 time-stamped CreatedDate (strftime and date take the date part), and RoundAmount compares the amount with its value
-rounded to thousands, because the % operator truncates decimals in SQLite and is not safe on amounts.""")
+rounded to thousands, because the % operator truncates decimals in SQLite and is not safe on amounts.
+
+AboveLimit compares the amount with the approver's own MaxApprovalAmount. Where the approver or the limit is missing,
+that comparison is unknown and AboveLimit is 0, which means the test did not establish a breach, not that the entry
+was authorized. ApprovalDataMissing reports those entries for review on their own, and it stays outside the five-flag
+RiskScore, so the score remains comparable with Tutorial 8.3. {data_missing_text}""")
     s.answer("Requirement (5)", """\
 A saved query applies one inspectable definition to the population it reads, which avoids the cell-by-cell copying
 errors of a formula filled down a column, and a reviewer can read how each flag is calculated rather than sample the
@@ -827,6 +848,10 @@ def ex6(b):
                   "WHERE RequisitionID BETWEEN ? AND ? OR RequisitionID BETWEEN ? AND ? ORDER BY RequisitionID",
                   v["middles"][0] - 1, v["middles"][0] + 1, v["middles"][1] - 1, v["middles"][1] + 1)
     cfo_title = d.one("SELECT JobTitle FROM Employee WHERE EmployeeID = ?", v["cfo"])
+    # The $5,000 limit is a screening benchmark: it is held by a few production employees (the note's claims), not
+    # necessarily the limit that governs these requesters.
+    n_5000 = d.one("SELECT COUNT(*) FROM Employee WHERE MaxApprovalAmount = 5000")
+    holders = ["no", "one", "two", "three", "four", "five"][n_5000] if n_5000 < 6 else str(n_5000)
     s = b.script("Ex 11.6.sql", "requisitions just under the $5,000 approval limit, and runs that look split",
                  "the requisitions by $50 band; the runs of three equal amounts; the requisitions without an approver")
     s.query("Requirement (1): requisitions in $50 bands from $4,700 to $5,250",
@@ -915,8 +940,10 @@ no approver and the third was approved by the {cfo_title.lower()}; all six were 
 unapproved ones are among the six requisitions without an approver of Exercise 2.5, and all six of those fall just
 below $5,000 ({money(v['low'])} to {money(v['high'])}).
 
-The pattern is consistent with a purchase split to stay under the limit and with requisitions that bypassed approval.
-Next procedures: obtain the purchase orders and supplier invoices behind the two runs and test whether each run is a
+The $5,000 limit belongs to {holders} production employees, so here it is a screening benchmark, and the approval
+policy that applies to these requesters and purchases needs to be confirmed. The pattern is consistent with a purchase
+split to stay under such a limit and with requisitions that bypassed approval, and it does not establish either.
+Next procedures: confirm the approval policy and its rules for related purchases; obtain the purchase orders and supplier invoices behind the two runs and test whether each run is a
 single need; ask the requesters and the purchasing manager why the requisitions were raised separately and how they
 were converted without approval; test the system control that should block conversion of an unapproved requisition;
 and extend the band test to the other approval limits and to requisitions of the same item and requester within a

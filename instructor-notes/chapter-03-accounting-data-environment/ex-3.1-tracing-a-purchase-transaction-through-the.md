@@ -21,13 +21,13 @@ By the end, students can:
 - explain why the invoice debits goods received not invoiced and not inventory, and where the price difference goes;
 - write the path as a one-page trace that an auditor could re-perform.
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and BAR M10 (advanced data analytics, including data models and joins); IMA Data Literacy, and Financial Recordkeeping and Financial Statement Preparation; IFAC IES 2 (a), financial accounting and reporting, and IES 2 (i), using information technology to analyze data; AACSB A5 part 5.1.
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and BAR M10 (advanced data analytics, including data models and joins); IMA Data Literacy, and Financial Recordkeeping; IFAC IES 2 (a), financial accounting and reporting, and IES 2 (i), using information technology to analyze data; AACSB A5 part 5.1.
 
 ## Before you assign
 
 - Students need CharlesRiver_Work.xlsx and Tutorial 3.2, whose filter pattern they repeat. PurchaseInvoice has 40,204 rows, PurchaseInvoiceLine 40,648 and DisbursementPayment 40,127, so filters work without delay.
 - The exercise relies on these conditions. Most paid invoices have a single line (36,581 of 36,980). Each invoice line names either a receipt line or an accrual journal entry: the 355 lines with an accrual have no receipt line and no order line, which is a dead end for this exercise, as requirement (2) warns. Every purchase invoice credits accounts payable for its GrandTotal, and the ledger rows of each of the three documents balance.
-- Real invoices are untidy. 9,477 receipt lines are billed on more than one invoice line, so a student may find an invoiced quantity that differs from the received one; some invoices are paid in two or three payments. Neither is an error. Ask the student to explain it.
+- Real invoices are untidy. 9,477 receipt lines are billed on more than one invoice line, so a student may find an invoiced quantity that differs from the received one; some invoices are paid in two or three payments. Neither is an error. Ask the student to explain it. Some invoices also carry purchase tax (7,226 of the paid single-line invoices). Such an invoice posts the tax to the purchase price variance account in a row of its own, with no SourceLineID, so its price variance is the line total less the receipt value, not the GrandTotal less it. The model invoice has none.
 - Do the trace once yourself on a different invoice from the model below, so you can answer questions about the unusual ones.
 
 ## How to run it

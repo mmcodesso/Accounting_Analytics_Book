@@ -20,7 +20,7 @@ Students can:
 - find break-even quotes with Goal Seek and build a two-way Data Table on the quote and the crew share (Part 3);
 - explain why the absorption view disagrees, and name what the numbers leave out (Parts 4 and 5).
 
-**Competencies practiced.** CPA Evolution BAR M8 (planning techniques, forecasting and decision models); IMA Strategy, Planning, and Performance (decision analysis); IFAC IES 2 (b); AACSB A5 part 5.1 (Excel with Power Query and data models).
+**Competencies practiced.** CPA Evolution BAR M8 (planning techniques, forecasting and decision models); IMA Strategy, Planning, and Performance (decision analysis); IFAC IES 2 (b); AACSB A5 part 5.1 (Excel).
 
 ## Before you assign
 

@@ -92,12 +92,13 @@ def fig_02_03() -> Diagram:
     examples = quality_examples(connection())
 
     def panel(x: float, y: float, title: str, caption: str, headers: list[str],
-              widths: list[float], rows: list[tuple], marks: set, label: str, note: str) -> None:
+              widths: list[float], rows: list[tuple], marks: set, label: str, note: str,
+              note_h: float = 56) -> None:
         d.header_box(title, x, y, 420, 30)
         d.text(f"<b>{caption}</b>", x, y + 34, 420, 18, size=SMALL, color=GRAY)
         d.grid(x, y + 56, headers, widths, rows, highlight=marks)
         top = y + 56 + ROW_H * (len(rows) + 1) + 8
-        d.text(f'<b><font color="{CORAL}">{label}</font></b> {note}', x, top, 420, 56)
+        d.text(f'<b><font color="{CORAL}">{label}</font></b> {note}', x, top, 420, note_h)
 
     miss = examples['missing']
     panel(0, 0, "Missing Values", "Charles River: Shipment table (Order-to-Cash)",
@@ -118,12 +119,15 @@ def fig_02_03() -> Diagram:
           "This is a duplicate-payment risk that requires investigation.")
 
     stat = examples['status']
+    (last_delivery,) = one("SELECT MAX(DeliveryDate) FROM Shipment")    # the year-end under review
+    assert all(r[3][:4] < last_delivery[:4] for r in stat if r[2] == "In Transit"), (stat, last_delivery)
     panel(0, 250, "Inconsistent Values", "Charles River: Shipment table (Order-to-Cash)",
           ["ShipmentNumber", "ShipmentDate", "Status", "DeliveryDate"], [120, 95, 95, 110],
           stat, {(i, 2) for i, r in enumerate(stat, 1) if r[2] == "In Transit"},
-          "Consistency problem:",
-          "These shipments are still marked In Transit, although their DeliveryDate passed years "
-          "before the data was extracted.")
+          "Possible consistency problem:",
+          "Still marked In Transit, with a DeliveryDate years before the year-end under review. "
+          "If that date records the delivery, the two columns disagree. If it is only the "
+          "expected date, the shipments are overdue.", note_h=74)
 
     out = examples['outliers']
     average, largest = examples['freight_summary']
@@ -268,7 +272,7 @@ def fig_02_07() -> Diagram:
 
     last_row = last + 1
     total_row, diff_row = last_row + 2, last_row + 3
-    xl.formula_bar(d, 0, 0, 860, f"D{diff_row}", f"=D{total_row}-E{total_row}")
+    xl.formula_bar(d, 0, 0, 860, f"D{diff_row}", f"=ROUND(D{total_row},2)-ROUND(E{total_row},2)")
     body = [(str(r[0] + 1), [str(r[0]), r[1], str(r[2]), f"{r[3]:.2f}", f"{r[4]:.2f}", r[5]])
             for r in rows]
     widths = [70, 96, 112, 90, 140, 140, 120]

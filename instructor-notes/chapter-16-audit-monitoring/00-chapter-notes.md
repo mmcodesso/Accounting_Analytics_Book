@@ -23,7 +23,7 @@ The chapter depends on these conditions of the data:
 - The register holds 151 exceptions from 11 tests: 43 journal entry, 25 purchase order and 83 payroll. January holds 44 of the 68 journal entry and purchase order exceptions, and leads in every year.
 - One test recurs in every month: 77 payroll registers approved by the employee they pay. One employee, the Accounting Manager, approves every register.
 - A first review records 15 dispositions and leaves 136 exceptions open. The six year-end closes, two a year, are the expected ones.
-- The last payday is December 18, while the journal entries and the orders run to 2026-12-31. The purchase order numbers run from 1 to 18,832 with no gap.
+- The last pay date of a payroll register is December 18, while the journal entries and the orders run to 2026-12-31. No pay period has a later pay date in the year, and the rest of December's work is in periods marked Open, with no registers. The purchase order numbers run from 1 to 18,832 with no gap.
 
 ## What students should be able to do afterward
 
@@ -42,7 +42,7 @@ The chapter depends on these conditions of the data:
 - Do the three tutorials yourself in order and save Audit Monitoring.pbix. Tutorial 16.3 Step 8 opens Charles River Reports.pbix as left at the end of Chapter 15, so every student needs it.
 - A student who falls behind takes Audit Monitoring from Chapter16-companion.zip, from the folder of the tutorial they start. Its README gives the steps: open the .pbip, point the queries at CharlesRiver.xlsx (**Home > Transform data > Data source settings > Change Source**), choose **Home > Refresh**, and **File > Save as** a .pbix.
 - Tell students to save a copy after Tutorial 16.3, such as `Ch16 Exercises.pbix`, with one page and one display folder of measures for each exercise. Exercise 16.2 uses Exercise 16.1's ledger query, and Exercise 16.6 uses Exercise 16.5's payments.
-- Open the model answer once. Its pages are Journal Entries, Entry Lines, Validation, Monitoring, Exception Detail and Review (the tutorials), Ex 16.1 to Ex 16.6 and Notes; its DAX query tabs are Tests and Checks. After **Home > Refresh**, **Run** on the Checks tab tests 298 values. Its queries read C:\CharlesRiver\CharlesRiver.xlsx.
+- Open the model answer once. Its pages are Journal Entries, Entry Lines, Validation, Monitoring, Exception Detail and Review (the tutorials), Ex 16.1 to Ex 16.6 and Notes; its DAX query tabs are Tests and Checks. After **Home > Refresh**, **Run** on the Checks tab tests 299 values. Its queries read C:\CharlesRiver\CharlesRiver.xlsx.
 - The Checks tab cannot read how a visual renders: compare the heat map's shading, the drill-through and the edited interactions by eye.
 
 **Pitfalls that cost class time**
@@ -176,13 +176,13 @@ Plan A is the safest: the stumbles are in a merge key and a filter, and a demons
 
 **Stumbles to expect**
 
-- Step 1: keys that do not match character for character (see the pitfalls).
+- Step 1: keys that do not match character for character (see the pitfalls). The six Deficiency rows rest on the tutorial's assumption that the reviewer looked past the register, at the approval log, the employment records and the earnings. Ask what the flags alone would support.
 - Step 3: a Test 3 that reads reviewed equal to dispositions and so passes a disposition typed twice: the key counts catch it.
 - Step 7: MAX in place of MINX.
 - Step 8: the package saved over, or a test run without its comment line.
 - Step 9: the registers approved by their own employee reported document by document. The memo reports them once.
 
-**The checkpoint to look for.** The four bullets. A strong student says the card bounds what the tests can have seen and proves no refresh.
+**The checkpoint to look for.** The four bullets. A strong student calls the card a bound observed in the extract, proving neither a refresh nor a complete payroll.
 
 ## Difficult ideas and misconceptions
 
@@ -200,11 +200,11 @@ Plan A is the safest: the stumbles are in a merge key and a filter, and a demons
 
 **More exceptions than reviewers can examine.** Tutorial 16.3, question 10. Li and colleagues and Alles and colleagues describe alarm floods. The chapter's answer is a simple order and one disposition for what is expected or recurs. Ask: what would you change in the rules before adding reviewers?
 
-**A copy is not the controlled report.** Question 14. A .pbix that imports its data holds every row and stops at the date of the copy. Ask: who holds copies of the package?
+**An uncontrolled copy is not the controlled report.** Question 14. A .pbix that imports its data holds every row, and a copy kept outside the approved release stops at the date of the copy. Ask: who holds copies of the package?
 
 **A process's rate counts failed tests.** Tutorial 16.2 Step 10. A document that fails two tests counts twice. Ask: what does the journal entry rate count?
 
-**Agreeing totals do not prove completeness; Data Through proves no refresh.** Tutorial 16.1 Step 12, Tutorial 16.3 Step 7, question 12. Ask: what could be missing from both totals?
+**Agreeing totals do not prove completeness, and Data Through proves no refresh.** Tutorial 16.1 Step 12, Tutorial 16.3 Step 7, question 12. Ask: what could be missing from both totals?
 
 **Who sees the report matters.** Question 3. Gonzalez and Hoffman found that prompt notice can encourage fraud when detection is weak. The chapter calls it a reason to think, not a rule. Ask: what does a notice reveal about what the test cannot detect?
 
@@ -215,7 +215,7 @@ Plan A is the safest: the stumbles are in a merge key and a filter, and a demons
 1. **Should the monitoring report go to the managers whose approvals it tests?** It reaches Gonzalez and Hoffman and the chapter's split: the report to the people who oversee the controls, the exceptions to those who must explain them.
 2. **The recurring payroll test fires every month. Keep it, retire it or reclassify it?** It reaches one finding, then a test that the approver's own pay has another approver, and the unexplained rate.
 3. **Who should write dispositions, and what should the record show?** It reaches who and when in the record, a reviewer who is not the preparer, and review by the chief audit executive.
-4. **A December page shows no payroll exceptions after December 18. What can you conclude?** It reaches nothing: Data Through bounds what the tests saw.
+4. **A December page shows no payroll exceptions after December 18. What can you conclude?** It reaches the open pay periods that hold the rest of December's work, and Data Through as a bound on what the tests saw, not proof of a complete payroll.
 5. **Next month brings dozens of new exceptions. How do you order the review?** It reaches the score, novelty and Li and colleagues, and the alarm floods Alles and colleagues found at Siemens.
 6. **A measure passed its test in April and was changed in May. Do you trust it?** It reaches rerunning the tests, the change record and the project under version control.
 7. **Should anomaly tests share the register with rule tests?** It reaches the register's five columns, a different disposition path, and keeping the two layers apart.
@@ -252,18 +252,18 @@ Key: 1 C, 2 A, 3 D, 4 B, 5 A, 6 C, 7 B, 8 D, 9 B, 10 A, 11 C, 12 D, 13 A, 14 B.
 |---:|:---:|---|
 | 1 | C | continuous monitoring is management's ongoing review of its own controls (Tronto & Killingsworth, 2021). |
 | 2 | A | rule tests produce exceptions; analytical tests produce anomalies (Kogan et al., 2014). |
-| 3 | D | with a weak system, early notification increased the inclination to commit fraud (Gonzalez & Hoffman, 2018). |
+| 3 | D | with a weak system, early notification increased the inclination to commit fraud (Gonzalez & Hoffman, 2018), a conditional result, not a rule that control owners never learn their exceptions. |
 | 4 | B | unpivoting turns the selected columns into Attribute and Value rows. |
 | 5 | A | Append matches by name, so OrderDate becomes its own column and EventDate stays null for orders. |
 | 6 | C | rates need populations; a count alone hides volume (hundreds of entries against thousands of orders). |
-| 7 | B | an exception in every period points to design (one approver approves every register, including the approver's own). |
+| 7 | B | an exception in every period points to a possible design flaw, to confirm against the policy and any other review (one approver approves every register, including the approver's own). |
 | 8 | D | the register is rebuilt at every refresh; a merge on the test and the document attaches each conclusion again, while text typed beside query output can end up beside a different row (Chapter 8). |
 | 9 | B | a null disposition means no conclusion yet, an open exception not yet reviewed (a mistyped disposition leaves its intended exception open, which Test 3 detects, but the null itself marks the exception as open). A reviewed exception is not necessarily resolved: follow-ups and deficiencies stay matters to track. |
-| 10 | A | several failed tests raise the suspicion (risk score; Li et al.'s suspicion scores), and new comes before explained, all else equal; materiality and urgency can override the simple order. |
+| 10 | A | with amounts and urgency alike, several failed tests come first under the chapter's simple order (Chapter 8's risk score), and new comes before explained; it is a first cue, not Li et al.'s adaptive suspicion score, and a serious single failure can come first when amounts or urgency differ. |
 | 11 | C | a recurring exception by design is one finding; the response is a change to the control. |
-| 12 | D | Data Through is the earliest of the populations' last dates; the last pay date is December 18 (open pay periods). It bounds what the tests can have seen; it does not prove a refresh or a complete extract. |
+| 12 | D | Data Through is the earliest of the populations' last dates, here the last pay date of a register, December 18; the rest of December's work is in pay periods marked Open, scheduled to pay in the next year. It is a bound observed in the extract; it does not prove a refresh or a complete payroll. |
 | 13 | A | a .pbip stores the model and report as text files that version control compares line by line. |
-| 14 | B | a .pbix whose model imports its data, as this one does, holds every row, and a copy sits outside change control and goes stale. |
+| 14 | B | a .pbix whose model imports its data, as this one does, holds every row, and a copy kept outside the approved release can go stale and drift from it; an approved, recorded and protected copy can stay governed. |
 
 **Questions where a wrong option tempts**
 
@@ -271,9 +271,9 @@ Key: 1 C, 2 A, 3 D, 4 B, 5 A, 6 C, 7 B, 8 D, 9 B, 10 A, 11 C, 12 D, 13 A, 14 B.
 - **Question 5.** Option C carries over UNION ALL's habit of matching by position. Append matches by name.
 - **Question 7.** Option C reads size as seriousness; D discards the design finding as noise.
 - **Question 9.** Option D confuses a null with a mistyped key. The null marks the exception open; Test 3 finds the mistype.
-- **Question 10.** Option C is the recurring design finding, one finding, not first; B is expected; D takes age over score.
+- **Question 10.** Option C is the recurring design finding, one finding, not first; B is expected; D takes age over score. The stem holds amounts and urgency alike, so the chapter's simple order applies.
 - **Question 11.** Option A reviews each register separately; D treats a design flaw as expected.
-- **Question 12.** Option A sounds like a refresh problem. It is a population that ends earlier.
+- **Question 12.** Option A sounds like a refresh problem. The card shows only that no payroll register has a later pay date, a bound observed in the extract.
 - **Length.** In none of the 14 questions is the correct option also the longest, so wording alone does not give it away.
 
 Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 1 to 3 make a quiz on monitoring and its tests, 4 to 6 on the register, 7 to 11 on the review, and 12 to 14 on auditing the reports.

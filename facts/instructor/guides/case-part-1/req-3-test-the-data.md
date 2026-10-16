@@ -139,4 +139,4 @@ A weak answer names the findings without a verdict, calls all of them threats, o
 - Add the tracking-number and "In Transit" findings to the table, and say which kind of assertion they weaken (the shipment's occurrence) and which they leave alone (its measurement).
 - Rerun the Furniture comparison for the previous fiscal year's last two quarters. Which findings of the nine invoices now matter?
 - Discuss: the case's findings were found by one analyst for another question. What should a data readiness memo do with findings that do not matter this time?
-- Discuss: Requirement 4 tests whether the documents reached the ledger. Which finding of this requirement would most weaken that test if it mattered?
+- Discuss: Requirement 4 tests whether the documents' totals agree with the ledger. Which finding of this requirement would most weaken that test if it mattered?

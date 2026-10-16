@@ -7,7 +7,7 @@
      depreciation (contra assets, credit); {% for a in equity %}{{ a.number }} {{ a.name }}{{ sep(loop) }}{% endfor %} (contra equity, debit); {% for a in revenue %}{{ a.number }} {{ a.name }}{{ sep(loop) }}{% endfor %} (contra revenue, debit). The query needs parentheses:
      (AccountType IN ('Asset','Expense') AND NormalBalance = 'Credit') OR (AccountType IN ('Liability','Equity','Revenue') AND NormalBalance = 'Debit').
      Inactive ({{ n_inactive }}), none with any posting: {% for a in inactive %}{{ a.number }} {{ a.name }}{% if a.subtype == 'Header' %} (header){% endif %}{{ ', ' if not loop.last }}{% endfor %}. Manufacturing salaries and factory overhead are charged to 1090 {{ clearing_name }} (AccountID {{ clearing }}) and reach cost of
-     goods sold through inventory and 5080 {{ variance_name }}. Memo points: 1030 has no postings in the extract, so no allowance was recorded in
-     the three years (Chapter 8); 4070 is inactive with no postings, and the Part II case found the discounts netted in the invoice
+     goods sold through inventory and 5080 {{ variance_name }}. Memo points: 1030 has no postings in the three years of the extract, to be read with
+     Chapter 8's allowance estimate; 4070 is inactive with no postings, and the Part II case found the discounts netted in the invoice
      prices, a presentation to confirm rather than assume. The absence of postings to inactive and header accounts does not rule out
      misclassified postings among the active accounts. -->

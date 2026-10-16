@@ -16,7 +16,7 @@ The case uses a new workbook that reads from CharlesRiver.xlsx, so the analysis 
 
 ## The Situation
 
-It is early 2027. Your analysis in Chapter 7 showed that the Furniture Seasonal Promotion would have needed about a third more orders to pay for itself, and that the orders showed no increase at all. The approved 2027 budget includes no promotions. The sales team has now come back with a broader proposal. In each of the last three years, Charles River ran three promotions: one on a collection of items in the spring, one on an item group in the fall, and one on a customer segment in November. The team proposes to repeat the 2026 calendar in 2027 at the same rates:
+It is early 2027. Your analysis in Chapter 7 showed that the Furniture Seasonal Promotion would have needed about a third more orders to pay for itself, and that orders in its months rose only slightly, far short of that. The comparison could not show what would have sold without the promotion. The approved 2027 budget includes no promotions. The sales team has now come back with a broader proposal. In each of the last three years, Charles River ran three promotions: one on a collection of items in the spring, one on an item group in the fall, and one on a customer segment in November. The team proposes to repeat the 2026 calendar in 2027 at the same rates:
 
 - the Harbor Collection Promotion, 8 percent off the items of the Harbor collection in March and April;
 - the Furniture Seasonal Promotion, 10 percent off every Furniture item in September and October;
@@ -54,7 +54,7 @@ Follow the Power Query conventions of Part II:
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
-PromotionProgram has three columns with the same names as columns of Item and Customer: ItemGroup, CollectionName, and CustomerSegment. Rename them in the `Promotions` query, for example to `PromoItemGroup`, `PromoCollection`, and `PromoSegment`, before you merge it into `OrderLines`, because two columns in one query cannot share a name. Keep the two kinds of date apart, too. A promotion applies to a line by its order date, so questions about timing and volume use `OrderLines`, while revenue and the ledger follow the invoice date in `BilledLines`, as you saw in Chapter 5.
+PromotionProgram has three columns with the same names as columns of Item and Customer: ItemGroup, CollectionName, and CustomerSegment. Rename them in the `Promotions` query, for example to `PromoItemGroup`, `PromoCollection`, and `PromoSegment`, before you merge it into `OrderLines`, because two columns in one query cannot share a name. Keep the dates apart, too. A promotion applies to a line by its order date, so questions about timing and volume use `OrderLines`. Billed revenue and discounts follow the invoice date in `BilledLines`, as you saw in Chapter 5. The ledger records each invoice on its posting date, which can fall in a later period, as Exercise 6.1 showed, so a tie to the ledger reconciles the two dates.
 :::
 
 
@@ -65,7 +65,7 @@ PromotionProgram has three columns with the same names as columns of Item and Cu
 - Start the workbook with a Documentation sheet laid out as in Tutorial 4.3. Add a Parameters sheet that holds the proposal's three discount rates and the 2026 commission rate you calculated in Tutorial 7.3 as named cells (`HarborRate`, `FurnitureRate`, `DesignTradeRate`, and `CommissionRate`), with the inputs in blue.
 - Build the queries listed above. In `OrderLines`, bring in the OrderDate and CustomerID from `Orders`, and the ItemCode, ItemName, ItemGroup, CollectionName, and StandardCost from `Items`. Add the CustomerSegment from `Customers`, and the scope, rate, and effective dates from `Promotions`. Then add columns for OrderYear and OrderMonth, and three amounts: ListAmount (Quantity times BaseListPrice), GrossAmount (Quantity times UnitPrice), and DiscountAmount (GrossAmount times Discount).
 - Give `BilledLines` the same three amounts, the InvoiceDate with its year and quarter, and the ItemGroup and StandardCost of each item.
-- Show that the queries are complete before you use them. Compare the row count of each loaded query that keeps every row of its source Table with that Table, and state what the filters of `RevenuePostings` and `BudgetPrices` keep. Compare the total LineTotal of `OrderLines` with the total OrderTotal of `Orders`. Confirm that no line without a PromotionID carries a discount. Record the checks on the Documentation sheet.
+- Check the queries against their sources before you use them. Compare the row count of each loaded query that keeps every row of its source Table with that Table, and state what the filters of `RevenuePostings` and `BudgetPrices` keep. Compare the total LineTotal of `OrderLines` with the total OrderTotal of `Orders`. Confirm that no line without a PromotionID carries a discount. Record the checks on the Documentation sheet.
 
 
 
@@ -73,8 +73,8 @@ PromotionProgram has three columns with the same names as columns of Item and Cu
 **Requirement 2: Measure what the promotions cost and where the cost appears (Chapter 6; financial reporting).**
 
 - Build a PivotTable from `BilledLines` of the promotional discount and the number of lines by promotion and invoice year, and chart the yearly totals. Express each year's discount as a percentage of that year's billed revenue.
-- For fiscal 2026, build a gross-to-net schedule by item group. It runs from the list amount, through the reductions of the price lists and approved overrides and then the promotional discounts, to the net amount billed.
-- Tie the net amount billed in fiscal 2026 to the revenue that `RevenuePostings` records from sales invoices, and explain any difference. Then find the account in the chart of accounts where discounts could be recorded, and explain what the income statement shows, and does not show, about the cost of promotions.
+- For fiscal 2026, build a gross-to-net schedule by item group. It runs from the list amount, through the price reductions made before the promotions (by the price lists and overrides) and then the promotional discounts, to the net amount billed.
+- Tie the net amount billed in fiscal 2026, by invoice date, to the revenue that `RevenuePostings` records from sales invoices by posting date, and explain any difference. Then find the account in the chart of accounts where discounts could be recorded, and explain what the income statement shows, and does not show, about the cost of promotions.
 - Show in which quarters of fiscal 2026 the discounts of the three promotions in the proposal were billed.
 
 
@@ -84,7 +84,7 @@ PromotionProgram has three columns with the same names as columns of Item and Cu
 
 - For each promotion, find the months in which it actually ran from the order dates of its lines, and compare them with its recorded effective dates. Identify its scope: an item group, a collection, or a customer segment.
 - Measure the volume ordered in each promotion's scope, month by month, with the ListAmount of `OrderLines`. Explain why the list amount measures volume better than the net amount billed.
-- Compare the volume in each promotion's months with two expectations from Chapter 7. The first is the average of the other months of the same year, scaled to the promotion's number of months. The second is the same months a year earlier, where the data has them. Use the standard deviation of the other months to judge whether a difference is larger than the scope's normal variation from month to month.
+- Compare the volume in each promotion's months with two expectations from Chapter 7. The first is the average of the other months of the same year, scaled to the promotion's number of months. The second is the same months a year earlier, where the data has them. Use the standard deviation of the other months to judge whether a difference is larger than the scope's normal variation from month to month. These comparisons describe the orders and cannot show what would have been ordered without a promotion, so say what further evidence would.
 - Test the sales team's claim that promotions bring in new customers: find each customer's first order in the data, and whether it included a promotion line. Consider what the first months of the data can and cannot tell you.
 
 
@@ -93,24 +93,24 @@ PromotionProgram has three columns with the same names as columns of Item and Cu
 **Requirement 4: Model the proposed 2027 calendar (Chapter 7; managerial accounting).**
 
 - Extend the contribution margin model of Tutorial 7.3 to the three promotions in the proposal, with one column for each. Use the units, price before discount, and standard cost of each promotion's 2026 billed lines, together with the rates and the commission rate on your Parameters sheet. Find each promotion's break-even lift, the increase in volume at which it just pays for itself.
-- Build a data table of the Furniture promotion's difference in contribution for discount rates of 5, 8, 10, and 12 percent and increases in volume from 0 to 40 percent in steps of 5 points. Then use Goal Seek to find the Furniture discount at which the largest increase you measured in Requirement 3 would just pay for the promotion.
+- Build a data table of the Furniture promotion's difference in contribution for discount rates of 5, 8, 10, and 12 percent and increases in volume from 0 to 40 percent in steps of 5 points. Then use Goal Seek to find the Furniture discount at which the largest increase you measured in Requirement 3 would just pay for the promotion. Label the result a sensitivity, because that increase may come from another scope and year, and it is an observed difference rather than an effect of a promotion.
 - Show from `BudgetPrices` how the budgets for 2024 through 2026 planned their promotions, and whether the 2027 budget plans any. Compare each month's budgeted revenue with its budgeted quantity at list price.
-- Estimate what the proposed calendar would cost Charles River in 2027 against a budget without promotions, and in which quarters the cost would appear. State the volume you base the estimate on, and explain why you did not use the quantities in the budget.
+- Estimate what the proposed calendar would cost Charles River in 2027 against a budget without promotions, and in which quarters the cost would appear. Present it as a sensitivity on stated assumptions. State the volume and mix you base the estimate on, note any promotion orders not yet billed, and explain why you did not use the quantities in the budget.
 
 
 
 
 **Requirement 5: Test the controls over promotions (Chapter 8; auditing).**
 
-- For every promotion line in `OrderLines`, test four conditions, and count the exceptions by promotion:
+- Test four conditions in `OrderLines`, and count the exceptions by promotion. The first three test every promotion line, and the fourth starts from all order lines:
   - the order date falls within the promotion's recorded effective dates;
   - the item or the customer falls within the promotion's scope;
   - the discount equals the promotion's rate;
-  - for completeness, every line in a promotion's scope that was ordered during the promotion carries it.
-- For the promotions whose recorded dates fail, look for other evidence of when they were meant to run, such as the months in which their lines were ordered and the months in which the budgets planned their discounts. Decide what kind of error the exception shows.
-- Investigate each line outside its promotion's scope in the item master, and decide whether the discount or the master record is wrong.
+  - for completeness, every line in a promotion's scope that was ordered during the promotion carries it, so a line with a blank or a different PromotionID is an exception.
+- For the promotions whose recorded dates fail, look for other evidence of when they were meant to run, such as the months in which their lines were ordered and the months in which the budgets planned their discounts. Say what kind of error the exception most likely shows, and what evidence would confirm it. Keep the completeness result on the recorded dates, even if those dates hold no line to test, and label any test on the months the evidence suggests as provisional.
+- Investigate each line outside its promotion's scope in the item master, and say whether the discount or the master record is more likely wrong, and which record would settle it.
 - Review who approved each promotion and when, and who requested and approved the price overrides in `Overrides`. Count the lines that received a promotional discount on top of an approved override price, and state the question this raises for management.
-- Record a disposition for each exception, and decide whether each shows a weakness in the design of a control or a failure in its operation. List the conditions that should be met before any promotion runs in 2027.
+- Record a disposition for each exception. Classify each one provisionally as a possible weakness in the design of a control or a possible failure in its operation, and name the evidence that would confirm the classification. List the conditions that should be met before any promotion runs in 2027.
 
 
 
@@ -135,7 +135,7 @@ Close the memo with your recommendation on the proposal.
 - A cost of the promotions that ties to the ledger, with a clear explanation of why the income statement cannot show it.
 - A volume test that holds price constant, compares each promotion with a stated expectation, and judges each difference against normal variation before calling it an increase.
 - A model with stated assumptions, a break-even result for each proposed promotion, and a justified volume basis for 2027.
-- Control exceptions traced to their cause with evidence from outside the record being tested, each with a disposition.
+- Control exceptions traced to their most likely cause with evidence from outside the record being tested, each with a disposition that says what is confirmed and what is still open.
 - A memo written for the controller: concise, organized by perspective, and ending with a recommendation she can take to the chief financial officer.
 
 ::: {.callout-note .connecting-dots icon=false}

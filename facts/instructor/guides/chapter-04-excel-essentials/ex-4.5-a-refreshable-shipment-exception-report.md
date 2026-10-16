@@ -14,7 +14,7 @@ figures:
     kind: excel-mock
     purpose: The shipment exception report with its two highlight colors, the counts and the Status slicer set to In Transit.
     shows: "Two panes of one window. The left pane shows the top of the Shipment Table (ShipmentID, TrackingNumber, Status and DeliveryDate) with amber rows for a blank TrackingNumber and coral rows for In Transit shipments with a DeliveryDate before the review date, and the Status filter set to In Transit. The right pane shows the Analysis worksheet with the review date, the three exception counts, the blank tracking numbers by Status, the In Transit shipments by year, and the SUBTOTAL cells beside a Status slicer with In Transit selected."
-    data: Shipment at the review date, the last day of the extract (the Expected results table).
+    data: Shipment at the review date, the year-end under review and the last shipment date (the Expected results table).
 ---
 {% set g = ch04_g5 %}
 # Exercise 4.5: A Refreshable Shipment Exception Report
@@ -40,7 +40,7 @@ By the end, students can:
 - **A new workbook.** Students start a new workbook, so their names are Shipment, Parameters and Analysis. The solution file already holds Exercise 4.4's Shipment query, so its names differ: the query is ShipmentReview, and the sheets are Ex 4.5 Parameters, Ex 4.5 Analysis and Ex 4.5 Shipment. The steps below use a student's names.
 - **Date types.** Power Query may read ShipmentDate and DeliveryDate as date and time, and the exercise has students set the Date type with **Replace current**, as Tutorial 4.1, Step 6 does.
 - **Data conditions.** The extract has {{ shipments|count }} shipments. {{ blank|count }} have no TrackingNumber ({{ blank_delivered|count }} Delivered and {{ blank_transit|count }} In Transit). {{ transit|count }} are In Transit, from every year of the data, and {{ late|count }} have a DeliveryDate before the review date, {{ review }}. No ShipmentDate or DeliveryDate is blank.
-- **Software.** Desktop Excel with Power Query. The workbook is too large for Excel for the web.
+- **Software.** Desktop Excel with Power Query. Excel for the web limits the size of the workbooks it opens and the features it offers.
 
 ## How to run it
 
@@ -67,7 +67,7 @@ a. Insert a worksheet named `Parameters`. In A4 type `ReviewDate` and in B4 ente
 b. Choose **Data > Data Validation**, allow a **Date** with only a lower bound (the model answer uses `=DATE(1900,1,1)`, so any date passes), add an input message, and choose the **Stop** style.
 c. In C4 write why the report uses a fixed date and not `TODAY()`.
 
-**Check:** text typed into B4 is refused. A model note: the review date is the last day of the extract, so the counts are the same every time the report is refreshed or re-performed, while `TODAY()` changes the result daily and, long after the extract, flags every In Transit shipment as late. The date is changed when the next extract arrives.
+**Check:** text typed into B4 is refused. A model note: the review date is the year-end under review, which is also the last shipment date in the extract, so the counts are the same every time the report is refreshed or re-performed, while `TODAY()` changes the result daily and, long after the extract, flags every In Transit shipment as late. The date is changed when the next extract arrives.
 
 ### Requirement (3): Two highlight rules
 
@@ -117,7 +117,7 @@ c. Set ReviewDate back to {{ g.review_long }}.
 
 ### Requirement (6): The memo
 
-**Step 7. Outline the half page.** Each exception gets what it is, the likely cause and the evidence to request. Blank tracking number: a completeness problem; the cause may be manual entry or pickups; ask for carrier documents and proof of delivery for a sample. Stale In Transit status: a consistency and timeliness problem (Chapter 2); the status is not updated on delivery; ask for carrier tracking and the status history. Both: the {{ blank_transit|count }} In Transit shipments with no tracking number are past due, so they are the first to confirm with customers. Neither exception proves that goods were lost.
+**Step 7. Outline the half page.** Each exception gets what it is, the likely cause and the evidence to request. Blank tracking number: a completeness problem; the cause may be manual entry or pickups; ask for carrier documents and proof of delivery for a sample. In Transit after the DeliveryDate: if DeliveryDate records the delivery, the two fields conflict, a consistency and timeliness problem (Chapter 2), and the status was not updated on delivery. If it is an expected date, the shipments are overdue and need follow-up. Either way, ask for carrier tracking and the status history. Both: the {{ blank_transit|count }} In Transit shipments with no tracking number are past their DeliveryDate, so they are the first to confirm with customers. Neither exception proves that goods were lost.
 
 **Check:** the memo does not call either exception fraud or a misstatement.
 

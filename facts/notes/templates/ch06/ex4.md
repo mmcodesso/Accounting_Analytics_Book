@@ -4,5 +4,7 @@
      {{ top.c3|money }} to {{ top.c4|money }}, as cheaper {{ top.plural }} made up more of the quarter{{ together }}. At this level, within-type item
      mix appears as price and cost; the price effect also contains the promotional discount (about {{ promotions|num }} at this level). Units by type
      Q3 to Q4: {% for t, a, b in fell %}{{ t }} {{ a|num(2) }} to {{ b|num(2) }}{{ ' and ' if not loop.last }}{% endfor %} fell; {% for t, a, b in rose %}{{ t }} {{ a|num(2) }} to {{ b|num(2) }}{{ ' and ' if not loop.last }}{% endfor %} rose. Tutorial
-     6.3's Furniture-level bridge is the better headline because each of its effects has one meaning (cost zero, mix at the item level),
-     with the product-type view as supporting detail for the sales team. -->
+     6.3's Furniture-level bridge is the better headline because its cost effect is zero and its mix effect works at the item level,
+     with the product-type view as supporting detail for the sales team. Both bridges assign the change by a convention. A shift
+     between items also moves the average price-list and promotion reductions per unit, so a price effect is not by itself evidence
+     of a price change. -->

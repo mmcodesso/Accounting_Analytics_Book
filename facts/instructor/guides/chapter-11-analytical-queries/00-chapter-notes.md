@@ -40,7 +40,7 @@ figures:
 The chapter depends on these conditions of the data:
 
 - Dates are text and a function's result has no type: of the {{ n_year_text }} journal entries posted in {{ y }}, `strftime('%Y', PostingDate) = '{{ y }}'` finds them all, and the test against the number finds {{ n_year_num }}.
-- The time records end on {{ t1.last }}, {{ t1.short }} days before the month ends, because the last pay periods are open. The measure cuts the output at the same day.
+- The time records end on {{ t1.last }}, {{ t1.short }} days before the month ends, because the last pay periods are open. The measure cuts the output at the same day. Indirect time ends a week earlier, on {{ t3.ind_end }}, so the measure's last month is provisional.
 - The plant starts up in the first month: indirect time is almost absent for four months afterward, and one of them, {{ t1.zero_month }}, has none at all.
 - Payroll is posted on pay dates with no accrual, so the largest months of the gap in account `1090` have three pay dates.
 - The only journal entries to the revenue accounts are the {{ n_close }} year-end closes, and every CreatedDate carries a time. Unit margins do not tie but margin percentages do, and six requisitions have no approver.
@@ -139,6 +139,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 - Step 2: without the LaborType filter only the overtime column changes: the year reads {{ t1.ot_year_all|num }} hours where {{ t1.ot_year|num }} is right.
 - Step 3: without `'start of month'` the month end reads {{ t1.no_start }}, {{ t1.no_start_days }} days away, not {{ t1.short }}; `date('2026-01-31', '+1 month')` returns {{ t1.jan31 }}.
 - Step 5: `strftime('%Y', ClosedDate) = {{ y }}` finds {{ t1.n_num }} work orders, and {{ t1.n_text|count }} with the year as text.
+- Step 5, the dates: one work order closed in {{ t1.neg_year }} is completed {{ -t1.neg_days }} days before its release, without moving the average. Credit checking the dates and reading close-year cohorts, not a cause.
 
 **The checkpoint to look for.** The six bullets. A strong student names three views of one change: indirect time, overtime on direct labor and slower work orders.
 
@@ -161,6 +162,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 - Step 2: a LAG with no partition compares each month with the month before: July of the last year against ${{ t2.prev_jul|money }}, June's figure.
 - Step 3: the rank in WHERE stops with `{{ t2.msg_alias }}`, or `{{ t2.msg_direct }}` when the expression is repeated.
 - Step 6: an inner join to the labor summary raises Packing to {{ t2.packing_inner|num(2) }} and Quality Assurance to {{ t2.qa_inner|num(2) }}, because operations with no direct time leave the plan; joining the labor entries straight to the operations repeats the planned hours and cuts them to {{ t2.packing_fan|num(2) }} and {{ t2.qa_fan|num(2) }}; without the cut-off {{ t2.n_null_year }} rows have no year.
+- Step 6, the cohort: of the {{ t2.ops_last|num }} operations counted in the last year, {{ t2.ops_no_time|num }} have no direct time and {{ t2.ops_late|num }} have direct time dated after they ended, hence a finding to investigate.
 
 **The checkpoint to look for.** The six bullets. A strong student says that the largest months come from the pay calendar, and that the work-center pattern is a finding to investigate, not an explanation.
 
@@ -180,6 +182,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 
 - Step 2: indirect time in a step of its own, with `WHERE LaborType = 'Indirect Manufacturing'`, loses the month with none: {{ t3.sep_monthly }} months where {{ t3.n_monthly }} belong, and a view of {{ t3.sep_view }} rows starting {{ t3.sep_first }}.
 - Step 4: `12 PRECEDING` holds thirteen months, and the filter on twelve keeps {{ t3.f13_rows }} row. An average of twelve monthly ratios reads {{ t3.avg_last|num(2) }} where the pooled figure reads {{ t3.last[4]|num(2) }}. Without the cut-off the last month's ratio reads {{ t3.nc_last[1]|num(2) }} instead of {{ t3.last[1]|num(2) }}.
+- Step 4, coverage: the last row's direct time and output run to {{ t3.cut_day }}, its indirect time to {{ t3.ind_end }}. Counted to that day on both sides, the row reads direct `{{ t3.c_last[2] }}`, indirect `{{ t3.c_last[3] }}`, total `{{ t3.c_last[4] }}` and overtime share `{{ t3.c_last[5] }}` (published `{{ t3.last[2] }}`, `{{ t3.last[3] }}`, `{{ t3.last[4] }}`, `{{ t3.last[5] }}`); no other row changes. Accept it as a labeled sensitivity. The rounded parts miss the rounded total by a hundredth in {{ t3.n_round }} of {{ t3.n_view }} rows.
 
 **The checkpoint to look for.** The seven bullets. A strong student says that the trailing ratio shows a trend only while coverage and definitions hold, and that the last month is provisional.
 
@@ -207,7 +210,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 
 **A trailing figure needs full windows.** Question 15, Tutorial 11.3 Steps 4 and 5. A frame counts rows, not months; partial windows are left out; the figure pools twelve months and is not an average of ratios; the last month is provisional. Ask: does this window hold twelve months?
 
-**A view is a query, not a result.** Question 13, Tutorial 11.3 Steps 6 to 8, Exercise 11.5 (5). It runs on whatever the file holds and breaks when its tables change. Ask: what would make today's view return something different tomorrow?
+**A view is a query, not a result.** Question 13, Tutorial 11.3 Steps 6 to 8, Exercise 11.5 (5). It runs on whatever the file holds. A change to its tables can be refused at once (a dropped column it uses) or leave a view that fails or changes meaning when next queried. Ask: what would make today's view return something different tomorrow?
 
 ## Discussion prompts
 

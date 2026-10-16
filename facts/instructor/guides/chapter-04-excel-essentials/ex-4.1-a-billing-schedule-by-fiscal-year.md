@@ -126,7 +126,7 @@ c. Optional: in G17 type `Invoices`, and count each year's invoices with the sam
 
 ### Requirement (5): Why this is not revenue
 
-**Step 9. Write the note.** Three points, in two or three sentences. Credit memos are not netted: the CreditMemo worksheet holds {{ g.cm_n|count }} credit memos dated in {{ g.c }}, with a SubTotal of ${{ g.cm_sub|money }}. GrandTotal includes sales tax (${{ g.year.tax|money }}), a liability collected for the government. The ledger records freight billed (${{ g.year.frt|money }}) in its own revenue account, {{ g.freight_account }}, and the tax in account {{ g.tax_account }}. Only SubTotal, net of credit memos, approaches product revenue.
+**Step 9. Write the note.** Three points, in two or three sentences. Credit memos are not netted: the CreditMemo worksheet holds {{ g.cm_n|count }} credit memos dated in {{ g.c }}, with a SubTotal of ${{ g.cm_sub|money }}. GrandTotal includes sales tax (${{ g.year.tax|money }}), which is billed to customers and owed to the tax authority, so it is a liability. The ledger records freight billed (${{ g.year.frt|money }}) in its own revenue account, {{ g.freight_account }}, and the tax in account {{ g.tax_account }}. Only SubTotal, net of credit memos, approaches product revenue.
 
 **Check:** the note names all three, with the worksheet or account that shows each.
 

@@ -23,7 +23,7 @@ By the end, students can:
 
 - restate the request as a descriptive question and a diagnostic question, each answerable from data;
 - name the type of analytics each question calls for, and say what in its wording shows the type;
-- list the six stages of the workflow and mark the ones this case completes and the ones it leaves for Part II.
+- list the six stages of the workflow and say for each what this case completes or begins and what it leaves for Part II.
 
 **Competencies practiced.** CPA Evolution Core S1 M8 T3 to T4 (data mining and analysis of financial data); IMA Data Literacy, and Decision Analysis within Strategy, Planning, and Performance; IFAC IES 3 (a), evaluating data and information from several sources; AACSB A5 part 5.2 (technology judgment, interpretation and communication). The analytics types exercised are descriptive and diagnostic.
 
@@ -56,7 +56,7 @@ b. Write the explanation as a question: which of price, volume, mix and cost exp
 
 ### Phase 3: Mark the workflow
 
-**Step 3. List the six stages and mark each one.** Use Figure 1.2. A model marking:
+**Step 3. List the six stages and say what the case does at each.** Use Figure 1.2. A model answer:
 
 | Stage | Status in this case | Where |
 |---|---|---|
@@ -64,17 +64,17 @@ b. Write the explanation as a question: which of price, volume, mix and cost exp
 | {{ s.n }}. {{ s.name }} | {{ s.status }} | {{ s.by }} |
 {% endfor %}
 
-The reasoning behind the marking is the case's title. The question is defined here, the data is identified and accessed (Requirement 2) and then prepared and tested (Requirements 3 to 5). The analysis that decomposes the change and the charts that present it come later. The last stage is only partly done: the memo communicates what the data can and cannot support, not the answer to the question.
+The reasoning behind the answer is the case's title. The question is defined here, and the data is identified and accessed (Requirement 2), then prepared and tested (Requirements 3 to 5). The analysis begins, because Requirement 5 computes the descriptive margins of the two quarters, and the appendix presents the data map and the reconciliation. The decomposition of the change and the charts that explain it come in Part II. The last stage is only partly done, because the memo communicates what the data can and cannot support, not the answer to the question.
 
-**Check:** stages 1 to 3 are marked done, stages 4 and 5 are left, and stage 6 is marked done for the readiness findings only. A student who marks all six done has read the case as the whole analysis. A student who marks stage 3 as left may be thinking of Part II's cleaning with Power Query; point them to Requirements 3 to 5, which test the data and treat the closing entry.
+**Check:** stages 1 to 3 are completed, stages 4 and 5 are begun here and finished in Part II, and stage 6 is done for the readiness findings only. A student who leaves stages 4 and 5 entirely to Part II has missed that Requirement 5 computes the descriptive margins and that the appendix presents the map and the table. A student who marks all six done has read the case as the whole analysis. A student who marks stage 3 as left may be thinking of Part II's cleaning with Power Query, so point them to Requirements 3 to 5, which test the data and treat the closing entry.
 
 ## Expected results
 
 | Quantity | Value | Where |
 |---|---:|---|
 | Questions written, by type | Two: one descriptive, one diagnostic | Steps 1 and 2 |
-| Stages completed in this case | Four of six: 1, 2, 3 and 6 for the readiness findings | Step 3 |
-| Stages left for Part II | Two: 4 and 5 | Step 3 |
+| Stages completed in this case | Stages 1 to 3, and stage 6 for the readiness findings | Step 3 |
+| Stages begun here and finished in Part II | Stages 4 and 5 | Step 3 |
 | Margin of the earlier quarter that the descriptive question will report | {{ g.m3|pct(2) }} | Requirement 5 |
 | Margin of the later quarter | {{ g.m4|pct(2) }} | Requirement 5 |
 | Change between them | {{ g.drop|num(2) }} points | Requirement 5 |
@@ -83,7 +83,7 @@ The reasoning behind the marking is the case's title. The question is defined he
 
 - **The two questions.** The descriptive question has a measure, a product line and two periods. The diagnostic question names price, volume, mix and cost, or an equivalent set of drivers, and says it needs product-level data.
 - **The types.** Each type is justified by the wording of the question, not just named.
-- **The stages.** Stages 1 to 3 and the readiness part of stage 6 are marked done, and stages 4 and 5 are left for Part II, with a sentence on why data readiness comes first.
+- **The stages.** Stages 1 to 3 are completed and stage 6 is done for the readiness findings. Stages 4 and 5 are begun, with the descriptive margins and the appendix's tables, and Part II finishes them with the decomposition and its charts. A sentence says why data readiness comes first.
 
 A weak answer states one question, names the types without a reason, or marks every stage as complete.
 
@@ -94,6 +94,7 @@ A weak answer states one question, names the types without a reason, or marks ev
 - **An undefined quarter.** *Symptom:* "the most recent quarter" with no dates. *Response:* say that Requirement 3 decides it, and ask what could make the latest rows of the ledger the wrong ones.
 - **Types named, not reasoned.** *Symptom:* "descriptive, diagnostic" with nothing more. *Response:* ask which words in the question point to the type.
 - **Everything marked done.** *Symptom:* all six stages complete. *Response:* ask where in this case anyone decomposes the change.
+- **Stages 4 and 5 left whole.** *Symptom:* "analysis and charts come in Part II". *Response:* ask what Requirement 5 computes and what the appendix shows.
 - **Stage 3 skipped.** *Symptom:* stage 3 left for Part II. *Response:* ask who tests the data, and point to Requirements 3 to 5.
 
 ## Grading guide
@@ -103,7 +104,7 @@ A weak answer states one question, names the types without a reason, or marks ev
 | Descriptive question | 30 | A measure, the product line and two periods | One of the three missing, or a vague period |
 | Diagnostic question | 30 | Names the drivers and needs a decomposition | A "why" with no drivers, or the answer built in |
 | Types and reasons | 15 | Both types named with the cue in the wording | Types named without reasons |
-| Stages marked | 25 | Stages 1 to 3 done, 4 and 5 left, stage 6 qualified, each with a reason | Marked without reasons, or one stage misplaced |
+| Stages marked | 25 | Stages 1 to 3 done, 4 and 5 begun, stage 6 qualified, each with a reason | Marked without reasons, or one stage misplaced |
 
 ## Extensions and discussion questions
 

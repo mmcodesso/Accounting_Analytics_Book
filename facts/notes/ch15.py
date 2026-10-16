@@ -275,8 +275,27 @@ def t3(d, claim):
     # Step 11c: the card's window at December is the current year, so a work center's direct hours over all output
     wrong = named[0][1] / by_year(p, "standard", d.C)
     claim(wrong < series[-1][1], "a work center selected in the bar chart would show a ratio below the plant's")
+    claim(all(shares[(t, d.C)] / shares[(t, d.F)] - 1 > 0.6 for t in TITLES)
+          and min(shares[(t, d.C)] / shares[(t, d.F)] for t in TITLES) - 1 < 2 / 3,
+          "the overtime share rose by about two-thirds or more for each job title, one of them just below two-thirds")
+    # Coverage (decision N3): the cut-off is the last day of direct time; indirect time ends earlier. The labeled
+    # sensitivity stops hours and output alike at the last day of indirect time; Test 5 keeps the published ratio.
+    ends = dict(d.q("SELECT LaborType, MAX(WorkDate) FROM LaborTimeEntry WHERE substr(WorkDate, 1, 4) = ? GROUP BY 1", str(d.C)))
+    indirect_end = ends["Indirect Manufacturing"]
+    claim(ends["Direct Manufacturing"] == p["last"] and indirect_end < p["last"],
+          "the cut-off is the last day of direct time, and indirect time ends earlier (Step 6)")
+    hours_c, overtime_c = d.q("SELECT SUM(RegularHours + OvertimeHours), SUM(OvertimeHours) FROM LaborTimeEntry "
+                              "WHERE LaborType <> 'NonManufacturing' AND WorkDate BETWEEN ? AND ?", f"{d.C}-01-01", indirect_end)[0]
+    standard_c = d.one("SELECT SUM(pcl.QuantityCompleted * i.StandardLaborHoursPerUnit) FROM ProductionCompletionLine pcl "
+                       "JOIN ProductionCompletion pc ON pc.ProductionCompletionID = pcl.ProductionCompletionID "
+                       "JOIN Item i ON i.ItemID = pcl.ItemID WHERE pc.CompletionDate BETWEEN ? AND ?", f"{d.C}-01-01", indirect_end)
+    common = dict(stop=indirect_end, ratio=hours_c / standard_c, share=overtime_c / hours_c)
+    claim(common["ratio"] < tests[-1]["ratio"] and common["ratio"] > tests[-2]["ratio"],
+          "counted to the last day of indirect time on both sides, the current year's ratio is a little lower and the "
+          "pattern of the three years is the same (Step 13)")
     return dict(rows=sum(n for _, n in types), types=[(t.replace(" Manufacturing", ""), n) for t, n in types],
-                last=p["last"], matched=matched, completions=completions, items=items, tests=tests, ttm=series,
+                last=p["last"], indirect_end=indirect_end, common=common, matched=matched, completions=completions,
+                items=items, tests=tests, ttm=series,
                 visual=[v for _, v in visual], centers=named, blank=blank,
                 titles=[(t, shares[(t, d.F)], shares[(t, d.C)]) for t in TITLES],
                 plant=[by_year(p, "overtime", y) / by_year(p, "hours", y) for y in d.years],

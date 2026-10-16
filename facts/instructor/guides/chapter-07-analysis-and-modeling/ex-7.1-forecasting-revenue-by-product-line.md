@@ -40,7 +40,7 @@ By the end, students can:
 
 ## Before you assign
 
-- **Files and software.** The analysis workbook at the end of Tutorial 7.1, with the InvoiceLines Table and the Forecast worksheet, whose B47 supplies the company forecast. The model answer uses SWITCH and dynamic arrays (Microsoft 365).
+- **Files and software.** The analysis workbook at the end of Tutorial 7.1, with the InvoiceLines Table and the Forecast worksheet, whose B47 supplies the company forecast. The model answer uses SWITCH and dynamic arrays, which every supported desktop Excel has.
 - **Data conditions.** InvoiceLines carries Period, the fiscal quarter of each line as text. The first quarter of {{ d.F }} holds the start-up month and is the company's lowest quarter. Lighting grew in {{ d.C }}, Services is volatile under every method, and its revenue is billed design hours. Check that every group has revenue in every quarter.
 - **A point to settle.** The sample is four quarters per group. Say before students start that a MAPE over four points is a weak basis for a choice, and that the exercise asks them to defend one anyway.
 
@@ -93,7 +93,7 @@ d. Repeat the trend and the mean in rows 32 to 39, fitted to rows 5 to 11, which
 - Furniture: with all eight quarters the same quarter last year is lowest of the first three ({{ fu.errors['Same quarter last year']|pct(1) }} against {{ fu.errors['Mean']|pct(1) }}), but the mean fitted without the first quarter is lowest of all five ({{ fu.errors['Mean without the first quarter']|pct(1) }}).
 - Lighting: the trend ({{ li.errors['Trend']|pct(1) }}), because its revenue grew in {{ d.C }}; it stays lowest without the first quarter ({{ li.errors['Trend without the first quarter']|pct(1) }}).
 - Textiles: the mean, with or without the first quarter ({{ tx.errors['Mean']|pct(1) }} and {{ tx.errors['Mean without the first quarter']|pct(1) }}).
-- Accessories: the mean ({{ ac.errors['Mean']|pct(1) }}), narrowly ahead of the same quarter last year ({{ ac.errors['Same quarter last year']|pct(1) }}). The trend without the first quarter is lower ({{ ac.errors['Trend without the first quarter']|pct(1) }}), but the series rises and falls with no steady direction.
+- Accessories: the mean ({{ ac.errors['Mean']|pct(1) }}), narrowly ahead of the same quarter last year ({{ ac.errors['Same quarter last year']|pct(1) }}). The trend without the first quarter is lower ({{ ac.errors['Trend without the first quarter']|pct(1) }}), but the series rises and falls with no steady direction. A student who picks that trend and warns that four quarters are weak evidence has a defensible answer.
 - Services: the mean ({{ sv.errors['Mean']|pct(1) }}), though every method misses by {{ sv.span[0]|pct(0) }} to {{ sv.span[1]|pct(0) }}.
 
 The first quarter of {{ d.F }}: leave it out of the forecasts. It holds the start-up month. Leaving it out lowers {{ g.n_lowered }} of the {{ g.n_changes }} trend and mean errors and raises the others, the largest drop being the {{ g.best_drop.group }} {{ g.best_drop.method }} ({{ g.best_drop.before|pct(1) }} to {{ g.best_drop.after|pct(1) }}).

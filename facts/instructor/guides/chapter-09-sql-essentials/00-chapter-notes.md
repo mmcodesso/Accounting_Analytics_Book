@@ -14,7 +14,7 @@ figures:
   - id: IF-09-0-B
     kind: sql-mock
     purpose: The in-class calculator demonstration, a statement with no table.
-    shows: "The Execute SQL tab with the statement of the check slide, a division of whole numbers, a division with a decimal and a text year compared with a number. The grid shows one row with three values, and the message pane reports one row returned."
+    shows: "The Execute SQL tab with the statement of the check slide, a division of two INTEGER values, a division with a REAL operand and a text year compared with a number. The grid shows one row with three values, and the message pane reports one row returned."
     data: The expressions of the check slide and of question 15, evaluated by SQLite.
 ---
 # Chapter 9: SQL Essentials for Accounting Analytics

@@ -29,7 +29,7 @@ By the end, students can:
 
 - find the months in which a promotion ran from its transactions and compare them with its recorded dates;
 - measure volume at constant prices and explain why net revenue would mislead;
-- compare a promotion's months with two expectations and judge the difference against the scope's variation, scaled to the number of months;
+- compare a promotion's months with two expectations and judge the difference against the scope's variation, like for like;
 - test a claim about new customers from first orders and say what the start of the data limits.
 
 **Competencies practiced.** CPA Evolution Core S1 M8 T3 to T4 (data mining and analysis) and BAR M8 (planning techniques, forecasting and decision models); IMA Data Analytics and Insights (statistical analysis) and Decision Analysis; IFAC IES 2 (b), management accounting, and IES 3 (a), evaluating information from several sources; AACSB A5 part 5.1.
@@ -42,7 +42,7 @@ By the end, students can:
 
 ## How to run it
 
-Individual or pairs, about 90 minutes: 15 for the months and scope, 25 for the monthly grids, 25 for the comparison, 20 for the customers and 5 to write the conclusion. Ask "is that big?" about the largest difference before giving any hint about variation. Hold back the scaling by the square root of the months until a student calls a promotion unusual. **Collect** the comparison table, which is Exhibit 3 of the memo.
+Individual or pairs, about 90 minutes: 15 for the months and scope, 25 for the monthly grids, 25 for the comparison, 20 for the customers and 5 to write the conclusion. Ask "is that big?" about the largest difference before giving any hint about variation. If a student compares a two-month total's difference with one month's standard deviation, ask them to compare like with like, the promotion's average month with the other months or the total with the variation scaled to its months. **Collect** the comparison table, which is Exhibit 3 of the memo.
 
 {{ figure('IF-C2-3-A') }}
 
@@ -93,22 +93,25 @@ Volume in its months:   =SUMPRODUCT((($E${{ x.cmp.grid_head }}:$P${{ x.cmp.grid_
 Expectation:            =AVERAGE(FILTER($E{{ x.cmp.grid }}:$P{{ x.cmp.grid }},($E${{ x.cmp.grid_head }}:$P${{ x.cmp.grid_head }}<$L{{ x.cmp.cal }})+($E${{ x.cmp.grid_head }}:$P${{ x.cmp.grid_head }}>$M{{ x.cmp.cal }})))*C{{ x.cmp.cmp }}
 Difference:             =D{{ x.cmp.cmp }}/E{{ x.cmp.cmp }}-1
 Normal variation:       =STDEV.S(FILTER($E{{ x.cmp.grid }}:$P{{ x.cmp.grid }},($E${{ x.cmp.grid_head }}:$P${{ x.cmp.grid_head }}<$L{{ x.cmp.cal }})+($E${{ x.cmp.grid_head }}:$P${{ x.cmp.grid_head }}>$M{{ x.cmp.cal }})))
+Average month, in SDs:  =(D{{ x.cmp.cmp }}-E{{ x.cmp.cmp }})/(C{{ x.cmp.cmp }}*I{{ x.cmp.cmp }})
 In standard deviations: =(D{{ x.cmp.cmp }}-E{{ x.cmp.cmp }})/(I{{ x.cmp.cmp }}*SQRT(C{{ x.cmp.cmp }}))
 ```
+
+The first of the last two compares the promotion's average month with the other months' mean, in monthly standard deviations, and needs only Chapter 6's STDEV.S. The model answer uses the second, which scales the monthly standard deviation by the square root of the number of months. That scaling assumes independent, comparable months and is not taught in Chapters 4 to 8, so accept either; here they give the same verdict.
 
 The year-earlier column is the same SUMPRODUCT on the prior grid, divided into the volume. A student without FILTER can blank the promotion's months in a helper row (`=IF(AND(month>=first,month<=last),"",value)`), because AVERAGE and STDEV.S ignore the empty text.
 
 **Check:**
 
-| Promotion | Months | Against other months | Against a year earlier | Monthly variation | Standard deviations |
-|---|---:|---:|---:|---:|---:|
+| Promotion | Months | Against other months | Against a year earlier | Monthly variation | Average month, SDs | Total, SDs |
+|---|---:|---:|---:|---:|---:|---:|
 {% for r in x.rows %}
-| {{ r.id }} {{ r.label }} | {{ r.n_months }} | {{ r.lift|spct }} | {{ 'n/a' if r.py is none else r.py|spct }} | {{ r.sd|pct(1) }} | {{ r.z|num(2) }} |
+| {{ r.id }} {{ r.label }} | {{ r.n_months }} | {{ r.lift|spct }} | {{ 'n/a' if r.py is none else r.py|spct }} | {{ r.sd|pct(1) }} | {{ r.month_z|num(2) }} | {{ r.z|num(2) }} |
 {% endfor %}
 
-The differences run from {{ x.lift_low|spct }} to {{ x.lift_high|spct }}. None is beyond two standard deviations: the largest, promotion {{ top.id }} ({{ top.label }}), is about {{ top.z|num(1) }} standard deviations of a {{ sd_total }}. Every difference is far below its promotion's break-even increase (Requirement 4).
+The differences run from {{ x.lift_low|spct }} to {{ x.lift_high|spct }}. None is beyond two standard deviations either way. The largest, promotion {{ top.id }} ({{ top.label }}), is about {{ x.top_month_z|num(1) }} for its average month and {{ top.z|num(1) }} standard deviations of a {{ sd_total }}. Read this as an informal screen, not a test of significance, because seasonality, other promotions in the other months and the choice of the largest of several results all limit it. Every difference is far below its promotion's break-even increase (Requirement 4).
 
-**Watch for:** the variation not scaled to the months. A two-month total compared with one month's standard deviation puts promotion {{ x.naive_flagged }} beyond two. Multiplying the monthly standard deviation by the square root of the number of months is the fix, because a total of independent months varies by about that factor.
+**Watch for:** a two-month total's difference compared with one month's standard deviation, which puts promotion {{ x.naive_flagged }} beyond two. Comparing the average month, or scaling the deviation by the square root of the months, is the fix.
 
 ### Phase 4: New customers
 
@@ -124,7 +127,7 @@ Look up CustomerSince and name, and summarize: customers who ordered, first orde
 
 **Check:** {{ customers }} customers ordered, and {{ n_promoted }} first orders included a promotion line. Of the first orders, {{ x.early }} fall in the first four months of the data ({{ x.jan }} in the first month), only because the data begins then: customers who had bought before appear as new. Just {{ late }} came after June {{ x.first_year }}, the last in {{ last }}. Of the {{ since }} customers with a CustomerSince in {{ x.first_year }} or later, {{ since_before }} placed their first order before that date, so CustomerSince cannot date a first purchase.
 
-**Step 6. State the conclusion.** The differences show no sign of an increase, and no customer's first order came through a promotion. The data cannot show that promotions never attract customers, because almost no new customers appear in it, and the comparison cannot show what orders would have been without the promotion. It gives the sales team's two arguments no support.
+**Step 6. State the conclusion.** No difference is beyond the scope's normal variation or near its break-even increase, and no customer's first order came through a promotion. The comparisons describe the orders and cannot show what would have been ordered without a promotion, which a comparison group or a designed test would need. The data cannot show that promotions never attract customers either, because almost no new customers appear in it. The evidence gives the sales team's two arguments no support, which is not proof that the promotions had no effect.
 
 ## Expected results
 
@@ -141,7 +144,7 @@ Look up CustomerSince and name, and summarize: customers who ordered, first orde
 
 - **When and what.** The months and scope of each promotion from the order dates, with the recorded dates shown to disagree for {{ bad }}.
 - **Why list amount.** It holds price constant, so it moves only with quantity and mix; the net amount falls by the discount itself and follows the invoice date.
-- **The judgment.** Each difference against its expectation and the scope's variation: none unusual, all far below break-even.
+- **The judgment.** Each difference against its expectation and the scope's variation, none unusual on this informal screen and all far below break-even.
 - **The customers.** No promotional first order, with the limits of data that begins in {{ x.first_year }} and an unreliable CustomerSince.
 - **Humility.** The result is the absence of evidence of a lift, not proof of none.
 
@@ -162,7 +165,7 @@ A weak answer calls the largest difference a success, or calls every difference 
 |---|---:|---|---|
 | Months and scope | 15 | Each promotion's months, scope and the date disagreement | Months from the recorded dates |
 | Volume measure | 20 | List amount by month and the reason | Net amount, or no reason |
-| The comparison | 30 | Both expectations, variation scaled, difference in standard deviations | One expectation, or no variation |
+| The comparison | 30 | Both expectations, each difference compared like for like with the monthly variation | One expectation, or no variation |
 | New customers | 20 | First orders, promotion flag, and the limits of the data | Flag without limits |
 | Conclusion | 15 | Stated with its scope and humility | Overclaimed in either direction |
 

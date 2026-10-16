@@ -42,8 +42,8 @@ from pbibuild.case4 import rows_expanded, text_measure
 from pbibuild.model import DATE_FORMAT, MEASURES_TABLE, Column, Measure, Model, Query, Table, query_table
 from pbibuild.pbir import Page, Report, Visual, col, lit, meas, textbox
 from pbibuild.project import Project
-from pbibuild.reports import CH14, COUNT, MONEY, card, claim, code_after, dax_blocks, definitions, entered, hide, keep, \
-    money, one, rows, slicer
+from pbibuild.reports import CH14, COUNT, MONEY, card, claim, code_after, dax_blocks, definitions, entered, grow, hide, \
+    keep, money, one, rows
 from xlbuild import pq
 from xlbuild.expected import Expected
 
@@ -366,10 +366,12 @@ def r2(b: Build) -> None:
     yr = col("Date", "Year")
     line, lab = col("WorkingTB", "StatementLine"), col("Account", "AccountLabel")
     page = b.report.add(Page("review", "Review", height=1000))
-    page.add(slicer("threshold", 20, 20, 300, 110, col("Threshold", "Threshold"), title="Threshold (what-if)"))
+    page.add(Visual("threshold", "slicer", 20, 20, 300, 110, {"Values": [col("Threshold", "Threshold")]},
+                    title="Threshold (what-if)", objects={"data": [{"properties": {"mode": lit("Single")}}]}))
     page.visuals[-1].objects = {"data": [{"properties": {"mode": lit("Single")}}]}
     page.add(card("materiality", 340, 20, 920, 110, [meas("Threshold", "Threshold Value"), M(f"Materiality {C}"),
-                                                     M(f"Materiality {P}")], units_none=True, title="Threshold and materiality"))
+                                                     M(f"Materiality {P}")], units_none=True, title="Threshold and materiality",
+                  size=20))
     levels = [line, lab]
     page.add(Visual("reviewMatrix", "pivotTable", 20, 150, 820, 560, {
         "Rows": levels, "Values": [M(f"Balance {y}") for y in years] + [M(chg), M("Flag")]},
@@ -384,7 +386,7 @@ def r2(b: Build) -> None:
     named = lambda n: f"{n} {ch17.chart(d)[n]['name']}"                  # noqa: E731
     re_change = ch17.xr(-(tb_c["3030"] - tb_p["3030"]))
     page.add(answer("reviewAnswer", 20, 730, 1240, 250, [
-        f"Materiality is 5% of income before income taxes as the ledger records it: {money(c2['mat_c'])} for {C} and "
+        f"The controller's materiality starts from 5% of income before income taxes as the ledger records it: {money(c2['mat_c'])} for {C} and "
         f"{money(c2['mat_p'])} for {P} (no income tax is recorded, so it is 5% of net income). With the slider at its "
         f"default, the changes from the end of {P} to the end of {C} above {money(c2['mat_c'])} are: " +
         "; ".join(f"{named(x['n'])} {signed(x['v'])}" + (" (credit)" if x["credit"] else "") for x in a) +
@@ -397,12 +399,14 @@ def r2(b: Build) -> None:
     top = a[0]
     page.expect = ["Threshold Value", money(c2["mat_c"]), money(c2["mat_p"]), "Absolute Change",
                    money(normal_sign(d, top["n"]) * top["v"]), ABOVE, "Model answer"]
+    grow(page, "materiality", 40)                     # the cards' labels and the slider need the room under the titles
+    next(v for v in page.visuals if v.name == "threshold").h += 40
 
     # Postings page: the drill-through from a flagged account, left as after a drill-through on the largest change
     detail = b.report.add(Page("postings", "Postings", hidden=True))
     drillthrough(detail, lab, label_of(d, top["n"]))
     detail.add(card("changeCards", 80, 20, 1180, 100, [M(f"Balance {P}"), M(f"Balance {C}"), M(chg)], units_none=True,
-                    title="The account drilled through"))
+                    title="The account drilled through", size=18))
     src = col("GLEntry", "SourceDocumentType")
     detail.add(Visual("bySource", "pivotTable", 20, 140, 560, 560, {"Rows": [src], "Columns": [yr], "Values": [M("GL Amount")]},
                       title=f"Activity by source document, {P} and {C} (closes left out)",
@@ -417,6 +421,7 @@ def r2(b: Build) -> None:
                    "ABS(SUM(g.Debit - g.Credit)) DESC LIMIT 1", int(top["n"]), C)[0]
     detail.expect = ["VoucherNumber", label_of(d, top["n"]), money(normal_sign(d, top["n"]) * top["v"]), top_src[0],
                      money(top_src[1])]
+    grow(detail, "changeCards", 40)
 
     # Sources page: balances by SourceDocumentType, the opening entry's lines, and the balances of journal entries alone
     page = b.report.add(Page("sources", "Sources", height=1220))
@@ -455,10 +460,10 @@ def r2(b: Build) -> None:
         f"{money(c2['asset_cost'])}); and {named('3010')}. Parts of three more rest on it with no document: "
         f"1020 {money(c2['receivable'])}, 2010 {money(c2['payable'])} (equal to the opening cash line to the cent), and "
         f"2040 {money(c2['accrued'])}.",
-        "Balance-sheet accounts posted by journal entries alone: " + ", ".join(named(n) for n in only_je) + ". No "
-        "source document supports them: 1050 rests on the opening entry alone; the equipment, its depreciation, and the "
-        "notes rest on entries that the FixedAsset and DebtAgreement records support; equity moves only by the opening "
-        "entry and the closes."], size=10))
+        "Balance-sheet accounts posted by journal entries alone: " + ", ".join(named(n) for n in only_je) + ". Their "
+        "source type is JournalEntry, so their support is inspected separately: 1050 rests on the opening entry alone; "
+        "the equipment, its depreciation, and the notes rest on entries that the FixedAsset and DebtAgreement records "
+        "support; equity moves only by the opening entry and the closes."], size=10))
     page.expect = ["JournalEntry", "Opening Entry Amount", money(c2["prepaid"]), money(-c2["payroll"]),
                    money(-c2["payable"]), "Model answer"]
 
@@ -486,8 +491,9 @@ def r2(b: Build) -> None:
         [10, "The chart has no income tax account: what is the company's tax status?", "none", "Requirement 9"],
         [11, f"Why does 7010 show no interest income on more than {c2['millions']} million of cash?", "7010, 1010",
          "Requirement 9"],
-        [12, "Do the opening balances no document supports (1020, 1050, 2010, 2030, 2040) exist?",
-         "1020, 1050, 2010, 2030, 2040", "Requirement 9"]]
+        [12, "Do the opening balances no document supports (1020, 1050, 2010, 2030, 2040) exist, and what supports the "
+             "opening inventories (1040, 1045), which have no item detail?",
+         "1020, 1040, 1045, 1050, 2010, 2030, 2040", "Requirement 9"]]
     m.add(Table("Questions", [Column("No", "int64"), Column("Question", "string"), Column("Accounts", "string"),
                               Column("Requirement", "string")], entered=[[str(v) for v in r] for r in qrows]))
     m.query_order.append("Questions")
@@ -495,7 +501,9 @@ def r2(b: Build) -> None:
     page.add(Visual("questionTable", "tableEx", 20, 20, 1240, 680, {"Values": [
         col("Questions", "No"), col("Questions", "Question"), col("Questions", "Accounts"), col("Questions", "Requirement")]},
         title="The questions the review raises, and the requirement that answers each",
-        sort=[(col("Questions", "No"), "Ascending")]))
+        sort=[(col("Questions", "No"), "Ascending")],
+        objects={"columnWidth": [{"properties": {"value": lit(760)}, "selector": {"metadata": "Questions.Question"}}],
+                 "values": [{"properties": {"wordWrap": lit(True)}}]}))      # a long question wraps in its column
     page.expect = ["Question", "Requirement 3", "Requirement 9", qrows[0][2]]
 
     # Validation page (Requirement 1's control totals, Milestone 1)
@@ -505,7 +513,7 @@ def r2(b: Build) -> None:
         M("Total Assets")]}, title="Trial balances at each fiscal year-end, before that day's closing entries",
         filters=[keep("tbYears", yr, years)]))
     page.add(card("chartCards", 20, 210, 620, 110, [M("Accounts Never Posted"), M("Income Tax Accounts")],
-                  title="The chart of accounts"))
+                  title="The chart of accounts", size=20))
     rec = c1["rec"]
     page.add(answer("validationAnswer", 20, 340, 1240, 300, [
         "The Balance measure reproduces Requirement 1's trial balances: " + "; ".join(
@@ -515,6 +523,7 @@ def r2(b: Build) -> None:
         ", ".join(f"{y} {money(r['ta'])}" for y, r in zip(years, rec)) + f". {c1['n_never']} accounts of the chart, "
         "headers aside, have never been posted, and no account is named for income tax."], size=10))
     page.expect = ["Trial Balance Accounts", money(rec[-1]["debits"]), money(c1["ni"][-1]), money(rec[-1]["ta"])]
+    grow(page, "chartCards", 40)
     b.report.active = "review"
 
     # Test 1: the trial balances of Requirement 1
@@ -720,7 +729,7 @@ def r6(b: Build) -> None:
     page = b.report.add(Page("packageTests", "Package Tests", height=1100))
     page.add(card("testCards", 20, 20, 1240, 110, [M("Adjustment Lines"), M("Entries"), M("Entries out of Balance"),
                                                    M("Largest Entry Imbalance"), M("Lines on Cash")],
-                  title="The adjustment lines of the package workbook"))
+                  title="The adjustment lines of the package workbook", size=20))
     page.add(Visual("entryMatrix", "pivotTable", 20, 150, 560, 400, {
         "Rows": [no], "Columns": [yr], "Values": [M("Adjustment Debits"), M("Adjustment Credits"), M("Adjustment Amount")]},
         title="Each entry balances: debits, credits, and debits less credits by adjustment and year-end"))
@@ -748,7 +757,8 @@ def r6(b: Build) -> None:
     page.add(answer("packageAnswer", 800, 570, 460, 510, [
         f"The workbook's {len(lines)} adjustment lines form {len({(r['No'], r['YearEnd']) for r in lines})} entries "
         "(each numbered adjustment at each year-end); every entry balances and none touches 1010.",
-        f"Adjusted net income (with A3 on its stated assumption; no income tax recorded): {P} {money(i_p['ni'])} "
+        f"Adjusted net income (with A3 on its stated assumptions; no income tax recorded, so it is income before income "
+        f"taxes and stays provisional until the tax expense is determined): {P} {money(i_p['ni'])} "
         f"and {C} {money(i_c['ni'])}, the ledger's net income plus the "
         "lines on revenue and expense accounts, equal to the workbook's adjusted trial balance.",
         "Recorded total assets equal the trial balances of Requirement 1 account by account: " +
@@ -759,6 +769,7 @@ def r6(b: Build) -> None:
         f"operating revenue {money(i_c['opr'])}, cost of goods sold {money(i_c['cogs'])}, operating expenses "
         f"{money(i_c['opx'])} in {C}."], size=10))
     page.expect = ["Adjusted Net Income", money(i_c["ni"]), money(i_p["ni"]), money(rec[-1]["ta"]), "Model answer"]
+    grow(page, "testCards", 40)
 
     # Tests 3 to 5
     yl = ", ".join(map(str, years))
@@ -783,10 +794,10 @@ def r6(b: Build) -> None:
 
     s = "Requirement 6"
     n_entries = len({(r["No"], r["YearEnd"]) for r in lines})
-    claim(n_entries == 4 * len(years) + 2 * 2, "A1-A4 at each year-end and R1-R2 at the two year-ends presented")
+    claim(n_entries == 5 * len(years) + 2, "A1-A4 and R1 at each year-end, and R2 at the two year-ends presented")
     b.check(s, "adjustment lines loaded (the workbook's Table, without its totals row)", len(lines),
             "[Adjustment Lines]", 0)
-    b.check(s, "entries (A1-A4 at each year-end, R1 and R2 at the two presented)", n_entries, "[Entries]", 0)
+    b.check(s, "entries (A1-A4 and R1 at each year-end, R2 at the two presented)", n_entries, "[Entries]", 0)
     b.check(s, "every entry nets to zero: entries out of balance", 0, "[Entries out of Balance]", 0)
     b.check(s, "every entry nets to zero: the largest imbalance", 0, "[Largest Entry Imbalance]")
     b.check(s, "lines on 1010 Cash", 0, "[Lines on Cash]", 0)
@@ -830,11 +841,11 @@ def m3(b: Build) -> None:
         st = f["s_c"] if y == d.C else f["s_p"]
         b.check(s, f"adjusted net income {y}", f["adj_ni"][y], f"CALCULATE ( [Adjusted Net Income], {cy} )", 0.01)
         b.check(s, f"total assets at {ch17.ye(y)}, adjusted", st["ta"], f"CALCULATE ( [Adjusted Total Assets], {cy} )", 0.01)
-    b.check(s, f"retained earnings at 1 January {d.P}, as previously reported (3030 at {ch17.ye(d.F)} plus {d.F} net "
+    b.check(s, f"retained earnings at January 1, {d.P}, as previously reported (3030 at {ch17.ye(d.F)} plus {d.F} net "
                "income)", f["reported"],
             f"- CALCULATE ( [Balance {d.F}], Account[AccountNumber] = 3030 ) + CALCULATE ( [Net Income], 'Date'[Year] = {d.F} )",
             0.01)
-    b.check(s, f"the correction of retained earnings at 1 January {d.P} (lines to 3030 at {ch17.ye(d.P)})",
+    b.check(s, f"the correction of retained earnings at January 1, {d.P} (lines to 3030 at {ch17.ye(d.P)})",
             ch17.xr(f["restated"] - f["reported"]),
             f"- CALCULATE ( [Adjustment Amount], Account[AccountNumber] = 3030, 'Date'[Year] = {d.P} )", 0.01)
     b.check(s, f"property and equipment cost at {ch17.ye(d.C)}", f["cost"],

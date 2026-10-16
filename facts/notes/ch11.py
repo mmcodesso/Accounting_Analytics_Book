@@ -145,15 +145,22 @@ def ex4(d, claim):
     claim(rows[0][2] / rows[4][2] < 1.1, "the five largest totals are close together")
     claim(abs(half - len(rows) / 2) <= 1, "half of the overtime is reached at about half of the employees")
     claim(max(averages) / min(averages) < 1.05, "overtime per employee is about the same in every job title (plant-wide)")
+    # The weekly figure is an equivalent (the year's mean per employee over 52), not a measured weekly average: the year's
+    # direct and indirect time records end on different days before the year's end.
+    ends = dict(d.q("SELECT LaborType, MAX(WorkDate) FROM LaborTimeEntry WHERE LaborType <> 'NonManufacturing' "
+                    "AND substr(WorkDate, 1, 4) = ? GROUP BY 1", str(d.C)))
+    direct_end, indirect_end = ends["Direct Manufacturing"], ends["Indirect Manufacturing"]
+    claim(indirect_end < direct_end < f"{d.C}-12-31", "the year's indirect time ends before its direct time, and both before the year's end")
     return dict(employees=len(rows), total=total, payroll=payroll, top=[(r[0], r[1], r[2]) for r in rows[:5]],
-                half=half, titles=by_title, year=d.C, weekly=WORDS[round(weekly)])
+                half=half, titles=by_title, year=d.C, weekly=WORDS[round(weekly)], mean=total / len(rows),
+                direct_end=direct_end, indirect_end=indirect_end)
 
 
 @note("ch11.ex5", EXERCISES)
 def ex5(d, claim):
     rows = d.q("SELECT j.EntryNumber, j.EntryType, c.JobTitle, "
                "(strftime('%w', j.CreatedDate) IN ('0', '6')), (date(j.CreatedDate) > j.PostingDate), "
-               "(j.CreatedByEmployeeID = j.ApprovedByEmployeeID), (j.TotalAmount > COALESCE(a.MaxApprovalAmount, 0)), "
+               "(j.CreatedByEmployeeID = j.ApprovedByEmployeeID), COALESCE(j.TotalAmount > a.MaxApprovalAmount, 0), "
                "(j.TotalAmount = ROUND(j.TotalAmount / 1000, 0) * 1000) FROM JournalEntry j "
                "LEFT JOIN Employee a ON a.EmployeeID = j.ApprovedByEmployeeID "
                "LEFT JOIN Employee c ON c.EmployeeID = j.CreatedByEmployeeID")
@@ -170,8 +177,13 @@ def ex5(d, claim):
     claim(top[0][1] == "Opening" and top[0][2] == "Chief Financial Officer",
           "the highest-scoring entry is the opening balance entry, created by the chief financial officer")
     claim(len(missing) <= 1, "at most one score in the range is missing (the wording names one)")
+    # AboveLimit compares with the approver's own limit (a missing approver or limit is unknown, so the flag is 0), and
+    # ApprovalDataMissing reports those entries on their own, outside the score.
+    data_missing = d.one("SELECT COUNT(*) FROM JournalEntry j LEFT JOIN Employee a ON a.EmployeeID = j.ApprovedByEmployeeID "
+                         "WHERE a.EmployeeID IS NULL OR a.MaxApprovalAmount IS NULL")
+    claim(data_missing == 0, "every journal entry has an approver who is an employee with a recorded approval limit")
     return dict(entries=len(rows), counts=counts, scores=[(s, scores[s]) for s in present], missing=missing,
-                top_score=present[-1], top_entry=top[0][0])
+                top_score=present[-1], top_entry=top[0][0], data_missing=data_missing)
 
 
 @note("ch11.ex6", EXERCISES)

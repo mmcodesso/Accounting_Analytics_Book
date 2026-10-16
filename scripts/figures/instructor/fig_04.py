@@ -763,7 +763,7 @@ def if_04_5_a() -> Diagram:
     xl.sheet_tabs(d, 0, right_bottom, ["Parameters", "Analysis", "Shipment"], "Shipment", max_right=left_w)
     d.text(f"<i>Two views of one workbook, side by side. Left: columns B to F and J to K of the Shipment Table are hidden, "
            f"and the first {len(found)} In Transit shipments are shown. Right: rows 1 and 2 are scrolled out of view. The review "
-           f"date is {review}, the last day of the extract. Outlined: the three exception counts, and the SUBTOTAL cells, which "
+           f"date is {review}, the year-end under review and the last shipment date. Outlined: the three exception counts, and the SUBTOTAL cells, which "
            f"agree with the counts for the status selected.</i>", 0, bottom, 860, 52, size=SMALL, color=GRAY)
     return d
 

@@ -19,7 +19,7 @@ Students can:
 - write a two-page memo that leads with the finding that changes the question, states each decision with its condition, and compares the whole paths (Steps 2 to 4);
 - close with the standards, the statements and the one decision only the production manager can make, and choose exhibits that fit three pages (Steps 5 and 6).
 
-**Competencies practiced.** CPA Evolution Core S1 M8 (visualization and communicating results); IMA Leadership (communication skills); IFAC IES 3 (b); AACSB A5 parts 5.2 and 5.3 (technology judgment, interpretation and communication).
+**Competencies practiced.** CPA Evolution Core S1 M8 (visualization and communicating results); IMA Leadership (communication skills); IFAC IES 3 (b); AACSB A5 part 5.2 (technology judgment, interpretation and communication).
 
 ## Before you assign
 
@@ -49,7 +49,7 @@ One-time cost =XLOOKUP($A5,'Make or Buy'!$A$10:$A$15,'Make or Buy'!$W$10:$W$15)+
 
 ![A mock of the Memo sheet's decision table, the exhibit the memo's recommendation rests on.](../figures/chapter-18-make-buy-or-reprice/IF-18-10-A.pdf)
 
-**Step 2. Lead with the finding that changes the question.** Evidence: Requirements 3, 4 and 7. The plant already pays for about 17.8 positions of capacity it does not use ($997,574 of crew cost a year), which is more than buying would free (10.6 positions). Fitting the crew to the work is the larger question, and the two reductions add up only if both can be made.
+**Step 2. Lead with the finding that changes the question.** Evidence: Requirements 3, 4 and 7. On the routings, the plant supplies about 17.8 position-equivalents of practical hours more than its completions need ($997,574 of crew cost a year), more than buying would free on the same base (10.9). Fitting the crew to the work is the larger question, and the two reductions add up only if both can be made. The memo says that these are annual hours from standard times, not a staffing plan, since some weeks were planned above capacity.
 
 **Step 3. State each decision with its condition.** Evidence: Requirements 6 and 8. Make SDB, SCN, PIL: buying them loses money whatever happens to the crew. Buy BNH, NGT, TBL only with a committed plan to reduce the crew in step, about 10.6 positions; otherwise keep making them and raise their prices. Raise BKC, CTB, SDB, CHD to the floor through new, approved price lists with end dates.
 
@@ -75,13 +75,14 @@ One-time cost =XLOOKUP($A5,'Make or Buy'!$A$10:$A$15,'Make or Buy'!$W$10:$W$15)+
 | CTB | Raise the price | +$81,312 | $0 |
 | CHD | Raise the price | +$33,558 | $0 |
 
-> **Instructor notes, Requirement 10:** a strong memo makes SDB, SCN, and PIL; buys BNH, NGT, and TBL only with a committed plan to reduce the crew in step (about 10.6 positions; otherwise keep making them and reprice); says first that the plant already pays for about 17.8 positions of unused capacity (997,574 of crew cost a year), a larger question than outsourcing, and that the two crew reductions add up only if the production manager can make both; raises BKC, CTB, SDB, and CHD to the floor (and BNH, NGT, TBL if kept) through new, approved price lists with end dates; and compares the whole paths, not one decision at a time: if volume holds, making all six and raising the seven families below the floor to it gains 556,535 a year with no one-time cost, against 501,792 for buying BNH, NGT, and TBL and raising the rest, with 172,660 once. Buying is a cost advantage at today's prices and with the crew reduced, not the better path under every assumption about price and demand: which wins depends on how much volume the increases on BNH, NGT, and TBL would cost and on the crew plan. It adopts standards on normal capacity for inventory and time-driven costs for decisions, and raises with the CFO the evidence the fiscal 2026 inventory question needs before anything is restated. It explains the disagreement between the CFO and the production manager in their own terms: both are right about part of the cost.
+> **Instructor notes, Requirement 10:** a strong memo makes SDB, SCN, and PIL; buys BNH, NGT, and TBL only with a committed plan to reduce the crew in step (about 10.6 position-equivalents on the 2026 sales; otherwise keep making them and reprice); says first that, on the routings, the plant supplies about 17.8 position-equivalents of practical hours more than its completions need (997,574 of crew cost a year), more than buying would free on the same base (10.9), a larger question than outsourcing, that this is an annual estimate from standard times and not a staffing plan (6 weeks of the year's rough-cut plan are above the plant's available hours), and that the two crew reductions add up only if the production manager can make both; raises BKC, CTB, SDB, and CHD to the floor (and BNH, NGT, TBL if kept) through new, approved price lists with end dates; and compares the whole paths, not one decision at a time: if volume holds, making all six and raising the seven families below the floor to it gains 556,535 a year with no one-time cost, against 501,792 for buying BNH, NGT, and TBL and raising the rest, with 172,660 once. Buying is a cost advantage at today's prices and with the crew reduced, not the better path under every assumption about price and demand: which wins depends on how much volume the increases on BNH, NGT, and TBL would cost and on the crew plan. It adopts standards on normal capacity for inventory and time-driven costs for decisions, and raises with the CFO the evidence the fiscal 2026 inventory question needs before anything is restated. It explains the disagreement between the CFO and the production manager in their own terms: both are right about part of the cost. It says that the figures rest on fiscal 2026 for decisions that take effect in 2028, so the 2027 records so far (demand, staffing, costs) should confirm them. A memo that keeps all six families and stages the increases, unless a workable crew plan and the demand evidence favor buying, is an equally strong answer.
 
 ## What a strong answer says
 
 - **A finding before the decisions,** worded for both readers: the unused capacity, then the two views of the cost.
 - **A condition on every decision.** What happens to the crew, what the quote's terms require, what volume loss an increase can absorb.
-- **Whole paths,** with the one-time costs shown, and an honest statement that buying is not the better path under every assumption.
+- **Whole paths,** with the one-time costs shown, and an honest statement that buying is not the better path under every assumption. A memo that keeps all six families and stages the price increases, unless a workable crew plan and the demand evidence favor buying, is an equally strong answer.
+- **The dates.** The figures rest on fiscal 2026 for decisions that take effect in 2028, so the memo names the 2027 records that should confirm them.
 - **The standards and the statements,** kept apart from the make-or-buy decision, with the evidence named and no restatement claimed.
 - **The production manager's decision left open,** with what it would save and cost.
 
@@ -92,7 +93,7 @@ A strong memo reads in two pages; a weak one lists results in the order the work
 - **Double counting.** *Symptom:* a total of $812,016. *Response:* ask which path each row belongs to.
 - **Missing one-time costs.** *Symptom:* $70,000 of one-time cost. *Response:* ask who is paid severance.
 - **Buying without a crew plan.** *Symptom:* "buy" in every decision row. *Response:* ask what the same purchase costs with the crew kept, $334,636 a year.
-- **The crew decision taken.** *Symptom:* "reduce the crew by 11 positions". *Response:* ask who owns that decision.
+- **The crew decision taken.** *Symptom:* "reduce the crew by 11 positions". *Response:* ask who owns that decision, and which weeks and skills the hours come from.
 - **Over the page limit.** *Symptom:* a third page of text. *Response:* ask which sentence a reader would miss.
 - **A sensitivity reported as an error.** *Symptom:* "the statements were misstated". *Response:* ask what evidence at the time would show it.
 

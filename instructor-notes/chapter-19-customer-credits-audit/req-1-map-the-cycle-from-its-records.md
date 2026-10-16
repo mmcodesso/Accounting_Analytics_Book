@@ -44,7 +44,7 @@ SELECT 'SalesReturn' AS TableName, COUNT(*) AS Records,
 FROM SalesReturn
 ```
 
-**Check:** 11 rows; Records equals DistinctKeys in every row and Missing is zero. M2 (15 rows) lists the values of each status, reason and method column.
+**Check:** 12 rows; Records equals DistinctKeys in every row and Missing is zero. M2 (15 rows) lists the values of each status, reason and method column.
 
 **Step 2. Read the days between the steps (M3).** Credits are dated 0 to 3 days after the return (mean 1.4), every approval carries the credit's date, and refunds come 2 to 94 days after the credit, clearing 0 to 3 days later. **Check:** 4 rows. The lags say how long to wait before a period's returns are complete (Requirement 5), and the records hold dates, not times (Requirement 4).
 
@@ -69,7 +69,7 @@ WHERE y.CustomerRefundID IS NULL
     AND x.Status = 'Refunded'
 ```
 
-**Check:** 15 rows, every Orphans value zero. **Watch for:**
+**Check:** 19 rows, every Orphans value zero. **Watch for:**
 
 - Every credit anti-joined to the refunds returns 390 rows. They are not orphans: credits in status Applied or Issued have no refund, so the test adds the status. The 390 also proves the anti-join can find rows.
 - An anti-join written with INNER JOIN returns 0 rows whatever the data hold.
@@ -147,7 +147,7 @@ ORDER BY p.Document, Documents DESC
 |---|---|---|
 | C1 | Every credit traces to a return the warehouse received | Inspection of the goods, a carrier claim |
 | C2 | The approver and the general limit on each credit | The delegation of authority, the preparer |
-| C3 | Each credit line against its return, shipment and invoice | Nothing material |
+| C3 | Each credit line against its return, shipment and invoice | The freight policy for partial returns, a criterion for the tax |
 | C4 | Who recorded and who applied each receipt | Cash handled outside the system |
 | C5 | A clawback for each line, with base, rate and amount | Whether representatives were told |
 | C6 | The refund's approver, title and limit | The delegation for refunds, the preparer |

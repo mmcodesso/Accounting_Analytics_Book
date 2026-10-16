@@ -591,8 +591,8 @@ def ex6_1(b: ExerciseBuild) -> None:
         + f". The ledger posted them on {posted}, in fiscal {y}; InvoiceLines assigns them to fiscal {y - 1} by their "
         "invoice dates.",
         "Neither the invoice number nor the invoice date should decide the period. Revenue is recognized when control "
-        "of the goods passes to the customer, which for Charles River is delivery, and every shipment is delivered in "
-        f"the year it ships. The shipment records show that only {e['number']} shipped in {y - 1} (on "
+        "of the goods passes to the customer, which the book takes to be delivery for Charles River, and every "
+        f"shipment is delivered in the year it ships. The shipment records show that only {e['number']} shipped in {y - 1} (on "
         f"{e['shipped'][0]}), so its {money(e['amount'])} belongs in fiscal {y - 1} and is a revenue cutoff error in "
         f"the ledger; the other {words(len(later))} shipped on {', '.join(later_dates)}, so the ledger's period is right and their "
         f"invoice dates are wrong. Freight revenue (4050, {money(-f['bal'].get(4050, 0.0))}) is billed on the invoice "
@@ -620,8 +620,9 @@ def ex6_1(b: ExerciseBuild) -> None:
         f"{money(sum(r['diff'] for r in diffs))} in {words(len(diffs))} accounts: {words(len(odd))} invoices dated in "
         f"{' and '.join(sorted({month_name(i['date']) for i in odd}, key=lambda m: MONTH_ORDER.index(m)))} {y - 1} "
         f"but numbered and posted in {y}. One of them, {e['number']} ({money(e['amount'])}), shipped in {y - 1} and is "
-        "a cutoff error that belongs in the prior year; it is immaterial, but the invoicing and posting dates should "
-        f"be reviewed at every year-end. The other {words(len(later))} shipped in {month_name(later_dates[0])} "
+        "a cutoff error that belongs in the prior year. It is small relative to the year's revenue, but its materiality "
+        "should be judged with the other misstatements found and any qualitative factors, and the invoicing and posting "
+        f"dates should be reviewed at every year-end. The other {words(len(later))} shipped in {month_name(later_dates[0])} "
         f"{later_dates[0][:4]}, so only their invoice dates are wrong."])
 
 
@@ -812,14 +813,14 @@ def ex6_2(b: ExerciseBuild) -> None:
         f"largest combinations were {name(top[0][0])} ({pct(top[0][1])} of revenue), {name(top[1][0])} "
         f"({pct(top[1][1])}), and {name(top[2][0])} ({pct(top[2][1])}). Revenue "
         f"{'rose' if f['total_change'] >= 0 else 'fell'} {pct(abs(f['total_change']))} from "
-        f"fiscal {p}: {', '.join(f'{s} {spct(seg[s])}' for s in segs)}. Among the combinations with at least "
+        f"fiscal {p} ({', '.join(f'{s} {spct(seg[s])}' for s in segs)}), and among the combinations with at least "
         f"$500,000 of revenue in {p}, the largest increases were {name(up[0][0])} ({spct(up[0][3])}) and "
-        f"{name(up[1][0])} ({spct(up[1][3])}), and the largest decreases {name(down[0][0])} ({spct(down[0][3])}) and "
+        f"{name(up[1][0])} ({spct(up[1][3])}) and the largest decreases {name(down[0][0])} ({spct(down[0][3])}) and "
         f"{name(down[1][0])} ({spct(down[1][3])}). By region, revenue changed "
         f"{', '.join(f'{r} {spct(reg[r])}' for r in regions)}, which the Company presents as supplementary "
         "information, because it sets its price lists and promotions by customer type and product line, not by region. "
-        "These amounts are invoice-based; before they could support the disclosure, they would be reconciled to the "
-        "revenue the income statement reports.")
+        "These amounts are invoice-based, so they would be reconciled to the revenue the income statement reports "
+        "before they could support the disclosure.")
     why = ("Why these categories: product line and type of customer are how Charles River manages and prices its "
            "business (price lists by segment, promotions by item group and segment), and they separate revenues with "
            "different economic characteristics. Design Services buys only design services, so for that segment the "
@@ -1104,9 +1105,10 @@ def ex6_4(b: ExerciseBuild) -> None:
         + (f"{' and '.join(same)} move the same way, " if same else "")
         + (f"and price and cost per unit rose together for {' and '.join(rose)}." if rose else "")])
     model_answer(ws, r, "Model answer, requirement (5): recommendation", [
-        "Present Tutorial 6.3's Furniture-level bridge as the headline, because each of its effects has one meaning: "
-        "price is the change in price-list reductions and promotional discounts on the same items, cost is zero "
-        "because standard costs did not change, and mix captures every shift between items. The product-type bridge "
+        "Present Tutorial 6.3's Furniture-level bridge as the headline, because its cost effect is zero, as no "
+        "standard cost changed, and its mix effect measures the change in list margin per unit from the items sold. "
+        "Its price-list and promotion effects are changes in the average reduction per unit, which a shift between "
+        "items can also move, so both bridges assign the change by a stated convention. The product-type bridge "
         "is useful supporting detail for the sales team, which plans its assortment by type, but at that level item "
         "mix within each type appears as price and cost, so it should be labeled as such. Whichever level the report "
         "uses, it should state it."], last_col=8)
@@ -1381,8 +1383,10 @@ def ex6_6(b: ExerciseBuild) -> None:
         + "; ".join(f"{g} {gr[g]['lines']:,} lines, average {money(gr[g]['mean'])}, median {money(gr[g]['median'])}"
                     for g in GROUPS[:4])
         + f". Design services are fewer and larger ({gr['Services']['lines']} lines, average "
-        f"{money(gr['Services']['mean'])}). In every group the average is above the median, so the distribution is "
-        "skewed to the right, with a tail of large lines that a sample should cover in full.",
+        f"{money(gr['Services']['mean'])}). In every group the average is above the median, which is consistent with "
+        "a right tail of large lines like the one Tutorial 6.1's histogram shows for the whole year. The largest lines "
+        "can be tested on their own, with procedures for the rest of the population designed to meet the audit "
+        "objective.",
         f"Concentration. Revenue is concentrated in Furniture ({pct(gr['Furniture']['revenue'] / f['revenue'])} of the "
         f"year), not in customers: the five largest customers hold {pct(f['top5'])} of revenue and the ten largest "
         f"{pct(f['top10'])}, all of them {', '.join(f['top10_segments'])} accounts (the largest are "

@@ -150,9 +150,9 @@ Plan A is the safest, because the stumbles of this chapter are about reading a r
 | 1, 2 | Profile; the chain | 52,967 entries, 5 not approved, 3 with no clock-out; 77 periods, 0 differ |
 | 3 | The first year | 8 periods from February to May with at most 80 indirect hours, against 4,931 in the first period |
 | 4, 5 | Whose pay; the expectation | 6 lines paid to another employee, 8 on unapproved entries; differences $5.29, $4.81, $4.23, no line above a cent |
-| 6, 7 | Overtime | 5,123 short entries, none approved; 3 long entries without a link |
-| 8 | Surge days | 12, 32, 49 days a year; share of overtime 35.5%, 58.9%, 70.5% |
-| 9, 10 | Late direct time | share after the end 19.5%, 49.8%, 65.8%; Packing 95.4% |
+| 6 | Overtime | 5,123 short entries, none approved; 3 long entries without a link |
+| 7 | Surge days | 12, 32, 49 days a year; share of overtime 35.5%, 58.9%, 70.5% |
+| 8, 9 | Late direct time | share after the end 19.5%, 49.8%, 65.8%; Packing 95.4% |
 
 **Stumbles to expect**
 
@@ -179,11 +179,11 @@ Plan A is the safest, because the stumbles of this chapter are about reading a r
 
 **Sum before you compare, and fix the tolerance first.** Questions 6 and 7, Tutorial 12.2. Receipt lines and invoice lines do not pair row by row. A tolerance set after the result is a choice of answer. Goods received and not invoiced are an accrual, not an exception (question 8).
 
-**Concentration is design.** Questions 10 and 11, Exercises 12.4 and 12.5. An approval that never changes a request and comes from one person records; it does not authorize. Ask: what could the approver have stopped?
+**Concentration is a design risk.** Questions 10 and 11, Exercises 12.4 and 12.5. An approval that never changes a request and comes from one person looks like a record more than an authorization, until the requests and the evidence of review show otherwise. Ask: what could the approver have stopped, and what else would catch an error the approver missed?
 
 **An expectation from the system's own rates recalculates.** Question 15, Tutorial 12.3 Step 5. The pay fits the hours and rates on file; whether the hours were worked is another question.
 
-**A pattern is not proof.** Questions 9 and 12, Exercise 12.3. Surge-day records look entered in bulk and late time is parked on finished operations. Neither shows that hours were not worked. Ask: what would corroborate them from outside the payroll system?
+**A pattern is not proof.** Questions 9 and 12, Exercise 12.3. Surge-day records look entered in bulk and late time is parked on finished operations. Neither shows that hours were not worked, and records that agree do not show that they were. Ask: what would corroborate them from outside the payroll system?
 
 **Plausible numbers from a wrong query.** Questions 4, 13 and 14, Exercise 12.6. A self-join pairs each row twice, a LAG partition skips a boundary, and a first character reads a tenth digit. Ask: what known answer checks this?
 
@@ -194,8 +194,8 @@ Plan A is the safest, because the stumbles of this chapter are about reading a r
 3. **A test returns no rows. When do you accept that?** It reaches positive controls, reconciled populations and the logic of the join.
 4. **One person approves nearly every order, register and overtime request. Exception or design?** It reaches concentration, segregation of duties and who reviews the reviewer.
 5. **The tolerance is two percent or three. Who sets it, and when?** It reaches policy, advance choice and follow-up capacity.
-6. **The staff accountant of Chapters 9 to 11 and the auditor of this chapter reach different strengths of conclusion. Why?** It reaches independence and which conclusions survived.
-7. **Do the standards still fit?** It reaches the plant-level conclusion that survives, time paid beyond the work, and the calendar effect, the answer to Chapter 9.
+6. **The staff accountant of Chapters 9 to 11 and the auditor of this chapter reach different strengths of conclusion. Why?** It reaches independence, and which conclusions the tests left standing and which need corroboration.
+7. **Do the standards still fit?** It reaches the plant-level totals that reproduce, time paid beyond the work, the calendar effect, and what agreeing records cannot show about the work the output required, the answer to Chapter 9.
 
 ## Using the exercises
 
@@ -235,7 +235,7 @@ Key: 1 A, 2 D, 3 C, 4 C, 5 B, 6 A, 7 D, 8 C, 9 A, 10 D, 11 C, 12 B, 13 B, 14 A, 
 | 9 | A | identical times for a whole plant suggest bulk entry; the records cannot show the hours were worked. |
 | 10 | D | one approver for nearly everything can indicate a design weakness. |
 | 11 | C | a pattern suggests a policy threshold, to be confirmed; test above it. |
-| 12 | B | time charged to finished operations cannot be placed at the operations that used it; the share is of the direct hours recorded against operations, not of the variance or the pay. |
+| 12 | B | time charged to finished operations cannot reliably be tied to the operations that used it; the share is of the direct hours recorded against operations, not of the variance or the pay. |
 | 13 | B | the condition keeps each pair once and excludes a payment paired with itself. |
 | 14 | A | scientific notation starts with the first significant digit, given enough decimals that rounding cannot carry it to the next power of ten. |
 | 15 | B | a recalculation from the hours and the rates on file tests the pay for the hours; it cannot show that the hours were worked or the rates authorized. |
@@ -251,7 +251,6 @@ Key: 1 A, 2 D, 3 C, 4 C, 5 B, 6 A, 7 D, 8 C, 9 A, 10 D, 11 C, 12 B, 13 B, 14 A, 
 - **Question 11.** Option A reports every short entry; confirm the policy first.
 - **Question 12.** Options A and C claim an overstated variance or unworked pay.
 - **Question 15.** Option A treats agreement with an expectation as proof the hours were worked.
-- **Length.** The correct option is also the longest in 1 of the 15 questions (12), so wording alone can give it away. If you grade with these, ask students to explain their answer or reword the options.
 
 Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 1 to 5 make a quiz of reconciliation, tracing and cutoff, questions 6 to 8 of the match, questions 9 to 12 and 15 of the records behind a cost, and questions 13 and 14 of the SQL of the library.
 

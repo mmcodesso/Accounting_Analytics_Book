@@ -432,9 +432,9 @@ def g1(d, claim):
     need(d, claim)
     m1, m2, m3 = test(d, "M1"), test(d, "M2"), test(d, "M3")
     m4, m5, m6, m7, m8 = test(d, "M4"), test(d, "M5"), test(d, "M6"), test(d, "M7"), test(d, "M8")
-    claim(len(m1) == 11 and all(r[1] == r[2] and r[7] == 0 for r in m1),
-          "the profile shows eleven tables, each with as many distinct keys as records and no missing key")
-    claim(len(m4) == 15 and all(r[1] == 0 for r in m4), "every one of the fifteen link tests finds no orphan")
+    claim(len(m1) == 12 and all(r[1] == r[2] and r[7] == 0 for r in m1),
+          "the profile shows the twelve tables, each with as many distinct keys as records and no missing key")
+    claim(len(m4) == 19 and all(r[1] == 0 for r in m4), "every one of the nineteen link tests finds no orphan")
     claim(len(m5) == 6 and all(r[1] == 0 and r[2] == 0 for r in m5), "every document of the cycle posts, and every posting has its document")
     claim(len(m6) == 12 and all(r[5] == 0 and r[6] == 0 for r in m6), "the four numbered series have no gap and no repeat")
     claim(all(r[7] in (None, 0) for r in m6), "each series continues across the years without a break")
@@ -511,7 +511,8 @@ def g2(d, claim):
     g1_, g2_, g3_, g4_, g5_ = (test(d, k) for k in ("G1", "G2", "G3", "G4", "G5"))
     g6_, g7_, g8_, g9_ = (test(d, k) for k in ("G6", "G7", "G8", "G9"))
     claim(all(r[11] == 0 and r[12] == 0 for r in g1_) and len(g1_) == 3, "the credits reconcile to the ledger in every year")
-    claim(all(r[7] == 0 for r in g2_) and len(g2_) == 3, "the returns' standard cost reconciles to inventory in every year")
+    claim(all(r[3] == 0 and r[6] == r[9] == r[12] == r[15] == 0 for r in g2_) and len(g2_) == 3,
+          "the returns' standard cost reconciles to inventory and to each cost of goods sold account in every year")
     claim(all(r[5] == 0 and r[6] == 0 for r in g3_) and len(g3_) == 3, "the refunds reconcile to cash and to 2060 in every year")
     claim(all(r[4] == 0 for r in g4_) and len(g4_) == 3, "the clawbacks reconcile to 2034 in every year")
     claim(all(r[7] == 0 and r[8] == 0 for r in g5_) and len(g5_) == 3, "the receipts and applications reconcile to cash and receivables in every year")
@@ -625,7 +626,7 @@ def g4(d, claim):
     # wrong version: the limit read without COALESCE (a blank limit)
     null_limit = d.one("SELECT COUNT(*) FROM Employee WHERE EmployeeID IN (SELECT ApprovedByEmployeeID FROM CreditMemo UNION "
                        "SELECT ApprovedByEmployeeID FROM CustomerRefund) AND MaxApprovalAmount IS NULL")
-    claim(null_limit == 0, "every approver of a credit or a refund has a recorded limit, so COALESCE changes nothing today")
+    claim(null_limit == 0, "every approver of a credit or a refund has a recorded limit, so LimitMissing is zero today")
     # wrong version: the credit and the applications of its invoice joined, and rows counted
     rows_applied = d.one("SELECT COUNT(*) FROM CreditMemo AS cm INNER JOIN CashReceiptApplication AS cra ON cra.SalesInvoiceID = cm.OriginalSalesInvoiceID "
                          "WHERE cra.AppliedByEmployeeID = cm.ApprovedByEmployeeID")
@@ -941,14 +942,17 @@ def g7(d, claim):
     claim(n_off == r7["n_frac"] and abs(gap - r7["frac_gap"]) < 0.005, "S4 finds the note's lines restocked below standard")
     dmg = by_reason["Damaged"]
     claim(abs(dmg[5] - r7["dmg_total"]) < 0.005, "S4's Damaged total is the note's")
-    other_c, dep_lo, dep_hi, lag_lo, lag_hi, not_full, early_r, early_a, early_amt = s5[0]
+    other_c, dep_lo, dep_hi, raw_lo, raw_hi, raw_over, raw_early, lag_lo, lag_hi, not_full, early_r, early_a, early_amt = s5[0]
+    lap = n19.lapping(d)
+    claim((raw_lo, raw_hi, raw_over, raw_early) == (lap["raw_lo"], lap["raw_hi"], lap["raw_over"], lap["raw_over_early"])
+          and raw_over == raw_early, "S5 shows the raw delay of the note, every long one on a receipt dated before its invoice")
     claim(other_c == 0 and not_full == 0 and lag_lo >= 0 and early_r > 0, "S5 finds no application to another customer's invoice and the deposits held in 2060")
-    # wrong version: the delay measured from the receipt date alone
+    # the raw delay, from the receipt date alone: the observation that the receipts dated before their invoice explain
     lag_receipt = d.q("SELECT MAX(julianday(cra.ApplicationDate) - julianday(cr.ReceiptDate)) FROM CashReceiptApplication cra "
                       "JOIN CashReceipt cr ON cr.CashReceiptID = cra.CashReceiptID")[0][0]
     lag_receipt_n = d.one("SELECT COUNT(*) FROM CashReceiptApplication cra JOIN CashReceipt cr ON cr.CashReceiptID = cra.CashReceiptID "
                           "WHERE julianday(cra.ApplicationDate) - julianday(cr.ReceiptDate) > ?", lag_hi)
-    claim(lag_receipt > 5 * lag_hi and lag_receipt_n > 100, "measured from the receipt date alone, applications look weeks late")
+    claim(lag_receipt > 5 * lag_hi and lag_receipt_n > 100, "measured from the receipt date alone, some applications come weeks later, which the advances explain")
     # the largest refund and its timeline
     big = n19.largest_refund(d)
     c = n19.cycle(d)

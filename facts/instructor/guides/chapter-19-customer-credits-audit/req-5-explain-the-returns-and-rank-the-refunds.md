@@ -123,7 +123,7 @@ ROW (
 )
 ```
 
-**Check:** {{ g.n_rf }}, zero and zero. The Checks tab proves the values and the tie to the export; the layout, the drill-through menu and the slicer state show only in Desktop.
+**Check:** {{ g.n_rf }}, zero and zero. The Checks tab tests the values and the tie to the export; the layout, the drill-through menu and the slicer state show only in Desktop.
 
 ## Expected results
 

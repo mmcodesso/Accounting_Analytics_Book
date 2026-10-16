@@ -63,7 +63,7 @@ You are the staff accountant from the opening scenarios of Chapters 1 and 3. Bef
 - Leave the analysis that answers the question for Part II
 
 ::: {.notes}
-Every step can be completed with the filters, lookup functions and PivotTables you have already practiced. The case is about readiness: which data, how it connects, whether it reconciles, and what could mislead.
+You will combine filters, lookup functions and PivotTables you have already met, in ways the tutorials did not work through, such as bringing each invoice's date onto its lines. The case is about readiness: which data, how it connects, whether it reconciles, and what could mislead.
 :::
 
 # The Data You Will Use
@@ -82,7 +82,7 @@ Item identifies each product's item group and the accounts its revenue and cost 
 ## Work in your Part I working copy
 
 - Use CharlesRiver_Work.xlsx, from the Part I tutorials
-- Filters, lookups and PivotTables are all the tools you need
+- Filters, lookups and PivotTables, combined in new ways
 - GLEntry is large: summarize it rather than copy formulas down
 - Keep the master workbook as you downloaded it
 
@@ -118,10 +118,10 @@ The requirements build on each other: frame the question, map the data, test it,
 - **Produce:** a descriptive and a diagnostic question, with their types
 - **Tool:** a short written framing; no worksheet is needed
 - **Revisit:** Chapter 1's types of analytics and its workflow
-- **Check:** each workflow stage is marked done here or left for Part II
+- **Check:** each stage says what this case does and what Part II does
 
 ::: {.notes}
-Restate the controller's request as two questions: what happened to the Furniture margin, and why. Identify the type of analytics each calls for, then list the stages of the analytics workflow and mark which ones this case completes.
+Restate the controller's request as two questions: what happened to the Furniture margin, and why. Identify the type of analytics each calls for, then list the stages of the analytics workflow and say, for each, what this case completes or begins and what it leaves for Part II.
 :::
 
 ## Check your understanding {.check}
@@ -155,7 +155,7 @@ These are the four types of analytics of Chapter 1. Requirement 1 asks you to ap
 - **Produce:** the Furniture accounts, a join-path sketch, the returns' postings
 - **Tool:** the Item and Account worksheets, with lookups
 - **Revisit:** Chapter 3's keys and cardinality, and Tutorial 3.2's trace
-- **Check:** every join names its key and cardinality, in account numbers
+- **Check:** each join has its key and cardinality, each account its ID and number
 
 ::: {.notes}
 In Item, find the column that identifies Furniture items and the columns that record the accounts their revenue and cost post to, and look those accounts up in Account. Sketch the joins from the invoice lines, the shipment lines and the ledger. Then examine where returns are recorded, and what that means for a product-line margin.
@@ -258,7 +258,7 @@ Using GLEntry alone, calculate the Furniture gross margin percentage for each qu
 - Auditing: the evidence for reliance, and the limitations
 
 ::: {.notes}
-The managerial section states the accounts, the rows to include and exclude, the quarters to compare, what the measure shows, and the product-level data available for Part II. The auditing section covers the evidence that the data can be relied on and any limitation. Close the memo with a recommendation for the analysis the team should perform next.
+The managerial section states the accounts, the rows to include and exclude, the quarters to compare, what the measure shows, and the product-level data available for Part II. The auditing section covers the evidence that the data can be relied on and any limitation, such as returns in a shared account, or revenue dated by the invoice and cost by the shipment. Close the memo with a recommendation for the analysis the team should perform next.
 :::
 
 ## Before you submit
@@ -276,13 +276,13 @@ These are self-checks, not answers. A reviewer should be able to start from any 
 
 ## From readiness to diagnosis
 
-- The data map and the margin measure are Part II's starting point
+- The data map, the margin measure and its limits start Part II
 - Part II splits the margin change into volume, mix, price and cost
 - That diagnostic question is the one this case prepares
 - The Excel chapters teach the techniques it needs
 
 ::: {.notes}
-This case answered the descriptive question and prepared the diagnostic one. Part II uses Excel to break the margin change into its effects, which is the analysis the memo's recommendation should point toward.
+This case answered the descriptive question and prepared the diagnostic one. The limits the memo names, the shared returns account and the different dates of revenue and cost, go with the measure. Part II uses Excel to break the margin change into its effects, which is the analysis the memo's recommendation should point toward.
 :::
 
 ## About these slides

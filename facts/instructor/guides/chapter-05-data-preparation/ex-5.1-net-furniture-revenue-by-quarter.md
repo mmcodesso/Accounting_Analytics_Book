@@ -35,7 +35,7 @@ By the end, students can:
 
 ## Before you assign
 
-- **Files and software.** The copy of Charles River Furniture Analysis.xlsx made after Tutorial 5.3, so that InvoiceLines, the Item Table and SalesInvoice exist. XLOOKUP needs Excel for Microsoft 365 or a recent perpetual version.
+- **Files and software.** The copy of Charles River Furniture Analysis.xlsx made after Tutorial 5.3, so that InvoiceLines, the Item Table and SalesInvoice exist. XLOOKUP is in every desktop Excel that Microsoft still supports.
 - **Data conditions.** The CreditMemo and CreditMemoLine Tables hold {{ g.memos_all|count }} memos and {{ g.lines_all|count }} lines, all years. Every credit memo line is for an item the workbook's Item Table keeps, so no lookup fails. Some memos hold lines of Furniture and of another item group, which matters for the header-total shortcut below.
 - **Check the Tutorial 5.3 workbook first.** The grid reads the Period and ItemGroup columns of InvoiceLines. A student who skipped Tutorial 5.3 needs the start or end file in Chapter05-companion.zip.
 - **Where the new columns go.** CreditMemoLine has its database columns first. The three new columns are CreditMemoDate in column {{ g.letters.CreditMemoDate }}, Period in {{ g.letters.Period }} and ItemGroup in {{ g.letters.ItemGroup }}.
@@ -104,7 +104,7 @@ Bring the flag to CreditMemoLine with an XLOOKUP on CreditMemoID, then count the
 
 **Check:** {{ g.early_memos|count }} memos dated {{ g.early_first }} to {{ g.early_last }}, for invoices dated {{ g.inv_first }} to {{ g.inv_last }}; {{ g.early_furn_lines|count }} of their lines are Furniture, ${{ g.early_furn|money }}, all in {{ g.periods[0] }}.
 
-**Step 7. Write the note.** Two or three sentences. The model answer assigns each credit to the quarter of its credit memo, because the ledger records it there and the closed periods stay as reported. It names the alternative, the quarter of the original invoice, which measures the net sale better but restates closed periods, and says the choice moves only ${{ g.early_furn|money }} out of {{ g.periods[0] }}. It adds that the credits are small and do not explain the change between the third and fourth quarters.
+**Step 7. Write the note.** Two or three sentences. The model answer assigns each credit to the quarter of its credit memo, because the ledger records it on that date and the schedule is one of recorded activity. It names the alternative, the quarter of the original invoice, which answers a different question, the net result of each quarter's sales, and belongs in a separate schedule, labeled and reconciled to this one. It says that neither choice changes the ledger and that the choice moves only ${{ g.early_furn|money }} out of {{ g.periods[0] }}. It adds that the credits are small and do not explain the change between the third and fourth quarters.
 
 **Check:** the note states which assignment the schedule uses.
 
@@ -127,7 +127,7 @@ Bring the flag to CreditMemoLine with an XLOOKUP on CreditMemoID, then count the
 ## What a strong answer says
 
 - **Requirement (3).** The grid ties: billed revenue agrees with the earlier tutorial, credits are summed by credit memo date, and net is billed less credits.
-- **Requirement (4).** A stated choice with its reason. The ledger records a credit when the memo is issued, so the credit memo's quarter keeps the closed periods unchanged. The invoice's quarter is a measure of the net sale, and it restates periods already reported. Either is defensible if the schedule says which.
+- **Requirement (4).** A stated choice with its reason. The ledger records a credit on the credit memo's date, so the credit memo's quarter suits a schedule of recorded activity. The invoice's quarter answers a different question, the net result of each quarter's sales, and goes in a separate schedule, labeled and reconciled to this one. Neither changes the ledger, and an adjustment to an earlier period would need accounting and transaction evidence, not a choice of schedule.
 - **The comparison.** Credits are at most {{ g.max_share|pct }} of billed revenue in any quarter, and net revenue still falls from the third to the fourth quarter under either assignment. The credits are not the story of the quarter, and the note should say so.
 
 A weak answer chooses an assignment without a reason, or concludes that the credits explain the fall.
@@ -139,7 +139,7 @@ A weak answer chooses an assignment without a reason, or concludes that the cred
 - **A header total for the Furniture credit.** *Symptom:* credits above the line total, by ${{ g.header_over|money }} in the year. *Cause:* {{ g.mixed|count }} memos hold Furniture and other lines, so a memo's SubTotal is not Furniture. *Response:* sum the lines.
 - **Credits added to revenue.** *Response:* ask whether a credit memo increases or decreases revenue.
 - **Mismatched labels.** *Symptom:* zero credits, no error. *Response:* click one Period cell and one header label and compare them character by character.
-- **A bare assertion about timing.** *Response:* ask what the controller would restate if the other assignment were used.
+- **A bare assertion about timing.** *Response:* ask which question each assignment answers, and which one this schedule is for.
 
 ## Grading guide
 

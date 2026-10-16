@@ -50,12 +50,12 @@ Operating expense of several million dollars is neither good nor bad until the r
 ## How a page is shown shapes the judgment
 
 - Readers weigh shared measures and pass over unique ones
-- Markers change how heavily readers weigh a measure: state each threshold
+- Organization and markers shift the weights, so state each threshold
 - Put the KPI and its comparison top left, the breakdown next
 - The five-second test: can someone say what the page shows?
 
 ::: {.notes}
-Lipe and Salterio found that superiors evaluating two units relied on the measures common to both and ignored those unique to each. That is a warning, not a reason to give every department the same KPIs: define the shared measures the same way, keep each department's own measures, and make clear that they count. Cardinaels and van Veen-Dirks found that markers for above, below and on target changed how evaluators weighted the measures, so a marker should appear only where it signals something to act on. Detail is available on demand, through drill-through pages and tooltips, rather than crowding the page.
+Lipe and Salterio found that participants acting as superiors, evaluating two units, relied on the measures common to both and ignored those unique to each. That is a warning, not a reason to give every department the same KPIs: define the shared measures the same way, keep each department's own measures, and make clear that they count. Cardinaels and van Veen-Dirks found that organizing the measures changed how evaluators weighted them, and with markers for above, below and on target added, the organized scorecard drew more weight to any category in which the units differed, so a marker should appear only where it signals something to act on. Detail is available on demand, through drill-through pages and tooltips, rather than crowding the page.
 :::
 
 ## Each reader gets a page and a KPI
@@ -171,7 +171,7 @@ SELECTEDVALUE returns the step of the current bar, or a blank when the context h
 {{< book-figure fig-15-03 crop="0,0.1094,1,0.4241" >}}
 
 ::: {.notes}
-The waterfall starts at the list amount, steps down twice, and ends with the total that Power BI adds, equal to the latest year's revenue of Chapter 6. The price lists and approved overrides take far more off the list amount than the promotions do, as the Part II case found.
+The waterfall starts at the list amount, steps down twice, and ends with the total that Power BI adds, equal to the latest year's revenue of Chapter 6. The price lists and overrides take far more off the list amount than the promotions do, as the Part II case found.
 :::
 
 ## One promotion gave away several times any other
@@ -187,7 +187,7 @@ The Furniture Seasonal Promotion leads by far. Two promotions of the year before
 {{< book-figure fig-15-04 crop="0,0,1,0.8371" >}}
 
 ::: {.notes}
-The Furniture Seasonal Promotion ran in September and October, but its discounts continue into November and December: Chapter 5 found those lines were ordered within the promotion's dates and invoiced later. Drilling through on the Harbor Collection Promotion shows an end date before its start date, the master-data error the Part II case found in every collection promotion.
+The Furniture Seasonal Promotion ran in September and October, but its discounts continue into November and December: Chapter 5 found those lines were ordered within the promotion's dates and invoiced later. Drilling through on the Harbor Collection Promotion shows an end date before its start date, which cannot be right. The Part II case found failing recorded dates in every collection promotion, and their orders point to the end date as the likely error.
 :::
 
 ## The tooltip shows the months while pointing
@@ -224,14 +224,14 @@ Microsoft's guidance for facts at a higher grain than the date table is to store
 {{< book-table tbl-15-03 >}}
 
 ::: {.notes}
-Charles River's operating expense shows four of the causes at once. Sales spent far less than its budget, mostly from volume. The Warehouse spent more and Administration less, offsetting each other, a classification difference that Chapter 2 warned about. What remains is a few percent under budget almost everywhere, the payroll burden rate, and the months with three pay dates are unfavorable against a budget that spreads salaries evenly.
+Charles River's operating expense shows four of the causes at once. Sales spent far less than its budget, mostly from volume. The Warehouse spent more and Administration less, offsetting each other, a classification difference that Chapter 2 warned about. What remains is a few percent under budget almost everywhere, consistent with the payroll burden rate, and the months with three pay dates are unfavorable against a budget that spreads salaries evenly.
 :::
 
 ## Watch out: a static sales budget misleads {.watch-out}
 
 - The sales budget plans several times the volume actually sold
 - Revenue and cost of sales fall far short of it every month
-- The huge variances say nothing about how the year went
+- The huge variances measure the plan's volume, not the year
 - Flex the budget to actual volume first, or leave revenue off
 
 ::: {.notes}
@@ -270,7 +270,7 @@ Ask students which of the four nets to zero across the cost centers.
 4. Rate
 
 ::: {.notes}
-The classification difference nets to zero: it moves cost from one cost center to another without changing the total. Spending is what remains after the other causes.
+The classification difference nets to zero: it moves cost from one cost center to another without changing the total. Spending is investigated in what remains after the other causes.
 :::
 
 # Visual Calculations
@@ -376,7 +376,7 @@ Sales spent far less than its budget, the Warehouse far more, and Administration
 {{< book-figure fig-15-09 crop="0.0139,0.0304,0.9687,0.719" >}}
 
 ::: {.notes}
-Each cost center's variance is the volume in the commission budget, plus the classification of depreciation, plus what remains. The classification column totals zero, the signature of a classification difference. What remains is a few percent below budget nearly everywhere, the payroll burden rate; Sales remains further below, because the actual commission rate on merchandise was also below the budgeted rate.
+Each cost center's variance is the volume in the commission budget, plus the classification of depreciation, plus what remains. The classification column totals zero, the signature of a classification difference. What remains is a few percent below budget nearly everywhere, consistent with the payroll burden rate, and it still has to be explained before anyone calls it efficient or wasteful spending. Sales remains further below, because the actual commission rate on merchandise was also below the budgeted rate.
 :::
 
 ## RUNNINGSUM shows how the variance built up
@@ -384,7 +384,7 @@ Each cost center's variance is the volume in the commission budget, plus the cla
 {{< book-figure fig-15-06 crop="0,0.2771,0.6389,0.6359" >}}
 
 ::: {.notes}
-The year-to-date variance climbs in January, falls through June, climbs again in July, and falls for the rest of the year. January and July are the months with three pay dates: against a budget that spreads salaries evenly, they look unfavorable and every other month favorable. A manager who read the report in July would have seen a cost center on budget for the year.
+The year-to-date variance climbs in January, falls through June, climbs again in July, and falls for the rest of the year. January and July are the months with three pay dates: against a budget that spreads salaries evenly, they look unfavorable and every other month favorable. A reader in July would have seen operating expense close to the flexed budget for the year to date, and the months between show the payroll timing behind it.
 :::
 
 ## Checkpoint
@@ -447,7 +447,7 @@ The bookmark is the one that can go stale: it keeps the state it captured until 
 {{< book-steps 15.3 1-7 >}}
 
 ::: {.notes}
-Labor time and completions join the model as two more fact tables, with Employee, WorkCenter, Item and Date as dimensions. A labor line takes the work center of its operation, so indirect time has none and appears under (Blank). Standard hours are cut off at the last day with time records, so that hours and output cover the same days, as in Chapters 10 and 11. Item filters the sales and the output, WorkCenter and Employee only the labor time, so the ratio of hours to output is meaningful for the whole plant over a period.
+Labor time and completions join the model as two more fact tables, with Employee, WorkCenter, Item and Date as dimensions. A labor line takes the work center of its operation, so indirect time has none and appears under (Blank). Standard hours are cut off at the last day with time records, December 11, 2026, as in Chapters 10 and 11. Indirect time ends a week earlier, on December 4, 2026, so the ratio is an observed-records diagnostic, not a labor efficiency variance, and its last month is provisional. Item filters the sales and the output, WorkCenter and Employee only the labor time, so the ratio of hours to output is meaningful for the whole plant over a period.
 :::
 
 ## Steps 8 to 13: compare, chart and finish the package
@@ -455,7 +455,7 @@ Labor time and completions join the model as two more fact tables, with Employee
 {{< book-steps 15.3 8-13 >}}
 
 ::: {.notes}
-The KPI card sets the latest trailing figure beside the first year's level, the KPI with its comparison; without its year filter it is blank, because its window would end in the empty last year of the Date table. Step 11 stops the work-center and job-title charts from filtering the KPI, and the report is saved on the About page, the page it then opens on. Test 5 returns the yearly ratios of Chapter 11's view.
+The KPI card sets the latest trailing figure beside the first year's level, the KPI with its comparison; without its year filter it is blank, because its window would end in the empty last year of the Date table. Step 11 stops the work-center and job-title charts from filtering the KPI, and the report is saved on the About page, the page it then opens on when no landing page is set. Test 5 returns the yearly ratios of Chapter 11's view, which shows that the model reproduces them, not that the ratio is a complete measure of labor performance.
 :::
 
 ## KEEPFILTERS lets the two filters combine
@@ -491,7 +491,7 @@ On a table that starts at the beginning of the data, the visual calculation of t
 {{< book-figure fig-15-11 crop="0,0,1,0.4284" >}}
 
 ::: {.notes}
-The plant used more hours for each standard hour of output in every successive year, the trend Part III explained. Most direct hours of the latest year were recorded at Packing, the work center Chapter 11 found far above its planned load, and the (Blank) work center holds the few direct lines without an operation. The bar chart does not filter the card or the line: one work center's hours over the whole plant's output would describe neither.
+The plant recorded more hours for each standard hour of output in every successive year, the trend Part III explained. Most direct hours of the latest year were recorded at Packing, the work center Chapter 11 found far above its planned load, and the (Blank) work center holds the few direct lines without an operation. The bar chart does not filter the card or the line: one work center's hours over the whole plant's output would describe neither.
 :::
 
 ## Overtime rose alike for every job title
@@ -499,7 +499,7 @@ The plant used more hours for each standard hour of output in every successive y
 {{< book-figure fig-15-11 crop="0,0.434,1,0.4681" >}}
 
 ::: {.notes}
-The overtime share rose by two-thirds or more from the first year to the latest for every manufacturing job title alike, the plant-wide pattern of the surge days that Chapter 12 found.
+The overtime share rose by about two-thirds or more from the first year to the latest for every manufacturing job title alike, the plant-wide pattern of the surge days that Chapter 12 found.
 :::
 
 ## Checkpoint
@@ -517,10 +517,10 @@ The package now answers three readers' questions on three pages, each with its c
 - Modeling > New parameter > Numeric range creates a slider and a value
 - Measures that use the value recalculate with every move
 - The Part II case's break-even lift becomes a page to try discounts on
-- The evidence of no lift is what the required lift must be weighed against
+- The case found no unusual increase in volume to weigh it against
 
 ::: {.notes}
-The parameter is a one-column table of the allowed values and a measure that returns the value the reader selected. The Part II case used Goal Seek to find the discount at which a promotion pays for itself; Exercise 15.4 builds the same calculation as a what-if page for the Design Trade promotion.
+The parameter is a one-column table of the allowed values and a measure that returns the value the reader selected. Chapter 7 used Goal Seek to find the break-even lift, the increase in volume a promotion needs after its discount, and the Part II case found it for each promotion of its proposal. Exercise 15.4 builds the same calculation as a what-if page for the Design Trade promotion.
 :::
 
 ## The forecast and exponential smoothing
@@ -536,7 +536,7 @@ Microsoft described the method as exponential smoothing when it introduced the f
 
 ## Watch out: a forecast learns from any history it gets {.watch-out}
 
-- The revenue history begins with a start-up month at half the usual level
+- The revenue history begins with a start-up month of half the usual invoices
 - Expense months with three pay dates may or may not read as seasonal
 - Fit the forecast on data that ends before a quarter you know
 - Compare it with that quarter and the benchmarks, and say so on the page

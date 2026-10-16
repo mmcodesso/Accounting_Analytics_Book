@@ -14,10 +14,6 @@ def quarter(year: int, q: int) -> tuple[str, str]:
     return f"{year}-{3 * q - 2:02d}-01", f"{year}-{ends[q]}"
 
 
-def quarter_of(date: str) -> tuple[int, int]:
-    return int(date[:4]), (int(date[5:7]) - 1) // 3 + 1
-
-
 def accounts(d):
     """The Furniture items' revenue, COGS, and inventory accounts (each must be one account)."""
     ids = d.q("SELECT COUNT(DISTINCT RevenueAccountID), MIN(RevenueAccountID), COUNT(DISTINCT COGSAccountID), "
@@ -73,6 +69,18 @@ def r2(d, claim):
           "apart from the contra-revenue account, CreditMemo postings debit at most one other revenue account (freight)")
     groups = d.one("SELECT COUNT(DISTINCT t.ItemGroup) FROM CreditMemoLine l JOIN Item t ON t.ItemID = l.ItemID")
     claim(groups > 1, "the credit memos (and so the returns account) span several product lines")
+    claim(d.one("SELECT COUNT(DISTINCT ItemGroup) FROM Item WHERE InventoryAccountID = ?", inventory["id"]) > 1,
+          f"the inventory account {inventory['number']} is shared with other item groups")
+    # the Furniture part of the shared account is real and reachable through SourceLineID, so the 4010/5010 measure,
+    # with revenue before those credits and cost after the returned goods, overstates the Furniture margin
+    if memo:
+        claim(d.one("SELECT COUNT(*) FROM GLEntry g LEFT JOIN CreditMemoLine l ON l.CreditMemoLineID = g.SourceLineID "
+                    "WHERE g.AccountID = ? AND g.SourceDocumentType = 'CreditMemo' AND l.CreditMemoLineID IS NULL",
+                    memo[0][0]) == 0, "every CreditMemo posting to the returns account carries its credit memo line's key")
+        claim(d.one("SELECT COALESCE(SUM(g.Debit), 0) FROM GLEntry g JOIN CreditMemoLine l ON l.CreditMemoLineID = g.SourceLineID "
+                    "JOIN Item t ON t.ItemID = l.ItemID WHERE g.AccountID = ? AND g.SourceDocumentType = 'CreditMemo' "
+                    "AND t.ItemGroup = ?", memo[0][0], GROUP) > 0,
+              "Furniture credit memo lines debit the shared returns account (so the 4010/5010 margin overstates the Furniture margin)")
     discounts = d.account("4070")
     discount_name = d.one("SELECT AccountName FROM Account WHERE AccountID = ?", discounts)
     claim(d.one("SELECT COUNT(*) FROM GLEntry WHERE AccountID = ?", discounts) == 0,
@@ -112,9 +120,9 @@ def r3(d, claim):
     claim(furniture and not any(window[0] <= x <= window[1] for r in furniture for x in (r[1], r[2], r[4])),
           f"none of the Furniture invoices is dated, shipped, or posted in {d.C} Q3 or Q4")
     claim(all(r[4] is not None for r in furniture), "each of the Furniture invoices is posted")
-    # the ones whose shipment or posting falls in a later quarter than the invoice date (a cutoff matter)
+    # the ones whose date, shipment and posting do not all fall in one fiscal year (a year-end cutoff matter)
     crossing = [dict(number=r[0], dated=r[1], shipped=r[2], posted=r[4]) for r in furniture
-                if r[4] is not None and len({quarter_of(r[1]), quarter_of(r[2]), quarter_of(r[4])}) > 1]
+                if r[4] is not None and len({r[1][:4], r[2][:4], r[4][:4]}) > 1]
     claim(d.one("SELECT COUNT(*) FROM (SELECT CustomerName FROM Customer GROUP BY 1 HAVING COUNT(*) > 1)") > 0,
           "some customers share a name")
     blank = d.q("SELECT ItemGroup, SupplyMode FROM Item WHERE ListPrice IS NULL")
@@ -141,8 +149,17 @@ def quarters(d):
             f"WHERE AccountID = ? AND PostingDate BETWEEN ? AND ? GROUP BY 1", account, a, b)}
         closes = d.q(f"SELECT AccountID, ROUND(SUM(Debit), 2), ROUND(SUM(Credit), 2) FROM GLEntry WHERE AccountID IN (?, ?) "
                      f"AND PostingDate BETWEEN ? AND ? AND NOT ({d.no_closes()}) GROUP BY 1", revenue["id"], cogs["id"], a, b)
+        unbilled = d.q("SELECT COUNT(*), ROUND(COALESCE(SUM(sl.ExtendedStandardCost), 0), 2) FROM ShipmentLine sl "
+                       "JOIN Shipment s ON s.ShipmentID = sl.ShipmentID JOIN Item t ON t.ItemID = sl.ItemID "
+                       "WHERE t.ItemGroup = ? AND s.ShipmentDate BETWEEN ? AND ? AND NOT EXISTS "
+                       "(SELECT 1 FROM SalesInvoiceLine il WHERE il.ShipmentLineID = sl.ShipmentLineID)", GROUP, a, b)[0]
+        shifted = d.one("SELECT COUNT(*) FROM SalesInvoiceLine l JOIN SalesInvoice i ON i.SalesInvoiceID = l.SalesInvoiceID "
+                        "JOIN Item t ON t.ItemID = l.ItemID JOIN ShipmentLine sl ON sl.ShipmentLineID = l.ShipmentLineID "
+                        "JOIN Shipment s ON s.ShipmentID = sl.ShipmentID WHERE t.ItemGroup = ? "
+                        "AND i.InvoiceDate BETWEEN ? AND ? AND s.ShipmentDate NOT BETWEEN ? AND ?", GROUP, a, b, a, b)
         out[q] = dict(lines=lines[0], std=lines[1], shipped=shipped, rev=by_source(revenue["id"], -1),
-                      cogs=by_source(cogs["id"], 1), closes={r[0]: (r[1], r[2]) for r in closes})
+                      cogs=by_source(cogs["id"], 1), closes={r[0]: (r[1], r[2]) for r in closes},
+                      unbilled=dict(lines=unbilled[0], cost=unbilled[1]), shifted=shifted)
     return revenue, cogs, out
 
 
@@ -163,7 +180,11 @@ def r4(d, claim):
     claim(qs[3]["closes"] == {} and set(qs[4]["closes"]) <= {revenue["id"], cogs["id"]} and cogs["id"] in qs[4]["closes"],
           f"the close posts to {cogs['number']} in Q4 (at year-end) and not in Q3")
     claim(all(qs[q]["cogs"].get("SalesReturn", 0) < 0 for q in (3, 4)), "SalesReturn postings reduce COGS in both quarters")
-    return dict(revenue=revenue, cogs=cogs,
+    # revenue follows the invoice date and cost the shipment date: some lines of the two quarters fall in different quarters
+    claim(qs[3]["shifted"] + qs[4]["shifted"] > 0,
+          "some Furniture lines invoiced in the two quarters were shipped in another quarter (the totals need not cover the same sales)")
+    unbilled = [dict(label=f"{d.C} Q{q}", **qs[q]["unbilled"]) for q in (3, 4) if qs[q]["unbilled"]["lines"]]
+    return dict(revenue=revenue, cogs=cogs, unbilled=unbilled,
                 q3=dict(lines=qs[3]["lines"], shipped=qs[3]["shipped"], returns=qs[3]["cogs"]["SalesReturn"]),
                 q4=dict(lines=qs[4]["lines"], shipped=qs[4]["shipped"], returns=qs[4]["cogs"]["SalesReturn"]))
 
@@ -196,7 +217,20 @@ def r5(d, claim):
     claim(m4 < m3, "excluding the close, the margin falls from Q3 to Q4")
     s3, s4 = margin(q3["lines"], q3["std"]), margin(q4["lines"], q4["std"])
     claim(s4 < s3, "the sub-ledger margin at standard cost also falls")
+    # the measure takes revenue before customer credits (shared account) and cost after returned goods; taking the
+    # Furniture credit memo lines, found through SourceLineID, off revenue gives a margin net of both
+    def traced_credits(a, b):
+        return d.one("SELECT COALESCE(SUM(g.Debit), 0) FROM GLEntry g JOIN CreditMemoLine l ON l.CreditMemoLineID = g.SourceLineID "
+                     "JOIN Item t ON t.ItemID = l.ItemID JOIN Account x ON x.AccountID = g.AccountID "
+                     "WHERE g.SourceDocumentType = 'CreditMemo' AND x.AccountSubType = 'Contra Revenue' AND t.ItemGroup = ? "
+                     "AND g.PostingDate BETWEEN ? AND ?", GROUP, a, b)
+    c3, c4 = traced_credits(*quarter(d.C, 3)), traced_credits(*quarter(d.C, 4))
+    claim(c3 > 0 and c4 > 0, "Furniture credit memo lines reduce the shared returns account in both quarters")
+    n3 = margin(q3["rev"]["SalesInvoice"] - c3, q3["cogs"]["Shipment"] + q3["cogs"]["SalesReturn"])
+    n4 = margin(rev4 - c4, cogs4)
+    claim(n3 < m3 and n4 < m4, "netting the Furniture credit memo lines lowers both margins (the 4010/5010 measure overstates them)")
+    claim(n4 < n3, "net of the Furniture credit memo lines, the margin still falls from Q3 to Q4")
     return dict(rev_all=rev_all, cogs_all=cogs_all, close=close, entry_type=entry_type, posted=posted,
                 revenue=revenue, cogs=cogs, close_debit=rev_dr, close_credit=cogs_cr, naive_q4=naive_q4, naive_q3=naive_q3,
                 naive_vs_q3=naive_vs_q3,
-                rev4=rev4, cogs4=cogs4, m3=m3, m4=m4, s3=s3, s4=s4)
+                rev4=rev4, cogs4=cogs4, m3=m3, m4=m4, s3=s3, s4=s4, n3=n3, n4=n4)

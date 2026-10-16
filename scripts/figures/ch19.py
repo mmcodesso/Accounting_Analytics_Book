@@ -113,11 +113,11 @@ def fig_19_02() -> Diagram:
     d = Diagram("Evaluating a Control Deficiency")
     lw = 380
     steps = [
-        "<b>Identify the deficiency</b>: a control that is missing, or one that did not operate as designed",
+        "<b>Identify the deficiency</b>: a needed control that is missing or poorly designed, or one that does not operate as designed",
         "<b>Likelihood</b>: is a misstatement reasonably possible, whether or not one occurred?",
         "<b>Magnitude</b>: how large could it be, against materiality?",
         "<b>Compensating controls</b>: do other controls catch it, precisely enough?",
-        "<b>Combine</b> the deficiencies that affect the same account or assertion",
+        "<b>Combine</b>: assess together the deficiencies that affect the same account, assertion, or component",
     ]
     ids = []
     for i, text in enumerate(steps):

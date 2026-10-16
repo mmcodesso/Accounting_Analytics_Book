@@ -18,7 +18,7 @@ import excel as xl
 from check_figures import text_width
 import re
 
-from drawio import (AMBER, AMBER_TINT, BLUE, BLUE_TINT, CORAL, GRAY, GRAY_TINT, INK, RULE, SMALL,
+from drawio import (AMBER, AMBER_TINT, BLUE, BLUE_TINT, CORAL, FONT, GRAY, GRAY_TINT, INK, RULE, SMALL,
                     TEAL, WHITE, Diagram, esc)
 
 FILE = "Charles River Reports"
@@ -207,11 +207,13 @@ def _category_labels(d: Diagram, xs: list[float], labels: list[str], y: float, e
 def line_chart(d: Diagram, x: float, y: float, w: float, h: float, title: str | None,
                categories: list[str], series: list[tuple[str, list[float], str]], unit: str,
                ticks: list[float], every: int = 1, legend: bool = False,
-               selected: bool = False) -> dict:
+               selected: bool = False, axis_title: str | None = None) -> dict:
     """A line chart: series are (name, values, color); ticks set the value axis, whose first
     tick is where the axis starts. A value of None is a blank, which Power BI leaves as a gap in
-    the line. Returns the plot geometry and the y mapping."""
+    the line. axis_title, when given, is the value axis's title (Format visual > Y-axis > Title),
+    written upward beside the tick labels. Returns the plot geometry and the y mapping."""
     ix, iy, iw, ih = frame(d, x, y, w, h, title, selected)
+    title_w = 18 if axis_title else 0
     if legend:
         lx = ix
         for name, _, color in series:
@@ -220,9 +222,14 @@ def line_chart(d: Diagram, x: float, y: float, w: float, h: float, title: str | 
             lx += text_width(esc(name), SMALL, False) + 34
         iy += 20
         ih -= 20
-    left, plot_w = ix + 48, iw - 56
+    left, plot_w = ix + 48 + title_w, iw - 56 - title_w
     top, plot_h = iy + 8, ih - 34
-    y_of = _value_axis(d, left, top, plot_h, ticks, unit, ix, grid_w=plot_w)
+    if axis_title:
+        assert text_width(esc(axis_title), SMALL, False) < plot_h, "the axis title is longer than the axis"
+        d.vertex(esc(axis_title), f"text;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;horizontal=0;"
+                 f"fontSize={SMALL};fontColor={GRAY};fontStyle=0;{FONT}spacing=0;fillColor=none;strokeColor=none;",
+                 ix, top, title_w, plot_h)
+    y_of = _value_axis(d, left, top, plot_h, ticks, unit, ix + title_w, grid_w=plot_w)
     step = plot_w / len(categories)
     xs = [left + step * (i + 0.5) for i in range(len(categories))]
     for name, values, color in series:

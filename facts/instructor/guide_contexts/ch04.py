@@ -171,6 +171,7 @@ def chapter(d, claim):
     large95 = [x for x in totals if x > thr95]
     median = excel_percentile(totals, 0.5)
     claim(median < thr < max(totals) / 2, "the 90th percentile is well above the median line total and far below the largest line")
+    claim(3000 <= thr < 10000, "the 90th-percentile threshold is several thousand dollars (Tutorial 4.2, Step 2)")
     claim(0.08 <= len(large) / n_lines <= 0.12, "about a tenth of the lines are large")
     claim(0.25 <= share <= 0.4, "the large lines hold close to a third of the value billed")
     methods = sorted({r[6] for r in lines})

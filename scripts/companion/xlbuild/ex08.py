@@ -394,7 +394,7 @@ class Facts:
         only = lambda *names: o["score"] == len(names) and all(f[n] for n in names)  # noqa: E731
         cap = self.capital.get(o["number"])
         if only("self", "above") and cap and a["title"] == "Purchasing Manager" and o["total"] > 10 * a["limit"]:
-            return ("Design and operation",
+            return ("Possibly design and operation",
                     f"Follow up: the note-financed capital purchase behind invoice {cap['invoice']['number']} "
                     f"(Exercise 8.2), {money(o['total'])}, created and approved by the purchasing manager, {a['name']}, "
                     f"far above the approval limit of {money(a['limit'])}. No recorded limit, the chief financial officer's "
@@ -403,25 +403,25 @@ class Facts:
                     "fixed-asset register.")
         if only("self", "above") and a["limit"] == 0 and a["family"] == "Purchasing and Procurement" \
                 and o["date"][5:7] == "01":
-            return ("Design and operation",
+            return ("Possibly design and operation",
                     f"Follow up: created and approved by the same {a['title'].lower()}, {a['name']}, whose approval "
-                    f"limit is $0, on {o['date']}. Nobody with authority approved the "
-                    f"order of {money(o['total'])}. Vouch it to its receipt and invoice, and ask why the system "
-                    "accepted the creator's own approval.")
+                    f"limit is $0, on {o['date']}. The records show no approval of the "
+                    f"order of {money(o['total'])} by anyone with authority. Vouch it to its receipt and invoice, and ask "
+                    "why the system accepted the creator's own approval.")
         if only("self") and a["title"] == "Purchasing Manager" and o["total"] <= a["limit"]:
-            return ("Design",
+            return ("Possibly design",
                     f"Follow up, low risk: created and approved by the purchasing manager, {a['name']}, within the "
-                    f"limit of {money(a['limit'])}. The amount is within authority, but no second person approved the "
-                    "order, a gap in segregation of duties. Vouch it to its receipt and invoice.")
+                    f"limit of {money(a['limit'])}. The amount is within authority, but the records show no second "
+                    "approval, a possible gap in segregation of duties. Vouch it to its receipt and invoice.")
         if only("above", "term") and a["limit"] == 0:
-            return ("Design and operation",
+            return ("Possibly design and operation",
                     f"Follow up: approved by {a['name']}, {audit.article(a['title'].lower())} terminated on "
                     f"{a['terminated']}, on an order dated {o['date']}, created by {c['name']}. The approver's "
                     "recorded termination precedes the order date, and the recorded limit is $0. The data hold no "
                     "approval timestamp or access log: obtain them to find out when the approval was recorded and who "
                     "recorded it, vouch the order, and report the finding.")
         if only("above") and a["limit"] > 0:
-            return ("Operation",
+            return ("Possibly operation",
                     f"Follow up: approved by the {a['title'].lower()}, {a['name']}, for {money(o['total'])}, "
                     f"{money(o['total'] - a['limit'])} above the limit of {money(a['limit'])}, on {o['date']}. Ask why "
                     "the order was not sent to an approver with enough authority.")
@@ -694,15 +694,17 @@ def ex8_1(b: ExerciseBuild) -> None:
            f"remain, so a further {money(f['topup'])} (Dr 6170, Cr 1030) restores it."
            if current else ""),
         "The credit loss standard (FASB, 2016; ASC 326-20) accepts an aging schedule as a method of estimating expected "
-        "credit losses, and it requires the estimate to reflect the risk of loss even when it is remote. The rates must "
-        "start from "
+        "credit losses, and it requires the estimate to reflect the risk of loss even when it is remote. It requires no "
+        "estimate only where the adjusted information gives an expectation of no nonpayment, which the absence of "
+        "write-offs does not show. The rates must start from "
         "historical loss experience for each bucket and then be adjusted for current conditions and reasonable and "
         "supportable forecasts (the standard's illustration of an aging schedule does exactly that). The data hold no "
         "write-off history, so the proposed rates are not Charles River's own experience: document their source, then "
         "raise "
         "them if customers' industries or the economy weaken, or if forecast conditions are worse than the period the "
         "rates come from, and lower them only with evidence. The adjustment is a judgment the controller documents and "
-        "revisits every reporting date."])
+        "revisits every reporting date. The newer practical expedient for current receivables (FASB, 2025), which would "
+        "hold the year-end conditions constant, is not elected in this answer, as the exercise assumes."])
 
     # (5) the memo.
     pct_ar = f["loss"] / f["total"]
@@ -846,7 +848,8 @@ def ex8_2(b: ExerciseBuild) -> None:
               "date, with no supplier invoices behind it. No payment has ever been applied to it (every payment pays "
               f"an invoice). The same entry debited cash with exactly {money(f['cash'])}, a coincidence worth a "
               "question. Unsupported, like the opening receivables of Tutorial 8.2.",
-              "The ledger, unless the conversion-date supplier detail supports it")]
+              "Unresolved until the conversion records are seen: restore the invoice detail if the liability is "
+              "valid, and correct the ledger only if the balance is shown to be wrong")]
     for j in f["reclass"]:
         items.append((j, "Add: invoice reclassified to notes payable, still open in the detail",
                       f"{j['kind']} entry: the note-financed capital invoice {j['invoice']['number']} "
@@ -909,10 +912,11 @@ def ex8_2(b: ExerciseBuild) -> None:
         "cash with exactly the same amount is a coincidence that adds to the question.",
         "Debt reclassifications (" + "; ".join(
             f"{j['voucher']}, {money(j['invoice']['total'])}, invoice {j['invoice']['number']}" for j in cap)
-        + f"): each moved a note-financed capital invoice from 2010 to 2110 Notes Payable. The ledger is right; the "
-        "invoice detail is not, because no supplier payment will ever close these invoices. The correction belongs in "
-        "the invoice detail: close them, or mark them settled by the note, so the open-invoice list stops overstating "
-        "what Charles River owes its suppliers.",
+        + f"): each moved a note-financed capital invoice from 2010 to 2110 Notes Payable. The ledger records the "
+        "reclassification, which the note agreements should support, and the invoice detail does not, because no "
+        "supplier payment will ever close these invoices. Once the agreements are seen, the correction belongs in the "
+        "invoice detail: close the invoices, or mark them settled by the note, so the open-invoice list stops "
+        "overstating what Charles River owes its suppliers.",
         "Purchase orders: " + "; ".join(
             f"{j['po']['number']} ({money(j['po']['total'])}, {j['po']['date']})" for j in cap)
         + f", both created and approved by {approver['name']}, the {approver['title'].lower()}, whose approval limit "
@@ -924,8 +928,9 @@ def ex8_2(b: ExerciseBuild) -> None:
         f"{money(f['balance'] - f['open_total'])}, explained by three journal entries: the unsupported opening balance "
         f"(+{money(opening['amount'])}) and the two note-financed invoices that remain open in the detail "
         f"(-{money(sum(j['invoice']['total'] for j in cap))}). Unexplained difference: none. Conclusion: the "
-        "reclassifications are explained and need a fix in the invoice detail; the opening balance is unsupported "
-        "and goes to the audit committee with the receivables finding."])
+        "reclassifications are explained by recorded entries, to be supported by the note agreements, and need a fix "
+        "in the invoice detail. The opening balance is unsupported, its correction unresolved until the conversion "
+        "records are seen, and it goes to the audit committee with the receivables finding."])
 
     t = "8.2"
     b.check(t, "open supplier invoices (Ex 8.2!B6)", len(f["open"]), "='Ex 8.2'!B6", 0, COUNT)
@@ -1086,8 +1091,9 @@ def ex8_3(b: ExerciseBuild) -> None:
         "the balance falls. (2) Make the system block or route for approval any order that would take a customer over "
         f"its limit, since {word(len(over))} exceed theirs with no approved exception recorded in the data. (3) Focus "
         "collection effort on the "
-        f"past-due balances of the {by_rate[0][0]} and {by_rate[1][0]} customers. (4) Watch the largest balances, which are not dangerously "
-        "concentrated today but would hurt most if a large customer failed."])
+        f"past-due balances of the {by_rate[0][0]} and {by_rate[1][0]} customers. (4) Watch the largest balances. "
+        "Compare their shares with the risk the company is willing to take on one customer, since they would hurt most "
+        "if a large customer failed."])
 
     t = "8.3"
     b.check(t, "customers with an open balance (rows of the PivotTable)", f["customers"], f"='Ex 8.3'!K{c0 + 1}", 0,
@@ -1230,10 +1236,11 @@ def ex8_4(b: ExerciseBuild) -> None:
         f"Concentration. Charles River paid {money(f['total'])} to {f['suppliers']} suppliers in {f['n']:,} payments. "
         f"Spending is not concentrated in dollars: {marks[0.5]} suppliers make up half of it, {marks[0.8]} make up 80 percent, and "
         f"{marks[0.9]} make up 90 percent, and the largest supplier, {f['top']} ({f['top_category']}), receives only "
-        f"{f['top_share']:.2%}. The dependence is on categories rather than on single suppliers: {cats[0][0]} takes "
-        f"{cats[0][1] / f['total']:.1%} of the spending and {cats[1][0]} {cats[1][1] / f['total']:.1%}. The dollars put "
-        "little weight on any one supplier, though a low-spend supplier can still be critical, which the dollars do not "
-        f"show; and a disruption in {cats[0][0].lower()} would reach many suppliers at once.",
+        f"{f['top_share']:.2%}. In dollars, the weight lies in categories rather than in single suppliers. "
+        f"{cats[0][0]} takes {cats[0][1] / f['total']:.1%} of the spending and {cats[1][0]} "
+        f"{cats[1][1] / f['total']:.1%}. The dollars do not measure operational dependence. A low-spend supplier can "
+        f"still be critical, and whether one disruption could reach many {cats[0][0].lower()} suppliers at once depends "
+        "on where they source, which the data do not show.",
         f"Timing. {f['late']:,} payments ({f['late'] / f['n']:.1%}, holding {f['late_value']:.1%} of the value) were made "
         f"after the due date, {f['on']:,} on it, and {f['early']:,} before it. The median payment is {f['median']:.0f} "
         f"days late and the mean {f['mean']:.1f} days; {f['late30']:,} payments were more than 30 days late.",
@@ -1332,7 +1339,7 @@ def ex8_5(b: ExerciseBuild) -> None:
 
     # --- Ex 8.5: purchase orders and supplier invoices ---------------------------------------------------------------
     title(ws, "Exercise 8.5: Testing Purchasing and Payment Controls")
-    for c, w in zip("ABCDEFGHIJKLMN", (18, 12, 14, 20, 20, 22, 12, 13, 12, 11, 15, 10, 90, 20)):
+    for c, w in zip("ABCDEFGHIJKLMN", (18, 12, 14, 20, 20, 22, 12, 13, 12, 11, 15, 10, 90, 30)):
         ws.Columns(c).ColumnWidth = w
     heading(ws, 3, "(1) and (2) Purchase order approvals (POApprovals)")
     put(ws, {"A4": "Purchase orders", "D4": "=ROWS(POApprovals[PONumber])",
@@ -1349,7 +1356,7 @@ def ex8_5(b: ExerciseBuild) -> None:
     ws.Cells(d0, 1).Font.Italic = True
     cols = ["PONumber", "OrderDate", "OrderTotal", "CreatorName", "ApproverName", "ApproverTitle", "ApproverLimit",
             "ApproverTerminationDate", "SelfApproved", "AboveLimit", "AfterTermination", "RiskScore"]
-    header(ws, d0 + 1, 1, cols + ["Disposition", "Design or operation"])
+    header(ws, d0 + 1, 1, cols + ["Disposition", "Provisional classification"])
     pick = ",".join(f'IF(POApprovals[{c}]="","",POApprovals[{c}])' if c == "ApproverTerminationDate"
                     else f"POApprovals[{c}]" for c in cols)
     anchor = f"A{d0 + 2}"
@@ -1398,16 +1405,18 @@ def ex8_5(b: ExerciseBuild) -> None:
         within = all(o["total"] <= a["limit"] for o in invs)
         cap = all(o["id"] in {j["invoice_id"] for j in fx.ex2["reclass"]} for o in invs)
         if a["limit"] == 0:
-            role_text[t_] = (f"No. {audit.article(t_.lower()).capitalize()} in {a['family']} has no purchasing or "
-                             "accounting role and no approval authority (limit $0); the invoices need a proper "
-                             "approval after the fact.")
+            role_text[t_] = (f"Not on the records. {audit.article(t_.lower()).capitalize()} in {a['family']} has no "
+                             "recorded purchasing or accounting role and a recorded limit of $0. Request the delegation "
+                             "policy, and an authorized approval of the invoices after the fact if the policy gives the "
+                             "role none.")
         elif within and a["family"] not in ("Purchasing and Procurement", "Finance and Accounting"):
-            role_text[t_] = (f"No. The amounts are within the {money(a['limit'])} limit, but {audit.article(t_.lower())} "
-                             f"in {a['family']} is outside purchasing and accounting: operations staff can confirm "
-                             "receipt, not approve payment.")
+            role_text[t_] = (f"Not without the policy. The amounts are within the {money(a['limit'])} limit, but "
+                             f"{audit.article(t_.lower())} in {a['family']} is outside purchasing and accounting. "
+                             "Operations staff usually confirm receipt, so request the policy that says who may approve "
+                             "supplier invoices.")
         elif above and cap:
             role_text[t_] = (f"No, not for these. The {t_.lower()} also created and approved their purchase orders "
-                             f"(Exercise 8.2), so approving the invoices removes the last independent check, and both "
+                             f"(Exercise 8.2), so the records show no independent check of the invoices, and both "
                              f"are far above the {money(a['limit'])} limit.")
         else:
             raise AssertionError(f"no role assessment fits the approver {a['name']} ({t_})")
@@ -1535,7 +1544,9 @@ def ex8_5(b: ExerciseBuild) -> None:
         + series(f"the {fx.staff[k]['title'].lower()} ({n:,})" for k, n in req_approvers)
         + (", all with limits well above $5,000" if limits_above else "")
         + ". Amounts clustered just under a threshold, runs of identical consecutive requisitions, and requisitions "
-        "converted to orders without any approval are the signs of a purchase split to stay below a review level. "
+        "converted to orders without any approval are consistent with a purchase split to stay below a review level, "
+        "but the requisitions' own approvers have higher limits, so the threshold that governs requisitions has to be "
+        "confirmed before the pattern is called a split. "
         "Follow up: ask whether requisitions under $5,000 are treated as needing no approval, obtain the purchase "
         f"orders behind the {word(len(unapproved))} unapproved requisitions and the needs behind each run, and require an approval before "
         "any requisition becomes an order (a design fix)."])
@@ -1619,11 +1630,12 @@ def ex8_5(b: ExerciseBuild) -> None:
         "production supervisor outside the purchasing and accounting roles, and the purchasing manager, on the two "
         f"capital invoices. The requisitions cluster just below $5,000, with {word(f['unapproved'])} converted to orders "
         "without approval.",
-        "Design or operation. The records point to a weak design: they hold approvals by the person who created "
-        "the document, by someone whose limit is $0 or below the amount, and under the ID of a terminated employee, "
-        "and requisitions converted to orders without an approval, so no control in the data stopped them. The limits "
-        "in the Employee table were not applied to these documents. Operation failed too: managers approved above their "
-        "limits. Whether each control was absent, bypassed, or misconfigured takes the approval policy, the system's "
+        "Design or operation. The records are consistent with a weak design. They hold approvals by the person who "
+        "created the document, by someone whose limit is $0 or below the amount, and under the ID of a terminated "
+        "employee, and requisitions converted to orders without an approval, and nothing in the data stopped them. The "
+        "limits in the Employee table were not applied to these documents. Where a control existed, its operation may "
+        "have failed too, since managers approved above their limits. Whether each control was absent, bypassed, or "
+        "misconfigured takes the approval policy, the system's "
         "configuration, and the access logs, so the classification is provisional until they are seen; if the design "
         "let the exceptions through, fixing it matters more than retraining.",
         f"Clean results. The near-duplicate test flags {f['same']} payments in {f['pairs']} pairs of the same supplier "
@@ -1917,10 +1929,11 @@ def ex8_6(b: ExerciseBuild) -> None:
         f"dates cite them ({money(f['after_total'])} of order value, not a loss): " + "; ".join(
             f"list {x['id']}: " + ", ".join(f"{f['grid'][(x['id'], y)]:,} in {y}" for y in years if f["grid"][(x["id"], y)])
             for x in fl)
-        + f". Nothing in the records stops an order line from citing an expired list. Lists "
+        + f". The records show no check that stops an order line from citing an expired list. Lists "
         f"{series(x['id'] for x in unused)} are "
-        "Active copies of the Design Trade list, with no lines, that price nothing: clutter that makes it harder to see "
-        "which list is in force."])
+        "Active copies of the Design Trade list, with no lines, that price nothing. Their intended purpose is the first "
+        "question, because unused records alone do not prove a deficiency, but they make it harder to see which list is "
+        "in force."])
 
     # --- the classification (6) and the memo (7), on Ex 8.6 -------------------------------------------------------------
     pt_rows = f["flagged"]
@@ -1935,27 +1948,35 @@ def ex8_6(b: ExerciseBuild) -> None:
     ordered_in = " and ".join(month_names[m - 1] for m in months)
     list_ids = series(x["id"] for x in fl)
     k0 = o_last + 4
-    heading(ws, k0, f"{MA}, requirement (6): design or operation")
+    same = [p for p in pt_rows if p["end"] == p["start"]]
+    heading(ws, k0, f"{MA}, requirement (6): design or operation, provisional until the system's configuration, the "
+                    "approval history and the pricing policy are seen")
     header(ws, k0 + 1, 1, ["Exception", "", "", "Design", "Operation", "Why"])
     classes = [
         (f"Promotions {series(p['id'] for p in pt_rows)}: end dates on or before their start dates",
-         "Yes", "Yes",
+         "Possibly", "Possibly",
          "The promotions were recorded, and approved by the sales manager on their start dates, with an end date "
-         "that is not after the start date (design: nothing in the records validates the dates); their discount was "
-         f"then granted on every collection line ordered in {ordered_in} (operation)."),
+         "that is not after the start date. The records show no date check (a possible design weakness), and the "
+         f"discount was then granted on every collection line ordered in {ordered_in} (a possible failure of operation)."
+         + (f" Promotion {series(p['id'] for p in same)} ends on its start date, as a one-day promotion would, so only "
+            "the date policy can make that record invalid." if same else "")),
         (f"{word(n_req, True)} pending override requests, billed at their ApprovedUnitPrice on "
-         f"{len(pend)} invoice lines", "Yes", "Yes",
+         f"{len(pend)} invoice lines", "Possibly", "Possibly",
          "Order lines carry the price of an override that is still Pending, under a price-list PricingMethod and "
-         "with no PriceOverrideApprovalID (design: nothing in the records links a price to an approved request); the "
-         "requests were never approved or rejected (operation)."),
-        (f"Expired price lists {list_ids} cited by {f['after']:,} order lines after their end dates", "Yes", "Yes",
-         "Order lines cite expired lists, and one list ends before it starts (design: no date check in the "
-         "records); the segment lists were not renewed or replaced (operation)."),
-        (f"Lists {series(x['id'] for x in unused)}: Active copies with no lines", "Yes", "",
-         "Duplicate master data that nothing uses: a weakness in how price lists are set up and retired."),
-        (f"Customer {own[0]['customer']}'s lines citing list {cited['id']}", "Yes", "",
-         "The price is right, but the record names the wrong list: nothing in the records checks that the cited "
-         "list set the price."),
+         "with no PriceOverrideApprovalID. The records show no link from a price to an approved request (a possible "
+         "design weakness), and the requests are Pending with blank approval fields in this extract (a possible "
+         "failure of operation)."),
+        (f"Expired price lists {list_ids} cited by {f['after']:,} order lines after their end dates", "Possibly",
+         "Possibly",
+         "Order lines cite expired lists, and one list ends before it starts. The records show no date check (a "
+         "possible design weakness), and the extract holds no successor to the segment lists (a possible failure of "
+         "operation)."),
+        (f"Lists {series(x['id'] for x in unused)}: Active copies with no lines", "Possibly", "",
+         "Duplicate master data that nothing uses, a possible weakness in how price lists are set up and retired. "
+         "Their intended purpose is the first question, because unused records alone do not prove a deficiency."),
+        (f"Customer {own[0]['customer']}'s lines citing list {cited['id']}", "Possibly", "",
+         "The price matches the customer's own list, but the record names another list. The records show no check "
+         "that the cited list set the price, a possible design weakness that the configuration would confirm."),
     ]
     width = sum(ws.Columns(c).ColumnWidth for c in "FGHIJ")
     for k, (exc, design, op, why) in enumerate(classes):
@@ -1972,7 +1993,8 @@ def ex8_6(b: ExerciseBuild) -> None:
         f"Promotions. Promotions {series(p['id'] for p in pt_rows)}, the {pt_rows[0]['pct']:.0%} collection "
         "promotions of each spring, were entered with end dates on or before their start dates and approved that way. "
         f"All {lines_total} of their invoice lines ({money(disc_total)} of discount) were ordered outside the recorded "
-        f"dates, in {ordered_in}. The discounts were probably intended, but no valid record authorizes them.",
+        f"dates, in {ordered_in}. The discounts may have been intended, but the recorded dates do not authorize them, "
+        "so the approved campaign terms are the evidence to request.",
         f"Override requests. {word(n_req, True)} price override requests are still Pending, yet their order "
         f"lines were billed at the pending ApprovedUnitPrice on {word(len(pend))} invoice lines, "
         f"{money(below)} below the reference prices, under a price-list pricing method with no approval recorded.",
@@ -1982,11 +2004,13 @@ def ex8_6(b: ExerciseBuild) -> None:
         + (f"; {word(len(backwards))} of them ends before it starts" if backwards else "")
         + f". {word(len(unused), True)} Active copies of the Design Trade list are unused. Customer "
         f"{own[0]['customer']}'s contract prices were recorded as if they came from the {cited['segment']} segment list.",
-        "Recommendations. Reject promotions and price lists whose end date is not after the start date; block "
+        "Recommendations. Reject promotions and price lists whose end date is before the start date, and define "
+        "whether a promotion may last one day; block "
         "pricing from expired lists, and renew or retire the segment lists; allow an override price only after the "
         "request is approved, and link the approval to the line; remove the unused copies; and review the promotion "
-        "and price-list setups each year before they take effect. Most exceptions point to design weaknesses: nothing "
-        "in the records stopped them, so the fixes likely belong in the system, with a periodic review as the "
+        "and price-list setups each year before they take effect. Most exceptions are consistent with design "
+        "weaknesses, since nothing in the records stopped them, so the fixes may belong in the system, with a periodic "
+        "review as the "
         "detective control; the classification is provisional until the system's configuration and the pricing policy "
         "are seen."])
 

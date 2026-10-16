@@ -31,7 +31,7 @@ The last three cover reviewing exceptions over time, testing a report before rel
 - So: build a monitoring report, and test both reports before relying on them
 
 ::: {.notes}
-You are back on the internal audit team of Chapters 8 and 12. Those tests found entries approved by their creators, orders approved after the approver had left, and pay approved by the employee being paid. The committee wants to know every month whether such exceptions recur, rather than wait for the next annual review. How a report is published and shared is the subject of the appendix on publishing and security.
+You are back on the internal audit team of Chapters 8 and 12. Those tests found entries approved by their creators, orders dated after their approver had left, and pay approved by the employee being paid. The committee wants to know every month whether such exceptions recur, rather than wait for the next annual review. How a report is published and shared is the subject of the appendix on publishing and security.
 :::
 
 # From Audit Tests to Monitoring
@@ -44,7 +44,7 @@ You are back on the internal audit team of Chapters 8 and 12. Those tests found 
 - So the results can be compared over time
 
 ::: {.notes}
-Vasarhelyi and Halper described one of the first such systems, for the internal auditors of AT&T Bell Laboratories: it measured key figures of large systems, compared them with standards, and called the auditors' attention to problems as they arose. Two decades later, Alles and colleagues found continuous auditing had moved from research into practice in many firms.
+Vasarhelyi and Halper described one of the first such systems, for the internal auditors of AT&T Bell Laboratories: it measured key figures of large systems, compared them with standards, and called the auditors' attention to problems as they arose. Two decades later, the adoption survey and the pilot implementations at two firms that Alles and colleagues describe showed continuous auditing moving from research into practice.
 :::
 
 ## Continuous auditing and continuous monitoring
@@ -146,7 +146,7 @@ The flags of a document add up to its risk score, as Chapter 8's flag formulas d
 - They are also what the auditor reconciles before relying on the tests
 
 ::: {.notes}
-A measure divides the exceptions of each test by the documents of its process. If the journal entries in the model do not add up to the journal entry postings in the ledger, the monitoring is testing an incomplete population.
+A measure divides the exceptions of each test by the documents of its process. If the journal entries in the model do not add up to the journal entry postings in the ledger, records may be missing or duplicated, values wrong, or the two sides drawn on different scopes, and the difference is reconciled before anyone relies on the tests.
 :::
 
 ## From flags to the register in Power Query
@@ -250,7 +250,7 @@ A monitoring page answers three questions in order: which tests are failing, whe
 
 ## A January cluster, and a row in every month
 
-- Most entry and order exceptions fall in January, in every year
+- Taken together, most entry and order exceptions fall in January
 - A seasonal cluster points to how controls work at that time of year
 - One test recurs every month: registers approved by their own employee
 - A recurring exception points to the design of a control
@@ -263,11 +263,11 @@ January is when the first entries, orders and payrolls of a new year are process
 
 - Journal entries are few, so a handful of exceptions is a high rate
 - Purchase orders run to many thousands, so theirs is a small fraction
-- Rates per thousand documents show whether a process is improving
+- Rates per thousand show how often the tests find exceptions
 - A count alone hides that as volume changes
 
 ::: {.notes}
-Over the three years, the journal entry rate fell and rose again, the purchase order rate fell by about two-thirds while the number of orders more than doubled, and the payroll rate barely moved, held in place by the recurring test. A process's rate adds the exceptions of its tests, so a document that fails two tests counts twice: it counts failed tests per thousand documents, not documents with an exception.
+Over the three years, the journal entry rate fell and rose again, the purchase order rate fell by about two-thirds while the number of orders more than doubled, and the payroll rate barely moved, held in place by the recurring test. A lower rate is not by itself evidence that a control improved. The tests, their coverage and the mix of documents must stay the same, and the causes still need a look. A process's rate adds the exceptions of its tests, so a document that fails two tests counts twice: it counts failed tests per thousand documents, not documents with an exception.
 :::
 
 ## Check your understanding {.check}
@@ -291,7 +291,7 @@ Ask students which of the four calls for a change to a control rather than a loo
 4. Check the rate before the count
 
 ::: {.notes}
-The December cell holds the year-end closing entries, which exceed every approver's limit, the policy gap Chapter 8 noted.
+The December cell holds the year-end closing entries, which exceed every approver's limit. They are expected in size, though Chapter 8 asked for the closing-entry policy and the limits that applied before calling them a gap in the policy or a failure to follow it.
 :::
 
 # Guided Tutorial 16.2: The Exception Register and the Monitoring Page
@@ -301,7 +301,7 @@ The December cell holds the year-end closing entries, which exceed every approve
 {{< book-steps 16.2 1-7 >}}
 
 ::: {.notes}
-A comparison with null returns null in Power Query, not false, so the termination flags check that a date exists first. The payroll test of termination compares the end of the pay period, not the pay date, so a final paycheck for work done before the employee left is not flagged. Because Append matches columns by name, the renaming of Step 6 is what puts each process's dates under EventDate.
+A relational comparison such as greater than returns null in Power Query when a side is null, so the termination flags first check, with a test that returns true or false, that a date exists. PurchaseOrder records no approval date, so the order date stands in for it, and only the approval log and the employment records can show when the approval was given. The payroll test compares the end of the pay period, not the pay date, so a period that ended before the employee left is not flagged only because it was paid later. A period that straddles the departure is still flagged and can hold wages earned before it. Because Append matches columns by name, the renaming of Step 6 is what puts each process's dates under EventDate.
 :::
 
 ## Steps 8 to 14: measure, map and test the register
@@ -351,7 +351,7 @@ The journal entry tests have the highest rates, because the population is small.
 {{< book-figure fig-16-06 crop="0,0,1,0.7704" >}}
 
 ::: {.notes}
-Drilling through from the January cell of orders approved after termination shows orders approved by an account executive whose employment had ended long before. Drill-through passes both the row and the column of the cell, so the page shows that test's exceptions of January only.
+Drilling through from the January cell of orders dated after termination shows orders that name as approver an account executive whose employment had ended long before. Drill-through passes both the row and the column of the cell, so the page shows that test's exceptions of January only, and the detail should list as many documents as the cell counts.
 :::
 
 ## Checkpoint
@@ -383,7 +383,7 @@ Chapter 8 kept its dispositions on a worksheet of pasted values for the same rea
 - Scores can learn from what past investigations found
 
 ::: {.notes}
-Li and colleagues note that the volume of exceptions can overwhelm an internal audit department, and Alles and colleagues found that preventing such alarm floods was critical at Siemens. Li and colleagues proposed suspicion scores from the rules each exception fails, updated as investigations show which were errors or fraud. Chapter 8's risk score is the simple version.
+Li and colleagues note that the volume of exceptions can overwhelm an internal audit department, and Alles and colleagues found that preventing such alarm floods was critical at Siemens. Li and colleagues proposed suspicion scores from the rules each exception fails, updated as investigations show which were errors or fraud. Chapter 8's risk score is a simpler first cue, not the score they tested, and a reviewer still weighs amount, age and urgency, so a serious single failure can come first.
 :::
 
 ## Two kinds of exception are not reviewed one by one
@@ -414,7 +414,7 @@ Ask students which two should not be reviewed document by document.
 
 1. Explained once with evidence, then checked as it recurs
 2. One design finding, reported once
-3. First, because it fails the most tests
+3. First, other things equal, since it fails the most tests
 4. Before the exceptions already explained
 
 ::: {.notes}
@@ -446,11 +446,11 @@ Charles River numbers its purchase orders in one series across the years, as Exe
 
 - A report shows the data of its last refresh
 - Entries and orders run to the last day of the year
-- The last payroll was paid earlier, because the last periods are open
-- So a page should state the date through which every test has run
+- Payroll's last pay date comes earlier, with later work in open periods
+- So a page states the latest date that every population reaches
 
 ::: {.notes}
-A December page that shows no payroll exceptions after the last payday has not tested those days at all. A measure that returns the earliest of the populations' last dates, shown on the page, states the date through which every test has run, as the package's About page states its period. It bounds what the tests can have seen; it does not show that a refresh succeeded or that nothing is missing before it.
+No pay period has a later pay date in December. The work of the rest of the month belongs to the two periods marked Open in the data, scheduled to pay in January 2027, so no payroll test has yet seen it. A measure that returns the earliest of the populations' last dates, shown on the page, states the latest date that every population reaches, as the package's About page states its period. It is a bound observed in the extract, not proof that a refresh succeeded or that nothing is missing before it, and payroll's completeness takes a reconciliation of the periods and registers expected with those recorded.
 :::
 
 ## Change control: a project shows every change
@@ -464,15 +464,15 @@ A December page that shows no payroll exceptions after the last payday has not t
 A report that managers act on every month is a system and deserves the change controls auditors expect of any system. Teams that keep reports as projects often review each change on a Git branch as a list of changed lines before it is merged and published; an auditor testing change control asks for that history. Sensitivity labels are not supported in projects, a tradeoff the appendix describes.
 :::
 
-## Watch out: a copy of a .pbix escapes every control {.watch-out}
+## Watch out: an uncontrolled .pbix copy escapes control {.watch-out}
 
 - A copy of an import model holds every row, whatever its pages show
 - Its data stop at the date of the copy
 - Its measures can drift from the version readers use
-- Treat the controlled report as the only version; ask who holds copies
+- Keep one authoritative version, and approve and record any copy
 
 ::: {.notes}
-Whoever opens a copy in Power BI Desktop sees everything. Control totals are evidence only if they are rerun, tests only if the report they test is the one readers use, and documentation only if it states how current the data are.
+Whoever opens an uncontrolled copy in Power BI Desktop can read all its imported data, so a project's folders need the same protection as the file. When you audit a report, ask who holds copies. Control totals are evidence only if they are rerun, tests only if the report they test is the one readers use, and documentation only if it states how current the data are.
 :::
 
 ## Check your understanding {.check}
@@ -506,7 +506,7 @@ A test that passed last month cannot answer the second for a measure changed sin
 {{< book-steps 16.3 >}}
 
 ::: {.notes}
-The first review records three dispositions: the year-end closes are expected; the orders and registers of the employee who had left are deficiencies to report; and the payments made before their registers were approved need a question for payroll. Open Exceptions counts the exceptions not yet reviewed, those with no disposition, and Test 3 shows that every disposition found exactly one exception; the follow-ups and deficiencies, though reviewed, still await action. Step 8 reruns the package's tests and closes it without saving: internal audit tests the package but does not change it.
+The first review records three dispositions. The year-end closes are expected in size, with the closing-entry policy still to obtain. The orders and registers of the employee who had left are deficiencies to report, on the tutorial's assumption that the reviewer examined the approval log, the employment records and the earnings, since the flags alone would support only a follow-up. The payments made before their registers were approved need a question for payroll. Open Exceptions counts the exceptions not yet reviewed, those with no disposition, and Test 3 shows that every disposition found exactly one exception; the follow-ups and deficiencies, though reviewed, still await action. Step 8 reruns the package's tests and closes it without saving: internal audit tests the package but does not change it.
 :::
 
 ## Most open exceptions are one design finding
@@ -522,7 +522,7 @@ Most open exceptions belong to the registers approved by the employee they pay, 
 {{< book-figure fig-16-07 crop="0.4797,0.0215,0.4681,0.6172" >}}
 
 ::: {.notes}
-At the top is the opening balance entry, which failed four tests; the other entries are the five keyed on the first Saturday of a new year and the two debt reclassifications. The orders outlined with dashes were reviewed for one of their two tests and are still open for the other: a disposition belongs to an exception, not to a document. The list continues with the remaining orders, among them the third approved after the approver had left and the two capital orders the purchasing manager approved alone.
+At the top is the opening balance entry, which failed four tests; the other entries are the five keyed on the first Saturday of a new year and the two debt reclassifications. The orders outlined with dashes were reviewed for one of their two tests and are still open for the other: a disposition belongs to an exception, not to a document. The list continues with the remaining orders, among them the third dated after its approver had left and the two capital orders the purchasing manager approved alone.
 :::
 
 ## Test 4 checks the numbers and the payment records
@@ -555,10 +555,10 @@ MINX (
 )
 ```
 
-- The earliest of the three last dates: here, the last payday
+- The earliest of the three last dates, here the last payday
 
 ::: {.notes}
-The braces build a one-column table of the three last dates, whose column DAX names Value, and MINX returns the earliest. The card shows a date in mid-December: the December column of the heat map covers the whole month for two processes and only part of it for the third, and the card says so on the page the reviewer reads. Step 7c keeps a click on a cell or an approver from changing it, and MINX skips a blank, so an empty population is caught by the counts of Tests 1 and 4, not by the card.
+The braces build a one-column table of the three last dates, whose column DAX names Value, and MINX returns the earliest. The card shows a date in mid-December, the last pay date of a payroll register. No pay period has a later pay date in December, and the rest of the month's work is in the open periods, so the card is a bound observed in the extract, not proof that payroll is complete or that the refresh ran. Step 7c keeps a click on a cell or an approver from changing it, and MINX skips a blank, so an empty population is caught by the counts of Tests 1 and 4, not by the card.
 :::
 
 ## Checkpoint

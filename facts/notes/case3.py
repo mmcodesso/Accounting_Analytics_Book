@@ -7,13 +7,10 @@ test H9), and the plant's entries are the time clock entries of the hourly manuf
 records follow the work date and end before the fiscal year does, so output is counted up to the last day with
 time records wherever it is compared with hours. The plan year is d.N; the statements to close are d.C's.
 
-One note is not registered, because its comment states a value the data do not give; its context function
-renders the corrected text, so register it once the comment is fixed:
-- r4 gives the overhead applied at 19.12 per standard hour as 1,317,582; the standard variable and fixed
-  overhead of the fiscal 2026 completions is 1,317,562.72 (1,317,563), the released conversion cost less its
-  standard labor gives 1,317,563.31 too. Its overhead of the plan, 1,902,775, is 1,902,775.50 (salaried staff
-  with the 14.14% burden, factory overhead, and depreciation, the same overhead its conversion costs use), which
-  rounds to 1,902,776; the comment truncates.
+Every note of the case is registered. The surge days take test H9's guard (more than one employee, counted by
+EmployeeID), attendance counts people rather than clock rows, the capacity of the ordinary days is measured by
+employee and work date, and minutes against a roster are rounded to whole minutes before any threshold, because
+julianday arithmetic leaves exact hours a fraction of a second off.
 """
 
 from __future__ import annotations
@@ -33,7 +30,7 @@ WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "S
 
 SURGE = ("SurgeDays AS (SELECT tc.WorkDate FROM TimeClockEntry AS tc JOIN Employee AS e ON e.EmployeeID = tc.EmployeeID "
          "JOIN CostCenter AS cc ON cc.CostCenterID = e.CostCenterID WHERE cc.CostCenterName = 'Manufacturing' "
-         "GROUP BY tc.WorkDate HAVING COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1 AND COUNT(*) > 1)")
+         "GROUP BY tc.WorkDate HAVING COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1 AND COUNT(DISTINCT tc.EmployeeID) > 1)")
 PLANT = ("WITH " + SURGE + ", PlantEntries AS (SELECT tc.*, e.BaseHourlyRate, CASE WHEN s.WorkDate IS NULL "
          "THEN 'Ordinary' ELSE 'Surge' END AS DayType FROM TimeClockEntry AS tc JOIN Employee AS e "
          "ON e.EmployeeID = tc.EmployeeID JOIN CostCenter AS cc ON cc.CostCenterID = e.CostCenterID "
@@ -71,8 +68,8 @@ def month_index(day: str) -> int:
 
 
 def day_month(day: str) -> str:
-    """'2026-12-11' -> '11 December'."""
-    return f"{int(day[8:10])} {MONTHS[int(day[5:7]) - 1]}"
+    """'2026-12-11' -> 'December 11'."""
+    return f"{MONTHS[int(day[5:7]) - 1]} {int(day[8:10])}"
 
 
 # --- shared measures ---------------------------------------------------------------------------
@@ -99,6 +96,13 @@ def yearly(d) -> tuple[dict, ...]:
         "SUM(OvertimeHours * BaseHourlyRate) FROM PlantEntries GROUP BY 1, 2")}
     std = {int(y): v for y, v in d.q(f"SELECT substr(pc.CompletionDate, 1, 4), SUM(pcl.QuantityCompleted * i.StandardLaborHoursPerUnit) "
                                      f"{COMPLETIONS} WHERE pc.CompletionDate <= ? GROUP BY 1", last_work(d))}
+    # The ordinary days' capacity by employee and work date: a few employee-days carry two clock entries.
+    for y, t, n, avg, unused in d.q(
+            PLANT + ", EmployeeDays AS (SELECT EmployeeID, WorkDate, DayType, SUM(RegularHours) AS Regular, "
+            "SUM(RegularHours + OvertimeHours) AS Hours FROM PlantEntries GROUP BY 1, 2, 3) "
+            f"SELECT substr(WorkDate, 1, 4), DayType, COUNT(*), AVG(Hours), SUM(CASE WHEN Regular < {STRAIGHT_DAY} "
+            f"THEN {STRAIGHT_DAY} - Regular ELSE 0 END) FROM EmployeeDays GROUP BY 1, 2"):
+        rows[(int(y), t)].update(employee_days=n, per_day=avg, unused_day=unused)
     out = []
     for y in d.years:
         s, o = rows[(y, "Surge")], rows[(y, "Ordinary")]
@@ -131,12 +135,14 @@ def burden(d, year: int) -> float:
 
 @lru_cache(maxsize=None)
 def weeks(d) -> tuple[dict, ...]:
-    """Monday weeks with hours through the week of the last day with time records: hours, standard hours completed,
-    surge days, and the average output of the six weeks that follow (a ROWS frame over these weeks)."""
+    """Monday weeks with hours through the week of the last day with time records: hours, standard hours completed up
+    to that day, surge days, and the average output of up to six weeks that follow (a ROWS frame over these weeks),
+    with the number of weeks the frame holds and whether they are six complete weeks (the last week is partial: its
+    output stops on the last day with time records)."""
     hours = dict(d.q(PLANT + "SELECT date(WorkDate, '-6 days', 'weekday 1'), SUM(RegularHours + OvertimeHours) "
                      "FROM PlantEntries GROUP BY 1"))
     output = dict(d.q(f"SELECT date(pc.CompletionDate, '-6 days', 'weekday 1'), SUM(pcl.QuantityCompleted * "
-                      f"i.StandardLaborHoursPerUnit) {COMPLETIONS} GROUP BY 1"))
+                      f"i.StandardLaborHoursPerUnit) {COMPLETIONS} WHERE pc.CompletionDate <= ? GROUP BY 1", last_work(d)))
     surge = {}
     for day in surge_days(d):
         surge[monday(day)] = surge.get(monday(day), 0) + 1
@@ -144,16 +150,30 @@ def weeks(d) -> tuple[dict, ...]:
     keys = sorted(w for w in hours if w <= end)
     out = []
     for i, w in enumerate(keys):
-        following = [output.get(k, 0.0) for k in keys[i + 1:i + 7]]
+        frame = keys[i + 1:i + 7]
+        following = [output.get(k, 0.0) for k in frame]
         out.append(dict(week=w, hours=hours[w], std=output.get(w, 0.0), surge=surge.get(w, 0),
-                        next=st.mean(following) if following else None))
+                        next=st.mean(following) if following else None, following=len(frame),
+                        complete=len(frame) == 6 and frame[-1] < end))
     return tuple(out)
 
 
 def week_group(rows) -> dict:
     nexts = [r["next"] for r in rows if r["next"] is not None]
+    six = [r["next"] for r in rows if r["complete"]]
     return dict(n=len(rows), hours=st.mean(r["hours"] for r in rows), std=st.mean(r["std"] for r in rows),
-                ratio=sum(r["std"] for r in rows) / sum(r["hours"] for r in rows), next=st.mean(nexts))
+                ratio=sum(r["std"] for r in rows) / sum(r["hours"] for r in rows), next=st.mean(nexts),
+                short=sum(1 for r in rows if r["following"] < 6), n_six=len(six), six=st.mean(six) if six else None)
+
+
+@lru_cache(maxsize=None)
+def last_week_output(d) -> dict:
+    """The completions of the last week dated after the last day with time records, which the weekly output leaves out."""
+    end = last_work(d)
+    n, hours = d.q(f"SELECT COUNT(*), SUM(pcl.QuantityCompleted * i.StandardLaborHoursPerUnit) {COMPLETIONS} "
+                   f"WHERE pc.CompletionDate > ? AND pc.CompletionDate < date(?, '-6 days', 'weekday 1', '+7 days')",
+                   end, end)[0]
+    return dict(lines=n, hours=hours or 0.0)
 
 
 @lru_cache(maxsize=None)
@@ -195,12 +215,12 @@ def working_days(d, first: str, last: str) -> int:
 
 @lru_cache(maxsize=None)
 def completions(d) -> dict:
-    """The current year's completions: standard hours, and their standard labor and overhead."""
-    std, labor, overhead, conversion = d.q(
+    """The current year's completions: standard hours, and their standard labor and overhead (variable and fixed)."""
+    std, labor, variable, fixed, conversion = d.q(
         f"SELECT SUM(pcl.QuantityCompleted * i.StandardLaborHoursPerUnit), SUM(pcl.ExtendedStandardDirectLaborCost), "
-        f"SUM(pcl.ExtendedStandardVariableOverheadCost + pcl.ExtendedStandardFixedOverheadCost), "
+        f"SUM(pcl.ExtendedStandardVariableOverheadCost), SUM(pcl.ExtendedStandardFixedOverheadCost), "
         f"SUM(pcl.ExtendedStandardConversionCost) {COMPLETIONS} WHERE substr(pc.CompletionDate, 1, 4) = ?", str(d.C))[0]
-    return dict(std=std, labor=labor, overhead=overhead, conversion=conversion)
+    return dict(std=std, labor=labor, overhead=variable + fixed, variable=variable, fixed=fixed, conversion=conversion)
 
 
 @lru_cache(maxsize=None)
@@ -308,6 +328,8 @@ def r1(d, claim):
                 "WHERE tc.TimeClockEntryID IS NULL") == 0, "no punch lacks its clock entry")
     claim(d.one("SELECT COUNT(*) FROM (SELECT TimeClockEntryID, PunchType FROM TimeClockPunch GROUP BY 1, 2 "
                 "HAVING COUNT(*) > 1)") == 0, "no clock entry has two punches of one type")
+    per_entry = dict(d.q("SELECT n, COUNT(*) FROM (SELECT TimeClockEntryID, COUNT(*) AS n FROM TimeClockPunch GROUP BY 1) GROUP BY 1"))
+    claim(min(per_entry) == 2 and max(per_entry) == 4, "a clock entry has two to four punches (the case's Watch out)")
     rosters = d.one("SELECT COUNT(*) FROM EmployeeShiftRoster")
     statuses = d.q("SELECT RosterStatus, COUNT(*) FROM EmployeeShiftRoster GROUP BY 1 ORDER BY 2 DESC")
     claim(d.one("SELECT COUNT(*) FROM (SELECT EmployeeID, RosterDate FROM EmployeeShiftRoster GROUP BY 1, 2 "
@@ -358,11 +380,21 @@ def r1(d, claim):
           "the misattributed exceptions name one employee on another single employee's clock entries")
     claim(d.one("SELECT COUNT(*) FROM AttendanceException ae LEFT JOIN TimeClockEntry tc ON tc.TimeClockEntryID = "
                 "ae.TimeClockEntryID WHERE tc.TimeClockEntryID IS NULL") == 0, "every exception has its clock entry")
+    exc_dates = d.one("SELECT COUNT(*) FROM AttendanceException ae JOIN TimeClockEntry tc ON tc.TimeClockEntryID = "
+                      "ae.TimeClockEntryID WHERE ae.WorkDate <> tc.WorkDate")
+    claim(exc_dates == 0, "every exception carries its clock entry's date")
     for kind, keys in (("punch_without_roster", [r[0] for r in detached]), ("missing_clock_out", sorted(no_out))):
         logged = d.anomalies(kind)
         if logged is not None:
             claim(sorted(keys) == logged, f"the {kind} rows are the generator's planted anomalies")
     surge = [(y["year"], y["surge"]["days"], y["surge"]["entries"]) for y in yearly(d)]
+    # The roster behind "every hourly employee": counted against Employee, not only from the clock.
+    plant = d.one("SELECT COUNT(*) FROM Employee e JOIN CostCenter c ON c.CostCenterID = e.CostCenterID "
+                  "WHERE c.CostCenterName = 'Manufacturing' AND e.PayClass = 'Hourly'")
+    people = d.q(PLANT + "SELECT MIN(n), MAX(n), MIN(k), MAX(k) FROM (SELECT WorkDate, COUNT(DISTINCT EmployeeID) AS n, COUNT(*) AS k "
+                 "FROM PlantEntries WHERE DayType = 'Surge' GROUP BY 1)")[0]
+    claim(people == (plant, plant, plant, plant),
+          "on every surge day each of the plant's hourly employees, counted from Employee, has exactly one entry")
     return dict(punches=punches, punch_employees=employees, punch_first=first, punch_last=last, source=sources[0],
                 types=types, missing=word(len(no_out)), missing_employee=owners[0][0],
                 rosters=rosters, statuses=statuses, creators=creators,
@@ -374,7 +406,7 @@ def r1(d, claim):
                 wrong_ids=[r[0] for r in wrong], wrong_named=wrong[0][1], wrong_owner=wrong[0][2],
                 wrong_entries=sorted({r[3] for r in wrong}),
                 surge_days=[n for _, n, _ in surge], surge_entries=[e for _, _, e in surge],
-                surge_total=sum(e for _, _, e in surge))
+                surge_total=sum(e for _, _, e in surge), per_entry=per_entry, exc_dates=exc_dates, plant=plant)
 
 
 # --- Requirement 2 -------------------------------------------------------------------------------
@@ -383,7 +415,7 @@ def r1(d, claim):
 def r2(d, claim):
     days = {t: dict(days=n, employees=emp, all_present=allp, clock_ins=ci, largest=lg, largest_max=lmax, largest_min=lmin)
             for t, n, emp, allp, ci, lg, lmin, lmax in d.q(
-                PLANT + ", Daily AS (SELECT WorkDate, DayType, COUNT(*) AS n, COUNT(DISTINCT ClockInTime) AS ci FROM PlantEntries "
+                PLANT + ", Daily AS (SELECT WorkDate, DayType, COUNT(DISTINCT EmployeeID) AS n, COUNT(DISTINCT ClockInTime) AS ci FROM PlantEntries "
                 "GROUP BY 1, 2), Groups AS (SELECT WorkDate, MAX(k) AS L FROM (SELECT WorkDate, COUNT(*) OVER (PARTITION BY "
                 "WorkDate, ClockInTime) AS k FROM PlantEntries) GROUP BY 1) "
                 "SELECT DayType, COUNT(*), AVG(n), SUM(n = (SELECT COUNT(DISTINCT e.EmployeeID) FROM Employee e JOIN CostCenter c "
@@ -452,9 +484,11 @@ def r2(d, claim):
     approved = d.one(PLANT + "SELECT COUNT(*) FROM PlantEntries pe JOIN OvertimeApproval oa ON oa.OvertimeApprovalID = "
                      "pe.OvertimeApprovalID WHERE pe.DayType = 'Surge' AND oa.Status = 'Approved'")
     claim(approved == meals["Surge"][0], "every surge entry's overtime is approved")
-    beyond = d.one(PLANT + "SELECT COUNT(*) FROM PlantEntries pe JOIN EmployeeShiftRoster r ON r.EmployeeShiftRosterID = "
-                   "pe.EmployeeShiftRosterID WHERE pe.DayType = 'Ordinary' AND (julianday(pe.ClockOutTime) - "
-                   "julianday(r.RosterDate || ' ' || r.ScheduledEndTime)) * 1440 > ?", threshold)
+    # Minutes rounded to whole minutes first: julianday leaves an exact two hours a fraction of a second either side.
+    beyond, beyond_raw = d.q(PLANT + "SELECT SUM(ROUND((julianday(pe.ClockOutTime) - julianday(r.RosterDate || ' ' || "
+                             "r.ScheduledEndTime)) * 1440) > ?), SUM((julianday(pe.ClockOutTime) - julianday(r.RosterDate || ' ' "
+                             "|| r.ScheduledEndTime)) * 1440 > ?) FROM PlantEntries pe JOIN EmployeeShiftRoster r ON "
+                             "r.EmployeeShiftRosterID = pe.EmployeeShiftRosterID WHERE pe.DayType = 'Ordinary'", threshold, threshold)[0]
     n_exc, open_exc, reviewed, first = d.q("SELECT COUNT(*), SUM(Status = 'Open'), COUNT(ReviewedByEmployeeID), MIN(WorkDate) "
                                            "FROM AttendanceException")[0]
     claim(open_exc == n_exc and reviewed == 0, "all exceptions are Open and none was reviewed")
@@ -482,7 +516,23 @@ def r2(d, claim):
         "LEFT JOIN Weeks USING (W) WHERE Load.W <= ? GROUP BY 1, 2", through)}
     claim(all(v < 1 for v in load.values()), "no group of weeks was planned above its available hours")
     claim(all(load[(y, True)] < load[(y, False)] + 0.05 for y in d.years),
-          "each year, surge weeks were planned no more heavily than other weeks, give or take a few points (not planned overloads)")
+          "each year, surge weeks were planned no more heavily than other weeks on average, give or take a few points")
+    # The weeks and work-center weeks planned above capacity: an average below capacity does not rule them out.
+    centers = ("WITH " + SURGE + ", Weeks AS (SELECT date(WorkDate, '-6 days', 'weekday 1') AS W FROM SurgeDays GROUP BY 1), "
+               "Centers AS (SELECT BucketWeekStartDate AS W, WorkCenterID, SUM(PlannedLoadHours) AS L, MAX(AvailableHours) AS A "
+               "FROM RoughCutCapacityPlan WHERE BucketWeekStartDate <= ? GROUP BY 1, 2) ")
+    over_weeks = d.q(centers + "SELECT c.W, SUM(c.L) / SUM(c.A) FROM Centers c JOIN Weeks USING (W) GROUP BY 1 "
+                     "HAVING SUM(c.L) > SUM(c.A) ORDER BY 1", through)
+    over_counts = {bool(sw): (n, over, cw, cwk) for sw, n, over, cw, cwk in d.q(
+        centers + ", ByWeek AS (SELECT W, SUM(L) AS L, SUM(A) AS A, SUM(L > A) AS CentersOver FROM Centers GROUP BY 1) "
+        "SELECT Weeks.W IS NOT NULL, COUNT(*), SUM(b.L > b.A), SUM(b.CentersOver), SUM(b.CentersOver > 0) FROM ByWeek b "
+        "LEFT JOIN Weeks USING (W) GROUP BY 1", through)}
+    worst = d.q(centers + "SELECT c.W, w.WorkCenterName, c.L / c.A FROM Centers c JOIN Weeks USING (W) JOIN WorkCenter w "
+                "ON w.WorkCenterID = c.WorkCenterID WHERE c.L > c.A ORDER BY 3 DESC LIMIT 1", through)
+    s_n, s_over, s_cw, s_cwk = over_counts[True]
+    o_n, o_over, o_cw, o_cwk = over_counts[False]
+    claim(0 < s_over < s_n / 4, "a few surge weeks, not most, were planned above the plant's capacity")
+    claim(s_over / s_n <= o_over / o_n, "weeks planned above capacity are no more common among surge weeks than among the others")
     reasons = d.q(PLANT + "SELECT oa.ReasonCode, COUNT(*), COUNT(DISTINCT oa.ApprovedByEmployeeID), MIN(oa.ApprovedByEmployeeID) "
                   "FROM PlantEntries pe JOIN OvertimeApproval oa ON oa.OvertimeApprovalID = pe.OvertimeApprovalID "
                   "WHERE pe.DayType = 'Surge' GROUP BY 1")
@@ -514,6 +564,10 @@ def r2(d, claim):
                 exceptions=n_exc, years=word(d.N - int(first[:4])), n_pwac=word(len(pwac)), wrong=word(wrong),
                 maintenance=maintenance, reduced=reduced, through=through,
                 load=[(load[(y, True)], load[(y, False)]) for y in d.years],
+                over_weeks=[(w, v) for w, v in over_weeks], surge_weeks=s_n, other_weeks=o_n, other_over=o_over,
+                center_over=s_cw, center_over_weeks=s_cwk, other_center_over=o_cw,
+                worst=dict(week=worst[0][0], center=worst[0][1].replace(" Work Center", ""), share=worst[0][2]),
+                beyond_raw=beyond_raw,
                 n_reasons=word(len(reasons)), per_reason=reasons[0][1], cite=cite,
                 weekdays=[(WEEKDAYS[k], weekdays.get(k, 0)) for k in range(1, 6)], late_week=late_week)
 
@@ -539,12 +593,20 @@ def r3(d, claim):
     later = week_group([w for w in weeks(d) if w["week"] >= since and not w["surge"]])
     claim(some["std"] > none["std"], "surge weeks complete more")
     claim(some["next"] < none["next"], "the weeks after surge weeks complete less")
+    claim(some["n_six"] and none["n_six"] and some["six"] < none["six"],
+          "the weeks after surge weeks complete less on six complete following weeks too")
+    claim(none["short"] + some["short"] > 0 and current[-1]["following"] == 0,
+          "the last weeks of the series have fewer than six weeks after them")
+    tail = last_week_output(d)
+    claim(tail["hours"] > 0, "completions are dated after the last day with time records in its own week")
     lead = d.one("SELECT AVG(julianday(CompletedDate) - julianday(ReleasedDate)) FROM WorkOrder WHERE substr(ClosedDate, 1, 4) = ?",
                  str(d.C))
     claim(d.one("SELECT COUNT(*) FROM ProductionCompletion WHERE strftime('%w', CompletionDate) IN ('0', '6') "
                 "AND substr(CompletionDate, 1, 4) = ?", str(d.C)) > 0, "completions post on weekends")
-    claim(cur["ordinary"]["unused"] > 2 * cur["surge"]["overtime"],
-          f"the {d.C} surge overtime would fit more than twice over into the unused straight time")
+    claim(cur["ordinary"]["unused_day"] > 2 * cur["surge"]["overtime"],
+          f"the {d.C} unused straight time on ordinary employee-days is more than twice the surge overtime")
+    claim(all(y["ordinary"]["employee_days"] < y["ordinary"]["entries"] for y in ys),
+          "a few ordinary employee-days carry two clock entries, so entries and employee-days differ")
     b = burden(d, d.C)
     led = ledger(d)
     lf, lc = led[d.F], led[d.C]
@@ -565,6 +627,15 @@ def r3(d, claim):
     pay = direct[0]
     extra = lc["paydates"] - lf["paydates"]
     claim(extra > 0, f"1090 received more payrolls in {d.C} than in {d.F}")
+    # Of the extra payrolls charged to 1090, some are pay dates the calendar added, and one is the first year's
+    # payroll that posted to 5080 instead (a direct posting of the bridge).
+    mfg_dates = dict(d.q("SELECT pp.FiscalYear, COUNT(DISTINCT pp.PayDate) FROM PayrollRegister pr JOIN PayrollPeriod pp "
+                         "ON pp.PayrollPeriodID = pr.PayrollPeriodID JOIN CostCenter c ON c.CostCenterID = pr.CostCenterID "
+                         "WHERE c.CostCenterName = 'Manufacturing' GROUP BY 1"))
+    to_5080 = mfg_dates[d.F] - lf["paydates"]
+    claim(to_5080 == 1 and mfg_dates[d.C] == lc["paydates"],
+          f"one {d.F} Manufacturing payroll posted to 5080 rather than 1090, and every {d.C} payroll went to 1090")
+    claim(mfg_dates[d.C] - mfg_dates[d.F] + to_5080 == extra, "the extra payrolls are the added pay dates and the posting change")
     calendar = lf["payroll"] / lf["paydates"] * extra
     r4 = rate(d, d.C)
     hours_beyond = cur["hours"] - first["ratio"] * cur["std"]
@@ -579,7 +650,8 @@ def r3(d, claim):
                 pay_month=MONTHS[int(pay[2][5:7]) - 1], pay_amount=pay[3], je=direct[1][1], je_amount=direct[1][3],
                 extra=word(extra), calendar=calendar, ratio_f=first["ratio"], hours_beyond=hours_beyond, rate=r4,
                 beyond_cost=beyond_cost, premium_growth=premium_growth, together=together,
-                excess=together - bridge["payroll"], last_day=day_month(last_work(d)))
+                excess=together - bridge["payroll"], last_day=day_month(last_work(d)),
+                mfg_dates=[mfg_dates[y] for y in d.years], added_dates=word(mfg_dates[d.C] - mfg_dates[d.F]), tail=tail)
 
 
 # --- Requirement 4 -------------------------------------------------------------------------------
@@ -590,6 +662,14 @@ def r4(d, claim):
     std = comp["std"]
     released = ledger(d)[d.C]["released"]
     claim(abs(released - comp["conversion"]) < 1, "the completions' standard conversion cost is what completions released to 1090")
+    # The completion lines dated in the year and the ledger's release differ by documents dated in one year and posted in
+    # another (here a completion dated two years earlier, posted in this one).
+    stray = d.q("SELECT pc.CompletionNumber, pc.CompletionDate, MIN(g.PostingDate), SUM(g.Credit - g.Debit) FROM GLEntry g "
+                "JOIN ProductionCompletion pc ON pc.ProductionCompletionID = g.SourceDocumentID WHERE g.SourceDocumentType = "
+                "'ProductionCompletion' AND g.AccountID = ? AND g.FiscalYear = ? AND substr(pc.CompletionDate, 1, 4) <> ? "
+                "GROUP BY 1, 2", d.account("1090"), d.C, str(d.C))
+    claim(abs(released - comp["conversion"] - sum(r[3] for r in stray)) < 0.005,
+          "the ledger's release less the completion lines of the year is the completions posted in the year but dated in another")
     budget = d.one("SELECT SUM(b.Quantity) FROM BudgetLine b JOIN Item i ON i.ItemID = b.ItemID WHERE b.FiscalYear = ? "
                    "AND b.BudgetCategory = 'Revenue' AND i.SupplyMode = 'Manufactured'", d.C)
     made = d.one("SELECT SUM(pcl.QuantityCompleted) FROM ProductionCompletionLine pcl JOIN ProductionCompletion pc "
@@ -680,6 +760,15 @@ def r4(d, claim):
     direct = d.one("SELECT SUM(RegularHours + OvertimeHours) FROM LaborTimeEntry WHERE LaborType = 'Direct Manufacturing' "
                    "AND substr(WorkDate, 1, 4) = ?", str(d.C))
     claim(direct < ys[-1]["std"], "direct time stays within the standard hours")
+    # The same comparison counted to the day indirect time ends, on both sides (Chapter 10's sensitivity).
+    ind_end = d.one("SELECT MAX(WorkDate) FROM LaborTimeEntry WHERE LaborType = 'Indirect Manufacturing' AND substr(WorkDate, 1, 4) = ?",
+                    str(d.C))
+    direct_common = d.one("SELECT SUM(RegularHours + OvertimeHours) FROM LaborTimeEntry WHERE LaborType = 'Direct Manufacturing' "
+                          "AND WorkDate BETWEEN ? AND ?", f"{d.C}-01-01", ind_end)
+    std_common = d.one(f"SELECT SUM(pcl.QuantityCompleted * i.StandardLaborHoursPerUnit) {COMPLETIONS} "
+                       "WHERE pc.CompletionDate BETWEEN ? AND ?", f"{d.C}-01-01", ind_end)
+    claim(ind_end < last_work(d) and direct_common < std_common,
+          "indirect time ends before the other time records, and direct time stays within the standard hours to that day as well")
     return dict(std=std, released=released, conv_rate=released / std, budget=word(round(budget / made)),
                 forecast_low=word(math.floor(min(ratios))), forecast_high=word(math.ceil(max(ratios))),
                 rate=r, burden=b, salary=salary, titles=titles, foh=foh, acct=d.account("1090"),
@@ -689,7 +778,10 @@ def r4(d, claim):
                 levels=levels, need=need, conv=conv, variance=variance, premium=premium, actual=actual,
                 rate_b=rate_b, std_labor_rate=std_labor_rate, labor_excess=round((rate_b - std_labor_rate) * std, -3),
                 overhead=overhead, applied=comp["overhead"], oh_rate=oh_rate,
-                oh_excess=round(overhead - comp["overhead"], -3), use=use)
+                oh_excess=round(overhead - comp["overhead"], -3), use=use,
+                lines=comp["conversion"], stray=[dict(number=n, dated=dt, posted=ps, amount=a) for n, dt, ps, a in stray],
+                variable=comp["variable"], fixed=comp["fixed"], direct=direct, std_cut=ys[-1]["std"],
+                ind_end=ind_end, direct_common=direct_common, std_common=std_common, cutoff=last_work(d))
 
 
 # --- Requirement 5 -------------------------------------------------------------------------------
@@ -757,7 +849,18 @@ def r5(d, claim):
     claim(d.one("SELECT COUNT(*) FROM Account WHERE AccountName LIKE '%Income Tax%'") == 0, "the ledger records no income tax")
     effect = net_rev - change
     share = abs(effect) / ni
-    claim(share < 0.01, "the effect on income is well under 1% and immaterial")
+    claim(share < 0.01, "the net effect on income is well under 1% of net income")
+    # A small net effect does not make the errors themselves small: the liability left out, against income and the balance sheet.
+    current_liab = -d.one("SELECT SUM(g.Debit - g.Credit) FROM GLEntry g JOIN Account a ON a.AccountID = g.AccountID "
+                          "WHERE a.AccountSubType = 'Current Liability' AND g.PostingDate <= ?", f"{d.C}-12-31")
+    liab_ni, liab_cl = p["accrual"] / ni, p["accrual"] / current_liab
+    claim(liab_ni > 0.05 and liab_cl > 0.02, "the liability left out is several percent of net income and of current liabilities")
+    # The adjusting entry: Manufacturing's whole cost (gross and employer costs) to 1090, the others' gross pay to their
+    # salary accounts and only their employer costs to 6060.
+    mfg = next(c for c in p["centers"] if c["name"] == "Manufacturing")
+    other_gross = round(p["gross"] - mfg["gross"], 2)
+    other_employer = round(p["tax"] + p["ben"] - (mfg["amount"] - mfg["gross"]), 2)
+    claim(abs(mfg["amount"] + other_gross + other_employer - p["accrual"]) < 0.005, "the three debits add up to the accrual")
     # The supplier invoices dated in the prior year and received in this one: each must have been accrued before the
     # year-end for the wording ("not a payables cutoff item") to hold.
     a2040 = d.account("2040")
@@ -779,7 +882,9 @@ def r5(d, claim):
     return dict(p=p, left_day=int(p["left_start"][8:]), prior=prior, change=change, hours=round(hour_based(d, d.P), -3),
                 opening=opening, entry=entry, actual_rate=(led["payroll"] + led["je"]) / std, std_rate=led["released"] / std,
                 fg=fg, delivered=delivered[1], n_uninv=n_uninv, uninv=uninv, uninv_std=uninv_std, net_rev=net_rev, ni=ni,
-                adj_ni=ni - change + net_rev, about=round(p["accrual"], -3), share=share,
+                adj_ni=ni - change + net_rev, about=round(p["accrual"], -3), share=share, effect=effect,
+                liab_ni=liab_ni, liab_cl=liab_cl, mfg_all_in=mfg["amount"], mfg_employer=round(mfg["amount"] - mfg["gross"], 2),
+                other_gross=other_gross, other_employer=other_employer,
                 share_under=next(x for x in (0.002, 0.005, 0.01) if share < x) if share < 0.01 else 0.01,
                 holidays=[day_month(h) for h in holidays], asv=asv)
 

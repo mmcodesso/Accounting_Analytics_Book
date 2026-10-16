@@ -44,7 +44,7 @@ Before any query or report, you need to know how the data is organized. Ask stud
 - Part III's queries, Part IV's data models and Part II's imports all build on this structure
 
 ::: {.notes}
-The accounting concepts have not changed; only where they are stored. The CPA model curriculum now expects new accountants to understand data repositories and the tools that extract data from them.
+The accounting concepts have not changed; only where they are stored. The CPA Evolution model curriculum covers relational concepts in its core, and its Information Systems and Controls discipline adds objectives on relational databases, data repositories and data extraction tools.
 :::
 
 # The Relational Database Model
@@ -57,12 +57,12 @@ The accounting concepts have not changed; only where they are stored. The CPA mo
 Each row is one instance, here one customer; each column is one attribute. A table is a tidy dataset whose structure is defined in advance, which prevents the drift that happens in spreadsheets.
 :::
 
-## Every value is an integer, a real or text
+## Values are integers, reals, text or NULL
 
 {{< book-table tbl-03-01 columns="Data Type,How Charles River Stores It,Charles River Example" >}}
 
 ::: {.notes}
-SQLite has no date or Boolean type, so dates are text in year-month-day form, which sorts in order, and true or false flags are 1 and 0. A declared type is a preference SQLite does not enforce, so the data's conventions, not the file, keep each column to one type. Excel and Power BI convert these on import, so check that each column arrives with the type you expect.
+A missing value is NULL. SQLite also has a BLOB class for binary data, which Charles River does not use. SQLite has no date or Boolean type, so dates are text in year-month-day form, which sorts in order, and true or false flags are 1 and 0. A declared type is a preference SQLite does not enforce, so the data's conventions, not the file, keep each column to one type. Excel and Power BI convert these on import, so check that each column arrives with the type you expect.
 :::
 
 ## Watch out: not every number is a quantity {.watch-out}
@@ -200,11 +200,11 @@ ParentAccountID points to another row of the same Account table, a self-referenc
 
 - Each GLEntry row is one side of a journal entry: a single debit or credit
 - Its AccountID points to the chart of accounts: one account, zero or many entries
-- Grouping the ledger by account and summing debits and credits gives the trial balance
+- Netting the debits and credits posted up to a date, account by account, gives the trial balance at that date
 - GLEntry is by far the largest table in the database
 
 ::: {.notes}
-This one-to-many link is the database equivalent of posting to a T-account. Header accounts have no entries, which is why the relationship is one to zero or many.
+This one-to-many link is the database equivalent of posting to a T-account. Header accounts have no entries, which is why the relationship is one to zero or many. At a year-end, leaving out the closing entries dated that day gives the pre-closing trial balance, and keeping them the post-closing one.
 :::
 
 ## Sub-ledgers post through the source-document trace
@@ -267,7 +267,7 @@ Count the tables first, then find the primary key of each. Item has a gray heade
 
 ## Orders, lines and shipments
 
-{{< book-figure fig-03-07 crop="0,0,1,0.572" >}}
+{{< book-figure fig-03-07 crop="0,0,1,0.559" >}}
 
 ::: {.notes}
 Read Customer to SalesOrder aloud, then find the junction table: SalesOrderLine sits between SalesOrder and Item, with one or many lines per order and zero or many per item. One order line can be shipped on several shipment lines.
@@ -275,7 +275,7 @@ Read Customer to SalesOrder aloud, then find the junction table: SalesOrderLine 
 
 ## Invoices and their settlement
 
-{{< book-figure fig-03-07 crop="0,0.39,1,0.61" >}}
+{{< book-figure fig-03-07 crop="0,0.375,1,0.625" >}}
 
 ::: {.notes}
 Each shipment line is billed on at most one invoice line, and design services have no shipment line at all. CashReceiptApplication is the second junction table: one check can settle several invoices, and one invoice can be settled by several checks.

@@ -5,11 +5,10 @@ with a list price), FiscalYear = the year of InvoiceDate, Month = its year and m
 ListAmount = Quantity x BaseListPrice and DiscountAmount = Quantity x UnitPrice x Discount. The SQL here is their twin.
 Power Query's profile reads the Tables in the workbook's order, which is the order of the primary key.
 
-Two notes are not registered, because their comments state a value the data do not give; each context function
-renders the corrected text, so register it once the comment is fixed:
-- t2 gives Design Trade's December 2026 discounts as 8,692.03; the line chart sums the unrounded DiscountAmount,
-  8,692.035176, which shows as 8,692.04 (8,692.03 is the sum of the rounded parts by promotion, 2,116.66 + 6,575.37);
-- t3 gives October 2026 revenue as 2,297,493.18; the October lines (and the invoices' SubTotal) total 2,297,493.38.
+Every note is registered, t2 and t3 included. The chapters carry no hidden comments, so each note renders from its
+template, which states the corrected values: Design Trade's December 2026 discounts are 8,692.04 (the line
+chart sums the unrounded DiscountAmount, 8,692.035176; 8,692.03 is the sum of the rounded parts by promotion,
+2,116.66 + 6,575.37), and October 2026 revenue is 2,297,493.38 (the October lines and the invoices' SubTotal).
 """
 
 from __future__ import annotations
@@ -140,7 +139,7 @@ def t1(d, claim):
 
 @note("ch13.t2", "chapters/13-power-bi-essentials/_tutorial-02.qmd")
 def t2(d, claim):
-    """Tutorial 13.2 (not registered: the comment rounds one value; see the module docstring)."""
+    """Tutorial 13.2 (see the module docstring on Design Trade's December discounts)."""
     rows = [r for r in lines(d) if r["year"] == d.C]
     furniture = [r for r in rows if r["group"] == "Furniture"]
     autumn = autumn_promotion(d)
@@ -188,7 +187,7 @@ def t2(d, claim):
 
 @note("ch13.t3", "chapters/13-power-bi-essentials/_tutorial-03.qmd")
 def t3(d, claim):
-    """Tutorial 13.3 (not registered: the comment mistypes one value; see the module docstring)."""
+    """Tutorial 13.3 (see the module docstring on October's revenue)."""
     all_lines = lines(d)
     rows = [r for r in all_lines if r["year"] == d.C]
     monthly = monthly_revenue(rows)
@@ -339,6 +338,7 @@ def ex3(d, claim):
                            after=len(after), after_months=sorted({MONTHS[r["m"] - 1] for r in after},
                                                                  key=MONTHS.index),
                            within=all(p["start"] <= ordered[r["id"]] <= p["end"] for r in after),
+                           from_start=all(ordered[r["id"]] >= p["start"] for r in mine),
                            ordered=sorted({MONTHS[int(ordered[r["id"]][5:7]) - 1] for r in mine}, key=MONTHS.index),
                            start=p["start"], end=p["end"], collection=p["collection"]))
     blank = [r for r in rows if r["promo"] is None]
@@ -350,6 +350,8 @@ def ex3(d, claim):
     claim(all(p["start"][:4] == str(d.P) for p in earlier), f"the earlier promotions with {d.C} lines are {d.P} promotions")
     claim(all(p["after"] == p["n"] for p in earlier), f"all {d.C} lines of the {d.P} promotions fall after their end dates")
     claim(all(p["after"] == p["n"] for p in invalid), "all the lines of the promotion that ends before it starts fall after its end date")
+    claim(all(p["from_start"] for p in invalid), "the orders of the promotion that ends before it starts were placed on or after its "
+          "start date, which makes the end date the likely error")
     claim(all(p["after"] > 0 for p in current), "each current promotion has lines invoiced after its end date")
     claim(current[0]["within"], "all of the first current promotion's late lines were ordered within its dates")
     # Requirement (5) asks on which item groups the discounts fell: the promotions' names do not say, since a

@@ -503,7 +503,7 @@ def ex7_2(b: ExerciseBuild) -> None:
         f"The Budget Table, from which last year's budget summary for the bank was prepared, totals {yc['summary']:,.2f} for "
         f"{d.C}, while the budget lines (revenue, cost of goods sold, and operating expenses) total {yc['detail']:,.2f}. The "
         f"difference, {gaps[d.C]:,.2f}, is exactly the {rows_blank} operating-expense lines that have no cost center. The "
-        "Budget Table summarizes the budget by cost center, so lines without one never reach it, and the accounts budgeted "
+        "Budget Table summarizes the budget by cost center, the lines without one do not appear in it, and the accounts budgeted "
         f"only that way ({len(blank)} accounts, listed above) are missing from it altogether. The same gap appears in "
         f"every year: {gaps[d.F]:,.2f} in {d.F} and {gaps[d.P]:,.2f} in {d.P}, so a summary prepared from the Budget "
         "Table, as last year's for the bank was, understates budgeted operating expenses, and overstates budgeted "
@@ -1362,8 +1362,9 @@ def ex7_5(b: ExerciseBuild) -> None:
             f"lowest rate, made up {mix[a_['month']]['low']:.0%} of {mname(a_)}'s commission base against "
             f"{mix[c_['month']]['low']:.0%} of {mname(c_)}'s (column N; {yl:.0%} for {d.C}), so the accrual rate was "
             f"{mix[a_['month']]['rate']:.2%} in {mname(a_)} and {mix[c_['month']]['rate']:.2%} in {mname(c_)} (column M). "
-            + ("The customer mix, which a regression on total revenue cannot see, accounts for the offsetting "
-               "differences; recomputing a sample of the accruals from the rate table would confirm it." if explained(a_) and explained(c_) else
+            + ("The customer mix, which a regression on total revenue cannot see, is consistent with the offsetting "
+               "differences. Recomputing a sample of the accruals from the rate table would test that explanation."
+               if explained(a_) and explained(c_) else
                "The customer mix explains only part of the offsetting differences, so the accruals need recomputing."))
     for c in flagged:
         if c["month"] in paired:
@@ -1396,7 +1397,8 @@ def ex7_5(b: ExerciseBuild) -> None:
         f"Reconciliation: the accruals dated in {d.C} total {e['accruals']:,.2f}. The ledger's {d.C} commission expense, "
         f"{sum(v for v in e['by_type'].values()):,.2f}, is the accrual postings less {e['adj_rows']} "
         f"SalesCommissionAdjustment rows ({-adj:,.2f}), which reverse commissions on credit memos; that source document "
-        "type explains the whole difference.",
+        "type explains the whole difference. The reconciliation shows that the records agree, not that each "
+        "commission is right.",
     ]
     model_answer(ws, 43, paras, last_col="H")
 
@@ -1610,10 +1612,12 @@ def ex7_6(b: ExerciseBuild) -> None:
         "The forecast is not consistent with Charles River's historical experience. In every product group and every year "
         f"it ran at more than twice the units customers ordered ({min(min(v) for v in by_year.values()):.2f} to "
         f"{max(max(v) for v in by_year.values()):.2f} times), and the bias grew each year, to {total[d.C]:.2f} in {d.C}. "
-        "Any plan or estimate that relies on it would be overstated: purchasing and production plans would buy and build far "
-        "more than customers order, building inventory that may need an excess and obsolescence reserve; estimates of "
-        "inventory recoverability or capacity needs based on it would be too high; and the budget, whose volume is "
-        "higher still, cannot be used to evaluate performance, as Tutorial 7.2 found.",
+        "The direction of its effect depends on how a plan or estimate uses it. Purchasing, production and "
+        "capacity plans built on it would buy and build far more than customers order, and the inventory they build may "
+        "need an excess and obsolescence reserve. An estimate of inventory recoverability based on the forecast would be "
+        "too high, so a reserve that relies on it would be understated and inventory overstated. The budget, whose volume "
+        "is higher still, shows the gap from the plan but is a poor standalone measure of performance, as Tutorial 7.2 "
+        "found. Services, forecast below the hours ordered, needs its own assessment.",
         f"The review of planners' changes: every forecast is within about 10 percent of its baseline (ratios "
         f"{e['low']:.2f} to {e['high']:.2f}) except {words(len(adj))}: DemandForecastID "
         + series(str(r[0]) for r in adj)
@@ -1624,7 +1628,8 @@ def ex7_6(b: ExerciseBuild) -> None:
         "every other adjustment but not for these; a recorded approval shows that the step was taken, not how carefully "
         "the change was reviewed. The quantities are small, but an unapproved override by a buyer who plans "
         f"most forecasts ({e['planned']:,} of {e['current']:,}) and also creates purchase orders ({e['pos']:,} of them) "
-        "is a segregation-of-duties exception worth reporting.",
+        "is an authorization exception worth reporting, and the buyer's two roles make an independent review more "
+        "important.",
         "Evidence and explanations to request: the forecasting method and its inputs, and why it runs above orders; "
         "management's own comparisons of forecast with actual orders; the reasons for the three overrides and who should "
         "have approved them; how the forecast feeds purchasing, production, and the budget; and inventory levels and "

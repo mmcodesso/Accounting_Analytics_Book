@@ -31,11 +31,11 @@ This is the question Part I prepares students to answer, and Chapter 6 answers i
 ## From samples to whole populations
 
 - Ledgers once held a few thousand entries a year; today's systems record millions
-- Sampling 50 of 500,000 transactions examines one hundredth of one percent of the evidence
+- Sampling 50 of 500,000 transactions examines one hundredth of one percent of the transactions
 - The technology that creates the data can also test every transaction
 
 ::: {.notes}
-Growth in data is both the challenge and the opportunity. Manual review cannot keep pace, but analyzing whole populations brings more evidence to a conclusion and finds patterns that sampling would miss.
+Growth in data is both the challenge and the opportunity. Manual review cannot keep pace, but a test of every recorded transaction removes the risk that a sample misses an exception the test looks for. It does not make up for the wrong test, incomplete or false records, or a misread result.
 :::
 
 ## The work shifts toward judgment
@@ -45,7 +45,7 @@ Growth in data is both the challenge and the opportunity. Manual review cannot k
 - The profession expects analytics: the CPA Evolution model curriculum, the IMA competency framework, IFAC's International Education Standards
 
 ::: {.notes}
-Automation has not removed the need for accountants; it changes what they contribute. Early field evidence shows accountants using generative AI spending more time on client communication and review, and that relying on wrong AI suggestions raises the risk of error. Surveys of finance leaders name the lack of analytics skills as a leading barrier to adopting new technology.
+Automation has not removed the need for accountants; it changes what they contribute. Early field evidence associates generative AI use with less routine data entry and more client communication and review. In a separate experiment, AI help improved accuracy on average, but relying on incorrect suggestions could raise the risk of error. A survey of finance leaders names a lack of skills and talent as the leading barrier to adopting new technology.
 :::
 
 # Defining Accounting Analytics
@@ -102,7 +102,7 @@ The value of analytics lies in the quality of the question and the rigor of the 
 
 - **Financial reporting**: the close, reconciliations, and fluctuation analysis before the statements are issued
 - **Managerial accounting**: explaining results against plan, forecasting, finding operational drivers
-- **Auditing**: testing whole populations, sharper risk assessment, continuous monitoring
+- **Auditing**: testing whole populations to find items to investigate, continuous monitoring
 
 ::: {.notes}
 The book's exercises are organized around these three perspectives. One technique can serve all three: a duplicate-payment analysis supports controls assurance in an audit, vendor management in procurement, and cash flow review in controllership.
@@ -304,7 +304,7 @@ Part I lays the foundations, Parts II to IV teach one tool each, and Part V's ca
 
 - Data growth, automation and AI move accountants toward questions, judgment and communication
 - Four types of analytics: descriptive, diagnostic, predictive and prescriptive
-- Six stages take every project from a question to a recommendation
+- Six stages take a project from a question to a recommendation, sometimes looping back
 - SQL extracts, Excel prepares and models, Power BI presents
 - Charles River's table groups post to one ledger that traces back to its sources
 

@@ -26,7 +26,7 @@ The case depends on these conditions of the data, all visible in the files stude
 - Fiscal 2027 holds only supplier payments (263 of them, $271,327.17), the last pay date with registers is 2026-12-18, and the ledger ends 2027-02-23.
 - Accrued expenses carry an opening line with no document, freight, and accruals that invoices cleared late or never: 7, 15 and 22 old items at the three year-ends.
 - Revenue, payroll and interest are each missing from a year-end: cutoff of $90,138.93, $19,540.86 and $44,481.11 in revenue, and payroll owed of $302,568.90, $365,921.19 and $383,044.82.
-- Sales tax payable of $5,620,840.66 has no remittance recorded, rent is paid from cash with no lease recorded, and balances that no document supports would raise equity by $1,836,371.12 if none is real.
+- Sales tax payable of $5,620,840.66 has no remittance recorded, rent is paid from cash with no lease recorded, and five opening lines that no document supports would raise equity by $1,836,371.12 if none is real.
 
 ## What students should be able to do afterward
 
@@ -149,12 +149,12 @@ Students hold the adjusted statements, the notes with their reconciliations, and
 
 Students hold the review of later events, the going-concern conditions and the memo to the CFO.
 
-**Quick check:** the records after the year-end hold 263 supplier payments ($271,327.17) and no unrecorded liability. The memo must cover the tax status, the leases, the sales tax payable of $5,620,840.66 with no remittance recorded, and the balances no document supports, which would raise equity by $1,836,371.12 if none is real. Read the opening and the recommendation first.
+**Quick check:** the records after the year-end hold 263 supplier payments ($271,327.17), and the search finds no unrecorded liability in that limited population. The memo must cover the tax status, the leases, the sales tax payable of $5,620,840.66 with no remittance recorded, and the balances no document supports, of which the five opening lines would raise equity by $1,836,371.12 if none is real. Read the opening and the recommendation first.
 
 ## Difficult ideas and misconceptions
 
 - **A balanced trial balance is not a right one.** A strict less-than, every close left out and every close left in all balance. Ask what Chapter 6's total says.
-- **Age is not evidence.** An accrual older than the longest wait has gone unbilled, not unowed. Ask what the suppliers' statements would show.
+- **Age is not evidence.** An accrual older than the longest wait has gone unbilled, not unowed, and the wait only selects it for investigation. Ask what the suppliers' statements would show, and when the facts were known.
 - **Measure clearing from the ledger.** An invoice larger than its accrual clears only the accrual; the rest is expense. Ask what the ledger debited.
 - **Errors reverse.** A cutoff item missed at one year-end enters that year's income and reverses in the next. Ask what the year before already took out.
 - **Error or estimate.** The test is what the facts were at the year-end. Ask whether the facts existed and were missed.

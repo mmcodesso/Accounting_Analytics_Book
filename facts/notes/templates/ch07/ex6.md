@@ -11,7 +11,7 @@
      Table, so the control is the approval of planner adjustments: every other adjustment has an approver recorded, which shows the approval
      step was taken, not how carefully each change was reviewed. The quantities are small, but
      an unapproved override by a buyer, who also places purchase orders (employee {{ planner_id }} plans most
-     forecasts and created {{ pos|count }} purchase orders), is a control exception worth reporting. Consequences: inflated purchasing and
-     production plans, excess inventory and a possible need for an obsolescence reserve, and a budget whose volume cannot be used to evaluate
-     performance (Tutorial 7.2). Evidence to request: the forecasting method and its inputs, the planners' adjustments, and management's own
+     forecasts and created {{ pos|count }} purchase orders), is a control exception worth reporting. Consequences, whose direction depends on the estimate: inflated purchasing and
+     production plans, excess inventory and a possible need for an obsolescence reserve, a reserve understated if it relies on the forecast's
+     view of recoverability, and a budget whose volume makes it a poor standalone measure of performance (Tutorial 7.2). Evidence to request: the forecasting method and its inputs, the planners' adjustments, and management's own
      comparisons of forecast with actual. -->

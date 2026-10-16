@@ -74,12 +74,12 @@ The controller wants to know what the ledger says as it stands and what it takes
 ## The controller's four conditions
 
 - Nothing is posted: each adjustment is a numbered entry with its evidence
-- Materiality is a set share of each year's income before income taxes
+- Materiality starts from a share of income before income taxes
 - Findings are worded as what the records show, not what anyone did
 - The package states the date through which its data run
 
 ::: {.notes}
-The adjustments live in the workbook, with the query and the document numbers behind each, so that the CFO can approve them before anyone posts them. Every adjustment is listed, however small. The chapter states the materiality rate; use it as written.
+The adjustments live in the workbook, with the query and the document numbers behind each, so that the CFO can approve them before anyone posts them. Every adjustment is listed, however small. The chapter states the rate as a starting benchmark, which qualitative and aggregate judgment then completes.
 :::
 
 ## The package: four statements and the policies
@@ -95,7 +95,7 @@ The outline gives the topic of the Accounting Standards Codification that govern
 {{< book-table tbl-17-01 6-12 >}}
 
 ::: {.notes}
-The last column says which requirements produce each component. Lenders use statements to monitor borrowers as well as to decide whether to lend: Minnis and Sutherland found banks requesting statements to monitor about half of small commercial loans, and Minnis found that private firms with audited statements pay less for their debt.
+The last column says which requirements produce each component. Lenders use statements to monitor borrowers as well as to decide whether to lend: Minnis and Sutherland found banks requesting statements to monitor about half of small commercial loans, and in Minnis's large sample of private firms, those with audited statements paid less for their debt.
 :::
 
 # The Data You Will Use
@@ -279,15 +279,15 @@ Phase 2 is the heart of the case: it finds what the ledger left out at each year
 - **Check:** the parts add up to the ledger's balance at every year-end
 
 ::: {.notes}
-Split the balance into the opening line, the freight accrued and not yet settled, and the service accruals not yet cleared. For each accrual, subtract what had cleared it by each date: the invoice postings that refer to it and the adjustment entries that reverse it. Measure how long invoices took to clear accruals, age the open ones against the longest wait, and decide which you treat as still owed and which you would reverse, and when. Age shows that an accrual has gone unbilled, not that nothing is owed, so state the assumption and the evidence that would confirm it, such as the suppliers' statements.
+Split the balance into the opening line, the freight accrued and not yet settled, and the service accruals not yet cleared. For each accrual, subtract what had cleared it by each date: the invoice postings that refer to it and the adjustment entries that reverse it. Measure how long invoices took to clear accruals, age the open ones against the longest wait, and decide which you treat as still owed and which you would reverse, and when. Age shows that an accrual has gone unbilled, not that nothing is owed. The longest wait selects the items to investigate, and the period of any reversal depends on what the facts were at each year-end and when they became known. So state the assumption and the evidence that would confirm it, such as the suppliers' statements.
 :::
 
-## Six kinds of posting reach accrued expenses
+## Five kinds of posting reach accrued expenses
 
 {{< book-figure fig-17-01 crop="0,0.7621,1,0.2379" >}}
 
 ::: {.notes}
-Accrual entries credit the account for services received and not yet billed; a supplier invoice debits it up to the amount accrued, and an adjustment entry clears all or part of what remains. Shipments credit it for freight, and a monthly settlement pays the carriers. The opening entry has no document behind it.
+Accrual entries credit the account for services received and not yet billed; a supplier invoice debits it up to the amount accrued, and an adjustment entry clears all or part of what remains. Shipments credit it for freight, and a monthly settlement pays the carriers. The opening line, apart from these five, has no document behind it.
 :::
 
 ## Each accrual is cleared through its references
@@ -332,7 +332,7 @@ Write each adjustment's entries for both year-ends, with its accounts and eviden
 The schedule shows each adjustment's effect on opening equity, on each year's income before income taxes, and on each year-end balance sheet, with its type and the decision to record or pass it.
 :::
 
-## A missed cutoff item reverses in the next year
+## Cutoff items recorded next year reverse in that year
 
 {{< book-figure fig-17-02 crop="0,0,1,0.6835" >}}
 
@@ -440,18 +440,18 @@ Equipment financed by a note and a disposal with no proceeds moved no cash, so t
 - **Check:** each note agrees with a line of the statements
 
 ::: {.notes}
-Roll property and equipment forward by class and reconcile it to the ledger; give each note payable's terms, maturities and current portion; disaggregate revenue on the adjusted basis and show the contract balances; and test whether any service work was done and not billed at a year-end. If you use the sales model for revenue, it must still be reconciled to the ledger and the cutoff adjustment, so choose, and say why. The notes on accounting policies and on the CFO's matters, such as income taxes and leases, complete the package before it goes to the bank.
+Roll property and equipment forward by class and reconcile it to the ledger; give each note payable's terms, maturities and current portion; disaggregate revenue on the adjusted basis and show the contract balances; and test whether any recorded service work was not billed at a year-end. For the timing, the case assumes that the design-service contracts give an enforceable right to payment for the work completed to date, so their revenue is recognized over time. If you use the sales model for revenue, it must still be reconciled to the ledger and the cutoff adjustment, so choose, and say why. The notes on accounting policies and on the CFO's matters, such as income taxes and leases, complete the package before it goes to the bank.
 :::
 
 ## Milestone 3: before you hand it in
 
 - The statements agree with one another and with the adjusted balances
-- Cash and the cash flow totals are unchanged by the adjustments
+- Cash and each activity's total are unchanged by these adjustments
 - Each required note is built from records and tied to the statements
 - The Review file's tests pass
 
 ::: {.notes}
-These are self-checks, not answers. A note that cannot be traced to its records, or that does not agree with its statement line, is not finished.
+These are self-checks, not answers. A note that cannot be traced to its records, or that does not agree with its statement line, is not finished. An adjustment that moved cash, or moved an amount from one activity to another, would change the activity totals.
 :::
 
 # Phase 4: What the Data Cannot Settle
@@ -508,12 +508,12 @@ Ask students what evidence would settle each one the records cannot.
 ## Each matter has its evidence {.answer}
 
 1. No: its tax status needs evidence outside the database
-2. Yes: the search for unrecorded liabilities
+2. In part: a search of the later payments the extract holds
 3. No: the lease terms are not in the records
 4. Yes: the last date of each population
 
 ::: {.notes}
-For each matter the records cannot settle, the memo states what the records do show, the evidence that would settle it, and its possible effect where the ledger allows a measure.
+The search covers only the supplier payments in the extract, so it can find none there without showing that none exist. For each matter the records cannot settle, the memo states what the records do show, the evidence that would settle it, and its possible effect where the ledger allows a measure.
 :::
 
 ## Milestone 4: before you hand it in
@@ -556,7 +556,7 @@ These are the four types of analytics of Chapter 1. The estimates were small pre
 ## After the package leaves
 
 - A lender reads the statements and the notes, and asks questions
-- It comes back each quarter to test the terms of the loan
+- It returns as the loan agreement requires, to test its terms
 - An outside accountant would start from the same balances and entries
 - Your reconciliations and documentation make those conversations short
 

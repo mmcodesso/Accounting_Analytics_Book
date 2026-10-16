@@ -31,7 +31,7 @@ The last three cover exploring the data, making exceptions visible, protecting t
 - So the workbook must refresh, never alter the company's data, and lead a reviewer from any number to its source
 
 ::: {.notes}
-"Build it as if you were going to hand it to someone else," she says, "because you are." In Part I you filtered worksheets and wrote one-off test formulas in CharlesRiver.xlsx; this chapter builds a sturdier foundation. Ask students what would make them trust a workbook someone else built.
+"Build it as if you were going to hand it to someone else," she says, "because you are." She accepts the memo with the limits it states, and the later chapters measure the margin on the invoice lines at standard cost, a different measure from the memo's posted-account margin. In Part I you filtered worksheets and wrote one-off test formulas in your working copy, CharlesRiver_Work.xlsx. This chapter builds a sturdier foundation. Ask students what would make them trust a workbook someone else built.
 :::
 
 # Why Workbook Structure Matters
@@ -39,17 +39,17 @@ The last three cover exploring the data, making exceptions visible, protecting t
 ## Spreadsheet errors are common; checks are informal
 
 - Panko: errors occur in a few percent of all cells, so a large workbook almost surely holds some
-- Powell et al.: error rates vary widely, and most errors change nothing, but one was worth $100 million
+- Powell et al.: error rates vary widely, and many errors change nothing, but one changed a result by over $100 million
 - Caulkins et al.: managers call errors common, and quality control is mostly informal
 - Church et al.: smaller companies still do their leading accounting tasks in Excel
 
 ::: {.notes}
-For a large spreadsheet the question is not whether an error exists but how many there are. In one field audit, nine of the twenty-five spreadsheets had no errors at all, so a workbook's appearance says little about its accuracy. Because accountants keep working in Excel, a spreadsheet behind a cost analysis or an audit procedure must be both accurate and reviewable.
+For a large spreadsheet the question is not whether an error exists but how many there are. In one field audit, the auditors confirmed no errors in nine of the twenty-five spreadsheets, so a workbook's appearance says little about its accuracy. The $100 million is the change in a calculated output, not a loss the study measured. Because accountants keep working in Excel, a spreadsheet behind a cost analysis or an audit procedure must be both accurate and reviewable.
 :::
 
 ## Structure is a control, not a guarantee
 
-- Little is known about which design practices prevent which errors (Powell et al.)
+- A 2008 review found little known about how errors arise or how to avoid them (Powell et al.)
 - A structured design approach cut errors in the links between parts of a workbook (Janvrin and Morrison)
 - Tables, named parameters, validation and documentation remove common chances for error
 - They also leave the logic visible to the person who checks it
@@ -119,7 +119,7 @@ A summary formula that lands inside a Table may be copied to thousands of rows o
 - The result loads as a Table, and Data > Refresh All repeats every step
 
 ::: {.notes}
-A copy of the data leaves the source alone but goes stale, which Power Query also solves. In the Navigator, choose the Table objects rather than the worksheets, because a Table already defines its headers and its extent. The tutorials need desktop Excel: on a Mac the Power Query Editor needs Excel for Microsoft 365, and the workbook is too large for Excel for the web.
+A copy of the data leaves the source alone but goes stale, which Power Query also solves. In the Navigator, choose the Table objects rather than the worksheets, because a Table already defines its headers and its extent. The tutorials need a supported desktop Excel, Microsoft 365 recommended. On a Mac only Excel for Microsoft 365 has the Power Query Editor, and Excel for the web limits the size of the workbooks it opens and the features it offers.
 :::
 
 ## Check the types Power Query chose
@@ -463,7 +463,7 @@ Students have not yet shown that this promotion explains the fall in the Furnitu
 - Chapter 5 combines them with the invoices, items and customers into one table
 
 ::: {.notes}
-The later chapters of Part II summarize that table and measure the effects that explain the change in margin. They extend the workbook built here, with its queries, parameters and documentation.
+The later chapters of Part II summarize that table and measure the effects that explain the change in the Furniture margin on the invoice lines. They extend the workbook built here, with its queries, parameters and documentation.
 :::
 
 ## Summary

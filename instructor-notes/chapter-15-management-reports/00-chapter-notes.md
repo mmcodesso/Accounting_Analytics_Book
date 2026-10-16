@@ -24,6 +24,7 @@ The chapter depends on these conditions of the data:
 - The budget plans 3.6 times the product revenue actually billed, so only the operating expense lines are comparable. Depreciation is budgeted in Administration and recorded partly in Warehouse, $101,828.64 each way.
 - Payroll is recorded on the pay date, so the two months with three pay dates, January and July, run above the flexed budget and every other month below it.
 - The time records end 2026-12-11, before the year does, and the Date table runs to the end of 2027. A trailing figure without a year filter is blank for that reason.
+- Indirect time ends earlier, 2026-12-04, so the plant ratio is an observed-records diagnostic whose last month is provisional. Counted to that day on both sides, hours and output alike, the year's ratio reads 1.48 against the published 1.51, a labeled sensitivity, not a correction.
 
 ## What students should be able to do afterward
 
@@ -187,7 +188,7 @@ Plan A is the safest: the stumbles are in reading a variance and a filter, and a
 - Step 11c: Edit interactions skipped, so a click on Packing shows 0.49.
 - Step 12: a measure without a description, or the navigator tested without Ctrl.
 
-**The checkpoint to look for.** The four bullets. A strong student says why the card ignores the work-center chart: the output has no work center.
+**The checkpoint to look for.** The four bullets. A strong student says why the card ignores the work-center chart: the output has no work center. A strong student also reads the latest ratio as provisional, because indirect time ends before the cut-off.
 
 ## Difficult ideas and misconceptions
 
@@ -199,7 +200,7 @@ Plan A is the safest: the stumbles are in reading a variance and a filter, and a
 
 **A classification effect nets to zero.** Question 9. It moves cost between cost centers: $101,828.64 each way, so it explains none of the company's total. Ask: what is the total of the column?
 
-**Timing hides in a year-to-date.** Tutorial 15.2 Step 10. The running variance stands at $4,848.62 in July, close to the flexed budget, because January and July run above it and the months between run below it. A manager who read the report in July saw a cost center on budget. Ask: which months are above it, and why?
+**Timing hides in a year-to-date.** Tutorial 15.2 Step 10. The running variance stands at $4,848.62 in July, close to the flexed budget, because January and July run above it and the months between run below it. A reader in July saw operating expense close to the flexed budget for the year to date. Ask: which months are above it, and why?
 
 **A visual calculation sees only its visual.** Tutorial 15.3 Step 9, Exercise 15.2 (3), question 10. On an axis that starts a year in, the first month averages one month: 1.375 against the measure's 1.121. Ask: which rows can it see?
 
@@ -216,7 +217,7 @@ Plan A is the safest: the stumbles are in reading a variance and a filter, and a
 1. **The controller wants one KPI for every department. What do you say?** It reaches Lipe and Salterio: shared measures defined alike, unique measures kept and flagged as counting.
 2. **Where should the threshold of an icon come from?** It reaches the five percent as the package's choice, stated on the page, and Cardinaels and van Veen-Dirks on markers changing weights.
 3. **Should the budget page show revenue against the static budget?** It reaches the static-budget trap, flexing, or leaving it off with a stated reason.
-4. **A manager reads the report in July and sees the cost center on budget. What happened?** It reaches three pay dates, recorded when paid, and the months between.
+4. **A manager reads the report in July and sees operating expense close to its flexed budget for the year to date. What happened?** It reaches three pay dates, recorded when paid, and the months between.
 5. **When is a visual calculation the right tool?** It reaches a chart's own shape, against a number readers export, compare or test.
 6. **Is the plant ratio a measure of one work center?** It reaches grain, and what the page would need to measure output where it happens.
 7. **Would you put the forecast on the plan page?** It reaches the hindcast, the benchmarks, the start-up month and the disclosure.

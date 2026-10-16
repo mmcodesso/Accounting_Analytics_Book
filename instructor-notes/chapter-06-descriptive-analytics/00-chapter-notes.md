@@ -21,7 +21,7 @@
 The chapter depends on these conditions of the data:
 
 - InvoiceLines holds 9,522 lines for fiscal 2026, billing $29,756,420.08, in five item groups. Services is billed by the hour (144 lines) and its items carry a standard cost of 0, so its margin at standard cost is 100 percent.
-- The lines are skewed to the right: the average line ($3,125.02) is 1.47 times the median ($2,129.62), and the largest line is a design service.
+- The lines are skewed to the right, as the histogram of Tutorial 6.1 shows, and the average line ($3,125.02) is 1.47 times the median ($2,129.62). The largest line is a design service.
 - The Furniture margin at standard cost falls from 42.26% in the third quarter to 40.78% in the fourth, while the other product lines stay within a point of their level. Promotional discounts more than double (2.3 times) while quantity, list price and standard cost per unit barely move.
 - The ledger has 71 accounts with a pre-closing balance. Three invoices numbered for fiscal 2026 are dated in fiscal 2025, and the ledger holds supplier payments dated after the fiscal year-end, so a trial balance needs a date filter.
 - The prior-year expectation of Exercise 6.5 flags 6 of 20 differences and misses the largest, which are Furniture's. Each exercise guide lists its own conditions.
@@ -39,7 +39,7 @@ The chapter depends on these conditions of the data:
 
 **Before the first class**
 
-- Students need desktop Excel with Power Query (on a Mac, Excel for Microsoft 365). FILTER needs Microsoft 365 or Excel 2021 or later. The model answers also use CHOOSECOLS, HSTACK, TAKE and SORTBY, so open them in Microsoft 365 or Excel 2024.
+- Students need a supported desktop Excel with Power Query, Microsoft 365 recommended, as the Preface's What You Need says. On a Mac the Power Query Editor needs Excel for Microsoft 365. FILTER is in Excel for Microsoft 365, Excel 2024 and Excel 2021, whose support ended in October 2026. The model answers also use CHOOSECOLS, HSTACK, TAKE and SORTBY, so open them in Microsoft 365 or Excel 2024.
 - Each tutorial begins from the previous one's workbook. A late student takes the start file from Chapter06-companion.zip, points its queries at their copy of CharlesRiver.xlsx (**Data > Get Data > Data Source Settings**, **Change Source**) and chooses **Data > Refresh All**.
 - Do the three tutorials yourself and time them. Tutorials 6.2 and 6.3 build several PivotTables on the InvoiceLines Table of 27,933 rows, so time the refreshes on your students' machines.
 - Get the PowerPoint deck from the Downloads page; its modules follow the chapter's sections.
@@ -51,7 +51,7 @@ The chapter depends on these conditions of the data:
 - **The shared pivot cache.** Calculated fields belong to the pivot cache, so MarginPct appears in every PivotTable built from the InvoiceLines Table. A PivotTable built from a pasted range does not have it, and a student who lacks it recreates the field.
 - **Σ Values.** A second value field sends **Σ Values** to the Columns area. Dragging it to Rows is a step the tutorials give once, and students forget it in the exercises.
 - **GETPIVOTDATA reads what the PivotTable shows.** The Bridge returns Furniture totals only while the ItemGroup filter says Furniture.
-- **Refresh twice.** A new query column may need a second **Refresh All**, because background refresh can update a PivotTable before its query ends.
+- **Refresh after the query.** A new query column may need a second **Refresh All** once the query has finished loading, because background refresh can update a PivotTable before its query ends. A second click while the query still runs repeats the problem.
 - **Load To.** In Exercise 6.1 **Only Create Connection** applies to both new queries, so TrialBalance is loaded afterward from **Data > Queries & Connections**.
 
 ## Teaching approaches
@@ -154,6 +154,7 @@ Plan A is the safest. Plan B trades the lecture for ownership of the workbook an
 - Step 3: Σ Values left in Columns, so the margin sits beside the revenue and not under it.
 - Step 5: % Difference From with the wrong base. Period is the base field and (previous) the base item.
 - Step 6: the first year left in the Column Labels, so the change column also compares the middle year with it.
+- Step 4: margins that differ slightly from the Part I case's. The case measured the posted accounts, whose cost is the standard cost of the goods shipped less the goods returned, and this PivotTable the standard cost of the quantities invoiced. Both fall.
 - Step 7: MarginPct missing from the field list because the PivotChart was built from a copied range.
 
 **The checkpoint to look for.** The five bullets. A strong student explains the 100 percent Services margin as an absence of standard cost, not as a finding, and says that the other product lines held steady.
@@ -192,7 +193,7 @@ Plan A is the safest. Plan B trades the lecture for ownership of the workbook an
 
 ![Why a calculated field cannot multiply two fields, and what to do instead.](../figures/chapter-06-descriptive-analytics/IF-06-0-B.pdf)
 
-**A control total shows coverage, not accuracy.** A difference of zero means the parts add up to the whole of the same source, not that the source is right, and a SUM range that does not grow after a row is inserted defeats it (Step 7). Question 4's option D is the silent zero, and question 14's rising margin before discounts shows the discounts offset every other effect.
+**A control total shows coverage, not accuracy.** A difference of zero means the parts add up to the whole of the same source, not that the source is right, and a SUM range that does not grow after a row is inserted defeats it (Step 7). Question 4's option D is the silent zero, and question 14's rising margin before discounts shows that the larger discounts more than offset the other effects, which on balance raised the margin.
 
 **A PivotTable summarizes a copy, with its own filters.** Question 10 and the two-filters pitfall have one cause: the pivot cache refreshes only on request, and its FiscalYear filter is not ReportYear.
 
@@ -215,7 +216,7 @@ Plan A is the safest. Plan B trades the lecture for ownership of the workbook an
 3. **The Furniture volume was steady, so why did the margin fall?** It reaches price, promotions and the margin before discounts, and the bridge as the control total of the explanation.
 4. **The bridge says the promotions cost $120,687.02 of margin. Was it a mistake?** It reaches the bridge measuring cost and not benefit, the lift the promotion may have produced, and Chapter 7's break-even analysis.
 5. **Which date should decide the period of the three invoices dated in fiscal 2025?** It reaches transfer of control, delivery as evidence and the shipment records.
-6. **You present the bridge for Furniture, and the sales team wants it by product type. Which goes in the report?** It reaches stating the level, a headline at the level where each effect has one meaning, and detail for the people who plan the assortment.
+6. **You present the bridge for Furniture, and the sales team wants it by product type. Which goes in the report?** It reaches stating the level and its convention, a headline at the level where cost is zero and mix works item by item, and detail for the people who plan the assortment.
 7. **When is last year a good expectation for this year?** A stable business with known changes adjusted, and never when a promotion or a price change falls in only one of the years.
 8. **A PivotTable shows Services at 100 percent. What do you tell the vice president of sales?** It reaches the missing standard cost, the two possible cost definitions of Exercise 6.3, and stating the definition.
 
@@ -246,7 +247,7 @@ Key: 1 B, 2 C, 3 A, 4 D, 5 A, 6 C, 7 D, 8 B, 9 C, 10 A, 11 D, 12 B, 13 C, 14 A, 
 
 | Question | Answer | Rationale |
 |---:|:---:|---|
-| 1 | B | a mean well above the median signals a right skew: a minority of large lines pulls the average up. |
+| 1 | B | a mean well above the median suggests a right skew, a minority of large lines pulling the average up, which the histogram of Tutorial 6.1 shows. |
 | 2 | C | STDEV.S divides by n - 1 for a sample; STDEV.P divides by n for a whole population. |
 | 3 | A | MEDIAN accepts no criteria and there is no MEDIANIFS, so FILTER supplies the year's rows. |
 | 4 | D | a misspelled criterion matches nothing, so SUMIFS returns zero silently; a control total catches it. |
@@ -256,7 +257,7 @@ Key: 1 B, 2 C, 3 A, 4 D, 5 A, 6 C, 7 D, 8 B, 9 C, 10 A, 11 D, 12 B, 13 C, 14 A, 
 | 8 | B | % of Column Total shows each group's share of the quarter's revenue. |
 | 9 | C | GETPIVOTDATA names the value by field and item, so layout changes do not break it. |
 | 10 | A | a PivotTable reads its pivot cache, which updates only on refresh. |
-| 11 | D | the year-end closing entry debits every revenue account on December 31. |
+| 11 | D | the year-end closing entry debits the Furniture revenue account on December 31, so the quarter's net credit turns negative. |
 | 12 | B | the closing entries zero the revenue and expense accounts, so the income statement cannot be prepared from the closed balances; a pre-closing trial balance leaves them out. |
 | 13 | C | each item has one standard cost, so the cost effect at standard is zero. |
 | 14 | A | margin before discounts rising while margin falls shows that the larger discounts more than offset the other effects, which on balance raised the margin; the bridge separates those effects. |
@@ -271,7 +272,6 @@ Key: 1 B, 2 C, 3 A, 4 D, 5 A, 6 C, 7 D, 8 B, 9 C, 10 A, 11 D, 12 B, 13 C, 14 A, 
 - **Question 12.** Option C says the closes fall after the cutoff. They are dated December 31; the later rows are supplier payments.
 - **Question 14.** Options B and C blame cost and volume, which are nearly unchanged.
 - **Question 15.** Option A is the independence failure. Option C is the prior-year shortcut that Exercise 6.5 uses and criticizes.
-- **Questions 2, 3, 4, 5, 6, 9, 10, 12, 13, and 14.** The correct option is also the longest. If you grade with these, ask students to explain their answer or reword the options.
 
 Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 1 to 6 make a quiz of the functions and charts, questions 7 to 10 of PivotTables, and questions 11 to 15 of the ledger and the bridge.
 

@@ -123,7 +123,7 @@ h. Right-click the chart, choose **Select Data**, click **Edit** under **Horizon
 
 The planned price lies above the actual price before promotions in every month except September and October, when the budget planned the promotion's discount and spread it over all of those months' sales. The actual discounts were concentrated on the promotion's orders, and they continued into November and December as those orders were invoiced. @fig-07-06 shows the chart.
 
-![Planned and Actual Furniture Prices by Month.](/visuals/svg/fig-07-06-furniture-price-by-month.svg){#fig-07-06 fig-alt="A line chart of Furniture prices as a percentage of list price in each month of fiscal 2026. A dashed line for the budget's planned net price stays above the other two lines in most months and dips in September and October, the promotion months in the budget. A line for the actual price before promotions is nearly flat below the planned line. A line for the actual price after promotions falls sharply in September and October and recovers only partly in November and December."}
+![Planned and Actual Furniture Prices by Month.](/visuals/svg/fig-07-06-furniture-price-by-month.svg){#fig-07-06 fig-alt="A line chart of Furniture prices as a percentage of list price in each month of fiscal 2026. A dashed line for the budget's planned net price stays above the other two lines in most months and dips in September and October, the promotion months in the budget. A line for the actual price before promotions is nearly flat below the planned line. A dotted line for the actual price after promotions falls sharply in September and October and recovers only partly in November and December."}
 
 **Step 8. Import the operating expenses from the ledger.**
 
@@ -158,7 +158,7 @@ d. In E5, enter `=D5#-C5#`, the variance of each account.
 
 Most accounts are within a few percent of their budget, and several match it exactly. The list ends with 7030, Interest Expense, which the budget files under Operating Expense, although the income statement of Chapter 6 places interest below operating income, with the other income and expense. Two accounts stand out, and both are under budget: Payroll Taxes and Benefits, and Sales Commission Expense.
 
-**Step 10. Test the drivers of the two exceptions.** Each of the two budgets was calculated from a driver, and testing the driver shows whether the difference is a saving or a wrong assumption.
+**Step 10. Test the drivers of the two exceptions.** Each of the two budgets was calculated as a rate times a base, and testing the driver separates the effect of the base from the effect of the rate. Why the rate differed takes evidence from outside the workbook.
 
 a. In G5:G9, type the labels `Budgeted burden rate`, `Actual burden rate`, `Budgeted commission rate`, `Flexed commission budget`, and `Actual commissions`.
 b. In H5, enter the budgeted burden rate, the budget for account 6060 divided by the budgeted salaries. The asterisk in `"Salaries*"` is a wildcard that stands for any text, so the criterion matches every account whose name starts with Salaries.
@@ -182,7 +182,7 @@ d. In H7, enter the budgeted commission rate, the commission budget divided by t
 e. In H8, enter `=H7*BudgetReport!F10`, the commission budget flexed to the actual revenue of the product lines.
 f. In H9, enter `=SUMIFS(GLOpex[Amount],GLOpex[AccountNumber],6290)`.
 
-The budget assumed that payroll taxes and benefits would cost a larger percentage of salaries than they did, so the variance on account 6060 comes from the rate, not from the salaries it applies to; why the actual rate was lower is a question for the payroll team before anyone calls the difference a saving. The commission variance is mostly volume: flexed to the actual revenue, the commission budget comes within about a tenth of what Charles River paid. The rest of the difference is a lower rate than the budget assumed, and the rate earned depends on the mix of customer segments, because each segment earns its own commission rate. The actual expense also includes the commissions on design services, which the budget did not plan, so on product sales alone the actual rate was lower still.
+The budget assumed that payroll taxes and benefits would cost a larger percentage of salaries than they did, so the variance on account 6060 comes almost entirely from the lower rate, while salaries were close to budget. Why the actual rate was lower is a question for the payroll team before anyone calls the difference a saving. The commission variance is mostly volume. Flexed to the actual revenue, the commission budget comes within about a tenth of what Charles River recognized as commission expense. The rest of the difference is a lower rate than the budget assumed, and the rate earned depends on the mix of customer segments, because each segment earns its own commission rate. The actual expense also includes the commissions on design services, which the budget did not plan, so on product sales alone the actual rate was lower still.
 
 **Step 11. Document the analysis.**
 
@@ -201,4 +201,4 @@ The Documentation worksheet now lists every query and worksheet that the budget 
 - the Furniture price after promotions falls in September and October and stays below the price before promotions through December;
 - the burden rate and the flexed commission explain the two largest operating-expense variances.
 
-The comparison with the budget answers the controller's second question. The plan's volume was far from reality, so the static budget cannot judge 2026. Flexed to what was sold, the plan's prices were slightly optimistic in every product line, the Furniture promotion cost more and later than the budget expected, and the operating expenses were close to plan once two assumptions are corrected.
+The comparison with the budget answers the controller's second question. The static budget shows how far 2026 fell from the original plan, but its volume was so far from reality that it is a poor standalone measure of performance, and the size of the gap is a reason to ask how the volume was planned. Flexed to what was sold, the plan's prices were slightly optimistic in every product line, the Furniture promotion cost more and later than the budget expected, and the operating expenses were close to plan once two assumptions are corrected.

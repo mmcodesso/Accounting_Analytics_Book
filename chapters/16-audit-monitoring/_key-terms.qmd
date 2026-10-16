@@ -12,7 +12,7 @@
 
 **Continuous monitoring.** Management's ongoing review, often automated, of whether its own controls operate as designed. Continuous auditing can rely on it when it is strong.
 
-**Data currency.** How recent the data in a report are: the last date each of its populations reaches at its last refresh. A report whose populations end on different dates can have been tested in full only through the earliest of them.
+**Data currency.** How recent the data in a report are, stated as the last date each population reaches, with the date field it uses, and the time of the last refresh. A report whose populations end on different dates can have been tested only through the earliest of them, and even that date is a bound observed in the data, not proof that every record up to it is present.
 
 **Exception register.** A table that holds the exceptions of several monitoring tests, one row per exception per test, with the same columns for every test: the test, the document, its date, its amount, and the employee responsible.
 

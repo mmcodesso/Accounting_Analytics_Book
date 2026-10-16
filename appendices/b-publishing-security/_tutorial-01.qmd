@@ -54,7 +54,7 @@ b. Confirm that each address belongs to the manager the controller named for tha
 c. Record the cost center the list leaves out.
 d. Record who maintained the list and who approved it.
 
-The list names the managers who actually run each department, as the controller confirmed them, and each of them belongs to the cost center the list gives them. Research and Development is left out until the controller names its manager, so for now no one sees it. The list was prepared by the controller's staff and approved by the controller, so no one both grants and authorizes access, and your check in this step is internal audit's review of it.
+The list names the managers who actually run each department, as the controller confirmed them, and each of them belongs to the cost center the list gives them. Research and Development is left out until the controller names its manager, so for now no department manager sees it, though the Finance role still does. The list was prepared by the controller's staff and approved by the controller, so no one both grants and authorizes access, and your check in this step is internal audit's review of it.
 
 **Step 5. Create the role and its first two rules.**
 
@@ -70,7 +70,7 @@ c. Select **Employee**, and enter the same rule.
 )
 ```
 
-The rule keeps a cost center if it is among the cost centers the security table lists for the person viewing the report. On CostCenter it filters the ledger and the budget lines; on Employee it filters the labor time of the Plant page to the employees of those cost centers. @fig-b-03 shows the editor with the rule on CostCenter; the tables that carry a rule are marked in the list.
+The rule keeps a cost center if it is among the cost centers the security table lists for the person viewing the report. On CostCenter it filters the ledger and the budget lines; on Employee it filters the labor time of the Plant page to the employees of those cost centers. @fig-b-03 shows the dialog as it looks once Step 6 is done, with the rule on CostCenter open and the tables that carry a rule marked in the list.
 
 ![The Manage Security Roles Dialog.](/visuals/svg/fig-b-03-manage-roles.svg){#fig-b-03 fig-alt="A mock of Power BI's Manage security roles dialog. The Roles list holds Cost Center Managers and Finance, with a New role button. The Tables list marks CostCenter, Employee, Item, and Security as having a filter. The rules area, switched to the DAX editor, shows the rule on CostCenter, which keeps the cost centers listed in the Security table for the user principal name of the viewer. Save and Close buttons sit at the bottom."}
 
@@ -110,7 +110,7 @@ d. Record what the Budget and Plant pages show.
 e. Repeat Step 7 for `employee083@charlesriver.example`, the terminated employee recorded as manager of Sales.
 f. Choose **Stop viewing** to return to your own view.
 
-The Warehouse Manager sees the Warehouse budget and an income statement that is a loss. The Production Manager sees the whole Plant page but an empty Budget page, because Manufacturing's costs are budgeted as cost of goods sold, not operating expense, so the page meant for department managers does not serve this one. The former employee, absent from the security table, sees nothing at all, which is the deny-by-default design working.
+The Warehouse Manager sees the Warehouse budget and an income statement that is a loss. The Production Manager sees the whole Plant page but an empty Budget page, because Manufacturing's costs are budgeted as cost of goods sold, not operating expense, so the page meant for department managers does not serve this one. The former employee, absent from the security table, sees no cost center, employee, or sale, which is the deny-by-default design working. The role denies the protected data, not the whole model, though. Customer has no rule and no rule's filter reaches it, so the segment and region slicers of the Sales and Discounts page still list every value.
 
 **Step 9. Tell readers what they are seeing.**
 
@@ -133,7 +133,7 @@ CONCATENATEX (
 Who Am I = USERPRINCIPALNAME ()
 ```
 
-DISTINCT leaves out the blank row that the ledger lines without a cost center would add to VALUES. Who Am I shows the name the rules compare. In the service it is the reader's sign-in name, and in View as it is the user you typed. In Desktop without View as it is your own Windows sign-in, which on a computer without a work account reads as the computer's name and yours; no rule applies to you there, because roles take effect only for readers.
+DISTINCT leaves out the blank row that the ledger lines without a cost center would add to VALUES. Who Am I shows the name the rules compare. In the service it is the reader's sign-in name, and in View as it is the user you typed. In Desktop without View as it is your own sign-in, which on a computer without a work account can read as the computer's name and yours. No rule applies to you there, because roles take effect only for readers.
 
 **Step 10. Check the cards as two managers.**
 
@@ -159,7 +159,7 @@ d. Save both files.
 
 - The access review lists the managers of record against the employee records, with the terminated managers visible.
 - Viewed as the Sales Manager, the Budget page shows only Sales, and the card says so.
-- Viewed as the terminated manager of record, the report shows nothing.
+- Viewed as the terminated manager of record, the report shows no cost center, employee, or sale, while the Customer slicers still list their values.
 - Your memo names the pages that a role leaves partial and who maintains, approves, and reviews the security table.
 
 Row-level security is only as good as the list behind it and the pages it is applied to, and both are things an auditor can test before any manager opens the report.

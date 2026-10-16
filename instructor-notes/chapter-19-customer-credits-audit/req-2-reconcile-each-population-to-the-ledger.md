@@ -55,7 +55,7 @@ SUM(CASE WHEN a.AccountNumber = 4060 THEN gl.Debit ELSE 0 END)
 - A GrandTotal tied to `1020` alone: the difference is the part posted to `2060`, $220,131.88 in all.
 - `4060` read by account alone, as debits less credits over every source: zero in every year, because the close credits it back.
 
-**Step 2. Reconcile the returns (G2).** The return lines at standard cost against the debits to `1040` and the credits to the four cost of goods sold accounts. **Check:** 3 rows; the cost is $325,840.19 over the three years. **Watch for:** tying the cost to `5010` alone, which leaves $42,102.68 in the last year.
+**Step 2. Reconcile the returns (G2).** The return lines at standard cost against the debits to `1040` and the credits to the four cost of goods sold accounts. **Check:** 3 rows; the cost is $325,840.19 over the three years. **Watch for:** tying the cost to `5010` alone, which leaves $138,128.82 in the last year.
 
 **Step 3. Reconcile the refunds and the clawbacks (G3, G4).** Refunds against the credits to cash (`1010`) and the debits to `2060`; clawbacks against the debits to `2034` and the credits to `6290`, with the year's accruals and payments beside them. **Check:** 3 rows each; refunds total $45,028.75, $86,581.85, $85,107.82 and clawbacks $2,694.49, $3,768.06, $4,369.54. **Watch for:** every credit to `6290`, whatever its source. It reads $521,989.10 in the first year, the year's accruals, because the close credits the expense account for its net cost.
 

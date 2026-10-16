@@ -36,11 +36,11 @@
 
 **Pre-closing trial balance.** A trial balance prepared at the end of a period before that period's closing entries, so that the revenue and expense accounts still hold the period's activity from which the income statement is prepared.
 
-**Price effect.** The part of a change in margin caused by charging different prices for the same items, including changes in price-list reductions and promotional discounts.
+**Price effect.** The part of a change in margin attributed to the prices charged, including changes in price-list reductions and promotional discounts. Measured as the change in the average reduction per unit, as in Tutorial 6.3, it also picks up shifts between items with different reductions.
 
 **Show Values As.** A PivotTable setting that displays a value field as a share of a total, a difference from a base item, a running total, or a rank, without changing the values behind it.
 
-**Skewed distribution.** A distribution whose values are not spread symmetrically around its center. In a distribution skewed to the right, the usual shape of accounting populations, a minority of large values pulls the mean above the median.
+**Skewed distribution.** A distribution whose values are not spread symmetrically around its center. A distribution skewed to the right, the usual shape of accounting populations, has a long tail of large values, which tends to pull the mean above the median.
 
 **Standard deviation.** A measure of how widely values are spread around their mean. In Excel, STDEV.S treats the values as a sample of a larger population, and STDEV.P treats them as the complete population.
 

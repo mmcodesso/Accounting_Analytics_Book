@@ -33,7 +33,7 @@ Students can:
 - summarize by family and find the top fifth's share of margin (Part 4);
 - use a Data Table to show how the practical share divides one committed cost (Part 5).
 
-**Competencies practiced.** CPA Evolution BAR M5 (cost accounting and variance analysis); IMA Reporting and Control (cost accounting) and Strategic Cost Management; IFAC IES 2 (b); AACSB A5 part 5.1 (Excel with Power Query and data models).
+**Competencies practiced.** CPA Evolution BAR M5 (cost accounting and variance analysis); IMA Reporting and Control (cost accounting) and Strategic Cost Management; IFAC IES 2 (b); AACSB A5 part 5.1 (Excel).
 
 ## Before you assign
 
@@ -145,7 +145,7 @@ Setup difference         {{ g.cells.setup_diff }}
 
 ## What a strong answer says
 
-- **Three views, three questions.** Time-driven cost lies between standard and absorption for every family. The standards miss ${{ td_over|money }} of cost (the rate increase, supervision and depreciation); absorption charges ${{ absorp_over|money }} of idle capacity the products did not use. It sits nearer standard for {{ near_std|join(', ') }} and nearer absorption for {{ near_absorp|join(', ') }}.
+- **Three views, three questions.** Time-driven cost lies between standard and absorption for every family. The standards miss ${{ td_over|money }} of cost (the rate increase, supervision and depreciation); the absorption proxy charges them the year's closed variance, idle capacity included. The ${{ absorp_over|money }} between the time-driven and proxy margins is not the measured cost of unused capacity, ${{ unused|money }}, because the proxy's populations (closes, completions, sales) differ. It sits nearer standard for {{ near_std|join(', ') }} and nearer absorption for {{ near_absorp|join(', ') }}.
 - **Unused capacity is the plant's.** Products plus unused capacity equal the inputs, with the setup difference shown.
 - **The Data Table.** The choice of practical capacity moves cost between the products and the unused capacity and leaves the total alone.
 

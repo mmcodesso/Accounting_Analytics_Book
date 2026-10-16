@@ -46,13 +46,13 @@ Pairs, about 240 minutes: 40 for authority and employment, 50 for separation of 
 **Step 1. Test authority and employment (T1, T2).** Credits and refunds are stacked in one CTE and each amount is compared with its approver's limit.
 
 ```sql
-SUM(CASE WHEN ap.Amount > COALESCE(e.MaxApprovalAmount, 0)
+SUM(CASE WHEN ap.Amount > e.MaxApprovalAmount
         THEN 1 ELSE 0 END) AS AboveLimit,
-    ROUND(SUM(CASE WHEN ap.Amount > COALESCE(e.MaxApprovalAmount, 0)
+    ROUND(SUM(CASE WHEN ap.Amount > e.MaxApprovalAmount
         THEN ap.Amount ELSE 0 END), 2) AS AboveLimitAmount
 ```
 
-**Check:** {{ g.t1 }} rows. Credits above the limit: {{ cm_above.n }} (${{ cm_above.amt|money }}), all approved by {{ above_title }} with a limit of {{ above_limit }}; the manager's limit of {{ manager_limit|count }} is never exceeded. Refunds above the limit: {{ rf_above.n }} (${{ rf_above.amt|money }}), by {{ rf_groups[0][0] }} and {{ rf_groups[1][0] }}; the {{ within.n }} of the {{ within_title }} are within it. T2, every document against its person's hire and termination dates, returns no rows. **Watch for:** COALESCE. Every approver has a limit today ({{ g.null_limit }} blanks), so it changes nothing, but a blank limit would make the comparison false and hide every exception.
+**Check:** {{ g.t1 }} rows. Credits above the limit: {{ cm_above.n }} (${{ cm_above.amt|money }}), all approved by {{ above_title }} with a limit of {{ above_limit }}; the manager's limit of {{ manager_limit|count }} is never exceeded. Refunds above the limit: {{ rf_above.n }} (${{ rf_above.amt|money }}), by {{ rf_groups[0][0] }} and {{ rf_groups[1][0] }}; the {{ within.n }} of the {{ within_title }} are within it. T2, every document against its person's hire and termination dates, returns no rows. **Watch for:** a blank limit. Every approver has a limit today ({{ g.null_limit }} blanks). A blank would make the comparison false and hide the document, so the query counts it apart in LimitMissing, as missing data and not a limit of zero.
 
 **Step 2. Test separation of duties (T3 to T5).** For each credit, did its approver apply, or record, cash on the credited invoice?
 
@@ -71,7 +71,7 @@ MAX(CASE WHEN cra.AppliedByEmployeeID = cm.ApprovedByEmployeeID
     GROUP BY cm.CreditMemoID
 ```
 
-**Check:** {{ g.t3 }} rows of credits whose approver recorded or applied the cash; the applied-only subset is {{ cc.n }} credits (${{ cc.amt|money }}), {{ cc_early.n }} of them on or before the credit date, and the register of Requirement 10 uses it. State which you use. T4 is one row of zeros: no refund approved by the credit's approver, no return received by it, none received outside the warehouse. **Watch for:** counting the joined rows. {{ g.rows_applied }} rows describe {{ cc.n }} credits.
+**Check:** {{ cc.n }} credits (${{ cc.amt|money }}) whose approver applied the cash, the rule Requirement 4 states and the register of Requirement 10 uses, {{ cc_early.n }} of them on or before the credit date. The query's {{ g.t3 }} rows add the {{ rec_only.n }} credits whose approver only recorded a receipt: testing the recorders too is an accepted extension when the answer states it. T4 is one row of zeros: no refund approved by the credit's approver, no return received by it, none received outside the warehouse. **Watch for:** counting the joined rows. {{ g.rows_applied }} rows describe {{ cc.n }} credits.
 
 T5 asks whom GLEntry.CreatedByEmployeeID names. **Check:** the approver on all {{ g.prep_rows[0]|count }} credit rows and {{ g.prep_rows[1] }} refund rows, and one person on all {{ g.ceo_rows|count }} sales invoice rows. The preparer cannot be tested, and the answer says why. Reading the column as the preparer says that every credit approved itself.
 
@@ -96,7 +96,7 @@ The test keeps the refunds with `lp.LastPaymentDate > rf.RefundDate`.
 
 {{ figure('IF-19-4-A') }}
 
-**Check:** {{ before.n }} refunds (${{ before.amt|money }}), {{ before.years[0] }}, {{ before.years[1] }} and {{ before.years[2] }} by year; by the receipts' dates {{ rcpt.n }} (${{ rcpt.amt|money }}), accepted when stated; {{ nothing.n }} before any application. T7 gives the cause: {{ to_2060 }} credits post a part to `2060`, {{ unpaid_2060 }} of them when nothing had been paid. **Watch for:** `>=`, which flags {{ g.same_day }}. The order within a day is unknown for the {{ same.n }} refunds dated the day of the last receipt, and no table shows when a payment cleared the bank.
+**Check:** {{ before.n }} refunds (${{ before.amt|money }}), {{ before.years[0] }}, {{ before.years[1] }} and {{ before.years[2] }} by year; by the receipts' dates {{ rcpt.n }} (${{ rcpt.amt|money }}), accepted when stated; {{ nothing.n }} before any application. T7 gives the cause: {{ to_2060 }} credits post a part to `2060`, {{ unpaid_2060 }} of them before any cash was applied to the invoice ({{ unrcpt_2060 }} before any receipt was dated). **Watch for:** `>=`, which flags {{ g.same_day }}. The order within a day is unknown for the {{ same.n }} refunds dated the day of the last receipt, and no table shows when a payment cleared the bank.
 
 **Step 4. Test the past-due balance on the refund date (T10).** The flags query carries the as-of rule: only applications and credits dated by the refund date reduce each invoice.
 
@@ -142,7 +142,7 @@ ORDER BY FiscalYear, TestID, DocumentNumber
 | Quantity | Value | Step |
 |---|---|---|
 | Credits above limit; refunds above limit | {{ cm_above.n }}; {{ rf_above.n }} | 1 |
-| Credits whose approver applied the cash | {{ cc.n }} | 2 |
+| Credits whose approver applied the cash; recorded or applied (an extension) | {{ cc.n }}; {{ cc_rec.n }} | 2 |
 | Refunds before the last application; by receipt date | {{ before.n }}; {{ rcpt.n }} | 3 |
 | Past due on the refund date; at least the refund | {{ pd1.n }}; {{ pd2.n }} | 4 |
 | Method mismatches; rows of the combined list | {{ mism.n }}; {{ g.t11 }} | 4, 6 |

@@ -8,7 +8,7 @@
 
 **Step 1. Open the report for editing, and add the page.**
 
-a. Select **My workspace** in the navigation pane, and open the **Charles River Reports** report, the item whose type is Report.
+a. Select **My workspace**, or the workspace you chose in Guided Tutorial C.1, in the navigation pane, and open the **Charles River Reports** report, the item whose type is Report.
 b. Choose **Edit** on the menu bar to switch from Reading view to Editing view.
 c. Click the plus sign beside the page tabs, double-click the new tab, and rename it `Sales and Discounts`.
 d. Drag the tab to the left of **Validation**.
@@ -44,7 +44,7 @@ b. Under **Apply settings to**, set **Cards** to **Revenue**.
 c. Under **Value**, set **Display units** to **None**.
 d. Repeat the two actions for At list price, Discounts, and Invoices.
 
-**Display units** appears under **Value** only when **Apply settings to** names one card, not **All**, which is why it is set four times. The four cards now show fiscal 2026 in full, as the Validation page shows its amounts.
+When this appendix was tested, **Display units** appeared under **Value** only when **Apply settings to** named one card, not **All**, which is why the step sets it four times. If your pane offers it for all the cards at once, set it once. The four cards now show fiscal 2026 in full, as the Validation page shows its amounts.
 
 **Step 6. Chart the discounts by month, in month order.**
 
@@ -83,4 +83,4 @@ The report keeps the name you gave it in Guided Tutorial C.1, so the button save
 - The months of the line chart are in order, and the discount line rises sharply in September and October.
 - Furniture leads the bar chart, and both charts have alt text.
 
-The report editor of the service built the same page as Desktop's Report view, and Tutorial 13.3's charts can be added the same way.
+The report editor of the service built the page of Tutorial 13.2, and Tutorial 13.3's charts are added to the report the same way.

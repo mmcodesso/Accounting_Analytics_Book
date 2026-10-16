@@ -109,7 +109,7 @@ All are Closed, and each is the first work order numbered in its year. The other
 
 ![A mock of the WorkOrder worksheet with the Operations helper column of Step 5, filtered to zero.](../figures/chapter-02-understanding-data/IF-02-3-A.pdf)
 
-**Step 6. Say why this makes the cost figures unreliable.** A model answer: the operations give the planned hours, the work center and the sequence against which actual labor and overhead are compared. Without them, a standard labor and overhead cost cannot be assigned step by step, and the labor recorded cannot be tied to a work center. The data confirms it: these work orders have 18 labor entries for 45.86 hours, none of which is tied to an operation that exists, and each has a close that posted a variance, $2,063.41 in all.
+**Step 6. Say why this makes the cost figures unreliable.** A model answer: the operations give the planned hours, the work center and the sequence against which actual labor and overhead are compared. Without them, a standard labor and overhead cost cannot be assigned step by step, and the labor recorded cannot be tied to a work center. The data show the gap. These work orders have 18 labor entries for 45.86 hours, none of which is tied to an operation that exists, and each has a close that posted a variance, $2,063.41 in all. The gap weakens the cost trail at the level of the operation, but it does not show that the costs recorded for these work orders are wrong.
 
 **Check:** the answer names what the operations provide and what the gap breaks. **Watch for:** "no operations means no cost", which is wrong: the close posted a cost, but it cannot be traced to a step.
 

@@ -38,7 +38,7 @@ Individual or pairs, about 90 minutes: 20 to profile and compare, 20 to search, 
 
 ```sql
 -- Requirement 8: the records dated after fiscal 2026
--- Population: GLEntry after 2026-12-31; expected: 526 supplier-payment rows, 1 January to 23 February 2027, debiting 2010 and crediting 1010
+-- Population: GLEntry after 2026-12-31; expected: 526 supplier-payment rows, January 1 to February 23, 2027, debiting 2010 and crediting 1010
 SELECT gl.SourceDocumentType, a.AccountNumber,
     COUNT(*) AS Postings,
     ROUND(SUM(gl.Debit), 2) AS Debits,
@@ -51,9 +51,9 @@ GROUP BY gl.SourceDocumentType, a.AccountID, a.AccountNumber
 ORDER BY a.AccountNumber;
 ```
 
-**Check:** 526 ledger rows, all supplier payments, from 1 January to 23 February 2027, debiting `2010` and crediting `1010`, 263 payments in all.
+**Check:** 526 ledger rows, all supplier payments, from January 1 to February 23 2027, debiting `2010` and crediting `1010`, 263 payments in all.
 
-**Step 2. Compare them with the same weeks of the year before.** Count the payments of 2026 from 1 January to the extract's last date, and the payables at the year-end that were due in those months.
+**Step 2. Compare them with the same weeks of the year before.** Count the payments of 2026 from January 1 to the extract's last date, and the payables at the year-end that were due in those months.
 
 ```sql
 -- Requirement 8: the same weeks of 2026, and the payables at 2026-12-31 due in the weeks the extract covers
@@ -135,13 +135,13 @@ FROM Paid AS p
         ON pi.PurchaseInvoiceID = p.PurchaseInvoiceID;
 ```
 
-**Check:** 263 payments ($271,327.17) settle 262 invoices of 78 suppliers, received in November to December 2026 and already in payables, 238 of them paid in full; no invoice was received after the year-end, so the search finds none. **Watch for:** reporting the $271,327.17 as unrecorded. It reduces payables the ledger already holds; the payments outnumber the invoices only because one invoice was paid in two parts.
+**Check:** 263 payments ($271,327.17) settle 262 invoices of 78 suppliers, received in November to December 2026 and already in payables, 238 of them paid in full; no invoice was received after the year-end, so the search finds none in this limited population. **Watch for:** reporting the $271,327.17 as unrecorded. It reduces payables the ledger already holds; the payments outnumber the invoices only because one invoice was paid in two parts.
 
 ### Part 3: Events the CFO must evaluate
 
 **Step 5. List the events up to the date the statements are available to be issued.** The credit line itself, if it is obtained before then; the sales tax position; and anything the CFO learns about the opening balances that no document supports. The package must also disclose the date; the records cannot supply it.
 
-**Check:** three events and a date, none of them in the records. **Watch for:** taking the ledger's last posting date, 23 February 2027, as that date. A balance at it reads cash of $8,170,928.63, $271,327.17 below the year-end's $8,442,255.80.
+**Check:** three events and a date, none of them in the records. **Watch for:** taking the ledger's last posting date, February 23 2027, as that date. A balance at it reads cash of $8,170,928.63, $271,327.17 below the year-end's $8,442,255.80.
 
 ### Part 4: Going concern
 
@@ -170,7 +170,7 @@ SELECT
 
 **Check:** cash net of sales tax payable $2,821,415.14; quick ratio 0.96, down from 1.28; operating cash flow -$807,189.75 against $3,975,026.14; inventories 64% of current assets, with materials ($11,751,653.92) above twelve months of issues ($10,161,204.64), about 13.9 months; $2,096,371.12 of opening payables unchanged for three years. Mitigating: profit, working capital of 23.4 million and debt of $389,304.68. **Watch for:** leading with the current ratio, 2.69, which hides the quick ratio.
 
-**Step 7. State what the evaluation needs beyond the database.** The terms of the credit line, management's plans for the materials, and evidence on the sales tax and the opening payables. Conclude in two sentences: the ledger alone does not establish substantial doubt, but the sales tax and the opening payables could change that.
+**Step 7. State what the evaluation needs beyond the database.** The terms of the credit line, management's plans for the materials, and evidence on the sales tax and the opening payables. The evaluation weighs the conditions first, without management's plans. A plan counts only if it is probable that it will be put in place and will mitigate them, and an application for the line is not committed financing. Conclude in two sentences: the ledger alone does not establish substantial doubt, but the sales tax and the opening payables could change that.
 
 ## Expected results
 
@@ -181,7 +181,7 @@ SELECT
 | Invoices paid; suppliers; received after the year-end | 262; 78; none | 4 |
 | Cash net of sales tax; quick ratio | $2,821,415.14; 0.96 | 6 |
 
-> **Instructor notes, Requirement 8:** the 2027 records are 263 supplier payments, 271,327.17, from 1 January to 23 February 2027 (526 ledger rows, Dr 2010, Cr 1010), paying 262 invoices of 78 suppliers, all received from November to December 2026 and recorded in payables at the year-end (238 paid in full); no invoice was received after 2026, so no unrecorded liability is found. The same weeks of 2026 had 2,530 payments, 3,040,077.15; payables at 2026 due in January and February 2027 were 2,665,014.91. The extract has no payroll for periods 78-79 (pay dates 2027-01-01 and 2027-01-05), no note payments (due 2027-01-01, 01-04, 02-01, 02-02, all Scheduled), no December freight settlement, and no rent, sales, or receipts, so it is incomplete: do not read it as the company having stopped paying. Events to evaluate: the credit line itself if obtained before the statements are available to be issued, the sales tax position, and anything the CFO learns about the opening balances; the date the statements are available to be issued must be disclosed. Conditions: cash net of sales tax 2,821,415.14; quick ratio 0.96, down from 1.28; operating cash flow -807,189.75 against +3,975,026.14; inventories 64% of current assets, with materials (11,751,653.92) above twelve months of issues (10,161,204.64); 2,096,371.12 of opening payables unchanged for three years. Mitigating: profit, working capital of 23.4 million, and debt of only 389,304.68. Conclusion: the ledger alone does not establish substantial doubt, but the sales tax and the opening payables could change that, so the CFO's evaluation needs evidence from outside the database.
+> **Instructor notes, Requirement 8:** the 2027 records are 263 supplier payments, 271,327.17, from January 1 to February 23, 2027 (526 ledger rows, Dr 2010, Cr 1010), paying 262 invoices of 78 suppliers, all received from November to December 2026 and recorded in payables at the year-end (238 paid in full); no invoice was received after 2026, so this search identifies no unrecorded liability, in a limited population of supplier payments that cannot show that none exists. The same weeks of 2026 had 2,530 payments, 3,040,077.15; payables at 2026 due in January and February 2027 were 2,665,014.91. The extract has no payroll for periods 78-79 (pay dates 2027-01-01 and 2027-01-05), no note payments (due 2027-01-01, 01-04, 02-01, 02-02, all Scheduled), no December freight settlement, and no rent, sales, or receipts, so it is incomplete: do not read it as the company having stopped paying. Events to evaluate: the credit line itself if obtained before the statements are available to be issued, the sales tax position, and anything the CFO learns about the opening balances; the date the statements are available to be issued must be disclosed. Conditions: cash net of sales tax 2,821,415.14; quick ratio 0.96, down from 1.28; operating cash flow -807,189.75 against +3,975,026.14; inventories 64% of current assets, with materials (11,751,653.92) above twelve months of issues (10,161,204.64); 2,096,371.12 of opening payables unchanged for three years. Mitigating: profit, working capital of 23.4 million, and debt of only 389,304.68. The evaluation weighs these conditions first, without management's plans. A plan such as the credit line counts only if it is probable that it will be put in place and will mitigate them, and an application is not committed financing. Conclusion: the ledger alone does not establish substantial doubt, but the sales tax and the opening payables could change that, so the CFO's evaluation needs evidence from outside the database.
 
 ## What a strong answer says
 

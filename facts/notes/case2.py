@@ -137,13 +137,24 @@ def volume(d) -> tuple[dict, ...]:
     return tuple(out)
 
 
+def discount_for(d, lift: float) -> float:
+    """The item-group promotion's discount at which an increase in volume of `lift` just pays for it."""
+    c = commission(d)[2]
+    m = unit_model(d, proposal(d)["ItemGroup"]["id"], d.C)
+    p, s = m["price"], m["cost"]
+    return 1 - ((p * (1 - c) - s) / (1 + lift) + s) / (p * (1 - c))
+
+
 def goal_seek(d) -> tuple[dict, float]:
     """The item-group promotion's discount at which the largest measured increase just pays for it."""
     best = max(volume(d), key=lambda v: v["lift"])
-    c = commission(d)[2]
-    m = unit_model(d, proposal(d)["ItemGroup"]["id"], d.C)
-    p, s, lift = m["price"], m["cost"], best["lift"]
-    return best, 1 - ((p * (1 - c) - s) / (1 + lift) + s) / (p * (1 - c))
+    return best, discount_for(d, best["lift"])
+
+
+def own_goal_seek(d) -> tuple[dict, float]:
+    """The same discount at the item-group promotion's own measured difference (the cross-scope check)."""
+    own = next(v for v in volume(d) if v["id"] == proposal(d)["ItemGroup"]["id"])
+    return own, discount_for(d, own["lift"])
 
 
 @lru_cache(maxsize=None)
@@ -304,6 +315,8 @@ def r3(d, claim):
     claim(len(bad) > 0, "some promotions have recorded dates that do not cover their lines")
     vol = volume(d)
     claim(all(v["z"] < 2 for v in vol), "no increase is unusual (all within two standard deviations)")
+    claim(all(v["lift"] / v["sd"] < 2 for v in vol),
+          "compared month for month (the average month against the other months' mean), no increase is unusual either")
     falls = [v for v in vol if v["z"] <= -2]              # unusual falls, if any: no promotion lifted volume either way
     top = max(vol, key=lambda v: v["lift"])
     low = min(vol, key=lambda v: v["lift"])
@@ -329,7 +342,8 @@ def r3(d, claim):
     late = [r for r in first if r[1] > f"{d.F}-06-30"]
     last = first[-1][1]
     since = [r for r in first if r[3] >= f"{d.F}-01-01"]
-    return dict(bad=series(bad), vol=vol, top=top, low=low, sd_total=sd_total, far=all(v["lift"] < be[v["id"]] / 2 for v in vol),
+    return dict(bad=series(bad), vol=vol, top=top, low=low, sd_total=sd_total, top_month_z=top["lift"] / top["sd"],
+                far=all(v["lift"] < be[v["id"]] / 2 for v in vol),
                 near=dict(near, be=be[near["id"]]),
                 falls=series(f"promotion {v['id']}'s {v['lift']:+.1%} ({v['z']:.1f} standard deviations)" for v in falls),
                 n_falls=len(falls), promoted=len(promoted), n_promoted=word(len(promoted)),
@@ -353,6 +367,18 @@ def r4(d, claim):
     grp["be5"] = breakeven(grp["price"], grp["cost"], 0.05, c)
     be = breakevens(d)
     best, discount = goal_seek(d)
+    own, own_discount = own_goal_seek(d)
+    claim(own_discount < discount, "the item-group promotion's own difference supports a smaller discount than the best one")
+
+    # the discount on the proposal's orders not yet billed in the data (the estimate leaves it out)
+    unbilled = []
+    for scope in ("Collection", "ItemGroup", "Segment"):
+        p = prop[scope]
+        ordered_disc = d.one(f"SELECT SUM(l.Quantity * l.UnitPrice * l.Discount) {ORDERS} WHERE l.PromotionID = ?", p["id"])
+        billed_disc = d.one(f"SELECT SUM(l.Quantity * l.UnitPrice * l.Discount) {BILLED} WHERE l.PromotionID = ?", p["id"])
+        unbilled.append(dict(id=p["id"], label=p["label"], amount=ordered_disc - billed_disc))
+    claim(all(u["amount"] > -0.005 for u in unbilled), "no promotion billed more discount than its orders carry")
+    claim(sum(u["amount"] for u in unbilled) > 0.005, "some of the proposal's discount was ordered but not yet billed")
 
     # budgets: promoted items at a lower price in their promotion months, the next year's budget flat
     promoted = []
@@ -390,6 +416,9 @@ def r4(d, claim):
     claim(not any("Customer" in r[1] for r in d.q("PRAGMA table_info(BudgetLine)")), "BudgetLine has no customer dimension")
     return dict(coll=model["Collection"], grp=grp, seg=model["Segment"], rate=c, be_low=min(be.values()),
                 be_high=max(be.values()), promos=word(len(be)), best=best, discount=discount,
+                best_year=next(p["year"] for p in promotions(d) if p["id"] == best["id"]), cross=best["id"] != grp["id"],
+                own=own, own_discount=max(own_discount, 0.0),
+                unbilled=[u for u in unbilled if u["amount"] > 0.005], unbilled_total=sum(u["amount"] for u in unbilled),
                 promoted=promoted_ratio, cfo=cfo, approved=approved, flat=flat, cost=prop_total,
                 contribution=prop_total * (1 - c), quarters=[(qn, round(amount, -2)) for qn, amount in quarters],
                 budget_units=budget_units, ordered=ordered)
@@ -408,6 +437,17 @@ def r5(d, claim):
     claim(all(p["lo"] >= f"{p['year']}-03-01" and p["hi"] <= f"{p['year']}-04-30" for p in bad),
           "all their lines were ordered between March 1 and April 30")
     claim(all(p["end"] < p["lo"] for p in bad), "their recorded end dates fall before the order dates")
+    recorded = {p["id"]: d.one(f"SELECT COUNT(*) {ORDERS} WHERE {SCOPE_SQL[p['scope']]} = ? AND o.OrderDate BETWEEN ? AND ?",
+                               p["label"], p["start"], p["end"]) for p in bad}
+    claim(all(n == 0 for n in recorded.values()),
+          "the recorded dates of the failing promotions hold no order line of their scope, so a completeness test on them tests nothing")
+    provisional = [dict(id=p["id"], label=p["label"], lines=d.one(
+        f"SELECT COUNT(*) {ORDERS} WHERE {SCOPE_SQL[p['scope']]} = ? AND o.OrderDate BETWEEN ? AND ?",
+        p["label"], f"{p['year']}-03-01", f"{p['year']}-04-30")) for p in bad]
+    claim(all(x["lines"] > 0 for x in provisional), "the March-April windows hold lines of each failing promotion's scope")
+    same_day = [p["id"] for p in bad if p["end"] == p["start"]]
+    reversed_ = [p["id"] for p in bad if p["end"] < p["start"]]
+    claim(len(same_day) + len(reversed_) == len(bad), "each failing promotion ends on or before its start date")
 
     def missed(p, start, end):
         return d.one(f"SELECT COUNT(*) {ORDERS} WHERE {SCOPE_SQL[p['scope']]} = ? AND o.OrderDate BETWEEN ? AND ? "
@@ -427,7 +467,7 @@ def r5(d, claim):
     base = item_name.split(f" {material} ")[0]
     oos_promo = next(p for p in promos if p["id"] == oos[0][1])
     claim(base != item_name and base.startswith(oos_promo["label"] + " "),
-          "the item's name places it in the promotion's collection (the discount is right)")
+          "the item's name places it in the promotion's collection (consistent with a missing collection, not a wrong discount)")
     claim(d.one("SELECT CollectionName FROM Item WHERE ItemID = ?", item_id) is None, "the item's CollectionName is blank")
     collections = {r[0] for r in d.q("SELECT DISTINCT CollectionName FROM Item WHERE CollectionName IS NOT NULL")}
     others = d.q("SELECT ItemCode, ItemName FROM Item WHERE CollectionName IS NULL AND ItemID <> ? AND ItemGroup IN "
@@ -455,15 +495,19 @@ def r5(d, claim):
     own_pending = [r for r in pending if r[1] == mgr_id]       # the manager's own requests among them
     claim(all(d.one("SELECT COUNT(*) FROM SalesInvoiceLine WHERE SalesOrderLineID = ?", r[4]) > 0 for r in pending),
           "the Pending requests were billed")
+    claim(all(d.one("SELECT COUNT(*) FROM SalesInvoiceLine WHERE SalesOrderLineID = ? AND PriceOverrideApprovalID IS NOT NULL",
+                    r[4]) == 0 for r in pending), "the Pending requests' billed lines carry no override link")
     titles = sorted({r[0] for r in d.q("SELECT e.JobTitle FROM PriceOverrideApproval a JOIN Employee e "
                                        "ON e.EmployeeID = a.RequestedByEmployeeID WHERE a.RequestedByEmployeeID <> ?", mgr_id)})
-    claim(center == "Sales", "pricing authority sits in sales, not finance")
+    claim(center == "Sales", "the one approver sits in sales, so no approval by finance is recorded")
     stack = (f"JOIN PriceOverrideApproval a ON a.PriceOverrideApprovalID = l.PriceOverrideApprovalID "
              f"WHERE l.PromotionID IS NOT NULL AND a.Status = 'Approved'")
     stack_orders = d.one(f"SELECT COUNT(*) FROM SalesOrderLine l {stack}")
     stack_billed, stack_disc = d.q(f"SELECT COUNT(*), SUM(l.Quantity * l.UnitPrice * l.Discount) FROM SalesInvoiceLine l {stack}")[0]
-    claim(any(p["end"] < p["start"] for p in promos), "the system accepted end dates before start dates")
+    claim(any(p["end"] < p["start"] for p in promos), "the records hold end dates before start dates")
     return dict(bad=bad, good=word(len(promos) - len(bad)), oos=word(len(oos)), oos_promo=oos_promo["id"],
+                provisional=provisional, same_day=series(same_day), n_same_day=len(same_day), reversed=series(reversed_),
+                n_reversed=len(reversed_),
                 oos_ids=series(r[0] for r in oos), item_id=item_id, code=code, base=base,
                 others=series(f"{c} ({n.split()[0]})" for c, n in others),
                 mgr=dict(id=mgr_id, name=name, title=title), promos=word(len(promos)), approved=len(approved), own=len(own),
@@ -482,6 +526,9 @@ def r6(d, claim):
     _, quarters, prop_total = proposal_quarters(d)
     share = dict(quarters).get(4, 0.0) / prop_total
     claim(0.6 <= share < 0.72, "about two thirds of the cost lands in the fourth quarter")
-    _, discount = goal_seek(d)
+    best, discount = goal_seek(d)
+    _, own_discount = own_goal_seek(d)
     return dict(promos=word(len(be)), proposed=word(len(proposal(d))), reached="came near" if near else "reached",
-                cost=round(prop_total * (1 - commission(d)[2]), -4), discount=discount)
+                cost=round(prop_total * (1 - commission(d)[2]), -4), discount=discount, own_discount=max(own_discount, 0.0),
+                cross=best["id"] != proposal(d)["ItemGroup"]["id"], best=best,
+                best_year=next(p["year"] for p in promotions(d) if p["id"] == best["id"]))

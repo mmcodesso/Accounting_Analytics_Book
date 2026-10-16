@@ -88,14 +88,14 @@ a. Add the second query below the first, and run it.
 {{ x.q3 }}
 ```
 
-**Check:** no rows, because the table has {{ users }} users and {{ ccs }} cost centers. **Watch for:** an empty result that is empty because the query is wrong. Add a second row for one user in the Security table of a copy, and the query lists that user with a count of 2.
+**Check:** no rows, because the table has {{ users }} users and {{ ccs }} cost centers. **Watch for:** an empty result that is empty because the query is wrong. In a copy of the Security table, add a second row for one user with another cost center, and the query lists that user with 2. A row that repeats an existing mapping exactly is not listed, because the query counts each user's distinct cost centers, not rows.
 
 ### Requirement (4): The matching and the flag
 
 **Step 4. Build the review in three layers.**
 
 a. Add the third query below the second.
-b. Read it from the inside out: Users adds the EmployeeID whose Email matches, Matched looks up five more columns by that ID, and the last layer adds the flag.
+b. Read it from the inside out. Users lists each user once, with the cost centers mapped to the user and the EmployeeID whose Email matches, Matched looks up five more columns by that ID, and the last layer adds the flag, which marks a user if any of those cost centers is not the employee's own.
 c. Choose **Run**.
 
 ```dax jinja
@@ -124,7 +124,7 @@ c. Read the table, then choose **Stop viewing**.
 
 {{ figure('IF-AB-2-B') }}
 
-**Check:** all {{ x.n_employees }} employees appear, with their termination dates, while Employee itself shows only the {{ x.s_employees }} of the Sales cost center. No rule filters a table that no relationship reaches. In **Manage roles**, a rule of `FALSE ()` on AccessEmployees for Cost Center Managers closes it, or the table is kept out of the published file. **Watch for:** the review run under a manager's role. It sees one cost center and one row of Security, so Requirement (2) returns nothing and the gap disappears. Run the review as the file's author.
+**Check:** all {{ x.n_employees }} employees appear, with their termination dates, while Employee itself shows only the {{ x.s_employees }} of the Sales cost center. No rule filters a table that no relationship reaches. In **Manage roles**, a rule of `FALSE ()` on AccessEmployees for Cost Center Managers empties it for the role, though its name and columns stay visible, which object-level security would hide too. Keeping the table out of the published file removes it. **Watch for:** the review run under a manager's role. It sees one cost center and one row of Security, so Requirement (2) returns nothing and the gap disappears. Run the review as the file's author.
 
 ### Requirement (6): The note
 
@@ -156,8 +156,8 @@ EVALUATE ROW ( "Unmapped", {{ x.dax_unmapped }}, "Users matched", {{ x.dax_match
 
 ## What a strong answer says
 
-- **(2) to (4)** The review found one cost center without a user, {{ x.center }}, which agrees with Tutorial B.1: nobody sees it until the controller names its manager. It found no user mapped twice and no user who is unmatched, terminated or in another cost center.
-- **(5)** A manager sees every row of AccessEmployees, including the e-mail addresses and termination dates of {{ x.n_employees }} employees, because no rule or relationship filters it. The fix is a rule of `FALSE ()` for the role, or leaving the table out of the published file.
+- **(2) to (4)** The review found one cost center without a user, {{ x.center }}, which agrees with Tutorial B.1, where no department manager sees it until the controller names its manager. It found no user mapped twice and no user who is unmatched, terminated or in another cost center.
+- **(5)** A manager sees every row of AccessEmployees, including the e-mail addresses and termination dates of {{ x.n_employees }} employees, because no rule or relationship filters it. The fix is leaving the table out of the published file, or a rule of `FALSE ()` for the role, which empties the table but leaves its name and columns visible.
 - **(6)** Run the review whenever the security table changes and at least quarterly, with the controller's approval recorded, and by someone other than the person who maintains the table.
 - The limits: the review tests status and cost center on the day it runs, and Email stands in for the sign-in name, which the service may spell differently.
 
@@ -168,6 +168,7 @@ A strong answer reports a clean review without calling it proof, and ties the fr
 - **`RELATEDTABLE`.** *Symptom:* the query fails. *Response:* ask whether Security is related to CostCenter.
 - **A flag nobody tested.** *Symptom:* "zero flagged, so it works". *Response:* ask for the test rows and their flags.
 - **The wrong order.** *Symptom:* the unmatched test row reads {{ x.wrong_order }}. *Response:* ask what a missing employee's status is.
+- **Rows counted, not cost centers.** *Symptom:* a user whose mapping was typed twice is listed in (3), or appears twice in (4). *Response:* ask what (3) and (4) ask about, a cost center or a row.
 - **An auto-created relationship.** *Symptom:* the Sales Manager sees {{ x.s_employees }} employees of the {{ x.n_employees }}, and the student reports no leak. *Response:* ask Model view what reaches the table.
 - **The review run under a role.** *Symptom:* an empty list of unmapped cost centers. *Response:* ask which rows the role hides.
 - **Findings ignored.** *Symptom:* a table typed in sequence, {{ x.seq_flagged|length }} users flagged, and a note that says all is well. *Response:* ask who sees what.

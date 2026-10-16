@@ -32,7 +32,7 @@ Students can:
 - assign accounts to bridge steps and measure each step from the year's postings (Steps 2 and 3);
 - chart the year as a waterfall and explain why the first year reads differently (Step 4);
 - drill through to the entries that moved no cash and restate the sections (Steps 5 and 6);
-- measure cash net of unremitted sales tax and the notes due within a year (Step 7).
+- measure cash net of the recorded sales tax payable and the notes due within a year (Step 7).
 
 **Competencies practiced.** CPA Evolution BAR M9 (financial statement analysis and working capital) and Core S1 M1 to M3 (financial statements, accounts and transactions); IMA Reporting and Control (financial statement analysis); IFAC IES 2 (a), financial accounting and reporting; AACSB A5 part 5.1.
 
@@ -54,7 +54,7 @@ The Checks tab proves every value; colors, order and the drill-through button ar
 
 **Step 1. Show the year-ends.** Add a **Matrix** with AccountType and AccountSubType on **Rows**, Year on **Columns** and `Statement Balance` in **Values**, titled "{{ g.t_matrix }}", and a **Table** titled "{{ g.t_ratios }}" with the working capital, current ratio and quick ratio.
 
-**Check:** `Statement Balance` reverses the sign of liabilities and equity. Working capital {% for v in ye %}${{ v.wc|money }}{{ ", " if not loop.last else "" }}{% endfor %}; current ratio {% for v in ye %}{{ v.current|num(2) }}{{ ", " if not loop.last else "" }}{% endfor %}; quick ratio {% for v in ye %}{{ v.quick|num(2) }}{{ ", " if not loop.last else "" }}{% endfor %}. The current ratio hides the change; the quick ratio, with inventories out, falls. Inventories are {{ inv_share|pct(0) }} of {{ d.C }} current assets.
+**Check:** `Statement Balance` reverses the sign of liabilities and equity. Working capital {% for v in ye %}${{ v.wc|money }}{{ ", " if not loop.last else "" }}{% endfor %}; current ratio {% for v in ye %}{{ v.current|num(2) }}{{ ", " if not loop.last else "" }}{% endfor %}; quick ratio {% for v in ye %}{{ v.quick|num(2) }}{{ ", " if not loop.last else "" }}{% endfor %}. The current ratio hides the change, and the quick ratio, cash and receivables over current liabilities, falls. Inventories are {{ inv_share|pct(0) }} of {{ d.C }} current assets.
 
 ### Part 2: The bridge columns and the measure
 
@@ -100,7 +100,7 @@ The Checks tab proves every value; colors, order and the drill-through button ar
 
 **Step 7. Measure what the cash is worth.** Add `Cash Net of Sales Tax`, `Sales Tax Payable` and `Principal Due within a Year` as cards titled "{{ g.t_cards }}".
 
-**Check:** cash net of the unremitted tax is ${{ net[-1]|money }} on tax of ${{ tax_c|money }}; the notes are ${{ outstanding|money }}, and ${{ due_next|money }} falls due in {{ d.N }} yet sits in `2110`. **Watch for:** filtering the schedule through Date. It runs past the table's last day, so {{ g.beyond_lines }} lines holding ${{ g.beyond|money }} drop out and the notes read ${{ g.inside|money }}, the next year's principal, which looks plausible.
+**Check:** cash net of the recorded tax payable (${{ tax_c|money }}) is ${{ net[-1]|money }}, a liquidity sensitivity (tax billed, not all collected). The notes are ${{ outstanding|money }}, and ${{ due_next|money }} falls due in {{ d.N }} yet sits in `2110`. **Watch for:** the schedule filtered through Date, which drops {{ g.beyond_lines }} payments past the table's end and reads ${{ g.inside|money }}, or on PaymentDate alone, which at an earlier year-end counts a note not yet originated.
 
 **Instructor check.** In **DAX query view**, compare this with the Expected results.
 
@@ -114,7 +114,7 @@ The Checks tab proves every value; colors, order and the drill-through button ar
 |---|---|---|
 | Net income; inventories; change in cash | {{ sm(cur.net_income) }}; {{ sm(cur.inventories) }}; {{ sm(cur.cash) }} | 4 |
 | Restated operating; investing; financing | {{ sm(rc.operating) }}; {{ sm(rc.investing) }}; {{ sm(rc.financing) }} | 6 |
-| Operating without the sales tax | {{ sm(without_tax) }} | 6 |
+| Operating, tax increase paid (a sensitivity) | {{ sm(without_tax) }} | 6 |
 | Cash net of tax; principal due next year | ${{ net[-1]|money }}; ${{ due_next|money }} | 7 |
 
 {{ expected() }}
@@ -122,16 +122,16 @@ The Checks tab proves every value; colors, order and the drill-through button ar
 ## What a strong answer says
 
 - **Balance sheet.** The current ratio barely moves; the quick ratio falls below one, because inventories are most of current assets.
-- **Bridge.** Profit went into inventories; unremitted tax and payables held cash up; the steps end at the change in cash. The opening entry makes {{ d.F }} start from zero cash.
+- **Bridge.** The recorded profit went into inventories, the growth of the recorded tax payable and of payables held cash up, and the steps end at the change in cash. The opening entry makes {{ d.F }} start from zero cash.
 - **Sections.** The entries that moved no cash named, the sections restated, the note disclosed.
-- **Cash and notes.** Net of the tax, cash is far smaller; the notes' current portion belongs in current liabilities.
+- **Cash and notes.** Net of the recorded tax payable, cash is far smaller, a sensitivity. The notes' current portion belongs in current liabilities.
 
 ## Common mistakes and how to respond
 
 - **Cash among the steps.** *Symptom:* steps sum to zero. *Response:* ask what a balanced entry guarantees about the sum of every account.
 - **Bridge from balances.** *Symptom:* net income of {{ sm(g.diff_ni) }}. *Response:* ask where the {{ d.P }} close went.
 - **Sections as recorded.** *Symptom:* financing of {{ sm(g.fin_rec) }}. *Response:* ask which entries moved no cash.
-- **Schedule through Date.** *Symptom:* notes of ${{ g.inside|money }}. *Response:* ask which dates the table covers.
+- **Schedule through Date, or without origination.** *Symptom:* notes of ${{ g.inside|money }}, or ${{ debt_hist[1].all|money }} at the end of {{ d.P }}. *Response:* ask which dates the table covers and when each note began.
 
 ## Grading guide
 

@@ -203,7 +203,7 @@ FROM GLEntry
 WHERE AccountID = 4;
 ```
 
-**Check:** {{ g.allowance_postings }} rows, so no allowance was recorded in the three years. Outline the memo in "What a strong answer says".
+**Check:** {{ g.allowance_postings }} rows, so account {{ g.no.allowance }} has no postings in the three years of the extract. Outline the memo in "What a strong answer says".
 
 ## Expected results
 
@@ -227,7 +227,7 @@ WHERE AccountID = 4;
 - **Requirement (3).** Two levels of headers: top-level headers head a section and two sub-headers sit under {{ subs[0].parent }} and {{ subs[1].parent }}. None has a posting, as a grouping account should not.
 - **Requirement (4).** Each of the {{ n_opposite }} accounts is a contra account: the accumulated depreciation accounts and the allowance reduce assets with a credit, the distributions account reduces equity with a debit, and returns and discounts reduce revenue with a debit.
 - **Requirement (5).** Manufacturing salaries and factory overhead are not expensed in their own accounts. Both are charged to {{ clearing_name }}, which payroll and overhead entries debit and which completions and closes relieve, so the cost reaches cost of goods sold through inventory and {{ variance_name }}.
-- **Requirement (6).** The structure in two sentences, then the two review points: no allowance is recorded (Chapter 8 estimates one), and the discounts account is inactive and unused. It adds that empty header and inactive accounts do not rule out misclassified postings among the active ones.
+- **Requirement (6).** The structure in two sentences, then the two review points: the allowance account has no postings in the extract, to be read with Chapter 8's estimate of the allowance, and the discounts account is inactive and unused. It adds that empty header and inactive accounts do not rule out misclassified postings among the active ones.
 
 A weak memo lists query results without a conclusion, or calls the inactive accounts a defect.
 

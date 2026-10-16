@@ -1,6 +1,6 @@
 ---
 uses: [case1.chapter]
-title: 'Comprehensive Case, Part 1: Getting the Data Ready for the Furniture Margin Question'
+title: 'Comprehensive Case, Part I: Getting the Data Ready for the Furniture Margin Question'
 kind: case-notes
 unit: case1
 minutes: 120
@@ -8,8 +8,8 @@ tool: conceptual
 figures:
   - id: IF-C1-0-A
     kind: diagram
-    purpose: How the six requirements feed the memo and its appendix, and which workflow stages the case completes.
-    shows: Six boxes stacked in a column for the requirements, each tagged with the chapter it draws on (Chapter 1, Chapter 3, Chapter 2, Chapters 2 and 3, none, none). Arrows run from Requirements 2 and 4 into a box labeled "Appendix with the data map and the reconciliation table", from Requirements 3 and 4 into the memo section "Financial reporting", and from Requirement 5 into "Managerial accounting" and "Auditing", which sit with the first in a frame for the memo. A bracket down the left of the column leads into the frame for all six requirements feeding the memo. Beneath, a strip of the six workflow stages with stages 1 to 3 and the readiness part of stage 6 filled and stages 4 and 5 outlined and labeled "Part II". The arrows show the main source of each part.
+    purpose: How the six requirements feed the memo and its appendix, and what the case completes or begins at each workflow stage.
+    shows: Six boxes stacked in a column for the requirements, each tagged with the chapter it draws on (Chapter 1, Chapter 3, Chapter 2, Chapters 2 and 3, none, none). Arrows run from Requirements 2 and 4 into a box labeled "Appendix with the data map and the reconciliation table", from Requirements 3 and 4 into the memo section "Financial reporting", and from Requirement 5 into "Managerial accounting" and "Auditing", which sit with the first in a frame for the memo. A bracket down the left of the column leads into the frame for all six requirements feeding the memo. Beneath, a strip of the six workflow stages with stages 1 to 3 and stage 6 (for the readiness findings) filled, and stages 4 and 5 tinted with a dashed outline as begun in the case and finished in Part II. The arrows show the main source of each part.
     data: none; the boxes and tags come from the case's requirements and the stage list of Chapter 1.
   - id: IF-C1-0-B
     kind: diagram
@@ -18,7 +18,7 @@ figures:
     data: The first and last PostingDate of GLEntry, the last InvoiceDate and the last ShipmentDate, and the posting date of the year-end close (the Expected results of Requirements 3 and 5).
 ---
 {% set g = case1_chapter %}
-# Comprehensive Case, Part 1: Getting the Data Ready for the Furniture Margin Question
+# Comprehensive Case, Part I: Getting the Data Ready for the Furniture Margin Question
 
 {{ header() }}
 
@@ -37,15 +37,15 @@ figures:
 The case depends on these conditions of the data, all visible in the workbook:
 
 - The ledger has {{ g.rows.GLEntry|count }} rows and runs from {{ g.first_post }} to {{ g.last_post }}. Invoices and shipments end on {{ g.last_invoice }}, and the {{ g.late_rows }} ledger rows of fiscal {{ g.next_year }} are all supplier payments.
-- Every Furniture item posts its revenue, its cost of goods sold and its inventory to one account each, so the product line is a clean selection of ledger rows.
-- The Furniture invoice lines and shipment lines of the two quarters equal their ledger postings to the cent.
+- Every Furniture item posts its revenue, its cost of goods sold and its inventory to one account each. The revenue and cost accounts are Furniture's own, so the product line's revenue and cost are a clean selection of ledger rows, while the inventory account is shared with other item groups.
+- The totals of the Furniture invoice lines and shipment lines of the two quarters equal their ledger postings to the cent.
 - The year-end closing entry posts to both Furniture accounts on the last day of the last quarter, which turns a naive Q4 margin into a plausible-looking ratio on negative totals.
 - A return posts its cost to the product line's account but its revenue to an account shared by every product line.
 - The Chapter 2 cutoff findings exist, but none of the Furniture invoices among them falls in either quarter.
 
 ## What students should be able to do afterward
 
-1. Restate a business request as a descriptive and a diagnostic question, name the type of analytics of each, and mark which stages of the six-stage workflow the work completes. Practiced in Requirement 1.
+1. Restate a business request as a descriptive and a diagnostic question, name the type of analytics of each, and say what the work completes or begins at each stage of the six-stage workflow. Practiced in Requirement 1.
 2. Find where a product line's revenue and cost are recorded (item group, then account ID, then account number), and name the key and the cardinality of every join on the path from a document to the ledger. Practiced in Requirement 2.
 3. Choose the quarters of a comparison from the edges of the extract, and decide for each known data quality finding whether it could distort that comparison. Practiced in Requirement 3.
 4. Reconcile a sub-ledger to the ledger for two quarters, and say what agreement shows and what it leaves open. Practiced in Requirement 4.
@@ -57,7 +57,7 @@ The case depends on these conditions of the data, all visible in the workbook:
 **Before the first class**
 
 - Ask each student to confirm that CharlesRiver_Work.xlsx exists and opens. A student who skipped Tutorial 2.1 can copy CharlesRiver.xlsx and rename the copy in two minutes; the download itself stays unchanged for Parts II and IV.
-- Check the Excel version. The model paths use XLOOKUP and MINIFS, which Tutorials 2.1 and 2.2 already introduced, so a student who completed them has what the case needs.
+- Check the Excel version. The model paths use XLOOKUP and MINIFS, which Tutorials 2.1 and 2.2 introduced. The tutorials use them to test a match, never to bring a column from one worksheet onto another, so show one such lookup (the InvoiceDate helper column of Requirement 4) before students start.
 - Build your own answer workbook once, in about an hour, following Requirements 2 to 5. Part I has no solution file. The values in these guides were checked with equivalent database queries, and the Excel formulas follow the Part I tutorials but were not run in Excel for these notes, so run each helper column and PivotTable in your own copy before class.
 - Rehearse the PivotTables on GLEntry, the largest worksheet ({{ g.rows.GLEntry|count }} rows). The first PivotTable takes a moment to build; say so, so that students do not think Excel has frozen. The Watch out in Tutorial 2.2 and in the case says to summarize GLEntry rather than copy formulas down every row.
 - Open the deck (slides {{ g.slide.question }} to {{ g.slide.handin }} set out the question and the deliverable). The criteria slides ({{ g.slide.judged }}) are the six bullets of "What a Strong Submission Includes"; read them aloud at kickoff.
@@ -115,7 +115,7 @@ The case depends on these conditions of the data, all visible in the workbook:
 
 - **A surrogate key is not a business key.** It shows as a filter on GLEntry that returns nothing, or as a lookup of the wrong account. Send the student to the Account worksheet and ask them to read the AccountID and AccountNumber side by side.
 - **The latest rows are not the latest complete period.** A student picks the quarter that holds the last rows of the ledger. Ask what the ledger holds after {{ g.last_invoice }}: supplier payments only, no sales and no shipments, so there is no margin to compute.
-- **Agreement proves too much.** Students write that a tie-out shows the data is complete and right. It shows that what was invoiced and shipped reached the ledger at the same amounts. It does not show that every sale was invoiced, that prices and dates are right, or that revenue and cost are matched in time. The Requirement 4 guide gives the cases the data holds.
+- **Agreement proves too much.** Students write that a tie-out shows the data is complete and right. It shows that the quarter's invoice and shipment totals equal their ledger postings, which supports the consistency of the recorded populations. It does not show that each line posted once, that every sale was invoiced, that prices and dates are right, or that revenue and cost are matched in time. The Requirement 4 guide gives the cases the data holds.
 - **A believable ratio can hide nonsense totals.** The naive Q4 margin of {{ g.naive_q4|pct(1) }} is about the Q3 figure of {{ g.m3|pct(1) }}. Make students say what a negative revenue means before they accept the percentage.
 - **Exclude an entry for a reason, not for its size.** A student drops the closing entry because it is large. The reason is its nature: it moves balances to an income summary and belongs to no quarter's operations. Excluding every journal entry would work here only because the closes are the only journal entries on the two accounts, and it would be wrong where adjusting entries exist.
 - **Not every finding matters for every question.** Students either list all findings as threats or dismiss all of them. A finding matters when it touches the population, the period or the measure of this comparison. The same finding may matter for another question.
@@ -132,7 +132,7 @@ The timeline shows the second idea at a glance, and is worth putting on the boar
 2. Why is the last day of the fiscal year different from any other day? A good discussion reaches closing entries, year-end adjustments and cutoff, and why an auditor looks at the last and first days of a year.
 3. If the sub-ledger and the ledger agree to the cent, can you rely on the data? A good discussion separates tests of completeness and accuracy from tests of agreement, and names what other evidence would add.
 4. Which of the Chapter 2 findings would matter if the controller asked about customers instead of products? A good discussion links each finding to the population and the measure of a question.
-5. Revenue on a return posts to one account for all product lines. How would you report Furniture's margin, before returns or after them? A good discussion weighs a simple ledger measure against a more exact one found by tracing, and ends with a stated choice.
+5. Revenue on a return posts to one account for all product lines. How would you report Furniture's margin, as the ledger gives it (revenue before customer credits, cost after returned goods) or net of both? A good discussion weighs a simple ledger measure against a more exact one found by tracing, and ends with a stated choice.
 6. What do you hand the analyst who will do the Part II diagnosis? A good discussion reaches the data map, the definition of the margin measure, the rows to exclude and the open questions.
 7. The memo goes to the controller. What would you leave out of it, and where would that material go? A good discussion distinguishes the memo from its appendix and from working papers.
 

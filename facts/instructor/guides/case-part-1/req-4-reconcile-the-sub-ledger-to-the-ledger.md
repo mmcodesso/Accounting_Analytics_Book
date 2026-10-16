@@ -23,7 +23,7 @@ figures:
 
 ## Purpose and learning outcomes
 
-Requirement 4 is the case's tie-out. The question is whether the documents students will analyze (invoice lines and shipment lines) are the same thing as the ledger the controller reports from. It is also the first time students need the whole map of Requirement 2 at once: lookups across worksheets, a PivotTable on the document side and another on the ledger side, and a comparison to the cent. The harder half is interpretive: what agreement does and does not show.
+Requirement 4 is the case's tie-out. The question is whether the totals of the documents students will analyze (invoice lines and shipment lines) agree with the ledger the controller reports from. It is also the first time students need the whole map of Requirement 2 at once: lookups across worksheets, a PivotTable on the document side and another on the ledger side, and a comparison to the cent. The harder half is interpretive: what agreement does and does not show.
 
 By the end, students can:
 
@@ -31,7 +31,7 @@ By the end, students can:
 - total the matching ledger postings by account, source document type and quarter, and compare to the cent;
 - explain what agreement shows, what it leaves open, and which source document types post to the cost account.
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and Core S2 M9 (audit procedures, analytical procedures and audit data analytics); IMA Financial Recordkeeping and Financial Statement Preparation; IFAC IES 2 (a), financial accounting and reporting, and IES 2 (f), audit; AACSB A5 part 5.1. The analytics type is descriptive.
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and Core S2 M9 (audit procedures, analytical procedures and audit data analytics); IMA Financial Recordkeeping; IFAC IES 2 (a), financial accounting and reporting, and IES 2 (f), audit; AACSB A5 part 5.1. The analytics type is descriptive.
 
 ## Before you assign
 
@@ -105,11 +105,11 @@ Individual work, 60 minutes: 20 on the revenue side, 20 on the cost side, 10 on 
 
 {{ figure('IF-C1-4-A') }}
 
-**Step 8. Say what agreement shows, and what it does not.** Agreement to the cent shows that the Furniture invoice lines and shipment lines reached the ledger in full in both quarters, at the same amounts, so either source can support the analysis. It leaves three things open:
+**Step 8. Say what agreement shows, and what it does not.** The selected totals agree to the cent for each quarter and source document type. That supports the consistency of these recorded populations, but agreement of totals does not show by itself that every line posted exactly once, because an omission and a duplicate of the same amount would offset. A line-by-line match through SourceLineID, which every posting of the two kinds carries, would support a stronger conclusion, and the case does not ask for it. Three more things stay open:
 
-a. Whether every Furniture sale was invoiced. In {{ g.recon[0].label }} every Furniture shipment line has an invoice line. In {{ g.recon[1].label }}, {{ g.recon[1].uninvoiced.lines }} lines shipped in its last month have none: their standard cost of ${{ g.recon[1].uninvoiced.cost|money }} sits in the cost account without revenue, and at their order prices they would bill ${{ g.recon[1].uninvoiced.at_order_price|money }}.
-b. Whether the documents are right: the prices, the dates and the quantities. Requirement 3's findings are the kind of evidence needed.
-c. Whether revenue and cost fall in the same quarter. Revenue follows the invoice date and cost the shipment date. In {{ g.recon[0].label }}, {{ g.recon[0].shifted.lines }} of the lines invoiced (${{ g.recon[0].shifted.revenue|money }}) shipped in an earlier quarter; in {{ g.recon[1].label }}, {{ g.recon[1].shifted.lines }} (${{ g.recon[1].shifted.revenue|money }}).
+a. Whether every Furniture sale was invoiced. In {{ g.recon[0].label }} every Furniture shipment line has an invoice line. In {{ g.recon[1].label }}, {{ g.recon[1].uninvoiced.lines }} lines shipped in its last month have none. Their standard cost of ${{ g.recon[1].uninvoiced.cost|money }} sits in the cost account without revenue, and at their order prices they would bill ${{ g.recon[1].uninvoiced.at_order_price|money }}. The extract cannot show whether they were billed later, so they need follow-up.
+b. Whether the documents are right, in their prices, dates and quantities. Requirement 3's findings are the kind of evidence needed.
+c. Whether revenue and cost fall in the same quarter. Revenue follows the invoice date and cost the shipment date. In {{ g.recon[0].label }}, {{ g.recon[0].shifted.lines }} of the lines invoiced (${{ g.recon[0].shifted.revenue|money }}) shipped in an earlier quarter, and in {{ g.recon[1].label }}, {{ g.recon[1].shifted.lines }} (${{ g.recon[1].shifted.revenue|money }}) did.
 
 **Step 9. Name the other source document types on the cost account.** Remove the filters on year and period and read the SourceDocumentType rows of account {{ cogs.number }}:
 
@@ -138,8 +138,8 @@ c. Whether revenue and cost fall in the same quarter. Revenue follows the invoic
 ## What a strong answer says
 
 - **The tie-out.** Both sides, both quarters, to the cent, in a table, with the differences shown.
-- **What agreement shows.** The documents reached the ledger in full and at the same amounts; either source can support the analysis.
-- **What it does not show.** That every sale was invoiced, that the documents are right, and that revenue and cost match in time; the best answers name the unbilled Q4 shipments.
+- **What agreement shows.** The selected totals agree for both quarters, which supports the consistency of the recorded populations, not the posting of every line.
+- **What it does not show.** That each line posted once, that every sale was invoiced, that the documents are right, and that revenue and cost match in time. The best answers name the unbilled Q4 shipments.
 - **Other sources.** Shipment, SalesReturn and JournalEntry on the cost account, with the direction of each.
 
 A weak answer reports totals without a comparison, calls agreement proof of reliability, or names only the Shipment type.
@@ -160,7 +160,7 @@ A weak answer reports totals without a comparison, calls agreement proof of reli
 |---|---:|---|---|
 | Revenue reconciliation | 30 | Both quarters, both sides, differences shown | One quarter, or a mismatch left unexplained |
 | Cost reconciliation | 30 | Both quarters, both sides, differences shown | One quarter, or the wrong cost source |
-| What agreement shows | 20 | Shows delivery to the ledger; names at least two things left open | "Reliable" with no limit |
+| What agreement shows | 20 | Agreement of the selected totals, not proof that each line posted, and at least two things left open | "Reliable" with no limit |
 | Other sources on the cost account | 10 | Shipment, SalesReturn and JournalEntry with their direction | One or two named |
 | The table | 10 | A clean table fit for the appendix | Totals scattered in the workbook |
 

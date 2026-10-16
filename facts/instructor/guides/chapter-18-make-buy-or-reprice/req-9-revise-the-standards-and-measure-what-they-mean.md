@@ -37,7 +37,7 @@ Students can:
 - rebuild the stock from the movements and revalue it at each year-end (Part 2);
 - measure the effect against the screen, test it against normal capacity and indirect hours, and recommend how to report it (Parts 3 and 4).
 
-**Competencies practiced.** CPA Evolution BAR M5 (cost accounting and variance analysis) and Core S2 M7 (materiality); IMA Reporting and Control (cost accounting, financial recordkeeping, financial statement preparation); IFAC IES 2 (a) and (b); AACSB A5 part 5.1 (Excel; SQL).
+**Competencies practiced.** CPA Evolution BAR M5 (cost accounting and variance analysis) and Core S2 M7 (materiality); IMA Reporting and Control (cost accounting and financial statement preparation); IFAC IES 2 (a) and (b); AACSB A5 part 5.1 (Excel; SQL).
 
 ## Before you assign
 
@@ -79,7 +79,7 @@ Current   {{ g.f.current }}
 Actual    {{ g.f.actual }}
 ```
 
-**Check:** the proposed rate ${{ new_rate|num(2) }} against ${{ current|num(2) }} today, ${{ td_std|num(2) }} time-driven and ${{ actual|num(2) }} actual. A standard on actual cost would carry the idle capacity and the hours paid beyond the work into inventory, and Topic 330 charges abnormal costs of that kind to the period.
+**Check:** the proposed rate ${{ new_rate|num(2) }} against ${{ current|num(2) }} today, ${{ td_std|num(2) }} time-driven and ${{ actual|num(2) }} actual. A standard on actual cost would carry the idle capacity and the hours recorded above the routings into inventory, and Topic 330 charges abnormal costs of that kind to the period.
 
 {{ figure('IF-18-9-A') }}
 
@@ -96,7 +96,7 @@ OnHand AS (
 )
 ```
 
-**Check:** Q28 returns {{ g.n_q28|count }} rows, Q29 {{ g.n_items|join(', ') }} items at the three year-ends. {% for n in g.neg %}{{ n[1] }} goes negative at the end of {{ n[0] }}{{ "; " if not loop.last else "." }}{% endfor %} The opening stock was drawn on, and item-level opening balances would say which layers remain. Paste Q28 into the Table OnHand and add the standard hours, conversion and standard cost per unit by lookup.
+**Check:** Q28 returns {{ g.n_q28|count }} rows, Q29 {{ g.n_items|join(', ') }} items at the three year-ends. {% for n in g.neg %}{{ n[1] }} goes negative at the end of {{ n[0] }}{{ "; " if not loop.last else "." }}{% endfor %} The opening stock was drawn on, and item-level opening balances would say which layers remain. Only manufactured finished goods revalue, because purchased ones are carried at their receipt cost. Paste Q28 into the Table OnHand and add the standard hours, conversion and standard cost per unit by lookup.
 
 **Step 4. Revalue at the proposed rate.** The revaluation is the standard hours in stock at the new rate, less the conversion already in them.
 
@@ -151,7 +151,7 @@ Q31 returns the opening entry's finished goods, ${{ opening_fg|num(2) }}, which 
 - **The effect.** The balance effects exceed the screen and the income effects do not, at either end of the normal-capacity range; with no indirect hours the prior year's balance falls below it.
 - **Materiality is more than the screen.** The nature of the item, its aggregate with other misstatements, the line items and periods it touches, and the tax effect the ledger cannot supply bear on it.
 - **Evidence before correction.** Would the standards in use, the normal capacity of those years and the costs known when each set of statements was prepared have given a materially different inventory under Topic 330? Name the period costs and volumes, the variances' disposition, counts and item-level opening balances.
-- **The recommendation.** A material prior-period error: revised statements, with inventories, retained earnings and income corrected and the correction disclosed. A change in estimate: the new standard from now on. An immaterial error: correct it in the next statements, with disclosure. The decision is the CFO's, and the shareholders hear which.
+- **The recommendation.** A material prior-period error: revised statements, with inventories, retained earnings and income corrected and the correction disclosed. A change in estimate: the new standard from now on. An error immaterial to the earlier years: corrected in the next statements only if recording it there would not itself materially misstate that year, judged on amount and nature, and otherwise by revising the comparatives (ASC Topic 250). The decision is the CFO's, and the shareholders hear which.
 
 A weak answer calls the revaluation an error, or stops at the screen.
 

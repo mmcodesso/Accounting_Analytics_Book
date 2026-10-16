@@ -47,7 +47,7 @@ D.  The drill-through page reads documents only from those tables
 **7.** On the monitoring page, most tests show exceptions only in January, while one test shows exceptions in every month of every year. Which reading is most appropriate?
 
 A.  The Date table assigns the recurring test's dates incorrectly
-B.  A design flaw in the control behind the recurring test
+B.  A possible design flaw in the recurring test's control
 C.  The January cluster is more serious because it is larger
 D.  The recurring test should be removed as a source of noise
 
@@ -65,7 +65,7 @@ B.  An open exception, still awaiting review
 C.  A document missing from the population of its process
 D.  A disposition whose document number was mistyped
 
-**10.** A reviewer has time for one exception today. Following Li et al. (2016) and Chapter 8's risk score, which should come first?
+**10.** A reviewer has time for one exception today, and the candidates' amounts and urgency are otherwise alike. Under the chapter's simple order of review, which should come first?
 
 A.  A new exception on a document that fails three tests
 B.  One of the year-end closing entries above every approval limit
@@ -79,12 +79,12 @@ B.  As false positives, because the approver is the accounting manager
 C.  As one finding on the design of the control
 D.  As expected exceptions that need no attention in later months
 
-**12.** The Data Through card shows December 18, 2026, although the journal entries and the purchase orders run to December 31. What does it mean?
+**12.** The Data Through card shows December 18, 2026, although the journal entries and the purchase orders run to December 31. What does the card establish?
 
 A.  The refresh failed for two of the three populations
 B.  The journal entries after December 18 were backdated
 C.  The Date table of the monitoring file ends on December 18
-D.  The payroll tests have not seen the last days of the year
+D.  No payroll register in the extract has a later pay date
 
 **13.** Which practice lets a reviewer see exactly which lines of a measure or query a change altered before the report is published?
 
@@ -93,9 +93,9 @@ B.  Applying a sensitivity label to the report in Power BI Desktop
 C.  Adding a page navigator and an About page to the report
 D.  Emailing each new version of the .pbix file to the reviewer
 
-**14.** A department manager asks for a copy of Charles River Reports.pbix to work with offline. Why should internal audit object?
+**14.** A department manager asks for a copy of Charles River Reports.pbix to keep and work with offline, outside the approved release. Why should internal audit object?
 
 A.  A copy cannot be opened without a Power BI Pro license
-B.  It holds every imported row and escapes change control
+B.  It holds every imported row and can drift from the release
 C.  The copy's measures are recalculated by a different engine
 D.  The copy loses its Tests tab and the queries saved in it

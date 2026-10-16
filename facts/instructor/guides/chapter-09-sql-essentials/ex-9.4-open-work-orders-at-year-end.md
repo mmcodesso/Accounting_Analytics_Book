@@ -30,7 +30,7 @@ By the end, students can:
 - find open records with IS NULL and explain why `= NULL` returns nothing (outcome 4);
 - take a year out of a document number with SUBSTR and CAST, and label a missing date with COALESCE (outcome 2);
 - compare dates stored as text, and sort to find the oldest item (outcomes 3 and 5);
-- say why the variance of open work orders is not in the year's results, and what the status cannot show (outcome 6).
+- say why any variance of open work orders is not in the year's results, and what the status cannot show (outcome 6).
 
 **Competencies practiced.** CPA Evolution BAR M5 and ISC M4 (cost accounting; use and management of data); IMA Reporting and Control (cost accounting) and Business Acumen and Operations (operational knowledge); IFAC IES 2 (b) and (i); AACSB A5 part 5.1.
 
@@ -125,7 +125,7 @@ WHERE ClosedDate IS NULL AND Status = 'Completed';
 
 ### Requirement (4): The past-due work orders
 
-**Step 5. List those due on or before the last day of the year.**
+**Step 5. List those due on or before the year-end.**
 
 ```sql
 -- Requirement (4): the open work orders due on or before 2026-12-31
@@ -139,7 +139,7 @@ ORDER BY DueDate, WorkOrderNumber;
 
 {{ figure('IF-09-4-A') }}
 
-**Check:** {{ due }} rows; the oldest is {{ oldest.number }}, released {{ oldest.released }} and due {{ oldest.due }}, then {{ next[0].number }} (due {{ next[0].due }}) and {{ next[1].number }} (due {{ next[1].due }}). **Watch for:** `<` and `<=` return the same {{ g.lt }} rows here, because no open work order is due on the last day; that is a property of this data, not a rule. A date typed as `12/31/{{ end[:4] }}` returns {{ g.slashed }} rows, because the stored dates begin with the year.
+**Check:** {{ due }} rows; the oldest is {{ oldest.number }}, released {{ oldest.released }} and due {{ oldest.due }}, then {{ next[0].number }} (due {{ next[0].due }}) and {{ next[1].number }} (due {{ next[1].due }}). **Watch for:** `<` and `<=` return the same {{ g.lt }} rows here, because no open work order is due on {{ end }} itself. That is a property of this data, not a rule. A date typed as `12/31/{{ end[:4] }}` returns {{ g.slashed }} rows, because the stored dates begin with the year.
 
 ### Requirement (5): Past due and still Released
 
@@ -169,7 +169,7 @@ ORDER BY DueDate, WorkOrderNumber;
 | Open work orders, and by status | {{ n }}; Released {{ status["Released"] }}, In Progress {{ status["In Progress"] }}, Completed {{ status["Completed"] }} | 1, 4 |
 | Release years, and the date range | {{ end[:4] }}; {{ released_low }} to {{ released_high }} | 2 |
 | Not completed on | {{ not_completed }} rows | 2 |
-| Due on or before the last day, by status | {{ due }}: {% for s in due_status %}{{ s[0] }} {{ s[1] }}{{ ", " if not loop.last else "" }}{% endfor %} | 5 |
+| Due on or before the year-end, by status | {{ due }}: {% for s in due_status %}{{ s[0] }} {{ s[1] }}{{ ", " if not loop.last else "" }}{% endfor %} | 5 |
 | Oldest | {{ oldest.number }}, due {{ oldest.due }} | 5 |
 | Still Released and past due | {{ released }} | 6 |
 
@@ -177,11 +177,11 @@ ORDER BY DueDate, WorkOrderNumber;
 
 ## What a strong answer says
 
-- **Requirement (2).** Every open work order was released in the current year, so nothing from earlier years is open, and COALESCE separates the work that was never completed from the work that was completed and not closed.
+- **Requirement (2).** Every open work order was released in the current year, so nothing from earlier years is open, and COALESCE separates the work orders with no CompletedDate from those completed and not closed. The label reports a missing date, not proof that no output was made, and some Released work orders already have production completions.
 - **Requirement (5).** Hundreds of work orders are past due and still Released. A strong answer treats the status as unreliable, not as a fact: some of them show activity in other tables, so production should reconcile the statuses. For the others, no recorded activity does not prove that nothing happened.
-- **Requirement (6).** The counts by status and the late ones, the oldest named, and the accounting: the variance is recorded when the WorkOrderClose document posts the difference between actual and standard cost to {{ g.no.variance }}. Until then the costs sit in work in process and {{ g.no.clearing }}, so any variance on these work orders is not in the year's results, and the open status does not say how large it will be. The completed work orders should be closed.
+- **Requirement (6).** The counts by status and the late ones, the oldest named, and the accounting. The variance is recorded when the WorkOrderClose document posts the difference between actual and standard cost to {{ g.no.variance }}. Completed output on {{ completed_out }} of the open work orders, all {{ status["Completed"] }} Completed ones among them, has already moved its standard cost to finished goods, so only the cost not yet relieved stays in work in process and {{ g.no.clearing }}. None has a recorded close, so any variance on them is not in the year's results, and the status does not say whether an order will close or how large or in which direction its variance would be. Production and cost accounting should explain why the completed work orders are still open and close or correct them through the approved process.
 
-A weak memo says that no work has started on the Released orders, or leaves out why the year's variance is understated.
+A weak memo says that no work has started on the Released orders, says that all their costs are still in work in process, or calls the year's variance understated, when the direction of any variance on the open work orders is unknown.
 
 ## Common mistakes and how to respond
 

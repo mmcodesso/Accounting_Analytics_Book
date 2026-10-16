@@ -21,7 +21,7 @@
 The chapter depends on these conditions of the data:
 
 - Dates are text and a function's result has no type: of the 297 journal entries posted in 2026, `strftime('%Y', PostingDate) = '2026'` finds them all, and the test against the number finds 0.
-- The time records end on 2026-12-11, 20 days before the month ends, because the last pay periods are open. The measure cuts the output at the same day.
+- The time records end on 2026-12-11, 20 days before the month ends, because the last pay periods are open. The measure cuts the output at the same day. Indirect time ends a week earlier, on 2026-12-04, so the measure's last month is provisional.
 - The plant starts up in the first month: indirect time is almost absent for four months afterward, and one of them, 2024-03, has none at all.
 - Payroll is posted on pay dates with no accrual, so the largest months of the gap in account `1090` have three pay dates.
 - The only journal entries to the revenue accounts are the 6 year-end closes, and every CreatedDate carries a time. Unit margins do not tie but margin percentages do, and six requisitions have no approver.
@@ -120,6 +120,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 - Step 2: without the LaborType filter only the overtime column changes: the year reads 20,547 hours where 20,030 is right.
 - Step 3: without `'start of month'` the month end reads 2027-01-10, 30 days away, not 20; `date('2026-01-31', '+1 month')` returns 2026-03-03.
 - Step 5: `strftime('%Y', ClosedDate) = 2026` finds 0 work orders, and 3,960 with the year as text.
+- Step 5, the dates: one work order closed in 2024 is completed 3 days before its release, without moving the average. Credit checking the dates and reading close-year cohorts, not a cause.
 
 **The checkpoint to look for.** The six bullets. A strong student names three views of one change: indirect time, overtime on direct labor and slower work orders.
 
@@ -142,6 +143,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 - Step 2: a LAG with no partition compares each month with the month before: July of the last year against $150,042.56, June's figure.
 - Step 3: the rank in WHERE stops with `misuse of aliased window function GapRank`, or `misuse of window function RANK()` when the expression is repeated.
 - Step 6: an inner join to the labor summary raises Packing to 4.73 and Quality Assurance to 6.28, because operations with no direct time leave the plan; joining the labor entries straight to the operations repeats the planned hours and cuts them to 1.93 and 2.45; without the cut-off 5 rows have no year.
+- Step 6, the cohort: of the 13,131 operations counted in the last year, 5,981 have no direct time and 1,795 have direct time dated after they ended, hence a finding to investigate.
 
 **The checkpoint to look for.** The six bullets. A strong student says that the largest months come from the pay calendar, and that the work-center pattern is a finding to investigate, not an explanation.
 
@@ -161,6 +163,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 
 - Step 2: indirect time in a step of its own, with `WHERE LaborType = 'Indirect Manufacturing'`, loses the month with none: 35 months where 36 belong, and a view of 24 rows starting 2025-01.
 - Step 4: `12 PRECEDING` holds thirteen months, and the filter on twelve keeps 1 row. An average of twelve monthly ratios reads 1.53 where the pooled figure reads 1.51. Without the cut-off the last month's ratio reads 0.72 instead of 1.03.
+- Step 4, coverage: the last row's direct time and output run to 2026-12-11, its indirect time to 2026-12-04. Counted to that day on both sides, the row reads direct `0.89`, indirect `0.58`, total `1.48` and overtime share `0.192` (published `0.94`, `0.57`, `1.51`, `0.198`); no other row changes. Accept it as a labeled sensitivity. The rounded parts miss the rounded total by a hundredth in 8 of 25 rows.
 
 **The checkpoint to look for.** The seven bullets. A strong student says that the trailing ratio shows a trend only while coverage and definitions hold, and that the last month is provisional.
 
@@ -188,7 +191,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 
 **A trailing figure needs full windows.** Question 15, Tutorial 11.3 Steps 4 and 5. A frame counts rows, not months; partial windows are left out; the figure pools twelve months and is not an average of ratios; the last month is provisional. Ask: does this window hold twelve months?
 
-**A view is a query, not a result.** Question 13, Tutorial 11.3 Steps 6 to 8, Exercise 11.5 (5). It runs on whatever the file holds and breaks when its tables change. Ask: what would make today's view return something different tomorrow?
+**A view is a query, not a result.** Question 13, Tutorial 11.3 Steps 6 to 8, Exercise 11.5 (5). It runs on whatever the file holds. A change to its tables can be refused at once (a dropped column it uses) or leave a view that fails or changes meaning when next queried. Ask: what would make today's view return something different tomorrow?
 
 ## Discussion prompts
 

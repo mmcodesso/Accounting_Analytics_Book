@@ -72,7 +72,7 @@ d. Under **Format visual > Visual > Slicer settings > Options**, set **Style** t
 a. Select **Matrix**, and drag Discounts from Key Measures into **Values**.
 b. Drag CustomerSegment from the Customer table into **Rows**, and Month from SalesInvoice into **Columns**.
 
-**Check:** {{ g.w_segs }} segment rows and twelve month columns. The {{ g.none }} row reads zero in every month, not blank, because it has invoice lines every month and each has a discount of zero. **Watch for:** the slicer left unselected, which gives {{ g.n_months }} month columns, or left as **Between**, a range with two handles.
+**Check:** {{ g.w_segs }} segment rows and twelve month columns. The {{ g.none }} row reads zero in every month, not blank, because it has invoice lines every month and each has a discount of zero. **Watch for:** the slicer left unselected, which gives {{ g.n_months }} month columns, or left as **Between**, a range with two handles. The matrix computes each total from the unrounded amounts, so Wholesale's displayed months add to ${{ g.ws_cells|money }} against its row total of ${{ g.ws_total|money }}, and the displayed monthly totals add to ${{ g.months_cells|money }} against ${{ g.total|money }}. Those are display rounding, not errors.
 
 {{ figure('IF-AC-2-A') }}
 
@@ -89,7 +89,7 @@ b. Read the labels under the axis. If they are not in month order, open **More o
 
 **Step 5. Read each segment's largest month.**
 
-**Check:** {{ g.trade }}, a segment promotion, explains {{ trade_month }} for the segment it names. The other peaks fall in the months of {{ autumn }}, which ran in {{ autumn_months }}: the other segments peak in {{ others|map("last")|unique|join(" or ") }}. One cell is worth matching.
+**Check:** {{ g.trade }}, a segment promotion, gives most of {{ trade_month }} for the segment it names (${{ trade_own|money }}), and the {{ autumn }}'s lines invoiced that month give the rest (${{ trade_rest|money }}). The other peaks fall in the months of {{ autumn }}, which ran in {{ autumn_months }}: the other segments peak in {{ others|map("last")|unique|join(" or ") }}. One cell is worth matching.
 
 ```dax jinja
 EVALUATE
@@ -102,7 +102,7 @@ ROW ( "Design Trade, {{ trade_month }}", {{ g.dax_trade }} )
 
 **Step 6. Say which segment and why.** The {{ g.none }} segment received none: it buys only {{ g.services_only }}, and no promotion covers Services.
 
-**Check:** two sentences. The first names the segment and the reason. The second says that an item-group promotion discounts every segment that buys the group, so Wholesale, the largest, holds {{ g.ws_share|pct(1) }} of the year's discounts, while a segment promotion reaches only its segment, so a calendar aimed at one segment uses a segment promotion.
+**Check:** two sentences. The first names the segment and the reason. The second says that an item-group promotion discounts every segment that buys the group, so Wholesale, the largest, holds {{ g.ws_share|pct(1) }} of the year's discounts, while a segment promotion reaches only its segment. A strong second sentence also says that the page shows the discounts by invoice month, not what the promotions did to sales, so a calendar aimed at one segment needs that segment's orders and margins as well.
 
 ## Expected results
 
@@ -119,7 +119,7 @@ ROW ( "Design Trade, {{ trade_month }}", {{ g.dax_trade }} )
 ## What a strong answer says
 
 - **(2), (3)** A page with the slicer on the current year, the matrix with five rows, and the line chart in month order, with a title.
-- **(4)** {{ trade }} for Design Trade in {{ trade_month }}; for the others, the autumn promotion, with the remark that its orders of {{ autumn_months }} are invoiced into the next months.
+- **(4)** {{ trade }} for most of Design Trade's {{ trade_month }}, with part of the autumn promotion's billing; for the others, the autumn promotion, with the remark that its orders of {{ autumn_months }} are invoiced into the next months.
 - **(5)** The segment, the reason (it buys only Services), and the distinction between a segment and an item-group promotion.
 
 ## Common mistakes and how to respond

@@ -1,6 +1,6 @@
 ## Guided Tutorial 5.3: Building InvoiceLines in Power Query
 
-**Context and objective.** In this tutorial, you will build the table the rest of Part II analyzes. Instead of adding more formula columns, you will create a new Power Query query, InvoiceLines, that starts from the invoice lines, merges in the invoice, item, and customer details, and calculates the fiscal period, the product type, and a quantity check as custom columns. You will load it as a Table, reconcile it with the source and with the lookups from Tutorial 5.2, and record it on the Documentation worksheet. Because it is a query, it rebuilds itself whenever you refresh the workbook.
+**Context and objective.** In this tutorial, you will build the table that Chapters 6 and 7 analyze. Instead of adding more formula columns, you will create a new Power Query query, InvoiceLines, that starts from the invoice lines, merges in the invoice, item, and customer details, and calculates the fiscal period, the product type, and a quantity check as custom columns. You will load it as a Table, reconcile it with the source and with the lookups from Tutorial 5.2, and record it on the Documentation worksheet. Because it is a query, it rebuilds itself whenever you refresh the workbook.
 
 **Prerequisites.** You need the analysis workbook from Tutorials 5.1 and 5.2, including the SalesInvoice, SalesInvoiceLine, and Item queries. If you start here, download Charles River Furniture Analysis.xlsx as it stands at the end of Tutorial 5.2 from [Companion Files](#sec-companion-files), and point its queries at your copy of CharlesRiver.xlsx as that page explains.
 
@@ -39,7 +39,7 @@ b. Expand ItemCode, ItemGroup, and StandardCost, without the prefix.
 c. Merge **InvoiceLines** with **Customer** on CustomerID, the column you added in Step 3, with a left outer join, and read the match message.
 d. Expand CustomerSegment and Region, without the prefix.
 
-Each match message estimates that every row of the first table finds a match. Because every key refers to exactly one row of the Table it is matched in, the merges add columns without adding or losing rows. The match message is only an estimate, and the editor's status bar shows only a preview of the rows, so you will confirm the exact count after loading, in Step 6.
+Each match message estimates that every row of the first table finds a match. Because every key refers to exactly one row of the Table it is matched in, the merges add columns without adding or losing rows. The match message is only an estimate, and the editor's status bar shows only a preview of the rows, so Step 6 checks the loaded result.
 
 **Step 5. Add the calculated columns.** Custom columns calculate the period, the product type, and the quantity check inside the query, so that they are rebuilt on every refresh.
 
@@ -78,7 +78,7 @@ d. In A53, type `Lines with a fractional quantity`, and in B53 enter:
    =COUNTIF(InvoiceLines[WholeQuantity],FALSE)
    ```
 
-B49 and B50 equal the invoice line count and line total from Chapter 4, and row 52 repeats row 45 to the cent, so the query and the lookups agree. B53 shows that most lines carry a fractional quantity, the validity finding described earlier in this chapter. @fig-05-08 shows the loaded Table.
+B49 and B50 equal the invoice line count and line total from Chapter 4, and row 52 repeats row 45 to the cent, so the query and the lookups agree. Like the control totals of Tutorial 4.1, Step 10, the count and total cannot show that every key matched, because a left outer merge keeps a line that finds no match. A left anti merge on each key that returns no rows would show it, and a key that appears only once in the second Table, as each of these does, is what keeps a line from being repeated. B53 shows that most lines carry a fractional quantity. It also counts the design services billed by the hour, but most of the lines it flags are for items sold by the unit, the validity finding described earlier in this chapter. @fig-05-08 shows the loaded Table.
 
 ![The InvoiceLines Table Loaded by Power Query.](/visuals/svg/fig-05-08-invoicelines-table.svg){#fig-05-08 fig-alt="A mock of the InvoiceLines worksheet. Seven of the Table's columns are shown: SalesInvoiceLineID, Quantity, InvoiceDate, ItemGroup, CustomerSegment, Period, and WholeQuantity; the Table also holds the line's other columns and the other merged and calculated columns. The Queries and Connections pane at the right lists every query with the number of rows it loaded, and InvoiceLines has as many rows as SalesInvoiceLine. The InvoiceLines entry in the pane is outlined."}
 
@@ -91,7 +91,7 @@ d. Add T4_Customer to the Source entry.
 e. Choose **Data > Refresh All**, and confirm that the row counts and totals are unchanged.
 f. Update the Last refreshed date, and save the workbook.
 
-The refresh rebuilds InvoiceLines from the source Tables, and the unchanged totals show that the query repeats itself exactly.
+The refresh reruns every recorded step on the source Tables. Unchanged counts and totals show that these controls agree after the refresh, not that every value in InvoiceLines is the same as before or right.
 
 **Checkpoint.** Check that:
 
@@ -100,4 +100,4 @@ The refresh rebuilds InvoiceLines from the source Tables, and the unchanged tota
 - most lines are flagged as having a fractional quantity, and the Documentation worksheet records it;
 - a refresh rebuilds InvoiceLines without any change to the totals.
 
-The two methods agree. Both start from the same keys and dates, so their agreement shows that the query prepares the data as consistently as the lookups, not that every source value is right; and the Furniture totals test the item group and the quarter, not the customer segment and region that only the query adds. From here on, the analysis uses InvoiceLines, because it is a single recorded procedure that repeats itself on every refresh, while the lookup columns on SalesInvoiceLine remain in the workbook as the check that confirmed it. The order date stays on SalesInvoiceLine, for the analyses that need it.
+The two methods agree. Both start from the same keys and dates, so their agreement shows that the query prepares the data as consistently as the lookups, not that every source value is right; and the Furniture totals test the item group and the quarter, not the customer segment and region that only the query adds. From here on, the analysis uses InvoiceLines, because it is a single recorded procedure that runs again on every refresh, while the lookup columns on SalesInvoiceLine remain in the workbook as its cross-check. The order date stays on SalesInvoiceLine, for the analyses that need it.

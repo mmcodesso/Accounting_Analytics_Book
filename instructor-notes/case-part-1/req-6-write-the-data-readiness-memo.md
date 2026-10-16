@@ -23,7 +23,7 @@ By the end, students can:
 ## Before you assign
 
 - Students need the results of Requirements 2 to 5: the data map, the choice of quarters, the reconciliation table and the margins. Students who skipped one should not start the memo.
-- The requirement relies on one condition that earlier steps established and that a student might forget to mention: the Furniture margin falls from the third to the fourth quarter of fiscal 2026 whichever way it is measured (from the ledger, or at standard cost from the invoice lines).
+- The requirement relies on one condition that earlier steps established and that a student might forget to mention. The Furniture margin falls from the third to the fourth quarter of fiscal 2026 in every measure these guides compute (from the ledger, net of the traced credit memo lines, or at standard cost from the invoice lines).
 - Decide the length rule in advance. Two pages of 11-point text hold about 800 to 900 words with the header, so the model budget below keeps to about 700.
 
 ## How to run it
@@ -45,7 +45,7 @@ The model memo follows a fixed order, and its parts take these words:
 
 ### Phase 1: The opening
 
-**Step 1. Write the bottom line first.** One paragraph. A model: the data can support a comparison of the Furniture gross margin of 2026 Q3 and 2026 Q4 once the year-end close (JE-2026-000296) is excluded; on that basis the margin fell from 43.33% to 41.06%, 2.27 points; the main limits are the revenue side of returns and the year-end cutoff; the recommendation is a diagnostic analysis in Part II.
+**Step 1. Write the bottom line first.** One paragraph. A model says that the data can support a comparison of the Furniture gross margin of 2026 Q3 and 2026 Q4 once the year-end close (JE-2026-000296) is excluded. On that basis the margin fell from 43.33% to 41.06%, 2.27 points. The main limits are the treatment of returns, the different dates of revenue and cost, and the unbilled December shipments. The recommendation is a diagnostic analysis in Part II.
 
 **Check:** the paragraph answers "can I use this data, and for what?" before any detail. **Watch for:** an opening that says what the student did ("I examined the data") instead of what the controller needs.
 
@@ -56,7 +56,7 @@ The model memo follows a fixed order, and its parts take these words:
 **Step 2. Report the reconciliation and the cutoff findings.** Model content:
 
 - The Furniture invoice lines ($4,283,322.86 in 2026 Q3 and $4,156,787.84 in 2026 Q4) equal the sales invoice credits to account 4010 ($4,283,322.86 and $4,156,787.84), and the standard cost on the shipment lines equals the shipment postings to account 5010 in both quarters, to the cent.
-- Agreement shows that the documents reached the ledger in full. It does not show that every sale was invoiced: 4 Furniture shipment lines of 2026 Q4 have no invoice line, $18,453.55 at standard cost.
+- Agreement supports the consistency of these recorded totals. It does not show that every line posted once or that every sale was invoiced, since 4 Furniture shipment lines of 2026 Q4 have no invoice line, $18,453.55 at standard cost.
 - Of the 9 invoices dated before their first shipment, 3 hold Furniture lines; none is dated, shipped or posted in either quarter, so they do not touch this comparison. They matter for annual revenue and the year-end cutoff.
 
 **Check:** a number is always followed by what it means for this quarter. **Watch for:** "the totals agree, so the data is reliable", and the cutoff finding presented as a defect of the margin.
@@ -65,8 +65,8 @@ The model memo follows a fixed order, and its parts take these words:
 
 **Step 3. State the measure and what it shows.** Model content:
 
-- The measure is revenue less cost of goods sold, over revenue, from the ledger: credits less debits on account 4010 and debits less credits on account 5010, including the postings of invoices, shipments and returns and excluding the year-end close; the quarters are 2026 Q3 and 2026 Q4, the latest two complete ones.
-- It shows 43.33% falling to 41.06%. Revenue fell 3.0% while cost rose 0.9%. At standard cost, from the invoice lines, the margin falls from 42.26% to 40.78%, so the two views agree.
+- The measure is revenue less cost of goods sold, over revenue, from the ledger. Revenue is credits less debits on account 4010 and cost is debits less credits on account 5010, with the postings of invoices, shipments and returns and without the year-end close, so revenue is before customer credits and cost is after the returned goods. The quarters are 2026 Q3 and 2026 Q4, the latest two complete ones.
+- It shows 43.33% falling to 41.06%. Revenue fell 3.0% while cost rose 0.9%. At standard cost, from the invoice lines before returns, the margin falls from 42.26% to 40.78%. That separate measure supports the direction of the change, not the level.
 - For the diagnosis, the invoice lines already hold the fields it needs: ItemID, Quantity, BaseListPrice, UnitPrice, Discount, PromotionID, LineTotal, and the item master holds ItemCode, StandardCost, ListPrice.
 
 **Check:** another analyst could reproduce the number from the memo's definition. **Watch for:** a margin given with no accounts, no quarters or no statement about the closing entry.
@@ -75,15 +75,15 @@ The model memo follows a fixed order, and its parts take these words:
 
 **Step 4. Give the evidence, the closing-entry problem and the limits.** Model content:
 
-- Evidence for reliance: both reconciliations agree; every account number the ledger refers to exists in the chart; every posting names its document, so a number can be traced from the ledger back to its source.
+- The evidence for reliance is that both reconciliations agree, that every AccountID the ledger uses exists in the chart, and that every posting to the two Furniture accounts names a source document that exists, so a number can be traced from the ledger back to its source.
 - The closing-entry problem: all rows give a 2026 Q4 margin of 43.4%, a plausible percentage on negative totals, because JE-2026-000296 debits revenue and credits cost by the year's balances. The measure excludes it by entry type, so a later quarter-end that is also a year-end is handled the same way.
-- Limits: the revenue side of returns posts to a shared account, so the margin is before it; the traced Furniture credit memo lines were $55,437.94 in 2026 Q3 and $39,719.44 in 2026 Q4, and netting them leaves the fall in place. The unbilled shipments are a cutoff question. A blank tracking number weakens the evidence that a shipment took place.
+- The limits come with their consequences. The measure takes revenue before customer credits, which post to a shared account, and cost after the returned goods, so it overstates the margin. The traced Furniture credit memo lines were $55,437.94 in 2026 Q3 and $39,719.44 in 2026 Q4, and netting them gives 42.59% and 40.49%, so the fall remains. Revenue follows the invoice date and cost the shipment date, so a few lines fall in different quarters. The unbilled December shipments need follow-up. A blank tracking number weakens the evidence that a shipment took place.
 
 **Check:** the memo says what the data can support and what it cannot. **Watch for:** a limitation list with no consequence for the controller's decision.
 
 ### Phase 5: The recommendation and the appendix
 
-**Step 5. End with the next analysis.** A model: perform the diagnostic analysis in Part II, decomposing the change between 2026 Q3 and 2026 Q4 into volume, mix, price and cost effects by product, from the invoice lines and the item master, using the measure above. First agree two treatments: whether to net the revenue side of returns, and whether to count the unbilled shipments. State the decision the controller needs to make.
+**Step 5. End with the next analysis.** A model recommends the diagnostic analysis of Part II, decomposing the change between 2026 Q3 and 2026 Q4 into volume, mix, price and cost effects by product, from the invoice lines and the item master, on the measure above. It asks the controller to settle three treatments first, the revenue side of returns, the lines invoiced in one quarter and shipped in another, and the unbilled shipments. State the decision the controller needs to make.
 
 **Step 6. Assemble the one-page appendix.** The data map of Requirement 2 and the reconciliation table of Requirement 4, on one page, readable on their own.
 

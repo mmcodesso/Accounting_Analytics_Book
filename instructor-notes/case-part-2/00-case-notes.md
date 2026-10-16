@@ -1,4 +1,4 @@
-# Comprehensive Case, Part 2: Deciding on the 2027 Promotion Calendar
+# Comprehensive Case, Part II: Deciding on the 2027 Promotion Calendar
 
 | | |
 |---|---|
@@ -24,17 +24,17 @@ The case depends on these conditions of the data, all visible in the workbook:
 - The company ran nine promotions in three fiscal years, one collection, one item group and one customer segment a year. Of the order lines, 1,650 carry a promotion, and no other line has a discount.
 - Revenue is recorded net of every price reduction. The discount account exists and has no postings, so the ledger cannot show what the promotions cost.
 - The recorded end dates of the collection promotions fall on or before their start dates, so none of their lines was ordered inside them.
-- Volume in each promotion's months is within normal variation, and far below the volume the promotion would need to pay for itself.
+- Volume in each promotion's months is within the scope's normal month-to-month variation on an informal screen, and far below the increase the promotion would need to pay for itself.
 - The 2027 budget prices every month alike, plans no promotion, and plans several times the volume actually ordered.
 - One employee approved every promotion and every approved price override.
 
 ## What students should be able to do afterward
 
-1. Build and document a refreshable workbook from several Tables with Power Query, and prove it complete with control totals. Practiced in Requirement 1.
+1. Build and document a refreshable workbook from several Tables with Power Query, and check it against its sources with control totals. Practiced in Requirement 1.
 2. Quantify a cost that no account records, tie billed revenue to the ledger, and say where the cost does and does not appear. Practiced in Requirement 2.
 3. Test a claimed effect against an expectation and the normal variation of the data, and state what the data cannot show. Practiced in Requirement 3.
 4. Model a decision with a contribution margin model, a data table and Goal Seek, and cost it against a plan on a justified volume. Practiced in Requirement 4.
-5. Test controls line by line, use evidence outside the record under test, and classify each exception as design or operation. Practiced in Requirement 5.
+5. Test controls line by line, use evidence outside the record under test, and classify each exception provisionally as design or operation, with the evidence that would confirm it. Practiced in Requirement 5.
 6. Write a short memo that recommends an action, with exhibits a reviewer can trace. Practiced in Requirement 6.
 
 ## Preparing to teach
@@ -50,7 +50,7 @@ The case depends on these conditions of the data, all visible in the workbook:
 
 - Three columns of PromotionProgram share names with Item and Customer. Unrenamed, the merge stops. Slide 15 is the Watch out; repeat it at the first merge.
 - Power Query types Discount as a whole number from the first 200 rows, which carry no discount, and every rate rounds to 0. **Replace current** fixes it. The no-discount checks then pass trivially, because every rate is 0.
-- The order date and the invoice date answer different questions (slides 16 and 17). Students use whichever they have open.
+- The order date, the invoice date and the ledger's posting date answer different questions (slides 16 and 17). Students use whichever they have open, and the tie to the ledger in Requirement 2 needs the last two.
 - A data table's input cells must sit on the sheet that holds the table, so the proposal's rates on Parameters cannot be the input cells.
 - A PivotTable ignores the worksheet's filters. A student who filters `OrderLines` to one scope and builds a PivotTable still sums every scope.
 - Goal Seek leaves the changing cell at the value it found unless the student cancels or resets it.
@@ -103,12 +103,12 @@ The case depends on these conditions of the data, all visible in the workbook:
 
 ## Difficult ideas and misconceptions
 
-- **Two dates, two purposes.** A promotion applies by order date, and revenue follows the invoice date. It shows as a Q4 share of 51% by order date against 64% by invoice date, and as 160 lines of the fall promotion invoiced after it ended. Ask which date answers the question in hand.
+- **Three dates, three purposes.** A promotion applies by order date, billed revenue follows the invoice date, and the ledger records each invoice on its posting date. The first two show as a Q4 share of 51% by order date against 64% by invoice date, and as 160 lines of the fall promotion invoiced after it ended. Ask which date answers the question in hand, and which one the ledger used.
 - **List amount measures volume; net amount measures revenue.** A student who measures volume at LineTotal sees nearly every promotion fall, from -30.2% to +0.9%. Ask what the discount does to the number in the promotion's own months.
-- **A difference is not an increase until it is compared with normal variation.** Read against one month's standard deviation, promotion 2 looks unusual; scaled to its months, it does not. Ask how much a two-month total varies.
+- **A difference is not an increase until it is compared with normal variation.** A two-month total's difference read against one month's standard deviation makes promotion 2 look unusual. The average month read against the monthly variation, or the total against the variation scaled to its months, does not. Either like-for-like comparison is fine, and both are an informal screen, not a test of significance. Ask how much a two-month total varies.
 - **A break-even is a threshold, not a forecast.** Students write that the promotion will lift volume by the break-even. Put the break-even beside the measured difference and ask which is evidence.
-- **No evidence of an effect is not evidence of no effect.** The first-order test finds no promotional first order, but the data begins in the first year and almost no new customers appear in it. Ask what the test could have shown.
-- **An exception is a symptom.** The failing dates look like unauthorized discounts. The orders and the budgets say the promotion ran when it was meant to and its end date was entered wrongly. Ask which other records speak to the question.
+- **No evidence of an effect is not evidence of no effect.** The volume comparisons describe the orders and cannot show what would have sold without a promotion. The first-order test finds no promotional first order, but the data begins in the first year and almost no new customers appear in it. Ask what each test could have shown.
+- **An exception is a symptom.** The failing dates look like unauthorized discounts. The orders and the budgets suggest the promotion ran when it was meant to and its end date was entered wrongly, which the approved campaign calendar would confirm. Ask which other records speak to the question, and which would settle it.
 - **A vacuous test is not a clean result.** A completeness test on the recorded dates of the 3 failing promotions examines no lines and returns zero. Ask how many lines it looked at.
 - **The ledger cannot show what it does not record.** Students look for the discounts in the income statement. Revenue is net, so there is nothing to find; the cost lives in a schedule.
 
@@ -155,9 +155,9 @@ The deck's check slides on dates, break-even and design versus operation suit cl
 |---|---:|---|
 | 1. Build and validate | 10 | Named queries, types corrected, control totals that agree, a complete Documentation sheet |
 | 2. Cost and ledger | 15 | The cost by year, a schedule that foots, a tie to the ledger and the reason the ledger hides the cost |
-| 3. Did promotions bring sales | 15 | List-price volume, two expectations, variation scaled to the months and the limits of the data |
+| 3. Did promotions bring sales | 15 | List-price volume, two expectations, variation compared like for like and the limits of the data |
 | 4. Model the calendar | 20 | Break-evens, data table, Goal Seek, the budgets and a cost by quarter on a stated volume |
-| 5. Controls | 15 | Four guarded tests, evidence for the cause, dispositions and conditions |
+| 5. Controls | 15 | Four guarded tests, evidence for the likely cause, provisional dispositions and conditions |
 | 6. The memo | 25 | Organization, accuracy, judgment, length and a usable recommendation |
 | Total | 100 | |
 
@@ -167,7 +167,7 @@ Four criteria run through every requirement.
 |---|---|---|
 | Accuracy | Totals tie to the sources and the ledger, formulas right, no silent type errors | Requirements 1, 2 and 4 |
 | Evidence | Every number in the memo traces to a query, a cell or an exhibit, and exceptions have evidence from outside the record tested | Requirements 3, 5 and 6 |
-| Judgment | Differences judged against variation, break-even read as a threshold, design separated from operation, limits stated | Requirements 3, 4 and 5 |
+| Judgment | Differences judged against variation, break-even read as a threshold, design and operation classified provisionally, limits stated | Requirements 3, 4 and 5 |
 | Communication | A memo organized by the controller's questions, within two pages, ending in a recommendation | Requirement 6 |
 
 Each requirement guide has its own grading table out of 100; scale it by the weight above to place it in the case grade.

@@ -12,7 +12,7 @@
      {{ run_len }} consecutive requisitions each, dated January 1, all for {{ qty|num }} units at {{ cost|money }} ({{ value|money }}), for different items and {{ requesters }}. {{ n_five }} employees have a 5,000 limit ({% for t in five %}{{ an(t) }} {{ t }}{{ sep(loop) }}{% endfor %}). Supplier invoices: the CFO
      approved {{ inv_cfo|count }} of {{ inv_total|count }}; the other {{ inv_other }} are PI {% for i in g.zero.ids %}{{ i }}{{ sep(loop) }}{% endfor %} ({% for t in g.zero.totals %}{{ t|money }}{{ ', ' if not loop.last }}{% endfor %}), approved by {{ g.zero.name }},
      {{ an(g.zero.title) }} {{ g.zero.title }} with a limit of {{ g.zero.limit|num }}; PI {% for i in g.within.ids %}{{ i }}{{ sep(loop) }}{% endfor %} ({% for t in g.within.totals %}{{ t|money }}{{ ', ' if not loop.last }}{% endfor %}), approved by {{ g.within.name }}, {{ an(g.within.title) }} {{ g.within.title }},
-     within the {{ g.within.limit|num }} limit but outside the purchasing and accounting roles;
+     within the {{ g.within.limit|num }} limit but outside the purchasing and accounting roles, so the delegation policy decides whether the role may approve invoices;
      and PI {% for i in g.beyond.ids %}{{ i }}{{ sep(loop) }}{% endfor %} ({% for t in g.beyond.totals %}{{ t|money }}{{ sep(loop) }}{% endfor %}), approved by {{ g.beyond.name }},
      the {{ g.beyond.title }}, above the {{ g.beyond.limit|num }} limit, the note-financed capital invoices of
      Exercise 8.2. Near-duplicates, payments dated before {{ d.N }}-01-01: SameAmount flags {{ n_payments }} payments in {{ pairs }} pairs (no group larger than

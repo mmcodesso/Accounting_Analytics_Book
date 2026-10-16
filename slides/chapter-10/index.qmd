@@ -28,7 +28,7 @@ The last three cover fan-out, subqueries, and the accounting work they make poss
 - Chapter 9 found the variance recorded at each work order's close, mostly overhead
 - Which products carry it? How much arose in each year?
 - Is it volume, fewer units to spread costs over, or the cost itself?
-- No single table answers: the product, the hours, the output and the amounts live apart
+- Together they need summaries and joins: product, hours, output and amounts live apart
 
 ::: {.notes}
 The product is recorded on the work order, the hours in the labor time and the payroll, the output in the completions, and the amounts in a ledger that identifies accounts only by their AccountID. Answering means joining tables on the keys of Chapter 3 and summarizing thousands of rows into a few totals.
@@ -41,7 +41,7 @@ The product is recorded on the work order, the hours in the labor time and the p
 - A database stores each fact once and links the tables through keys
 - A close names its work order; the work order names its item; the item its group
 - No foreign keys are declared, so nothing guarantees that the keys match
-- A join on mismatched keys returns fewer or more rows, never an error: test the count
+- A join on mismatched keys returns fewer or more rows, never an error, so test it
 
 ::: {.notes}
 A join is the SQL version of Power Query's Merge from Chapter 5: Inner keeps the matched rows, Left Outer keeps every row of the first query, and Left Anti keeps the rows with no match. XLOOKUP behaves like a left join that brings back one column, as long as its key is unique: where the key repeats, XLOOKUP still returns one match, while a join returns a row for each.
@@ -64,7 +64,7 @@ FROM WorkOrderClose AS woc
 - Every close has one work order and every work order one item, so the rows must equal the closes
 
 ::: {.notes}
-A column whose name appears in both tables must be qualified, or the query stops with "ambiguous column name". If the join returns fewer rows than the WorkOrderClose table holds, some closes point to a work order or item that does not exist, and the inner join has dropped them without a word.
+A column whose name appears in both tables must be qualified, or the query stops with "ambiguous column name". If the join returns fewer rows than the WorkOrderClose table holds, some closes point to a work order or item that does not exist, and the inner join has dropped them without a word. WorkOrderID and ItemID are primary keys, so an unchanged count shows that no close was lost or repeated. On a key that is not unique, a lost row and a repeated one could cancel.
 :::
 
 ## Only the work orders that have a close
@@ -103,13 +103,13 @@ The payroll tables link through the register to its period, employee and cost ce
 
 ## A join to the ledger names the document type too
 
-- SourceDocumentType names the document table; SourceDocumentID holds its key
+- SourceDocumentType names the kind of document, usually a table, and SourceDocumentID its key
 - Each document table numbers its own rows, so one ID belongs to many kinds of document
 - So the join's condition includes the type, such as `gl.SourceDocumentType = 'JournalEntry'`
 - Without it, ledger rows pair with whichever document happens to share their number
 
 ::: {.notes}
-The ledger rows with one SourceDocumentID come from several kinds of document, of which the traced sale of Tutorial 3.2 is only one. With the type in the condition, a join to JournalEntry finds the one journal entry posted to the variance account in the year: the closing entry of Chapter 9.
+The ledger rows with one SourceDocumentID come from several kinds of document, of which the traced sale of Tutorial 3.2 is only one. With the type in the condition, a join to JournalEntry finds the one journal entry posted to the variance account in the year: the closing entry of Chapter 9. PayrollSummary is the exception Chapter 3 named, a summary of a pay period by cost center whose ID is a code, not the key of a table.
 :::
 
 # Keeping Unmatched Rows with LEFT JOIN
@@ -126,7 +126,7 @@ The left join keeps all four work orders, with NULL in the close columns where n
 
 - An anti-join keeps the left join's rows whose matched key IS NULL
 - NOT EXISTS asks the same thing with a correlated subquery
-- NOT IN returns nothing when its list holds a NULL, because no comparison is true
+- NOT IN keeps no row when its list holds a NULL, because none can be shown to be absent
 - So use NOT EXISTS or the anti-join when the column can be NULL
 
 ::: {.notes}
@@ -183,7 +183,7 @@ Without GROUP BY, an aggregate summarizes every row the query keeps. GROUP_CONCA
 {{< book-figure fig-10-02 >}}
 
 ::: {.notes}
-Every column in the SELECT list is either named in GROUP BY or wrapped in an aggregate. SQLite accepts a bare column and fills it from one of the group's rows, which says nothing about the group, so treat it as an error. After a left join, count the second table's key rather than every row, and wrap a SUM in COALESCE to show a zero; GROUP BY does what a PivotTable's Rows area does.
+In this book, every column in the SELECT list is either named in GROUP BY or wrapped in an aggregate. SQLite accepts a bare column and fills it from one of the group's rows, which says nothing about the group, so treat it as an error. After a left join, count the second table's key rather than every row, and wrap a SUM in COALESCE to show a zero; GROUP BY does what a PivotTable's Rows area does.
 :::
 
 ## Watch out: group by the key, not the name {.watch-out}
@@ -204,7 +204,7 @@ The same rule applies to accounts, employees and suppliers: names are labels, ke
 - WHERE runs before any group exists, so it cannot use an aggregate
 - An aggregate in WHERE stops with "misuse of aggregate"
 - HAVING runs after the aggregates, so its condition can use them
-- Filter rows in WHERE whenever you can: fewer rows reach the grouping step
+- Filter rows in WHERE where you can, so fewer rows reach the grouping step
 
 ::: {.notes}
 The two often work together: in Tutorial 10.1, WHERE keeps the year's closes and HAVING keeps the items whose total variance passes a threshold. Listing only the accounts with a balance is another HAVING condition.
@@ -352,10 +352,10 @@ Tutorial 10.2 puts two scalar subqueries side by side to tie the closes to the l
 - It refers to a column of the outer query, such as each account's ID
 - NOT EXISTS is one; a count of each account's postings is another
 - With an index on the searched column, it is quick
-- Without one, over thousands of rows, it can take minutes: use a join instead
+- Without one, over thousands of rows, it can take minutes, and a join is often faster
 
 ::: {.notes}
-GLEntry has an index on AccountID and FiscalYear, so counting each account's postings is fast. A derived table or a join is the faster way to ask the same question of a large table without an index.
+GLEntry has an index on AccountID and FiscalYear, so counting each account's postings is fast. For a large table without an index, a join to a derived table is often faster, so test the query rather than assume.
 :::
 
 ## Derived tables summarize before they join
@@ -450,13 +450,13 @@ The ledger locates the variance precisely: it is the part of the actual conversi
 - It is Chapter 7's flexible budget applied to hours
 
 ::: {.notes}
-A standard cost system recalculates the standard at the output actually achieved before comparing it with the actual (Datar and Rajan). The ratio of hours recorded to standard hours allowed measures the efficiency of direct labor.
+A standard cost system recalculates the standard at the output actually achieved before comparing it with the actual (Datar and Rajan). A labor efficiency variance compares the hours allowed with the direct hours used on that output, at the standard rate. Tutorial 10.3's yearly ratio is a simpler comparison, an observed-hours diagnostic.
 :::
 
 ## Indirect time is overhead
 
 - Indirect labor is time no single work order carries
-- It reaches the variance through overhead, not the labor part
+- In Charles River's records it reaches the variance through overhead
 - Fixed overhead is absorbed only by units made: output below plan leaves some unabsorbed
 - LaborType separates direct, indirect and non-manufacturing time
 
@@ -484,18 +484,18 @@ Students measure the output and its standard hours, the payroll's hours and pay,
 
 ## Two derived tables meet on the year
 
-{{< book-figure fig-10-09 crop="0,0,1,0.607" >}}
+{{< book-figure fig-10-09 crop="0,0,1,0.618" >}}
 
 ::: {.notes}
 The first derived table sums the hours by year and labor type; the second sums the standard hours of output by year, counting completions only up to the last day with time records. Each holds one row per year, so the join cannot fan out.
 :::
 
-## Direct time stayed within the standard
+## Direct time stayed below the standard hours
 
-{{< book-figure fig-10-09 crop="0,0.61,1,0.39" >}}
+{{< book-figure fig-10-09 crop="0,0.62,1,0.38" >}}
 
 ::: {.notes}
-The direct hours recorded stayed below the standard hours in every year, while indirect time per standard hour grew. The profiles had shown that the time records end before the year does, so the output is counted only up to that day; indirect time ends a week earlier still, on 4 December 2026.
+The direct hours recorded stayed below the standard hours in every year, while indirect time per standard hour grew. The profiles had shown that the time records end before the year does, so the output is counted only up to that day. Indirect time ends a week earlier still, on December 4, 2026, so the ratio is an observed-records diagnostic. Counted to that day on both sides, the 2026 direct ratio is somewhat lower and the indirect ratio a little higher, and the pattern of the years holds.
 :::
 
 ## Checkpoint
@@ -520,23 +520,23 @@ COUNT of rows counts registers, and COUNT DISTINCT of employees counts people. A
 
 - Products: the variance rises where the plant makes most, while closes fall
 - Where: conversion cost the standard did not absorb, mostly overhead
-- Volume: mostly no; output was flat and direct labor within the standards
+- Volume: output was about the same, so the records point to cost
 - But indirect time grew by about two-thirds and overtime more than doubled
 
 ::: {.notes}
-Indirect labor is overhead, so its growth is consistent with the growth of the overhead part, while the favorable labor part shrank as direct hours moved toward the standard; the queries do not yet measure how much each cause explains. Next, the controller needs a measure she can follow month by month, which Chapter 11 builds.
+The direct hours recorded stayed below the standard hours. Indirect labor is overhead, so its growth is consistent with the growth of the overhead part, while the favorable labor part shrank as direct hours moved toward the standard. The comparison is an observed-hours diagnostic, not a labor efficiency variance or a measure of the production-volume variance, and the queries do not yet measure how much each cause explains. Next, the controller needs a measure she can follow month by month, which Chapter 11 builds.
 :::
 
 ## Summary
 
-- Joins follow logical keys, and each is tested by its row count
+- Joins follow logical keys, tested by their keys, row counts and totals
 - Left joins keep whole populations; anti-joins and NOT EXISTS find what is missing
 - Aggregates with GROUP BY and HAVING summarize by key, after profiling the table
 - Fan-out repeats header amounts: sum each amount at its own level
 - Subqueries and derived tables answer questions that take more than one step
 
 ::: {.notes}
-Most of this chapter's queries were diagnostic analytics: they explained why the variance grew by breaking it down by product, year and part, and by comparing hours with the standards.
+Most of this chapter's queries were diagnostic analytics: they narrowed the search for why the variance grew, by breaking it down by product, year and part, and by comparing hours with the standard hours of the output.
 :::
 
 ## Key terms

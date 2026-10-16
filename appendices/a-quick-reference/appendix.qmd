@@ -5,22 +5,23 @@ aliases:
 
 # Quick Reference: Excel, SQL, and DAX {#sec-appendix-reference}
 
-This appendix gathers the functions and commands the book teaches, so that you can look one up without searching for the chapter that introduced it. It lists only what the chapters use, grouped by tool and by purpose, and each entry names the chapter that explains it, which is where to find an example on the Charles River data. Arguments have short placeholder names, and optional arguments are left out unless the book uses them. The last section sets the three tools side by side, with the same calculations in Excel, SQL, and DAX.
+This appendix gathers the functions the book teaches, and its main commands, so that you can look one up without searching for the chapter that introduced it. It lists only what the chapters use, grouped by tool and by purpose, and each entry names the chapter that explains it, which is where to find an example on the Charles River data. Arguments have short placeholder names, and optional arguments are left out unless the book uses them. The last section sets the three tools side by side, with the same calculations in Excel, SQL, and DAX.
 
 
 ## Excel
 
-The Excel chapters of Part II teach these functions, and a few appear earlier, in the tutorials of Part I. Every formula begins with an equals sign, which the tables leave out. Microsoft's alphabetical list of Excel functions describes each one in full (Microsoft, n.d.).
+The Excel chapters of Part II teach these functions, and a few appear earlier, in the tutorials of Part I. Every formula begins with an equals sign, which the tables leave out. The tables assume Excel for Microsoft 365, the version that [What You Need](#sec-what-you-need) recommends. Older versions lack some of these functions, and the Analysis ToolPak and Solver are add-ins that must be loaded first. Microsoft's alphabetical list of Excel functions describes each one in full (Microsoft, n.d.).
 
 | Function | What it does | Chapter |
 |:---------------------------------|:--------------------------------------------------------|:---------|
-| `XLOOKUP(key, keys, results)` | Finds a key in one column and returns the value beside it, with an exact match by default; a fourth argument supplies a value when the key is not found | 2, 5 |
+| `XLOOKUP(key, keys, results)` | Finds a key in one column, with an exact match by default, and returns the value in the same row of another column, for the first match. A fourth argument supplies a value when the key is not found | 2, 5 |
 | `VLOOKUP(key, range, n, FALSE)` | Finds a key in the first column of a range and returns the value in its nth column | 5 |
 | `INDEX(range, MATCH(...))` | MATCH, with 0 as its last argument, finds the position of a key, and INDEX returns the value at that position | 5 |
 | `IF(test, if_true, if_false)` | One of two values, depending on a test | 2, 5 |
 | `IFS(test1, value1, ...)` | The value paired with the first true test | 5 |
 | `AND`, `OR`, `NOT` | TRUE if every test is true, if at least one is, or if the test is false | 5 |
 | `IFERROR(value, if_error)` | The value, or a substitute when the value is an error | 5 |
+| `ISBLANK(value)` | TRUE only for a cell that holds nothing, so FALSE for a formula that returns empty text | 5 |
 
 : Lookup and logical functions {#tbl-a-01}
 
@@ -29,7 +30,7 @@ The Excel chapters of Part II teach these functions, and a few appear earlier, i
 | `LEFT(text, n)`, `RIGHT(text, n)` | The first or last n characters | 5 |
 | `MID(text, start, n)` | n characters, starting at a position counted from 1 | 5 |
 | `LEN(text)` | The number of characters | 5 |
-| `FIND(find, text)` | The position of one text inside another | 5 |
+| `FIND(find, text)` | The position of one text inside another, matching case | 5 |
 | `TRIM(text)` | The text without leading, trailing, or repeated spaces | 5 |
 | `CLEAN(text)` | The text without the basic non-printing control characters | 5 |
 | `SUBSTITUTE(text, old, new)` | The text with one string replaced by another | 5 |
@@ -46,7 +47,7 @@ The Excel chapters of Part II teach these functions, and a few appear earlier, i
 | `YEAR`, `MONTH`, `DAY` | The year, month, or day of a date | 5 |
 | `DATE(year, month, day)` | The date with those parts | 4, 5 |
 | `EOMONTH(date, n)` | The last day of the month n months away; with 0, the last day of the date's own month | 5 |
-| `EDATE(date, n)` | The same day n months later, or earlier when n is negative | 7 |
+| `EDATE(date, n)` | The same day n months later, or earlier when n is negative, or the month's last day when that day does not exist | 7 |
 | `DATEDIF(start, end, unit)` | The whole days, months, or years between two dates | 5 |
 | `TODAY()` | Today's date, updated whenever the workbook recalculates | 5 |
 | `WEEKDAY(date, 2)` | The day of the week, from 1 for Monday to 7 for Sunday | 8 |
@@ -57,21 +58,21 @@ The Excel chapters of Part II teach these functions, and a few appear earlier, i
 |:---------------------------------|:--------------------------------------------------------|:---------|
 | `SUM(range)` | The total | 4 |
 | `SUBTOTAL(109, range)` | The total of the visible rows only, so a filter changes it; 103 counts the visible values instead | 4 |
-| `ROUND(x, d)`, `ROUNDUP(x, d)` | x rounded to d decimal places, to the nearest or always up | 4, 5 |
+| `ROUND(x, d)`, `ROUNDUP(x, d)` | x rounded to d decimal places, by ROUND to the nearest value with halves away from zero, by ROUNDUP always away from zero, so `ROUNDUP(-3.14, 1)` is -3.2 | 4, 5 |
 | `INT(x)` | x rounded down to a whole number | 5 |
 | `MOD(x, d)` | The remainder after dividing x by d | 5 |
 | `ABS(x)` | x without its sign | 7 |
 | `LOG10(x)` | The base-10 logarithm of x | 8 |
-| `COUNTA(range)` | The number of cells that are not empty | 4 |
-| `COUNTBLANK(range)` | The number of empty cells | 2, 7 |
+| `COUNTA(range)` | The number of cells that are not empty, including errors and formulas that return empty text | 4 |
+| `COUNTBLANK(range)` | The number of empty cells, including formulas that return empty text but not zeros | 2, 7 |
 | `COUNTIF(range, criteria)` | The number of cells that meet one condition | 5 |
 | `COUNTIFS(range, criteria)` | The number of rows that meet every condition; more range and criteria pairs can follow | 2, 4 |
 | `SUMIFS(sums, range, criteria)` | The total of the rows that meet every condition; more range and criteria pairs can follow | 4 |
 | `AVERAGE`, `AVERAGEIFS` | The mean of all the values, or of the rows that meet every condition | 4, 6 |
 | `MAX`, `MIN`, `MAXIFS`, `MINIFS` | The largest or smallest value, of all the values or of the rows that meet every condition | 2, 6 |
-| `MEDIAN(range)` | The middle value | 6 |
+| `MEDIAN(range)` | The middle value, or the mean of the two middle values when the count is even | 6 |
 | `STDEV.S`, `STDEV.P` | The standard deviation of a sample, or of a whole population | 6 |
-| `PERCENTILE.INC(range, k)` | The value below which a fraction k of the values fall | 4, 6 |
+| `PERCENTILE.INC(range, k)` | The kth percentile of the values, for k from 0 to 1, interpolated between two values when needed | 4, 6 |
 | `SUMPRODUCT(range1, range2)` | Multiplies two ranges of the same size cell by cell and adds the products | 7 |
 | `CORREL(range1, range2)` | The correlation coefficient of two series | 7 |
 | `FORECAST.LINEAR(x, ys, xs)` | The value of the fitted straight line at x | 7 |
@@ -82,7 +83,7 @@ The Excel chapters of Part II teach these functions, and a few appear earlier, i
 
 | Function | What it does | Chapter |
 |:---------------------------------|:--------------------------------------------------------|:---------|
-| `FILTER(array, include)` | The rows of an array that meet a condition, spilled into the cells below | 6 |
+| `FILTER(array, include)` | The rows of an array that meet a condition, spilled from the formula's cell. With no row to return it gives #CALC!, unless a third argument supplies a value | 6 |
 | `UNIQUE(array)` | The distinct values or rows of an array | 7 |
 | `SORT(array)`, `SORTBY(array, by)` | The array sorted by its own values, or by the values of another array | 7, 8 |
 | `SEQUENCE(n)` | The numbers 1 to n | 8 |
@@ -107,32 +108,33 @@ The Excel chapters of Part II teach these functions, and a few appear earlier, i
 
 ## Power Query {.new-page}
 
-Power Query is the same editor in Excel, where Part II uses it, and in Power BI, where Part IV does. Its commands record steps that run again at every refresh, and a custom column holds a formula in M, Power Query's language. M is case-sensitive, and its text functions count characters from 0, where Excel and SQL count from 1. Microsoft's M function reference describes each function (Microsoft, 2025).
+Power Query is the same editor in Excel, where Part II uses it, and in Power BI, where Part IV does. Its commands record steps that run again at every refresh, and a custom column holds a formula in M, Power Query's language. M is case-sensitive, and its text positions start at 0, as in Text.Middle, where Excel's MID and SQLite's SUBSTR start at 1. Microsoft's M function reference describes each function (Microsoft, 2025).
 
 | Command | What it does | Chapter |
 |:---------------------------------|:--------------------------------------------------------|:---------|
 | Get Data | Connects to a source; for CharlesRiver.xlsx, choose its Tables in the Navigator | 4, 13 |
 | Choose Columns | Keeps only the columns you select, as the step Removed Other Columns | 4 |
 | A column's filter | Keeps the rows that pass it, before the data load | 4 |
-| Data type, Replace current | Sets a column's type in the Changed Type step itself; check the types, because Power Query sets each column's type from its first 200 rows | 4, 13 |
+| Data type, Replace current | Sets a column's type in the Changed Type step itself. Check the types, because for an Excel workbook or a CSV file Power Query detects each column's type from its first 200 rows | 4, 13 |
+| Reference | Starts a new query from another query's result, which is rebuilt from it at every refresh | 5, 7, 8, 16 |
 | Merge Queries | Adds columns from another query by matching a key; expand them without the column-name prefix | 5 |
 | Join kind | Left outer keeps every row of the first query; left anti keeps only its rows that have no match | 5 |
 | Group By | Totals or counts rows by one or more columns; Advanced allows more than one column or total | 6 |
 | Custom Column | Adds a column computed by an M formula | 5 |
 | Conditional Column | Adds a column from if-then rules, without writing M | 5 |
 | Replace Values | Replaces one value with another in a column | 8 |
-| Append Queries | Stacks the rows of two or more queries that have the same columns | 16 |
+| Append Queries | Stacks the rows of two or more queries, matching their columns by name, with nulls in a column that one query lacks | 16 |
 | Unpivot Only Selected Columns | Turns the chosen columns into rows of attribute and value | 16 |
 | Only Create Connection | In Excel, the Load To choice for a query that only feeds other queries (Close & Load To, or right-click the query under Data > Queries & Connections) | 6, 7, 8 |
 | Enable load | In Power BI, cleared for a query that only feeds other queries | 13 |
 | Close & Load, Close & Load To, Close & Apply | Loads the queries into Excel, where Close & Load To chooses a Table, a connection only, or the Data Model, or into the Power BI model | 4, 6, 13 |
-| Refresh All, Refresh | Runs every query again against its source | 4, 13 |
+| Refresh All, Refresh | In Excel, Refresh All runs every query of the workbook again against its source, and Refresh only the selected one. In Power BI, Refresh reloads the model's tables | 4, 13 |
 | Column quality, distribution, profile | Profile each column, on the first rows only unless profiling is set to the entire data set | 13 |
 
 : Power Query commands {#tbl-a-07}
 
 | Function | What it does | Chapter |
-|:---------------------------------|:--------------------------------------------------------|:---------|
+|:------------------------------------|:-----------------------------------------------------|:---------|
 | `Date.Year([d])` | The year of a date; `Date.Month` gives the month | 5, 7 |
 | `Date.QuarterOfYear([d])` | The quarter of a date, 1 to 4 | 5 |
 | `Date.ToText([d], "yyyy-MM")` | A date as text, in a format | 13 |
@@ -144,13 +146,14 @@ Power Query is the same editor in Excel, where Part II uses it, and in Power BI,
 | `Text.StartsWith([t], "x")` | TRUE if a text begins with another | 14 |
 | `Number.RoundDown([x])` | x rounded down to a whole number | 5 |
 | `Number.Mod([x], d)` | The remainder after dividing x by d | 16 |
+| `List.Count(List.Distinct([c]))` | In a Group By step's formula, the number of distinct values of a column in each group | 16 |
 
-: M functions in custom columns {#tbl-a-08}
+: M functions in custom columns and grouping steps {#tbl-a-08}
 
 
 ## SQL {.new-page}
 
-The SQL chapters of Part III query SQLite through DB Browser for SQLite. SQLite's documentation describes its functions and the behaviors that differ from other databases (SQLite, n.d.-a, n.d.-b, n.d.-c, n.d.-d, n.d.-e). Keywords are written in capitals, by the book's convention, and the double bar operator joins texts, so `a || ' ' || b` puts a space between a and b (Chapter 9).
+The SQL chapters of Part III query SQLite through DB Browser for SQLite. SQLite's documentation describes its functions and the behaviors that differ from other databases (SQLite, n.d.-a, n.d.-b, n.d.-c, n.d.-d, n.d.-e, n.d.-f, n.d.-g). Keywords are written in capitals, by the book's convention, and the double bar operator joins texts, so `a || ' ' || b` puts a space between a and b (Chapter 9).
 
 | Clause | What it does | Evaluated | Chapter |
 |:--------------------|:------------------------------------------------|:----------|:---------|
@@ -162,30 +165,13 @@ The SQL chapters of Part III query SQLite through DB Browser for SQLite. SQLite'
 | `ORDER BY` | Sorts the result, ascending unless `DESC` follows | 6th | 9 |
 | `LIMIT n` | Returns the first n rows | 7th | 9 |
 
-: The clauses of a query, in written order, with the step at which each is evaluated {#tbl-a-09}
+: The clauses of a query, in written order, with each clause's place in the logical order of evaluation {#tbl-a-09}
 
 Window functions are calculated after HAVING and before ORDER BY, which is why they cannot appear in WHERE or HAVING (Chapter 11).
 
-| Construct | What it does | Chapter |
-|:---------------------------------|:--------------------------------------------------------|:---------|
-| `INNER JOIN t ON ...` | Only the rows that have a match in both tables | 10 |
-| `LEFT JOIN t ON ...` | Every row of the first table, with NULLs where the second has no match | 10 |
-| Anti-join | A LEFT JOIN followed by `WHERE key IS NULL`, which keeps the rows without a match | 10 |
-| `NOT EXISTS (subquery)` | The rows for which the subquery finds nothing; unlike NOT IN, it is safe when the list holds NULLs | 10 |
-| `IN (subquery)` | The rows whose value is in the list the subquery returns | 10 |
-| Scalar subquery | A subquery that returns one value, used where a value is expected | 10 |
-| Correlated subquery | A subquery that refers to the outer row, and runs once for each row | 10 |
-| Derived table | A subquery in FROM, named with an alias | 10 |
-| Self-join | A table joined to itself under two aliases | 12 |
-| `WITH name AS (...)` | A common table expression: a named query that later steps read | 11 |
-| `UNION ALL` | Stacks the rows of two queries that have the same columns | 12 |
-| `CREATE VIEW name AS` | Saves a query in the database; run `DROP VIEW IF EXISTS` first, and `TEMP` keeps it for the session only | 11 |
-
-: Joins, subqueries, and saved queries {#tbl-a-10}
-
 | Function or operator | What it does | Chapter |
 |:---------------------------------|:--------------------------------------------------------|:---------|
-| `=`, `<>`, `<`, `>`, `<=`, `>=` | Comparisons; `=` on text is case-sensitive | 9 |
+| `=`, `<>`, `<`, `>`, `<=`, `>=` | Comparisons; `=` on text is case-sensitive under the default collation | 9 |
 | `BETWEEN a AND b` | Within a range, including both ends | 9 |
 | `IN (a, b, c)` | Equal to any value in the list | 9 |
 | `LIKE 'A%'` | Matches a pattern, in which `%` stands for any characters; not case-sensitive for the letters A to Z | 9 |
@@ -199,19 +185,36 @@ Window functions are calculated after HAVING and before ORDER BY, which is why t
 | `LENGTH(x)` | The number of characters in x | 9 |
 | `SUBSTR(x, s, n)` | n characters of x from position s, counted from 1; without n, the rest of x | 9 |
 | `COALESCE(x, y)`, `IFNULL(x, y)` | x, or y when x is NULL | 9 |
-| `CASE WHEN ... THEN ... END` | The result paired with the first true condition, or the ELSE value | 11 |
+| `CASE WHEN ... THEN ... END` | The result paired with the first true condition, or the ELSE value, or NULL when there is no ELSE | 11 |
 | `COUNT(*)`, `COUNT(column)` | The number of rows, or of values that are not NULL | 10 |
-| `COUNT(DISTINCT column)` | The number of different values | 10 |
+| `COUNT(DISTINCT column)` | The number of different values that are not NULL | 10 |
 | `SUM`, `AVG`, `MIN`, `MAX` | Totals, averages, and extremes, skipping NULLs | 10 |
-| `GROUP_CONCAT(column, sep)` | The values joined into one text | 10 |
-| `strftime('%Y', d)` | A part of a date, as text: `%Y` the year, `%m` the month, `%w` the weekday | 11 |
+| `GROUP_CONCAT(column, sep)` | The values joined into one text, skipping NULLs, in no guaranteed order | 10 |
+| `strftime('%Y', d)` | A part of a date, as text: `%Y` the year, `%m` the month, `%w` the weekday, 0 for Sunday | 11 |
 | `date(d, modifier)` | A date moved by modifiers such as `'start of month'`, applied in order | 11 |
 | `julianday(d)` | The date as a number of days, for the difference between two dates | 11 |
-| `printf('%e', x)` | x as text, here in scientific notation | 12 |
-| `LOG10(x)` | The base-10 logarithm of x | 12 |
+| `printf('%.15e', x)` | x as text in scientific notation, with the fifteen decimals that keep the first digit right | 12 |
+| `LOG10(x)` | The base-10 logarithm of x, one of the math functions that some builds of SQLite leave out | 12 |
 | `sqlite_version()` | The version of SQLite in use; window functions need version 3.25 or later | 11 |
 
-: Functions and operators {#tbl-a-11}
+: Functions and operators {#tbl-a-10}
+
+| Construct | What it does | Chapter |
+|:---------------------------------|:--------------------------------------------------------|:---------|
+| `INNER JOIN t ON ...` | Only the rows that have a match in both tables | 10 |
+| `LEFT JOIN t ON ...` | Every row of the first table, with NULLs where the second has no match | 10 |
+| Anti-join | A LEFT JOIN followed by `WHERE key IS NULL`, on a key of the second table that a match always fills, which keeps the rows without a match | 10 |
+| `NOT EXISTS (subquery)` | The rows for which the subquery finds nothing; unlike NOT IN, it is safe when the list holds NULLs | 10 |
+| `IN (subquery)` | The rows whose value is in the list the subquery returns | 10 |
+| Scalar subquery | A subquery that returns one value, used where a value is expected | 10 |
+| Correlated subquery | A subquery that refers to the outer row, and runs once for each row | 10 |
+| Derived table | A subquery in FROM, named with an alias | 10 |
+| Self-join | A table joined to itself under two aliases | 12 |
+| `WITH name AS (...)` | A common table expression, a named query that the later steps of the same statement read | 11 |
+| `UNION ALL` | Stacks the rows of two queries with the same number of columns, matched by position, and keeps duplicates | 12 |
+| `CREATE VIEW name AS` | Saves a query in the database. To replace a view, run `DROP VIEW IF EXISTS` first, and `TEMP` keeps a view for the connection only | 11 |
+
+: Joins, subqueries, and saved queries {#tbl-a-11}
 
 | Function or clause | What it does | Chapter |
 |:---------------------------------|:--------------------------------------------------------|:---------|
@@ -230,12 +233,12 @@ Window functions are calculated after HAVING and before ORDER BY, which is why t
 |:---------------------------------|:--------------------------------------------------------|:---------|
 | Integer division | `7 / 2` returns 3; multiply one side by 1.0 for a decimal result | 9 |
 | `%` | Returns the remainder, after dropping the decimals of both numbers | 9 |
-| Comparisons with NULL | Never true, so test for a missing value with IS NULL | 9 |
-| Sorting NULLs | NULLs come first in ascending order | 9 |
-| Dates | Stored as text in the form YYYY-MM-DD, so they compare and sort correctly as text | 9 |
-| Type affinity | A value is converted to the type of the column it is compared with, never between two expressions, so `SUBSTR(x, 1, 4) = 2026` finds no rows when x is text; compare with `'2026'` | 9, 11 |
-| Double quotes | A double-quoted value is read as a column name, and as text only when no column has that name; write text in single quotes | 9 |
-| A missing comma | Makes the next column an alias of the one before it, a logical error with no message | 9 |
+| Comparisons with NULL | An ordinary comparison, such as `=` or `<`, is never true, so test for a missing value with IS NULL | 9 |
+| Sorting NULLs | NULLs come first in ascending order, by default | 9 |
+| Dates | Stored in the Charles River database as text in the form YYYY-MM-DD, so they compare and sort correctly as text. A range on a column that also stores a time must end before the next day | 9 |
+| Type affinity | A value compared with a column, or with a CAST, is converted to that type where it can be. A typed value or a function's result, such as SUBSTR's, has no affinity, so `SUBSTR(x, 1, 4) = 2026` finds no rows. Compare with `'2026'`, or CAST the text first | 9, 11 |
+| Double quotes | A double-quoted value is read as a column name, and as text only when no column has that name and the build allows it, so write text in single quotes | 9 |
+| A missing comma | Can make the next column an alias of the one before it, a logical error with no message | 9 |
 | An alias in GROUP BY | Accepted by SQLite, though some databases, such as SQL Server, reject it | 10 |
 
 : SQLite behaviors the book relies on {#tbl-a-13}
@@ -243,17 +246,17 @@ Window functions are calculated after HAVING and before ORDER BY, which is why t
 
 ## DAX {.new-page}
 
-The Power BI chapters of Part IV write DAX in measures, calculated columns, calculated tables, and queries. The book puts a space inside each parenthesis and quotes the table names Date and Item, which are reserved words (Chapter 14). Microsoft's DAX function reference describes each function (Microsoft, 2023).
+The Power BI chapters of Part IV write DAX in measures, calculated columns, calculated tables, and queries. The book puts a space inside each parenthesis and quotes the table names Date and Item, which are reserved words (Chapter 14). Microsoft's DAX function reference describes each function (Microsoft, 2023). The time intelligence functions appear in the classic form that Chapter 14 teaches, which takes the date column of the marked Date table. The functions of the last table belong to visual calculations, which work on the aggregated rows and columns of a single visual, its visual matrix, and move along its first axis, the rows in most visuals, unless another axis is named (Microsoft, 2026).
 
 | Function | What it does | Chapter |
 |:---------------------------------|:--------------------------------------------------------|:---------|
 | `SUM ( column )` | Adds up a column over the rows in the filter context | 14 |
-| `COUNTROWS ( table )` | The number of rows of a table | 14 |
-| `DISTINCTCOUNT ( column )` | The number of different values of a column | 14 |
+| `COUNTROWS ( table )` | The number of rows of a table, or a blank when it has none | 14 |
+| `DISTINCTCOUNT ( column )` | The number of different values of a column, counting a blank as a value | 14 |
 | `MAX ( column )`, `MIN ( column )` | The largest or smallest value | 14 |
 | `DIVIDE ( a, b )` | a divided by b, or a blank when b is zero | 14 |
 | `SUMX ( table, expression )` | Evaluates an expression row by row and adds the results | 14 |
-| `MINX`, `MAXX` | The smallest or largest result of an expression over a table | 16 |
+| `MINX ( table, expr )`, `MAXX ( table, expr )` | The smallest or largest result of an expression over a table | 16 |
 | `ROUND ( x, d )`, `ABS ( x )` | x rounded to d decimal places, or x without its sign | 14 |
 | `LOG10 ( x )` | The base-10 logarithm of x | 16 |
 
@@ -281,12 +284,12 @@ The Power BI chapters of Part IV write DAX in measures, calculated columns, calc
 |:---------------------------------|:--------------------------------------------------------|:---------|
 | `CALENDAR ( start, end )` | A table of every date between two dates | 14 |
 | `DATE`, `YEAR`, `QUARTER`, `MONTH` | Build a date from its parts, or return one part | 14 |
-| `EDATE ( date, n )` | The same day n months later, or earlier when n is negative | 14 |
+| `EDATE ( date, n )` | The same day n months later, or earlier when n is negative, or the month's last day when that day does not exist | 14 |
 | `TOTALYTD ( expr, dates )` | A measure's total for the year to date, from January 1 | 14 |
 | `SAMEPERIODLASTYEAR ( dates )` | The same dates one year earlier | 14 |
 | `DATEADD ( dates, n, unit )` | The dates shifted by n days, months, quarters, or years | 14 |
 | `DATESBETWEEN ( dates, a, b )` | The dates between two dates, inclusive | 14 |
-| `DATESINPERIOD` | A period of n intervals from a date; with a negative n, the period that ends on it, such as the trailing twelve months | 15 |
+| `DATESINPERIOD ( dates, start, n, unit )` | The dates of n intervals from a start date, or, with a negative n, of the period that ends on it, such as the trailing twelve months | 15 |
 
 : Dates and time intelligence {#tbl-a-16}
 
@@ -300,48 +303,48 @@ The Power BI chapters of Part IV write DAX in measures, calculated columns, calc
 | `FORMAT ( x, format )` | A number or date as text, in a format | 14 |
 | `VALUE ( text )` | The number that a text value represents | 16 |
 | `RIGHT ( text, n )` | The last n characters of a text | 16 |
-| `CONCATENATEX ( t, expr, sep )` | The results of an expression over a table, joined into one text | [Appendix](#sec-appendix-publishing) |
-| `USERPRINCIPALNAME ( )` | The sign-in name of the person viewing the report | [Appendix](#sec-appendix-publishing) |
+| `CONCATENATEX ( t, expr, sep )` | The results of an expression over a table, joined into one text | [Publishing appendix](#sec-appendix-publishing) |
+| `USERPRINCIPALNAME ( )` | The sign-in name of the person viewing the report | [Publishing appendix](#sec-appendix-publishing) |
 | `ADDCOLUMNS ( t, name, expr )` | A table with calculated columns added | 14 |
 | `SELECTCOLUMNS ( t, name, x )` | A table of the named columns only | 16 |
 | `SUMMARIZECOLUMNS ( ... )` | One row for each combination of grouping columns, with named expressions; the usual body of a query | 14 |
-| `UNION ( t1, t2 )` | The rows of two tables stacked | 14 |
+| `SUMMARIZE ( t, col, ... )` | One row for each combination of the grouping columns found in a table, as in a test that a key is unique | 16 |
+| `DISTINCT ( table )` | The distinct rows of a table or table expression | 16 |
+| `UNION ( t1, t2 )` | The rows of two tables with the same number of columns stacked, matched by position, with duplicates kept | 14 |
 | `ROW ( name, x )` | A table of one row | 14 |
 | `{ a, b, c }` | A table of the listed values | 14 |
 | `VAR name = expr RETURN ...` | Names an intermediate result and uses it | 14 |
-| `DEFINE`, `EVALUATE`, `ORDER BY` | The parts of a DAX query: measures defined for the query, the table to return, and its order | 14 |
+| `DEFINE`, `EVALUATE`, `ORDER BY` | The parts of a DAX query, of which only EVALUATE is required: measures defined for the query, the table to return, and its order | 14 |
 | `NAMEOF ( [measure] )` | The name of a measure or column, as a field parameter stores it | 15 |
 
 : Logic, text, tables, and queries {#tbl-a-17}
 
-Visual calculations belong to a single visual and work on the rows it shows (Microsoft, 2026).
-
 | Function | What it does | Chapter |
 |:---------------------------------|:--------------------------------------------------------|:---------|
 | `RUNNINGSUM ( [x] )` | The running total down the rows of the visual | 15 |
-| `MOVINGAVERAGE ( [x], n )` | The average of the last n rows | 15 |
+| `MOVINGAVERAGE ( [x], n )` | The average of the last n rows, or of fewer at the start of the axis | 15 |
 | `PREVIOUS ( [x] )` | The value of the previous row | 15 |
 | `FIRST ( [x] )` | The value of the first row | 15 |
-| `COLLAPSE ( [x], ROWS )` | The value at the parent level of the rows | 15 |
+| `COLLAPSE ( [x], ROWS )` | x evaluated at the parent level of the rows, so a ratio is calculated again there rather than added up | 15 |
 
-: Visual calculation functions {#tbl-a-18}
+: Visual calculation functions, which work on the rows of a single visual {#tbl-a-18}
 
 
 ## The Same Calculation in Three Tools {.new-page}
 
-The chapters return to a handful of calculations in each tool. @tbl-a-19 sets them side by side, with the chapters in parentheses, so that a technique learned in one Part can be found in the others.
+The chapters return to a handful of calculations in each tool. @tbl-a-19 sets them side by side, with the chapters in parentheses, so that a technique learned in one Part can be found in the others. The entries of a row answer the same question, but their results agree only when the population, the grain of the rows, the treatment of blanks, the dates, and the filters agree as well. Some entries give only part of the answer, such as the previous period's value, which a subtraction completes.
 
 | Task | Excel | SQL | DAX and Power BI |
 |:------------------|:-------------------------|:-------------------------|:-------------------------|
 | Total under a condition | SUMIFS (4) | SUM with WHERE, or with GROUP BY (10); SUM of a CASE (11) | CALCULATE with a filter (14) |
-| Count distinct values | COUNTA of UNIQUE (7) | COUNT(DISTINCT) (10) | DISTINCTCOUNT (14) |
+| Count distinct values | COUNTA of UNIQUE, on a column without blanks (7) | COUNT(DISTINCT), which skips NULL (10) | DISTINCTCOUNT, which counts a blank as a value (14) |
 | Bring in a value from another table | XLOOKUP, or a merge in Power Query (5) | A JOIN on the key (10) | A relationship, and RELATED row by row (14) |
-| Find rows with no match | A left anti merge, or COUNTIFS against the parent table (2, 5) | An anti-join or NOT EXISTS (10) | The (Blank) row in a visual (13, 14) |
+| Find rows with no match | A left anti merge, or COUNTIFS against the parent table (2, 5) | An anti-join or NOT EXISTS (10) | The (Blank) row in a visual, which shows that some keys have no match, though not which rows (13, 14) |
 | Summarize by group | A PivotTable, or Group By in Power Query (4, 6) | GROUP BY (10) | A matrix visual, or SUMMARIZECOLUMNS in a query (13, 14) |
-| Share of a total | Show Values As % of Grand Total (6) | SUM over an empty window, OVER () (11) | DIVIDE with REMOVEFILTERS (14) |
-| Running total | Show Values As Running Total In (6) | SUM over a window ordered by date (11) | TOTALYTD, or the RUNNINGSUM visual calculation (14, 15) |
-| Change from the previous period | Show Values As Difference From (6) | LAG (11) | DATEADD or SAMEPERIODLASTYEAR, or the PREVIOUS visual calculation (14, 15) |
-| Trailing twelve months | Not covered | A window of the current row and the 11 before it (11) | DATESINPERIOD over 12 months, or MOVINGAVERAGE (15) |
+| Share of a total | Show Values As % of Grand Total (6) | A value divided by its SUM over an empty window, OVER () (11) | DIVIDE with REMOVEFILTERS (14) |
+| Running total | Show Values As Running Total In (6) | SUM over a window ordered by date (11) | TOTALYTD, which starts again each January, or the RUNNINGSUM visual calculation, which runs down the rows the visual shows (14, 15) |
+| Change from the previous period | Show Values As Difference From (6) | A value less its LAG (11) | A measure less its value under DATEADD or SAMEPERIODLASTYEAR, or less PREVIOUS in a visual calculation (14, 15) |
+| Trailing twelve months | Not covered | A window of the current row and the 11 before it, on one row for each month (11) | DATESINPERIOD over 12 months, or MOVINGAVERAGE, which averages the rows rather than totaling them (15) |
 
 : The same calculations in Excel, SQL, and DAX {#tbl-a-19}
 

@@ -36,7 +36,7 @@ By the end, students can:
 - trace an odd total to a source document type, a voucher and an EntryType;
 - explain why the entry does not belong in a quarterly measure, exclude it by a rule, and recompute the margins.
 
-**Competencies practiced.** CPA Evolution Core S1 M8 T7 (data ethics) and Core S2 M5 (risk of fraud and noncompliance); IMA Data Literacy, and Internal Control within Reporting and Control; IFAC IES 4 (a), professional skepticism and professional judgment; AACSB A5 part 5.2. The analytics type is descriptive, applied with an auditor's skepticism.
+**Competencies practiced.** CPA Evolution Core S2 M5 (risk of fraud and noncompliance); IMA Data Literacy, and Internal Control within Reporting and Control; IFAC IES 4 (a), professional skepticism and professional judgment; AACSB A5 part 5.2. The analytics type is descriptive, applied with an auditor's skepticism.
 
 ## Before you assign
 
@@ -118,7 +118,7 @@ The margin at standard cost is {{ s3|pct(2) }} in {{ g.ql3 }} and {{ s4|pct(2) }
 
 {{ figure('IF-C1-5-B') }}
 
-**Step 7. State what the margins show.** The Furniture margin fell from {{ m3|pct(2) }} to {{ m4|pct(2) }}, a drop of {{ g.drop|num(2) }} points, and the standard-cost view agrees, with a drop of {{ g.std_drop|num(2) }} points. Revenue fell {{ (-g.rev_change)|num(1) }}% from {{ g.ql3 }} to {{ g.ql4 }} while cost rose {{ g.cogs_change|num(1) }}%. That is the descriptive answer. Why it fell is the Part II question.
+**Step 7. State what the margins show.** On this measure the Furniture margin fell from {{ m3|pct(2) }} to {{ m4|pct(2) }}, a drop of {{ g.drop|num(2) }} points. Revenue fell {{ (-g.rev_change)|num(1) }}% from {{ g.ql3 }} to {{ g.ql4 }} while cost rose {{ g.cogs_change|num(1) }}%. The measure takes revenue before customer credits, which post to a shared account, and cost after the returned goods, so it overstates the margin, and a model answer says so. The cross-check at standard cost also falls, by {{ g.std_drop|num(2) }} points, but it is a separate measure (the invoice lines before returns), so it supports the direction of the change, not the level. That is the descriptive answer. Why it fell is the Part II question.
 
 ## Expected results
 
@@ -139,7 +139,7 @@ The margin at standard cost is {{ s3|pct(2) }} in {{ g.ql3 }} and {{ s4|pct(2) }
 - **The trap.** Using all rows gives a {{ g.ql4 }} margin of {{ naive_q4|pct(1) }}, {{ naive_vs_q3 }} the {{ g.ql3 }} figure, on negative totals; the percentage hides both the nonsense and the decline.
 - **The entry.** {{ close }}, a journal entry of EntryType "{{ entry_type }}", posted on the last day of the year, debiting revenue and crediting cost by the year's balances.
 - **The reason.** It is a bookkeeping transfer, not a transaction of the quarter, so it must be excluded from a quarterly margin; the exclusion rule is stated.
-- **The result.** {{ m3|pct(1) }} to {{ m4|pct(1) }}, a fall, confirmed at standard cost.
+- **The result.** {{ m3|pct(1) }} to {{ m4|pct(1) }}, a fall on the stated basis (revenue before customer credits, cost after returned goods). The invoice-line view at standard cost falls too.
 
 A weak answer reports the naive percentage as the result, removes one side of the close only, or drops the entry without saying why.
 

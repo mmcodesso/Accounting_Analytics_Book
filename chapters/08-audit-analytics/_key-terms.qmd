@@ -4,23 +4,23 @@
 
 **Aging schedule.** A classification of the unpaid invoices at an as-of date by how long each is past its due date, in buckets such as current, 1 to 30 days, 31 to 60 days, 61 to 90 days, and over 90 days. It supports credit follow-up and the estimate of credit losses.
 
-**Allowance for credit losses.** A valuation account, deducted from receivables, for the amount not expected to be collected. Under the credit loss standard of the Financial Accounting Standards Board (FASB), it reflects expected losses even when the risk of loss is remote and may be estimated from an aging schedule. Charles River's account for it is named Allowance for Doubtful Accounts, the older term.
+**Allowance for credit losses.** A valuation account, deducted from receivables, for the amount not expected to be collected. Under the credit loss standard of the Financial Accounting Standards Board (FASB), it reflects expected losses even when the risk of loss is remote, unless the expected nonpayment is zero, and may be estimated from an aging schedule. Charles River's account for it is named Allowance for Doubtful Accounts, the older term.
 
-**Audit workpaper.** The documentation of an audit test: its objective, source, population check, procedure, parameters, results, exceptions and their dispositions, conclusion, preparer, and reviewer, recorded so that an experienced auditor with no connection to the engagement can understand and review the work.
+**Audit workpaper.** The documentation of an audit test: its objective, source, population check, procedure, parameters, results, exceptions and their dispositions, conclusion, and the preparer and reviewer with their dates, recorded so that an experienced auditor with no connection to the engagement can understand and review the work.
 
 **Backdated entry.** A journal entry created on a later day than the date it posts to, so that it may change a period that has already been closed or reported.
 
 **Benford's Law.** The observation that in many collections of numbers the first digit d occurs with a proportion of about `LOG10(1+1/d)`, so that about 30 percent of the numbers begin with 1 and fewer than 5 percent with 9.
 
-**Confirmation.** Audit evidence obtained directly from a third party, such as a customer asked to state its balance to the auditor. The PCAOB's standard on confirmation requires it for accounts receivable unless the evidence is obtained directly from a knowledgeable external source in another way.
+**Confirmation.** A response sent directly to the auditor by a third party, such as a customer asked to state its balance. For accounts receivable, the PCAOB's standard on confirmation calls for confirmation or direct access to information held by a knowledgeable external source, and for other substantive procedures where neither is feasible.
 
 **Control deficiency.** A weakness in the design or operation of a control that keeps it from preventing or detecting misstatements on time.
 
 **Disposition.** The auditor's conclusion about an exception: expected, with the evidence that explains it; follow up, with the question to ask or the document to request; or a misstatement or control deficiency to be reported.
 
-**Exception.** A record that meets a test's criteria and therefore needs an explanation, such as a payment above an approval limit or a journal entry created after its posting date. An exception is not an error until it has been investigated.
+**Exception.** A record that meets a test's criteria and therefore needs an explanation, such as a payment above an approval limit or a journal entry created after its posting date. An exception is a reason to investigate, not proof of an error.
 
-**False positive.** A record that meets a test's criteria but turns out to be legitimate. Most exceptions from tests of whole populations are false positives, and the auditor's work is to explain them and refine the tests.
+**False positive.** A record that meets a test's criteria but turns out to be legitimate. Many exceptions from tests of whole populations are false positives, and the auditor's work is to explain them and refine the tests.
 
 **First-digit test.** A test that compares the proportion of amounts beginning with each digit from 1 to 9 with the proportions that Benford's Law expects.
 
@@ -28,11 +28,11 @@
 
 **Individually significant item.** An item large enough, or risky enough, that the auditor examines it in full rather than accepting any sampling risk on it.
 
-**Journal entry testing.** The identification and examination of journal entries with characteristics of inappropriate or unauthorized entries, required in audits because journal entries are a common means of management override.
+**Journal entry testing.** The identification and examination of journal entries with characteristics of inappropriate or unauthorized entries, required in financial statement audits because journal entries are a common means of management override.
 
 **Management override of controls.** The ability of managers to bypass controls that operate effectively for everyone else, for example by recording or approving journal entries outside the normal process.
 
-**Mean absolute deviation (MAD).** In a Benford analysis, the average of the absolute differences between the actual and expected proportions of each digit. Nigrini's ranges classify a first-digit MAD from close conformity to nonconformity.
+**Mean absolute deviation (MAD).** In a Benford analysis, the average of the absolute differences between the actual and expected proportions of each digit. Nigrini's practical screening ranges classify a first-digit MAD from close conformity to nonconformity.
 
 **Near-duplicate.** A record that agrees with another on the fields that matter, such as supplier and amount, but differs in one, such as the date. Near-duplicates can reveal duplicate payments that repeat no reference number.
 
@@ -46,7 +46,7 @@
 
 **Sampling risk.** The risk that the conclusion drawn from a sample differs from the conclusion the whole population would support. Examining individually significant items in full removes it for those items.
 
-**Segregation of duties.** The principle that no one person should both initiate and approve a transaction, or both record and authorize it, so that one person's error or fraud is caught by another.
+**Segregation of duties.** The principle that no one person should both initiate and approve a transaction, or both record and authorize it, which reduces the risk that one person's error or fraud goes undetected.
 
 **Stratification.** The division of a population into groups, or strata, usually by value, to show where the items and the value are concentrated and to direct audit attention.
 

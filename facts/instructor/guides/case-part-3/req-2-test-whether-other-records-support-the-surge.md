@@ -23,7 +23,7 @@ figures:
 
 ## Purpose and learning outcomes
 
-The audit left one question: were the surge-day hours worked? This requirement tests them against every record that is not the time clock and grades each record for independence as well as agreement, because two records from one source agree for free. The wording rule holds: the hours are unsupported, not unworked. The analytics type is diagnostic.
+The audit left one question: were the surge-day hours worked? This requirement tests them against every record that is not the time clock and grades each record for independence as well as agreement, because two records from one source agree for free. The analytics type is diagnostic.
 
 Students can:
 
@@ -37,17 +37,17 @@ Students can:
 ## Before you assign
 
 - **Files.** Case.sql with the views SurgeDays and PlantEntries of Requirement 1, saved with **Write Changes**. It builds on Chapter 11's CASE and windows and Chapter 12's tests (Exercise 12.4 on overtime approval).
-- **Data conditions.** The plant has {{ plant }} hourly employees. Roster times are `HH:MM:SS` with no date, clock times carry the date, and a late shift clocks out the next day. RoughCutCapacityPlan repeats a work center's available hours on every item row. The absence table records none in Manufacturing.
+- **Data conditions.** Roster times are `HH:MM:SS` with no date, clock times carry the date, and a late shift clocks out the next day. RoughCutCapacityPlan repeats a work center's available hours on every item row.
 
 ## How to run it
 
-Pairs, about 150 minutes: 25 for Steps 1 and 2, 35 for the roster and clock, 30 for the rule, 30 for the plans and approvals, 30 for the matrix. The routine: type the two comment lines and the query, select it, click **Execute all/selected SQL**, read the message pane. Hold back the rule until a pair has listed the {{ n_off }} Off Shift Clocking exceptions, and the matrix until Requirement 3's weekly comparison is done. **Collect** the script and matrix.
+Pairs, about 150 minutes: 25 for Steps 1 and 2, 35 for the roster and clock, 30 for the rule, 30 for the plans and approvals, 30 for the matrix. Hold back the matrix until Requirement 3's weekly comparison is done. **Collect** the script and matrix.
 
 ## Step-by-step solution
 
 ### Part 1: Surge days against ordinary days
 
-**Step 1. Compare attendance, clock-in times and groups sharing one time.** Daily counts entries and distinct clock-in times, Plant the hourly employees, and Groups the largest group on one clock-in timestamp, with a window.
+**Step 1. Compare attendance, clock-in times and groups sharing one time.** Daily counts distinct employees and clock-in times, Plant the hourly employees, and Groups the largest group on one clock-in timestamp, with a window.
 
 ```sql
 Groups AS (
@@ -62,10 +62,12 @@ Groups AS (
 ),
 ```
 
-**Check:** {{ s.days }} surge days at {{ s.clock_ins|num(1) }} clock-in times a day and a largest group of {{ s.largest|num(1) }}, against {{ o.days }} ordinary days at {{ o.clock_ins|num(1) }} and {{ o.largest|num(1) }}. All {{ plant }} are present on every surge day and on {{ o.all_present }} ordinary days, so attendance says little. **Watch for:** two wrong versions.
+**Check:** {{ s.days }} surge days at {{ s.clock_ins|num(1) }} clock-in times a day and a largest group of {{ s.largest|num(1) }}, against {{ o.days }} ordinary days at {{ o.clock_ins|num(1) }} and {{ o.largest|num(1) }}. All {{ plant }} are present on every surge day and on {{ o.all_present }} ordinary days, so attendance says little. **Watch for:** three wrong versions.
+
+- `COUNT(*)` for the employees counts clock rows: a few ordinary days carry two entries for one person, and the count reads {{ g.rows_present.Ordinary }} days.
 
 - A window partitioned by the date alone counts the whole day's attendance: the largest group reads {{ g.flat_largest.Surge|num(1) }} and {{ g.flat_largest.Ordinary|num(1) }}, the attendance itself.
-- A headcount from the whole cost center ({{ g.cost_center_staff }}) leaves {{ g.all_present_67 }} days with everyone present. The salaried staff keep no time clock.
+- A headcount from the whole cost center ({{ g.cost_center_staff }}) leaves {{ g.all_present_67 }} days with everyone present.
 
 **Step 2. Count the entries with meal punches.** Summarize the punches, then left-join.
 
@@ -95,7 +97,7 @@ WITH Meals AS (
 
 **Check:** the surge entries were rostered {{ rostered }} hours on {{ shifts|join(' and ') }} by the {{ creator_title }}, {{ lead }} days ahead, and clocked {{ clocks|join(' and ') }}, {{ clocked }} hours: {{ early }} minutes early and {{ late }} late. Roster equals clock on {{ equal.Ordinary[1]|count }} of {{ equal.Ordinary[0]|count }} ordinary entries and on {{ equal.Surge[1] }} surge entries. **Watch for:** the roster's time without its date reads as a day in the year `2000`, and the minutes run to millions (the smallest is {{ g.no_date_min|num }}); the clock-out taken as a time of day makes the late shift leave early, {{ g.tod_late[0]|num }} minutes.
 
-**Step 4. Find the rule behind the Off Shift Clocking exceptions and apply it.** The {{ n_off }} exceptions are clock-ins at {{ off_in }} against a start of {{ off_start }}, {{ g.minutes_rule }} minutes after it, so the rule tests arrival. RuleMinutes, Timing and Flagged CTEs feed a final query that counts arrivals and departures against the rule, and the entries flagged.
+**Step 4. Infer the rule behind the Off Shift Clocking exceptions and apply it.** The {{ n_off }} exceptions are clock-ins at {{ off_in }} against a start of {{ off_start }}, {{ g.minutes_rule }} minutes after it. They point to a rule on arrival, but cannot show its threshold, whether it tests departures or whether approved overtime is exempt, which only the configuration shows. RuleMinutes, Timing (minutes rounded with `ROUND`) and Flagged feed a query that counts arrivals, departures and flags.
 
 ```sql
     SUM(CASE WHEN t.Arrival >= (SELECT Minutes FROM RuleMinutes)
@@ -104,26 +106,23 @@ WITH Meals AS (
         THEN 1 ELSE 0 END) AS LateDepartures,
 ```
 
-**Check:** surge entries: {{ g.by_type.Surge[2] }} late arrivals, {{ g.by_type.Surge[3]|count }} late departures, {{ g.by_type.Surge[4] }} flagged; ordinary: {{ g.by_type.Ordinary[2] }}, {{ g.by_type.Ordinary[3]|count }} and {{ g.by_type.Ordinary[4] }}. Design failed: surge arrivals are early, and the late departures count as approved overtime that nothing compares with a roster or a plan. Operation failed: all {{ exceptions }} exceptions are Open, none reviewed, {{ wrong }} naming the wrong employee. **Watch for:** applying the rule to departures flags all {{ g.by_type.Surge[3]|count }} surge entries and reverses the finding; `>` against `>=` and an ungrouped Flagged CTE change nothing here.
+**Check:** surge entries: {{ g.by_type.Surge[2] }} late arrivals, {{ g.by_type.Surge[3]|count }} late departures, {{ g.by_type.Surge[4] }} flagged; ordinary: {{ g.by_type.Ordinary[2] }} (date-shifted entries, Requirement 1), {{ g.by_type.Ordinary[3]|count }} and {{ g.by_type.Ordinary[4] }}. On that rule the design fails, because surge arrivals are early and nothing compares the approved late departures with a roster or plan, a finding to confirm against the configuration. The operation fails in the recorded review: all {{ exceptions }} exceptions are Open, none reviewed, {{ wrong }} naming the wrong employee. **Watch for:** applying the rule to departures flags all {{ g.by_type.Surge[3]|count }} surge entries and reverses the finding. Unrounded minutes leave exact two-hour departures a fraction of a second either side and give {{ g.raw_ordinary|count }}, and in whole minutes `>=` gives {{ g.ge_ordinary|count }}. An ungrouped Flagged CTE changes nothing here.
 
 ### Part 3: The plans and the approvals
 
-**Step 5. Test the calendar and the planned load.** Join SurgeDays to WorkCenterCalendar on the date. For the load, take each work center's hours once a week and compare planned load with available hours in weeks with and without surge days, through the week of {{ through }}.
+**Step 5. Test the calendar and the planned load.** Join SurgeDays to WorkCenterCalendar on the date. For the load, take each work center's hours once a week, compare planned load with available hours in weeks with and without surge days through the week of {{ through }}, and count the weeks and work centers planned above capacity.
 
 ```sql
-Available AS (
-    SELECT WeekStart, SUM(Hours) AS AvailableHours
-    FROM (
-        SELECT BucketWeekStartDate AS WeekStart, WorkCenterID,
-            MAX(AvailableHours) AS Hours
-        FROM RoughCutCapacityPlan
-        GROUP BY BucketWeekStartDate, WorkCenterID
-    ) AS t
-    GROUP BY WeekStart
+Centers AS (
+    SELECT BucketWeekStartDate AS WeekStart, WorkCenterID,
+        SUM(PlannedLoadHours) AS PlannedHours,
+        MAX(AvailableHours) AS AvailableHours
+    FROM RoughCutCapacityPlan
+    GROUP BY BucketWeekStartDate, WorkCenterID
 ),
 ```
 
-**Check:** every surge day is a working day, {{ maintenance }} with maintenance at a work center and {{ reduced }} at reduced capacity. Load in surge weeks against other weeks:{% for y in d.years %} {{ y }}, {{ load[loop.index0][0]|num(3) }} against {{ load[loop.index0][1]|num(3) }}{{ ";" if not loop.last else "." }}{% endfor %} The surge weeks were not planned overloads. **Watch for:** three wrong versions.
+**Check:** every surge day is a working day, {{ maintenance }} with maintenance at a work center and {{ reduced }} at reduced capacity. Load in surge weeks against other weeks:{% for y in d.years %} {{ y }}, {{ load[loop.index0][0]|num(3) }} against {{ load[loop.index0][1]|num(3) }}{{ ";" if not loop.last else "." }}{% endfor %} Surge weeks were planned more lightly on average, yet {{ over_weeks|length }} of the {{ surge_weeks }} were planned above the plant's capacity, with {{ center_over }} work-center weeks above theirs, and so were {{ other_over }} other weeks. An average cannot rule out an overloaded week, and the plan does not explain a recurring pattern. **Watch for:** three wrong versions.
 
 - Summing every item row's hours makes the load a few hundredths of capacity ({{ g.flat_shares|min|num(3) }} to {{ g.flat_shares|max|num(3) }}).
 - Without the cut-off a row for {{ g.beyond[0][0] }} appears, with {{ g.beyond[0][2] }} weeks.
@@ -149,7 +148,7 @@ ORDER BY pe.DayType DESC;
 
 ### Part 4: The matrix
 
-**Step 7. Grade each test for independence, and name two explanations.** Place every test in one result column and mark whether its record is independent of the {{ creator_title }} and the time clock. Attendance and punches support the hours but come from the clock; clock-in times, rosters and approvals contradict them and come from the clock or the {{ creator_title }}; the calendar, the plan and the output are outside, and none supports the hours as recorded; absences are silent. Two explanations fit: the hours were worked and entered for the plant as a block, or they were not worked as recorded. Gate logs, supervisor statements, security video, machine data and the system's own entry log would separate them.
+**Step 7. Grade each test for independence, and name two explanations.** Place every test in one result column and mark whether its record is independent of the {{ creator_title }} and the time clock. Attendance and punches support the hours but come from the clock. Clock-in times, rosters and approvals contradict them and come from the clock or the {{ creator_title }}. The calendar, the plan and the output lie outside the clock trail, their independence from that manager not established, and none supports the hours as recorded. Absences are silent. Two explanations fit, the hours worked and entered as a block or not worked as recorded, and evidence outside the database would separate them.
 
 {{ figure('IF-C3-2-A') }}
 
@@ -166,15 +165,13 @@ ORDER BY pe.DayType DESC;
 
 ## What a strong answer says
 
-- **Corroboration.** Attendance and punches agree with the hours but are one system; the clock-in pattern, roster, approvals and plan contradict them.
-- **Independence.** Rosters and approvals come from one manager; only the calendar, the capacity plan and the output are outside, and they do not support the hours.
-- **The control.** A design failure (the rule tests arrival only) and an operation failure (every exception open, none reviewed, some misattributed).
-- **Wording.** Unsupported, never fictitious; the evidence that separates the explanations lies outside the database.
+- **Corroboration and independence.** Agreement from one system, contradiction from the rest, and no record shown to be independent of the {{ creator_title }}.
+- **The control.** A candidate rule with its limits, a design failure to confirm against the configuration, and an operation failure in the recorded review.
+- **Wording.** Unsupported, never fictitious.
 
 ## Common mistakes and how to respond
 
 - **A window without the clock-in time, or the cost center as the headcount.** *Symptom:* the largest group equals the attendance; no day has everyone present. *Response:* ask what makes a group, and who has a time clock.
-- **A time with no date.** *Symptom:* millions of minutes, or a late shift that leaves early. *Response:* ask what date each time belongs to.
 - **The rule applied to departures.** *Symptom:* everything would have been flagged. *Response:* ask what the system's own exceptions tested.
 - **Plan tests on the item rows, or without the cut-off.** *Symptom:* a load of a few hundredths, or a row after the data. *Response:* ask how often a center's hours repeat.
 - **Fictitious, or proven.** *Symptom:* "the hours were faked", or "attendance proves them". *Response:* ask which record is independent and what each explanation predicts.
@@ -185,12 +182,11 @@ ORDER BY pe.DayType DESC;
 |---|---:|---|---|
 | Surge against ordinary days | 20 | All measures; window correct; hourly headcount | A measure wrong |
 | Roster and clock | 15 | Minutes early and late; rostered against clocked | Dates or times mishandled |
-| Control reperformance | 20 | Rule found, applied to arrival; design and operation | Applied to departures, or one failure |
+| Control reperformance | 20 | Rule inferred with its limits, minutes rounded; design and operation | Applied to departures, or one failure |
 | Plans and approvals | 15 | Cut-off, hours once a week, operations tested | A fan-out |
 | Matrix and explanations | 30 | Result and independence for each test; two explanations; outside evidence | No independence |
 
 ## Extensions and discussion questions
 
 - Count the ordinary entries that leave more than the rule's minutes late ({{ beyond|count }}) and ask why so few were flagged.
-- Group the surge days by weekday and say what the pattern suggests ({{ weekdays[0][0] }} {{ weekdays[0][1] }}, {{ weekdays[-1][0] }} {{ weekdays[-1][1] }}).
 - Discuss: which record would you ask for first, and from whom?

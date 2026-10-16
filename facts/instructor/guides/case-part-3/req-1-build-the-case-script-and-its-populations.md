@@ -114,11 +114,13 @@ ORDER BY p.TimeClockEntryID;
     CASE
         WHEN tc.TimeClockEntryID IS NULL
             THEN 'No clock entry: investigate'
+        WHEN ae.WorkDate <> tc.WorkDate
+            THEN 'Dated differently: correct the report'
         WHEN ae.EmployeeID <> tc.EmployeeID
             THEN 'Names another employee: correct the report'
         WHEN ae.ExceptionType = 'Paid Without Approved Clock'
             THEN 'Paid on a Pending entry (test H1): follow up'
-        ELSE 'Isolated: record and close'
+        ELSE 'Isolated: logged, not pursued in this case'
     END AS Disposition
 FROM AttendanceException AS ae
     LEFT JOIN TimeClockEntry AS tc
@@ -128,7 +130,7 @@ ORDER BY ae.AttendanceExceptionID;
 
 {{ figure('IF-C3-1-B') }}
 
-**Check:** {{ g.n.dispositions }} rows:{% for label, n in g.disp %} {{ label }}, {{ n }}{{ ";" if not loop.last else "." }}{% endfor %} Exceptions {{ wrong_ids|join(', ') }} name employee {{ wrong_named }} on entries that belong to employee {{ wrong_owner }}, so the exception report misattributes its own rows. The order of the first two tests does not change a count here, because no exception is both. The isolated rows are recorded and closed, not pursued.
+**Check:** {{ g.n.dispositions }} rows:{% for label, n in g.disp %} {{ label }}, {{ n }}{{ ";" if not loop.last else "." }}{% endfor %} Exceptions {{ wrong_ids|join(', ') }} name employee {{ wrong_named }} on entries that belong to employee {{ wrong_owner }}, so the exception report misattributes its own rows. No exception carries another date than its entry, so the date test returns none, and the order of the employee and Pending tests does not change a count, because no exception is both. The isolated rows are logged and not pursued, which does not clear them.
 
 ### Part 4: The views
 
@@ -144,7 +146,7 @@ FROM TimeClockEntry AS tc
 WHERE cc.CostCenterName = 'Manufacturing'
 GROUP BY tc.WorkDate
 HAVING COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1
-    AND COUNT(*) > 1;
+    AND COUNT(DISTINCT tc.EmployeeID) > 1;
 ```
 
 ```sql
@@ -168,7 +170,7 @@ WHERE cc.CostCenterName = 'Manufacturing'
 
 - Without the Manufacturing filter SurgeDays is empty ({{ g.no_mfg }} days): across the company the hours are never one pattern.
 - An `INNER JOIN` to SurgeDays leaves {{ g.inner|count }} entries, all surge, so Requirement 2 has no ordinary days.
-- A second run without `DROP VIEW IF EXISTS` fails with "{{ g.again }}". The `PayClass` filter and the test for more than one entry remove nothing here; keep them, because they state who the plant is.
+- A second run without `DROP VIEW IF EXISTS` fails with "{{ g.again }}". The `PayClass` filter and the test for more than one employee remove nothing here. Keep them, because they state who the plant is, and count employees rather than rows, as H9 does, so two entries of one person cannot make a surge day.
 
 **Step 7. Reconcile the views to Tutorial 12.3.**
 
@@ -193,7 +195,7 @@ ORDER BY WorkYear;
 
 {{ figure('IF-C3-1-A') }}
 
-**Check:** three rows (year, surge days, surge entries, ordinary days, ordinary entries):{% for r in g.reconcile %} {{ r[0] }}, {{ r[1] }}, {{ r[2]|count }}, {{ r[3] }}, {{ r[4]|count }}{{ ";" if not loop.last else "." }}{% endfor %} The surge figures are those of Tutorial 12.3's test H8.
+**Check:** three rows (year, surge days, surge entries, ordinary days, ordinary entries):{% for r in g.reconcile %} {{ r[0] }}, {{ r[1] }}, {{ r[2]|count }}, {{ r[3] }}, {{ r[4]|count }}{{ ";" if not loop.last else "." }}{% endfor %} The surge figures are those of Tutorial 12.3's test H8, and a count against Employee shows that each surge day holds one entry for each of the {{ g.hourly }} hourly employees.
 
 ## Expected results
 
@@ -240,5 +242,5 @@ A strong script separates what needs follow-up (the exceptions on Pending entrie
 
 - Find the clock entries that carry two or more exceptions ({{ g.multi|length }} entries, {{ g.multi_total }} exceptions) and say what the pattern suggests about how the exceptions were raised.
 - Write the same link test from OvertimeApproval to its clock entry, and say what a break would mean for Requirement 2.
-- Discuss: "Isolated: record and close" is a decision to stop looking. What would you want to know before you made it for a real company?
+- Discuss: "Isolated: logged, not pursued in this case" is a decision to stop looking. What would you want to know before you closed such an item for a real company?
 - Discuss: what must a reviewer see in Case.sql before they trust a number in the memo?

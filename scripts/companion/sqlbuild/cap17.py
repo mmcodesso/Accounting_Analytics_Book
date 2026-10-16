@@ -435,7 +435,8 @@ def r2_(b: Build) -> None:
              Check("2040 opening line", -n["accrued"], lambda r: r.where(AccountNumber=2040)["OpeningLine"])])
 
     s.answer("Requirement 2", f"""
-        Materiality is {money(n['mat_c'])} for {d.C} and {money(n['mat_p'])} for {d.P}. At a year-end a revenue or
+        The controller's materiality, a starting benchmark, is {money(n['mat_c'])} for {d.C} and {money(n['mat_p'])}
+        for {d.P}. At a year-end a revenue or
         expense account's balance is that year's activity, because the prior close zeroed it, so the change for those
         accounts is this year's activity less last year's. The changes above {d.C} materiality, on each account's
         normal side, are {', '.join(f"{a['n']} {a['v']:+,.2f}" for a in above)}; retained earnings moves by {d.P}'s net income, closed into it. The opening
@@ -773,7 +774,7 @@ def r3(b: Build) -> None:
                      lambda r: [abs(v) for v in r.col("Difference")])])
 
     last = d.C
-    s.query(f"Requirement 3: the accruals older than the window at {ye(last)}, the items to reverse",
+    s.query(f"Requirement 3: the accruals older than the window at {ye(last)}, the items to investigate",
             f"Population: the view OpenAccruals at {ye(last)}; expected: {n['n_old']} items, "
             f"{money(comp[last]['old'])}, none ever invoiced",
             f"""
@@ -830,13 +831,15 @@ def r3(b: Build) -> None:
         {n['lag_low']} to {n['lag_high']} days (median {n['median']}), and {n['at_window']} cleared at exactly
         {n['window']} days, so "older than {n['window']} days" is the rule.
 
-        Age and the missing invoice show that an old accrual has gone unbilled, not that nothing is owed. A3 reverses
-        the old items at each year-end on the assumption that they will never be billed, which the suppliers'
-        statements or confirmations, the service contracts, and the absence of any later invoice or settlement must
-        support; if they do, the facts existed at each year-end and A3 corrects errors (retained earnings at 1 January
-        {d.P} {a3['re']:+,.2f}; {d.P} expense {-a3['P']:+,.2f}; {d.C} expense {-a3['C']:+,.2f}). Until that evidence is in
-        hand, keeping them as liabilities is equally sound. An accrual within the window is an estimate, and one
-        that later proves unneeded is a change in estimate in the year it goes stale. Keep the
+        Age and the missing invoice show that an old accrual has gone unbilled, not that nothing is owed, and the
+        window only selects the items to investigate. A3 reverses the old items at each year-end on two case
+        assumptions, that they will never be billed and that the facts available when each year's statements were
+        prepared already supported the release. The suppliers' statements or confirmations, the service contracts, and
+        the absence of any later invoice or settlement must support them. On those assumptions A3 corrects errors
+        (retained earnings at January 1, {d.P}, {a3['re']:+,.2f}; {d.P} expense {-a3['P']:+,.2f}; {d.C} expense
+        {-a3['C']:+,.2f}). Where the evidence shows the facts emerged later, the release belongs to the year they
+        became known, as a change in estimate. Until that evidence is in hand, keeping them as liabilities is equally
+        sound. Keep the
         {money(n['young_c'])} of young {d.C} accruals, and leave the {money(n['opening'])} to Requirement 9.""")
 
 
@@ -969,7 +972,7 @@ def r4(b: Build) -> None:
 
     expected_unbilled = unbilled_rows(d)
     s.query("Requirement 4: test L6, shipment lines never invoiced, at order price less discount (UnbilledLines)",
-            f"Population: every shipment line; expected: {cc['n_lines']} December {d.C} lines, {money(cc['total'])} "
+            f"Population: every shipment line; expected: {cc['n_lines']} lines shipped in December {d.C}, {money(cc['total'])} "
             f"at order price, standard cost {money(cc['std'])}",
             f"""
             SELECT sl.ShipmentLineID, s.ShipmentNumber, s.ShipmentDate,
@@ -1216,7 +1219,7 @@ def r4(b: Build) -> None:
     s.answer("Requirement 4", f"""
         Revenue, by the latest delivery of each invoice's shipments against the year of its posting (SubTotal; these
         invoices carry no freight): {cf['n']} invoices for {d.F} deliveries posted in {d.P}, {money(cf['total'])}; {cp['n']}
-        for {d.P} deliveries posted in {d.C}, {money(cp['total'])}; and {cc['n_lines']} December {d.C} shipment lines
+        for {d.P} deliveries posted in {d.C}, {money(cp['total'])}; and {cc['n_lines']} shipment lines of December {d.C}
         never invoiced, {money(cc['total'])} at order price, whose standard cost ({money(cc['std'])}) is already in cost
         of goods sold. Sales tax is recorded on invoicing and is not adjusted.
 
@@ -1242,7 +1245,9 @@ def aging(d, year: int) -> tuple[list[float], list[int]]:
             "SELECT si.DueDate, si.GrandTotal - COALESCE((SELECT SUM(a.AppliedAmount) FROM CashReceiptApplication a "
             "WHERE a.SalesInvoiceID = si.SalesInvoiceID AND a.ApplicationDate <= ?1), 0) - COALESCE((SELECT SUM(c.GrandTotal) "
             "FROM CreditMemo c WHERE c.OriginalSalesInvoiceID = si.SalesInvoiceID AND c.CreditMemoDate <= ?1), 0) "
-            "FROM SalesInvoice si WHERE si.InvoiceDate <= ?1", asof):
+            "FROM SalesInvoice si JOIN (SELECT SourceDocumentID AS id, MIN(PostingDate) AS pd FROM GLEntry "
+            "WHERE SourceDocumentType = 'SalesInvoice' GROUP BY SourceDocumentID) p ON p.id = si.SalesInvoiceID "
+            "WHERE p.pd <= ?1", asof):
         balance = xr(balance)
         if balance > 0:
             k = bucket_of(notes_days(due, asof))
@@ -1264,8 +1269,9 @@ def r5(b: Build) -> None:
     P, C = d.P, d.C
     s.query(f"Requirement 5: the open receivables at {ye(P)} and {ye(C)} saved as a view, aged in Exercise 8.1's "
             f"buckets",
-            "Population: each invoice dated by the year-end less the receipts applied and the credit memos dated by "
-            "then, rounded, kept if greater than zero; expected: the view OpenReceivables",
+            "Population: each invoice posted by the year-end (its first SalesInvoice posting, the population 1020 "
+            "records) less the receipts applied and the credit memos dated by then, rounded, kept if greater than zero; "
+            "expected: the view OpenReceivables",
             f"""
             DROP VIEW IF EXISTS OpenReceivables;
             CREATE VIEW OpenReceivables AS
@@ -1286,6 +1292,13 @@ def r5(b: Build) -> None:
                         ON cm.CreditMemoDate <= ye.AsOfDate
                 GROUP BY ye.AsOfDate, cm.OriginalSalesInvoiceID
             ),
+            Posted AS (
+                SELECT SourceDocumentID AS SalesInvoiceID,
+                    MIN(PostingDate) AS PostingDate
+                FROM GLEntry
+                WHERE SourceDocumentType = 'SalesInvoice'
+                GROUP BY SourceDocumentID
+            ),
             Balances AS (
                 SELECT ye.AsOfDate, si.SalesInvoiceID, si.CustomerID,
                     ROUND(si.GrandTotal - COALESCE(ap.Applied, 0)
@@ -1293,8 +1306,10 @@ def r5(b: Build) -> None:
                     julianday(ye.AsOfDate) - julianday(si.DueDate)
                         AS DaysPastDue
                 FROM YearEnds AS ye
+                    INNER JOIN Posted AS po
+                        ON po.PostingDate <= ye.AsOfDate
                     INNER JOIN SalesInvoice AS si
-                        ON si.InvoiceDate <= ye.AsOfDate
+                        ON si.SalesInvoiceID = po.SalesInvoiceID
                     LEFT JOIN Applied AS ap
                         ON ap.AsOfDate = ye.AsOfDate
                         AND ap.SalesInvoiceID = si.SalesInvoiceID
@@ -1502,7 +1517,7 @@ def r5(b: Build) -> None:
 
     a, tot = n["a"], n["total"]
     s.answer("Requirement 5", f"""
-        Recorded adjustments, effect on retained earnings at 1 January {P} / {P} income / {C} income: A1 payroll
+        Recorded adjustments, effect on retained earnings at January 1, {P} / {P} income / {C} income: A1 payroll
         accrual {a['A1']['re']:+,.2f} / {a['A1']['P']:+,.2f} / {a['A1']['C']:+,.2f}; A2 revenue cutoff
         {a['A2']['re']:+,.2f} / {a['A2']['P']:+,.2f} / {a['A2']['C']:+,.2f}; A3 old accruals {a['A3']['re']:+,.2f} /
         {a['A3']['P']:+,.2f} / {a['A3']['C']:+,.2f}; A4 interest {a['A4']['re']:+,.2f} / {a['A4']['P']:+,.2f} /
@@ -1513,13 +1528,16 @@ def r5(b: Build) -> None:
         Materiality {money(n['mat_c'])} ({C}, on recorded income as the controller set it) and {money(n['mat_p'])}
         ({P}). {C}'s income effect is {n['share']:.0%} of materiality, but the payroll liability
         ({money(n['pay_c']['total'])}) exceeds it, current liabilities at {C} rise by {money(n['rise'])} before the
-        reclassification, and the missing payroll accrual recurs every year. Record A1-A4, R1, and R2, and present {P} as
-        restated, with the Topic 250 disclosures, because the shareholders received {P} statements. Passed items: P1 the
-        allowance {money(n['p1'])} ({n['p1_income']:+,.2f} on {C} income), P2 expected returns about
+        reclassification, and the missing payroll accrual recurs every year. Record A1, A2, A4, R1, and R2, and A3 on
+        its stated assumptions once the suppliers' evidence supports them (or hold it). Present {P} as restated, with
+        the Topic 250 disclosures, because the errors are material to the {P} statements the shareholders received,
+        judged on the balance sheet as well as on income. Passed items: P1 the allowance {money(n['p1'])}
+        ({n['p1_income']:+,.2f} on {C} income), on the invoices posted by each year-end, P2 expected returns about
         {money(p2['effect'])} ({p2['income']:+,.2f}), P3 the damaged and quality-concern returns restocked at full cost
         {money(p3['effect'])}; aggregate {money(n['aggregate'])}, {n['agg_share']:.0%} of materiality
-        ({n['agg_income']:+,.2f} on {C} income). Pass all three and list them for the CFO's approval, with the freight
-        residual of {money(n['residual'])} as trivial.""")
+        ({n['agg_income']:+,.2f} on {C} income). All three are candidates to pass, listed for the CFO's approval: each
+        is passed once its support holds, and an amount still unresolved is held for evidence. List the freight
+        residual of {money(n['residual'])} as clearly trivial.""")
 
 
 # --- Requirement 6: the statements -----------------------------------------------------------------------------------
@@ -2139,7 +2157,7 @@ def r8(b: Build) -> None:
     C, N = d.C, d.N
     s.query(f"Requirement 8: the records dated after fiscal {C}",
             f"Population: GLEntry after {ye(C)}; expected: {n['rows']} supplier-payment rows, {n['first_day']} to "
-            f"{n['last_day']} {N}, debiting 2010 and crediting 1010",
+            f"{n['last_day']}, {N}, debiting 2010 and crediting 1010",
             f"""
             SELECT gl.SourceDocumentType, a.AccountNumber,
                 COUNT(*) AS Postings,
@@ -2274,17 +2292,20 @@ def r8(b: Build) -> None:
 
     s.answer("Requirement 8", f"""
         The {N} records are {n['n_pay']} supplier payments, {money(n['paid'])}, from {n['first_day']} to
-        {n['last_day']} {N} ({n['rows']} ledger rows, Dr 2010, Cr 1010), paying {n['n_inv']} invoices of {n['n_sup']}
+        {n['last_day']}, {N} ({n['rows']} ledger rows, Dr 2010, Cr 1010), paying {n['n_inv']} invoices of {n['n_sup']}
         suppliers, all received from {n['recv_first']} to {n['recv_last']} {C} and recorded in payables at the
-        year-end; no invoice was received after {C}, so no unrecorded liability is found. The same weeks of {C} had
+        year-end; no invoice was received after {C}, so this search identifies no unrecorded liability in a limited
+        population of supplier payments, which cannot show that none exists. The same weeks of {C} had
         {n['same_n']:,} payments, {money(n['same_amount'])}, and payables due in {n['due_months']} {N} were
         {money(n['due'])}. The extract has no payroll for the pay dates it covers, no note payments, no freight
         settlement, and no rent, sales, or receipts, so it is incomplete: it does not show that the company stopped
         paying. Going-concern conditions: cash net of sales tax {money(n['cash_net'])}; quick ratio {n['qr_c']:.2f},
         down from {n['qr_p']:.2f}; operating cash flow {money(n['op_c'])} against {money(n['op_p'])}; materials
         ({money(n['mat'])}) above twelve months of issues ({money(n['issues'])}); {money(n['opening_ap'])} of opening
-        payables unchanged for {n['years']} years. The ledger alone does not establish substantial doubt, but the
-        CFO's evaluation needs evidence from outside the database.""")
+        payables unchanged for {n['years']} years. The conditions are weighed first, without management's plans, and
+        the credit line counts only if it is probable that it will be put in place and will mitigate them (an
+        application is not committed financing). The ledger alone does not establish substantial doubt, but the CFO's
+        evaluation needs evidence from outside the database.""")
 
 
 # --- Requirement 9: the matters for the CFO --------------------------------------------------------------------------
@@ -2334,7 +2355,7 @@ def r9(b: Build) -> None:
              Check("no debits from invoices", 0.0, lambda r: r.where(SourceDocumentType="SalesInvoice")["Debits"]),
              Check("balance", n["stax"], lambda r: round(r.total("Balance"), 2))])
 
-    s.query("Requirement 9: the opening balances no document supports, and the equity effect if none is real",
+    s.query("Requirement 9: the five opening balances no document supports, and the equity effect if none is real",
             f"Population: the opening entry's lines to 1020, 1050, 2010, 2030, 2040; expected: assets "
             f"{money(n['assets'])}, liabilities {money(n['liabilities'])}, equity {n['equity']:+,.2f}",
             """
@@ -2368,13 +2389,18 @@ def r9(b: Build) -> None:
         paid from cash each month while 2120 Lease Liability is unused (1140 Leasehold Improvements is not a
         right-of-use account); the agreements decide the right-of-use assets and lease liabilities. Sales tax:
         {money(n['stax'])} recorded as payable on invoicing, with no remittance recorded (2050 credits only from
-        invoices, debits only from credit memos, {money(n['memo_debits'])}). Opening balances: assets {money(n['assets'])} and liabilities
-        {money(n['liabilities'])} that no document supports; if none is real, equity rises by {money(n['equity'])}.
+        invoices, debits only from credit memos, {money(n['memo_debits'])}); it is tax billed, not tax collected, and
+        {n['unpaid_n']:,} taxable invoices unpaid at the year-end hold {money(n['unpaid_tax'])} of it. Opening balances:
+        assets {money(n['assets'])} and liabilities {money(n['liabilities'])} on five lines no document supports; if none
+        of them is real, equity rises by {money(n['equity'])}, a sensitivity and not a proposed entry. The opening
+        inventories ({money(n['o_inv'])}) have no item detail either, a question for the opening listing.
         Standards unchanged since {d.F}: at a standard rebuilt on normal capacity the manufactured finished goods would
         be about {num(n['reval_c'])} higher at the end of {d.C} and {num(n['reval_p'])} at the end of {d.P}, so a strong
         memo recommends a cost study. Recommendation: record A1, A2, A4, and R1-R2, and A3 once the suppliers'
-        evidence supports it, and do not release the package until the tax status, the leases, the sales tax, and
-        the opening balances are settled.""")
+        evidence supports it and its period, and hold the package until every matter that could be material is
+        settled or supported by a documented conclusion (tax status, leases, sales tax, the opening balances and
+        inventories, cash, inventory costing and recoverability, the credit-loss and returns estimates, A3, and the
+        subsequent events and going concern), with the notes completed and the CFO's approval.""")
 
 
 def m4(b: Build) -> None:

@@ -869,7 +869,8 @@ def if_17_5_a() -> Diagram:
             else:
                 assert ws[f"{col}{r}"].value in (None, 0), f"{col}{r} holds {ws[f'{col}{r}'].value!r}"
     heads = [ws.cell(4, c).value for c in range(1, 12)]
-    assert heads[:5] == ["No.", "Adjustment", "Accounts", "Evidence", "Retained earnings, 1 January 2025"] and heads[9:] == ["Type", "Decision"], heads
+    assert heads[:4] == ["No.", "Adjustment", "Accounts", "Evidence"] and heads[4] == (
+        "Retained earnings, January 1, 2025") and heads[9:] == ["Type", "Decision"], heads
     shown = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
     text = lambda r, c: "" if ws.cell(r, c).value is None else str(ws.cell(r, c).value)                          # noqa: E731
     bold_rows = {9, 18}
@@ -910,7 +911,7 @@ def if_17_5_a() -> Diagram:
     xl.select(d, *geo2[(idx[10], 2)])
     bottom = _tabs(d, geo2["bottom"] + 8, "Adjustments", ["Cutoff", "Adjustments", "Statements"])
     _note(d, f"Outlined in coral: the total of A1 to A4 on retained earnings, on each year's income and on the year-end balances. Outlined in teal: the adjusted net "
-             f"income, recorded income plus that total, with G10 selected. A text cell shows its first line, as a row of fixed height does; rows 11 and 14 are blank and "
+             f"income, recorded income plus that total, with G10 selected. Each text cell is drawn with its first line only (the workbook's rows are tall enough for the whole text); rows 11 and 14 are blank and "
              f"row 19, the clearly trivial freight estimate, is below the block drawn.", bottom + 4)
     return d
 
@@ -1329,7 +1330,8 @@ def if_17_9_a() -> Diagram:
           rounded=False)
     y += 108
     d.box("<b>The closing recommendation</b><br>Record the adjustments the records settle and the reclassifications; record the old accruals once the suppliers' "
-          "evidence supports it; do not release the package until the four required matters are settled", x, y, iw, 96, fill=TEAL_TINT, stroke=TEAL,
+          "evidence supports them and their period; hold the package until every matter that could be material is settled or supported, the notes are "
+          "complete and the CFO approves", x, y, iw, 96, fill=TEAL_TINT, stroke=TEAL,
           stroke_width=1.5, size=SMALL, align="left", valign="top", rounded=False)
     d.box("", x, y, 5, 96, fill=TEAL, stroke=TEAL, rounded=False)
     # the appendix

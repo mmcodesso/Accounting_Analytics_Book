@@ -369,7 +369,10 @@ for r in q("""SELECT strftime('%Y', PaymentDate), ROUND(SUM(PrincipalAmount),2),
     WHERE PaymentDate>'2026-12-31' GROUP BY 1"""):
     print("  maturities", r)
 for y in YEARS:
-    print("  notes at", y, one("SELECT ROUND(SUM(PrincipalAmount),2) FROM DebtScheduleLine WHERE PaymentDate>?", (YE[y],))[0], "GL", -TB[y].get("2110", 0))
+    # only the notes originated by the year-end: note 2 began in 2026, so its schedule is not owed at the earlier year-ends
+    print("  notes at", y, one("""SELECT ROUND(SUM(dsl.PrincipalAmount),2) FROM DebtScheduleLine dsl JOIN DebtAgreement da
+        ON da.DebtAgreementID=dsl.DebtAgreementID WHERE da.OriginationDate<=? AND dsl.PaymentDate>?""", (YE[y], YE[y]))[0],
+          "GL", -TB[y].get("2110", 0))
 # revenue on the adjusted ledger basis
 for y in (2025, 2026):
     base = {k: -flow([k], f"{y}-01-01", YE[y]) for k in ("4010", "4020", "4030", "4040", "4050", "4080")}

@@ -16,7 +16,7 @@ B.  Completeness
 C.  Consistency
 D.  Timeliness
 
-**3.** Some shipments in the Charles River Shipment table are marked "In Transit" in the Status column, even though the DeliveryDate column shows a delivery date that passed long ago. Which data quality dimension best describes the disagreement between the two columns?
+**3.** Some shipments in the Charles River Shipment table are marked "In Transit" in the Status column, although the DeliveryDate column, which records the date the goods arrived, shows a date years before the year-end under review. Which data quality dimension best describes the disagreement between the two columns?
 
 A.  Accuracy
 B.  Completeness
@@ -44,12 +44,12 @@ B.  Completeness
 C.  Consistency
 D.  Timeliness
 
-**7.** Which of the following best describes the relationship between structured and unstructured data in accounting practice?
+**7.** Which of the following matches an accounting source with its data structure correctly?
 
-A.  Accountants work exclusively with structured data and never encounter unstructured data.
-B.  Unstructured data has replaced structured data as the primary input for accounting analytics.
-C.  Most accounting analytical work uses structured data, but the proportion of unstructured data in accounting is growing.
-D.  Structured and unstructured data require the same analytical tools and techniques.
+A.  An XBRL filing is unstructured, because its data are not arranged in rows and columns.
+B.  A scanned supplier invoice is structured, because the ERP system stores it as a file.
+C.  A general ledger table is structured, and the narrative text of a contract is unstructured.
+D.  A payroll register is semi-structured, because each row combines amounts with employee names.
 
 **8.** A management accountant discovers that the same product appears in the Item table under two different ItemID values because it was entered separately by two warehouse locations. This is an example of which data quality problem?
 

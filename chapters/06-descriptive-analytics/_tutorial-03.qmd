@@ -53,7 +53,7 @@ The formula of MarginBeforeDiscountPct is:
 =(LineTotal+DiscountAmount-StdCostAmount)/(LineTotal+DiscountAmount)
 ```
 
-Read the two columns side by side, as @fig-06-08 does. The quantity sold barely changed, and neither did the list price or the standard cost per unit. The price per unit fell, and the promotional discounts more than doubled. The margin before discounts, which adds the discounts back to revenue, did not fall at all. In this comparison at standard cost, the drivers point to one dominant cause: the margin fell because of what Charles River charged, not because of how much or what it sold, or of what the goods cost. The bridge in the next steps measures each effect separately.
+Read the two columns side by side, as @fig-06-08 does. The quantity sold barely changed, and neither did the list price or the standard cost per unit. The price per unit fell, and the promotional discounts more than doubled. The margin before discounts, which adds the discounts back to revenue, did not fall at all. In this comparison at standard cost, the drivers point to one dominant component, the larger promotional discounts. The bridge in the next steps measures it separately from the smaller volume, mix, and price-list effects.
 
 ![The Furniture Driver PivotTable for the Third and Fourth Quarters.](/visuals/svg/fig-06-08-furniture-drivers.svg){#fig-06-08 fig-alt="A mock of the Drivers worksheet. A PivotTable filtered to the Furniture item group shows, for 2026-Q3 and 2026-Q4 side by side, the sums of Quantity, ListAmount, LineTotal, DiscountAmount, and StdCostAmount, the calculated fields PricePerUnit, ListPerUnit, CostPerUnit, MarginPct, and MarginBeforeDiscountPct. A gray column beside the PivotTable gives the change from Q3 to Q4 of each measure. The DiscountAmount row, which more than doubles, the PricePerUnit row, which falls, and the MarginBeforeDiscountPct row, which rises slightly, are outlined."}
 
@@ -100,7 +100,7 @@ d. Say in the chart title or a note that the axis starts at 1.6 million, because
 
 ![The Furniture Margin Bridge from the Third to the Fourth Quarter.](/visuals/svg/fig-06-09-margin-bridge.svg){#fig-06-09 fig-alt="A waterfall chart of the Furniture margin at standard cost. It starts with a total bar for the 2026-Q3 margin, followed by a small increase for volume, small changes for mix and price lists, a large decrease for promotions, and no change for cost, and it ends with a lower total bar for the 2026-Q4 margin. Each bar is labeled with its dollar amount and sign, and a legend distinguishes totals, increases, decreases, and no effect. The vertical axis starts at 1.6 million dollars."}
 
-**Step 7. Drill into the discounts.** The bridge says the promotions caused the decline. The next question is which promotions.
+**Step 7. Drill into the discounts.** In the bridge, the promotions effect is the largest negative component of the change in margin. The next question is which promotions the discounts came from.
 
 a. Insert a PivotTable from the InvoiceLines Table on a new worksheet named `Discounts`. Drag ItemGroup to **Filters** and select Furniture, and drag Period to **Columns** and select only 2026-Q3 and 2026-Q4.
 b. Drag PromotionID to **Rows**, and drag SalesInvoiceLineID and DiscountAmount to **Values**.
@@ -114,7 +114,7 @@ d. Turn off the grand totals, and find the promotions that appear in the PivotTa
 **Step 8. Record the finding.**
 
 a. On the **Documentation** worksheet, add the ListAmount and DiscountAmount custom columns to the Query steps entry, the four calculated fields to the Calculated fields entry, and the Drivers, Bridge, and Discounts worksheets to the Worksheets entry.
-b. Replace the open question about promotion 8, which you recorded in Chapter 4, with a `Finding` entry of two or three sentences that states the change in the Furniture margin, the effect of the promotions, and the effects that were small.
+b. Replace the open question about promotion 8, which you recorded in Chapter 4 and revised in Tutorial 5.2, with a `Finding` entry of two or three sentences that states the change in the Furniture margin, the effect of the promotions, and the effects that were small.
 c. Save the workbook.
 
 The Documentation worksheet now states the answer to the controller's question in the place where a reviewer looks first, next to the evidence that supports it.

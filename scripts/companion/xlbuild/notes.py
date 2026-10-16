@@ -67,7 +67,7 @@ def write(wb, *, file_name: str, role: str, sections: list[dict], stamp: dict, c
           meaning_heading: str = "What the results mean", check_prefix: str = "Tutorial"):
     """(Re)write the Solution Notes worksheet. `sections` holds, for each tutorial or exercise, its label, title, the
     items done (step titles or requirements), and what its results mean; `checks` pairs each check with its label."""
-    from xlbuild.xl import add_sheet, wait_ready
+    from xlbuild.xl import add_sheet, retry, wait_ready
     wait_ready(wb.Application)
     existing = [ws for ws in wb.Worksheets if ws.Name == NOTES_SHEET]
     if existing:                       # reused, never deleted: deleting a worksheet can crash Excel once a slicer exists
@@ -117,7 +117,7 @@ def write(wb, *, file_name: str, role: str, sections: list[dict], stamp: dict, c
         if sec["meaning"]:
             line(sec["label"], sec["meaning"])
 
-    for r, (style, cells) in enumerate(rows, start=1):
+    def put_row(r: int, style: str, cells: tuple) -> None:
         for c, value in enumerate(cells, start=1):
             cell = ws.Cells(r, c)
             if style.startswith("check") and c == 3:
@@ -140,6 +140,9 @@ def write(wb, *, file_name: str, role: str, sections: list[dict], stamp: dict, c
             ws.Cells(r, 1).Font.Size = 12
         elif style == "bold":
             ws.Range(f"A{r}:D{r}").Font.Bold = True
+
+    for r, (style, cells) in enumerate(rows, start=1):
+        retry(put_row, r, style, cells)               # a whole row again if Excel, busy calculating, rejects a call
     ws.Columns("A").ColumnWidth = 48
     ws.Columns("B").ColumnWidth = 80
     ws.Columns("C").ColumnWidth = 18

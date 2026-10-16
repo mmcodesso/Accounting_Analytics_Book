@@ -43,6 +43,8 @@ real:
     rx: '(?:©|\(c\)|[Cc]opyright)\s*{Y}'
   - name: release number
     rx: '(?:Release|Release No\.|No\.)\s+{Y}-\d{3}'
+  - name: accounting standards update (ASU 2023-09)
+    rx: '\bASU {Y}-\d{2}\b'
   - name: software release
     rx: '(?:\((?:GA|Preview),?\s+|\b(?:GA|Preview) (?:in|since) |\bretires? in |\bms\.date |\bStore build [\d.]+ \()(?:(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+)?{Y}'
   - name: software release (month year release)
@@ -157,19 +159,24 @@ files:
     - {rx: 'Microsoft 365 or Excel {Y}', class: real, why: "a software release: Excel 2024 adds the functions the Excel solutions use"}
   front-matter/preface.qmd:
     - {rx: 'framework for management accountants in {Y}', class: real, why: "IMA framework published in 2025"}
-    - {rx: 'takes effect in July {Y}', class: real, why: "the revised International Education Standards take effect on 1 July 2026"}
+    - {rx: 'Excel {Y}', class: real, why: "a software release: Excel 2024, which has the functions the Excel solutions use"}
     - {rx: 'Technical competence \({Y}\)', class: real, why: "the title of the 2026 revision of IES 2, in the preface's reference list"}
   appendices/d-competencies/appendix.qmd:
-    - {rx: 'Revised versions, issued in {Y}', class: real, why: "IFAC issued the revised IES in 2025"}
-    - {rx: 'take effect in July {Y}', class: real, why: "the revised IES take effect on 1 July 2026"}
-    - {rx: 'standards were revised in {Y}', class: real, why: "IFAC's 2025 revision of the IES"}
-    - {rx: 'accounting standards in {Y}', class: real, why: "AACSB's 2026 accounting standards"}
+    - {rx: 'The versions issued in {Y}', class: real, why: "IFAC issued the revised IES in 2025"}
+    - {rx: "IMA's {Y} framework", class: real, why: "IMA's framework published in 2025"}
+    - {rx: "AACSB's {Y} accounting standards", class: real, why: "AACSB's 2026 accounting standards"}
   chapters/01-role-of-analytics/chapter.qmd:
-    - {rx: 'takes effect in July {Y}', class: real, why: "the revised International Education Standards take effect on 1 July 2026"}
-    - {rx: 'CPA Exam that took effect in January {Y}', class: real, why: "the CPA Evolution exam took effect in January 2024"}
     - {rx: 'competency framework in {Y}', class: real, why: "IMA framework published in 2025"}
     - {rx: 'In a {Y} survey by the AICPA', class: real, why: "a 2025 survey"}
     - {rx: 'In {Y}, the Public Company Accounting Oversight Board', class: real, why: "PCAOB amendments of 2024"}
+  chapters/01-role-of-analytics/_multiple-choice.qmd:
+    - {rx: 'expanded in {Y}', class: real, why: "question 9: the IMA framework expanded in 2025"}
+  chapters/05-data-preparation/chapter.qmd:
+    - {rx: 'Excel {Y}', class: real, why: "a software release: Table 5.4 lists Excel 2024 and Excel 2021, the perpetual versions with XLOOKUP"}
+  chapters/05-data-preparation/_key-terms.qmd:
+    - {rx: 'Excel {Y}', class: real, why: "a software release: the XLOOKUP key term names Excel 2024 and Excel 2021"}
+  chapters/06-descriptive-analytics/chapter.qmd:
+    - {rx: 'Excel {Y}', class: real, why: "a software release: FILTER is in Excel 2024 and Excel 2021"}
   chapters/12-sql-audit-analytics/chapter.qmd:
     - {rx: 'amended its standards in {Y}', class: real, why: "PCAOB amendments of 2024"}
   chapters/14-data-models-and-dax/chapter.qmd:
@@ -178,6 +185,8 @@ files:
     - {rx: 'into February {Y}', class: role, why: "the ledger's last month (N); Microsoft is the date-table guidance"}
   appendices/b-publishing-security/_exercises.qmd:
     - {rx: 'RLS guidance {Y}', class: real, why: "a Microsoft Learn page date"}
+  appendices/c-power-bi-browser/appendix.qmd:
+    - {rx: 'school account in October {Y}', class: real, why: "the month the Power BI service was tested for this appendix (the author's log, 2026-10-06)"}
   back-matter/closing.qmd:
     - {rx: 'in effect since {Y}', class: real, why: "the IIA standards took effect in 2025"}
   scripts/figures/powerbi.py:

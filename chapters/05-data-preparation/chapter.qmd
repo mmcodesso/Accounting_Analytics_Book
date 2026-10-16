@@ -21,7 +21,7 @@ After completing this chapter, you will be able to:
 
 ## Opening Scenario {.unnumbered}
 
-The analysis workbook you built in Chapter 4 ended with a clue and an open question. The Furniture Seasonal Promotion carries more invoice lines and more discount dollars than any other promotion, and its effective dates, September and October 2026, straddle the two quarters whose margins the controller wants explained. When you tell her, she asks the obvious next question: how many of those discounted lines fell in the fourth quarter, and how much of the Furniture revenue did they account for? You cannot answer yet. The invoice lines record what was sold, at what price, and under which promotion, but not when the invoice was issued, which product group the item belongs to, or which customer bought it. That information lives in other Tables: the invoices, the items, the customers, and the sales orders. Before any of the analysis in the rest of Part II can begin, you have to bring it together, check that it came together correctly, and make the result easy to refresh. This chapter teaches you how.
+The analysis workbook you built in Chapter 4 ended with a clue and an open question. The Furniture Seasonal Promotion carries more invoice lines and more discount dollars than any other promotion, and its effective dates, September and October 2026, straddle the two quarters whose margins the controller wants explained. When you tell her, she asks the obvious next question: how many of those discounted lines fell in the fourth quarter, and how much of the Furniture revenue did they account for? You cannot answer yet. The invoice lines record what was sold, at what price, and under which promotion, but not when the invoice was issued, which product group the item belongs to, or which customer bought it. That information lives in other Tables: the invoices, the items, the customers, and the sales orders. Before the Furniture analysis of Chapters 6 and 7 can begin, you have to bring it together, check that it came together correctly, and make the result easy to refresh. This chapter teaches you how.
 
 
 
@@ -33,7 +33,7 @@ For accountants, preparation is rarely optional. Transaction systems store data 
 
 Preparation is also where many analytical errors begin. A lookup that silently fails, a date assigned to the wrong quarter, or a join that duplicates rows can change every number that follows, and none of these errors announces itself. That is why this chapter pairs every preparation technique with a check: a count of the rows that failed to match, a total that must agree with its source, or a test that a field has the form it should. The quality dimensions you studied in Chapter 2, accuracy, completeness, consistency, and timeliness, are the standard the checks apply. And because preparation involves many small decisions, it has to be documented, as you learned in Chapter 4, so that someone else can repeat it and reach the same result.
 
-@fig-05-01 shows the destination of this chapter. By the end of Tutorial 5.3, your workbook will contain a single table, InvoiceLines, in which every invoice line carries its invoice date and fiscal period, its item's group and product type, and its customer's segment and region. The rest of Part II analyzes that table.
+@fig-05-01 shows the destination of this chapter. By the end of Tutorial 5.3, your workbook will contain a single table, InvoiceLines, in which every invoice line carries its invoice date and fiscal period, its item's group and product type, and its customer's segment and region. Chapters 6 and 7 analyze that table.
 
 ![From Related Tables to One Analytical Table.](/visuals/svg/fig-05-01-invoicelines-map.svg){#fig-05-01 fig-alt="A diagram of the preparation this chapter performs. Four Tables from the analysis workbook, SalesInvoiceLine, SalesInvoice, Item, and Customer, are connected by their keys: each invoice line carries a SalesInvoiceID and an ItemID, and each invoice carries a CustomerID. Arrows show the columns each Table contributes to a single InvoiceLines table: the line's own quantity, prices, discount, line total, and promotion; the invoice date and customer from SalesInvoice; the item group, item code, and standard cost from Item; and the segment and region from Customer. Columns calculated during preparation, the fiscal year, fiscal quarter, period label, product type, and a whole-quantity check, are shown as added columns."}
 
@@ -158,7 +158,7 @@ A logical test compares values exactly. Text comparisons ignore upper and lower 
 
 A lookup function retrieves a value from one table using a key from another. It is the spreadsheet equivalent of following a foreign key to the row it references, which you practiced by hand in Tutorial 3.2. Each invoice line carries a SalesInvoiceID, and the SalesInvoice Table holds exactly one row for each SalesInvoiceID, with its invoice date, customer, and totals. A lookup finds that row and returns the column you ask for, as @fig-05-04 shows.
 
-![How XLOOKUP Retrieves a Value from Another Table.](/visuals/svg/fig-05-04-xlookup-anatomy.svg){#fig-05-04 fig-alt="A diagram of an XLOOKUP formula on real Charles River rows. On the left, an invoice line from the SalesInvoiceLine Table shows its SalesInvoiceID. On the right, rows of the SalesInvoice Table show SalesInvoiceID, InvoiceNumber, and InvoiceDate. Arrows show the three arguments of the formula: the lookup value is the line's SalesInvoiceID, the lookup array is the SalesInvoiceID column of SalesInvoice, where the matching row is highlighted, and the return array is the InvoiceDate column, from which the matching row's date is returned to the invoice line."}
+![How XLOOKUP Retrieves a Value from Another Table.](/visuals/svg/fig-05-04-xlookup-anatomy.svg){#fig-05-04 fig-alt="A diagram of an XLOOKUP formula on real Charles River rows. On the left, an invoice line from the SalesInvoiceLine Table shows its SalesInvoiceID. On the right, rows of the SalesInvoice Table show SalesInvoiceID, InvoiceNumber, and InvoiceDate. Arrows show the three arguments of the formula: the lookup value is the line's SalesInvoiceID, the lookup array is the SalesInvoiceID column of SalesInvoice, where the matching row is highlighted, and the return array is the InvoiceDate column, from which the matching row's date is returned to the invoice line. Numbered labels also mark the fourth argument, the value returned when the key is not found."}
 
 ### XLOOKUP
 
@@ -178,7 +178,7 @@ Before XLOOKUP was added to Excel, the same retrieval was written by combining t
 =INDEX(SalesInvoice[InvoiceDate],MATCH([@SalesInvoiceID],SalesInvoice[SalesInvoiceID],0))
 ```
 
-The final 0 in MATCH asks for an exact match, which is almost always what accounting keys require. Leave it out, and MATCH looks for an approximate match in a column it assumes is sorted, which can return the wrong row without an error. INDEX and MATCH work in every version of Excel, which matters when you share a workbook with someone who does not have Microsoft 365 or Excel 2021 or later.
+The final 0 in MATCH asks for an exact match, which is almost always what accounting keys require. Leave it out, and MATCH looks for an approximate match in a column it assumes is sorted, which can return the wrong row without an error. INDEX and MATCH work in every version of Excel, which matters when you share a workbook with someone whose version of Excel does not have XLOOKUP.
 
 VLOOKUP is the oldest of the three and the most limited. It searches only the first column of a range and returns a column identified by its number, as in `=VLOOKUP(key, range, 3, FALSE)`. Because the key must be in the leftmost column, it cannot look to the left, and because the return column is a number, the formula can return the wrong column if columns are added or removed. You will meet it in older workbooks, and it is worth recognizing, but XLOOKUP is the better choice for new work. @tbl-05-04 compares the three.
 
@@ -187,9 +187,9 @@ VLOOKUP is the oldest of the three and the most limited. It searches only the fi
 | Where the key can be | Only in the first column of the range | In any column | In any column |
 | How the return column is chosen | By its number in the range | By reference to the column | By reference to the column |
 | Effect of inserting or deleting columns | Can return the wrong column | Adjusts, unless a referenced column is deleted | Adjusts, unless a referenced column is deleted |
-| Match when the last argument is left out | Approximate; FALSE asks for an exact match | Approximate; 0 asks for an exact match | Exact |
+| Match when the match argument is left out | Approximate; FALSE asks for an exact match | Approximate; 0 asks for an exact match | Exact |
 | When the key is not found, in an exact match | #N/A | #N/A | #N/A, or a value you supply |
-| Availability | All versions of Excel | All versions of Excel | Microsoft 365 and Excel 2021 or later |
+| Availability | All versions of Excel | All versions of Excel | Microsoft 365, Excel 2024, and Excel 2021 |
 
 : Lookup functions compared {#tbl-05-04}
 
@@ -204,7 +204,7 @@ A lookup returns one value, the first match it finds. That is correct when the l
 
 ::: {.callout-note .connecting-dots icon=false}
 ## Connecting the Dots
-The lookups of the tutorials follow a foreign key to a primary key, the relationship you studied in Chapter 3; the match key of Exercise 5.5 is the kind you build when no such relationship exists. The same operation is called a join in SQL, where it is written in a query rather than in a column formula, and it is called a relationship in Power BI's data model. The skill of asking which key connects two tables, and on which side of the relationship each table sits, carries over to both of the tools you will learn in Parts III and IV.
+The lookups of the tutorials follow a foreign key to a primary key, the relationship you studied in Chapter 3; the match key of Exercise 5.5 is the kind you build when no such relationship exists. In SQL, a join combines two tables in a query result, much as a lookup brings one table's values onto another's rows, while a relationship in Power BI's data model keeps the tables separate and lets a filter on one reach the other without copying columns. The skill of asking which key connects two tables, and on which side of the relationship each table sits, carries over to both of the tools you will learn in Parts III and IV.
 :::
 
 
@@ -241,7 +241,7 @@ Power Query's equivalent of a lookup is a merge. Merge Queries, on the Home tab 
 
 : Join kinds in Power Query merges {#tbl-05-05}
 
-For enriching the invoice lines, left outer is the right choice, because every invoice line must stay in the result whether or not its match is found. A left anti merge on the same keys is a useful check: it returns the lines that failed to match, which should be none. A left outer merge returns exactly as many rows as it started with only when each key appears once in the second table, as the keys of the Charles River Tables do, so checking that the row count has not changed is the first test of any merge. The message at the bottom of the Merge dialog helps you choose the right columns, but Power Query calls its count of matches an estimate, so the tests use the loaded result instead.
+For enriching the invoice lines, left outer is the right choice, because every invoice line must stay in the result whether or not its match is found. A left anti merge on the same keys is a useful check: it returns the lines that failed to match, which should be none. A left outer merge repeats a row of the first query for each row of the second that matches it, so the row count stays the same only when no row has more than one match, as with the Charles River keys, each of which appears once in its Table. An unchanged row count therefore shows that no row was repeated, not that every row found a match, because a row without one stays in the result with empty columns. The message at the bottom of the Merge dialog helps you choose the right columns, but Power Query calls its count of matches an estimate, so the tests use the loaded result instead.
 
 ### Custom Columns
 
@@ -253,7 +253,7 @@ A merge can change the query it is applied to, so it is good practice to build t
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
-Junior auditors are routinely asked to prepare client data for testing. In a teaching case built around that task, Hunter et al. (2020) describe cleaning large data sets as a vital task that is routinely performed by the most junior member of the audit team, and they pair the cleaning with checks that the prepared data is complete and accurate. A preparation workflow that records its steps, reconciles its row counts and totals to the source, and can be rerun on the next extract is exactly the evidence such checks require.
+Junior auditors are routinely asked to prepare client data for testing. In a teaching case built around that task, Hunter et al. (2020) describe cleaning large data sets as a vital task that is routinely performed by the most junior member of the audit team, and they pair the cleaning with checks that the prepared data is complete and accurate. A preparation workflow that records its steps, reconciles its row counts and totals to the source, and can be rerun on the next extract gives a reviewer part of that evidence. Whether the source data are complete and reliable can still need evidence from outside the workflow.
 :::
 
 
@@ -264,7 +264,7 @@ Junior auditors are routinely asked to prepare client data for testing. In a tea
 
 This chapter has prepared the Charles River invoice lines for analysis. You have used text functions to extract a product type from an item code and learned when standardizing text helps and when it harms. You have assigned invoices to fiscal periods, measured the time between orders and invoices, and seen why an as-of date is better than TODAY. You have written logical tests with IF, IFS, AND, and OR to classify and check values, and used IFERROR to handle a lookup that fails. You have combined Tables with lookups, followed a key through two tables, and learned to count the rows a lookup failed to match. You have distinguished meaningful blanks from missing information and recorded a validity finding about quantities. Finally, you have built the same enrichment in Power Query as a refreshable InvoiceLines table and reconciled it with your lookups and with the source.
 
-The preparation has already sharpened the controller's question. The Furniture Seasonal Promotion priced orders placed in September and October, but many of those orders were invoiced after the promotion ended, so its effect reaches further into the fourth quarter than its dates suggest. InvoiceLines now holds, for every invoice line, the period, the product group and type, and the customer segment that an answer requires. Chapter 6 summarizes that table and uses it to explain the change in the Furniture margin, and the rest of Part II builds on the result.
+The preparation has already sharpened the controller's question. The Furniture Seasonal Promotion priced orders placed in September and October, but many of those orders were invoiced after the promotion ended, so its effect reaches further into the fourth quarter than its dates suggest. InvoiceLines now holds, for every invoice line, the period, the product group and type, and the customer segment that an answer requires. Chapter 6 summarizes that table and uses it to explain the change in the Furniture margin, and Chapter 7 builds on the result.
 
 
 

@@ -59,7 +59,7 @@ b. Drag CreatorTitle and then EntryType to the **Rows** area, and EntryNumber to
 c. Insert a second PivotTable from the same Table on a new worksheet.
 d. Drag EntryType to the **Rows** area, RiskScore to the **Columns** area, and EntryNumber to the **Values** area.
 
-The first PivotTable answers the question of who makes journal entries. The accounting manager creates most of them, the controller creates the monthly depreciation and the year-end closes, the production manager creates a monthly factory overhead entry, and the chief financial officer has created exactly one entry, the opening balance entry. The second PivotTable shows that some flags come in groups. Every Depreciation entry with a Weekend flag was created on the last day of a month that fell on a weekend, the date it posts to. The year-end closing entries all exceed their approver's limit, because a closing entry carries a whole year's revenue and expenses, or the year's net income, and no employee has an approval limit above $250,000. That is a gap in the approval policy to report, not a sign of override in itself.
+The first PivotTable answers the question of who makes journal entries. The accounting manager creates most of them, the controller creates the monthly depreciation and the year-end closes, the production manager creates a monthly factory overhead entry, and the chief financial officer has created exactly one entry, the opening balance entry. The second PivotTable shows that some flags come in groups. Every Depreciation entry with a Weekend flag was created on the last day of a month that fell on a weekend, the date it posts to. The year-end closing entries all exceed their approver's limit, because a closing entry carries a whole year's revenue and expenses, or the year's net income, and the Employee table records no approval limit above $250,000. The size of a close explains the flag, but not who may approve it. Request the closing-entry policy, the limits that applied at the time, and the evidence of the required review before deciding whether the exception is a gap in the policy or a failure to follow it.
 
 **Step 5. Record a disposition for each flagged entry.**
 
@@ -114,8 +114,8 @@ The completed workpaper records the journal entry tests in a form that another a
 **Checkpoint.** Check that:
 
 - the five flag columns and RiskScore calculate for every entry, and only one entry scores 4;
-- the PivotTables explain the weekend depreciation entries and the year-end closes;
+- the PivotTables show the patterns behind the weekend depreciation entries and the year-end closes;
 - the Dispositions worksheet holds a disposition for every entry with a score of 1 or more;
 - the totals of the JournalEntries and JournalLines Tables agree, and the Drilldown worksheet shows the accounts receivable line of JE-2024-000001.
 
-The journal entry tests explained the flags on the recurring entries by their timing, which still leaves their amounts and approvals to be checked against their schedules before the entries are cleared. They did find weaknesses in how entries are approved, and they led back to the opening balance entry from two directions. That entry, created after its date, approved by its own creator, and carrying balances that the detail does not support, is the first item for the audit committee.
+The journal entry tests explained the flags on the recurring entries by their timing, which still leaves their amounts and approvals to be checked against their schedules before the entries are cleared. They did find approval exceptions to follow up, and they led back to the opening balance entry from two directions. That entry, created after its date, approved by its own creator, and carrying balances that the detail does not support, is the first item for the audit committee.

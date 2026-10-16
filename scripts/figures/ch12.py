@@ -90,8 +90,13 @@ def fig_12_02() -> Diagram:
     d = Diagram("The Trace Exceptions in One List")
     rows = db.run(sql("trace"))[1]
     assert len(rows) == 6 and {r[0] for r in rows} == {"Posting with no payroll payment"}, rows
-    assert sorted({r[2][:7] for r in rows}) == ["2024-01", "2025-01", "2026-01"], rows
-    out = CHAPTER12.mock(d, "trace", [320, 130, 150, 150], lines=slice(0, 22), compact=True)
+    assert sorted({r[3][:7] for r in rows}) == ["2024-01", "2025-01", "2026-01"], rows
+    # each pair of postings points to one missing payment, whose ID is its register's (Step 4)
+    unpaid = [r[0] for r in q("SELECT pr.PayrollRegisterID FROM PayrollRegister pr LEFT JOIN PayrollPayment p "
+                              "ON p.PayrollRegisterID = pr.PayrollRegisterID WHERE p.PayrollPaymentID IS NULL")]
+    assert sorted({r[2] for r in rows}) == sorted(unpaid) and all(
+        sum(1 for x in rows if x[2] == r[2]) == 2 for r in rows), rows
+    out = CHAPTER12.mock(d, "trace", [270, 100, 120, 140, 120], lines=slice(0, 22), compact=True)
     db.emphasize_cells(d, out["geometry"], [(-1, 0), (len(rows) - 1, 0)])
     note(d, "The editor shows the first two of the four tests; the query continues below. Outlined: every "
             "row comes from the first test, and the other three return none.", out["bottom"] + 8, 40)
@@ -285,7 +290,7 @@ def fig_12_08() -> Diagram:
                   "ON oa.OvertimeApprovalID = tc.OvertimeApprovalID WHERE e.CostCenterID = 4 AND tc.WorkDate IN "
                   "(SELECT tc2.WorkDate FROM TimeClockEntry tc2 JOIN Employee e2 ON e2.EmployeeID = tc2.EmployeeID "
                   "WHERE e2.CostCenterID = 4 GROUP BY tc2.WorkDate "
-                  "HAVING COUNT(DISTINCT tc2.RegularHours + tc2.OvertimeHours) = 1 AND COUNT(*) > 1)")
+                  "HAVING COUNT(DISTINCT tc2.RegularHours + tc2.OvertimeHours) = 1 AND COUNT(DISTINCT tc2.EmployeeID) > 1)")
     assert approvers == [(4, 1)], approvers        # the Production Manager, on the work date
     out = CHAPTER12.mock(d, "surge_days", [110, 110, 170, 150, 130], compact=True)
     db.emphasize_cells(d, out["geometry"], [(-1, 1), (len(rows) - 1, 1)])
@@ -293,6 +298,12 @@ def fig_12_08() -> Diagram:
     hourly = one("SELECT COUNT(*) FROM Employee e JOIN CostCenter cc ON cc.CostCenterID = e.CostCenterID "
                  "WHERE cc.CostCenterName = 'Manufacturing' AND e.PayClass = 'Hourly'")[0]
     assert hourly == 64, hourly
+    # the 64 who clocked in on each surge day are the whole hourly staff, one entry each (Step 7)
+    roster = q("SELECT tc.WorkDate, COUNT(*), COUNT(DISTINCT tc.EmployeeID), SUM(e.PayClass = 'Hourly') "
+               "FROM TimeClockEntry tc JOIN Employee e ON e.EmployeeID = tc.EmployeeID WHERE e.CostCenterID = 4 "
+               "GROUP BY tc.WorkDate HAVING COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1 "
+               "AND COUNT(DISTINCT tc.EmployeeID) > 1")
+    assert len(roster) == sum(r[1] for r in rows) and all(r[1:] == (hourly, hourly, hourly) for r in roster), roster
     note(d, "Outlined: the days on which every one of the 64 hourly manufacturing employees clocked the same hours, "
             "and their share of the year's manufacturing overtime.", out["bottom"] + 8, 40)
     return d
@@ -310,7 +321,7 @@ def fig_12_09() -> Diagram:
     assert staff == [("Assembler", "Hourly", "Manufacturing")], staff
     first_surge = one("SELECT MIN(WorkDate) FROM (SELECT tc.WorkDate FROM TimeClockEntry tc JOIN Employee e "
                       "ON e.EmployeeID = tc.EmployeeID WHERE e.CostCenterID = 4 GROUP BY tc.WorkDate HAVING "
-                      "COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1 AND COUNT(*) > 1)")[0]
+                      "COUNT(DISTINCT tc.RegularHours + tc.OvertimeHours) = 1 AND COUNT(DISTINCT tc.EmployeeID) > 1)")[0]
     assert NORMAL_DAY < first_surge, first_surge
 
     def stats(day: str) -> tuple:
@@ -343,14 +354,14 @@ def fig_12_09() -> Diagram:
     widths = [110, 110, 110, 110, 110, 310]
     y = 0
     for day, title, st, highlight in [
-            (NORMAL_DAY, "12 March 2024, before the first surge day", normal, None),
-            (SURGE_DAY, "10 June 2026, a surge day", surge, {(r, c) for r in range(1, 7) for c in (1, 2, 3, 4)})]:
+            (NORMAL_DAY, "March 12, 2024, before the first surge day", normal, None),
+            (SURGE_DAY, "June 10, 2026, a surge day", surge, {(r, c) for r in range(1, 7) for c in (1, 2, 3, 4)})]:
         d.text(f"<b>{title}</b>", 0, y, 860, 20, size=SMALL)
         d.grid(0, y + 22, heads, widths, rows(day), highlight=highlight)
         y += 22 + ROW_H * 7 + 6
         clock_ins = f"{st[1]} different clock-in times" if st[1] > 1 else "one clock-in time"
         hours = f"{st[2]} different numbers of hours" if st[2] > 1 else "one number of hours"
-        d.text(f"All {st[0]} hourly manufacturing employees: {clock_ins}, {hours}; {st[3]} worked overtime, "
+        d.text(f"All {st[0]} hourly manufacturing employees: {clock_ins}, {hours}; {st[3]} recorded overtime, "
                f"{st[4]:,.1f} hours in all.", 0, y, 860, 22, size=SMALL)
         y += 44
     note(d, "The same six Assemblers on both days; a clock-out after midnight falls on the next day. Highlighted: "

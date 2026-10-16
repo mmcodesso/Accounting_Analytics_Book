@@ -10,6 +10,8 @@ would have typed, so its line numbers match the book's figures. Two things are a
 neither changes the line count:
   - the header's "your name, date" becomes a stamp (the checkpoint and the dataset release);
   - each query's last line gets a trailing "-- Result: ..." comment from running it read-only.
+A start file keeps the header's last line as the first tutorial writes it ("Checks: listed at the end of
+Tutorial N.3"); only the end-of-chapter file carries the completed checks that the last tutorial types.
 The builder refuses to run unless datasets/CharlesRiver.sqlite is the release pinned in
 _variables.yml, so every expected result comes from the files readers download.
 
@@ -27,6 +29,7 @@ import filecmp
 import hashlib
 import importlib
 import json
+import os
 import re
 import shutil
 import sqlite3
@@ -49,6 +52,9 @@ SITE = "https://aa.accountinganalyticshub.com/front-matter/downloads.html#sec-co
 SUPPLEMENTARY = REPO / "supplementary"              # gitignored; scripts/release.py uploads it to the release
 DOWNLOADS = REPO / "front-matter" / "downloads.qmd"
 NEUTRAL = "C:\\CharlesRiver\\CharlesRiver.xlsx"   # where the Excel and Power BI files look for the workbook
+# COMPANION_PBI_CAPTURE=1: save an image of Desktop's window on each page of every Power BI verification (verify.ps1
+# -CaptureDir) in the work folder, capture-<checkpoint>/ or capture/, to look at what UI Automation cannot read
+CAPTURE = bool(os.environ.get("COMPANION_PBI_CAPTURE"))
 # Functions of Excel 2024 and Microsoft 365 that Excel 2021 lacks (the preface accepts Excel 2021 for the tutorials, and
 # the tutorial builders use none of them); a solution whose builder writes one says so in its README.
 NEWER_FUNCTIONS = re.compile(r"\b(BYCOL|BYROW|CHOOSECOLS|CHOOSEROWS|DROP|EXPAND|HSTACK|IMAGE|LAMBDA|MAKEARRAY|MAP|"
@@ -144,6 +150,23 @@ def script_text(header: str, queries: list[tuple[str, str, str]], notes: dict[st
     return "\n\n".join(parts) + "\n"
 
 
+def start_header(header: str, chapter: int, last: str) -> str:
+    """The header as a start file holds it: the chapter's first tutorial writes "Checks: listed at the end of Tutorial
+    N.3" and the last tutorial replaces that line, so only the end-of-chapter file carries the completed checks. The
+    placeholder is checked against the first tutorial's text (line by line, ignoring the indent of a list item)."""
+    lines = header.split("\n")
+    assert lines[-1].lstrip().startswith("Checks: ") and lines[-1].endswith(" */"), "the header must end with its checks"
+    indent = lines[-1][:len(lines[-1]) - len(lines[-1].lstrip())]
+    draft = "\n".join(lines[:-1] + [f"{indent}Checks: listed at the end of Tutorial {last} */"])
+    folders = sorted((REPO / "chapters").glob(f"{chapter:02d}-*"))
+    assert len(folders) == 1, f"chapter {chapter}: {folders}"
+    first = [line.strip() for line in (folders[0] / "_tutorial-01.qmd").read_text(encoding="utf-8").split("\n")]
+    wanted = [line.strip() for line in draft.split("\n")]
+    assert any(first[i:i + len(wanted)] == wanted for i in range(len(first))), \
+        f"chapter {chapter}: the first tutorial does not write the start header\n{draft}"
+    return draft
+
+
 def strip_additions(text: str, header: str, stamped: str) -> str:
     """The checkpoint text without the stamp and the result comments (for verification)."""
     text = text.replace(stamped, header, 1)
@@ -172,13 +195,16 @@ def build_sql_chain(chain: dict, variables: dict, out: Path) -> tuple[Path, list
               f"Companion files for Chapter {chain['chapter']}: {chain['file']}", "",
               f"Built from Charles River dataset release {release} ({variables['dataset']['window']}).",
               f"CharlesRiver.sqlite SHA-256 {variables['dataset']['sha256']['sqlite']}", ""]
+    draft = start_header(script.header, chain["chapter"], order[-1])
     for i, t in enumerate(order):
         upto = max(j for j, (_, c, _) in enumerate(script.queries) if tutorial_of(c) == t) + 1
-        stamped = stamp(script.header, f"companion file, end of Tutorial {t}; dataset {release}")
+        # A start file holds the header as the first tutorial writes it; the last tutorial completes its checks.
+        header = script.header if i == len(order) - 1 else draft
+        stamped = stamp(header, f"companion file, end of Tutorial {t}; dataset {release}")
         text = script_text(stamped, script.queries[:upto], notes)
         # Verification: the file is the book's script up to this tutorial, line for line.
-        expected = "\n\n".join([script.header] + [f"{c}\n{s.rstrip()}" for _, c, s in script.queries[:upto]])
-        assert strip_additions(text, script.header, stamped) == expected, f"{chain['id']} {t}: text differs"
+        expected = "\n\n".join([header] + [f"{c}\n{s.rstrip()}" for _, c, s in script.queries[:upto]])
+        assert strip_additions(text, header, stamped) == expected, f"{chain['id']} {t}: text differs"
         assert text.count("\n") == expected.count("\n") + 1, f"{chain['id']} {t}: line count differs"
         lines, cursor = text.split("\n"), 0
         for key, comment, _ in script.queries[:upto]:
@@ -374,7 +400,9 @@ def distribute_excel(chain: dict, variables: dict, out: Path, ends: dict[str, Pa
                   f"2. Its queries read {NEUTRAL}. Put your copy of CharlesRiver.xlsx there, or open the workbook",
                   "   and point the queries at your copy: Data > Get Data > Data Source Settings > Change Source.",
                   "3. Choose Data > Refresh All. The Solution Notes worksheet then checks every control total.",
-                  "4. Continue with the tutorial.", "", f"More: {SITE}", ""]
+                  "4. Continue with the tutorial.", "",
+                  "Each workbook opens on the Solution Notes worksheet that the companion file adds, rather than",
+                  "on a worksheet the tutorial builds.", "", f"More: {SITE}", ""]
         (folder / "README.txt").write_text("\n".join(readme), encoding="utf-8", newline="\n")
     return [zip_folder(folder) for folder in folders.values()]
 
@@ -455,7 +483,8 @@ def build_pbi_chain(chain: dict, variables: dict, out: Path) -> list[Path]:
         tab = lambda pg: f"Hidden {pg.display}" if pg.hidden else pg.display
         pages = [tab(pg) for pg in p.report.pages]
         roles = role_checks_file(getattr(b, "role_checks", None), work / f"roles-{t}")
-        result = verify.run(check_pbip, chain["table"], checks, pages, work / f"result-{t}.json", role_checks=roles)
+        result = verify.run(check_pbip, chain["table"], checks, pages, work / f"result-{t}.json", role_checks=roles,
+                            capture_dir=work / f"capture-{t}" if CAPTURE else None)
         problems = verify.judge(result, {tab(pg): pg.expect for pg in p.report.pages}, list(p.queries))
         if problems:
             raise SystemExit(f"Tutorial {t}: Power BI Desktop verification fails:\n  " + "\n  ".join(problems))
@@ -506,6 +535,32 @@ def also_copies(chain: dict, out: Path) -> dict[int, list[str]]:
     return lines
 
 
+def refresh_dependents(chain: dict, out: Path) -> list[Path]:
+    """The other side of `also`: copy this chain's new checkpoints into the folders of the other chains that hold a
+    copy of them (Appendix B's Start of Tutorial B.1 holds Audit Monitoring at the end of 16.3, which the monitoring
+    chain builds after the reports chain), and zip those folders again. Only a copy the other chain's build already
+    placed (and its README names) is replaced."""
+    name = chain["file"].removesuffix(".pbip")
+    archives = []
+    for other in load_yaml(HERE / "manifest.yml")["chains"]:
+        for role, ref in (other.get("also") or {}).items():
+            if ref["chain"] != chain["id"]:
+                continue
+            src_ch, src_role = checkpoint_roles(ref["after"], chain["chapters"])[0]
+            source = out / folder_name(src_ch) / src_role / name
+            folder = out / folder_name(chapter_id(role.rsplit(" ", 1)[-1].split(".")[0]))
+            target = folder / role / name
+            if not source.is_dir() or not target.is_dir():
+                if folder.is_dir():
+                    print(f"  WARNING: {folder.name}/{role} holds no {name} to replace: rebuild {other['id']}")
+                continue
+            shutil.rmtree(target)
+            shutil.copytree(source, target)
+            archives.append(zip_folder(folder))
+            print(f"  copied the end of Tutorial {ref['after']} into {folder.name}/{role} ({other['id']})")
+    return archives
+
+
 def distribute_pbi(chain: dict, variables: dict, out: Path, ends: dict[str, Path]) -> list[Path]:
     release, sha = variables["dataset"]["version"], variables["dataset"]["sha256"]["xlsx"]
     name = chain["file"].removesuffix(".pbip")
@@ -516,6 +571,7 @@ def distribute_pbi(chain: dict, variables: dict, out: Path, ends: dict[str, Path
             target = folder / role / name
             shutil.copytree(project, target)
     also = also_copies(chain, out)
+    dependents = refresh_dependents(chain, out)
     for ch, folder in folders.items():
         roles = sorted(p.name for p in folder.iterdir() if p.is_dir())
         readme = [f"Accounting Analytics: An Integrated Approach ({variables['book']['edition']} edition)",
@@ -532,9 +588,12 @@ def distribute_pbi(chain: dict, variables: dict, out: Path, ends: dict[str, Path
                   "4. Choose Home > Refresh. The project holds no data until you refresh it.",
                   f"5. Choose File > Save as and save it as {name}.pbix, the file the tutorials use.",
                   "6. Continue with the tutorial. The Notes page lists what the file holds; in DAX query view, the",
-                  "   Checks tab checks every control total (choose Run).", "", f"More: {SITE}", ""]
+                  "   Checks tab tests the control totals listed on the Notes page (choose Run). The Notes page",
+                  "   belongs to the companion file, not to the report the tutorials build, so delete it if you like.",
+                  "", f"More: {SITE}",
+                  ""]
         (folder / "README.txt").write_text("\n".join(readme), encoding="utf-8", newline="\n")
-    return [zip_folder(folder) for folder in folders.values()]
+    return [zip_folder(folder) for folder in folders.values()] + dependents
 
 
 # --- Excel solutions (instructor) -------------------------------------------------------------------------------
@@ -718,7 +777,7 @@ def build_pbi_solution(entry: dict, variables: dict, out_root: Path, start_folde
     pages = [tab(pg) for pg in p.report.pages]
     roles = role_checks_file(getattr(b, "role_checks", None), work / "roles")
     result = verify.run(check_pbip, table, check_pbip.parent / f"{name}.SemanticModel" / "DAXQueries" / "Checks.dax",
-                        pages, work / "result.json", role_checks=roles)
+                        pages, work / "result.json", role_checks=roles, capture_dir=work / "capture" if CAPTURE else None)
     problems = verify.judge(result, {tab(pg): pg.expect for pg in p.report.pages}, list(p.queries))
     if problems:
         raise SystemExit(f"{entry['id']}: Power BI Desktop verification fails:\n  " + "\n  ".join(problems))
@@ -740,7 +799,11 @@ def build_pbi_solution(entry: dict, variables: dict, out_root: Path, start_folde
               f"Open {name}/{name}.pbip in Power BI Desktop (the September 2026 release or later). Its queries read",
               f"{NEUTRAL}; point them at your copy with Home > Transform data > Data source settings >",
               "Change Source, choose Home > Refresh, and save it as a .pbix file if you prefer. The Notes page lists the",
-              "exercises or requirements with the instructor notes; in DAX query view, the Checks tab tests every value.",
+              "exercises or requirements with the instructor notes. In DAX query view, the Checks tab tests the values",
+              "listed under Checks on the Notes page, not every figure of the answers. A figure read from a query that",
+              "does not load into the model, such as a profile query, is checked in Power Query. Values that a visual",
+              "computes itself, such as visual calculations and the Analytics-pane forecast, and how the pages",
+              "respond to clicks, drill-through and tooltips, are read on the report pages in Power BI Desktop.",
               "These files are public, like the rest of the book. Try an exercise first, then compare your work.", ""]
     for neutral, real in also.items():
         readme[-2:-2] = [f"It also reads {neutral}: copy {Path(real).name} from {Path(real).parent.name}.zip",

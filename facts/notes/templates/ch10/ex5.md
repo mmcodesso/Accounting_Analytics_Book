@@ -5,7 +5,7 @@
      to investigate. (3) {{ n_customers }} customers have no orders in the extract, all with IsActive 0, consistent with dormant
      accounts; their setup and deactivation records are the evidence that confirms it. (4) {{ n_wo }} work orders have no
      operations, {% for w in work_orders %}{{ w }}{{ sep(loop) }}{% endfor %}, all Closed (planted), a process exception: a closed work order should
-     have operations. They do have labor: {{ wo_labor }} direct time entries. (5) {{ orphans }} Direct Manufacturing entries ({{ orphan_hours|num(1) }} hours) carry a
+     have operations. Their RoutingIDs resolve, so what is missing is the work order operation records, not a routing. They do have labor: {{ wo_labor }} direct time entries. (5) {{ orphans }} Direct Manufacturing entries ({{ orphan_hours|num(1) }} hours) carry a
      WorkOrderOperationID that matches no operation: {% for w, n in orphan_by_wo %}{{ n }} on {{ w }}{{ sep(loop) }}{% endfor %}, the work orders of
      requirement (4). An orphaned key, not a missing one, so an IS NULL filter alone would miss them; an integrity failure to correct.
      ({{ no_op_word }} more direct entries have no WorkOrderOperationID at all, Exercise 9.6.) -->

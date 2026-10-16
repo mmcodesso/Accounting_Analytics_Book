@@ -469,8 +469,10 @@ def fig_13_09() -> Diagram:
     pbi.line_chart(d, 0, 306, 860, 280, "Revenue and promotional discounts by month, fiscal 2026",
                    MONTHS_2026, [("Revenue", rev, BLUE), ("Discounts", disc, AMBER)], "M", shared,
                    legend=True)
+    # Step 7c turns on the Y-axis title, which reads the field the axis shows
     pbi.line_chart(d, 0, 600, 860, 250, "Promotional discounts by month, fiscal 2026", MONTHS_2026,
-                   [("Discounts", disc, AMBER)], "K", pbi.nice_ticks(0, max(disc), 3))
+                   [("Discounts", disc, AMBER)], "K", pbi.nice_ticks(0, max(disc), 3),
+                   axis_title="Sum of DiscountAmount")
     d.text("<i>Top: the draft, with discounts on a second axis on the right (outlined). Middle: both series "
            "on one axis. Bottom: the discounts on their own axis, in a separate chart. The revenue columns "
            "and the revenue line are blue; the discounts are amber, with diamond markers in the draft.</i>",

@@ -29,11 +29,11 @@ figures:
 
 ## Purpose and learning outcomes
 
-A report is only as good as the balances under it. The requirement rolls each working-capital account forward by its sources, reconciles receivables and payables to their open items, tests the cutoff and the sales tax account, and records every difference as a finding that the report itself tests. The words matter: each finding states what the records show, never what anyone did. The analytics type is diagnostic, with the dispositions as the judgment.
+A report is only as good as the balances under it. The requirement breaks the working-capital balances down by source document, reconciles receivables and payables to their open items, tests the cutoff and the sales tax account, and records every difference as a finding that the report itself tests. The words matter: each finding states what the records show, never what anyone did. The analytics type is diagnostic, with the dispositions as the judgment.
 
 Students can:
 
-- roll accounts forward by source document and name the parts no subledger supports (Step 1);
+- break balances down by source document, trace the journal-entry parts and say that the breakdown tests nothing by itself (Step 1);
 - reconcile receivables and payables to open items and explain each difference (Step 2);
 - explain the billing differences with the cutoff findings of Chapters 6 and 12, and age the payables (Steps 3 and 4);
 - test account `2050` and name the outside evidence (Step 5);
@@ -45,7 +45,7 @@ Students can:
 
 - **Files.** Requirements 1 to 4 done. The model answer is in PartIV-case.zip: the page, the Findings table and Tests 4 and 5.
 - **From earlier work.** Exercise 16.1's open balance, Exercise 8.2's payables, Chapter 8's dispositions, Chapter 16's dispositions table and the cutoff findings of Chapters 6 and 12.
-- **Data conditions.** The opening entry {{ entry }} carries balances no document supports; two supplier invoices were moved to notes payable while the subledger still shows them open; one supplier invoice crosses a year-end; account `2050` has no debit except credit memos.
+- **Data conditions.** The opening entry {{ entry }} carries balances no document in the extract supports; two supplier invoices were moved to notes payable while the subledger still shows them open; one supplier invoice crosses a year-end; account `2050` has no debit except credit memos.
 - **Verify first.** The {{ g.n_checks }} Requirement 5 rows of the Checks tab agree.
 
 ## How to run it
@@ -58,9 +58,9 @@ The Checks tab proves every value; the matrix layout is visible only in Desktop.
 
 ### Part 1: The roll-forward
 
-**Step 1. Roll the accounts forward.** Add a **Matrix** titled "{{ g.t_roll }}" with AccountNumber on **Rows** (the six accounts), SourceDocumentType on **Columns** and Balance in **Values**, filtered to the current year.
+**Step 1. Break the balances down by source.** Add a **Matrix** titled "{{ g.t_roll }}" with AccountNumber on **Rows** (the six accounts), SourceDocumentType on **Columns** and Balance in **Values**, filtered to the current year.
 
-**Check:** the JournalEntry column is what no subledger document supports: receivables ${{ roll['1020'].parts.JournalEntry|money }}, materials ${{ roll['1045'].parts.JournalEntry|money }}, finished goods ${{ roll['1040'].parts.JournalEntry|money }} and payables {{ sm(roll['2010'].parts.JournalEntry) }}, which are the opening lines and, in payables, the two reclassifications to notes.
+**Check:** the JournalEntry column holds the opening entry's lines, which no subledger document in the extract supports (receivables ${{ roll['1020'].parts.JournalEntry|money }}, materials ${{ roll['1045'].parts.JournalEntry|money }}, finished goods ${{ roll['1040'].parts.JournalEntry|money }}), and payables of {{ sm(roll['2010'].parts.JournalEntry) }}, the opening line less the two reclassifications to notes. The matrix only decomposes the ledger, and Step 2 and the Validation page carry the evidence.
 
 ### Part 2: Reconciliations
 
@@ -81,7 +81,7 @@ b. Add cards titled "{{ g.t_cards }}" with the ledger balance, the open items an
 
 **Step 3. Compare billing with the invoices dated in each year.** Add a **Table** titled "{{ g.t_billing }}" with Year, billing by invoice date, billing in the ledger and the difference.
 
-**Check:** the differences are{% for b in billing %} {{ b.year }} {{ sm(b.diff) }}{{ ";" if not loop.last else "." }}{% endfor %} Invoices dated in one year and posted on 1 January of the next explain them; only {{ shipped }} shipped in {{ shipped_year }} (Chapter 6's cutoff error), so for the others the ledger is right and the dates are wrong.
+**Check:** the differences are{% for b in billing %} {{ b.year }} {{ sm(b.diff) }}{{ ";" if not loop.last else "." }}{% endfor %} Invoices dated in one year and posted on January 1 of the next explain them, and only {{ shipped }} shipped in {{ shipped_year }} (Chapter 6's cutoff error), so for the others the ledger is right and the dates are wrong.
 
 **Step 4. Age the payables.** Add `Bucket` and `MovedToNotes` columns in APInvoices and a **Table** titled "{{ g.t_aging }}".
 
@@ -114,7 +114,7 @@ b. Add the measures and Tests 4 and 5 in **DAX query view**.
 {{ g.d_find }}
 ```
 
-**Check:** both differences equal their findings to the cent, and in Test 5 the {{ g.later_quarters }} quarters after Data Through show no value. The dispositions follow Chapter 8: expected, follow up, or a misstatement to report. **Watch for:** the note invoices entered as +${{ notes_total|money }}. The payables findings read ${{ g.wrong_find|money }} against ${{ g.right_find|money }}, and Test 4 shows {{ sm(-g.wrong_gap) }} unexplained.
+**Check:** both differences equal their findings to the cent, and in Test 5 the working-capital measures of Requirement 3 show no value in the {{ g.later_quarters }} quarters after Data Through. The dispositions follow Chapter 8: expected, follow up, or a misstatement to report. The opening inventories (${{ opening_inv|money }}) are recorded for follow-up with no difference to reconcile, so Test 4 leaves them out. **Watch for:** the note invoices entered as +${{ notes_total|money }}. The payables findings read ${{ g.wrong_find|money }} against ${{ g.right_find|money }}, and Test 4 shows {{ sm(-g.wrong_gap) }} unexplained.
 
 {{ figure('IF-C4-5-B') }}
 
@@ -137,10 +137,11 @@ b. Add the measures and Tests 4 and 5 in **DAX query view**.
 
 ## What a strong answer says
 
-- **Roll-forward.** The journal-entry parts are the opening balances and the reclassifications; everything else comes from a subledger document.
+- **Breakdown.** The journal-entry parts are the opening balances and the reclassifications, and the matrix only decomposes the ledger, so the reconciliations carry the evidence.
+- **Opening balances.** All four recorded for follow-up, with the evidence to request.
 - **Reconciliations.** Each difference equals its recorded items to the cent, with a disposition in Chapter 8's terms.
 - **Cutoff.** The billing differences are invoices posted a year later; only one shipped in the earlier year.
-- **Sales tax.** Posted, never remitted in the records, with the outside evidence named; the wording is "no remittance is recorded", not "unpaid" or "withheld".
+- **Sales tax.** Posted when billed, with no remittance recorded, with the outside evidence named; the wording is "no remittance is recorded", not "unpaid" or "withheld".
 
 A strong submission ties the findings to Tests 4 and 5. A weak one lists the differences without recording them.
 
@@ -156,7 +157,7 @@ A strong submission ties the findings to Tests 4 and 5. A weak one lists the dif
 
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
-| Roll-forward | 15 | Six accounts by source; unsupported parts named | Balances without the reading |
+| Breakdown by source | 15 | Six accounts by source; journal-entry parts traced; read as a decomposition | Balances without the reading |
 | Reconciliations | 30 | Both differences explained to the cent | One reconciled |
 | Cutoff and aging | 20 | Billing differences explained; aging without notes | Differences without the cause |
 | Sales tax | 15 | Posts and non-posts; outside evidence | Balance only |

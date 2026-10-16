@@ -453,10 +453,10 @@ def if_16_0_b() -> Diagram:
     return d
 
 
-# -- IF-16-0-C: what the Checks tab proves and what only Desktop shows ----------------------------------------------------------------
+# -- IF-16-0-C: what the Checks tab tests and what only Desktop shows ----------------------------------------------------------------
 
 def if_16_0_c() -> Diagram:
-    """A two-column board: what a row of the Checks tab proves for each tutorial and exercise, and what only Desktop shows."""
+    """A two-column board: what a row of the Checks tab tests for each tutorial and exercise, and what only Desktop shows."""
     d = Diagram("What the Checks Tab Proves and What Only Desktop Shows")
     c = ctx.values("ch16.chapter")
     t3 = ctx.values("ch16.t3")
@@ -506,20 +506,20 @@ def if_16_0_c() -> Diagram:
     assert _page("entryLines")["type"] == "Drillthrough" and _page("exceptionDetail")["type"] == "Drillthrough"
     years = ", ".join(t3["through_years"])
     right = [
-        "<b>The heat map's shading</b> The Checks tab proves the count in each cell of the Monitoring matrix, but not the rule colors that make January "
+        "<b>The heat map's shading</b> The Checks tab tests the count in each cell of the Monitoring matrix, but not the rule colors that make January "
         "darkest, or that the number stays in every cell<br><i>Tutorial 16.2, Step 11</i>",
         "<b>The drill-through click</b> The right-click that opens Entry Lines or Exception Detail, and the filters the click passes: the page's rows "
         "come from the cell, not from a measure<br><i>Tutorial 16.1, Step 10; Tutorial 16.2, Step 13</i>",
         "<b>The edited interactions as a reader meets them</b> The project saves a click on an approver or on the heat map as None for the rates table "
         "and the Data Through card, and Exercise 16.5's slicer as None for its table. Only a click shows that they hold<br><i>Tutorial 16.2, Step 12c; "
         "Tutorial 16.3, Step 7c; Exercise 16.5, Step 4d</i>",
-        f"<b>The Data Through card under a slicer</b> The Checks tab proves the date with each year selected ({years}), but not that the card on the "
+        f"<b>The Data Through card under a slicer</b> The Checks tab tests the date with each year selected ({years}), but not that the card on the "
         "page follows the Year slicer and ignores a click<br><i>Tutorial 16.3, Step 7</i>",
         "<b>The Power Query step names a student chose</b> The project's steps carry Desktop's names. A student's queries are read in the file, because "
         "the Checks tab tests the model and not how it was built<br><i>Tutorials 16.1 to 16.3; every exercise</i>",
     ]
     col_w, gap = 422, 16
-    d.box("<b>Proved by the Checks tab</b>", 0, 0, col_w, 32, fill=TEAL, stroke=TEAL, color=WHITE, size=14, rounded=False)
+    d.box("<b>Tested by the Checks tab</b>", 0, 0, col_w, 32, fill=TEAL, stroke=TEAL, color=WHITE, size=14, rounded=False)
     d.box("<b>Visible only in Desktop</b>", col_w + gap, 0, col_w, 32, fill=AMBER, stroke=AMBER, color=WHITE, size=14, rounded=False)
     bottoms = []
     for x0, cards, fill, stroke, badge in ((0, items, TEAL_TINT, TEAL, True), (col_w + gap, right, AMBER_TINT, AMBER, False)):
@@ -535,7 +535,7 @@ def if_16_0_c() -> Diagram:
             cy += h + 8
         bottoms.append(cy - 8)
     _note(d, f"The Checks tab of the model answer holds {c['n_checks']} rows, a section for each tutorial and exercise. Choose Home > Refresh, then Run. "
-             "A row is proof of a value, not of how a visual looks: the right-hand column is for the instructor to open the pages.", max(bottoms) + 12)
+             "A row tests a value, not how a visual looks, so the right-hand column is for the instructor to open the pages.", max(bottoms) + 12)
     return d
 
 

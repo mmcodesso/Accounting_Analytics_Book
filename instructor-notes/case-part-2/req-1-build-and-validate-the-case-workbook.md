@@ -11,7 +11,7 @@
 
 ## Purpose and learning outcomes
 
-Requirement 1 builds the workbook that every later requirement reads, and it is graded as much on what it proves as on what it builds. Students have imported Tables with Power Query since Chapter 4, but here they choose the queries, document them and show with control totals that no merge lost or doubled a row. A mistyped Discount column or an inner join would flow silently into Requirements 2 to 5, so this requirement is the quality gate of the case. The analytics type is descriptive: it prepares the data and states its limits.
+Requirement 1 builds the workbook that every later requirement reads, and it is graded as much on what it checks as on what it builds. Students have imported Tables with Power Query since Chapter 4, but here they choose the queries, document them and show with control totals that no merge lost or doubled a row. A mistyped Discount column or an inner join would flow silently into Requirements 2 to 5, so this requirement is the quality gate of the case. The analytics type is descriptive: it prepares the data and states its limits.
 
 By the end, students can:
 
@@ -55,7 +55,7 @@ d. Add `CommissionRate`. Typing Tutorial 7.3's value is enough. The model answer
 =SUMIFS(BilledLines[LineTotal],BilledLines[InvoiceYear],ReportYear)
 ```
 
-**Check:** CommissionRate reads 1.903%: commission expense of $566,347.93 over invoice-line revenue of $29,756,420.08, leaving out the year-end close JE-2026-000296. **Watch for:** the close left in. It brings the account to zero for the year, and the rate collapses.
+**Check:** CommissionRate reads 1.903%: commission expense of $566,347.93 over invoice-line revenue of $29,756,420.08, leaving out the year-end close JE-2026-000296. The formula leaves out every journal entry to the account, and in the report year the close is the only one, which the note checks. A year with an adjusting entry to commissions would need the close left out by its voucher number instead. **Watch for:** the close left in. It brings the account to zero for the year, and the rate collapses.
 
 ### Phase 2: The queries
 

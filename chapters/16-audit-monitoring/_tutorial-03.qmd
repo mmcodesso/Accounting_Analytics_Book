@@ -33,7 +33,7 @@ d. In **Model view**, right-click **Dispositions**, and choose **Hide in report 
 
 : The dispositions of a first review {#tbl-16-04}
 
-The table holds the conclusions of a first review, with Chapter 8's three dispositions. The year-end closes are expected, for the reason Chapter 8 gave; the orders and registers of the employee who had left are control deficiencies to report, as Chapter 12 and Exercise 12.5 found; and the payments made before their registers were approved need a question for payroll. Each test and document number must match the register character for character, or the disposition will attach to nothing.
+The table holds the conclusions of a first review, with Chapter 8's three dispositions. The year-end closes are expected in size, as Chapter 8 found, with the closing-entry policy and the limits that applied still to obtain. For this tutorial, assume that the reviewer looked past the register before recording the rest. Chapter 12 and Exercise 12.5 found the orders and registers of the employee who had left, and the approval log, the employment records, and the earnings behind them led the reviewer to call them control deficiencies to report. The flags alone would support only a follow-up. The payments made before their registers were approved need a question for payroll. Each test and document number must match the register character for character, or the disposition will attach to nothing.
 
 **Step 2. Merge the dispositions into the register.**
 
@@ -90,7 +90,7 @@ a. Add a table visual with DocumentNumber, Exceptions, and Open Exceptions.
 b. In the **Filters** pane, under **Filters on this visual**, show items when Exceptions is greater than or equal to 2, and click **Apply filter**.
 c. Sort the table by Exceptions, descending.
 
-At the top of the table, as @fig-16-07 shows, is the opening balance entry, which failed four tests. The other journal entries are the five keyed on the first Saturday of a new year and the two debt reclassifications. The purchase orders include small orders that buyers with no approval limit approved themselves, the departed account executive's approvals, and two capital orders the purchasing manager approved alone. No payroll register fails two tests. The orders approved after the approver left are reviewed for one of their two tests and still open for the other: a disposition belongs to an exception, not to a document.
+At the top of the table, as @fig-16-07 shows, is the opening balance entry, which failed four tests. The other journal entries are the five keyed on the first Saturday of a new year and the two debt reclassifications. The purchase orders include small orders that buyers with no approval limit approved themselves, the orders that name the departed account executive as approver, and two capital orders the purchasing manager approved alone. No payroll register fails two tests. The orders dated after their approver left are reviewed for one of their two tests and still open for the other, because a disposition belongs to an exception, not to a document.
 
 ![The Review Page.](/visuals/svg/fig-16-07-review-page.svg){#fig-16-07 fig-alt="A mock of a Power BI report page named Review. Two cards show the number of reviewed exceptions and the much larger number of open exceptions. A matrix lists the open exceptions by test and year; the row of registers approved by their own employee holds most of them, and the row of journal entries above the approver's limit is small because the year-end closes have dispositions. A table lists the documents that fail two tests or more, with the opening balance entry at the top with four, followed by journal entries and purchase orders with two; three orders show one open exception of their two."}
 
@@ -144,7 +144,7 @@ MINX (
 )
 ```
 
-The braces build a one-column table of the three last dates, whose column DAX names Value, and MINX returns the earliest. The card shows a date in mid-December 2026: the payroll tests have seen pay dates only through the 18th, while the journal entries and orders run to the 31st. The December column of the heat map covers the whole month for two processes and only part of it for the third, and the card says so on the page the reviewer reads. With the Year slicer set to an earlier year, it shows that year's last payday; the edited interactions keep a click on a cell or an approver from changing it. MINX skips a blank, so a population with no rows would leave the card showing the others' date: an empty table is caught by the counts of Tests 1 and 4, not by the card.
+The braces build a one-column table of the three last dates, whose column DAX names Value, and MINX returns the earliest. The card shows a date in mid-December 2026, the last pay date of a payroll register, while the journal entries and orders run to the 31st. No pay period has a later pay date in December, and the work of the rest of the month belongs to the two periods marked Open in the data, scheduled to pay in January 2027. The card describes the dates observed in this extract. It does not show that payroll is complete, which takes a reconciliation of the periods and registers expected with those recorded, or that the refresh ran, which the refresh history shows. With the Year slicer set to an earlier year, it shows that year's last payday, and the edited interactions keep a click on a cell or an approver from changing it. MINX skips a blank, so a population with no rows would leave the card showing the others' date. An empty table is caught by the counts of Tests 1 and 4, not by the card.
 
 **Step 8. Rerun the package's tests.**
 
@@ -154,14 +154,14 @@ c. Run Tests 2 to 5 in the same way, one at a time.
 d. Compare each result with the values its chapter expected, and record the result and today's date.
 e. Read the period that the About page states, and close the file without saving it.
 
-Each test returns the totals of the chapter it was written against, so the package's measures still reproduce the totals of Chapters 6, 7, and 11 that the tests name. The tests check those totals, not every visual on the package's pages, which a reviewer checks by using the pages. The About page's note that the time records end before the year does agrees with what Step 7 found for payroll. Closing without saving leaves the controller's file as you found it: internal audit tests the package but does not change it.
+Each test returns the totals of the chapter it was written against, so the package's measures still reproduce the totals of Chapters 6, 7, and 11 that the tests name. Test 5 reproduces Part III's ratio of hours to standard hours, which Chapter 15 read as an observed-records diagnostic, not a complete measure of the plant's labor performance. The tests check those totals, not every visual on the package's pages, which a reviewer checks by using the pages. The About page notes that the time records end before the year does, direct time on December 11, 2026, and indirect time on December 4, 2026, because of the same open pay periods that end payroll's dates in Step 7. Closing without saving leaves the controller's file as you found it: internal audit tests the package but does not change it.
 
 **Step 9. Write the memo.** Write a short memo to the chief audit executive.
 
 a. Report the dispositions recorded, the follow-ups and deficiencies still awaiting action, and the open exceptions, with the documents that fail more than one test listed first.
 b. Report the registers approved by the employee they pay as one finding on the design of the payroll approval, and recommend a second approver.
 c. Report the results of Tests 1 to 4 of the monitoring file and Tests 1 to 5 of the package, with the date you ran them and the date through which the data run.
-d. Recommend change controls for both reports: a project under version control, a named owner, a reviewer who approves each change, the tests rerun before each release, and no copies of the file in circulation.
+d. Recommend change controls for both reports: a project under version control, a named owner, a reviewer who approves each change, the tests rerun before each release, and approved access and distribution controls for any copies of the file.
 e. Save Audit Monitoring.pbix.
 
 
@@ -171,7 +171,7 @@ e. Save Audit Monitoring.pbix.
 
 - The dispositions are merged into the register on the test and the document, and Test 3 shows that every one found exactly one exception.
 - The Review page shows the open exceptions by test and year and lists the documents that fail two tests or more.
-- Test 4 shows the order numbers without a gap and the three registers without a payment record, and the Data Through card shows the latest date that every process's data reach.
+- Test 4 shows the order numbers without a gap and the three registers without a payment record, and the Data Through card shows the latest date that every process's data reach, a bound observed in the extract.
 - The package's Tests 1 to 5 return the values their chapters expected, and the package was closed without saving.
 
 A monitoring report earns its place when its conclusions accumulate and its own numbers can be trusted: the dispositions give it a memory, and the tests give internal audit grounds to rely on the totals they test in both reports.

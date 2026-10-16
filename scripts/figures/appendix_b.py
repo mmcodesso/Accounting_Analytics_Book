@@ -196,7 +196,7 @@ def fig_b_05() -> Diagram:
           size=SMALL, align="left")
     d.box("<b>Audience: finance</b><br>the full package, with the Income Statement and Validation pages",
           660, 104, 190, 80, fill=BLUE_TINT, stroke=BLUE, size=SMALL, align="left")
-    d.text("Readers need Pro or Premium Per User, unless the workspace is on a capacity.", 660, 192, 190, 56,
+    d.text("Readers need Pro or Premium Per User, unless the workspace is on an F64 or Premium capacity.", 660, 192, 190, 56,
            size=SMALL)
     d.arrow(ws, app, exit=(1, 0.3), entry=(0, 0.3), label="Create app")
     # Refresh.
@@ -204,7 +204,7 @@ def fig_b_05() -> Diagram:
     gw = d.box("<b>On-premises data gateway</b>", 250, 300, 200, 50, fill=WHITE, stroke=GRAY, size=SMALL)
     d.arrow(src, gw, exit=(1, 0.5), entry=(0, 0.5))
     d.arrow(gw, ws, exit=(0.5, 0), entry=(0.3, 1), label="scheduled refresh")
-    d.box("Or keep the workbook in OneDrive for work or school or SharePoint, refreshed without a gateway.",
+    d.box("Or connect the queries to the workbook in OneDrive for work or school or SharePoint, refreshed without a gateway.",
           0, 370, 450, 44, fill=GRAY_TINT, stroke=RULE, size=SMALL, align="left")
     # Publish to web.
     pub = d.box("<b>Publish to web</b><br>a public link, no sign-in, all the model's data; no row-level security",
@@ -212,7 +212,8 @@ def fig_b_05() -> Diagram:
     d.text("<b>Anyone on the internet: avoid for financial data</b>", 560, 384, 300, 20, size=SMALL, color=CORAL,
            align="right")
     d.arrow(ws, pub, exit=(1, 0.95), entry=(0, 0.4), points=[(615, 237), (615, 332)], label="Publish to web")
-    note(d, "Sharing the .pbix file itself bypasses all of this: whoever opens it in Desktop sees every row.", 424)
+    note(d, "Sharing the .pbix file bypasses row-level security. Whoever can open it sees every row, and only an encrypting "
+            "label limits who can.", 424)
     return d
 
 

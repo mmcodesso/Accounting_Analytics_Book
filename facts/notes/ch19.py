@@ -258,6 +258,7 @@ def tests(d) -> SimpleNamespace:
     cm_above = [m for m in cm.values() if m["gt"] > emp[m["appr"]]["limit"]]
     cash_credit = [m for m in cm.values() if any(a[2] == m["appr"] for a in c.apps[m["inv"]])]
     cc_early = [m for m in cash_credit if any(a[2] == m["appr"] and a[0] <= m["date"] for a in c.apps[m["inv"]])]
+    # the wider test, an accepted extension of the case's rule: the approver recorded a receipt, or applied one, on the invoice
     cc_rec = [m for m in cm.values() if any(a[2] == m["appr"] or c.rcpt[a[3]]["rec"] == m["appr"] for a in c.apps[m["inv"]])]
     rf_above = [r for r in rf.values() if r["amt"] > emp[r["appr"]]["limit"]]
     before = [r for r in rf.values() if (last_payment(c, cm[r["cm"]]["inv"]) or "") > r["date"]]
@@ -489,6 +490,9 @@ def lapping(d) -> dict:
     dep = [(D(r["dep"]) - D(r["date"])).days for r in c.rcpt.values() if r["dep"]]
     no_dep = sum(1 for r in c.rcpt.values() if not r["dep"])
     lag = [(D(a[0]) - max(D(c.rcpt[a[3]]["date"]), D(c.inv[i]["date"]))).days for i, v in c.apps.items() for a in v]
+    # the raw lag, receipt to application, before allowing for receipts dated before their invoice (deposits)
+    raw = [((D(a[0]) - D(c.rcpt[a[3]]["date"])).days, c.rcpt[a[3]]["date"] < c.inv[i]["date"]) for i, v in c.apps.items()
+           for a in v]
     applied = defaultdict(float)
     for v in c.apps.values():
         for a in v:
@@ -497,7 +501,8 @@ def lapping(d) -> dict:
     early = [(i, a) for i, v in c.apps.items() for a in v if c.rcpt[a[3]]["date"] < c.inv[i]["date"]]
     clean = other == 0 and not_full == 0 and no_dep == 0 and min(lag) >= 0
     return dict(other=other, dep_lo=min(dep), dep_hi=max(dep), no_dep=no_dep, lag_lo=min(lag), lag_hi=max(lag),
-                not_full=not_full, early_receipts=len({a[3] for i, a in early}), early_apps=len(early),
+                raw_lo=min(x for x, _ in raw), raw_hi=max(x for x, _ in raw), raw_over=sum(1 for x, _ in raw if x > 2),
+                raw_over_early=sum(1 for x, e in raw if x > 2 and e), not_full=not_full, early_receipts=len({a[3] for i, a in early}), early_apps=len(early),
                 early_amount=r2(sum(a[1] for i, a in early)), clean=clean)
 
 
@@ -922,6 +927,15 @@ def r4(d, claim):
     claim(final, "each credit's part to 1020 is what the invoice's final payments leave unpaid, the rest goes to 2060")
     to_2060 = [k for k, p in c.parts.items() if p[1] > 0]
     unpaid_2060 = [k for k in to_2060 if not any(a[0] <= c.cm[k]["date"] for a in c.apps[c.cm[k]["inv"]])]
+    # no application by the credit date, and the stricter reading, no receipt dated by it
+    unrcpt_2060 = [k for k in to_2060 if not any(c.rcpt[a[3]]["date"] <= c.cm[k]["date"] for a in c.apps[c.cm[k]["inv"]])]
+    claim(set(unrcpt_2060) <= set(unpaid_2060) and len(unrcpt_2060) < len(unpaid_2060),
+          "a credit with no receipt dated by its date has no application by then either, and some had a receipt not yet applied")
+    # the case's rule tests the people who applied cash; recording it too is an accepted extension
+    cc_ids = {m["id"] for m in t.cash_credit}
+    claim(cc_ids <= {m["id"] for m in t.cc_rec}, "every credit whose approver applied the cash is in the wider test")
+    rec_only = [m for m in t.cc_rec if m["id"] not in cc_ids]
+    claim(len(rec_only) > 0, "the wider test adds credits whose approver only recorded the cash")
     # the receipt-date variant (an accepted definition when stated): a subset of the application-date test
     rcpt = t.before_rcpt
     rcpt_ids = {r["id"] for r in rcpt}
@@ -977,7 +991,8 @@ def r4(d, claim):
                 manager_limit=manager_limit,
                 cc=dict(n=len(t.cash_credit), amt=amount(t.cash_credit), years=yr(t.cash_credit), cur=cur(t.cash_credit)),
                 cc_early=dict(n=len(t.cc_early), amt=amount(t.cc_early), cur=cur(t.cc_early)[0]),
-                cc_rec=dict(n=len(t.cc_rec), amt=amount(t.cc_rec)),
+                cc_rec=dict(n=len(t.cc_rec), amt=amount(t.cc_rec), years=yr(t.cc_rec)),
+                rec_only=dict(n=len(rec_only), amt=amount(rec_only), years=yr(rec_only)), unrcpt_2060=len(unrcpt_2060),
                 rf_above=dict(n=len(t.rf_above), amt=amount(t.rf_above, "amt"), years=yr(t.rf_above),
                               cur=cur(t.rf_above, "amt")), rf_groups=rf_groups, within_title=within_title,
                 within=dict(n=len(within_rf), amt=amount(within_rf, "amt")),
@@ -1159,6 +1174,8 @@ def r7(d, claim):
     claim({m["id"] for m in sub["tax_sub_flags"]} == {m["id"] for m in sub["with_freight"]},
           "a tax test on SubTotal alone flags exactly the credits with freight")
     claim(sub["freight_over"] == 0, "no freight credit above the invoice's freight")
+    claim(d.one("SELECT COUNT(*) FROM SalesInvoice WHERE ABS(TaxAmount - ROUND((SubTotal + FreightAmount) * ?, 2)) > 0.011",
+                sub["rate"]) == 0, "every sales invoice carries tax at the same rate on SubTotal plus freight")
     # restocking: at standard cost, except the return lines of less than one unit (the whole shipment line), which are
     # costed at the quantity times the shipment line's extended cost
     rest = dict(d.q("SELECT sr.ReasonCode || '|' || substr(sr.ReturnDate, 1, 4), SUM(srl.ExtendedStandardCost) FROM SalesReturnLine srl "
@@ -1179,6 +1196,8 @@ def r7(d, claim):
     both = r2(sum(v for k, v in rest.items() if k.split("|")[0] in ("Damaged", "Quality Concern")))
     lap = lapping(d)
     claim(lap["clean"], "lapping tests clean: no other customer's invoice, every receipt deposited and fully applied")
+    claim(lap["raw_over"] > 0 and lap["raw_over"] == lap["raw_over_early"],
+          "every application more than two days after its receipt is of a receipt dated before its invoice")
     claim(sides(d, "CashReceipt") == {("Dr", "1010"), ("Cr", "2060")}, "receipts are held in 2060 until applied")
     chance_rf, chance_cm = chance_mad(len(c.rf)), chance_mad(len(c.cm))
     mad_rf = first_digit_mad([r["amt"] for r in c.rf.values()])
@@ -1312,16 +1331,20 @@ def r8(d, claim):
     claim(d.one("SELECT COUNT(*) FROM PayrollRegister WHERE ApprovedByEmployeeID IS NOT ?", am) == 0,
           "the Accounting Manager approved every payroll register")
     claim(warehouse_receipt(d) and sides(d, "SalesReturn") == {("Dr", "1040"), ("Cr", "5010"), ("Cr", "5020"), ("Cr", "5030"), ("Cr", "5040")},
-          "damaged goods go back to inventory at full cost")
+          "damaged goods go back to inventory at standard cost")
     claim(reconciles(d) and clawbacks(d)["clean"] and sub["clean"], "the reconciliations, clawbacks, and substantive tests are clean")
     u12 = [x for x in in_year(c.cm.values(), d.C) if x["id"] in {y["id"] for y in t.cm_above + t.cash_credit}]
     u34 = [x for x in in_year(c.rf.values(), d.C) if x["id"] in {y["id"] for y in t.rf_above + t.before}]
     claim(amount(u12) < amount(in_year(t.cm_above, d.C)) + amount(in_year(t.cash_credit, d.C)),
           "the credits failing D1 or D2 overlap, so their union is less than the sum")
+    # the same union on the wider test of Requirement 4 (recorded or applied), an accepted extension
+    u12w = [x for x in in_year(c.cm.values(), d.C) if x["id"] in {y["id"] for y in t.cm_above + t.cc_rec}]
+    claim(len(u12w) > len(u12) and amount(u12w) < m["mat"],
+          f"on the wider test the {d.C} union of D1 and D2 is larger, and still below materiality")
     return dict(rf_centers=rf_centers, am_largest=am is not None and largest_refund(d)["appr"] == am,
                 d1_n=len(t.cm_above), d1=d1, perf=m["perf"], all_c=all_c, d2=len(t.cash_credit), d2_early=len(t.cc_early),
                 d3_n=len(t.rf_above), d3=(len(d3), amount(d3, "amt")), d4_n=len(t.before), d4=(len(d4), amount(d4, "amt")),
-                d4r=(len(t.before_rcpt), len(in_year(t.before_rcpt, d.C))), u12=(len(u12), amount(u12)),
+                d4r=(len(t.before_rcpt), len(in_year(t.before_rcpt, d.C))), u12=(len(u12), amount(u12)), u12w=(len(u12w), amount(u12w)),
                 u34=(len(u34), amount(u34, "amt")), all_r=amount(in_year(c.rf.values(), d.C), "amt"),
                 n_frac=d.one("SELECT COUNT(*) FROM SalesReturnLine srl JOIN Item i ON i.ItemID = srl.ItemID WHERE "
                              "ABS(srl.ExtendedStandardCost - ROUND(srl.QuantityReturned * i.StandardCost, 2)) > 0.011"))
@@ -1376,4 +1399,6 @@ def r10(d, claim):
     return dict(tests=tests_, pop_c=pop_c, pop_r=pop_r, old=len(old), new=new, through=through, cm_last=cm_last,
                 rf_last=rf_last, rcpt_n=len(t.before_rcpt), rcpt_years=rcpt_years,
                 rcpt_rates=[1000 * k / p for k, p in zip(rcpt_years, pop_r)],
-                rcpt_new=new - len(t.before) + len(t.before_rcpt))
+                rcpt_new=new - len(t.before) + len(t.before_rcpt),
+                ext_n=len(t.cc_rec), ext_years=[len(in_year(t.cc_rec, y)) for y in d.years],
+                ext_new=new - len(t.cash_credit) + len(t.cc_rec))

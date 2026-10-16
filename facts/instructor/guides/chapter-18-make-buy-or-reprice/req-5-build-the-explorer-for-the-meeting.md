@@ -104,7 +104,7 @@ ROW (
 )
 ```
 
-**Check:** a difference of zero and {{ g.blank_lines|count }} lines. The Checks tab proves the values and each view's tie to the workbook; the layout, the slicer state and how (Blank) displays show only in Desktop.
+**Check:** a difference of zero and {{ g.blank_lines|count }} lines. The Checks tab tests the values and each view's tie to the workbook. The layout, the slicer state and how (Blank) displays show only in Desktop.
 
 {{ figure('IF-18-5-B') }}
 

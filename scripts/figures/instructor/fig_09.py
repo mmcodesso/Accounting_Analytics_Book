@@ -151,8 +151,8 @@ def if_09_0_b() -> Diagram:
     bottom = db.message(d, 0, y, 860, len(rows), sql, line=2)
     db.emphasize_cells(d, geometry, [(0, 0), (0, 2)])
     whole, decimal, text = (db.cell(v)[0] for v in rows[0])
-    _note(d, f"Outlined: the three values SQLite returns: {whole}, because two whole numbers divide as whole numbers; "
-             f"{decimal}, because one decimal keeps the decimals; and {text}, because the text '{year}' is not equal to "
+    _note(d, f"Outlined: the three values SQLite returns: {whole}, because two INTEGER values divide as integers; "
+             f"{decimal}, because a REAL operand keeps the fraction; and {text}, because the text '{year}' is not equal to "
              f"the number {year}, so the comparison is false and SQLite writes false as 0. The statement is question 15, "
              f"and a SELECT with no FROM tests any expression before a query uses it.", bottom)
     return d
@@ -206,7 +206,7 @@ def if_09_2_a() -> Diagram:
 # -- IF-09-4-A: the oldest past-due work orders --------------------------------------------------------------------------------
 
 def if_09_4_a() -> Diagram:
-    """Exercise 9.4, Step 5: the open work orders due on or before the last day, oldest first."""
+    """Exercise 9.4, Step 5: the open work orders due on or before the year-end, oldest first."""
     ex = ctx.values("ch09.ex4")
     shown = slice(0, 9)
     d = Diagram("The Oldest Past-Due Work Orders")
@@ -278,7 +278,7 @@ def if_09_0_a() -> Diagram:
          "parentheses, then the row count", ("Exercise 9.1, Step 6", "Exercise 9.6, Step 8")),
         ("A missing comma",
          "The second name becomes an alias",
-         "the headings: an alias, not a column", ("Question 11", "Tutorial 9.3, Step 2")),
+         "the headings: an alias, not a column", ("Question 11",)),
         ("A NULL in a calculation",
          f"Dividing by zero hours gives NULL: {g3['no_filter_null']} blank rates",
          "COALESCE labels the NULL", ("Exercise 9.3, Step 5", "Tutorial 9.2, Step 7")),

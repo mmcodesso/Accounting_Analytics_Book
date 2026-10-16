@@ -21,7 +21,7 @@ By the end, students can:
 - apply data bars to a column (outcome 5);
 - design a consistency test, read a clean result, and say what it does not show (outcomes 1 and 6).
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and Core S1 M8 T3 to T4 (data mining and analysis); IMA Data Analysis, and Financial Recordkeeping; IFAC IES 2 (a) and IES 2 (i); AACSB A5 part 5.1.
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and Core S1 M8 T3 to T4 (data mining and analysis); IMA Data Analysis; IFAC IES 2 (a) and IES 2 (i); AACSB A5 part 5.1.
 
 ## Before you assign
 
@@ -71,7 +71,7 @@ b. Select F4 to F12 and choose **Home > Conditional Formatting > Data Bars**.
 
 Add two integrity rows below the summary: `=COUNTIFS(SalesInvoiceLine[PromotionID],"",SalesInvoiceLine[Discount],"<>0")` for discounts with no promotion, and `=COUNTIFS(SalesInvoiceLine[PromotionID],"<>")-D13` for promotion lines the summary leaves out.
 
-**Check:** every cell of column I and both integrity rows show 0, so no promotion was applied at a rate other than its approved rate. **Watch for:** a student who reports a clean test as a finished audit. It shows that rates are consistent, not that a line was eligible or billed within the promotion's dates.
+**Check:** every cell of column I and both integrity rows show 0, so no promotion was applied at a rate other than the rate the PromotionProgram Table records for it. **Watch for:** a student who reports a clean test as a finished audit. It shows that the lines' rates agree with that Table, not that the Table's rates were authorized, or that a line was eligible or billed within the promotion's dates.
 
 ### Requirement (4): The largest promotion
 

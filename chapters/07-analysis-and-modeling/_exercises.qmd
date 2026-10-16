@@ -124,7 +124,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 (5) Import the T27_SalesCommissionAccrual Table, total the CommissionAmount of the accruals dated in 2026, and reconcile the total to the 2026 commission expense in GLCommission. Identify the source document type that explains the difference.
 
-**Deliverable.** Two regressions, a table of 2026 expectations and differences, and a half-page memo to your senior.
+**Deliverable.** The regressions of requirements (2) and (3), a table of 2026 expectations and differences, and a half-page memo to your senior.
 
 
 

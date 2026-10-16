@@ -1,7 +1,7 @@
 """Instructor figures of Appendix C (guides in facts/instructor/guides/appendix-c-power-bi-browser/).
 
 The appendix is the last unit.  It has NO solution file: the projects open only in Desktop, and the browser steps were read
-in the author's own Power BI service account on 6 October 2026 (drafts/appendix-c-service-results.md).  So the mocks draw the
+in the author's own Power BI service account on October 6, 2026 (drafts/appendix-c-service-results.md).  So the mocks draw the
 service as the book's own mocks of this appendix do (scripts/figures/appendix_c.py: the service's top bar, the model editor's
 DAX query view, the report editor's menu bar, panes and page tabs, with no Desktop ribbon), and every value comes from the
 dataset through the guides' own contexts (appC.g1 to appC.g3) and the registered notes (appendix_c.ex1 to appendix_c.ex3),
@@ -499,12 +499,13 @@ def if_ac_3_a() -> Diagram:
         d.text(f"<b>{esc(label)}</b>", x0 + 6, mid - 44, gap - 12, 36, size=SMALL, color=INK, align="center", valign="bottom")
     cols = [
         ("Version history, in the service", [
-            "The model as it stood at each saved version",
+            "The model and its data at each saved version",
             "The last five versions only",
-            "Only the last person to change each version",
+            "The last person to change each, and a description if one was typed",
             "A Pro license to use it"], "teal"),
         ("It does not record", [
-            "What changed, or why",
+            "What changed, change by change",
+            "A reason, unless someone typed it",
             "A review before a change takes effect"], "coral"),
         ("A project under version control adds", [
             "Every change, with its author and a message",

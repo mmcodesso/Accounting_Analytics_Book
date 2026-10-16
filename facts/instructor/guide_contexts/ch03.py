@@ -13,6 +13,7 @@ Keys: ch03.chapter (the chapter note), ch03.t1 and ch03.t2 (the two tutorials) a
 
 from __future__ import annotations
 
+import calendar
 import re
 from datetime import date
 from pathlib import Path
@@ -429,6 +430,9 @@ def ex1(d, claim):
                                                 "AND InvoiceNumber = ?", r[0], r[1]) == 2 for r in differ),
           "the ledger's VoucherNumber differs from the InvoiceNumber only for the invoices whose supplier number repeats, one for each repeated number")
     paid_one = d.one("SELECT COUNT(*) FROM PurchaseInvoice pi WHERE pi.Status = 'Paid' AND (SELECT COUNT(*) FROM PurchaseInvoiceLine x WHERE x.PurchaseInvoiceID = pi.PurchaseInvoiceID) = 1")
+    taxed = d.one("SELECT COUNT(*) FROM PurchaseInvoice pi WHERE pi.Status = 'Paid' AND pi.TaxAmount > 0 AND (SELECT COUNT(*) FROM PurchaseInvoiceLine x "
+                  "WHERE x.PurchaseInvoiceID = pi.PurchaseInvoiceID) = 1")
+    claim(taxed > 0, "some paid single-line invoices carry purchase tax, so a student's invoice may post a second 5060 row")
     paid = d.one("SELECT COUNT(*) FROM PurchaseInvoice WHERE Status = 'Paid'")
     claim(paid_one / paid > 0.9, "nearly every paid invoice has a single line")
     accrual = d.one("SELECT COUNT(*) FROM PurchaseInvoiceLine WHERE GoodsReceiptLineID IS NULL")
@@ -447,7 +451,7 @@ def ex1(d, claim):
         supplier=dict(id=sup[0], name=sup[1]), item=dict(code=it[0], name=it[1]), pay=dict(id=pay[0], number=pay[1], date=pay[2], amount=pay[3], method=pay[4]),
         gl_pi=gl_pi, gl_gr=gl_gr, gl_dp=gl_dp, variance=variance, variance_abs=abs(variance), variance_side="unfavorable" if variance > 0 else "favorable",
         paid_one=paid_one, paid=paid, accrual=accrual, pays=pays, single=dict(pays)[1], multi=sum(n for k, n in pays if k > 1), split=split, same=same, same_rows=sum(n for _, n in same), same_types=len(same),
-        differ=len(differ), repeated=repeated,
+        differ=len(differ), repeated=repeated, taxed=taxed,
         rows=rows_of(d, ["PurchaseInvoice", "PurchaseInvoiceLine", "GoodsReceiptLine", "PurchaseOrderLine", "DisbursementPayment"]))
 
 
@@ -509,6 +513,7 @@ def ex2(d, claim):
 
 MFG = ["BillOfMaterial", "BillOfMaterialLine", "WorkOrder", "WorkOrderOperation", "MaterialIssue", "MaterialIssueLine", "ProductionCompletion",
        "ProductionCompletionLine", "WorkOrderClose"]
+MFG_OMITTED = ["Routing", "RoutingOperation", "WorkCenter", "WorkCenterCalendar", "WorkOrderOperationSchedule"]   # in the group, not in Figure 3.8
 EX3_SCHEMA = {
     "Item": ["ItemID", "ItemCode", "ItemName", "ItemGroup", "SupplyMode", "StandardCost", "StandardConversionCost", "LifecycleStatus"],
     "BillOfMaterial": ["BOMID", "ParentItemID", "VersionNumber", "Status", "StandardBatchQuantity"],
@@ -530,8 +535,8 @@ def ex3(d, claim):
     schema(d, claim, EX3_SCHEMA)
     in_group(claim, {"BillOfMaterial": "Manufacturing", "WorkOrder": "Manufacturing", "MaterialIssue": "Manufacturing", "ProductionCompletion": "Manufacturing",
                      "WorkOrderClose": "Manufacturing", "LaborTimeEntry": "Payroll and Time", "Item": "Master Data"})
-    claim(all(d.one(f"SELECT COUNT(*) FROM sqlite_master WHERE name = '{t}'") for t in ("Routing", "RoutingOperation", "WorkCenter")),
-          "Routing, RoutingOperation and WorkCenter tables exist beyond the focused diagram")
+    claim(all(d.one(f"SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = '{t}'") for t in MFG_OMITTED),
+          "the Manufacturing tables that the focused diagram leaves out exist in the file")
     manufactured = d.one("SELECT COUNT(*) FROM Item WHERE SupplyMode = 'Manufactured'")
     with_bom = d.one("SELECT COUNT(DISTINCT ParentItemID) FROM BillOfMaterial")
     boms = d.one("SELECT COUNT(*) FROM BillOfMaterial")
@@ -602,7 +607,7 @@ def ex3(d, claim):
         lines=lines, material=material, noscrap=sum(x["quantity"] * x["cost"] for x in lines), per_unit=per_unit, no_completion=dict(spread).get(0, 0), statuses=statuses, spread=spread, one_completion=dict(spread).get(1, 0),
         open_orders=sum(n for s, n, c in statuses if not c), closes=d.one("SELECT COUNT(*) FROM WorkOrderClose"),
         v=dict(closes=v[0], material=v[1], labor=v[2], overhead=v[3], conversion=v[4], total=v[5], units=units, released=released, per_unit=v[5] / units),
-        labor_entries=labor_hours, components=and_join(x.lower() for x in comp_groups))
+        labor_entries=labor_hours, components=and_join(x.lower() for x in comp_groups), omitted=and_join(MFG_OMITTED), n_omitted=len(MFG_OMITTED))
 
 
 # --- Exercise 3.4: the keys behind a budget-versus-actual report ----------------------------------------------------------
@@ -664,12 +669,26 @@ def ex4(d, claim):
     matched_next = d.one("SELECT COUNT(*) FROM Budget b WHERE b.FiscalYear = ? AND EXISTS (SELECT 1 FROM GLEntry g WHERE g.FiscalYear = b.FiscalYear AND g.FiscalPeriod = b.Month "
                          "AND g.CostCenterID = b.CostCenterID AND g.AccountID = b.AccountID)", d.N)
     claim(next_year > 0 and matched_next == 0, "no Budget row of the next fiscal year has a matching ledger row, because the ledger holds only supplier payments for that year")
+    # the grain: matched row to row, a Budget row repeats once for each ledger row of its month, cost center and account
+    fan = d.q("SELECT a.AccountNumber, a.AccountName, c.CostCenterName, b.Month, b.BudgetAmount, g.n FROM Budget b JOIN Account a USING (AccountID) "
+              "JOIN CostCenter c USING (CostCenterID) JOIN (SELECT FiscalYear, FiscalPeriod, CostCenterID, AccountID, COUNT(*) n FROM GLEntry GROUP BY 1, 2, 3, 4) g "
+              "ON g.FiscalYear = b.FiscalYear AND g.FiscalPeriod = b.Month AND g.CostCenterID = b.CostCenterID AND g.AccountID = b.AccountID "
+              "WHERE b.FiscalYear = ? ORDER BY g.n DESC, b.BudgetID LIMIT 1", C)
+    claim(len(fan) == 1 and fan[0][5] > 1, "a Budget row of the current year meets several ledger rows at its grain, so a row-to-row join repeats its amount")
+    fan = dict(number=fan[0][0], name=fan[0][1], cc=fan[0][2], month=calendar.month_name[fan[0][3]], amount=fan[0][4], n=fan[0][5],
+               repeated=round(fan[0][4] * fan[0][5], 2))
+    line_only = d.q("SELECT COUNT(DISTINCT l.AccountID), COUNT(*), SUM(l.CostCenterID IS NULL) FROM BudgetLine l JOIN Account a USING (AccountID) "
+                    "WHERE a.AccountType IN ('Revenue', 'Expense') AND l.AccountID NOT IN (SELECT AccountID FROM Budget)")[0]
+    claim(line_only[0] > 0 and line_only[1] == line_only[2], "the revenue and expense accounts that only BudgetLine budgets are budgeted with no cost center")
+    claim(d.one("SELECT COUNT(*) FROM (SELECT FiscalYear, Month, CostCenterID, AccountID FROM BudgetLine WHERE CostCenterID IS NOT NULL GROUP BY 1, 2, 3, 4) l "
+                "LEFT JOIN Budget b USING (FiscalYear, Month, CostCenterID, AccountID) WHERE b.BudgetID IS NULL") == 0,
+          "every BudgetLine combination that names a cost center has its Budget row")
     return dict(
         cc=[dict(id=r[0], name=r[1], manager=r[3]) for r in cc], n_cc=len(cc), gl_cc=gl_cc, bud_cc=bud_cc, line_cc=line_cc, line_acct=line_acct,
         n_budget_accounts=b_accounts, n_line_accounts=line_accounts, line_cats=[dict(category=r[0], accounts=r[1], rows=r[2], no_cc=r[3], no_item=r[4]) for r in line_cats],
         n_unbudgeted=len(unbudgeted), unbudgeted_first=and_join(f"{n} {name}" for n, name in unbudgeted[:4]), gl_accounts=d.one("SELECT COUNT(DISTINCT AccountID) FROM GLEntry"), budget_rows=d.one("SELECT COUNT(*) FROM Budget"), line_rows=d.one("SELECT COUNT(*) FROM BudgetLine"),
         year=C, matched=[m for y, n, m in grain if y == C][0], budget_year=[n for y, n, m in grain if y == C][0], quiet=quiet, next_year=d.N, next_rows=next_year,
-        in_gl=in_gl)
+        in_gl=in_gl, fan=fan, n_line_only=line_only[0])
 
 
 # --- Exercise 3.5: a data extraction plan for three audit procedures -----------------------------------------------------

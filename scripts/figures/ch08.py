@@ -413,10 +413,12 @@ def fig_08_09() -> Diagram:
                        "approver. Round: MOD(TotalAmount,1000)=0."),
         ("Results", f"{flagged} entries flagged: {scores[1]} with one flag, {scores[2]} with two, and "
                     f"{scores[4]} with four."),
-        ("Exceptions and disposition", "Expected, with evidence: weekend depreciation at month-ends, "
-                                       "year-end closes (no approval limit covers them). Follow up: the "
-                                       "opening entry, the backdated entries, the self-approved entries, and "
-                                       "the two debt reclasses. Details on the Dispositions worksheet."),
+        ("Exceptions and disposition", "Expected patterns, with the evidence still to examine: weekend "
+                                       "depreciation at month-ends (agree to the schedule), year-end closes above "
+                                       "every recorded limit (request the closing-entry policy), asset disposals "
+                                       "at original cost (agree to the register). Follow up: the opening entry, "
+                                       "the backdated entries, the self-approved entries, and the two debt "
+                                       "reclasses. Details on the Dispositions worksheet."),
         ("Conclusion", "The approval of opening and recurring entries needs follow-up before a conclusion "
                        "on the control can be reached."),
         ("Prepared by", "Your name and date"),

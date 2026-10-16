@@ -20,7 +20,7 @@ The first three objectives cover what a reporting tool adds, loading and relatin
 {{< book-objectives 4-6 >}}
 
 ::: {.notes}
-The last three cover reconciling a report, honest visuals, and pages that every reader can use.
+The last three cover reconciling a report, honest visuals, and pages that more readers can use.
 :::
 
 ## One report the managers can explore themselves
@@ -31,7 +31,7 @@ The last three cover reconciling a report, honest visuals, and pages that every 
 - It must tie to the reported numbers, and it must not mislead
 
 ::: {.notes}
-The report covers revenue, list prices and promotional discounts, by item group, product type, customer segment, region and period. In the controller's words, a chart that makes a flat year look like a crisis is worse than no chart at all. It has to tie to the numbers in the Chapter 6 workbook before anyone sees it.
+The report covers revenue, list prices and promotional discounts, by item group, product type, customer segment, region and period. In the controller's words, a chart that makes a flat year look like a crisis is worse than no chart at all. It has to tie to the numbers in the Chapter 6 workbook before anyone sees it. The adjustments proposed in the Part III case are not in the workbook, so the report starts from the unchanged data and Chapter 6's control totals.
 :::
 
 # Why a Reporting Tool
@@ -40,11 +40,11 @@ The report covers revenue, list prices and promotional discounts, by item group,
 
 - A workbook holds an analysis and its evidence together
 - A saved query extracts exactly the rows an analysis needs
-- Neither is built for a reader who wants to explore further
+- Neither is built as a shared report for readers who explore
 - A business intelligence tool puts interactive visuals on a model
 
 ::: {.notes}
-The sales manager who sees the Furniture discounts wants them by region, then by month, then for one segment, and each question would come back as a new request. In a business intelligence tool, the reader changes what the visuals show by clicking. Power BI is not where accounting judgments are made or documented in detail; that stays in the workbook and the query. It is where agreed results are shown to the people who use them.
+The sales manager who sees the Furniture discounts wants them by region, then by month, then for one segment, and each question would come back as a new request. A workbook's PivotTables and slicers let its author explore further, but in a business intelligence tool the reader changes what the visuals show by clicking. The supporting schedules, assumptions and evidence of an accounting judgment stay with the workbook and the query, and the report documents the definitions it uses. Power BI is where agreed results are shown to the people who use them.
 :::
 
 ## Desktop builds the report; the service shares it
@@ -82,7 +82,7 @@ Much of the path is familiar: Power BI uses the same Power Query as Part II, wit
 {{< book-table tbl-13-01 columns="In Excel (Part II),In Power BI (Part IV)" >}}
 
 ::: {.notes}
-The main change is where the ideas live. In a workbook you merged tables into one wide table and summarized it with a PivotTable. In Power BI the tables stay separate, the relationships do the work of the merge, and every visual on a page summarizes the same model. Measures come in Chapter 14, and publishing in the appendix.
+The main change is where the ideas live. In a workbook you merged tables into one wide table and summarized it with a PivotTable. In Power BI the tables stay separate, a relationship passes a filter from one table to another where the merge combined their rows, and every visual on a page summarizes the same model. Measures come in Chapter 14, and publishing in the appendix.
 :::
 
 ## Check your understanding {.check}
@@ -165,7 +165,7 @@ The View tab's Column quality, Column distribution and Column profile summarize 
 
 ## Watch out: two defaults hide what the model contains {.watch-out}
 
-- Auto date/time adds a hidden date table behind every date column
+- Auto date/time adds hidden date tables behind the date columns
 - Autodetect guesses relationships from column names after loading
 - A wrong guess gives wrong totals, without any warning
 - Tutorial 13.1 turns both off in the Options, under Data Load
@@ -375,7 +375,7 @@ Cleveland and McGill ranked the judgments a reader makes in decoding a graph, fr
 {{< book-figure fig-13-07 crop="0,0.4666,1,0.4606" >}}
 
 ::: {.notes}
-Position was also judged about twice as accurately as angle, as in a pie. The ranking puts angle with length, area, as in circles, below them, and color shading last; those lower ranks rest on psychophysics more than on their experiments. The same values that bars make easy to compare become a matter of guessing as slices or circles, which is why a bar chart is usually better than a pie.
+Position was also judged about twice as accurately as angle, as in a pie. The ranking puts angle with length, area, as in circles, below them, and color shading last; those lower ranks rest on psychophysics more than on their experiments. The same values that bars make easy to compare become much harder to compare as slices or circles, which is why a bar chart is usually better than a pie.
 :::
 
 ## Fit the visual to the reader's task
@@ -426,7 +426,7 @@ Each of these charts misleads through a choice made by default or by habit, whic
 
 # Accessible Report Design
 
-## Four practices make a page usable by every reader
+## Four practices make a page usable by more readers
 
 - Contrast: text at least 4.5 to 1 against its background
 - A second cue: never let a meaning rest on color alone
@@ -434,7 +434,7 @@ Each of these charts misleads through a choice made by default or by habit, whic
 - A theme: one set of colors and fonts across the report
 
 ::: {.notes}
-Some readers cannot tell certain colors apart, some use a screen reader or a keyboard, and projectors wash out pale colors. The Web Content Accessibility Guidelines of the W3C set the standards, and Power BI has the settings to meet them: alt text under General in each visual's format settings, and the Themes gallery on the Design tab. These practices make a report clearer for every reader, and the book's figures are drawn to the same rules.
+Some readers cannot tell certain colors apart, some use a screen reader or a keyboard, and projectors wash out pale colors. The Web Content Accessibility Guidelines of the W3C are a widely used standard, and Power BI has settings that help meet it: alt text under General in each visual's format settings, and the Themes gallery on the Design tab. These practices make a report clearer for every reader, and the book's figures are drawn to the same rules. They are a start, not a guarantee. Microsoft's guidance also sets the tab order of the visuals, and only a test with the keyboard and a screen reader shows whether a page works for the readers who rely on them.
 :::
 
 ## Check your understanding {.check}

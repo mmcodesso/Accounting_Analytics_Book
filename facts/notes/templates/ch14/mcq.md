@@ -11,7 +11,7 @@
      9 B: the row, the column, and the slicer all filter the cell.
      10 D: a row context does not filter other tables; CALCULATE's context transition would.
      11 A: a filter argument replaces the existing filter on the same column.
-     12 C: ALL on the fact table removes the filters that reach it from Date as well (Furniture {{ all_share|pct(2) }} instead of {{ rf_share|pct(2) }}).
+     12 C: inside CALCULATE, ALL on the fact table also removes the filters on the dimensions it relates to, Date among them (Furniture {{ all_share|pct(2) }} instead of {{ rf_share|pct(2) }}).
      13 B: a test compares the model's result with a total trusted from elsewhere.
      14 C: the {{ d.N }} rows of the date table have {{ d.C }} as their prior year.
      15 A: the closes move each year's revenue and expenses to retained earnings, netting them to zero. -->

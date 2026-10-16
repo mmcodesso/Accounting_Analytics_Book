@@ -213,7 +213,8 @@ def ex2(d, claim):
     manager = d.one("SELECT ManagerID FROM CostCenter WHERE CostCenterID = ?", unmapped[0])
     title = emp[manager]["title"]
     upns = [u for u, _ in SECURITY]
-    claim(len(set(upns)) == len(upns), "no user is mapped to more than one cost center")
+    claim(all(len({c for v, c in SECURITY if v == u}) == 1 for u in upns),
+          "no user is mapped to more than one cost center (distinct cost centers per user)")
     us = users(d)
     claim(all(u["employee"] is not None and u["employee"]["status"] == "Active" for u in us),
           "every name matches the Email of an active employee")

@@ -41,7 +41,7 @@ Individual or pairs, about 150 minutes: 20 for the key figures and the conclusio
 
 **Check:** the block holds six figures: the four counts of Requirement 4, the number of significant deficiencies (2) and the overall classification. **Watch for:** a count with no definition. A committee member who recomputes the refunds before payment by the receipts' dates finds 51, not 58; the report names the definition.
 
-**Step 2. Write the conclusion.** Two or three sentences, in this order: what the tests covered (the populations reconcile to the ledger by year, every credit recomputes, the lapping tests found no trace, on the definitions stated); what they could not reach (the customers' requests, the payee checks, the inspection of returned goods, the bank clearance of refunds and the operation of the compensating controls, with no assurance on them); and the finding (the controls over who may grant credits and refunds are not designed to prevent an unauthorized one, rated provisionally as two significant deficiencies, with no material weakness identified and one refund under follow-up).
+**Step 2. Write the conclusion.** Two or three sentences, in this order: what the tests covered (the populations reconcile to the ledger by year, every credit recomputes within the stated limits of rounding, tax and freight, the lapping tests found no trace, on the definitions stated); what they could not reach (the customers' requests, the payee checks, the inspection of returned goods, the bank clearance of refunds and the operation of the compensating controls, with no assurance on them); and the finding (credits and refunds approved above the recorded limits, whether by a gap in design or in operation still to be settled, rated provisionally as two significant deficiencies, with no material weakness identified and one refund under follow-up).
 
 **Check:** the conclusion says what was not tested before it gives a rating. **Watch for:** assurance words ("the controls are effective"), accusation words, and the three-year amount set against materiality: the first pattern's $421,606.55 exceeds $225,180.56, but materiality is the year's judgment, and the year's exposure is $172,307.40.
 
@@ -51,11 +51,11 @@ Individual or pairs, about 150 minutes: 20 for the key figures and the conclusio
 
 | Finding | Rating |
 |---|---|
-| F1. Credits approved without authority, in the department that handles the customer's cash (D1, D2) | Significant deficiency (provisional) |
+| F1. Credits approved above recorded authority, in the department that handles the customer's cash (D1, D2) | Significant deficiency (provisional) |
 | F2. Refunds approved without recorded authority and dated before the customer's payments were applied, with no preparer recorded (D3, D4, D6) | Significant deficiency (provisional) |
 | F3. Concentration of duties with the Accounting Manager (D7) | Deficiency (may combine entity-wide) |
 | F4. No offset of past-due balances, and refunds by another method (D5) | Follow up |
-| F5. Damaged goods restocked at full cost (D8) | Valuation follow-up |
+| F5. Damaged goods restocked at standard cost (D8) | Valuation follow-up |
 | F6. The largest refund (follow-up) | Follow up |
 
 **Check:** every finding has all six elements, the condition carries its count and definition, the effect says whether a misstatement is reasonably possible, and the rating is provisional. **Watch for:** a finding without a cause ("not yet known" is an answer when it is true), and a condition worded as an act.
@@ -76,11 +76,11 @@ Individual or pairs, about 150 minutes: 20 for the key figures and the conclusio
 |---|---|---|
 | Customer service manager | Will point to the warehouse receipt as the compensating control | The receipt shows that goods came back, not that the credit's amount or the customer's cash was right; show the credits whose approver applied the invoice's cash. |
 | Accounting manager | Will point to the review of each credit balance | The review did not stop refunds before payment or to customers past due by at least the refund; show its precision with those counts. |
-| Chief financial officer | May argue that the team is small | The audit partners Cohen et al. (2020) interviewed describe managers who resist a weakness when no error has been detected: answer with the likelihood and the absence of any independent review, not with a detected error. |
+| Chief financial officer | May argue that the team is small | The audit partners Cohen et al. (2020) interviewed describe managers who resist a weakness when no error has been detected: answer with the likelihood and the absence of evidence of an independent review, not with a detected error. |
 
 **Watch for:** an action with no owner or date, and an owner assumed to agree.
 
-**Step 6. Fit the pages.** Three pages and an appendix of at most three. The model's text (conclusion, findings, clean results and action plans) runs to about 1,632 words; count yours, then cut the findings' prose before the clean results.
+**Step 6. Fit the pages.** Three pages and an appendix of at most three. The model's text (conclusion, findings, clean results and action plans) runs to about 1,725 words; count yours, then cut the findings' prose before the clean results.
 
 ## Expected results
 
@@ -92,7 +92,7 @@ Individual or pairs, about 150 minutes: 20 for the key figures and the conclusio
 | Findings; action plans; owners | 6; 10; 8 | 3, 5 |
 | Materiality; the first pattern's exposure for the last year | $225,180.56; $172,307.40 | 2 |
 
-> **Instructor notes, Requirement 9:** the conclusion is bounded and describes rather than accuses: the recorded populations reconcile to the ledger by year, and the trace and recomputation tests agree, on the definitions stated; the customer's requests, the payee checks, the inspection of returned goods, the bank clearance of refunds, and the operation of the compensating controls remain untested, so the report gives no assurance on them or on the balances beyond the records. The controls over who may grant credits and refunds are not designed to prevent an unauthorized one; two significant deficiencies, rated provisionally; one refund under follow-up; no trace of lapping in the tests run. Actions: an approved delegation of authority for credits and refunds, enforced in the system; credits approved by someone who does not handle the customer's cash; credits on unpaid invoices reduce the receivable, and refunds wait for cleared payment; refunds to the original instrument or a verified account, with open balances offset first; a preparer recorded on credits and refunds; review of the Accounting Manager's concentration; a request for the approved 2027 commission rates (the records end with 2026, so their absence is a question, not a finding); inspection and a write-down step for damaged returns. Expected pushback: the customer service manager points to the warehouse receipt; the accounting manager points to the review of each credit balance; managers resist a weakness without a detected error, as the audit partners Cohen et al. (2020) interviewed describe, so answer with the precision and the evidence of each compensating control.
+> **Instructor notes, Requirement 9:** the conclusion is bounded and describes rather than accuses: the recorded populations reconcile to the ledger by year, and the trace and recomputation tests agree, on the definitions stated; the customer's requests, the payee checks, the inspection of returned goods, the bank clearance of refunds, and the operation of the compensating controls remain untested, so the report gives no assurance on them or on the balances beyond the records. Credits and refunds were approved above the approvers' recorded limits, and whether that is a gap in the design or in the operation of the controls waits on the delegation of authority; two significant deficiencies, rated provisionally; one refund under follow-up; no trace of lapping in the tests run. Actions: an approved delegation of authority for credits and refunds, enforced in the system; credits approved by someone who does not handle the customer's cash; credits on unpaid invoices reduce the receivable, and refunds wait for cleared payment; refunds to the original instrument or a verified account, with open balances offset first; a preparer recorded on credits and refunds; review of the Accounting Manager's concentration; a request for the approved 2027 commission rates (the records end with 2026, so their absence is a question, not a finding); inspection of returned goods, and a write-down where the inspection finds one is needed. Expected pushback: the customer service manager points to the warehouse receipt; the accounting manager points to the review of each credit balance; managers resist a weakness without a detected error, as the audit partners Cohen et al. (2020) interviewed describe, so answer with the precision and the evidence of each compensating control.
 
 ## What a strong answer says
 

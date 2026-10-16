@@ -12,11 +12,11 @@
 
 ## Purpose and learning outcomes
 
-A report is only as good as the balances under it. The requirement rolls each working-capital account forward by its sources, reconciles receivables and payables to their open items, tests the cutoff and the sales tax account, and records every difference as a finding that the report itself tests. The words matter: each finding states what the records show, never what anyone did. The analytics type is diagnostic, with the dispositions as the judgment.
+A report is only as good as the balances under it. The requirement breaks the working-capital balances down by source document, reconciles receivables and payables to their open items, tests the cutoff and the sales tax account, and records every difference as a finding that the report itself tests. The words matter: each finding states what the records show, never what anyone did. The analytics type is diagnostic, with the dispositions as the judgment.
 
 Students can:
 
-- roll accounts forward by source document and name the parts no subledger supports (Step 1);
+- break balances down by source document, trace the journal-entry parts and say that the breakdown tests nothing by itself (Step 1);
 - reconcile receivables and payables to open items and explain each difference (Step 2);
 - explain the billing differences with the cutoff findings of Chapters 6 and 12, and age the payables (Steps 3 and 4);
 - test account `2050` and name the outside evidence (Step 5);
@@ -28,8 +28,8 @@ Students can:
 
 - **Files.** Requirements 1 to 4 done. The model answer is in PartIV-case.zip: the page, the Findings table and Tests 4 and 5.
 - **From earlier work.** Exercise 16.1's open balance, Exercise 8.2's payables, Chapter 8's dispositions, Chapter 16's dispositions table and the cutoff findings of Chapters 6 and 12.
-- **Data conditions.** The opening entry JE-2024-000001 carries balances no document supports; two supplier invoices were moved to notes payable while the subledger still shows them open; one supplier invoice crosses a year-end; account `2050` has no debit except credit memos.
-- **Verify first.** The 81 Requirement 5 rows of the Checks tab agree.
+- **Data conditions.** The opening entry JE-2024-000001 carries balances no document in the extract supports; two supplier invoices were moved to notes payable while the subledger still shows them open; one supplier invoice crosses a year-end; account `2050` has no debit except credit memos.
+- **Verify first.** The 83 Requirement 5 rows of the Checks tab agree.
 
 ## How to run it
 
@@ -41,9 +41,9 @@ The Checks tab proves every value; the matrix layout is visible only in Desktop.
 
 ### Part 1: The roll-forward
 
-**Step 1. Roll the accounts forward.** Add a **Matrix** titled "Working-capital accounts at the end of fiscal 2026, by source document" with AccountNumber on **Rows** (the six accounts), SourceDocumentType on **Columns** and Balance in **Values**, filtered to the current year.
+**Step 1. Break the balances down by source.** Add a **Matrix** titled "Working-capital accounts at the end of fiscal 2026, by source document" with AccountNumber on **Rows** (the six accounts), SourceDocumentType on **Columns** and Balance in **Values**, filtered to the current year.
 
-**Check:** the JournalEntry column is what no subledger document supports: receivables $380,000.00, materials $3,587,025.70, finished goods $4,111,795.76 and payables -$1,456,371.12, which are the opening lines and, in payables, the two reclassifications to notes.
+**Check:** the JournalEntry column holds the opening entry's lines, which no subledger document in the extract supports (receivables $380,000.00, materials $3,587,025.70, finished goods $4,111,795.76), and payables of -$1,456,371.12, the opening line less the two reclassifications to notes. The matrix only decomposes the ledger, and Step 2 and the Validation page carry the evidence.
 
 ### Part 2: Reconciliations
 
@@ -64,7 +64,7 @@ b. Add cards titled "Ledger against open items at the end of fiscal 2026" with t
 
 **Step 3. Compare billing with the invoices dated in each year.** Add a **Table** titled "Billing by invoice date against the ledger" with Year, billing by invoice date, billing in the ledger and the difference.
 
-**Check:** the differences are 2024 $791.35; 2025 $4,119.16; 2026 -$4,910.51. Invoices dated in one year and posted on 1 January of the next explain them; only SI-2026-013742 shipped in 2025 (Chapter 6's cutoff error), so for the others the ledger is right and the dates are wrong.
+**Check:** the differences are 2024 $791.35; 2025 $4,119.16; 2026 -$4,910.51. Invoices dated in one year and posted on January 1 of the next explain them, and only SI-2026-013742 shipped in 2025 (Chapter 6's cutoff error), so for the others the ledger is right and the dates are wrong.
 
 **Step 4. Age the payables.** Add `Bucket` and `MovedToNotes` columns in APInvoices and a **Table** titled "Open payables aged, without the invoices moved to notes".
 
@@ -92,10 +92,12 @@ b. Add the measures and Tests 4 and 5 in **DAX query view**.
 | 1020 | Opening receivables with no invoice (JE-2024-000001) | $380,000.00 | Follow up | Receivables |
 | 2010 | Opening payables with no invoice (JE-2024-000001) | $2,096,371.12 | Follow up | Payables |
 | 2010 | Invoices moved to notes payable still open in the subledger (PI 3160 and 21692); close them against the notes | -$640,000.00 | Expected | Payables |
+| 1045 | Opening materials with no item or cost detail (JE-2024-000001) | $3,587,025.70 | Follow up |  |
+| 1040 | Opening finished goods with no item or cost detail (JE-2024-000001) | $4,111,795.76 | Follow up |  |
 | 2050 | No remittance of the sales tax recorded | $5,620,840.66 | Follow up |  |
 | 2110 | Current portion of the notes classified as long-term (due 2027) | $147,503.76 | Misstatement |  |
 | 1010 and 2010 | Supplier payments posted after Data Through | $271,327.17 | Expected |  |
-| 2030 | Payroll accrual not recorded at the year-end (Part III case) | $383,044.82 | Misstatement |  |
+| 2030 | Payroll accrual not recorded at the year-end, an estimate the Part III case proposed and did not post | $383,044.82 | Misstatement |  |
 
 ```dax
 Payables Findings = CALCULATE ( [Findings Amount], Findings[Reconciles] = "Payables" )
@@ -103,7 +105,7 @@ Payables Findings = CALCULATE ( [Findings Amount], Findings[Reconciles] = "Payab
 Unexplained Payables = [Payables Difference] - [Payables Findings]
 ```
 
-**Check:** both differences equal their findings to the cent, and in Test 5 the 4 quarters after Data Through show no value. The dispositions follow Chapter 8: expected, follow up, or a misstatement to report. **Watch for:** the note invoices entered as +$640,000.00. The payables findings read $2,736,371.12 against $1,456,371.12, and Test 4 shows -$1,280,000.00 unexplained.
+**Check:** both differences equal their findings to the cent, and in Test 5 the working-capital measures of Requirement 3 show no value in the 4 quarters after Data Through. The dispositions follow Chapter 8: expected, follow up, or a misstatement to report. The opening inventories ($7,698,821.46) are recorded for follow-up with no difference to reconcile, so Test 4 leaves them out. **Watch for:** the note invoices entered as +$640,000.00. The payables findings read $2,736,371.12 against $1,456,371.12, and Test 4 shows -$1,280,000.00 unexplained.
 
 ![The two reconciliations as one picture, so students see that each difference is a short list of recorded items.](../figures/case-part-4/IF-C4-5-B.pdf)
 
@@ -129,14 +131,15 @@ ROW (
 | Sales tax payable; debits to it other than credit memos | $5,620,840.66; none | 5 |
 | Rows after Data Through; their amount | 526; $271,327.17 | 6 |
 
-> **Instructor notes, Requirement 5:** balances at 2026-12-31 by source: 1020 SalesInvoice 92,727,541.64, CashReceiptApplication -87,896,623.29, CreditMemo -412,114.03, JournalEntry 380,000.00 (4,798,804.32); 1045 GoodsReceipt 38,891,819.55, MaterialIssue -30,727,191.33, JournalEntry 3,587,025.70 (11,751,653.92); 1040 JournalEntry 4,111,795.76, GoodsReceipt 13,295,060.67, ProductionCompletion 40,099,313.03, SalesReturn 325,840.19, Shipment -45,662,307.91 (12,169,701.74); 2010 PurchaseInvoice -56,461,312.87, DisbursementPayment +51,680,217.33, JournalEntry -1,456,371.12 (-2,096,371.12 opening + 360,000 + 280,000 moved to notes), -6,237,466.66; 2020 GoodsReceipt -53,336,880.22, PurchaseInvoice +52,315,888.16 (-1,020,992.06, Chapter 12); 2050 SalesInvoice -5,659,428.46, CreditMemo +38,587.80. Open items: receivables 1,079 invoices, 4,418,804.32 (positive balances; 225 negative balances, -220,131.88, are credit memos on paid invoices, credited to 2060 and refunded, except 3 (3,413.46) not yet refunded at the year-end); difference 380,000.00, the opening line of JE-2024-000001. The same rebuild at 2024-12-31 and 2025-12-31 differs by 379,208.65 and 375,089.49, the cutoff invoices below. Payables: 3,462 invoices received and unpaid at 2026-12-31, 4,781,095.54; difference 1,456,371.12 = opening payables 2,096,371.12 less the 640,000.00 of PI 3160 and PI 21692, which the ledger moved to notes payable but the subledger still shows open (past due since 2024-07-30 and 2026-01-26). Aging: past due 2,089,989.68 with them, 1,449,989.68 of 4,141,095.54 (35.0%) without them. Reconcile payables on ReceivedDate, as the ledger posts them; on InvoiceDate, 2025-12-31 differs by ASV0050-2025-040073 (3,266.27). Billing by invoice date less the ledger: +791.35 (2024; SI-2025-006733 to 006735, dated November-December 2024, posted 2025-01-01), +4,119.16 (2025), -4,910.51 (2026; SI-2026-013741 to 013743, posted 2026-01-01); only SI-2026-013742 shipped in 2025 (Chapter 6's cutoff error), and the other dates are wrong, not the ledger. Sales tax: credits only from SalesInvoice (1,787,832.54 / 1,923,180.10 / 1,948,415.82, equal to the invoices' TaxAmount), debits only from CreditMemo; no payment and no journal entry ever posts to 2050. Evidence outside the database: the sales tax returns filed, the tax authority's account, the bank statements, and a bank reconciliation. Findings: 1020 opening receivables with no invoice, 380,000.00, follow up; 2010 opening payables with no invoice, 2,096,371.12, follow up; 2010 note invoices still open in the subledger, 640,000.00, expected, close them against the notes; 2050 no remittance recorded, 5,620,840.66, follow up; 2110 current portion classified as long-term, 147,503.76, misstatement; 1010 and 2010 supplier payments after Data Through, 271,327.17, expected. The Part III case's unrecorded payroll accrual at 2026-12-31 (383,044.82) belongs in the same list. Tests: both differences equal their findings to the cent, the bridge equals the change in cash in 2025 and 2026, 526 rows fall after Data Through, and every measure is blank in 2027.
+> **Instructor notes, Requirement 5:** balances at 2026-12-31 by source: 1020 SalesInvoice 92,727,541.64, CashReceiptApplication -87,896,623.29, CreditMemo -412,114.03, JournalEntry 380,000.00 (4,798,804.32); 1045 GoodsReceipt 38,891,819.55, MaterialIssue -30,727,191.33, JournalEntry 3,587,025.70 (11,751,653.92); 1040 JournalEntry 4,111,795.76, GoodsReceipt 13,295,060.67, ProductionCompletion 40,099,313.03, SalesReturn 325,840.19, Shipment -45,662,307.91 (12,169,701.74); 2010 PurchaseInvoice -56,461,312.87, DisbursementPayment +51,680,217.33, JournalEntry -1,456,371.12 (-2,096,371.12 opening + 360,000 + 280,000 moved to notes), -6,237,466.66; 2020 GoodsReceipt -53,336,880.22, PurchaseInvoice +52,315,888.16 (-1,020,992.06, Chapter 12); 2050 SalesInvoice -5,659,428.46, CreditMemo +38,587.80. The matrix only decomposes the ledger, and the tests are the reconciliations below and the Validation page's tie of the materials flows to 1045. Open items: receivables 1,079 invoices, 4,418,804.32 (positive balances; 225 negative balances, -220,131.88, are credit memos on paid invoices, credited to 2060 and refunded, except 3 (3,413.46) not yet refunded at the year-end); difference 380,000.00, the opening line of JE-2024-000001. The same rebuild at 2024-12-31 and 2025-12-31 differs by 379,208.65 and 375,089.49, the cutoff invoices below. Payables: 3,462 invoices received and unpaid at 2026-12-31, 4,781,095.54; difference 1,456,371.12 = opening payables 2,096,371.12 less the 640,000.00 of PI 3160 and PI 21692, which the ledger moved to notes payable but the subledger still shows open (past due since 2024-07-30 and 2026-01-26). Aging: past due 2,089,989.68 with them, 1,449,989.68 of 4,141,095.54 (35.0%) without them. Reconcile payables on ReceivedDate, as the ledger posts them; on InvoiceDate, 2025-12-31 differs by ASV0050-2025-040073 (3,266.27). Billing by invoice date less the ledger: +791.35 (2024; SI-2025-006733 to 006735, dated November-December 2024, posted 2025-01-01), +4,119.16 (2025), -4,910.51 (2026; SI-2026-013741 to 013743, posted 2026-01-01); only SI-2026-013742 shipped in 2025 (Chapter 6's cutoff error), and the other dates are wrong, not the ledger. Sales tax: credits only from SalesInvoice (1,787,832.54 / 1,923,180.10 / 1,948,415.82, equal to the invoices' TaxAmount), debits only from CreditMemo; no payment and no journal entry ever posts to 2050. Evidence outside the database: the sales tax returns filed, the tax authority's account, the bank statements, and a bank reconciliation. Findings: 1020 opening receivables with no invoice, 380,000.00, follow up; 2010 opening payables with no invoice, 2,096,371.12, follow up; 2010 note invoices still open in the subledger, 640,000.00, expected, close them against the notes; 1045 opening materials with no item detail, 3,587,025.70, follow up; 1040 opening finished goods with no item detail, 4,111,795.76, follow up (the prior system's stock and costing schedules, and a count); 2050 no remittance recorded, 5,620,840.66, follow up; 2110 current portion classified as long-term, 147,503.76, misstatement; 1010 and 2010 supplier payments after Data Through, 271,327.17, expected. The inventory rows reconcile no difference, so Test 4 leaves them out, and the findings are not added into one total. The opening entry's other current lines (1010 2,096,371.12, 1050 60,000.00, 2030 95,000.00, and 2040 85,000.00) lack support too but fall outside the accounts reconciled, and recording them earns credit. The Part III case's adjustments go in as proposals, as the model answer records its payroll accrual at 2026-12-31 (383,044.82), an estimate. Tests: both differences equal their findings to the cent, the bridge equals the change in cash in 2025 and 2026, 526 rows fall after Data Through, and each working-capital measure of Requirement 3 is blank in every 2027 quarter.
 
 ## What a strong answer says
 
-- **Roll-forward.** The journal-entry parts are the opening balances and the reclassifications; everything else comes from a subledger document.
+- **Breakdown.** The journal-entry parts are the opening balances and the reclassifications, and the matrix only decomposes the ledger, so the reconciliations carry the evidence.
+- **Opening balances.** All four recorded for follow-up, with the evidence to request.
 - **Reconciliations.** Each difference equals its recorded items to the cent, with a disposition in Chapter 8's terms.
 - **Cutoff.** The billing differences are invoices posted a year later; only one shipped in the earlier year.
-- **Sales tax.** Posted, never remitted in the records, with the outside evidence named; the wording is "no remittance is recorded", not "unpaid" or "withheld".
+- **Sales tax.** Posted when billed, with no remittance recorded, with the outside evidence named; the wording is "no remittance is recorded", not "unpaid" or "withheld".
 
 A strong submission ties the findings to Tests 4 and 5. A weak one lists the differences without recording them.
 
@@ -152,7 +155,7 @@ A strong submission ties the findings to Tests 4 and 5. A weak one lists the dif
 
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
-| Roll-forward | 15 | Six accounts by source; unsupported parts named | Balances without the reading |
+| Breakdown by source | 15 | Six accounts by source; journal-entry parts traced; read as a decomposition | Balances without the reading |
 | Reconciliations | 30 | Both differences explained to the cent | One reconciled |
 | Cutoff and aging | 20 | Billing differences explained; aging without notes | Differences without the cause |
 | Sales tax | 15 | Posts and non-posts; outside evidence | Balance only |

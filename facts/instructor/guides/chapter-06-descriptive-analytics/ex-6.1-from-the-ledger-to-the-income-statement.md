@@ -36,7 +36,7 @@ By the end, students can:
 - turn it into a common-size income statement with SUMIFS by AccountSubType, and tie net income to the closing entry and the balance sheet to equity (outcomes 6 and 2);
 - reconcile the ledger's product revenue to InvoiceLines, identify the invoices behind the differences and say which date should decide their period (outcome 5).
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions); IMA Reporting and Control: Financial Recordkeeping and Financial Statement Preparation; IFAC IES 2 (a) and IES 2 (i); AACSB A5 part 5.1.
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions); IMA Reporting and Control: Financial Statement Preparation; IFAC IES 2 (a) and IES 2 (i); AACSB A5 part 5.1.
 
 ## Before you assign
 

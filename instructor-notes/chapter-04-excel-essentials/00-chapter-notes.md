@@ -13,7 +13,7 @@
 |---|---|
 | Part | Part II, Accounting Analytics with Excel: the first Excel chapter. It builds the workbook the rest of Part II extends |
 | Analytics types | None is named. The controller's question is diagnostic, but the work here is descriptive (control totals, summaries, counts) and sets the question up for Chapter 5 |
-| Tools | Excel for Windows or Microsoft 365 for Mac, with Power Query. No SQL or Power BI |
+| Tools | A supported desktop Excel with Power Query, Microsoft 365 recommended (on a Mac only Excel for Microsoft 365 has the Power Query Editor). No SQL or Power BI |
 | Components | 3 guided tutorials, 6 exercises (2 for each perspective), 15 multiple-choice questions and a deck of 63 slides |
 | Files students need | CharlesRiver.xlsx, never edited. Tutorial 4.1 creates Charles River Furniture Analysis.xlsx. Chapter04-companion.zip holds the workbook at the start of Tutorials 4.2 and 4.3 and at the end of the chapter, and Chapter04-exercises.zip holds the model answers. The companion files read `C:\CharlesRiver\CharlesRiver.xlsx` |
 | Time | Class: about 180 minutes. Students: about two hours of reading, 50 to 60 minutes for Tutorial 4.1, 35 to 40 for Tutorial 4.2, 45 for Tutorial 4.3, and 60 to 90 minutes for each exercise (assign two or three) |
@@ -39,7 +39,7 @@ The chapter depends on these conditions of the data:
 
 **Before the first class**
 
-- Students need desktop Excel with Power Query. On a Mac the Power Query Editor requires Excel for Microsoft 365, and the commands sit in different places. Excel for the web will not do: the workbook is too large. XLOOKUP is used in Exercises 4.2, 4.4 and 4.6 and in every model answer, so check versions.
+- Students need desktop Excel with Power Query. On a Mac the Power Query Editor requires Excel for Microsoft 365, and the commands sit in different places. Excel for the web will not do, because it limits the size of the workbooks it opens and the features it offers. XLOOKUP is used in Exercises 4.2, 4.4 and 4.6 and in every model answer, so check versions.
 - CharlesRiver.xlsx must be the downloaded master, unchanged. Chapter 4 reads it through Power Query, so students do not open it. Tutorial 4.1 saves the new workbook beside it. The start files read `C:\CharlesRiver\CharlesRiver.xlsx`; a student who uses one must choose **Data > Get Data > Data Source Settings**, **Change Source**, and then **Data > Refresh All**.
 - Do Tutorial 4.1 yourself and time the import and the first refresh. Decide whether late students take the start files: Tutorials 4.2 and 4.3 each begin from the previous tutorial's workbook.
 - Get the PowerPoint deck from the Downloads page. Its modules follow the chapter's sections, and the three tutorial modules show each step list with the figures.
@@ -266,13 +266,12 @@ Key: 1 C, 2 A, 3 B, 4 D, 5 C, 6 B, 7 A, 8 D, 9 B, 10 A, 11 C, 12 D, 13 A, 14 B, 
 - **Question 11.** The option that the first rule always wins (A) is the reverse of Excel's behavior: a new rule goes to the top of the list.
 - **Question 12.** The option that validation checks only pasted values (C) reverses the limit. Typed values are checked, pasted ones are not.
 - **Question 14.** The option that accounting standards require a documentation worksheet (D) overstates: the PCAOB standard is about audit documentation.
-- **Questions 1, 6, 8, 9, 12, 13, and 15.** The correct option is also the longest. If you grade with these, ask students to explain their answer or reword the options.
 
 Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 3, 4, 5 and 10 make a good quiz of the referencing ideas, questions 2, 8, 9 and 12 of filters and validation, and 1, 6, 7 and 13 to 15 of the structure and Power Query ideas.
 
 ## Connections
 
-**Builds on.** Chapter 1 introduced the controller's question and the dataset. Chapter 2 treated tests such as blank values and stale statuses as data quality tests, and Tutorial 2.1's filters become Exercise 4.5's exception report. Chapter 3 gave the Table names (a number and the database table) and the keys the exercises' lookups use. The Part I case ends with the data readiness memo that opens this chapter.
+**Builds on.** Chapter 1 introduced the controller's question and the dataset. Chapter 2 treated tests such as blank values and stale statuses as data quality tests, and Tutorial 2.1's filters become Exercise 4.5's exception report. Chapter 3 gave the Table names (a number and the database table) and the keys the exercises' lookups use. The Part I case ends with the data readiness memo that opens this chapter. Its margin is measured on the posted Furniture accounts, while Chapter 6 measures the margin on the invoice lines at standard cost, so ask students to keep the two apart.
 
 **Later chapters.** Chapter 5 combines the invoice lines with the invoices, items and customers into one table in this workbook. Chapter 6 measures the Furniture bridge that promotion 8 starts. Chapter 8 adds the gap tests that Tutorial 4.1 points to. The Part II case applies the same techniques in a new workbook, and Part IV carries slicers and Validation pages into Power BI.
 

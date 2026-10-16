@@ -25,7 +25,7 @@ By the end, students can:
 - identify a reporting task that needs the Order-to-Cash group and the Accounting Core together, and say why neither is enough alone;
 - present the mapping in a one-page memo for a named reader (workflow stage 6).
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and ISC M4 (use and management of data); IMA Data Literacy, and Financial Recordkeeping and Financial Statement Preparation; IFAC IES 2 (a), financial accounting and reporting, and IES 3 (a), evaluating data from several sources; AACSB A5 part 5.2, judging a technology and communicating its results.
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and ISC M4 (use and management of data); IMA Data Literacy, and Financial Recordkeeping; IFAC IES 2 (a), financial accounting and reporting, and IES 3 (a), evaluating data from several sources; AACSB A5 part 5.2, judging a technology and communicating its results.
 
 ## Before you assign
 

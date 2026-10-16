@@ -6,7 +6,7 @@
 
 A.  The Table prevents other users from changing any of the values it contains.
 B.  The Table automatically creates a PivotTable summary of every numeric column.
-C.  Formulas can refer to the data by Table and column name, and they include rows added to the Table later.
+C.  Formulas can refer to its columns by name and include rows added later.
 D.  The Table checks each value against the source database and flags values that differ.
 
 **2.** An analyst filters the SalesInvoiceLine Table to show only the lines of one promotion and then enters `=SUM(SalesInvoiceLine[LineTotal])` on another worksheet. The result equals the total of all invoice lines, not just the lines in view. What should the analyst use instead?
@@ -46,7 +46,7 @@ D.  $A17 and B$16
 **6.** An analysis workbook imports the SalesInvoiceLine Table from CharlesRiver.xlsx with Power Query, after filtering and removing columns in the Power Query Editor. When a colleague later chooses Data > Refresh All, what happens?
 
 A.  Power Query writes the filtered data back to CharlesRiver.xlsx so that the two workbooks match.
-B.  Power Query reads CharlesRiver.xlsx again and repeats every applied step, leaving the source file unchanged.
+B.  Power Query rereads the source and repeats every applied step, leaving the source unchanged.
 C.  Power Query reloads the data without the filters, which must then be applied again by hand.
 D.  Power Query deletes the Table from the analysis workbook and asks the colleague to choose the data again.
 
@@ -62,12 +62,12 @@ D.  Importing a worksheet changes the formatting of the source workbook.
 A.  Date filters work only on columns formatted as text.
 B.  The ShipmentDate column contains no dates in the fourth quarter.
 C.  Filters cannot be combined with the banded formatting of an Excel Table.
-D.  This Quarter is measured from today's date, not from the dates in the data.
+D.  This Quarter counts from today's date, not from the data's dates.
 
 **9.** A slicer on the PromotionID column is connected to the SalesInvoiceLine Table. An analyst clicks the button for promotion 8. What happens?
 
 A.  The rows for every other promotion are deleted from the Table until the workbook is refreshed.
-B.  The Table is filtered to the rows for promotion 8, and the other rows are hidden but not deleted.
+B.  The Table shows only promotion 8's rows, and the others are hidden, not deleted.
 C.  A new worksheet is created that holds a copy of the rows for promotion 8.
 D.  The rows for promotion 8 are highlighted, and every row remains visible.
 
@@ -90,11 +90,11 @@ D.  No fill, because the two rules conflict and cancel each other
 A.  Data validation does not apply to decimal values.
 B.  The rule was entered with the minimum and maximum reversed.
 C.  Data validation checks only values pasted into the cell, not values typed.
-D.  The rule's Error Alert style was set to Warning, which lets the user accept an invalid entry.
+D.  The alert style was Warning, which lets a user keep an invalid entry.
 
 **13.** An analyst types a summary formula in the empty column immediately to the right of an Excel Table. What is the most likely result, and what is the better practice?
 
-A.  The Table expands to include the column, and the formula may be copied to every row; summaries belong on a separate worksheet.
+A.  The Table absorbs the column and may fill the formula down; summaries belong on a separate worksheet.
 B.  Excel refuses the entry, because cells next to a Table are locked; summaries must be entered in a new workbook.
 C.  The formula is ignored until the Table is refreshed; summaries should be entered only after a refresh.
 D.  The formula is converted into a PivotTable; summaries are best created as PivotTables in any case.
@@ -116,5 +116,5 @@ What is the main advantage of this approach?
 
 A.  PERCENTILE.INC guarantees that every line above the threshold is an error to investigate.
 B.  A named cell cannot be changed, so the threshold is protected without any data validation.
-C.  The threshold comes from the data, is stated in one named place, and updates with the data.
+C.  The threshold comes from the data, sits in one named cell, and updates with it.
 D.  The formula keeps the threshold identical from one year to the next, whatever the data.

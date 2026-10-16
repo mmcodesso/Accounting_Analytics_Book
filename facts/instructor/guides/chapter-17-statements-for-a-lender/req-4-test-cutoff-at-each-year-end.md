@@ -31,7 +31,7 @@ Students can:
 - measure the payroll owed at each year-end by one working-day method, split between manufacturing and the rest (Part 2);
 - accrue the interest each note owes, stating the day count (Part 3).
 
-**Competencies practiced.** CPA Evolution Core S2 M9 (audit procedures, analytical procedures, and audit data analytics); IMA Reporting and Control (financial recordkeeping; financial statement preparation); IFAC IES 2 (a) and 2 (f); AACSB A5 part 5.1 (technology integration: SQL).
+**Competencies practiced.** CPA Evolution Core S2 M9 (audit procedures, analytical procedures, and audit data analytics); IMA Reporting and Control (financial recordkeeping); IFAC IES 2 (a) and 2 (f); AACSB A5 part 5.1 (technology integration: SQL).
 
 ## Before you assign
 
@@ -75,7 +75,7 @@ Posted AS (
 
 ```sql
 -- Requirement 4: test L6, shipment lines never invoiced, at order price less discount (UnbilledLines)
--- Population: every shipment line; expected: 9 December 2026 lines, 44,481.11 at order price, standard cost 22,895.78
+-- Population: every shipment line; expected: 9 lines shipped in December 2026, 44,481.11 at order price, standard cost 22,895.78
 SELECT sl.ShipmentLineID, s.ShipmentNumber, s.ShipmentDate,
     s.DeliveryDate, i.ItemCode, i.ItemGroup, c.CustomerSegment,
     sl.QuantityShipped, sol.UnitPrice, sol.Discount,

@@ -3,13 +3,16 @@
      find the same {{ n_dupes }} pairs and no others: the numbers are entered consistently. (2) {{ n_checks }} check numbers are used twice, both for
      supplier {{ check_supplier }}: {{ checks|join(' and ') }} (the AnomalyLog lists {{ n_logged }} duplicate references, but only {{ n_with_check }} have check numbers). (3) {{ pairs|count }}
      pairs share supplier and amount on different dates; {{ within30 }} are within 30 days (the chapter's example, with 14 days, finds {{ within14 }}), and
-     none pays the same recorded invoice, which rules out paying one invoice twice but not a duplicate bill entered under
-     another number: the pairs within 30 days need their invoices, orders, and receipts reviewed before they are treated as
+     none pays the same recorded invoice, which within the test's scope (same supplier and amount, different dates) does not
+     exclude a duplicate bill under another number, on the same date, or at another amount, so the pairs within 30 days need their invoices, orders, and receipts reviewed before they are treated as
      distinct purchases. Grouping finds identical values; comparing
      each payment with other payments across a range of dates needs the table joined to itself.
      (4) No gaps in any series. Sales invoices and cash receipts continue across years (SI {% for lo, hi in series[0] %}{{ lo|count }}-{{ hi|count }} in {{ d.years[loop.index0] }}{{ ', ' if not loop.last }}{% endfor %}; CR {% for lo, hi in series[1] %}{{ lo|count }}-{{ hi|count }}{{ ', ' if not loop.last }}{% endfor %}), as do purchase orders ({% for lo, hi in series[2] %}{{ lo|count }}-{{ hi|count }}{{ ', ' if not loop.last }}{% endfor %}); journal entries restart each year ({% for lo, hi in series[3] %}{{ lo|count }}-{{ hi|count }}{{ ', ' if not loop.last }}{% endfor %}). A LAG partitioned by year on a continuing series would miss a
      gap between the last number of one year and the first of the next. (5) MAD: all payments {{ mad_all|num(5) }}, full payments {{ mad_full|num(5) }}, partial payments
-     {{ mad_partial|num(5) }}, exactly the values of Tutorial 8.1. printf('%.15e') writes 688.42 as 6.884200000000000e+02 and {{ smallest|money }} as {{ smallest_e }}, so the first
+     {{ mad_partial|num(5) }}, exactly the values of Tutorial 8.1. All nine digits occur in
+     each group, so the average is over nine (a quarter missing a digit needs the nine listed and joined). The partial payments'
+     nonconformity plausibly reflects a selection by size (only invoices of {{ partial_floor|count }} or more are paid in parts), and
+     conformity would not prove the payments genuine. printf('%.15e') writes 688.42 as 6.884200000000000e+02 and {{ smallest|money }} as {{ smallest_e }}, so the first
      character is the first significant digit for every positive amount (the smallest payment is {{ smallest|money }}); with
      printf's default of six decimals, an amount just below a power of ten would round up (999,999.99 to 1.000000e+06),
      although no payment here changes its digit. LOG10 needs SQLite's math functions, which the Windows release of DB

@@ -99,7 +99,7 @@ the left edge, top edge, width and height as fractions of the figure, and the ca
 "Figure 3.7 · Caption (detail)":
 
 ```markdown
-{{< book-figure fig-03-07 crop="0,0,1,0.572" >}}
+{{< book-figure fig-03-07 crop="0,0,1,0.559" >}}
 ```
 
 The fractions are of the figure's drawing (its SVG viewBox), and the PowerPoint PNG is cut through the same

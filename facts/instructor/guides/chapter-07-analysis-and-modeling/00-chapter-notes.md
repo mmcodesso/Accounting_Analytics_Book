@@ -59,7 +59,7 @@ The chapter depends on these conditions of the data:
 ## Preparing to teach
 **Before the first class**
 
-- Students need desktop Excel with Power Query (on a Mac, Excel for Microsoft 365). The tutorials use FILTER, UNIQUE, SORT and spill ranges (Microsoft 365 or Excel 2021 or later); the model answers also use LET, XLOOKUP, HSTACK and VSTACK (Microsoft 365 or Excel 2024).
+- Students need a supported desktop Excel with Power Query, Microsoft 365 recommended, as the Preface's What You Need says. On a Mac the Power Query Editor needs Excel for Microsoft 365. FILTER, UNIQUE, SORT and spill ranges are in Excel for Microsoft 365, Excel 2024 and Excel 2021, whose support ended in October 2026. The model answers also use LET, XLOOKUP, HSTACK and VSTACK, so open them in Microsoft 365 or Excel 2024.
 - Students load the Analysis ToolPak before Tutorial 7.1 and the Solver add-in before Exercise 7.4. Check on one machine that **Data > Data Analysis** and **Data > Solver** appear.
 - A late student takes the start file from Chapter07-companion.zip, points its queries at their copy of CharlesRiver.xlsx (**Data > Get Data > Data Source Settings**, **Change Source**) and chooses **Data > Refresh All**.
 - Do the three tutorials yourself. Tutorial 7.2 is the longest: several merges, one on three columns, and a FlexLines Table of several thousand rows. Time its refreshes.
@@ -159,7 +159,7 @@ Plan A is the safest. Plan B gives students ownership of the models and needs a 
 | 5 | The two variances | Sales-volume -${{ (t2.fb.total.svv|abs)|money }}; flexible-budget -${{ (t2.fb.total.fbv|abs)|money }}; budgeted units {{ t2.fb.total.unit_ratio|num(1) }} times actual |
 | 6 | Price gap before discounts, as a share of flexible revenue | {{ (t2.fb.groups|map(attribute='gap_pct')|max|abs)|pct(1) }} to {{ (t2.fb.groups|map(attribute='gap_pct')|min|abs)|pct(1) }} in the four lines; discounts ${{ t2.fb.total.discounts|money }}, almost all Furniture |
 | 7 | Furniture price after promotions, September and October, against the planned price | {{ t2.prices.sep.after|pct(1) }} and {{ t2.prices.oct.after|pct(1) }} against {{ t2.prices.sep.planned|pct(1) }}; still {{ t2.prices.dec.after|pct(1) }} in December against {{ t2.prices.dec.before|pct(1) }} before promotions |
-| 9, 10 | The two expense exceptions | Burden rate {{ t2.opex.burden_a|pct(1) }} against {{ t2.opex.burden_b|pct(1) }} budgeted; flexed commission ${{ t2.opex.flexed|money }} against ${{ t2.opex.commissions|money }} paid |
+| 9, 10 | The two expense exceptions | Burden rate {{ t2.opex.burden_a|pct(1) }} against {{ t2.opex.burden_b|pct(1) }} budgeted; flexed commission ${{ t2.opex.flexed|money }} against ${{ t2.opex.commissions|money }} of commission expense |
 
 **Stumbles to expect**
 
@@ -168,7 +168,7 @@ Plan A is the safest. Plan B gives students ownership of the models and needs a 
 - Step 8: **Load** chosen for the ledger Table, which has hundreds of thousands of rows.
 - Step 9: a typed value in the spill range, which returns #SPILL!.
 
-**The checkpoint to look for.** The five bullets. A strong student says the static budget cannot judge the year, and that only the flexible-budget variance is a pricing question.
+**The checkpoint to look for.** The five bullets. A strong student says the static budget shows the gap from the plan but is a poor measure of the year's performance, and that only the flexible-budget variance is a pricing question.
 
 ### Guided Tutorial 7.3: Should Charles River Repeat the Furniture Promotion?
 
@@ -210,7 +210,7 @@ Plan A is the safest. Plan B gives students ownership of the models and needs a 
 
 **Flex what varies.** Question 8's option B scales every line by one percentage, and question 10's option D calls commissions fixed. Tutorial 7.2 flexes the commission and leaves rent at its budget.
 
-**Two variances, two questions.** The sales-volume variance (question 9) belongs to whoever built the volume forecast, the flexible-budget variance to pricing and production. For the product lines it is entirely a price variance, because the budget and the actuals value units at standard cost.
+**Two variances, two questions.** The first question about the sales-volume variance (question 9) goes to whoever built the volume forecast, and about the flexible-budget variance to pricing and production, as the chapter's table of the two variances says. For the product lines it is entirely a price variance, because the budget and the actuals value units at standard cost.
 
 **Break-even needs the right fixed costs.** Exercise 7.3 leaves out interest, which the income statement of Chapter 6 shows below operating income, and adds freight-out and two variances that standard costs omit. Question 11 tests the formula; the exercise tests the judgment.
 
@@ -221,7 +221,7 @@ Plan A is the safest. Plan B gives students ownership of the models and needs a 
 ## Discussion prompts
 1. **The sales team wants a higher revenue forecast. What do you give the controller?** A good discussion reaches the backtest as the objective reference, the range as a record of past errors, and a statement of the method and the months fitted.
 2. **The trend is significant with the first month and not without it. Which result do you report?** Both, with the reason for any exclusion; the first month is a start-up month, not noise.
-3. **The budget planned {{ t2.fb.total.unit_ratio|num(1) }} times the units sold. What is the variance report worth?** The sales-volume variance describes the forecast; the flexible-budget variance is the one to act on.
+3. **The budget planned {{ t2.fb.total.unit_ratio|num(1) }} times the units sold. What is the variance report worth?** The sales-volume variance points to how the volume was planned, which is worth investigating, and the flexible-budget variance is the one pricing can act on.
 4. **The Furniture promotion needs a lift of {{ t3.lift|pct(0) }}. How would you find out whether it would come?** It reaches the orders as description and not cause, a test or a smaller promotion, and the lower bar of a smaller discount.
 5. **Solver says only Assembly binds. What do you do on Monday?** It reaches the shadow price as the most you would pay for an extra hour, and the range over which it holds.
 6. **A forecast runs {{ ch07_ex6.years[2].ratio|num(1) }} times the orders. Is it an estimate or a bias?** The same direction in every group and year, a systematic cause, and what a reserve or a plan built on it would do.

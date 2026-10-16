@@ -21,7 +21,7 @@ Students can:
 - tie the quarters to the Validation page and explain a one-cent difference (Requirement 3);
 - find the quarter that holds the discounts and name the promotions behind it (Requirement 4).
 
-**Competencies practiced.** Appendix D maps this exercise to CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and M8 T2 (extracting, transforming and cleansing financial data); to the IMA competencies for financial recordkeeping, financial statement preparation and data tools and techniques; to IFAC IES 2 (a) and (i); and to AACSB A5 parts 5.1 and 5.3.
+**Competencies practiced.** Appendix D maps this exercise to CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions) and M8 T2 (extracting, transforming and cleansing financial data); to the IMA competency data tools and techniques; to IFAC IES 2 (a) and (i); and to AACSB A5 part 5.1, with part 5.3 when the instructor adds an independent-learning task.
 
 ## Before you assign
 
@@ -92,14 +92,14 @@ ORDER BY SalesInvoice[FiscalYear], SalesInvoice[Period]
 a. Add the four quarters' lines, revenue, list amount and discounts.
 b. Open the report's **Validation** page (Reading view is enough) and read its fiscal 2026 row.
 
-**Check:** lines, revenue and list amount agree exactly. The discounts differ by $0.01: the rounded quarters add to $362,110.74, and the page shows $362,110.75. The cause is rounding, not an error, because the discount of each line is unrounded and each quarter was rounded on its own. The instructor check reads the year straight from the lines:
+**Check:** lines, revenue and list amount agree exactly. The discounts differ by $0.01: the rounded quarters add to $362,110.74, and the page shows $362,110.75. The cause is rounding, not an error, because the discount of each line is unrounded and each quarter was rounded on its own. Unrounded, the four quarters add to the year exactly. Rounding every line to the cent first would give $362,110.79, a different calculation from the book's unrounded DiscountAmount, so neither the query nor the data is changed. The instructor check reads the year straight from the lines:
 
 ```dax
 EVALUATE
 ROW ( "Discounts, current fiscal year", ROUND ( CALCULATE ( SUM ( SalesInvoiceLine[DiscountAmount] ), SalesInvoice[FiscalYear] = 2026 ), 2 ) )
 ```
 
-**Watch for:** a student who adjusts a quarter to force agreement, or reports the cent as unexplained.
+**Watch for:** a student who adjusts a quarter to force agreement, rounds the lines to make the cent disappear, or reports the cent as unexplained.
 
 ### Requirement (4): The quarter that holds the discounts
 
@@ -109,7 +109,7 @@ ROW ( "Discounts, current fiscal year", ROUND ( CALCULATE ( SUM ( SalesInvoiceLi
 
 ### Requirement (5): Why a query remains evidence
 
-**Step 6. Write the explanation.** The model answer has four points: a query reads the model, not any visual, so a page edit cannot change it; a changed measure or relationship will change it, which is what the test detects; DAX query view in the browser discards its tabs on close, so the file is the record; and the comment line says which exercise and which question the query answers.
+**Step 6. Write the explanation.** The model answer has four points: a query reads the model, not any visual, so a page edit cannot change it; a changed measure or relationship will change it, which is what the test detects; DAX query view in the browser discards its tabs on close, so the file is the record; and the comment line says which exercise and which question the query answers. The query alone shows which test was specified, and the result and date written under it show that the model passed it on that day.
 
 ## Expected results
 
@@ -122,7 +122,7 @@ ROW ( "Discounts, current fiscal year", ROUND ( CALCULATE ( SUM ( SalesInvoiceLi
 | Quarters' discounts against the year | $362,110.74 against $362,110.75 | 4 |
 | Largest quarter | Quarter 4, 63.0% of the discounts | 5 |
 
-> **Instructor notes, Exercise C.1:** fiscal 2026 by quarter (lines, revenue, list amount, discounts): Q1 2,472, 7,546,851.67, 8,432,384.12, 15,118.02; Q2 2,377, 7,654,417.42, 8,579,566.07, 22,524.82; Q3 2,341, 7,267,963.31, 8,212,248.05, 96,353.72; Q4 2,332, 7,287,187.68, 8,364,939.21, 228,114.18. The quarters add up to the Validation row: 9,522 lines, 29,756,420.08, 33,589,137.45, 362,110.75 (the discounts may differ from the sum of the rounded quarters by a cent). (4) Q4 carries 63.0% of the year's discounts: Furniture Seasonal Promotion 200,056.61; Design Trade Customer Promotion 28,057.57. The Furniture Seasonal Promotion ran in September and October, but its orders were invoiced through December. (5) A query in Tests.dax does not change when a page is edited, and DAX query view in the browser discards its tabs on close.
+> **Instructor notes, Exercise C.1:** fiscal 2026 by quarter (lines, revenue, list amount, discounts): Q1 2,472, 7,546,851.67, 8,432,384.12, 15,118.02; Q2 2,377, 7,654,417.42, 8,579,566.07, 22,524.82; Q3 2,341, 7,267,963.31, 8,212,248.05, 96,353.72; Q4 2,332, 7,287,187.68, 8,364,939.21, 228,114.18. The quarters add up to the Validation row: 9,522 lines, 29,756,420.08, 33,589,137.45, 362,110.75 (the sum of the rounded quarters' discounts can differ from the year's by a cent, while the unrounded quarters add up to it exactly, so the cent is rounding). (4) Q4 carries 63.0% of the year's discounts: Furniture Seasonal Promotion 200,056.61; Design Trade Customer Promotion 28,057.57. The Furniture Seasonal Promotion ran in September and October, but its orders were invoiced through December. (5) A query in Tests.dax does not change when a page is edited, and DAX query view in the browser discards its tabs on close.
 
 ## What a strong answer says
 

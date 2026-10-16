@@ -2,7 +2,7 @@
      SubTotal {{ sub|map('money')|join(' / ') }} ({{ sub_total|money }}); FreightAmount {{ frt|map('money')|join(' / ') }};
      TaxAmount {{ tax|map('money')|join(' / ') }}; GrandTotal {{ gt|map('money')|join(' / ') }}.
      SubTotal + Freight + Tax = GrandTotal on every invoice. Limitations: credit memos are not netted ({{ cm_n|map('count')|join(' / ') }} credit memos,
-     SubTotal {{ cm_sub|map('money')|join(' / ') }}), sales tax is a liability collected for the government rather than revenue, and freight
+     SubTotal {{ cm_sub|map('money')|join(' / ') }}), sales tax billed to customers is owed to the tax authority, a liability rather than revenue, and freight
      billed is recorded in its own revenue account (4050). Grid formula, for example
      =SUMIFS(SalesInvoice[SubTotal],SalesInvoice[[InvoiceDate]:[InvoiceDate]],">="&DATE($A5,1,1),SalesInvoice[[InvoiceDate]:[InvoiceDate]],"<="&DATE($A5,12,31)),
      entered once and filled right and down: filling across shifts SubTotal to the adjacent FreightAmount, TaxAmount, and GrandTotal

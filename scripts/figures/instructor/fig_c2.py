@@ -622,7 +622,7 @@ def if_c2_2_b() -> Diagram:
             d.box(f"<b>{text}</b>", cx - 62, top_y - 24, 124, 18, fill=WHITE, stroke=WHITE, size=SMALL, rounded=False)
     gx0, gx1 = ends[1][0], ends[3][1]
     mid = plot.y_of(15e6)
-    d.box(f"<b>{red / lst:.1%} of the list amount</b> goes to the price lists and approved overrides; <b>{disc / lst:.1%}</b> goes to "
+    d.box(f"<b>{red / lst:.1%} of the list amount</b> goes to the price lists and overrides, and <b>{disc / lst:.1%}</b> goes to "
           f"promotions. The line rounding, {rounding:.2f} dollars in all, is the cent each LineTotal is rounded to.", gx0 - 10, mid - 30,
           gx1 - gx0 + 20, 66, fill=AMBER_TINT, stroke=AMBER, size=SMALL, rounded=False, align="left")
     ly = 26 + 420 + 12
@@ -879,7 +879,8 @@ def if_c2_5_a() -> Diagram:
     xl.sheet(d, 0, sy, letters, widths, [], None, show_letters=True)
     y = sy + 22
     y = _gap(d, 0, y, sum(widths), "Rows 1 and 2: the title of the sheet", 22)
-    rows = [dict(n="3", cells=[dict(text="(1) Four tests of every promotion line, counted by promotion", bold=True, span=9, clip=False)], h=22),
+    rows = [dict(n="3", cells=[dict(text="(1) Four tests by promotion: three on every promotion line, and completeness from all order lines",
+                                    bold=True, span=9, clip=False)], h=22),
             dict(n="4", cells=[_wrapped(h, w, bold=True, fill=BLUE_TINT, align="left" if i < 2 else "right") for i, (h, w) in
                                enumerate(zip(heads, widths[1:]))])]
     for k, r in enumerate(rows_in):
@@ -906,9 +907,9 @@ def if_c2_5_a() -> Diagram:
     names = ", ".join(str(r["id"]) for r in failing[:-1]) + f" and {failing[-1]['id']}"
     oos = next(r for r in rows_in if r["scope"])
     _note(d, f"Outlined in coral: the count outside the recorded dates for promotions {names}, which equals their line counts. Outlined in teal: the "
-             f"{_words(oos['scope'])} lines of promotion {oos['id']} outside their scope. Every other count is zero. The window of a promotion whose lines "
-             f"all fail the date test is the calendar months in which they were ordered. Columns B and C, the promotion's name and its kind of scope, "
-             f"are hidden.", bottom + 34)
+             f"{_words(oos['scope'])} lines of promotion {oos['id']} outside their scope. Every other count is zero. For a promotion whose lines all "
+             f"fail the date test, the window is the calendar months in which they were ordered, a provisional test, because its recorded dates hold "
+             f"no order line of its scope. Columns B and C, the promotion's name and its kind of scope, are hidden.", bottom + 34)
     return d
 
 

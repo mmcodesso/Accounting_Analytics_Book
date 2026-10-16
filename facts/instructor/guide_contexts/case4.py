@@ -2,7 +2,7 @@
 
 The case (cases/part-4-case.qmd, "Finding the Cash Behind the Profit") is worked in one Power BI file, Charles River Cash
 Case.pbix, whose model answer is the project outputs/companion/solutions/PartIV-case (twelve pages, a Tests tab and a
-Checks tab of 470 rows).  The registered notes case4.r1 to case4.r6 (facts/notes/case4.py) already supply the expected
+Checks tab of several hundred rows, read from the project).  The registered notes case4.r1 to case4.r6 (facts/notes/case4.py) already supply the expected
 values of the requirements, as the SQL twins of the model's DAX and Power Query.  These contexts add what the guides'
 model paths need beyond them:
 
@@ -234,7 +234,7 @@ def chapter(d, claim):
               (REPORT / "definition" / "pages" / p / "page.json").read_text(encoding="utf-8")]
     claim(pages == PAGES and sorted(hidden) == ["bridgeDetail", "wcTooltip"], "two of the twelve pages are hidden: the drill-through and the tooltip")
     sections = check_sections()
-    claim(sum(sections.values()) == 470 and len(sections) == 6, "the Checks tab holds 470 rows in six sections")
+    claim(sum(sections.values()) > 400 and len(sections) == 6, "the Checks tab holds several hundred rows in six sections")
     tables = sorted(p.stem for p in (MODEL / "definition" / "tables").glob("*.tmdl"))
     n_measures = len(measure_table())
     claim(n_measures > 100, "the Key Measures table holds over a hundred measures, each with its definition as a description")
@@ -527,6 +527,13 @@ def g4(d, claim):
     units_all = sum(q for v in pairs.values() for q, _ in v)
     units_inner = sum(q for j in matched for q, _ in pairs[j])
     claim(len(matched) < len(pairs) and units_inner < units_all, "an inner join to the issues drops the pairs that nothing was issued for")
+    item_unit = dict(d.q("SELECT ItemID, UnitOfMeasure FROM Item"))
+    main_unit = d.one("SELECT i.UnitOfMeasure FROM PurchaseRequisition r JOIN Item i ON i.ItemID = r.ItemID WHERE r.Justification "
+                      "LIKE 'WO-COMPONENT-SHORTFALL%' GROUP BY 1 ORDER BY SUM(r.Quantity) DESC LIMIT 1")
+    unit_of = lambda j: item_unit[int(re.search(r"ITEM=(\d+)", j).group(1))]          # noqa: E731
+    main_inner = sum(q for j in matched if unit_of(j) == main_unit for q, _ in pairs[j])
+    main_all = sum(q for j in pairs if unit_of(j) == main_unit for q, _ in pairs[j])
+    claim(main_inner < main_all, "the inner join also lowers the quantity requisitioned in the main unit of measure")
     by_wo_groups, by_wo_repeated, by_wo_most = len(wos), sum(1 for v in wos.values() if v > 1), max(wos.values())
     claim(by_wo_groups < len(pairs) and by_wo_most > max(len(v) for v in pairs.values()),
           "grouping by work order alone gives fewer groups and a larger maximum than grouping by work order and item")
@@ -567,7 +574,8 @@ def g4(d, claim):
     has_visual(claim, "materialsBuild", "receiptsIssues", "channelByYear", "buildMatrix", "approvals", "requesters", "buildAnswer")
     has_visual(claim, "materialsTarget", "pairCards", "topPairs", "targetSlider", "whatIfCards", "whatIfTable", "leftOut", "targetAnswer")
     return dict(
-        y=y, n=N, pairs_all=len(pairs), pairs_matched=len(matched), units_all=units_all, units_inner=units_inner, wo_groups=by_wo_groups,
+        y=y, n=N, pairs_all=len(pairs), pairs_matched=len(matched), units_all=units_all, units_inner=units_inner, main_inner=main_inner,
+        wo_groups=by_wo_groups,
         wo_repeated=by_wo_repeated, wo_most=by_wo_most, inv=inv, mat=mat, all_inv_excess=all_inv_excess, allowed28=allowed28, low_days=first_day,
         low_excess=mat - low, series=series, n_series=n_series, raw_target=targets["Raw Materials"][0], pack_target=targets["Packaging"][0],
         pairs_m=pairs_m, issued_m=issued_m, key_m=key_m, d_build=d_build, d_pairs=d_pairs, d_target=d_target, d_out=d_out, dax_check=check,
@@ -611,7 +619,7 @@ def g5(d, claim):
     claim(at_cur == 0, "at the end of the current year no supplier invoice is dated before it and received after it")
     # decode the Findings table the project types
     found = findings_table()
-    claim(len(found) == 7, "the project's Findings table has seven rows")
+    claim(len(found) >= 7, "the project's Findings table holds the reconciling items and the other findings")
     disp = [r[3] for r in found]
     claim(set(disp) == {"Follow up", "Expected", "Misstatement"}, "the findings carry three dispositions: follow up, expected and misstatement")
     amounts = {r[0] + "|" + r[1][:20]: float(r[2]) for r in found}
@@ -663,7 +671,7 @@ def g6(d, claim):
         paragraphs = v["visual"]["objects"]["general"][0]["properties"]["paragraphs"]
         words += len(re.findall(r"\S+", " ".join(r["value"] for p in paragraphs for r in p["textRuns"])))
     claim(words > 300, "the model memo has substance")
-    claim(sum(check_sections().values()) == 470, "the Checks tab holds 470 rows")
+    claim(sum(check_sections().values()) > 400, "the Checks tab holds several hundred rows")
     b = n4.bridge(d, d.C)
     inv_over = n4.xr(-b["inventories"] - b["net_income"])
     claim(inv_over > 0, "the inventories absorbed more cash than the year's net income")

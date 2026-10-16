@@ -28,7 +28,7 @@ figures:
 
 ## Purpose and learning outcomes
 
-Exercise 4.6 found override requests that were never approved, and the promotion analyses of Chapters 4 to 6 used effective dates without testing them. This exercise tests three pricing controls against the transactions: a promotion's dates against the order dates of its lines, an override request's status against the price billed, and a price list's dates against the lines that cite it. It ends by asking, for every exception, whether the control was badly designed, badly operated or both. The analytics type is diagnostic.
+Exercise 4.6 found override requests still recorded as Pending, and the promotion analyses of Chapters 4 to 6 used effective dates without testing them. This exercise tests three pricing controls against the transactions: a promotion's dates against the order dates of its lines, an override request's status against the price billed, and a price list's dates against the lines that cite it. It ends by asking, for every exception, whether the control was badly designed, badly operated or both. The analytics type is diagnostic.
 
 By the end, students can:
 
@@ -123,17 +123,19 @@ b. In OrderLines merge PriceListLines (PriceListID) and PriceLists (the list's E
 
 **Step 8. Classify each exception.**
 
-| Exception | Design | Operation |
+| Exception | Design (provisional) | Operation (provisional) |
 |---|---|---|
-| Promotions with end dates on or before their start dates | Nothing validates the dates | The discount was granted on every line ordered in the spring |
-| Pending requests billed at their price | Nothing links a price to an approval | The requests were never decided |
-| Expired lists cited | No date check, one list ends before it starts | The segment lists were not renewed |
-| Active copies with no lines | Duplicate master data | None |
-| Customer lists cited wrongly | Nothing checks that the cited list set the price | None |
+| Promotions with end dates on or before their start dates | The records show no date check | The discount was granted on every line ordered in the spring |
+| Pending requests billed at their price | The records show no link from a price to an approval | The requests are Pending, with blank approval fields in the extract |
+| Expired lists cited | No date check in the records, and one list ends before it starts | No successor to the segment lists in the extract |
+| Active copies with no lines | Unused master data, whose purpose is the first question | None |
+| Customer lists cited wrongly | The records show no check that the cited list set the price | None |
+
+Promotion 1's end date equals its start date, as a one-day promotion would, so only the date policy can make that record invalid. Each classification waits for the system's configuration, the approval history and the pricing policy.
 
 ### Requirement (7): The memo
 
-**Step 9. Outline the memo.** To the sales manager and the controller: a paragraph for each family of exception with its count and amount; the classification marked provisional until the configuration and the pricing policy are seen; and recommendations (reject dates that are not in order, block pricing from expired lists, allow an override price only after approval and link the approval to the line, remove the unused copies, review setups each year).
+**Step 9. Outline the memo.** To the sales manager and the controller: a paragraph for each family of exception with its count and amount; the classification marked provisional until the configuration and the pricing policy are seen; and recommendations (reject reversed dates and define whether a one-day promotion is allowed, block pricing from expired lists, allow an override price only after approval and link the approval to the line, remove the unused copies, review setups each year).
 
 ## Expected results
 
@@ -150,8 +152,8 @@ b. In OrderLines merge PriceListLines (PriceListID) and PriceLists (the list's E
 
 ## What a strong answer says
 
-- **Requirement (2).** The counts and discount of the flagged promotions, every line ordered outside the dates, and the reading that the discounts were probably intended while no valid record authorizes them.
-- **Requirement (6).** Each exception placed in design, operation or both with the reason, marked provisional.
+- **Requirement (2).** The counts and discount of the flagged promotions, every line ordered outside the dates, and the reading that the discounts may have been intended while the recorded dates do not authorize them, so the approved campaign terms are the evidence to request.
+- **Requirement (6).** Each exception placed in design, operation or both with the reason and the evidence that would confirm it, marked provisional.
 - **Requirement (7).** Amounts on each finding, an order value described as value and not loss, and fixes placed in the system with a periodic review as the detective control.
 
 A weak answer reports the exceptions as losses, blames individuals, or recommends retraining where the system accepted an impossible date.

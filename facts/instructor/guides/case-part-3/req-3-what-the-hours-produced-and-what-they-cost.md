@@ -23,7 +23,7 @@ figures:
 
 ## Purpose and learning outcomes
 
-Requirement 2 asked whether the surge hours were worked; this one asks what they bought and what they cost, on three calendars that must not be mixed: hours by work date, output by completion date, cost by pay date. It also teaches the difference between a bridge, which sums to the ledger, and measures, which explain a line and may overlap. The analytics type is diagnostic.
+This requirement asks what the surge hours bought and what they cost, on three calendars that must not be mixed. It also teaches the difference between a bridge, which sums to the ledger, and measures, which explain a line and may overlap. The analytics type is diagnostic.
 
 Students can:
 
@@ -37,12 +37,12 @@ Students can:
 ## Before you assign
 
 - **Files.** Case.sql with SurgeDays and PlantEntries (Requirement 1). It builds on Chapter 10's measure of the plant (Tutorial 10.3), Chapter 11's frames and Tutorial 12.3's test H5. Tutorial 11.3's view MonthlyLaborEfficiency, from the chapter or from Setup_Part3_Views.sql with **Write Changes**; without it the December query fails with "{{ g.err }}".
-- **Data conditions.** Time records end on {{ cutoff }}; completions run to the year-end and fall on weekends; payroll posts on pay dates, so the first fiscal year charged {{ lf.paydates }} payrolls to 1090 and the last {{ lc.paydates }}. Closes must be excluded, and GLEntry.AccountID is not the account number.
+- **Data conditions.** Time records end on {{ cutoff }}; completions run to the year-end; the first fiscal year charged {{ lf.paydates }} payrolls to 1090 and the last {{ lc.paydates }}. GLEntry.AccountID is not the account number.
 - **Verify first.** The bridge returns {{ g.n.bridge }} row, and the unexplained column of the ledger query is zero in every year.
 
 ## How to run it
 
-Pairs, about 150 minutes: 30 for output against hours and the weekly view, 20 for capacity and cost, 40 for the ledger view and bridge, 35 for the three measures, 25 for the explanation. The routine: type the two comment lines and the query, select it, click **Execute all/selected SQL**, read the message pane. Hold back the frame until a pair has seen the weeks one at a time, and the measures until the bridge sums. **Collect** the script and the bridge.
+Pairs, about 150 minutes: 30 for output against hours and the weekly view, 20 for capacity and cost, 40 for the ledger view and bridge, 35 for the three measures, 25 for the explanation. Hold back the measures until the bridge sums. **Collect** the script and the bridge.
 
 ## Step-by-step solution
 
@@ -64,25 +64,31 @@ WITH Output AS (
 ),
 ```
 
-**Check:**{% for y in ys %} {{ y.year }}, {{ y.hours|num }} hours against {{ y.std|num }} standard, {{ y.ratio|num(3) }}{{ ";" if not loop.last else "." }}{% endfor %} Surge overtime rises from {{ ys[0].surge.overtime|num }} to {{ ys[-1].surge.overtime|num }} hours: output flat, surge overtime {{ grew }}. The December values of the view agree to two decimals. **Watch for:** without the cut-off the last year reads {{ g.no_cut[2]|num }} standard hours and {{ g.no_cut[3]|num(3) }}.
+**Check:**{% for y in ys %} {{ y.year }}, {{ y.hours|num }} hours against {{ y.std|num }} standard, {{ y.ratio|num(3) }}{{ ";" if not loop.last else "." }}{% endfor %} Surge overtime rises from {{ ys[0].surge.overtime|num }} to {{ ys[-1].surge.overtime|num }} hours: output flat, surge overtime {{ grew }}. The December values of the view agree to two decimals, but the view is no coverage test. Its indirect time ends on {{ g.ind_end }}, so its last row is provisional, and counted to that day on both sides the last year's direct ratio is somewhat lower and the indirect a little higher (Chapter 10). **Watch for:** without the cut-off the last year reads {{ g.no_cut[2]|num }} standard hours and {{ g.no_cut[3]|num(3) }}.
 
-**Step 2. Build the weekly view, group the weeks by surge days, and state the limits.** PlantWeeks holds each Monday week's clocked hours, surge days and standard hours, with the average output of the six weeks that follow in a window frame.
+**Step 2. Build the weekly view, group the weeks by surge days, and state the limits.** PlantWeeks holds each Monday week's clocked hours, surge days and standard hours completed up to {{ cutoff }}, with the average output of up to six following weeks in a window frame and the number of weeks the frame holds.
 
 ```sql
     AVG(COALESCE(o.StandardHours, 0)) OVER (
         ORDER BY h.WeekStart
         ROWS BETWEEN 1 FOLLOWING AND 6 FOLLOWING
-    ) AS NextSixWeeks
+    ) AS NextSixWeeks,
+    COUNT(*) OVER (
+        ORDER BY h.WeekStart
+        ROWS BETWEEN 1 FOLLOWING AND 6 FOLLOWING
+    ) AS FollowingWeeks
 ```
 
-**Check:** in the last year {{ other.n }} weeks without surge days average {{ other.hours|num }} hours and {{ other.std|num }} standard hours ({{ other.ratio|num(2) }}); the {{ surge.n }} weeks with surge days {{ surge.hours|num }} and {{ surge.std|num }} ({{ surge.ratio|num(2) }}). The six weeks after a surge week average {{ surge.next|num }} standard hours, against {{ other.next|num }}, which looks like work pulled forward rather than more work. The limits: completions lag the work (about {{ lead|num }} days from release to completion) and {{ g.limits[1]|count }} of {{ g.limits[2]|count }} completions fall on weekends, so a week's hours and completions are not the same work. **Watch for:** two wrong frames.
+**Check:** in the last year {{ other.n }} weeks without surge days average {{ other.hours|num }} hours and {{ other.std|num }} standard hours ({{ other.ratio|num(2) }}); the {{ surge.n }} weeks with surge days {{ surge.hours|num }} and {{ surge.std|num }} ({{ surge.ratio|num(2) }}). The following weeks average {{ surge.next|num }} standard hours after a surge week, against {{ other.next|num }}. The last {{ g.short }} frames of the year hold fewer than six weeks and the last week stops on the cut-off, and over six complete following weeks the figures are {{ surge.six|num }} after {{ surge.n_six }} surge weeks against {{ other.six|num }} after {{ other.n_six }}. That is consistent with output timing, including work brought forward, but cannot show which hours produced the output: work orders closed in the last year took about {{ lead|num }} days from release to completion, and {{ g.limits[1]|count }} of {{ g.limits[2]|count }} completions fall on weekends. **Watch for:** three wrong versions.
+
+- Without the cut-off in the view's Output CTE the last week takes in {{ tail.hours|num(1) }} standard hours completed after {{ cutoff }}, and surge weeks read {{ g.surge_no_cut[4]|num }}.
 
 - `ROWS UNBOUNDED PRECEDING` averages the earlier weeks, and every group reads about the same ({{ g.cum_next|min|num }} to {{ g.cum_next|max|num }}).
 - `CURRENT ROW AND 5 FOLLOWING` mixes the week's own output into its follow-on ({{ g.own_next|map('num')|join(', ') }} against {{ g.groups|map(attribute=5)|map('num')|join(', ') }}).
 
 ### Part 2: Capacity and cost
 
-**Step 3. Measure the capacity the ordinary days used.** Average the hours clocked on ordinary entries, and total the straight-time hours left unused on entries under eight regular hours.
+**Step 3. Measure the capacity the ordinary days used.** Sum each employee's entries by work date first, because a few employee-days carry two entries, then average the ordinary employee-days and total the straight-time hours left unused on days under eight regular hours.
 
 ```sql
     ROUND(SUM(CASE WHEN DayType = 'Ordinary' AND RegularHours < 8
@@ -90,9 +96,9 @@ WITH Output AS (
         AS UnusedStraightTime,
 ```
 
-**Check:** unused straight time falls from {{ g.capacity[0][2]|num }} to {{ g.capacity[-1][2]|num }} hours while surge overtime rises from {{ g.capacity[0][3]|num }} to {{ g.capacity[-1][3]|num }}; in the last year the unused hours are {{ (g.capacity[-1][2] / g.capacity[-1][3])|num(1) }} times the surge overtime, at {{ g.capacity[-1][1]|num(2) }} hours an ordinary entry.
+**Check:** unused straight time falls from {{ g.capacity[0][2]|num }} to {{ g.capacity[-1][2]|num }} hours while surge overtime rises from {{ g.capacity[0][3]|num }} to {{ g.capacity[-1][3]|num }}; in the last year the unused hours are {{ (g.capacity[-1][2] / g.capacity[-1][3])|num(1) }} times the surge overtime, at {{ g.capacity[-1][1]|num(2) }} hours an ordinary employee-day. That is a total, not a schedule, so only a dated plan by work center and skill could show the work could move.
 
-**Step 4. Cost the surge overtime two ways, with the employer's taxes and benefits.** The premium is half the base rate, if the hours were needed and could have been worked at straight time; the full cost is one and a half times, if they were not needed. The burden is the Manufacturing registers' taxes and benefits over gross pay, by pay year.
+**Step 4. Cost the surge overtime two ways, with the employer's taxes and benefits.** The premium is half the base rate, if the hours were needed; the full cost is one and a half times, if they were not. The burden comes from the Manufacturing registers, by pay year.
 
 ```sql
     ROUND(s.StraightTimeCost * 0.5, 2) AS Premium,
@@ -118,11 +124,11 @@ WITH Output AS (
 
 {{ figure('IF-C3-3-A') }}
 
-**Check:** 5080 grew {{ g.bridge[0]|money }}: payroll charged to 1090 +{{ g.bridge[1]|money }}, journal entries -{{ (g.bridge[2]|abs)|money }}, standard cost released +{{ g.bridge[3]|money }}, change in 1090 -{{ (g.bridge[4]|abs)|money }}, material variance -{{ (g.bridge[5]|abs)|money }}, direct postings -{{ (g.bridge[6]|abs)|money }}. The direct postings are the first year's {{ pay_month }} payroll ({{ pay_amount|money }}) and {{ je }} ({{ je_amount|money }}). **Watch for:** with the closes left in, 5080 nets to zero in every year, because each close credits it with the year's total; and `AccountID IN (1090, 5080)` returns {{ g.by_id }} rows, since no AccountID is that large.
+**Check:** 5080 grew {{ g.bridge[0]|money }}: payroll charged to 1090 +{{ g.bridge[1]|money }}, journal entries -{{ (g.bridge[2]|abs)|money }}, standard cost released +{{ g.bridge[3]|money }}, change in 1090 -{{ (g.bridge[4]|abs)|money }}, material variance -{{ (g.bridge[5]|abs)|money }}, direct postings -{{ (g.bridge[6]|abs)|money }}. The direct postings are the first year's {{ pay_month }} payroll ({{ pay_amount|money }}) and {{ je }} ({{ je_amount|money }}). **Watch for:** with the closes left in, 5080 nets to zero in every year; and `AccountID IN (1090, 5080)` returns {{ g.by_id }} rows, since no AccountID is that large.
 
 ### Part 4: The payroll line
 
-**Step 6. Explain the payroll line with three measures, and say why they overlap.** The calendar: the extra pay dates at the first year's average payroll. The hours beyond the work: the last year's hours less the first year's hours per standard hour times its output, priced at the last year's rate with burden. The growth of the surge premium, with burden.
+**Step 6. Explain the payroll line with three measures, and say why they overlap.** The calendar: the extra payrolls charged to 1090 at the first year's average, {{ added_dates }} an added pay date and the other the first year's payroll that posted to 5080. The hours beyond the work: the last year's hours less the first year's hours per standard hour times its output, priced at the last year's rate with burden. The growth of the surge premium, with burden.
 
 ```sql
         (lc.PayDates - lf.PayDates) * lf.Payroll / lf.PayDates
@@ -132,7 +138,7 @@ WITH Output AS (
             AS HoursBeyond,
 ```
 
-**Check:** payroll line +{{ bridge.payroll|money }}; calendar {{ calendar|money }} ({{ extra }} more pay dates); hours beyond {{ hours_beyond|num }}, {{ beyond_cost|num }} at {{ rate|num(2) }} with burden; premium growth {{ premium_growth|num }}. Together {{ together|num }}, {{ excess|num }} above the line. The bridge's lines are ledger amounts and sum exactly; the measures overlap and use different calendars: hours by work date to {{ last_day }}, payroll by pay date, and a calendar measure at the first year's average payroll, which includes its start-up month. **Watch for:** counting the last year's output to its year-end gives {{ g.m_cut[2]|num }} hours and an excess of only {{ g.m_cut[6]|num }}, which looks better and is worse; the calendar at the last year's average reads {{ g.m_cal[1]|money }}.
+**Check:** payroll line +{{ bridge.payroll|money }}; calendar {{ calendar|money }} ({{ extra }} more payrolls charged to 1090); hours beyond {{ hours_beyond|num }}, {{ beyond_cost|num }} at {{ rate|num(2) }} with burden; premium growth {{ premium_growth|num }}. Together {{ together|num }}, {{ excess|num }} above the line. The bridge's lines are ledger amounts and sum exactly. The measures are diagnostics, not a second bridge, because they overlap and use different calendars and populations (the note spells them out). **Watch for:** counting the last year's output to its year-end gives {{ g.m_cut[2]|num }} hours and an excess of only {{ g.m_cut[6]|num }}, which looks better and is worse; the calendar at the last year's average reads {{ g.m_cal[1]|money }}.
 
 ## Expected results
 
@@ -148,10 +154,9 @@ WITH Output AS (
 
 ## What a strong answer says
 
-- **Output and hours.** Output flat, hours up; surge weeks complete more but not in proportion, and the weeks after complete less. The weekly comparison only suggests, and the answer says so.
-- **Capacity and cost.** The ordinary days left more straight time unused than the surge overtime used, so the overtime was not needed for capacity; its cost is the premium if the work was needed and the full amount if it was not.
-- **The bridge.** Six ledger lines sum to the change; almost all of it is payroll charged to 1090.
-- **The measures.** Three explanations of the payroll line, on stated calendars, with the reason they overlap.
+- **Output and hours.** Output flat, hours up, and a weekly comparison read as a suggestion, with its tail stated.
+- **Capacity and cost.** Unused straight time above the surge overtime in total, to be confirmed by a dated check; two costs, not a sum.
+- **The bridge and the measures.** Six ledger lines that sum to the change, and three overlapping diagnostics of the payroll line on stated calendars.
 
 ## Common mistakes and how to respond
 
@@ -159,7 +164,6 @@ WITH Output AS (
 - **A frame that averages the past or the week itself.** *Symptom:* follow-on averages that look alike, or mix the week's output. *Response:* ask which weeks the frame includes.
 - **Closes left in, or AccountID read as the number.** *Symptom:* 5080 at zero, or an empty view. *Response:* ask what a close does and which column holds the number.
 - **The measures called a bridge.** *Symptom:* a forced fit to the payroll line. *Response:* ask which ones are ledger lines.
-- **A confident week-by-week conclusion.** *Symptom:* "surge weeks produce more". *Response:* ask what a completion date measures.
 
 ## Grading guide
 
@@ -173,7 +177,6 @@ WITH Output AS (
 
 ## Extensions and discussion questions
 
-- Rerun Step 5 for the middle year and say whether the bridge pattern holds.
 - Test the frame at two and at eight weeks and say how sensitive the conclusion is.
-- Discuss: if the overtime was needed, which of the two costs is the right one, and why does the capacity test say otherwise?
+- Discuss: if the overtime was needed, which of the two costs is the right one?
 - Discuss: could any single calendar serve all three measures?

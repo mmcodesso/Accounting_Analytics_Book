@@ -32,7 +32,7 @@ Students can:
 - measure the clearing lag and age the open accruals against the longest wait (Part 3);
 - decide which old accruals to treat as owed, stating the assumption and the evidence that would confirm it (Part 5).
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 and Core S2 M9 (audit procedures, analytical procedures, and audit data analytics); IMA Reporting and Control (financial recordkeeping; financial statement preparation); IFAC IES 2 (a); AACSB A5 part 5.1 (technology integration: SQL).
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 and Core S2 M9 (audit procedures, analytical procedures, and audit data analytics); IMA Reporting and Control (financial recordkeeping); IFAC IES 2 (a); AACSB A5 part 5.1 (technology integration: SQL).
 
 ## Before you assign
 
@@ -121,9 +121,9 @@ ORDER BY pa.AsOfDate
 
 ### Part 5: The decision
 
-**Step 5. Decide which old accruals are still owed.** Age shows that an accrual has gone unbilled, not that nothing is owed. The model answer reverses them at each year-end (A3) on the stated assumption that they will never be billed, and names the evidence that would confirm it: the suppliers' statements or confirmations, the service contracts, any later invoice or settlement, and the support for the original estimate.
+**Step 5. Decide which old accruals are still owed.** Age shows that an accrual has gone unbilled, not that nothing is owed, and the window only selects the items to investigate. The model answer reverses them at each year-end (A3) on two stated case assumptions: that they will never be billed, and that the facts available when each year's statements were prepared already supported the release at that year-end. It names the evidence that would confirm them: the suppliers' statements or confirmations, the service contracts, any later invoice or settlement, and the support for the original estimate.
 
-**Check:** {{ n_old }} old items at the last year-end, none ever invoiced, {{ cleanups|count }} of them partly cleaned up by adjustments ({{ cleanup_entries|join(', ') }}). Reversing at each year-end moves ${{ a3.re|money }} into opening retained earnings and ${{ a3.P|money }} and ${{ a3.C|money }} into the income of {{ d.P }} and {{ d.C }}. **Watch for:** reversing only at the last year-end, which puts ${{ g.only_last|money }} into that year's income. A retained-liability answer, which keeps them until the evidence is in hand, is equally acceptable if it states its assumption.
+**Check:** {{ n_old }} old items at the last year-end, none ever invoiced, {{ cleanups|count }} of them partly cleaned up by adjustments ({{ cleanup_entries|join(', ') }}). Reversing at each year-end moves ${{ a3.re|money }} into opening retained earnings and ${{ a3.P|money }} and ${{ a3.C|money }} into the income of {{ d.P }} and {{ d.C }}. **Watch for:** reversing only at the last year-end with no argument about when the facts became known, which puts ${{ g.only_last|money }} into that year's income. That period is right only where the evidence shows the facts emerged in that year, a change in estimate. A retained-liability answer, which keeps them until the evidence is in hand, is equally acceptable if it states its assumption.
 
 ## Expected results
 
@@ -141,7 +141,7 @@ ORDER BY pa.AsOfDate
 
 - **The rebuild.** Opening line, freight not yet settled and open accruals, reconciled to the ledger at each date, with clearing measured from the postings.
 - **The window.** The longest observed wait, and the item that a shorter rule would wrongly flag.
-- **The decision.** A stated assumption, the evidence that would settle it, and the effect of the other choice; the opening line left to the memo.
+- **The decision.** A stated assumption about what is owed and when the facts were known, the evidence that would settle it, and the effect of the other choice; the opening line left to the memo.
 
 A weak answer calls the old accruals "stale" and reverses them without evidence.
 
@@ -150,7 +150,7 @@ A weak answer calls the old accruals "stale" and reverses them without evidence.
 - **Invoice totals as clearing.** *Symptom:* open amounts short by ${{ g.netted[2]|abs|money }}. *Response:* ask what the ledger debited for an invoice larger than its accrual.
 - **An ID-only join.** *Symptom:* {{ g.ids_rows }} accrual rows. *Response:* ask what else carries the same document number.
 - **A round aging rule.** *Symptom:* ${{ g.t30[2][0]|money }} of old items. *Response:* ask what the longest observed wait was.
-- **One year-end only.** *Symptom:* ${{ g.only_last|money }} in one year's income. *Response:* ask what the same accruals were a year earlier.
+- **One year-end only.** *Symptom:* ${{ g.only_last|money }} in one year's income. *Response:* ask what the facts were a year earlier, and when they became known.
 
 ## Grading guide
 

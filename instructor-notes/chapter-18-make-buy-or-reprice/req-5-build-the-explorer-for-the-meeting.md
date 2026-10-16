@@ -108,7 +108,7 @@ ROW (
 )
 ```
 
-**Check:** a difference of zero and 439 lines. The Checks tab proves the values and each view's tie to the workbook; the layout, the slicer state and how (Blank) displays show only in Desktop.
+**Check:** a difference of zero and 439 lines. The Checks tab tests the values and each view's tie to the workbook. The layout, the slicer state and how (Blank) displays show only in Desktop.
 
 ![A mock of the Tests tab in DAX query view, the check students run before they present.](../figures/chapter-18-make-buy-or-reprice/IF-18-5-B.pdf)
 

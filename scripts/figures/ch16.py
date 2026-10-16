@@ -67,7 +67,7 @@ def employees() -> dict[int, tuple[str, str]]:
 def fig_16_01() -> Diagram:
     d = Diagram("The Monitoring Cycle")
     steps = [("Rule", "A test states its rule, population, frequency, and expected result", 150, 0),
-             ("Population", "Each period's documents, reconciled to the ledger before testing", 300, 140),
+             ("Population", "Each period's documents, reconciled to the ledger or tested for gaps", 300, 140),
              ("Exceptions", "The records that fail the rule, kept in the exception register", 150, 280),
              ("Disposition", "Internal audit reviews each exception: expected, follow up, or a deficiency",
               0, 140)]

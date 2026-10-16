@@ -40,7 +40,7 @@ The chapter depends on these conditions of the data:
 
 **Before the first class**
 
-- Students need desktop Excel with Power Query. On a Mac the Power Query Editor needs Excel for Microsoft 365. XLOOKUP needs Microsoft 365 or Excel 2021 or later; INDEX and MATCH is the fallback, and the chapter shows both. The model answers also use HSTACK, TAKE and CHOOSECOLS, so open them in Microsoft 365 or Excel 2024.
+- Students need a supported desktop Excel with Power Query, Microsoft 365 recommended, as the Preface's What You Need says. On a Mac the Power Query Editor needs Excel for Microsoft 365. XLOOKUP is in Excel for Microsoft 365, Excel 2024 and Excel 2021, whose support ended in October 2026. INDEX and MATCH is the fallback for older versions, and the chapter shows both. The model answers also use HSTACK, TAKE and CHOOSECOLS, so open them in Microsoft 365 or Excel 2024.
 - Each tutorial begins from the previous one's workbook. Late students take the start file for the tutorial they begin with, from Chapter05-companion.zip. The start files read `C:\CharlesRiver\CharlesRiver.xlsx`; a student who uses one chooses **Data > Get Data > Data Source Settings**, **Change Source**, and then **Data > Refresh All**.
 - Do the tutorials yourself and time them. Tutorial 5.2 adds six formula columns to a Table of 27,933 rows, so time the recalculation on your students' machines.
 - Get the PowerPoint deck from the Downloads page. Its modules follow the chapter's sections.
@@ -50,7 +50,7 @@ The chapter depends on these conditions of the data:
 - **The first empty cell.** A new column starts in the first empty cell right of the last header, or it does not join the Table. On the Item Table the new columns are L and M, on SalesInvoice M to R, and on SalesInvoiceLine the lookups of Tutorial 5.2 run from R to W. Step 5 of Tutorial 5.2 counts "No match" over those six adjacent columns, so a column inserted between them is counted too.
 - **Fill against paste.** Tutorial 5.2's Furniture formula uses `B$44`; copy and paste it, as Chapter 4 taught.
 - **Two queries, one load.** In Tutorial 5.3 Step 6 the choice of **Close & Load To**, **Table** and **New worksheet** applies to both new queries. A plain **Close & Load** sends them to the Data Model.
-- **The merge dialog.** The **Use original column name as prefix** box is cleared on every expansion, or later formulas cannot find the plain names. The match message is an estimate; the loaded row count is the test.
+- **The merge dialog.** The **Use original column name as prefix** box is cleared on every expansion, or later formulas cannot find the plain names. The match message is an estimate. The loaded row count shows whether a line was repeated, and only a left anti merge that returns no rows shows that every line found its match.
 - **Zero-based and one-based.** MID counts from one and Text.Middle from zero. The product type starts at 5 in Excel and 4 in M.
 
 ## Teaching approaches
@@ -145,7 +145,7 @@ Plan A is the safest. Plan B trades the vocabulary lecture for ownership of the 
 | 5 | Lookups not matched | B41 reads 0 |
 | 6 | Furniture revenue by quarter, 2026 | $4,354,122.83; $4,600,820.85; $4,283,322.86; $4,156,787.84; the last two agree with the Part I case |
 | 7 | Promotion 8 lines invoiced after October 31, 2026 | 160 in the status bar and in B47 |
-| 8 | Documentation | SalesOrder and the six columns listed |
+| 8 | Documentation | SalesOrder and the six columns listed, and the open question rewritten |
 
 **Stumbles to expect**
 
@@ -191,7 +191,7 @@ Plan A is the safest. Plan B trades the vocabulary lecture for ownership of the 
 
 ![Which way a lookup may follow a relationship, and what to use instead when the other table is on the many side.](../figures/chapter-05-data-preparation/IF-05-0-A.pdf)
 
-**A merge is safe only when the key is unique in the second table.** Merging SalesInvoice with Customer on CustomerID keeps the row count. Merging SalesInvoice with Shipment on SalesOrderID turns 20,914 invoices into 41,408 rows. Question 11 asks about it, and the row count after loading is the test. Ask: what does each row of the result represent now?
+**A merge repeats rows when the key repeats in the second table.** Merging SalesInvoice with Customer on CustomerID keeps the row count. Merging SalesInvoice with Shipment on SalesOrderID turns 20,914 invoices into 41,408 rows. Question 11 asks about it. The row count after loading tests the repetition, not the match, because a left outer merge keeps a row that finds nothing, so a left anti merge that returns no rows is the test of the match. Ask: what does each row of the result represent now?
 
 ![The row-count test for a merge, and what a repeated key in the second table does to it.](../figures/chapter-05-data-preparation/IF-05-0-B.pdf)
 
@@ -245,7 +245,7 @@ Key: 1 D, 2 B, 3 A, 4 C, 5 B, 6 D, 7 C, 8 A, 9 D, 10 C, 11 B, 12 A, 13 C, 14 A, 
 | 1 | D | MID returns 3 characters starting at position 5, the product type DSK. |
 | 2 | B | PROPER capitalizes the first letter of each word and lowers the rest, so LLC becomes Llc. |
 | 3 | A | with a fiscal year starting April 1, January to March is the fourth quarter. |
-| 4 | C | TODAY changes daily, so results cannot be reproduced; an as-of date is fixed. |
+| 4 | C | TODAY changes when the workbook recalculates on a later day, so the results cannot be reproduced, while an as-of date is fixed. |
 | 5 | B | the fourth argument is the value returned when the key is not found. |
 | 6 | D | the order date is two keys away: invoice first, then order. |
 | 7 | C | a lookup returns the first match; on the many side, MINIFS returns the earliest date. |
@@ -270,7 +270,6 @@ Key: 1 D, 2 B, 3 A, 4 C, 5 B, 6 D, 7 C, 8 A, 9 D, 10 C, 11 B, 12 A, 13 C, 14 A, 
 - **Question 11.** Option C, blank keys that match every row, sounds technical; the repeated key is what multiplies rows.
 - **Question 14.** Option B returns "Late" because the line carries a discount, and ignores the date test.
 - **Question 15.** Option A, rounding every quantity, changes the data to suit the analysis.
-- **Questions 2, 4, 5, 7, 9, 13, 14, and 15.** The correct option is also the longest. If you grade with these, ask students to explain their answer or reword the options.
 
 Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 1, 2, 3, 4 and 14 make a quiz of the functions, questions 5 to 7 of lookups, and questions 8 to 13 and 15 of blanks, merges and Power Query.
 
@@ -278,6 +277,6 @@ Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 1
 
 **Builds on.** Chapter 2 named missing values, duplicates and the quality dimensions that the checks apply, and Tutorial 2.1 found the invoices dated before their shipments that Exercise 5.2 rediscovers. Chapter 3 gave the keys and the cardinality that tell a lookup its direction. Chapter 4 built the workbook, the Documentation worksheet and the habit of Replace current in the type step. The Part I case reconciled the Furniture revenue that Tutorial 5.2 reproduces.
 
-**Later chapters.** Chapter 6 summarizes InvoiceLines and bridges the Furniture margin from the third to the fourth quarter. Chapter 7 forecasts from it. Chapter 8 returns to the promotion dates and the duplicate tests, and Exercise 6.1 and Exercise 12.1 return to the invoices of Exercise 5.2. Parts III and IV carry the same idea: a join in SQL and a relationship in Power BI are the lookup of this chapter.
+**Later chapters.** Chapter 6 summarizes InvoiceLines and bridges the Furniture margin from the third to the fourth quarter. Chapter 7 forecasts from it. Chapter 8 returns to the promotion dates and the duplicate tests, and Exercise 6.1 and Exercise 12.1 return to the invoices of Exercise 5.2. Parts III and IV carry the same idea of following a key. A join in SQL combines tables in a query result, as this chapter's lookups and merges do, while a relationship in Power BI keeps the tables separate and passes filters between them.
 
 **Appendices.** The quick reference lists every Excel and Power Query function the chapter uses. **Appendix D** maps each exercise to the CPA Evolution model curriculum, the IMA framework, the IFAC education standards and the AACSB standard; each exercise guide names the competencies it practices.

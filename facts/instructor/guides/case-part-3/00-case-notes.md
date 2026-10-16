@@ -1,6 +1,6 @@
 ---
 uses: [case3.chapter, case3.g4, case3.r1, case3.r2, case3.r3, case3.r4, case3.r5]
-title: 'Comprehensive Case, Part 3: Planning the Plant''s Hours for 2027'
+title: 'Comprehensive Case, Part III: Planning the Plant''s Hours for 2027'
 kind: case-notes
 unit: case3
 minutes: 150
@@ -25,7 +25,7 @@ figures:
 {% set r4 = case3_r4 %}
 {% set r5 = case3_r5 %}
 {% set s = c.slide %}
-# Comprehensive Case, Part 3: Planning the Plant's Hours for 2027
+# Comprehensive Case, Part III: Planning the Plant's Hours for 2027
 
 {{ header() }}
 
@@ -44,9 +44,9 @@ figures:
 The case depends on these conditions of the data, all visible in the working copy:
 
 - The plant has {{ c.hourly }} hourly employees with a time clock. On {{ r1.surge_days|sum }} days ({{ r1.surge_days|join(', ') }} by year) all of them recorded the same hours, the surge days, which carry {{ r1.surge_total|count }} entries and the growth in overtime.
-- The punches behind each clock entry repeat its times; the rosters and the overtime approvals come from the Production Manager. Only the work center calendar, the capacity plan and the output come from outside the time clock.
-- Time records end on {{ r3.cutoff }}, the calendar on {{ r1.cal_last }}; payroll posts on pay dates, with no accrual at any year-end.
-- The plant makes about {{ r4.use|pct(0) }} of its regular capacity, and the budget plans {{ r4.budget }} times the units it completed.
+- The punches behind each clock entry repeat its times; the rosters and the overtime approvals come from the Production Manager. The work center calendar, the capacity plan and the output lie outside the time clock, though the records do not show who keeps them.
+- Time records end on {{ r3.cutoff }} (indirect labor time on {{ r4.ind_end }}), the calendar on {{ r1.cal_last }}; payroll posts on pay dates, with no accrual at any year-end.
+- The plant's output is about {{ r4.use|pct(0) }} of its regular employee-hours, and the budget plans {{ r4.budget }} times the units it completed.
 - All {{ r1.exceptions }} attendance exceptions are Open and never reviewed, and {{ r2.wrong }} of them name the wrong employee.
 - Account 2030 carries an opening balance of {{ r5.opening|money }} that no payroll ever cleared, and the ledger records no income tax.
 
@@ -63,7 +63,7 @@ The case depends on these conditions of the data, all visible in the working cop
 
 **Before the first class**
 
-- Check the software. The model script uses CTEs, window frames, `julianday` and `strftime`, so students need the DB Browser for SQLite release the chapters use. Each model query finishes in seconds on the working copy.
+- Check the software. The model script uses CTEs, window frames, `julianday` and `strftime`, so students need the DB Browser for SQLite release the chapters use. Each model query finished in seconds when run through Python's sqlite3 on the working copy; time a few in DB Browser.
 - Ask students to confirm three things in their working copy: Tutorial 11.3's view exists, Audit.sql is at hand, and the original download is untouched. A student without the view runs Setup_Part3_Views.sql once and selects **Write Changes**. Views the case creates persist only after **Write Changes**.
 - Run the model script once from the top, or build your own answer. Its views are created in order, each after a `DROP VIEW IF EXISTS`; note the time it takes.
 - Open the deck. Slides {{ s.criteria }} set out the criteria, which are the six bullets of "What a Strong Submission Includes"; read them aloud at kickoff.
@@ -123,13 +123,13 @@ The case depends on these conditions of the data, all visible in the working cop
 ## Difficult ideas and misconceptions
 
 - **Unsupported is not unworked.** The records fail to support the hours as recorded; they do not show that no one worked. Students write fictitious, or call the hours proved because every employee was present ({{ r2.o.all_present }} of {{ r2.o.days }} ordinary days also had everyone). Ask which record is independent and what each explanation predicts.
-- **Agreement is not corroboration.** The punches equal the clock entry's times on all but {{ r2.n_differ }} entries, so they repeat the clock. Ask who produced each record.
-- **A control that tests arrival cannot catch a long day.** The surge arrivals are {{ r2.early }} minutes early and the departures {{ r2.late }} minutes late, so the rule flags none. A student who applies the rule to departures concludes the opposite. Ask what the system's own exceptions tested.
+- **Agreement is not corroboration.** The punches equal the clock entry's times on all but {{ r2.n_differ }} entries, so they repeat the clock, and a separate table is not by itself an independent source. Ask who produced each record.
+- **The stored exceptions point to a rule; they do not show it.** The {{ r2.n_off }} Off Shift exceptions are consistent with a rule on arrival, which could not flag surge entries {{ r2.early }} minutes early and {{ r2.late }} minutes late, but {{ r2.n_off }} examples cannot show its threshold or scope. A student who applies it to departures concludes the opposite, and one who states the rule as proven overreaches. Ask what the configuration would add.
 - **Three calendars.** Hours by work date, cost by pay date, output by completion date. It shows as {{ r3.ys[2].ratio|num(3) }} against a lower figure when output is not cut off, and as a payroll measure {{ r3.excess|num }} above the payroll line. Ask what date each record carries.
 - **A bridge is not a set of measures.** The ledger lines sum to the {{ r3.bridge.delta|money }} growth of 5080; the three measures overlap and do not. Ask which are ledger lines.
 - **A scenario is not a forecast.** The expected variances ({{ r4.variance|map('num')|join(', ') }}) are what each ratio would produce, and the budget's volume would have put the plan {{ g4.budget_over|num }} hours beyond regular capacity. Ask what each ratio assumes.
 - **Two accruals nearly cancel in income and not on the balance sheet.** Income moves {{ r5.change|money }}; the liability moves {{ r5.p.accrual|money }}. Ask what opening retained earnings would then claim.
-- **Idle capacity belongs in the period.** The actual conversion cost was {{ r5.actual_rate|num(2) }} per standard hour against {{ r5.std_rate|num(2) }}; raising the standards would carry the difference into {{ r5.fg|money }} of finished goods. Ask where an abnormal cost goes.
+- **Abnormal cost belongs in the period.** The actual conversion cost was {{ r5.actual_rate|num(2) }} per standard hour against {{ r5.std_rate|num(2) }}; raising the standards would carry idle capacity and unsupported hours into {{ r5.fg|money }} of finished goods. Ask where an abnormal cost goes, and how much of the difference is abnormal.
 - **A saved view is not saved until Write Changes.** The next session fails with "no such table". Ask whether the changes were written.
 
 ## Discussion prompts
@@ -137,7 +137,7 @@ The case depends on these conditions of the data, all visible in the working cop
 1. The Production Manager creates the rosters and approves the overtime. What would a second approver add, and what would it cost? A good discussion reaches segregation of duties and the difference between design and operation.
 2. The plant clocked {{ r3.ys[2].hours|num }} hours in the last year against {{ r3.ys[2].std|num }} standard hours. What would you want to know before calling the difference inefficiency? A good discussion reaches idle capacity, the standards and how output is dated.
 3. The overtime was paid on each employee's own register. Does that settle whether the hours were worked? A good discussion reaches the difference between payment and evidence.
-4. The accrual is immaterial to income and recurs every year. Do you record it? A good discussion reaches materiality, the balance sheet and the deficiency in the close.
+4. The two accruals nearly cancel in income, yet the liability left out is {{ r5.liab_ni|pct(1) }} of net income and recurs every year. Is the error immaterial? A good discussion reaches materiality judged on each error, the balance sheet and the deficiency in the close.
 5. Should the overhead rate rise to absorb idle capacity? A good discussion reaches the inventory standard, normal capacity and what a standard is for.
 6. Which single record would you ask for first to settle the two explanations, and from whom? A good discussion reaches independence and access.
 7. What would you monitor next month, and how would the saved views help? A good discussion reaches repeatable scripts and the move to dashboards in Part IV.
@@ -192,6 +192,6 @@ Each requirement guide has its own grading table out of 100; scale it by the wei
 
 **Builds on.** Chapter 9 supplies the working copy, the script header and the habit of a comment on every query. Chapter 10 supplies the data profile, joins, aggregates and the measure of the plant (hours per standard hour, Tutorial 10.3). Chapter 11 supplies CASE, dates, windows and frames, CTEs and the saved view (Tutorials 11.2 and 11.3, with the pay dates). Chapter 12 supplies the tests the case reuses: H9's surge days, L5 and L6's cutoff and L8's account 2030, with Exercises 12.1, 12.3 and 12.5 as neighbors. Chapter 7 supplies the documented model and the flexible budget, Chapter 6 the income statement the adjustments start from, and Chapter 8 the unsupported opening balances. The Part II case supplies the memo form. The finished guides for Chapters 9 to 12 hold the tutorial and exercise detail each requirement here relies on.
 
-**What builds on it.** Part IV turns results like these into reports managers can explore: Chapter 15 builds the plant page and the trailing hours per standard hour in Power BI, and Chapter 16 monitors exceptions in a register. The script and its views can run again next month without change, which is the bridge to both.
+**What builds on it.** Part IV turns results like these into reports managers can explore: Chapter 15 builds the plant page and the trailing hours per standard hour in Power BI, and Chapter 16 monitors exceptions in a register. The script and its views can run again on new records once their dates are moved forward and the coverage checks repeated, which is the bridge to both.
 
 **Appendix D** maps each requirement to the CPA Evolution model curriculum, the IMA framework, the IFAC education standards and the AACSB standard. Each requirement guide names the competencies it practices.

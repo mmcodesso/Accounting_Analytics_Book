@@ -35,7 +35,7 @@ By the end, students can:
 
 ## Before you assign
 
-- **Files and software.** The analysis workbook at the end of Chapter 7's tutorials, including the CommissionRate name of Tutorial 7.3, and the Solver add-in loaded and checked on every machine. The model answer saves its Solver model with the worksheet: **Data > Solver** opens it ready to solve.
+- **Files and software.** The analysis workbook at the end of Chapter 7's tutorials, including the CommissionRate name of Tutorial 7.3, and the Solver add-in loaded and checked on every machine. The model answer saves its Solver model with the worksheet: **Data > Solver** opens it ready to solve. Its list of reduced items uses HSTACK, which needs a newer Excel than the tutorials do, as the chapter note says.
 - **Data conditions.** {{ g.manufactured }} items are manufactured, {{ g.n_items }} of them sold in {{ d.C }} and {{ unsold }} not; every one sold has a routing. The routings give run hours for {{ g.n_centers }} work centers. In {{ d.C }} the plant used well under its capacity, so half of the hours is an assumption.
 - **Verify first.** Solve it yourself. The model has {{ g.n_items }} variable cells and {{ g.n_constraints }} constraints counting the demand limits, and solves instantly. The Answer and Sensitivity reports in the solution file were written in Solver's layout by the builder, not by Solver, so your own reports will differ in names and formatting but not in numbers.
 

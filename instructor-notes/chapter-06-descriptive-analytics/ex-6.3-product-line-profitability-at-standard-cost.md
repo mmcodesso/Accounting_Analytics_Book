@@ -79,7 +79,7 @@ c. Drag LineTotal, Margin and MarginPct to **Values**, rename them `Revenue`, `M
 ## What a strong answer says
 
 - **Requirement (2).** Lighting, Textiles, and Accessories contribute more margin than revenue, because their margins are above Furniture's. The shares exclude Services, whose margin percentage is an artifact.
-- **Requirement (3).** The two highest types are desks and console tables and the two lowest are benchs and bookcases, with the margin spread across types small.
+- **Requirement (3).** The two highest types are DSK (desk) and CON (console table) and the two lowest BNH (bench) and BKC (bookcase), with the margin spread across types small.
 - **Requirement (4).** The missing standard cost, the two cost definitions with their margins, and a statement that the report must say which one it uses.
 
 A weak answer calls Services the most profitable line, or gives a cost number without a source.

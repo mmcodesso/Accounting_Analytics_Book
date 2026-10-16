@@ -12,7 +12,7 @@
 
 **Drill-through.** Moving from a visual on one report page to another page filtered to the item selected, such as a promotion or a cost center. The target page holds the drill-through field, and Power BI adds a back button to it.
 
-**Exponential smoothing.** A family of forecasting methods that weight recent observations more heavily than older ones, with variants that also model a trend and a seasonal pattern. Microsoft described the forecast of Power BI's line charts as using it when the forecast was introduced.
+**Exponential smoothing.** A family of forecasting methods that weight recent observations more heavily than older ones, with variants that also model a trend and a seasonal pattern. Microsoft described the forecast as using it when the feature was introduced in Power View, and the documentation of Power BI's Analytics pane still points to that description.
 
 **Field parameter.** A small table, created in Power BI with Modeling > New parameter > Fields, that lists measures or columns so that a reader can choose from a slicer which of them a visual shows.
 

@@ -60,7 +60,7 @@ d. Under **Format visual > Visual > Slicer settings > Options**, set **Style** t
 a. Select **Matrix**, and drag Discounts from Key Measures into **Values**.
 b. Drag CustomerSegment from the Customer table into **Rows**, and Month from SalesInvoice into **Columns**.
 
-**Check:** five segment rows and twelve month columns. The Design Services row reads zero in every month, not blank, because it has invoice lines every month and each has a discount of zero. **Watch for:** the slicer left unselected, which gives 36 month columns, or left as **Between**, a range with two handles.
+**Check:** five segment rows and twelve month columns. The Design Services row reads zero in every month, not blank, because it has invoice lines every month and each has a discount of zero. **Watch for:** the slicer left unselected, which gives 36 month columns, or left as **Between**, a range with two handles. The matrix computes each total from the unrounded amounts, so Wholesale's displayed months add to $184,926.13 against its row total of $184,926.14, and the displayed monthly totals add to $362,110.73 against $362,110.75. Those are display rounding, not errors.
 
 ![A mock of the Ex C.2 page at its end state, where the Design Services row and the peaks can be read.](../figures/appendix-c-power-bi-browser/IF-AC-2-A.pdf)
 
@@ -77,7 +77,7 @@ b. Read the labels under the axis. If they are not in month order, open **More o
 
 **Step 5. Read each segment's largest month.**
 
-**Check:** Design Trade Customer Promotion, a segment promotion, explains November for the segment it names. The other peaks fall in the months of Furniture Seasonal Promotion, which ran in September and October: the other segments peak in September or October. One cell is worth matching.
+**Check:** Design Trade Customer Promotion, a segment promotion, gives most of November for the segment it names ($21,482.20), and the Furniture Seasonal Promotion's lines invoiced that month give the rest ($6,113.67). The other peaks fall in the months of Furniture Seasonal Promotion, which ran in September and October: the other segments peak in September or October. One cell is worth matching.
 
 ```dax
 EVALUATE
@@ -90,7 +90,7 @@ ROW ( "Design Trade, November", CALCULATE ( SUM ( SalesInvoiceLine[DiscountAmoun
 
 **Step 6. Say which segment and why.** The Design Services segment received none: it buys only Services, and no promotion covers Services.
 
-**Check:** two sentences. The first names the segment and the reason. The second says that an item-group promotion discounts every segment that buys the group, so Wholesale, the largest, holds 51.1% of the year's discounts, while a segment promotion reaches only its segment, so a calendar aimed at one segment uses a segment promotion.
+**Check:** two sentences. The first names the segment and the reason. The second says that an item-group promotion discounts every segment that buys the group, so Wholesale, the largest, holds 51.1% of the year's discounts, while a segment promotion reaches only its segment. A strong second sentence also says that the page shows the discounts by invoice month, not what the promotions did to sales, so a calendar aimed at one segment needs that segment's orders and margins as well.
 
 ## Expected results
 
@@ -103,12 +103,12 @@ ROW ( "Design Trade, November", CALCULATE ( SUM ( SalesInvoiceLine[DiscountAmoun
 | Design Services: every month | zero | 3 |
 | Months on the matrix with no year selected | 36 | 3 |
 
-> **Instructor notes, Exercise C.2:** fiscal 2026 discounts by segment, with each segment's peak month: Design Trade peaks in November (27,595.87 of 59,673.47); Small Business peaks in September (4,070.03 of 13,279.03); Strategic peaks in October (46,330.25 of 104,232.11); Wholesale peaks in October (74,453.77 of 184,926.14). (4) Design Trade peaks in November, the month of the Design Trade Customer Promotion; Small Business peaks in September, Strategic peaks in October, Wholesale peaks in October, the months of the Furniture Seasonal Promotion (September and October). (5) Design Services received no discounts. A segment promotion reaches one segment, while an item-group promotion reaches every segment that buys the group, so a calendar aimed at one segment should use a segment promotion.
+> **Instructor notes, Exercise C.2:** fiscal 2026 discounts by segment, with each segment's peak month: Design Trade peaks in November (27,595.87 of 59,673.47); Small Business peaks in September (4,070.03 of 13,279.03); Strategic peaks in October (46,330.25 of 104,232.11); Wholesale peaks in October (74,453.77 of 184,926.14). (4) Design Trade peaks in November, the month of the Design Trade Customer Promotion, which gives 21,482.20 of it, while 6,113.67 comes from the Furniture Seasonal Promotion's lines invoiced that month. Small Business peaks in September, Strategic peaks in October, Wholesale peaks in October, the months of the Furniture Seasonal Promotion (September and October). (5) Design Services received no discounts. The segment promotion reached one segment, while the item-group promotion reached every segment that bought the group. The pattern shows the discounts by invoice month, not what the promotions did to sales, so a calendar aimed at one segment also needs that segment's orders and margins.
 
 ## What a strong answer says
 
 - **(2), (3)** A page with the slicer on the current year, the matrix with five rows, and the line chart in month order, with a title.
-- **(4)** Design Trade Customer Promotion for Design Trade in November; for the others, the autumn promotion, with the remark that its orders of September and October are invoiced into the next months.
+- **(4)** Design Trade Customer Promotion for most of Design Trade's November, with part of the autumn promotion's billing; for the others, the autumn promotion, with the remark that its orders of September and October are invoiced into the next months.
 - **(5)** The segment, the reason (it buys only Services), and the distinction between a segment and an item-group promotion.
 
 ## Common mistakes and how to respond

@@ -15,7 +15,7 @@ figures:
   - id: IF-05-0-B
     kind: diagram
     purpose: The row-count test for a merge, and what a repeated key in the second table does to it.
-    shows: "Two panels side by side. On the left a left outer merge of SalesInvoice with Customer on CustomerID: a row count box before and the same row count after, labeled each key appears once. On the right a merge of SalesInvoice with Shipment on SalesOrderID: a row count box before and a larger one after, labeled the key repeats in the second table, with one invoice drawn as two rows after the merge. Under each panel a verdict reads count unchanged, merge safe, or count grew, key repeats."
+    shows: "Two panels side by side. On the left a left outer merge of SalesInvoice with Customer on CustomerID: a row count box before and the same row count after, labeled each key appears once. On the right a merge of SalesInvoice with Shipment on SalesOrderID: a row count box before and a larger one after, labeled the key repeats in the second table, with one invoice drawn as two rows after the merge. Under each panel a verdict reads count unchanged, no row repeated, or count grew, the key repeats. A note beneath says the count cannot show that every invoice found a match, which a left anti merge tests."
     data: The row counts of SalesInvoice, and of SalesInvoice merged with Shipment on SalesOrderID (the Difficult ideas section).
 ---
 # Chapter 5: Data Preparation and Cleaning in Excel
@@ -55,7 +55,7 @@ The chapter depends on these conditions of the data:
 
 **Before the first class**
 
-- Students need desktop Excel with Power Query. On a Mac the Power Query Editor needs Excel for Microsoft 365. XLOOKUP needs Microsoft 365 or Excel 2021 or later; INDEX and MATCH is the fallback, and the chapter shows both. The model answers also use HSTACK, TAKE and CHOOSECOLS, so open them in Microsoft 365 or Excel 2024.
+- Students need a supported desktop Excel with Power Query, Microsoft 365 recommended, as the Preface's What You Need says. On a Mac the Power Query Editor needs Excel for Microsoft 365. XLOOKUP is in Excel for Microsoft 365, Excel 2024 and Excel 2021, whose support ended in October 2026. INDEX and MATCH is the fallback for older versions, and the chapter shows both. The model answers also use HSTACK, TAKE and CHOOSECOLS, so open them in Microsoft 365 or Excel 2024.
 - Each tutorial begins from the previous one's workbook. Late students take the start file for the tutorial they begin with, from Chapter05-companion.zip. The start files read `C:\CharlesRiver\CharlesRiver.xlsx`; a student who uses one chooses **Data > Get Data > Data Source Settings**, **Change Source**, and then **Data > Refresh All**.
 - Do the tutorials yourself and time them. Tutorial 5.2 adds six formula columns to a Table of {{ t3.lines|count }} rows, so time the recalculation on your students' machines.
 - Get the PowerPoint deck from the Downloads page. Its modules follow the chapter's sections.
@@ -65,7 +65,7 @@ The chapter depends on these conditions of the data:
 - **The first empty cell.** A new column starts in the first empty cell right of the last header, or it does not join the Table. On the Item Table the new columns are {{ item.ProductType }} and {{ item.CodeCheck }}, on SalesInvoice {{ si.FiscalYear }} to {{ si.StandardTerms }}, and on SalesInvoiceLine the lookups of Tutorial 5.2 run from {{ sil.InvoiceDate }} to {{ sil.ProductType }}. Step 5 of Tutorial 5.2 counts "No match" over those six adjacent columns, so a column inserted between them is counted too.
 - **Fill against paste.** Tutorial 5.2's Furniture formula uses `B$44`; copy and paste it, as Chapter 4 taught.
 - **Two queries, one load.** In Tutorial 5.3 Step 6 the choice of **Close & Load To**, **Table** and **New worksheet** applies to both new queries. A plain **Close & Load** sends them to the Data Model.
-- **The merge dialog.** The **Use original column name as prefix** box is cleared on every expansion, or later formulas cannot find the plain names. The match message is an estimate; the loaded row count is the test.
+- **The merge dialog.** The **Use original column name as prefix** box is cleared on every expansion, or later formulas cannot find the plain names. The match message is an estimate. The loaded row count shows whether a line was repeated, and only a left anti merge that returns no rows shows that every line found its match.
 - **Zero-based and one-based.** MID counts from one and Text.Middle from zero. The product type starts at 5 in Excel and 4 in M.
 
 ## Teaching approaches
@@ -160,7 +160,7 @@ Plan A is the safest. Plan B trades the vocabulary lecture for ownership of the 
 | 5 | Lookups not matched | B41 reads 0 |
 | 6 | Furniture revenue by quarter, {{ y }} | ${{ ch05_ex1.gross[0]|money }}; ${{ ch05_ex1.gross[1]|money }}; ${{ ch05_ex1.gross[2]|money }}; ${{ ch05_ex1.gross[3]|money }}; the last two agree with the Part I case |
 | 7 | Promotion {{ t2.promo.id }} lines invoiced after {{ t2.promo.end_long }} | {{ t2.promo.after|count }} in the status bar and in B47 |
-| 8 | Documentation | SalesOrder and the six columns listed |
+| 8 | Documentation | SalesOrder and the six columns listed, and the open question rewritten |
 
 **Stumbles to expect**
 
@@ -206,7 +206,7 @@ Plan A is the safest. Plan B trades the vocabulary lecture for ownership of the 
 
 {{ figure('IF-05-0-A') }}
 
-**A merge is safe only when the key is unique in the second table.** Merging SalesInvoice with Customer on CustomerID keeps the row count. Merging SalesInvoice with Shipment on SalesOrderID turns {{ t1.invoices|count }} invoices into {{ t2.fanout|count }} rows. Question 11 asks about it, and the row count after loading is the test. Ask: what does each row of the result represent now?
+**A merge repeats rows when the key repeats in the second table.** Merging SalesInvoice with Customer on CustomerID keeps the row count. Merging SalesInvoice with Shipment on SalesOrderID turns {{ t1.invoices|count }} invoices into {{ t2.fanout|count }} rows. Question 11 asks about it. The row count after loading tests the repetition, not the match, because a left outer merge keeps a row that finds nothing, so a left anti merge that returns no rows is the test of the match. Ask: what does each row of the result represent now?
 
 {{ figure('IF-05-0-B') }}
 
@@ -277,6 +277,6 @@ Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 1
 
 **Builds on.** Chapter 2 named missing values, duplicates and the quality dimensions that the checks apply, and Tutorial 2.1 found the invoices dated before their shipments that Exercise 5.2 rediscovers. Chapter 3 gave the keys and the cardinality that tell a lookup its direction. Chapter 4 built the workbook, the Documentation worksheet and the habit of Replace current in the type step. The Part I case reconciled the Furniture revenue that Tutorial 5.2 reproduces.
 
-**Later chapters.** Chapter 6 summarizes InvoiceLines and bridges the Furniture margin from the third to the fourth quarter. Chapter 7 forecasts from it. Chapter 8 returns to the promotion dates and the duplicate tests, and Exercise 6.1 and Exercise 12.1 return to the invoices of Exercise 5.2. Parts III and IV carry the same idea: a join in SQL and a relationship in Power BI are the lookup of this chapter.
+**Later chapters.** Chapter 6 summarizes InvoiceLines and bridges the Furniture margin from the third to the fourth quarter. Chapter 7 forecasts from it. Chapter 8 returns to the promotion dates and the duplicate tests, and Exercise 6.1 and Exercise 12.1 return to the invoices of Exercise 5.2. Parts III and IV carry the same idea of following a key. A join in SQL combines tables in a query result, as this chapter's lookups and merges do, while a relationship in Power BI keeps the tables separate and passes filters between them.
 
 **Appendices.** The quick reference lists every Excel and Power Query function the chapter uses. **Appendix D** maps each exercise to the CPA Evolution model curriculum, the IMA framework, the IFAC education standards and the AACSB standard; each exercise guide names the competencies it practices.

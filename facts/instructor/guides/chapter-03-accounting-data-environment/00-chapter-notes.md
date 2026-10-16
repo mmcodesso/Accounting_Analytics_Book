@@ -43,7 +43,7 @@ The chapter depends on these conditions of the data:
 
 ## What students should be able to do afterward
 
-1. Explain how the database stores accounting data: tables, rows, columns, and the three types of the SQLite file, with dates as text and flags as 0 and 1. Practiced in questions 13 and 14 and in the data dictionary of Exercise 3.2.
+1. Explain how the database stores accounting data: tables, rows, columns, and the three types that the SQLite file declares, with dates as text, flags as 0 and 1, and NULL for a missing value. Practiced in questions 13 and 14 and in the data dictionary of Exercise 3.2.
 2. Name the primary key of a table and the foreign keys that connect it, and say which relationships the file declares (none) and which the data follow. Practiced in Tutorial 3.1 (Steps 2 and 3), Exercises 3.1, 3.2, 3.4, 3.5 and 3.6, and questions 1, 2, 8 and 9.
 3. Read an ER diagram: the tables, the keys, and the cardinality and optionality at both ends of a line. Practiced in Tutorial 3.1 and Exercises 3.2, 3.3 and 3.4, and questions 3 and 4.
 4. Map the chart of accounts, the ledger and the sub-ledgers to tables, and say what a join does to the rows. Practiced in Tutorial 3.2 (Steps 4 and 5), Exercises 3.1 and 3.2, and questions 6, 7, 10 and 11.
@@ -169,9 +169,9 @@ Plan A is the safest. Plan B costs the vocabulary lecture but makes the junction
 
 - Steps 1 to 3: students lose the key chain across worksheets. Suggest a scratch sheet with a line for each key found.
 - Step 3: students assume the order line equals the invoice line. It is for a larger quantity; the order was shipped and invoiced in parts.
-- Step 4: filtering SourceDocumentID without the type. Ask them to read the type column of what they found. Students also ask why only one row has a SourceLineID: the receivable, freight and tax belong to the whole invoice, not to one line.
+- Step 4: filtering SourceDocumentID without the type. Ask them to read the type column of what they found. A SUM over the Debit column of the filtered sheet adds the hidden rows too, which is why the step adds the four rows by hand. Students also ask why only one row has a SourceLineID: the receivable, freight and tax belong to the whole invoice, not to one line.
 - Step 5: AccountID read as the account number. The check to stress is that AccountID {{ ch03_t2.gl_inv[1].account_id }} is also the item's RevenueAccountID.
-- Step 7: students expect the receipt to credit receivables. It credits unapplied cash, and the application moves it. The sale posts from {{ ch03_t2.documents }} documents in all, counting the commission accrual of ${{ ch03_t2.commission|money }} that the checkpoint mentions.
+- Step 7: students expect the receipt to credit receivables. It credits unapplied cash, and the application moves it. The sale posts from {{ ch03_t2.documents }} documents in all, counting the commission accrual of ${{ ch03_t2.commission|money }} that the checkpoint's optional item finds.
 
 **The checkpoint to look for.** The four bullets of the tutorial. A weak answer says the invoice created all the postings.
 
@@ -240,7 +240,8 @@ All six exercises end in a one-page written deliverable. There is no solution wo
 - **Question 10.** The answer is the number of lines, 45. Option D adds the orders to the lines.
 - **Question 12.** Two columns (A) is true and beside the point. The reason is that one column points to different tables.
 - **Question 14.** A decimal (C) tempts students who forget that INTEGER means whole numbers. In SQLite the declared type is only a preference, which is why the question says a database that enforces types.
-- **Questions {{ longest_correct }}.** The correct option is also the longest. If you grade with these, ask students to explain their answer or reword the options.
+{% if n_longest %}- **Question{{ 's' if n_longest > 1 else '' }} {{ longest_correct }}.** The correct option is also the longest. If you grade with {{ 'these' if n_longest > 1 else 'it' }}, ask students to explain their answer or reword the options.
+{% endif %}
 
 Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 1, 2, 3, 6 and 9 make a good quiz of the vocabulary. Questions 4, 10 and 12 cover junction tables, the fan-out and the trace, and 5, 7 and 15 the Charles River table groups.
 

@@ -258,7 +258,7 @@ def if_08_0_a() -> Diagram:
 def if_08_0_b() -> Diagram:
     """A decision tree read from left to right: the records, then the tests that fit them, each with where the chapter practices it."""
     rows = [
-        ("Amounts with no upper limit",
+        ("Measured amounts over a wide range",
          [("Strata", "Tutorial 8.1, Steps 3 and 4"), ("First-digit test of the subsets", "Tutorial 8.1, Steps 5 to 8")]),
         ("Documents numbered in a series",
          [("Uniqueness check", "Exercise 8.5, requirement (6)"), ("Gap test", "Exercise 8.5, requirement (6)")]),
@@ -380,7 +380,8 @@ def if_08_2_a() -> Diagram:
     reclass_text = lambda r: (f"Debt Reclass entry: the note-financed capital invoice {r['invoice']} ({money(r['amount'])}) was moved "
                               f"from 2010 to 2110 Notes Payable when a note financed it. No supplier payment will ever settle it, so "
                               f"it stays open in the invoice detail.")
-    ledger_fix = "The ledger, unless the conversion-date supplier detail supports it"
+    ledger_fix = ("Unresolved until the conversion records are seen: restore the invoice detail if the liability is valid, "
+                  "and correct the ledger only if the balance is shown to be wrong")
     detail_fix = "The invoice detail: close or flag the invoice as settled by the note"
     w1 = [28, 246, 106, 146, 120, 124, 90]
     w2 = [28, 520, 312]
@@ -570,24 +571,25 @@ def _disposition(o: dict, capital: dict) -> tuple[str, str]:
     money = lambda x: f"${x:,.2f}"
     cap = capital.get(o["number"])
     if on == ("self", "above") and cap:
-        return ("Design and operation",
+        return ("Possibly design and operation",
                 f"Follow up: the note-financed capital purchase behind invoice {cap['invoice']} (Exercise 8.2), {money(o['total'])}, "
                 f"created and approved by the {a['title'].lower()}, {a['name']}, far above the approval limit of {money(a['limit'])}. "
                 f"No recorded limit, the chief financial officer's included, reaches {money(o['total'])}: request the board's approval.")
     if on == ("self", "above") and a["limit"] == 0:
-        return ("Design and operation",
+        return ("Possibly design and operation",
                 f"Follow up: created and approved by the same {a['title'].lower()}, {a['name']}, whose approval limit is $0, on "
-                f"{o['date']}. Nobody with authority approved the order of {money(o['total'])}. Vouch it to its receipt and invoice.")
+                f"{o['date']}. The records show no approval of the order of {money(o['total'])} by anyone with authority. Vouch it "
+                f"to its receipt and invoice.")
     if on == ("self",) and o["total"] <= a["limit"]:
-        return ("Design",
+        return ("Possibly design",
                 f"Follow up, low risk: created and approved by the {a['title'].lower()}, {a['name']}, within the limit of "
-                f"{money(a['limit'])}. The amount is within authority, but no second person approved the order.")
+                f"{money(a['limit'])}. The amount is within authority, but the records show no second approval.")
     if on == ("above", "term") and a["limit"] == 0:
-        return ("Design and operation",
+        return ("Possibly design and operation",
                 f"Follow up: approved by {a['name']}, {_article(a['title'].lower())} terminated on {a['term']}, on an order dated "
                 f"{o['date']}, created by {o['creator']['name']}. The approver's recorded termination precedes the order date.")
     if on == ("above",) and a["limit"] > 0:
-        return ("Operation",
+        return ("Possibly operation",
                 f"Follow up: approved by the {a['title'].lower()}, {a['name']}, for {money(o['total'])}, "
                 f"{money(o['total'] - a['limit'])} above the limit of {money(a['limit'])}, on {o['date']}. Ask why the order was not "
                 f"sent to an approver with enough authority.")
@@ -607,16 +609,16 @@ def if_08_5_b() -> Diagram:
     # POApprovals as the model answer pastes it: PurchaseOrder's PONumber, OrderDate, OrderTotal, the creator and approver
     # columns, then the three flags, RiskScore and the two columns the student adds.
     letters = {"PONumber": "A", "SelfApproved": "I", "AboveLimit": "J", "AfterTermination": "K", "RiskScore": "L",
-               "Disposition": "M", "Design or operation": "N"}
+               "Disposition": "M", "Provisional classification": "N"}
     visible = list(letters.values())
-    widths = [30, 112, 94, 82, 112, 78, 268, 84]
+    widths = [30, 112, 94, 82, 112, 78, 252, 100]
     total_w = sum(widths)
     assert total_w <= 860, total_w
     widths[6] += 860 - total_w                                              # the Disposition column takes what is left
     wrap_w = widths[6] - 22
     first_row = 16                                                          # the header is row 15 of the Ex 8.5 worksheet
     head = [_head("PONumber"), _head("SelfApproved", "center"), _head("AboveLimit", "center"), _head("AfterTermination", "center"),
-            _head("RiskScore", "center"), _head("Disposition"), _head("", html="<b>Design or<br>operation</b>")]
+            _head("RiskScore", "center"), _head("Disposition"), _head("", html="<b>Provisional<br>classification</b>")]
     body = [dict(n="14", h=22, cells=[dict(text="Flagged orders, sorted by RiskScore, pasted as values with a disposition (as in Tutorial 8.3)",
                                             bold=True, span=7, clip=False, fill=WHITE)]),
             dict(n="15", h=38, cells=head)]
@@ -630,7 +632,8 @@ def if_08_5_b() -> Diagram:
             dict(text=o["number"]), flag(o["flags"]["self"]), flag(o["flags"]["above"]), flag(o["flags"]["term"]),
             dict(text=str(o["score"]), align="center", bold=True),
             dict(html="<br>".join(esc(x) for x in lines), align="left"),
-            dict(html=esc(kind).replace(" and ", " and<br>") if " and " in kind else esc(kind), align="left")]))
+            dict(html=esc(kind).replace(" and ", "<br>and ") if " and " in kind else esc(kind).replace("Possibly ", "Possibly<br>"),
+                 align="left")]))
         if o["number"] in capital:
             capital_rows.append(i + 2)
     d = Diagram("The Flagged Purchase Orders with Their Dispositions")
