@@ -1,5 +1,6 @@
 ---
 title: "Data Models and DAX Measures"
+description: "Design star schemas and date tables in Power BI, write DAX measures with CALCULATE and time intelligence, and model the general ledger with correct signs."
 ---
 
 

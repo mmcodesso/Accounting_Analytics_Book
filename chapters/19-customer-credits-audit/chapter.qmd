@@ -1,5 +1,6 @@
 ---
 title: "Auditing the Customer Credits Cycle"
+description: "An auditing capstone case on customer credits and refunds, with risk assessment, tests of controls, attribute sampling, fraud risks, and deficiency evaluation."
 ---
 
 

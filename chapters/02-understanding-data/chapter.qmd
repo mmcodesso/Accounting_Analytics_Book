@@ -1,5 +1,6 @@
 ---
 title: "Understanding Data in Accounting"
+description: "Types and sources of accounting data, the dimensions of data quality, tests for common data problems, tidy data, and source-to-ledger traceability."
 aliases:
   - /02_chapter.html
 ---

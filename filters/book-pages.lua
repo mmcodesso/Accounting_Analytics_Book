@@ -1,7 +1,10 @@
 -- The title page and the copyright page that open the PDF, EPUB and DOCX. Their text is front-matter/_book-pages.qmd,
 -- included at the top of index.qmd: the title page is one [line]{.class} paragraph per line, and the copyright page
 -- names each version's ISBN as [key]{.isbn}, filled in here from the isbn block of _quarto.yml ("ISBN to be
--- assigned" while it is blank). This filter lays the two pages out for each format; the website has neither.
+-- assigned" while it is blank). The book's DOI (doi in _quarto.yml) fills a [doi]{.doi} line, which is left out with
+-- its line break while the DOI is blank, and [address]{.citation-url} in a suggested citation (here and on the
+-- homepage) becomes https://doi.org/<doi> once there is one, as APA 7 cites a work that has a DOI. This filter lays
+-- the two pages out for each format; the website has neither.
 --   PDF: the pages go between the cover (\maketitle) and the table of contents, in the aatitlepage and
 --        aacopyrightpage layouts of styles/book-pdf.tex. The print interiors (print/book-print.tex) drop the
 --        cover, so there the title page is page 1.
@@ -13,6 +16,7 @@
 --         _quarto.yml), already listing the headings.
 
 local isbns = nil          -- key -> ISBN text ('' while unassigned), from the isbn block of _quarto.yml
+local doi = ''             -- the book's DOI ('' while unassigned), from doi in _quarto.yml
 local title_lines = nil    -- the title page's lines: {class, content}
 local copyright = nil      -- the copyright page's blocks
 local toc_title = nil      -- the table of contents' title, for the DOCX
@@ -40,8 +44,18 @@ local function valid_isbn(text)
   return (10 - sum % 10) % 10 == tonumber(digits:sub(13, 13))
 end
 
+-- A DOI: 10., a registrant code of four or more digits, a slash and a suffix (Crossref's pattern, loosened only in the
+-- suffix's characters).
+local function valid_doi(text)
+  return text:match('^10%.%d%d%d%d+/%S+$') ~= nil
+end
+
 local function read_meta(meta)
   toc_title = meta['toc-title'] and pandoc.utils.stringify(meta['toc-title']) or 'Table of contents'
+  doi = meta.doi and trim(pandoc.utils.stringify(meta.doi)) or ''
+  if doi ~= '' and not valid_doi(doi) then
+    error('book-pages.lua: doi in _quarto.yml is not a DOI (type it as 10.xxxx/yyyy, without https://doi.org/): ' .. doi)
+  end
   isbns = {}
   if meta.isbn == nil then return end
   for key, value in pairs(meta.isbn) do
@@ -61,6 +75,32 @@ local function isbn_span(span)
   end
   if value == '' then value = 'to be assigned' end
   return pandoc.Inlines('ISBN ' .. value)
+end
+
+-- The DOI's line and the address of a suggested citation. A blank DOI drops its [doi]{.doi} line together with the
+-- line break before it, so the lines around it close up; a citation keeps the website's address until there is a DOI.
+local function doi_inlines(inlines)
+  local result, changed = pandoc.Inlines({}), false
+  for _, inline in ipairs(inlines) do
+    if inline.t == 'Span' and inline.classes:includes('doi') then
+      changed = true
+      if doi == '' then
+        while #result > 0 and (result[#result].t == 'LineBreak' or result[#result].t == 'SoftBreak'
+                               or result[#result].t == 'Space') do
+          result:remove(#result)
+        end
+      else
+        local url = 'https://doi.org/' .. doi
+        result:extend({pandoc.Str('DOI'), pandoc.Space(), pandoc.Link(url, url, '', pandoc.Attr('', {'uri'}))})
+      end
+    elseif inline.t == 'Span' and inline.classes:includes('citation-url') then
+      changed = true
+      if doi == '' then result:extend(inline.content) else result:insert(pandoc.Str('https://doi.org/' .. doi)) end
+    else
+      result:insert(inline)
+    end
+  end
+  if changed then return result end
 end
 
 local function line_class(span)
@@ -293,15 +333,23 @@ local function finish(doc)
   if front.epub_title then epub_pages:insert(front.epub_title) end
   if front.epub_copyright then epub_pages:insert(front.epub_copyright) end
   if #epub_pages > 0 then doc.meta['book-pages'] = pandoc.MetaBlocks(epub_pages) end
-  if is_format('epub') and isbns.epub and isbns.epub ~= '' then
-    doc.meta.identifier = pandoc.MetaList({pandoc.MetaMap({
-      scheme = pandoc.MetaString('ISBN-13'), text = pandoc.MetaString(isbns.epub)})})
+  -- The EPUB's identifiers: its ISBN first (the package's unique identifier), then the book's DOI.
+  if is_format('epub') then
+    local identifiers = pandoc.MetaList({})
+    if isbns.epub and isbns.epub ~= '' then
+      identifiers:insert(pandoc.MetaMap({scheme = pandoc.MetaString('ISBN-13'), text = pandoc.MetaString(isbns.epub)}))
+    end
+    if doi ~= '' then
+      identifiers:insert(pandoc.MetaMap({scheme = pandoc.MetaString('DOI'), text = pandoc.MetaString(doi)}))
+    end
+    if #identifiers > 0 then doc.meta.identifier = identifiers end
   end
   return doc
 end
 
 return {
   {Meta = function(meta) read_meta(meta) end},
+  {Inlines = doi_inlines},
   {Span = function(span) if span.classes:includes('isbn') then return isbn_span(span) end end},
   {Div = pages},
   {Pandoc = finish},

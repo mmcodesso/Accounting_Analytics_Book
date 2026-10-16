@@ -6,6 +6,8 @@ project:
     - '!outputs/**'
     - '!supplementary/**'
     - '!instructor-notes/**'
+    # Tells search engines they may crawl the site, and where book.site-url's sitemap.xml is.
+    - robots.txt
   pre-render:
     - python scripts/export_drawio_svgs.py --pre-render
 
@@ -17,6 +19,11 @@ filters:
   # before the filter writes them out as LaTeX, XHTML or Word XML.
   - path: filters/book-pages.lua
     at: post-quarto
+  # The metadata catalogs, search engines and stores read (the website's structured data and license link, the
+  # EPUB's description and subjects, the PDF's XMP), from the book, isbn, doi, indexing, citation and license
+  # blocks below. After Quarto's own filters, like book-pages.lua, so the edition and revision are known.
+  - path: filters/book-metadata.lua
+    at: post-quarto
   - filters/pdf-code.lua
   - filters/learning-objectives.lua
   - filters/pdf-keep-together.lua
@@ -24,7 +31,32 @@ filters:
 book:
   title: "Accounting Analytics: An Integrated Approach"
   output-file: "Accounting-Analytics"
-  author: "Mauricio Codesso"
+  # The author and the identifiers that tell catalogs and search engines it is one person: the ORCID iD (Quarto's
+  # own field), the ISNI, the affiliation's ROR ID and the faculty page (the website's structured data, through
+  # filters/book-metadata.lua). The copyright page prints the ORCID iD and the ISNI too, and CITATION.cff repeats
+  # the ORCID iD (tests/test_metadata.py checks that they agree and that both check digits are right).
+  author:
+    - name: "Mauricio Codesso"
+      orcid: "0000-0002-6214-7177"
+      isni: "0000000531767244"
+      url: "https://damore-mckim.northeastern.edu/people/mauricio-codesso/"
+      affiliations:
+        - name: "Northeastern University"
+          department: "D'Amore-McKim School of Business"
+          city: "Boston"
+          region: "MA"
+          country: "US"
+          ror: "https://ror.org/04t5xt781"
+  # The publication date of the first edition: the EPUB's dc:date, Google Scholar's tags and the structured data.
+  date: "2027-01-18"
+  # The website's address, without a final slash (Quarto appends the social cards' /visuals/... image path to it).
+  # Quarto builds sitemap.xml, the canonical links and the social cards' image links from it.
+  site-url: "https://aa.accountinganalyticshub.com"
+  # Social cards (Open Graph, X/Twitter) for every page: its title, its description (front matter, or the
+  # description below), and the cover. The cover is portrait, so the small card suits it.
+  open-graph: true
+  twitter-card:
+    card-style: summary
   cover-image: visuals/cover/cover.png
   cover-image-alt: "Cover of Accounting Analytics: An Integrated Approach"
   chapters:
@@ -77,11 +109,110 @@ book:
 # without hyphens; a wrong check digit fails the render. They live here, not in _variables.yml, because
 # _variables.yml is an input of every slide deck (scripts/release.py), and _quarto.yml only of the book.
 isbn:
-  pdf: "978-65-978221-9-5"
+  pdf: &isbn-pdf "978-65-978221-9-5"
   epub: "978-65-978221-8-8"
   paperback-bw: "978-65-978221-7-1"
   paperback-color: "978-65-978221-4-0"
   hardcover: "978-65-978221-5-7"
+
+# The book's DOI, from Zenodo (the author's, 2026-10-16; Zenodo gives each version a DOI and all versions a concept
+# DOI). Type the DOI alone, 10.xxxx/yyyy, without https://doi.org/; a value that is not a DOI fails the render, and a
+# blank one leaves it out everywhere. The copyright page prints it under the ISBNs, the suggested citation (copyright
+# page and homepage) ends with https://doi.org/... in place of the website's address (APA 7), and it reaches Google
+# Scholar's tags on the homepage, the structured data, the EPUB's identifiers and the PDF's XMP metadata. After
+# changing it, run python scripts/citation_cff.py (tests/test_metadata.py fails until CITATION.cff agrees).
+doi: "10.5281/zenodo.23425592"
+
+# What catalogs, stores and search engines read about the book besides its title, author and ISBNs. Unknown to
+# Quarto, so its own templates never show it: filters/book-metadata.lua and the anchors below put it where it goes.
+indexing:
+  # The long description: the EPUB's dc:description, the DOCX's Comments, Google Scholar's citation_abstract on the
+  # homepage, the structured data and CITATION.cff's abstract. A retailer that asks for one (IngramSpark) takes it
+  # too. The short one, for search results and social cards, is `description` below.
+  summary: &summary >-
+    Accounting Analytics: An Integrated Approach is an open textbook that teaches accounting and business students
+    to extract, prepare, analyze, and visualize financial and operational data with Microsoft Excel, SQL, and
+    Microsoft Power BI. Every technique is taught through an accounting question, and every example draws on the
+    records of one fictional company in the Charles River Accounting Dataset, so a customer order analyzed in Excel
+    is the same one found in the general ledger with SQL and reported on in Power BI. Part I lays the foundations of
+    accounting analytics, data quality, and the relational database behind accounting systems. Part II teaches data
+    preparation, descriptive analytics, forecasting, budgeting, what-if analysis, and audit testing in Excel. Part
+    III queries, joins, and summarizes whole populations of transactions in SQL, for management questions and for
+    audit tests. Part IV turns to data visualization, data models, DAX measures, management reports, and audit
+    monitoring in Power BI. Part V offers capstone cases in financial reporting, managerial accounting, and
+    auditing. The chapters of Parts I to IV combine guided tutorials, multiple-choice questions, and exercises from
+    the perspectives of financial accounting, managerial accounting, and auditing, and each of these Parts closes
+    with a comprehensive case. The book is written for undergraduate and graduate students with no prior analytics
+    or programming experience. It is free to read online and to download, as are its dataset, slides, companion
+    files, and solutions, and it is licensed under CC BY-SA 4.0.
+  # The PDF's and the DOCX's keywords, Google Scholar's citation_keywords and the structured data. Top-level
+  # `keywords` would also print a Keywords block under the title of every chapter page.
+  # (The digital PDF's keywords come through filters/book-metadata.lua; the DOCX takes this list by its anchor.)
+  keywords: &keywords
+    - Accounting Analytics
+    - Data Analytics
+    - Accounting Information Systems
+    - Financial Accounting
+    - Managerial Accounting
+    - Auditing
+    - Audit Data Analytics
+    - Continuous Auditing
+    - Data Visualization
+    - Business Intelligence
+    - Relational Databases
+    - Microsoft Excel
+    - Power Query
+    - SQL
+    - SQLite
+    - Microsoft Power BI
+    - DAX
+    - Open Educational Resources
+    - Open Textbook
+    - Charles River Accounting Dataset
+  # Who the book is for and what kind of resource it is: the structured data's audience, educationalLevel and
+  # learningResourceType, which catalogs of open educational resources read.
+  audience: [student, teacher]
+  educational-level: [Undergraduate, Graduate]
+  resource-type: Textbook
+  # BISAC subject codes, most important first (checked against BISG's lists on 2026-10-16). IngramSpark and most
+  # retailers take the first three; the EPUB carries them all, and the structured data names them.
+  bisac:
+    - {code: BUS001000, heading: "BUSINESS & ECONOMICS / Accounting / General"}
+    - {code: COM021030, heading: "COMPUTERS / Data Science / Data Analytics"}
+    - {code: BUS003000, heading: "BUSINESS & ECONOMICS / Auditing"}
+    - {code: BUS001040, heading: "BUSINESS & ECONOMICS / Accounting / Managerial"}
+    - {code: BUS001010, heading: "BUSINESS & ECONOMICS / Accounting / Financial"}
+    - {code: COM005030, heading: "COMPUTERS / Business & Productivity Software / Business Intelligence"}
+
+# The short description (at most about 155 characters, which search results show in full): the homepage's meta
+# description and social card, and the default for a page whose front matter has no description of its own. Every
+# page of the book has one, written for that page. (book.description would replace them all with the book's.)
+description: "A free, open textbook that teaches accounting analytics with Excel, SQL, and Power BI through financial accounting, managerial accounting, and auditing questions."
+
+# The book's own citation. index.qmd turns on Google Scholar's tags (google-scholar), so the homepage is the one
+# record of the book and the chapters carry none (Quarto never prints this in a book; the suggested citations of
+# the copyright page and the homepage are written out in their text).
+citation:
+  type: book
+  title: "Accounting Analytics: An Integrated Approach"
+  publisher: "Accounting Analytics Hub"
+  issued: "2027-01-18"
+  language: en-US
+  isbn: *isbn-pdf
+  abstract: *summary
+
+# The license and the copyright: the website's <link rel="license">, the structured data, and the PDF's XMP
+# (filters/book-metadata.lua). The copyright page's own text is in front-matter/_book-pages.qmd.
+license:
+  text: "Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)"
+  link: "https://creativecommons.org/licenses/by-sa/4.0/"
+copyright:
+  holder: "Mauricio Codesso"
+  year: 2027
+
+# The image of every page's social card (a page's first figure otherwise, which is an SVG the platforms ignore).
+image: /visuals/cover/cover-web.png
+image-alt: "Cover of Accounting Analytics: An Integrated Approach"
 
 format:
   html:
@@ -95,6 +226,8 @@ format:
     tbl-cap-location: top
     link-external-newwindow: true
     number-sections: true
+    # <link rel="canonical"> on every page, from book.site-url, so search engines index each page at one address.
+    canonical-url: true
   pdf:
     documentclass: scrreprt
     papersize: letter
@@ -119,13 +252,16 @@ format:
     number-depth: 3
     fig-cap-location: bottom
     tbl-cap-location: top
+    # The PDF's Subject (a document property). Its keywords, language and XMP metadata come from
+    # filters/book-metadata.lua: `lang` here would also load babel, which changes the line breaks.
+    subject: "An open textbook on accounting analytics with Microsoft Excel, SQL, and Microsoft Power BI"
   epub:
     cover-image: visuals/cover/cover.png
     # Pandoc's EPUB template, whose title page prints the book's title and copyright pages
     # (front-matter/_book-pages.qmd, through filters/book-pages.lua) in place of Pandoc's own.
     template: styles/book-epub.template
     publisher: "Accounting Analytics Hub"
-    rights: "Licensed under CC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0/"
+    rights: "Copyright © 2027 Mauricio Codesso. Licensed under CC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0/"
     # The book's EPUB styles (the learning objectives box), in every page's head.
     include-in-header: styles/book-epub-head.html
   docx:
@@ -133,6 +269,9 @@ format:
     # filters/book-pages.lua writes the table of contents after the title and copyright pages; Pandoc's
     # would come before them.
     toc: false
+    # The DOCX's Subject and Keywords (its document properties); filters/book-metadata.lua sets its Comments.
+    subject: "An open textbook on accounting analytics with Microsoft Excel, SQL, and Microsoft Power BI"
+    keywords: *keywords
 
 crossref:
   fig-title: Figure

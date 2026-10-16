@@ -1,5 +1,6 @@
 ---
 title: "Descriptive and Diagnostic Analytics in Excel"
+description: "Describe and explain accounting data in Excel with statistics, SUMIFS, and PivotTables, decompose a margin change, and build a trial balance from the ledger."
 ---
 
 

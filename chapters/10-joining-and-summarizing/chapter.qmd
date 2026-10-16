@@ -1,5 +1,6 @@
 ---
 title: "Joining and Summarizing Data in SQL"
+description: "Join accounting tables in SQL, find unmatched records, summarize with GROUP BY and HAVING, avoid fan-out, write subqueries, and build a trial balance."
 ---
 
 

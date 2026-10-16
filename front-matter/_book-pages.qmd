@@ -16,7 +16,9 @@
 *Accounting Analytics: An Integrated Approach*\
 Revision {{< var book.revision >}} of the {{< var book.edition >}} edition
 
-Copyright © 2027 Mauricio Codesso
+Copyright © 2027 Mauricio Codesso\
+ORCID <https://orcid.org/0000-0002-6214-7177>\
+ISNI 0000 0005 3176 7244
 
 This book is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0), <https://creativecommons.org/licenses/by-sa/4.0/>. You may share and adapt it for any purpose, including commercially, provided you give appropriate credit, link to the license, indicate any changes, and distribute your adaptations under the same license.
 
@@ -27,7 +29,8 @@ Read the book online, and download the dataset and companion files, at <https://
 [epub]{.isbn} (EPUB)\
 [paperback-bw]{.isbn} (paperback, black and white)\
 [paperback-color]{.isbn} (paperback, color)\
-[hardcover]{.isbn} (hardcover)
+[hardcover]{.isbn} (hardcover)\
+[doi]{.doi}
 
 The examples are verified against release {{< var dataset.version >}} of the Charles River Accounting Dataset ({{< var dataset.window >}}). Charles River and every person, customer, supplier, and transaction in the dataset are fictional; any resemblance to real people or organizations is coincidental.
 
@@ -35,5 +38,5 @@ Microsoft, Excel, Power BI, and Power Query are trademarks of the Microsoft grou
 
 The information in this book is provided as is, without warranty of any kind. To report an error, open an issue at <https://github.com/mmcodesso/Accounting_Analytics_Book/issues>.
 
-Suggested citation: Codesso, M. (2027). *Accounting analytics: An integrated approach*. Accounting Analytics Hub. https://aa.accountinganalyticshub.com/
+Suggested citation: Codesso, M. (2027). *Accounting analytics: An integrated approach*. Accounting Analytics Hub. [https://aa.accountinganalyticshub.com/]{.citation-url}
 :::

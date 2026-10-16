@@ -1,4 +1,5 @@
 ---
+description: "The Part III case. Use SQL to explain the plant's growing hours and manufacturing variance, plan next year's hours, and propose the year-end entries."
 format:
   html:
     number-sections: false

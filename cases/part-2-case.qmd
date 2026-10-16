@@ -1,4 +1,5 @@
 ---
+description: "The Part II case. Use Excel to measure the cost of sales promotions, test their effect on volume, check the controls over them, and recommend a calendar."
 format:
   html:
     number-sections: false

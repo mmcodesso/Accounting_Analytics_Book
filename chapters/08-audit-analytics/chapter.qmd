@@ -1,5 +1,6 @@
 ---
 title: "Audit Analytics in Excel"
+description: "Audit whole populations in Excel with stratification, Benford's Law, receivables aging, journal entry risk scores, and duplicate and gap tests."
 ---
 
 

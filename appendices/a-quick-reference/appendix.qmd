@@ -1,4 +1,5 @@
 ---
+description: "A quick reference to the Excel, Power Query, SQL, and DAX functions and commands the book teaches, each with its chapter, and one calculation in three tools."
 aliases:
   - /appendices/c-quick-reference/appendix.html
 ---

@@ -1,4 +1,5 @@
 ---
+description: "How this open textbook is organized, how its chapters work, the software it needs, the Charles River dataset, and notes for students and instructors."
 format:
   html:
     number-sections: false
@@ -117,6 +118,10 @@ Mauricio Codesso is an Associate Teaching Professor of Accounting at Northeaster
 His teaching and research focus on accounting analytics, accounting information systems, managerial accounting, and auditing. His academic work applies data analytics, artificial intelligence, machine learning, text mining, and other emerging technologies to accounting and business decisions, with particular emphasis on how technology can improve accounting processes, organizational performance, and professional judgment.
 
 He wrote this book and developed the Charles River Accounting Dataset, the integrated data environment it uses throughout. Because the records of one company run through every business process and every tool, students build practical skills in Excel, SQL, and Power BI while they deepen their understanding of accounting. Through Accounting Analytics Hub, he develops open educational resources, including textbooks, datasets, and practical learning materials, that connect academic knowledge with professional practice. His teaching emphasizes learning through practice, critical thinking, and the responsible use of analytical technology on real accounting problems.
+
+::: {.content-visible when-format="html"}
+His ORCID iD is <https://orcid.org/0000-0002-6214-7177>, and his International Standard Name Identifier (ISNI) is [0000 0005 3176 7244](https://isni.org/isni/0000000531767244).
+:::
 
 ## References
 

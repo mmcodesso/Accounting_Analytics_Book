@@ -1,5 +1,6 @@
 ---
 title: "Analytical Queries in SQL"
+description: "Analytical SQL for accounting with CASE, date functions, window functions such as LAG and RANK, common table expressions, and views for a monthly measure."
 ---
 
 

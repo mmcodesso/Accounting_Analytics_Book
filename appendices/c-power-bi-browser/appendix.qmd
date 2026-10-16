@@ -1,3 +1,7 @@
+---
+description: "Build the book's first Power BI model, report page, and measure in the Power BI service in a browser, on a Mac or a computer without Power BI Desktop."
+---
+
 # Power BI in the Browser {#sec-appendix-browser}
 
 Power BI Desktop runs only on Windows. The Power BI service, at app.powerbi.com, does much of the same work in a supported browser, on a Mac, a Chromebook, or a Windows computer without Desktop: it builds a semantic model from CharlesRiver.xlsx with Power Query, relates the model's tables, holds its measures and tests them with DAX queries, and builds the report's pages (Microsoft, 2026b). This appendix gives you a starting point for that path. Its three tutorials rebuild Chapter 13's model and its Sales and Discounts page in the browser and add a first measure, and its last section lists what else changes, so that you can follow the rest of Part IV on your own.

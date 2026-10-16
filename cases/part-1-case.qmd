@@ -1,4 +1,5 @@
 ---
+description: "The Part I case. Frame a falling furniture margin as an analytics question, test the Charles River data for quality, and trace it through the database."
 format:
   html:
     number-sections: false

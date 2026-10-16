@@ -1,5 +1,6 @@
 ---
 title: "Data Preparation and Cleaning in Excel"
+description: "Prepare and clean accounting data in Excel with text, date, and lookup functions such as XLOOKUP, and build a refreshable preparation workflow in Power Query."
 ---
 
 

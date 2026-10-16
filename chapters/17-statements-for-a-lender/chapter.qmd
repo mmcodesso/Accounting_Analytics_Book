@@ -1,5 +1,6 @@
 ---
 title: "Financial Statements for a Lender"
+description: "A financial accounting capstone case. Prepare comparative statements and notes for a lender from the ledger, with accruals, cutoff, materiality, and cash flows."
 ---
 
 

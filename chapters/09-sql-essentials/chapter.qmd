@@ -1,5 +1,6 @@
 ---
 title: "SQL Essentials for Accounting Analytics"
+description: "Query an accounting database with SQL in DB Browser for SQLite, using SELECT, WHERE, ORDER BY, and functions, and save your work as documented scripts."
 ---
 
 

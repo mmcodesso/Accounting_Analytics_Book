@@ -1,5 +1,6 @@
 ---
 title: "Audit Monitoring and Report Assurance"
+description: "Continuous auditing and monitoring in Power BI with an exception register, a monitoring page, dispositions, and the tests and change controls a report needs."
 ---
 
 

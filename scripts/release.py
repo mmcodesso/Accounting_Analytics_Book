@@ -131,6 +131,13 @@ def bump(root: Path, revision: str) -> Revision:
             raise ValueError(f'_variables.yml: no book.{key} line')
     with open(path, 'w', encoding='utf-8', newline='') as handle:
         handle.write(text[:block.start(1)] + body + text[block.end(1):])
+    # CITATION.cff carries the revision as its version (scripts/citation_cff.py writes it from _variables.yml).
+    if (root / 'CITATION.cff').exists():
+        try:
+            from scripts import citation_cff
+        except ImportError:
+            import citation_cff
+        citation_cff.write(root)
     return read_revision(root)
 
 
@@ -832,8 +839,8 @@ def main(argv: list[str] | None = None) -> int:
             notes(ROOT, update=args.update)
         elif args.command == 'bump':
             revision = bump(ROOT, args.revision)
-            print(f'_variables.yml now names revision {revision.revision} ({revision.tag}). Commit it, then run '
-                  'python scripts/release.py publish, which creates the release.')
+            print(f'_variables.yml now names revision {revision.revision} ({revision.tag}), and CITATION.cff its '
+                  'version. Commit both, then run python scripts/release.py publish, which creates the release.')
         else:
             summary = os.environ.get('GITHUB_STEP_SUMMARY')
             return check(ROOT, args.site, summary=Path(summary) if summary else None)

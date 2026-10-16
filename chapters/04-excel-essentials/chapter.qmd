@@ -1,5 +1,6 @@
 ---
 title: "Excel Essentials for Accounting Analytics"
+description: "Build a controlled Excel workbook for accounting analysis with Power Query, Tables, structured references, filters, conditional formatting, and documentation."
 ---
 
 

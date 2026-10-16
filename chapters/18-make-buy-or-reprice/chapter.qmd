@@ -1,5 +1,6 @@
 ---
 title: "Make, Buy, or Reprice"
+description: "A managerial accounting capstone case on standard, absorption, and time-driven product costs, unused capacity, a supplier's quote, and price increases."
 ---
 
 

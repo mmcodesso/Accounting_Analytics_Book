@@ -1,5 +1,6 @@
 ---
 title: "Reports for Management Decisions"
+description: "Design Power BI reports for managers with KPIs, drill-through pages, tooltips, budget variance analysis, visual calculations, what-if parameters, and forecasts."
 ---
 
 

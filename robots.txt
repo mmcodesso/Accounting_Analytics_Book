@@ -1,0 +1,5 @@
+# Search engines may crawl the whole book. Quarto writes the sitemap from book.site-url in _quarto.yml.
+User-agent: *
+Allow: /
+
+Sitemap: https://aa.accountinganalyticshub.com/sitemap.xml

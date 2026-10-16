@@ -1,5 +1,6 @@
 ---
 title: "The Accounting Data Environment"
+description: "How relational databases organize accounting data with tables, primary and foreign keys, and ER diagrams, and how a transaction traces to the general ledger."
 aliases:
   - /03_chapter.html
 ---

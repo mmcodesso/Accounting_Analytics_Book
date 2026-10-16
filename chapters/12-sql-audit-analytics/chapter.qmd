@@ -1,5 +1,6 @@
 ---
 title: "Audit Analytics in SQL"
+description: "Audit analytics in SQL with reconciliations, document traces, cutoff tests, three-way matching, and approval and payroll tests in a reusable audit library."
 ---
 
 

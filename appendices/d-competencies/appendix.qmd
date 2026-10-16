@@ -1,3 +1,7 @@
+---
+description: "A map of the book's exercises and cases to the CPA Evolution model curriculum, the IMA competency framework, IFAC's education standards, and AACSB's standards."
+---
+
 # The Exercises and Professional Competencies {#sec-appendix-competencies}
 
 This appendix maps the book's exercises, comprehensive cases, and capstone cases to the competency areas of four frameworks that accounting programs use to plan courses and to document what their students learn. It is written for instructors who align a course with the CPA Evolution model curriculum, with the management accounting competencies of the Institute of Management Accountants (IMA), with the International Education Standards of the International Federation of Accountants (IFAC), or with the accounting accreditation standards of AACSB International. An entry means that the item practices the competency as one of its main tasks, not that it covers everything the framework expects. Each item appears in at most three rows of each framework's table, the ones its requirements exercise most directly, and a row can group related competencies or topics.

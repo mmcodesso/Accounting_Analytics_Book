@@ -1,4 +1,5 @@
 ---
+description: "A closing reflection on the habits of accounting analytics that stay constant, such as reconciling, profiling, and documenting, and on the changes ahead."
 format:
   html:
     number-sections: false

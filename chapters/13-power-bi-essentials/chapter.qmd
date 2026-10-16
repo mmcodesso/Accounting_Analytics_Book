@@ -1,5 +1,6 @@
 ---
 title: "Power BI Essentials for Accounting Analytics"
+description: "Build a first Power BI report on accounting data with Power Query, a data model, cards, charts, and slicers, a validation page, and honest, accessible visuals."
 ---
 
 

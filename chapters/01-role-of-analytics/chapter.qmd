@@ -1,5 +1,6 @@
 ---
 title: "The Role of Analytics in Accounting"
+description: "How data and technology are changing accounting work, the four types of analytics, the analytics workflow, and where Excel, SQL, and Power BI each fit."
 aliases:
   - /01_chapter.html
 ---

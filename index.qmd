@@ -1,6 +1,8 @@
 ---
 title-block: false
 body-classes: welcome-page
+# Google Scholar's tags, from the citation block of _quarto.yml: the homepage is the book's one record.
+google-scholar: true
 format:
   html:
     number-sections: false
@@ -48,4 +50,4 @@ This book is a living project, and contributions from instructors, students, and
 
 This is the {{< var book.edition >}} edition of the book, revision {{< var book.revision >}}; the [Downloads](#sec-downloads) page links its files. If you use this book in your teaching or research, please cite it as:
 
-> Codesso, M. (2027). *Accounting analytics: An integrated approach*. Accounting Analytics Hub. https://aa.accountinganalyticshub.com/
+> Codesso, M. (2027). *Accounting analytics: An integrated approach*. Accounting Analytics Hub. [https://aa.accountinganalyticshub.com/]{.citation-url}

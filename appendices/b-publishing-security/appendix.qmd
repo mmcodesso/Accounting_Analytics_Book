@@ -1,4 +1,5 @@
 ---
+description: "Publish and share Power BI reports with row-level and object-level security, workspaces, apps, licenses, refresh, and the risks of each way to share."
 aliases:
   - /appendices/a-publishing-security/appendix.html
 ---

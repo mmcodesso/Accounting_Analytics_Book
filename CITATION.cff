@@ -1,0 +1,69 @@
+# Written by scripts/citation_cff.py from _quarto.yml and _variables.yml: edit those and run the script, not
+# this file. GitHub shows it as "Cite this repository"; Zenodo and reference managers read it too.
+cff-version: 1.2.0
+message: If you use this book in your teaching or research, please cite it as below.
+title: 'Accounting Analytics: An Integrated Approach'
+abstract: 'Accounting Analytics: An Integrated Approach is an open textbook that teaches accounting and business
+  students to extract, prepare, analyze, and visualize financial and operational data with Microsoft Excel, SQL,
+  and Microsoft Power BI. Every technique is taught through an accounting question, and every example draws on the
+  records of one fictional company in the Charles River Accounting Dataset, so a customer order analyzed in Excel
+  is the same one found in the general ledger with SQL and reported on in Power BI. Part I lays the foundations
+  of accounting analytics, data quality, and the relational database behind accounting systems. Part II teaches
+  data preparation, descriptive analytics, forecasting, budgeting, what-if analysis, and audit testing in Excel.
+  Part III queries, joins, and summarizes whole populations of transactions in SQL, for management questions and
+  for audit tests. Part IV turns to data visualization, data models, DAX measures, management reports, and audit
+  monitoring in Power BI. Part V offers capstone cases in financial reporting, managerial accounting, and auditing.
+  The chapters of Parts I to IV combine guided tutorials, multiple-choice questions, and exercises from the perspectives
+  of financial accounting, managerial accounting, and auditing, and each of these Parts closes with a comprehensive
+  case. The book is written for undergraduate and graduate students with no prior analytics or programming experience.
+  It is free to read online and to download, as are its dataset, slides, companion files, and solutions, and it
+  is licensed under CC BY-SA 4.0.'
+authors:
+- family-names: Codesso
+  given-names: Mauricio
+  orcid: https://orcid.org/0000-0002-6214-7177
+  affiliation: Northeastern University
+version: '2027.1'
+date-released: '2027-01-18'
+doi: 10.5281/zenodo.23425592
+license: CC-BY-SA-4.0
+url: https://aa.accountinganalyticshub.com
+repository-code: https://github.com/mmcodesso/Accounting_Analytics_Book
+keywords:
+- Accounting Analytics
+- Data Analytics
+- Accounting Information Systems
+- Financial Accounting
+- Managerial Accounting
+- Auditing
+- Audit Data Analytics
+- Continuous Auditing
+- Data Visualization
+- Business Intelligence
+- Relational Databases
+- Microsoft Excel
+- Power Query
+- SQL
+- SQLite
+- Microsoft Power BI
+- DAX
+- Open Educational Resources
+- Open Textbook
+- Charles River Accounting Dataset
+preferred-citation:
+  type: book
+  title: 'Accounting Analytics: An Integrated Approach'
+  authors:
+  - family-names: Codesso
+    given-names: Mauricio
+    orcid: https://orcid.org/0000-0002-6214-7177
+    affiliation: Northeastern University
+  publisher:
+    name: Accounting Analytics Hub
+  year: 2027
+  isbn: 978-65-978221-9-5
+  doi: 10.5281/zenodo.23425592
+  url: https://aa.accountinganalyticshub.com
+  license: CC-BY-SA-4.0
+  languages:
+  - en

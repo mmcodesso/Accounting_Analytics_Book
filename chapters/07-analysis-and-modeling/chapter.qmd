@@ -1,5 +1,6 @@
 ---
 title: "Forecasting, Budgeting, and What-If Analysis in Excel"
+description: "Regression and forecasts, static and flexible budgets, break-even models, and what-if analysis with data tables, Goal Seek, and Solver in Excel."
 ---
 
 

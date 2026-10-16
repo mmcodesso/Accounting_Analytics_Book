@@ -158,6 +158,11 @@ everywhere:
   "43.15 percent": {key: val.furniture.margin.Q2, format: ".2 percent"}
 
 files:
+  # ---- front matter -----------------------------------------------------------------------------------
+  front-matter/_book-pages.qmd:
+    constants: ["3176", "7244"]              # the author's ISNI (0000 0005 3176 7244), which a roll never changes
+  front-matter/preface.qmd:
+    constants: ["3176", "7244"]              # the author's ISNI, in About the Author
   # ---- Part I -----------------------------------------------------------------------------------------
   chapters/01-role-of-analytics/chapter.qmd:
     constants: ["50", "500,000", "1,446"]    # a generic audit-sampling illustration; the CIMA survey (Chapter 1's reference)

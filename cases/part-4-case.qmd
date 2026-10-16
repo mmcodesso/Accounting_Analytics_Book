@@ -1,4 +1,5 @@
 ---
+description: "The Part IV case. Build a Power BI working capital report for the audit committee that explains why a profitable year ended with less cash."
 format:
   html:
     number-sections: false
