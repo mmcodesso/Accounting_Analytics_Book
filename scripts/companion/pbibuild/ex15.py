@@ -363,7 +363,7 @@ def ex4(b: Build) -> None:
 # --- Exercise 15.5 ---------------------------------------------------------------------------------------------------
 
 # The Analytics-pane forecast of October to December (point, lower bound, upper bound) by the chart's first month, as
-# Power BI Desktop 2.158 drew it on 2026-10-05 on dataset v2026.1. Desktop computes it in the visual, so it cannot be
+# Power BI Desktop 2.158 drew it on 2026-10-05 on dataset v2027.1 (then tagged v2026.1). Desktop computes it in the visual, so it cannot be
 # derived here; the page's expect strings require the canvas to show these values, so a new Desktop or dataset that
 # changes them fails the verification and this table (and the model answer) must be read again from the result JSON.
 FORECAST = {"January": [(2435621.24, 1930153.52, 2941088.95), (2419256.64, 1864968.02, 2973545.27),

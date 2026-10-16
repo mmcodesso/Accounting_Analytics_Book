@@ -8,7 +8,7 @@
 | Tools | The Power BI service in a browser (the report editor) |
 | Time | About 45 minutes |
 | Solution file | No solution file, because the projects open only in Desktop. The model answer is Steps 1 to 6 of this guide, built from Guided Tutorial C.2 (the page, the slicer, the line chart and its sort), the Discounts measure of Exercise C.1, and the Checks tab of Chapter13-exercises-pbi.zip for the month and segment values |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

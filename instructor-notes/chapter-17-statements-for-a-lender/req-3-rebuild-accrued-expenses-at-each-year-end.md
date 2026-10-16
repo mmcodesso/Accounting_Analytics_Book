@@ -8,7 +8,7 @@
 | Tools | SQL (DB Browser for SQLite) |
 | Time | About 150 minutes |
 | Solution file | Chapter17-capstone-sql.zip: LenderPackage.sql, the queries headed Requirement 3 and the view OpenAccruals; Chapter17-capstone-excel.zip: worksheet Accrued Expenses, the same rebuild in formulas, as a cross-check |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

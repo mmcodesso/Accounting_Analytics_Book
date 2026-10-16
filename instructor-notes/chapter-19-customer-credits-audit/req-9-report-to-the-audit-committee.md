@@ -7,7 +7,7 @@
 | Tools | Excel |
 | Time | About 150 minutes |
 | Solution file | Chapter19-capstone-excel.zip: Credits Audit.xlsx, worksheet Report (key figures linked live, the conclusion, findings F1 to F6, the clean results and the action plans); the appendix is the workbook's own sheets |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

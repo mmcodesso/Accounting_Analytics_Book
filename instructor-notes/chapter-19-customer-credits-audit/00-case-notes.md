@@ -5,7 +5,7 @@
 | Unit | Chapter 19: Auditing the Customer Credits Cycle |
 | Tools | More than one tool |
 | Time | About 240 minutes of class time |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## At a glance
 

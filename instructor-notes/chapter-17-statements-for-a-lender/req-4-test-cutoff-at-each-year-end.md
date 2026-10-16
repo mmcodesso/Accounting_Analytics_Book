@@ -8,7 +8,7 @@
 | Tools | More than one tool |
 | Time | About 150 minutes |
 | Solution file | Chapter17-capstone-sql.zip: LenderPackage.sql, the queries headed Requirement 4 (tests L5 to L8 rerun, the revenue accounts, the payroll owed and the interest); Chapter17-capstone-excel.zip: worksheet Cutoff, with the proration in formulas, and the pasted results on SQL Results |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

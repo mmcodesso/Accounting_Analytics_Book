@@ -5,7 +5,7 @@
 | Unit | Appendix C: Power BI in the Browser |
 | Tools | The Power BI service in a browser (Power Query Online, the model editor, the report editor) |
 | Time | About 180 minutes of class time |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## At a glance
 

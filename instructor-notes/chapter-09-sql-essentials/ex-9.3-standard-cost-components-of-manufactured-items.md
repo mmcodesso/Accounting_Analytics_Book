@@ -8,7 +8,7 @@
 | Tools | SQL (DB Browser for SQLite) |
 | Time | About 60 minutes |
 | Solution file | Chapter09-exercises-sql.zip: Ex 9.3.sql |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

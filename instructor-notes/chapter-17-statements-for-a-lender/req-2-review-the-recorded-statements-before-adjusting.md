@@ -8,7 +8,7 @@
 | Tools | Power BI Desktop |
 | Time | About 150 minutes |
 | Solution file | Chapter17-capstone-pbi.zip: Charles River Lender Review.pbip, pages Review, Postings (the hidden drill-through), Sources, Questions and Validation, the Tests tab (Tests 1 and 2) and the Requirement 2 rows of the Checks tab; Chapter17-capstone-excel.zip: worksheet Review, which keeps the same results for the package |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

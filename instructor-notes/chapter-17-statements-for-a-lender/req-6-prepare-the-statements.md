@@ -8,7 +8,7 @@
 | Tools | More than one tool |
 | Time | About 180 minutes |
 | Solution file | Chapter17-capstone-excel.zip: Charles River Lender Package.xlsx, worksheet Statements, built from the Tables WorkingTB and AdjustmentLines; Chapter17-capstone-pbi.zip: Charles River Lender Review, page Package Tests and the Tests 3 to 5 and Checks tabs; Chapter17-capstone-sql.zip: LenderPackage.sql, the two queries headed Requirement 6 |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

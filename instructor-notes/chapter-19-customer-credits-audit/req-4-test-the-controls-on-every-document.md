@@ -8,7 +8,7 @@
 | Tools | SQL (DB Browser for SQLite) |
 | Time | About 240 minutes |
 | Solution file | Chapter19-capstone-sql.zip: Credits.sql, the queries headed Requirement 4 (tests T1 to T12, T10 is the export RefundFlags.csv); Chapter19-capstone-excel.zip: Credits Audit.xlsx, worksheets Tests and RefundFlags (the same results by year, as live flags and as pasted values) |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

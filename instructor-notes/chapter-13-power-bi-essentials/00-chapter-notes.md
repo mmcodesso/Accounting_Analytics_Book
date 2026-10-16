@@ -5,7 +5,7 @@
 | Unit | Chapter 13: Power BI Essentials for Accounting Analytics |
 | Tools | Power BI Desktop |
 | Time | About 300 minutes of class time |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## At a glance
 

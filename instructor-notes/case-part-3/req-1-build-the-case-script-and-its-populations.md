@@ -7,7 +7,7 @@
 | Tools | SQL (DB Browser for SQLite) |
 | Time | About 120 minutes |
 | Solution file | PartIII-case-sql.zip: Case.sql, the queries labeled Requirement 1 (the profiles, the link tests, and the views SurgeDays and PlantEntries with their reconciliation) |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

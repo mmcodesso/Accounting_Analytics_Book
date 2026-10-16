@@ -7,7 +7,7 @@
 | Tools | Excel |
 | Time | About 60 minutes |
 | Solution file | PartII-case.zip: Charles River Promotion Case.xlsx, sheet Memo (the model memorandum and its five exhibits, linked live to the analysis sheets), and the Recommendation row of the Documentation sheet |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

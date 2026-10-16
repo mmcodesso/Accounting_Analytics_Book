@@ -7,7 +7,7 @@
 | Tools | Excel |
 | Time | About 120 minutes |
 | Solution file | Chapter17-capstone-excel.zip: Charles River Lender Package.xlsx, worksheet Memo (the matters with live numbers and the model memo) and the Statements and Notes worksheets that the PDF prints; Chapter17-capstone-sql.zip: LenderPackage.sql, the three queries headed Requirement 9 |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

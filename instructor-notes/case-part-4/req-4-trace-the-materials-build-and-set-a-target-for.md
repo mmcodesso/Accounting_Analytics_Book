@@ -8,7 +8,7 @@
 | Tools | Power BI Desktop |
 | Time | About 150 minutes |
 | Solution file | PartIV-case.zip: Charles River Cash Case.pbip, pages Materials Build and Materials Target, the queries IssuedByPair and ShortfallPairs, the what-if table Target Days, the display folder Materials and the Requirement 4 rows of the Checks tab |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

@@ -8,7 +8,7 @@
 | Tools | SQL (DB Browser for SQLite) |
 | Time | About 120 minutes |
 | Solution file | Chapter19-capstone-sql.zip: Credits.sql, the queries headed Requirement 2 (tests G1 to G9); Chapter19-capstone-excel.zip: Credits Audit.xlsx, worksheet Reconciliation (the same reconciliations, in formulas, for the report's appendix) |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

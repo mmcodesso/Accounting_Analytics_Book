@@ -8,7 +8,7 @@
 | Tools | Excel |
 | Time | About 120 minutes |
 | Solution file | Chapter19-capstone-excel.zip: Credits Audit.xlsx, worksheets Materiality and Risks (the Ledger Table feeds the formulas); Chapter19-capstone-sql.zip: Credits.sql, tests P1 and P2, the same rates and the same income in SQL |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

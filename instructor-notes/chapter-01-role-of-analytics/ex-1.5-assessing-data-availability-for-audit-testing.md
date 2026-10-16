@@ -7,7 +7,7 @@
 | Perspective | Auditing |
 | Tools | Workbook browsing and written work |
 | Time | About 70 minutes |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

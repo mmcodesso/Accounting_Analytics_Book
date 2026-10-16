@@ -1,6 +1,6 @@
 # The yearly roll
 
-Each summer the book moves to a new three-year window: the 2026 edition is fiscal 2024–2026 (dataset release v2026.1), the 2027 edition would be fiscal 2025–2027 (v2027.1). (In this runbook an edition is a data window; the book's own edition and revision, such as the first edition, revision 2027.1, are `book.edition` and `book.revision` in `_variables.yml`; step 10 publishes a roll under a new revision, `python scripts/release.py bump`, and a new edition of the book is set by hand in `book.edition`.) The generator is seeded, so almost every value changes. A roll is a scripted pipeline plus a review of what the scripts could not decide. This runbook is the order of work; the tools are all in the repository.
+Each summer the book moves to a new three-year window: the 2026 edition is fiscal 2024–2026 (dataset release v2027.1, tagged v2026.1 until 2026-10-16), the 2027 edition would be fiscal 2025–2027. The dataset's tag carries the year of the book revision that first ships it (v2027.1 with book-v2027.1), so the 2027 edition's dataset takes the year of the revision it is published under in step 10 (v2028.1 with revision 2028.1, for example). (In this runbook an edition is a data window; the book's own edition and revision, such as the first edition, revision 2027.1, are `book.edition` and `book.revision` in `_variables.yml`; step 10 publishes a roll under a new revision, `python scripts/release.py bump`, and a new edition of the book is set by hand in `book.edition`.) The generator is seeded, so almost every value changes. A roll is a scripted pipeline plus a review of what the scripts could not decide. This runbook is the order of work; the tools are all in the repository.
 
 Everything is public. The chapters stay clean: no hidden comments, notes or markers in the text.
 
@@ -25,7 +25,7 @@ In the generator repository (`greenfield_database`, branch with the book scenari
 
 The three book scenarios (`cutoff_invoices`, `traced_sale`, `stranded_work_orders`) plant the storylines that are accidents of one seed on one window, only when the build lacks them. Check the log for their `BOOK SCENARIO` lines.
 
-The same code with the window 2024-2026 rebuilds v2026.1 table for table (83 of 83; checked on 2026-10-06 after the last change to the scenarios), so the scenarios change nothing on the shipped window.
+The same code with the window 2024-2026 rebuilds the shipped release (v2027.1, then tagged v2026.1) table for table (83 of 83; checked on 2026-10-06 after the last change to the scenarios), so the scenarios change nothing on the shipped window.
 
 Keep the exports the release needs switched on (`export_sqlite`, `export_excel`, the CSV bundle, `export_support_excel`): the tutorials read `CharlesRiver.xlsx`, and the builds of the rehearsals switched the workbook and CSV exports off to save time, so a rehearsal's dataset has no workbook (the five figures that read it need the real one).
 
@@ -42,7 +42,7 @@ It runs the data contract (every storyline and quirk the chapters rely on; 41 ch
 
 ### 3. Pin the new dataset
 
-Create the dataset release with a new tag (v2027.1). Never re-upload assets under an existing tag. Then edit `_variables.yml` (`dataset.version`, `dataset.window`, the two URLs, the three SHA-256 values). The companion files carry no edition in their names, so `scripts/companion/manifest.yml` needs no change. Put the files in `datasets/` and run:
+Create the dataset release with a new tag, `v` and the year of the book revision step 10 publishes (v2028.1 for revision 2028.1). Never re-upload assets under an existing tag. Then edit `_variables.yml` (`dataset.version`, `dataset.window`, the two URLs, the three SHA-256 values). The companion files carry no edition in their names, so `scripts/companion/manifest.yml` needs no change. Put the files in `datasets/` and run:
 
     python scripts/verify/pinned_dataset.py --verify datasets/CharlesRiver.sqlite
 

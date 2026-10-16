@@ -8,7 +8,7 @@
 | Tools | More than one tool |
 | Time | About 90 minutes |
 | Solution file | Chapter17-capstone-sql.zip: LenderPackage.sql, the queries headed Requirement 1; Chapter17-capstone-excel.zip: Charles River Lender Package.xlsx, worksheets TB 2024, TB 2025, TB 2026, Working TB and Recorded |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

@@ -8,7 +8,7 @@
 | Tools | Excel |
 | Time | About 120 minutes |
 | Solution file | Chapter07-exercises.zip: Chapter 7 Exercises - Solutions.xlsx, sheets Ex 7.4, Ex 7.4 Answer Report and Ex 7.4 Sensitivity Report (the Solver model is saved with the Ex 7.4 sheet) |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

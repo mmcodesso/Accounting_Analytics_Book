@@ -8,7 +8,7 @@
 | Tools | More than one tool |
 | Time | About 120 minutes |
 | Solution file | Chapter18-capstone-excel.zip: Make Buy Reprice.xlsx, worksheets Capacity, Growth 40%, Growth 40% Sensitivity, Growth 50% and Growth 50% Sensitivity; Chapter18-capstone-sql.zip: MakeBuy.sql, Q23 |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

@@ -8,7 +8,7 @@
 | Tools | Excel |
 | Time | About 100 minutes |
 | Solution file | Chapter05-exercises.zip: Chapter 5 Exercises - Solutions.xlsx, sheets Ex 5.6, Ex 5.6 PurchaseOrder and Ex 5.6 ItemMaster (the supplier columns are on Ex 5.5 Supplier, the line columns on SalesInvoiceLine) |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

@@ -8,7 +8,7 @@
 | Tools | The Power BI service in a browser (the model editor and DAX query view) |
 | Time | About 60 minutes |
 | Solution file | No solution file, because the projects open only in Desktop. The model answer is Steps 1 to 6 of this guide, built from Guided Tutorial C.3 (the Revenue measure and its test), the Key Measures formulas of Chapter 14 as the Appendix B project holds them, and the Checks tab of Chapter13-exercises-pbi.zip for the fiscal totals |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

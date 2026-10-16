@@ -8,7 +8,7 @@
 | Tools | Excel |
 | Time | About 75 minutes |
 | Solution file | Chapter05-exercises.zip: Chapter 5 Exercises - Solutions.xlsx, sheets Ex 5.1, Ex 5.1 CreditMemo and Ex 5.1 CreditMemoLine |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

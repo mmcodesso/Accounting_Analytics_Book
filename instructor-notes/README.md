@@ -1,6 +1,6 @@
 # Instructor Notes
 
-*Accounting Analytics: An Integrated Approach*, First edition, dataset release v2026.1 (fiscal 2024–2026).
+*Accounting Analytics: An Integrated Approach*, First edition, dataset release v2027.1 (fiscal 2024–2026).
 
 One folder per chapter, comprehensive case and appendix that has exercises. Each folder holds a chapter (or case) note, with the teaching approaches, the tutorial guide and the multiple-choice key, and one file per exercise or requirement, with its purpose, a step-by-step solution, the expected values, common mistakes and a grading guide.
 

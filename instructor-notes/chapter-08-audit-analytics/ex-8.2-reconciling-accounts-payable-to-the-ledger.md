@@ -8,7 +8,7 @@
 | Tools | Excel |
 | Time | About 90 minutes |
 | Solution file | Chapter08-exercises.zip: Chapter 8 Exercises - Solutions.xlsx, sheet Ex 8.2, with Ex 8.2 Pivot, Ex 8.2 JE Rows and the queries OpenPayables, PaidByInvoice, LedgerAP and PurchaseOrders |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

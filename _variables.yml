@@ -14,15 +14,11 @@ book:
   download: "https://github.com/mmcodesso/Accounting_Analytics_Book/releases/download/book-v2027.1"
 
 dataset:
-  # The release this edition is verified against. Tags are immutable: a new build gets a new tag.
-  version: "v2026.1"
+  
+  version: "v2027.1"
   window: "fiscal 2024–2026"
-  # Until release v2026.1 exists, the links still point to the latest release, which today holds
-  # the same files (same SHA-256). Once it is published, switch both URLs to the pinned tag:
-  #   release: https://github.com/mmcodesso/CharlesRiver_Database/releases/tag/v2026.1
-  #   download: https://github.com/mmcodesso/CharlesRiver_Database/releases/download/v2026.1
-  release: "https://github.com/mmcodesso/CharlesRiver_Database/releases/tag/v2026.1"
-  download: "https://github.com/mmcodesso/CharlesRiver_Database/releases/download/v2026.1"
+  release: "https://github.com/mmcodesso/CharlesRiver_Database/releases/tag/v2027.1"
+  download: "https://github.com/mmcodesso/CharlesRiver_Database/releases/download/v2027.1"
   sha256:
     sqlite: "de861968e07412d71032b6ed6a0fb8eb9825cf6911886b1597c4a628a914474c"
     xlsx: "185d42bd069fad177fae23c5e30df93edc7cf2669f687236c8a9f29435388e09"

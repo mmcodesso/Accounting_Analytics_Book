@@ -8,7 +8,7 @@
 | Tools | Power BI Desktop |
 | Time | About 180 minutes |
 | Solution file | PartIV-case.zip: Charles River Cash Case.pbip, pages Balance Sheet, Cash Bridge and Bridge Detail (the hidden drill-through page), Test 3 of the Tests tab and the Requirement 2 rows of the Checks tab |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

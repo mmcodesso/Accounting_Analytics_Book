@@ -7,7 +7,7 @@
 | Tools | More than one tool |
 | Time | About 90 minutes |
 | Solution file | PartIII-case-sql.zip: Case.sql, the Requirement 6 model answer in its closing comments (the memo's content, in the order of the controller's questions, with its recommendation) |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

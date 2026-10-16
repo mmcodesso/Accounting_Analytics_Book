@@ -2,7 +2,7 @@
 
 This register lists every data fact the book relies on, as verified against the dataset of the 2026 edition:
 
-- Charles River dataset v2026.1, fiscal 2024–2026;
+- Charles River dataset v2027.1 (tagged v2026.1 until 2026-10-16, the same files), fiscal 2024–2026;
 - `CharlesRiver.sqlite` SHA-256 `de861968e07412d71032b6ed6a0fb8eb9825cf6911886b1597c4a628a914474c`, the same file as release v1.0.0-rc1 after its assets were re-uploaded on 2026-05-09.
 
 It moved verbatim from CLAUDE.md on 2026-10-02 (Phase 0 of the companion-files and yearly-roll program), so that it has version history. CLAUDE.md imports it, so it stays in Claude Code's context.

@@ -8,7 +8,7 @@
 | Tools | Power BI Desktop |
 | Time | About 180 minutes |
 | Solution file | Chapter19-capstone-pbi.zip: Credits Analytics/Credits Analytics.pbip (pages About, Returns, Timing, Concentration, Refund Ranking, Refund Detail, Validation and Notes; the Tests and Checks tabs in DAX query view) and RefundFlags.csv, the export of test T10 of Credits.sql |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

@@ -8,7 +8,7 @@
 | Tools | The Power BI service in a browser (the model editor, DAX query view and version history) |
 | Time | About 45 minutes |
 | Solution file | No solution file, because the projects open only in Desktop. The model answer is Steps 1 to 5 of this guide, built from Guided Tutorial C.3 (the Revenue measure and its test in Tests.dax) and the Checks tab of Chapter13-exercises-pbi.zip for the fiscal totals. Version history cannot be run outside a Pro account, so its dialog is described in general terms |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

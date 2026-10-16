@@ -8,7 +8,7 @@
 | Tools | Excel |
 | Time | About 75 minutes |
 | Solution file | PartII-case.zip: Charles River Promotion Case.xlsx, sheets R2 Cost (PivotTable PromotionCost) and R2 Gross to Net, with the queries BilledLines, RevenuePostings, LedgerActivity, Accounts and Items |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

@@ -8,7 +8,7 @@
 | Tools | Excel |
 | Time | About 120 minutes |
 | Solution file | Chapter06-exercises.zip: Chapter 6 Exercises - Solutions.xlsx, sheets TrialBalance, IncomeStatement, JournalEntries and Ex 6.1 |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

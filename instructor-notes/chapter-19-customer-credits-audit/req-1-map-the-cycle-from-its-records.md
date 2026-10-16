@@ -8,7 +8,7 @@
 | Tools | SQL (DB Browser for SQLite) |
 | Time | About 120 minutes |
 | Solution file | Chapter19-capstone-sql.zip: Credits.sql, the queries headed Requirement 1 (tests M1 to M8); Chapter19-capstone-excel.zip: Credits Audit.xlsx, worksheet Cycle Map (the same map, in formulas, for the report's appendix) |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

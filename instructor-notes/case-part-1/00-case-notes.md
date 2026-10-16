@@ -5,7 +5,7 @@
 | Unit | Case Part 1: Getting the Data Ready for the Furniture Margin Question |
 | Tools | Workbook browsing and written work |
 | Time | About 120 minutes of class time |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## At a glance
 

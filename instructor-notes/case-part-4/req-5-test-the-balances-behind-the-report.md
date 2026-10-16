@@ -8,7 +8,7 @@
 | Tools | Power BI Desktop |
 | Time | About 150 minutes |
 | Solution file | PartIV-case.zip: Charles River Cash Case.pbip, page Reconciliations, the Findings table, Tests 4 and 5 of the Tests tab and the Requirement 5 rows of the Checks tab |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

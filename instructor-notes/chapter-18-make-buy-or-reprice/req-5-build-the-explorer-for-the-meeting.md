@@ -8,7 +8,7 @@
 | Tools | Power BI Desktop |
 | Time | About 150 minutes |
 | Solution file | Chapter18-capstone-pbi.zip: Product Costs/Product Costs.pbip (pages About, Families, Concentration, Capacity, Validation and Notes; the Tests and Checks tabs in DAX query view); it reads Make Buy Reprice.xlsx from Chapter18-capstone-excel.zip |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

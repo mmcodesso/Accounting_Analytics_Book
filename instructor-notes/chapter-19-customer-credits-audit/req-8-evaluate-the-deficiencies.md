@@ -8,7 +8,7 @@
 | Tools | Excel |
 | Time | About 120 minutes |
 | Solution file | Chapter19-capstone-excel.zip: Credits Audit.xlsx, worksheet Deficiencies (the matrix D1 to D8, the combined evaluation G1 to G5, the clean results and the model answer) |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

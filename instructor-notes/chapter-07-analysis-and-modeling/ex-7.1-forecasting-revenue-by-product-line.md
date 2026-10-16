@@ -8,7 +8,7 @@
 | Tools | Excel |
 | Time | About 90 minutes |
 | Solution file | Chapter07-exercises.zip: Chapter 7 Exercises - Solutions.xlsx, sheet Ex 7.1 |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

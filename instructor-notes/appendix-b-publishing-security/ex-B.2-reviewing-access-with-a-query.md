@@ -8,7 +8,7 @@
 | Tools | Power BI Desktop |
 | Time | About 75 minutes |
 | Solution file | AppendixB-exercises-pbi.zip: Appendix B Exercises - Solutions.pbip, page Ex B.2, the DAX query tab Ex B.2, and the query AccessEmployees |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

@@ -8,7 +8,7 @@
 | Tools | Excel |
 | Time | About 135 minutes |
 | Solution file | Chapter08-exercises.zip: Chapter 8 Exercises - Solutions.xlsx, sheets Ex 8.6 and Ex 8.6 Price Lists, with the queries Promotions, InvoiceLines, PendingOverrides, PriceLists, PriceListLines and OrderLines |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

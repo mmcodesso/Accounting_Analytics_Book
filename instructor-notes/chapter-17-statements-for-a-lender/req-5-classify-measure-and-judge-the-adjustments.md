@@ -8,7 +8,7 @@
 | Tools | More than one tool |
 | Time | About 180 minutes |
 | Solution file | Chapter17-capstone-excel.zip: Charles River Lender Package.xlsx, worksheets Adjustments (the schedule, the AdjustmentLines Table, materiality and the passed items) and Working TB (the adjustments and adjusted balances); Chapter17-capstone-sql.zip: LenderPackage.sql, the queries headed Requirement 5 (the receivables aging, the allowance, returns after the year-end, the current portion of the notes) |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

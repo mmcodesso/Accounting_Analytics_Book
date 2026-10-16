@@ -8,7 +8,7 @@
 | Tools | SQL (DB Browser for SQLite) |
 | Time | About 140 minutes |
 | Solution file | PartIII-case-sql.zip: Case.sql, the queries labeled Requirement 5 (the views PayrollAccrual, PriorYearWork and CutoffItems, the reruns of tests L5, L6 and L8, and the summary of adjustments), and the Requirement 5 model answer in its closing comments |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

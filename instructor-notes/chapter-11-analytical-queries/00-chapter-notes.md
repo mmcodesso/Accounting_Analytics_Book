@@ -5,7 +5,7 @@
 | Unit | Chapter 11: Analytical Queries in SQL |
 | Tools | SQL (DB Browser for SQLite) |
 | Time | About 270 minutes of class time |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## At a glance
 

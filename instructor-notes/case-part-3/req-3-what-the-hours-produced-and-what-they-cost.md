@@ -8,7 +8,7 @@
 | Tools | SQL (DB Browser for SQLite) |
 | Time | About 150 minutes |
 | Solution file | PartIII-case-sql.zip: Case.sql, the queries labeled Requirement 3 (the hours against output, the view PlantWeeks, the capacity and cost queries, the view PlantLedger, the bridge and the three measures), and the Requirement 3 model answer in its closing comments |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

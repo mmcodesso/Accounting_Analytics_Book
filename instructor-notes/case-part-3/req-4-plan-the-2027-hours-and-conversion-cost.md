@@ -8,7 +8,7 @@
 | Tools | SQL (DB Browser for SQLite) |
 | Time | About 150 minutes |
 | Solution file | PartIII-case-sql.zip: Case.sql, the queries labeled Requirement 4 (the view PlantAssets, the depreciation schedule, the standard cost of the output, the Params and Scenarios CTEs and the variance at standard hours), and the Requirement 4 model answer in its closing comments |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

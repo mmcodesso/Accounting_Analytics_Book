@@ -8,7 +8,7 @@
 | Tools | Excel |
 | Time | About 90 minutes |
 | Solution file | PartII-case.zip: Charles River Promotion Case.xlsx, sheets R3 Volume and R3 Customers, with the queries OrderLines, Promotions and Customers |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

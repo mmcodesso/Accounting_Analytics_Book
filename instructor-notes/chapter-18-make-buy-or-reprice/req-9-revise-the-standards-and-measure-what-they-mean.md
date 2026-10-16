@@ -8,7 +8,7 @@
 | Tools | More than one tool |
 | Time | About 150 minutes |
 | Solution file | Chapter18-capstone-excel.zip: Make Buy Reprice.xlsx, worksheet Standards; Chapter18-capstone-sql.zip: MakeBuy.sql, Q27 to Q31 |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

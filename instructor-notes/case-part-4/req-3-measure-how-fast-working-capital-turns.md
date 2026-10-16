@@ -8,7 +8,7 @@
 | Tools | Power BI Desktop |
 | Time | About 180 minutes |
 | Solution file | PartIV-case.zip: Charles River Cash Case.pbip, page Working Capital and its hidden tooltip page WC Tooltip, the field parameter table WC Measure, the display folders Working capital, Working capital (average balance) and Policy targets, and the Requirement 3 rows of the Checks tab |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

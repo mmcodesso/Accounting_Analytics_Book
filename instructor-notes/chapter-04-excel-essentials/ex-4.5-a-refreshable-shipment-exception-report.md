@@ -8,7 +8,7 @@
 | Tools | Excel |
 | Time | About 90 minutes |
 | Solution file | Chapter04-exercises.zip: Chapter 4 Exercises - Solutions.xlsx, sheets Ex 4.5 Parameters, Ex 4.5 Analysis and Ex 4.5 Shipment |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

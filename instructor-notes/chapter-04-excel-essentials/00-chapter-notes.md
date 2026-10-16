@@ -5,7 +5,7 @@
 | Unit | Chapter 4: Excel Essentials for Accounting Analytics |
 | Tools | Excel |
 | Time | About 180 minutes of class time |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## At a glance
 

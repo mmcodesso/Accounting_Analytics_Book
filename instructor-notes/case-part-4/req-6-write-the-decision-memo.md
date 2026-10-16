@@ -7,7 +7,7 @@
 | Tools | Power BI Desktop |
 | Time | About 90 minutes |
 | Solution file | PartIV-case.zip: Charles River Cash Case.pbip, page Memo (the model memo in two text boxes, in the order of the controller's questions, ending with the recommendation) and the Requirement 6 rows of the Checks tab |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

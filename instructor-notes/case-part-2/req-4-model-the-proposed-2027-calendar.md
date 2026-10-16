@@ -8,7 +8,7 @@
 | Tools | Excel |
 | Time | About 100 minutes |
 | Solution file | PartII-case.zip: Charles River Promotion Case.xlsx, sheets R4 Model and R4 Budgets, with the Parameters sheet and the queries BilledLines, BudgetPrices and OrderLines |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

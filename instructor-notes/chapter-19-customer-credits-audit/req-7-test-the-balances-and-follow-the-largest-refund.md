@@ -8,7 +8,7 @@
 | Tools | More than one tool |
 | Time | About 150 minutes |
 | Solution file | Chapter19-capstone-sql.zip: Credits.sql, the queries headed Requirement 7 (tests S1 to S6); Chapter19-capstone-excel.zip: Credits Audit.xlsx, worksheet Timeline (the largest refund live, the timeline, the restocking by reason, the results and the disposition) |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 

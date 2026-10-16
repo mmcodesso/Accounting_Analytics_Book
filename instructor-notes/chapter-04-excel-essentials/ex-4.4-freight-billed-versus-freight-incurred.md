@@ -8,7 +8,7 @@
 | Tools | Excel |
 | Time | About 75 minutes |
 | Solution file | Chapter04-exercises.zip: Chapter 4 Exercises - Solutions.xlsx, sheets Ex 4.4, Ex 4.4 Shipment and Ex 4.4 SalesOrder |
-| Release | First edition, dataset release v2026.1 (fiscal 2024–2026) |
+| Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 
