@@ -105,6 +105,52 @@ keep theirs. The companion and solution files are built with
 [its README](supplementary/README.md)). The [contributor guide](CONTRIBUTING.md#building-the-book)
 has the details.
 
+### The complete build in one command
+
+`python scripts/build_everything.py` runs every step of a build in order and skips each one that is already
+current, so after a small change it rebuilds only what the change touches:
+
+1. the fast checks (keys, literals, citation file, deck sources, SQL, quick reference);
+2. the book's generated figures and their exports;
+3. the companion and solution files: SQL, then Excel (Excel for Microsoft 365 and the environment of
+   `scripts/companion/requirements-excel.txt`), then Power BI Desktop, one file at a time;
+4. the instructor guides' figures, the guides rendered from their templates and checked, their PDF files, and
+   `Instructor-Notes.zip`;
+5. the copy of the companion and solution files into `supplementary/`;
+6. the book (PDF, EPUB, DOCX, both deck formats, and the website) with `scripts/build_all.py`;
+7. the generated notes and the unit tests.
+
+```sh
+python scripts/build_everything.py --plan          # what would run, and why; changes nothing
+python scripts/build_everything.py                 # build everything that is out of date
+python scripts/build_everything.py --only guides   # one stage or unit (--list names them); --skip and --from also work
+python scripts/build_everything.py --force all     # run everything again (or --force with a stage or a unit)
+python scripts/build_everything.py --no-office     # leave out the Excel and Power BI Desktop builds
+python scripts/build_everything.py --print         # also build the print interiors
+```
+
+A step is current when nothing it was built from has changed since it ran. A companion file is built from its
+Python builder and the modules that builder imports, the chapter text it reads, the dataset, and the files other
+steps built for it, so editing the Chapter 7 builder makes only Chapter 7's workbook out of date. The record is
+`outputs/build/everything.json`, which is not tracked, so a computer that has built nothing starts with no record
+and builds everything once (hours, because of Excel and Power BI Desktop). If its files are already current, run
+`python scripts/build_everything.py --adopt` first to record them. `--adopt` refuses a file that is older than one
+of its inputs, and says which.
+
+A failed step stops the run and names the log, `outputs/build/everything-last-run.log`. Fix the cause and run the
+command again; the steps that finished are skipped.
+
+To build and publish a revision:
+
+```sh
+python scripts/build_everything.py                 # build what is out of date
+git add -A && git commit                           # commit the text and the files the build changed
+python scripts/build_everything.py --publish       # the checks, then release.py publish (--publish-dry-run shows the plan)
+```
+
+`--publish` stops while the working tree has uncommitted changes. The second run builds nothing, because the
+commit leaves every step current.
+
 ### Print editions
 
 The printed book (IngramSpark, US Letter, 8.5 × 11 in) has two interiors, one in

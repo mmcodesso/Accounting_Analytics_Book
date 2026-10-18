@@ -224,6 +224,13 @@ diagrams and the cover. Set `DRAWIO_BIN` if Draw.io is not found automatically.
 PDF output also requires a TeX installation; diagrams reach the PDF as the
 vector PDFs that the hook exports.
 
+### The whole build in one command
+
+`python scripts/build_everything.py` runs every build step in order (checks, figures, companion and solution
+files, instructor guides and PDFs, the book and its decks, tests) and skips what is current; `--plan` shows what
+would run and why. The [README](README.md#the-complete-build-in-one-command) describes it. The rest of this
+section is what each step runs.
+
 ### What is built where
 
 GitHub Actions (`.github/workflows/publish.yml`) renders and deploys only the
