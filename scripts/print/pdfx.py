@@ -53,7 +53,7 @@ def cmyk_profile(gs: str) -> Path:
 
 def strip_transparency_groups(source: Path, target: Path) -> int:
     """Copy source to target without the transparency groups of its forms and pages; returns how many."""
-    import fitz  # PyMuPDF
+    import pymupdf as fitz  # PyMuPDF
     doc = fitz.open(source)
     removed = 0
     for xref in range(1, doc.xref_length()):

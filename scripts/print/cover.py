@@ -142,7 +142,7 @@ def remove_page_background(data: bytes) -> bytes:
 
 def recolor_overlay(source: Path, target: Path, cmyk: dict[str, tuple]) -> int:
     """Replace every RGB or gray operator of the Draw.io PDF with its CMYK value; returns the replacements."""
-    import fitz
+    import pymupdf as fitz
     doc = fitz.open(source)
     if len(doc) != 1:
         raise ValueError(f'{source.name}: expected one page, found {len(doc)}')
@@ -187,7 +187,7 @@ def recolor_overlay(source: Path, target: Path, cmyk: dict[str, tuple]) -> int:
 # -- the page --------------------------------------------------------------------------------------
 def build_page(template: Template, idml: Path, cmyk_art_jpeg: bytes, overlay: Path, width_px: float,
                height_px: float, target: Path) -> None:
-    import fitz
+    import pymupdf as fitz
     doc = fitz.open()
     page = doc.new_page(width=template.page.w, height=template.page.h)
     art = fitz.Rect(template.art.x0, template.art.y0, template.art.x1, template.art.y1)
@@ -209,7 +209,7 @@ def zone_of(template: Template, box) -> str | None:
 
 
 def preflight_cover(pdf: Path, template: Template, isbn: str, pages: int, interior_pages: dict[str, int]) -> dict:
-    import fitz
+    import pymupdf as fitz
     import numpy as np
     problems: list[str] = []
     warnings: list[str] = []
@@ -360,7 +360,7 @@ def proof_image(pdf: Path, template: Template, target: Path, gs: str, dpi: int =
 # -- build -----------------------------------------------------------------------------------------
 def build_variant(variant: str, args, config: dict, copy: dict, gs: str, drawio_bin: Path, book_name: str,
                   interior_pages: dict[str, int]) -> dict:
-    import fitz
+    import pymupdf as fitz
     key, suffix = VARIANTS[variant]
     isbn_text = str((config.get('isbn') or {}).get(key) or '').strip()
     if not isbn_text:
@@ -454,7 +454,7 @@ def main() -> int:
     config = read_config()
     copy = yaml.safe_load((SOURCE_DIR / 'cover.yml').read_text(encoding='utf-8'))
     book_name = read_revision(ROOT).book_name
-    import fitz
+    import pymupdf as fitz
     interior_pages = {}
     for suffix in ('Print_Color', 'Print_BW'):
         interior = OUTPUT / f'{book_name}_{suffix}.pdf'

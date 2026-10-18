@@ -27,7 +27,7 @@ def available(*modules: str) -> bool:
 
 
 HAS_ART = available('numpy', 'PIL', 'scipy')            # scripts/print/cover_art.py
-HAS_OVERLAY = HAS_ART and available('fitz')             # scripts/print/cover.py
+HAS_OVERLAY = HAS_ART and available('pymupdf')             # scripts/print/cover.py
 CONFIG = yaml.safe_load((ROOT / '_quarto.yml').read_text(encoding='utf-8'))
 ISBNS = {key: re.sub(r'\D', '', str(value)) for key, value in CONFIG['isbn'].items()}
 

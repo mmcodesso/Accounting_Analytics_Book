@@ -583,7 +583,8 @@ def build_stages(args: argparse.Namespace) -> list[Stage]:
             Unit('notes', 'checks', 'every generated note against the data',
                  [py('scripts/facts.py', 'check')], inputs=notes_inputs(), outputs=()),
             Unit('unit-tests', 'checks', 'the unit tests',
-                 [[PY, '-m', 'unittest', 'discover', '-s', 'tests', '-p', 'test_*.py']], always=True)],
+                 # -b: a passing test's output (the release tests print the warnings of a fake revision) stays out of the log
+                 [[PY, '-m', 'unittest', 'discover', '-s', 'tests', '-p', 'test_*.py', '-b']], always=True)],
         'publish': [Unit('release', 'publish', 'scripts/release.py publish',
                          custom=publish_plan_for(bool(args.publish_dry_run) and not args.publish))],
     }

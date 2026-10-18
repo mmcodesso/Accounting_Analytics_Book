@@ -28,7 +28,7 @@ def swatches(archive: zipfile.ZipFile) -> dict[str, tuple[float, float, float, f
 
 def draw_marks(page, idml: Path) -> int:
     """Draw the template's printing marks onto a PyMuPDF page of the template's size; returns the shapes drawn."""
-    import fitz
+    import pymupdf as fitz
     with zipfile.ZipFile(idml) as archive:
         name = next(n for n in archive.namelist() if n.startswith('Spreads/Spread_'))
         spread = ET.fromstring(archive.read(name)).find('Spread')

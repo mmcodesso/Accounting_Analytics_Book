@@ -20,7 +20,7 @@ from scripts.print.pdfops import operations  # noqa: E402
 from scripts.print.recolor import recolor_stream  # noqa: E402
 from scripts.print.pdfx import pdfx_definition  # noqa: E402
 
-HAS_FITZ = importlib.util.find_spec('fitz') is not None
+HAS_FITZ = importlib.util.find_spec('pymupdf') is not None
 DARK_FILLS = ('BLUE', 'TEAL', 'CORAL', 'AMBER', 'GRAY')
 TINTS = ('BLUE_TINT', 'TEAL_TINT', 'AMBER_TINT', 'CORAL_TINT', 'GRAY_TINT')
 
@@ -143,7 +143,7 @@ class ProfilesTest(unittest.TestCase):
 @unittest.skipUnless(HAS_FITZ, 'PyMuPDF is not installed')
 class PreflightTest(unittest.TestCase):
     def test_flags_rgb_and_odd_pages(self):
-        import fitz
+        import pymupdf as fitz
         from scripts.print.preflight import check_color, check_pages
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / 'one.pdf'

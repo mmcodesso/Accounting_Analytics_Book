@@ -96,7 +96,7 @@ def content_xrefs(doc) -> list[int]:
 
 
 def recolor_file(source: Path, target: Path, mode: str) -> int:
-    import fitz  # PyMuPDF
+    import pymupdf as fitz  # PyMuPDF
     doc = fitz.open(source)
     count = 0
     for xref in content_xrefs(doc):
