@@ -49,7 +49,7 @@ Below floor   =E6<MarginFloor
 
 a. Choose **Data > What-If Analysis > Goal Seek**.
 b. Enter H6 in **Set cell**, `0` in **To value** and G6 in **By changing cell**, and repeat for each family below the floor.
-c. Compare with column I, which computes the same price directly.
+c. Compare with column I, which computes the same price directly. The increase, the volume it can lose and the revenue read column I, so they follow the floor and the costs, and column O says whether the Goal Seek result still agrees.
 ```
 Check      =IF(F6,B6*(G6*(1-MarginFloor)-D6),"")
 Direct     =IF(F6,D6/(1-MarginFloor),"")
@@ -60,9 +60,9 @@ Direct     =IF(F6,D6/(1-MarginFloor),"")
 **Step 3. Compute the increase and the volume it can lose.** Contribution is measured over the relevant cost with the crew kept. The volume the increase can lose is one minus the contribution per unit now, over that contribution plus the increase per unit: beyond it the family earns less contribution than today.
 
 ```
-Increase      =IF(F6,G6/C6-1,"")
+Increase      =IF(F6,I6/C6-1,"")
 Contribution  =C6-K6
-Volume lost   =IF(F6,1-L6/(L6+G6-C6),"")
+Volume lost   =IF(F6,1-L6/(L6+I6-C6),"")
 ```
 
 **Check:** BNH needs 9.21% and can lose 16.9% of its volume; the table of Expected results gives the rest. **Watch for:** contribution over the time-driven cost: BNH then reads 21.1% against 16.9%, an overstated threshold, because the committed costs inside the time-driven cost stay when volume is lost.
@@ -121,8 +121,8 @@ ORDER BY ApprovedOverrides DESC;
 **Step 6. Recommend, and show what changes if families are bought.** Raise each family below the floor by its increase through new, approved price lists with stated end dates, renegotiate the customer-specific lists rather than inheriting them, and stage the increases against the loss each can absorb. The totals block shows the revenue if volume holds and, for the families bought in Requirement 6, which families still need an increase.
 
 ```
-Still to reprice   =TEXTJOIN(", ",TRUE,FILTER(A5:A20,F5:F20*ISNA(XMATCH(A5:A20,FILTER('Make or Buy'!$A$10:$A$15,'Make or Buy'!$P$10:$P$15=1))),"none"))
-Their revenue      =SUMPRODUCT(--F5:F20,ISNA(XMATCH(A5:A20,FILTER('Make or Buy'!$A$10:$A$15,'Make or Buy'!$P$10:$P$15=1)))*1,N5:N20)
+Still to reprice   =TEXTJOIN(", ",TRUE,FILTER(A5:A20,F5:F20*ISNA(XMATCH(A5:A20,FILTER('Make or Buy'!$A$10:$A$15,'Make or Buy'!$P$10:$P$15=1,""))),"none"))
+Their revenue      =SUMPRODUCT(--F5:F20,ISNA(XMATCH(A5:A20,FILTER('Make or Buy'!$A$10:$A$15,'Make or Buy'!$P$10:$P$15=1,"")))*1,N5:N20)
 ```
 
 **Check:** the families bought (BNH, NGT, TBL) deliver margins of 45.0%, 43.2%, 42.7% at the delivered cost, above the floor; four families still need increases (BKC, CTB, SDB, CHD), worth $246,311 a year. **Watch for:** the whole table's $556,535 read as the revenue of the path that buys: the families bought clear the floor and need no increase.

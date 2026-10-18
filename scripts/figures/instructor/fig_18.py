@@ -1429,7 +1429,10 @@ def if_18_6_a() -> Diagram:
         r = first + i
         for col, key in (("G", "delivered"), ("I", "kept"), ("J", "reduced"), ("L", "absorp"), ("M", "a_kept"), ("N", "a_reduced")):
             _agree(ws, f"{col}{r}", q[key], tol=0.05)
-        decision = "Buy" if q["a_kept"] > 0 else "Buy only with the crew reduced" if q["a_reduced"] > 0 else "Make"
+        # the decision cell also asks whether the two years the quote is fixed cover the family's one-time costs (MOD18-04)
+        decision = ("Buy" if q["a_kept"] > 0 else
+                    ("Buy only with the crew reduced" if q["two_year"] > 0
+                     else "Make: the two years do not cover the one-time costs") if q["a_reduced"] > 0 else "Make")
         assert ws[f"O{r}"].value == decision, (r, ws[f"O{r}"].value, decision)
         decisions.append(decision)
     to_buy = [i for i, dec in enumerate(decisions) if dec != "Make"]
@@ -1441,7 +1444,8 @@ def if_18_6_a() -> Diagram:
     widths = [28, 80, 88, 88, 88, 96, 96, 96, 200]
     d = Diagram("The Make or Buy Table")
     formula = _g().clean(_g().workbook()["Make or Buy"]["O10"].value)
-    assert formula == '=IF(M10>0,"Buy",IF(N10>0,"Buy only with the crew reduced","Make"))', formula
+    assert formula == ('=IF(M10>0,"Buy",IF(N10>0,IF(Y10>0,"Buy only with the crew reduced",'
+                       '"Make: the two years do not cover the one-time costs"),"Make"))'), formula
     _formula_bar(d, 0, 0, 860, "O10", formula)
     sy = 40.0
     _ws(d, 0, sy, letters, widths, [], show_letters=True)
@@ -1459,8 +1463,8 @@ def if_18_6_a() -> Diagram:
     bottom = _tabs(d, bottom + 8, "Make or Buy", ["Costs", "Make or Buy", "Capacity"])
     _note(d, f"Outlined in teal: the {n.word(len(buy))} families whose decision is to buy only with the crew reduced. A positive effect means buying saves money; "
              f"with the crew kept (column M) every quoted family costs money to buy, and the CFO's absorption view (column L) is positive for {n.word(absorp_buy)} of "
-             f"the {n.word(len(quoted))}. Columns B to F, H, K and P to W are hidden here, and the columns are narrower than the workbook's; the formula bar "
-             f"shows the rule of the decision cells.", bottom + 4)
+             f"the {n.word(len(quoted))}. Columns B to F, H, K and P to Z are hidden here, and the columns are narrower than the workbook's; the formula bar "
+             f"shows the rule of the decision cells, which also asks (column Y) whether the two years the quote is fixed cover the family's one-time costs.", bottom + 4)
     return d
 
 

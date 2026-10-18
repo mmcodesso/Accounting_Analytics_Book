@@ -66,7 +66,7 @@ Then the other matters the records point to, briefly: cash (no interest income a
 
 ### Part 4: Screen the wording and the length
 
-**Step 4. Read the draft as the CFO would.** Search it for words that assign intent, such as hidden, unpaid, kept and fraud, and rewrite each as what the records show. Count the pages: two for the memo, three for the appendix. The model memo runs 888 words in 10 paragraphs.
+**Step 4. Read the draft as the CFO would.** Search it for words that assign intent, such as hidden, unpaid, kept and fraud, and rewrite each as what the records show. Count the pages: two for the memo, three for the appendix. The model memo runs 915 words in 10 paragraphs.
 
 **Check:** every number traces to the Memo worksheet or a requirement's result. No new adjustment is booked for a matter the ledger cannot settle, and the recorded balances it cannot support stay as recorded, named in the memo and held for evidence.
 

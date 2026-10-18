@@ -772,7 +772,7 @@ def g6(d, claim):
     need(d, claim)
     m = n18.model(d)
     n18.make_buy_claims(m, claim)
-    quoted, buy = m["quoted"], m["buy"]
+    quoted, buy, lose = m["quoted"], m["buy"], m["lose"]
     names = [x["name"] for x in buy]
     ws = workbook()["Make or Buy"]
     claim([ws.cell(r, 1).value for r in range(10, 10 + len(quoted))] == [x["name"] for x in quoted],

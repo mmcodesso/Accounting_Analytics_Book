@@ -12,7 +12,7 @@
 
 ## Purpose and learning outcomes
 
-The CFO and the production manager will want to move between families and items and between the three views while they talk. That is a report, not a workbook, and Chapters 13 to 15 taught the patterns: a model with explicit relationships, a disconnected table that switches a measure (Tutorial 15.1's Steps table), a Validation page and a Tests tab. Power BI fits because the readers explore. Item costs come from the saved workbook, and the report's capacity assumption must come from the same source or be reconciled explicitly: the practical share is typed in the report, so it is reconciled by hand. Recalculate and save Excel before refreshing Power BI. The analytics type is descriptive, with prescriptive intent.
+The CFO and the production manager will want to move between families and items and between the three views while they talk. That is a report, not a workbook, and Chapters 13 to 15 taught the patterns: a model with explicit relationships, a disconnected table that switches a measure (Tutorial 15.1's Steps table), a Validation page and a Tests tab. Power BI fits because the readers explore. Item costs come from the saved workbook, and the report's capacity assumption must come from the same source or be reconciled explicitly: the Model Parameters table reads the practical share from the workbook's name PracticalUsed. Recalculate and save Excel before refreshing Power BI. The analytics type is descriptive, with prescriptive intent.
 
 Students can:
 
@@ -26,7 +26,7 @@ Students can:
 
 - **Files.** Power BI Desktop (Windows only), CharlesRiver.xlsx and Make Buy Reprice.xlsx with its ItemCosts Table from Requirement 4. The project reads `C:\CharlesRiver\` for both; students point the queries at their copies with **Change Source**. The solution ships as a .pbip project, and students save their own .pbix.
 - **Data conditions.** The design services have no row in ItemCosts: 439 lines in all years, $1,213,344.00 of revenue in the year. ItemCosts holds the base year's costs only, so every visual needs the year.
-- **Verify first.** In DAX query view, run the Checks tab: all 209 rows of Requirement 5 and 12 of Milestone 2 agree.
+- **Verify first.** In DAX query view, run the Checks tab: all 211 rows of Requirement 5 and 12 of Milestone 2 agree.
 
 ## How to run it
 
@@ -45,7 +45,7 @@ Individual work or pairs, about 150 minutes: 30 for the model, 20 for the measur
     #"Added Custom" = Table.AddColumn(#"Changed Type1", "Year", each Date.Year([InvoiceDate]))
 ```
 
-The Capacity and Validation pages need six more Tables of the workbook, loaded the same way: Activity, Calendar, FamilyResults, PayClass, Debits1090 and Ledger5080. Transform Activity into Routing Time: keep Family, ItemGroup and the ten Run and Setup columns, choose **Transform > Unpivot Columns > Unpivot Other Columns** on Family and ItemGroup, split the attribute into its work-center prefix and its kind (Run or Setup), and name the value Hours. Transform Calendar into Work Centers and add a short WorkCenter name (Cutting, Assembly, Finishing, Packing, QA) that matches the prefixes. **Check:** 219 item rows, 27,933 invoice lines, 20,914 invoices.
+The Capacity and Validation pages need six more Tables of the workbook, loaded the same way: Activity, Calendar, FamilyResults, PayClass, Debits1090 and Ledger5080, and the practical share, the one-cell name PracticalUsed, as Model Parameters (its query stops the refresh unless the cell holds one number above 0 and at most 1). Transform Activity into Routing Time: keep Family, ItemGroup and the ten Run and Setup columns, choose **Transform > Unpivot Columns > Unpivot Other Columns** on Family and ItemGroup, split the attribute into its work-center prefix and its kind (Run or Setup), and name the value Hours. Transform Calendar into Work Centers and add a short WorkCenter name (Cutting, Assembly, Finishing, Packing, QA) that matches the prefixes. **Check:** 219 item rows, 27,933 invoice lines, 20,914 invoices.
 
 **Step 2. Relate the tables.** In Model view create three relationships, each many to one with a single direction: the lines to the item costs on ItemID, the lines to the invoices on SalesInvoiceID, and Routing Time to Work Centers on WorkCenter. The Costing View table of Step 4 and the control-total tables stay unrelated. Create the empty Key Measures table (**Home > Enter data**, no rows) before its measures.
 
@@ -92,9 +92,9 @@ Cost per Unit = DIVIDE ( [Product Cost], [Units] )
 
 **Step 6. Build the Families page.** Page filters: the year, and Family is not blank (**Filters on this page**). Add the slicer "Costing view" with **Single select**, a matrix "Margin % and cost per unit by family and costing view, manufactured items, fiscal 2026" (item groups and families in rows, View in columns, Margin % and Cost per Unit as values, manufactured items only), a bar chart "Items ranked by margin under the costing view selected" and a table "Every finished good sold in fiscal 2026, by costing view". Select the slicer and choose **Format > Edit interactions**: choose None for the matrix and the totals table, so both keep all three views side by side, and keep Filter for the cards and the ranked-item chart. Turn off the matrix's column subtotals and the table's total row, because the views are alternatives and are never added. **Check:** FUR-TBL reads 41.3%, 30.1% and 36.8%, as in Requirement 4. Choose Standard, Absorption and Time-driven in turn: the cards and the chart change, and the matrix and the table keep all three views.
 
-**Step 7. Build the Capacity page.** From the workbook's capacity data: a chart "Practical capacity and routing time used (hours)", a table "Capacity and its use by work center, fiscal 2026 (the total is the plant)", a matrix "Routing time used by family and work center, fiscal 2026 (hours)" and cards for the practical capacity, the routing time used, the unused capacity, the committed cost and the rate. The practical share is a typed measure, so it changes with the Assumptions value by hand:
+**Step 7. Build the Capacity page.** From the workbook's capacity data: a chart "Practical capacity and routing time used (hours)", a table "Capacity and its use by work center, fiscal 2026 (the total is the plant)", a matrix "Routing time used by family and work center, fiscal 2026 (hours)" and cards for the practical capacity, the routing time used, the unused capacity, the committed cost and the rate. The practical share is a measure over the one-row Model Parameters table, so it follows the workbook's saved value at each refresh:
 ```
-Practical Share = 0.8
+Practical Share = SELECTEDVALUE ( 'Model Parameters'[PracticalShare] )
 ```
 
 **Step 8. Add About, Validation and Tests.** About holds a text box, the last invoice date and a page navigator. Validation shows "Every invoice line by year (Chapters 13 and 14)", "Fiscal 2026 by item group: (Blank) is the design services (Chapter 6)", "Inputs to 1090, fiscal 2026 (Chapter 10)", and "Each view against the workbook's ItemCosts Table, finished goods, fiscal 2026". The Tests tab (DAX query view) runs 6 tests: Tests 1 to 5 are the core reconciliations, and Test 6 reads the rank table of the optional Concentration page. The Checks tab is the instructor's own regression, not an assignment. This instructor check returns the time-driven margin difference and the blank-line count:
@@ -119,7 +119,7 @@ ROW (
 | Finished goods revenue; items sold | $28,543,076.08; 207 | 5 |
 | Margin: Standard; Absorption; Time-driven | $12,739,803.20; $10,661,488.03; $11,731,216.94 | 5 |
 | Lines with no item cost; their revenue | 439; $1,213,344.00 | 3 |
-| Checks that agree | 209 and 12 | 8 |
+| Checks that agree | 211 and 12 | 8 |
 
 > **Instructor notes, Requirement 5 (CR18 reference model in Desktop 2.158, through the local engine):** Product Cost = SWITCH ( SELECTEDVALUE ( 'Costing View'\[View\], "Standard" ), "Standard", \[Standard Cost\], "Absorption", \[Absorption Cost\], "Time-driven", \[Time-Driven Cost\] ), each cost a SUMX over SalesInvoiceLine of Quantity x RELATED ( the item cost ); with no view selected it falls back to Standard. 2026, the 207 finished goods sold (Services left out, the blank row): revenue 28,543,076.08 (29,756,420.08 less Services 1,213,344.00); margin at standard 12,739,803.20 (standard cost 15,803,272.88, Chapter 14's figure), absorption 10,661,488.02, time-driven 11,731,216.94 (10,562,490.53 after unused capacity); with the year's variance charged 10,474,166.32 (the totals differ through the inventory build and timing). These totals take the item costs at six decimals, as CR18's CSV holds them; unrounded, absorption is 10,661,488.03. Family margins match Requirement 4 (FUR-TBL 41.3 / 30.1 / 36.8%). Optional for strong students: a cumulative-margin curve on a disconnected rank table (GENERATESERIES) with TOPN over ALLSELECTED items, checked in the engine (41 items 51.2 / 50.6 / 50.7%, 100% at 207, blank beyond). Tests: each view's total equals the workbook's; revenue and standard cost equal Chapter 14's; the variances charged equal 5080.
 
@@ -128,7 +128,7 @@ ROW (
 - **One measure, three views.** A disconnected table, SWITCH on SELECTEDVALUE, and Margin and Margin % built on it, so the selected-view cards and the ranking change with the slicer. The matrix and the totals table keep all three views because their interaction with the slicer is set to None.
 - **The blank is a decision.** The design services are out of the cost views and in the Validation row, with the reason.
 - **The report ties out.** Validation reproduces the year's revenue and standard cost of Chapters 13 and 14, the inputs to `1090`, and each view's total against the workbook.
-- **The caveats are visible.** The practical share is typed and must follow the workbook's value; the default view is Standard.
+- **The caveats are visible.** The practical share is the workbook's saved value, so recalculate and save before refreshing; the default view is Standard.
 
 A weak answer builds the visuals without the year filter or the tie to the workbook.
 
@@ -137,7 +137,7 @@ A weak answer builds the visuals without the year filter or the tie to the workb
 - **No year filter.** *Symptom:* revenue of $82,927,040.29. *Response:* ask which year the item costs describe.
 - **Services in the margin.** *Symptom:* 46.89%. *Response:* ask what standard cost the design services carry.
 - **A silent default.** *Symptom:* two views selected, Standard shown. *Response:* ask what SELECTEDVALUE returns.
-- **A drifting practical share.** *Symptom:* the Capacity page and the costs disagree after the Assumptions change. *Response:* ask where each file holds the share.
+- **A drifting practical share.** *Symptom:* the Capacity page and the costs disagree after the Assumptions change. *Response:* ask where each file holds the share, and whether the workbook was recalculated and saved before the refresh.
 - **A broken source path.** *Symptom:* a refresh error on a new computer. *Response:* point the queries at the files with **Change Source**.
 
 ## Grading guide

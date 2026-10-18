@@ -22,7 +22,7 @@ Students can add rule tests and their populations to a register (Part 1), keep a
 
 - **Files.** Audit Monitoring.pbix as Chapter 16 leaves it, CharlesRiver.xlsx, and Power BI Desktop (Windows only). Students use the definitions of Requirement 4; a different definition of "before the payment" changes a count (51 refunds by the receipts' dates, and a register of 985 rows).
 - **Data conditions.** The credits end 2026-12-26 and the refunds 2026-12-22, after payroll's last pay date, 2026-12-18, so Data Through stays where it is. No exception of the new tests is dated after the audited year.
-- **Verify first.** In DAX query view, run the Checks tab: 101 rows for the requirement and the register's chain, 7 and 6 for the milestones, all agree.
+- **Verify first.** In DAX query view, run the Checks tab: 107 rows for the requirement and the register's chain, 7 and 6 for the milestones, all agree.
 
 ## How to run it
 
@@ -102,7 +102,7 @@ SWITCH (
 **Step 5. Link each exception to its finding and keep every exception.** The model keeps one Findings row for each supported cause (credits, refunds): the finding, design or operation, its owner, the period it covers and the due date, with the fix date, retest date and result and closure approval left blank. A Finding Exceptions table (**Home > Enter data**) maps each historical exception, by TestID and DocumentNumber, to its finding, so coverage is a reviewed mapping and not a date rule: a late-loaded historical record stays open for review until mapped. Merge the mapping into the register, add a Covered column, relate Findings to Exceptions on FindingID, and measure the open exceptions without the covered ones. A finding's status names its first unmet step; it closes only when the fix is made, a retest after it passes and the closure is approved, and a target date reached with no fix stays open.
 
 ```
-    #"Added Custom" = Table.AddColumn(#"Expanded Design Findings", "Covered", each if [CoversThrough] <> null and [EventDate] <= [CoversThrough] then 1 else 0)
+    #"Added Custom" = Table.AddColumn(#"Expanded Finding Exceptions", "Covered", each if [FindingID] <> null then 1 else 0)
 Open Exceptions = CALCULATE ( [Exceptions], ISBLANK ( Exceptions[Disposition] ), Exceptions[Covered] = 0 )
 Design Finding Exceptions = CALCULATE ( [Exceptions], Exceptions[Covered] = 1 )
 ```

@@ -25,7 +25,7 @@ Students can:
 ## Before you assign
 
 - **From earlier work.** Requirements 1 to 5 with their pages, and the memos of the earlier cases as models. No new modeling: students write in a word processor.
-- **Length.** At most two pages with an appendix of up to three pages of 5 exhibits, each large enough to read and each naming the report page that holds its complete schedule. An exhibit may show a selection, such as the priority findings or the quarters that carry the argument. The model memo on the Memo page is about 770 words, an outline and not a finished memo.
+- **Length.** At most two pages with an appendix of up to three pages of 5 exhibits, each large enough to read and each naming the report page that holds its complete schedule. An exhibit may show a selection, such as the priority findings or the quarters that carry the argument. The model memo on the Memo page is about 840 words, an outline and not a finished memo.
 - **The model's view.** The recorded profit went into inventories, the growth of the recorded tax payable and of payables held cash up, the cash on the balance sheet may overstate what the company can use until the tax position is settled, and settling it comes first. Another recommendation from the same evidence earns full credit if it follows from the exhibits and states its limits.
 
 ## How to run it

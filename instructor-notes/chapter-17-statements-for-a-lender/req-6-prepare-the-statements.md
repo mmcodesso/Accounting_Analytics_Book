@@ -105,7 +105,7 @@ ROW (
 )
 ```
 
-**Check:** each entry nets to zero, no line is on cash, and adjusted income and total assets agree with the workbook; the 42 Checks rows of this requirement all agree. The project tests these numbers; how the page renders is visible only in Desktop.
+**Check:** each entry nets to zero, no line is on cash, and adjusted income and total assets agree with the workbook; the 43 Checks rows of this requirement all agree. The project tests these numbers; how the page renders is visible only in Desktop.
 
 ## Expected results
 

@@ -160,25 +160,31 @@ def write(wb, *, file_name: str, role: str, sections: list[dict], stamp: dict, c
 
     for r, (style, cells) in enumerate(rows, start=1):
         retry(put_row, r, style, cells)               # a whole row again if Excel, busy calculating, rejects a call
-    ws.Columns("A").ColumnWidth = 48
-    ws.Columns("B").ColumnWidth = 80
-    ws.Columns("C").ColumnWidth = 18
-    ws.Columns("D").ColumnWidth = 10
-    ws.Columns("A:D").VerticalAlignment = -4160          # top
-    for r, (style, cells) in enumerate(rows, start=1):
-        if not style.startswith("check") and len(cells) == 2 and len(str(cells[1])) > 70:
-            ws.Range(f"B{r}").WrapText = True
-            ws.Rows(r).AutoFit()
-    ws.Range(f"B{first}:B{last}").HorizontalAlignment = -4152   # right, like the numbers beside them
-    for r, (style, cells) in enumerate(rows, start=1):
-        # a text check such as a list of IDs: wrapped and left-aligned in Expected and Actual, so both show whole
-        # (column C is narrow and D holds the result, so the text could not overflow)
-        if style.startswith("check") and isinstance(cells[1], str) and len(cells[1]) > 16:
-            ws.Range(f"B{r}:C{r}").WrapText = True
-            ws.Range(f"B{r}:C{r}").HorizontalAlignment = -4131         # left
-            # sized for column C, which wraps the most; the Actual formula may not have calculated yet, so the height
-            # comes from the expected text, which an agreeing Actual repeats
-            ws.Rows(r).RowHeight = min(409, 15 * wrapped_lines(cells[1], 16) + 3)
+    def lay_out() -> None:
+        ws.Columns("A").ColumnWidth = 48
+        ws.Columns("B").ColumnWidth = 80
+        ws.Columns("C").ColumnWidth = 18
+        ws.Columns("D").ColumnWidth = 10
+        ws.Columns("A:D").VerticalAlignment = -4160          # top
+        for r, (style, cells) in enumerate(rows, start=1):
+            if not style.startswith("check") and len(cells) == 2 and len(str(cells[1])) > 70:
+                ws.Range(f"B{r}").WrapText = True
+                ws.Rows(r).AutoFit()
+        ws.Range(f"B{first}:B{last}").HorizontalAlignment = -4152   # right, like the numbers beside them
+        for r, (style, cells) in enumerate(rows, start=1):
+            # a text check such as a list of IDs: wrapped and left-aligned in Expected and Actual, so both show whole
+            # (column C is narrow and D holds the result, so the text could not overflow)
+            if style.startswith("check") and isinstance(cells[1], str) and len(cells[1]) > 16:
+                ws.Range(f"B{r}:C{r}").WrapText = True
+                ws.Range(f"B{r}:C{r}").HorizontalAlignment = -4131         # left
+                # sized for column C, which wraps the most; the Actual formula may not have calculated yet, so the height
+                # comes from the expected text, which an agreeing Actual repeats
+                ws.Rows(r).RowHeight = min(409, 15 * wrapped_lines(cells[1], 16) + 3)
+
+    # every step sets a layout value, so the whole pass can run again if Excel, still calculating the checks'
+    # formulas, rejects a call ("Call was rejected by callee", seen on the row heights of a capstone's Notes sheet)
+    wait_ready(wb.Application)
+    retry(lay_out)
     return ws, first, last
 
 

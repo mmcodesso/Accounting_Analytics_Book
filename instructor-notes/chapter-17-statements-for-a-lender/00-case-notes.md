@@ -14,7 +14,7 @@
 | Part | Part V, Capstone Cases. The case is an independent final-project option: it asks for nothing from another capstone, and the Part III and Part IV case files are only an optional head start |
 | Analytics types | Descriptive (the statements and notes), diagnostic (the rebuilt accruals, the cutoff tests, the opening balances), predictive (the estimates: payroll at a cost per working day, returns still to come) and prescriptive (what to record, pass and settle) |
 | Tools | SQL in DB Browser for SQLite, Excel and Power BI Desktop. Where the choice is clear the requirement says why a tool fits; where it is not, students choose and explain |
-| Components | Nine requirements in four phases, with a milestone after each; no tutorials, exercises or questions. The deck has 63 slides. The model answer is three files: LenderPackage.sql (63 queries), Charles River Lender Package.xlsx (30 worksheets) and the Power BI project Charles River Lender Review (7 pages, 144 checks) |
+| Components | Nine requirements in four phases, with a milestone after each; no tutorials, exercises or questions. The deck has 63 slides. The model answer is three files: LenderPackage.sql (63 queries), Charles River Lender Package.xlsx (30 worksheets) and the Power BI project Charles River Lender Review (7 pages, 145 checks) |
 | Files students need | CharlesRiver.sqlite, copied as CharlesRiver_Capstone.sqlite; CharlesRiver.xlsx; and the three files they build. Solutions: Chapter17-capstone-sql.zip, Chapter17-capstone-excel.zip and Chapter17-capstone-pbi.zip |
 | Deliverables | The script; the workbook; a PDF of the draft statements and notes; the Review file with its Questions table and Tests tab; a memo of two pages with an appendix of three |
 | Time | Class: about 220 minutes in Plan A. Students: about 21 hours in all, from 90 minutes for Requirement 1 to 180 for each of Requirements 5 and 6 |
@@ -43,7 +43,7 @@ The case depends on these conditions of the data, all visible in the files stude
 
 - Check the software. Students need DB Browser for SQLite, Excel for Microsoft 365 or Excel 2024 (the model workbook uses dynamic array functions such as CHOOSECOLS, HSTACK and TAKE) and Power BI Desktop, which runs only on Windows. Students on a Mac need a Windows computer for Requirements 2 and 6.
 - Open the model answer as Opening a Companion File on the Downloads page describes. The Review project reads two workbooks, CharlesRiver.xlsx and the package workbook, so use **Change Source** for both and refresh once before class; the ledger is large.
-- In **DAX query view**, run the Checks tab: all 144 rows should agree. Run the script top to bottom on a copy of the database; every query is read-only except the views it creates.
+- In **DAX query view**, run the Checks tab: all 145 rows should agree. Run the script top to bottom on a copy of the database; every query is read-only except the views it creates.
 - Open the deck. Slides 7 to 8 set out the criteria, which are the six bullets of "What a Strong Submission Includes".
 - Know where the complete answers are. A guide quotes only the part of a query, formula or measure that its step needs, and says so. The complete blocks are in the solution files: each query under the comment heading the guide names in LenderPackage.sql, each formula on its worksheet (**Formulas > Name Manager** lists the names the formulas read), and each measure and test in the project's Key Measures table and its Tests tab.
 

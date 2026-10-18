@@ -14,7 +14,7 @@
 | Part | Part V, Capstone Cases. The case is an independent final-project option: it asks for nothing from another capstone, and the Part III and Part IV case files are only an optional head start |
 | Analytics types | Descriptive (Requirements 1 and 3), diagnostic (2 and 4), predictive (7 and 8) and prescriptive (the make, buy and reprice decisions, the standards and the memo) |
 | Tools | SQL in DB Browser for SQLite, Excel (Goal Seek, Data Tables and, optionally, Solver) and Power BI Desktop. Where the choice is clear the requirement says why a tool fits; where it is not, students choose and explain |
-| Components | Ten requirements in four phases, with a milestone after each; no tutorials, exercises or questions. The deck has 66 slides. The model answer is three files: MakeBuy.sql (31 queries), Make Buy Reprice.xlsx (18 worksheets) and the Power BI project Product Costs (6 pages, 221 checks) |
+| Components | Ten requirements in four phases, with a milestone after each; no tutorials, exercises or questions. The deck has 66 slides. The model answer is three files: MakeBuy.sql (31 queries), Make Buy Reprice.xlsx (18 worksheets) and the Power BI project Product Costs (6 pages, 223 checks) |
 | Files students need | CharlesRiver.sqlite, copied as CharlesRiver_Capstone.sqlite; CharlesRiver.xlsx; and the three files they build. Solutions: Chapter18-capstone-sql.zip, Chapter18-capstone-excel.zip and Chapter18-capstone-pbi.zip |
 | Deliverables | The script; the workbook; the explorer; a memo of at most two pages, including the decision table, with at most three pages of exhibits |
 | Time | Class: about 240 minutes in Plan A. Students: a planning estimate of 20 hours 35 minutes for the required work, from 90 minutes for Requirements 1, 3 and 10 to 180 for Requirement 4, plus 55 minutes for the optional growth test. The estimates assume students fluent in the prerequisite tools, are not measured times, count class work toward the total, and leave setup and debugging to be budgeted apart |
@@ -42,7 +42,7 @@ The case depends on these conditions of the data, all visible in the files stude
 
 - Check the software. Students need DB Browser for SQLite, Excel for Microsoft 365 (the model workbook uses XLOOKUP, LET and FILTER; Solver only for the optional part of Requirement 7) and Power BI Desktop, which runs only on Windows. Students on a Mac need a Windows computer for Requirement 5.
 - Open the model answer as Opening a Companion File on the Downloads page describes. Product Costs reads two workbooks, CharlesRiver.xlsx and Make Buy Reprice.xlsx, from one folder: copy both there or use **Change Source**, and refresh once before class.
-- In **DAX query view**, run the Checks tab: all 221 rows should agree. Run MakeBuy.sql top to bottom on a copy of the database; two queries save views.
+- In **DAX query view**, run the Checks tab: all 223 rows should agree. Run MakeBuy.sql top to bottom on a copy of the database; two queries save views.
 - Run Goal Seek and Solver once yourself. The workbook holds their results and the saved Solver models, but the notes' optimum was computed outside Solver, so rerun **Data > Solver** on a growth sheet and compare.
 - Open the deck. Slides 7 to 8 set out the criteria, which are the seven bullets of "What a Strong Submission Includes", and slides 45 to 47 show the make-or-buy test in three stages.
 
