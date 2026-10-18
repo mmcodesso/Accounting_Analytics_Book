@@ -22,11 +22,11 @@ figures:
 
 ## Purpose and learning outcomes
 
-The exercise is a readiness check before any revenue analysis: can the order, invoice and customer tables support a revenue figure? It asks for three kinds of evidence. Some tests find problems (dates that disagree across tables), some find none (line totals, references to customers), and some blanks are by design. The memo asks for a recommendation, not a list. The tests are descriptive; the analytics types come after.
+The exercise is a readiness check before any revenue analysis: can the order, invoice and customer tables support a revenue figure? It asks for three kinds of evidence. Some tests find problems (dates that disagree across tables), some find none (line totals, references to customers), and some blanks are by design. The memo asks for a recommendation, not a list. The tests are descriptive data-quality checks that prepare the later analyses of every type.
 
 By the end, students can:
 
-- classify each problem by dimension and say when it touches two (chapter outcome 3);
+- classify each problem by dimension and say when it touches two (outcome 3);
 - test a line total against its parts with a tolerance for rounding, and test a reference between two tables (outcome 4);
 - separate a blank that is by design from one that is missing information (outcome 5);
 - recommend, in one page, whether revenue can be reported and what must be resolved first.
@@ -50,13 +50,14 @@ Individual work, then a ten-minute comparison in pairs. For about 60 minutes: 25
 
 ### Requirement (1): Find and classify the problems
 
-**Step 1. Test the required fields of SalesOrder.**
+**Step 1. Test the required fields of SalesOrder and SalesOrderLine.**
 
 a. On **SalesOrder**, use the filter button of OrderDate, CustomerID and Status in turn to show only blank cells.
 b. Read the count in the status bar each time, then clear the filter.
 c. Do the same for Notes.
+d. On **SalesOrderLine**, filter SalesOrderID, ItemID, Quantity, UnitPrice, Discount and LineTotal for blanks the same way. The reference and line-total tests of Steps 6 and 8 apply to it too.
 
-**Check:** no blanks in OrderDate, CustomerID or Status among {{ orders|count }} orders. Notes is blank on {{ notes_blank|count }} orders, by design, because it is optional free text. **Watch for:** students who list the blank Notes as a completeness problem.
+**Check:** no blanks in OrderDate, CustomerID or Status among {{ orders|count }} orders. Notes is blank on {{ notes_blank|count }} orders, by design, because it is optional free text. All {{ sol_rows|count }} SalesOrderLine rows have their order, item, quantity, price, discount and line total, every SalesOrderID and ItemID exists in its parent table, and no line total differs from its parts by more than a cent. Record these passing tests with the exceptions. **Watch for:** students who list the blank Notes as a completeness problem.
 
 **Step 2. Compare the customers that share a name.** Sort **Customer** by CustomerName, find the adjacent pairs, and compare City, Region, CustomerSegment and the orders of each (filter SalesOrder by CustomerID).
 
@@ -74,11 +75,11 @@ The Customer table has {{ ch02_t1.n_pairs }} shared names:
 
 **Step 3. Read the Item blanks.** Filter **Item** for a blank ListPrice and read ItemGroup.
 
-**Check:** {{ ch02_t1.blank_items }} blank list prices, in {{ ch02_t1.sizes }}. The {{ ch02_t1.sellable|count }} other items are the ones sold. These are by design: Charles River buys these items. In the same table, {{ names }} item names are shared by {{ shared_items }} items with different codes and costs; Exercise 2.3 examines them.
+**Check:** {{ ch02_t1.blank_items }} blank list prices, in {{ ch02_t1.sizes }}. The {{ ch02_t1.sellable|count }} other items have a list price and are the ones Charles River offers for sale (not all of them were sold). These are by design: Charles River buys these items. In the same table, {{ names }} item names are shared by {{ shared_items }} items with different codes and costs; Exercise 2.3 examines them.
 
 **Step 4. Compare dates and numbers across tables.**
 
-a. On **SalesInvoice**, in the first free column after Tutorial 2.1's Check column, look up each invoice's order date:
+a. On **SalesInvoice**, in the first free column after Tutorial 2.1's Check column, look up each invoice's order date (the Table fills each new column to the last invoice; check the last row):
 
    ```
    =XLOOKUP(E2, SalesOrder!A:A, SalesOrder!C:C)
@@ -96,7 +97,7 @@ d. Filter each flag for TRUE, and filter Tutorial 2.1's Check column for "Check"
 | {{ r.number }} | {{ r.date }} | {{ r.posted[:4] }} |
 {% endfor %}
 
-These invoices are dated in one fiscal year and numbered and posted in the next, so revenue by invoice date and revenue by posting date differ for them. That is an accuracy problem with a cutoff consequence, and Exercise 6.1 returns to it. The invoices dated before their order are the first invoices of the data. **Watch for:** students who stop at "the dates look odd" without saying what changes in a revenue total.
+These invoices are dated in one fiscal year and numbered and posted in the next, so revenue by invoice date and revenue by posting date differ for them. That is a possible accuracy problem with a cutoff consequence: the period the revenue belongs to depends on the shipment and delivery evidence and the recognition policy, which Exercise 6.1 returns to. The invoices dated before their order are the first invoices of the data. **Watch for:** students who stop at "the dates look odd" without saying what changes in a revenue total.
 
 **Step 5. Record the blanks that are by design.** Filter the Table columns in turn and note: ShipmentLineID blank on {{ no_shipment_lines|count }} invoice lines (the design service lines, which ship nothing), PromotionID on {{ promo_blank|count }}, PriceOverrideApprovalID on {{ override_blank|count }}, and PaymentDate on {{ paid_blank|count }} invoices.
 
@@ -112,7 +113,7 @@ a. On **SalesInvoiceLine**, add a column headed `Difference` with the unrounded 
    =ABS(G2*I2*(1-J2)-K2)
    ```
 
-b. Copy it down, then read the largest value with `=MAX(P:P)` and the count above one cent with `=COUNTIF(P:P,">0.01")`.
+b. The Table fills the column down. In a cell outside the column, on a separate Results sheet for example, read the largest value with `=MAX(T17_SalesInvoiceLine[Difference])` and the count above one cent with `=COUNTIF(T17_SalesInvoiceLine[Difference],">0.01")`. A summary typed inside the column would refer to itself.
 c. Sort the column from largest to smallest and look at the top rows.
 
 {{ figure('IF-02-1-A') }}
@@ -140,7 +141,7 @@ b. Filter the column for 0.
 
 ### Requirement (4): Write the memo
 
-**Step 9. Outline a one-page memo.** A strong memo has a header and the purpose; a short conclusion up front (the data can support revenue reporting once the cutoff items are resolved); a table with one row per finding (table and column, dimension, count, error or by design); the tests that found nothing; and recommended resolutions: decide the date basis for the {{ prefix|length }} year-end invoices, group by CustomerID and not by name, and report design service revenue separately because it has no shipment.
+**Step 9. Outline a one-page memo.** A strong memo has a header and the purpose; a short conclusion up front (the data can support revenue reporting once the cutoff items are resolved); a table with one row per finding (table and column, dimension, count, error or by design); the tests that found nothing; and recommended resolutions: for the {{ prefix|length }} invoices dated in one year and posted in the next, obtain the shipment and delivery evidence and apply the recognition policy (choosing the date field that makes the totals agree resolves nothing); group by CustomerID and not by name; and report design service revenue separately because it has no shipment. The tests run on the whole extract are profiling, and the memo states the effect on the scenario's year separately. In fiscal {{ d.C }}, the {{ c_invoices|count }} invoices dated in the year bill ${{ c_subtotal|money }}, while the year's revenue postings from sales invoices, freight aside, are ${{ c_posted|money }}. The difference, ${{ into_c_total|money }}, is the {{ n_into_c|count }} invoices dated in fiscal {{ d.P }} and posted on January 1. These are billed line amounts before freight, tax and later credits, not net revenue.
 
 **Check:** the conclusion is stated before the evidence, and the memo separates errors from judgments.
 
@@ -149,8 +150,9 @@ b. Filter the column for 0.
 | Quantity | Value | Where |
 |---|---:|---|
 | Orders; blanks in OrderDate, CustomerID and Status | {{ orders|count }}; {{ required.OrderDate }}, {{ required.CustomerID }}, {{ required.Status }} | Step 1 |
+| SalesOrderLine rows; with a blank required field, a missing order or item, or a line total off by more than a cent | {{ sol_rows|count }}; 0 | Step 1 |
 | Same-name pairs | {{ ch02_t1.n_pairs }} | Step 2 |
-| Blank list prices; items sold | {{ ch02_t1.blank_items }}; {{ ch02_t1.sellable|count }} | Step 3 |
+| Blank list prices; items with a list price | {{ ch02_t1.blank_items }}; {{ ch02_t1.sellable|count }} | Step 3 |
 | Invoices dated before their order | {{ before_order|length }} | Step 4 |
 | Invoices dated before the first shipment | {{ ch02_t1.n_before }} | Step 4 |
 | Invoice numbers with a different year from the date | {{ prefix|length }} | Step 4 |

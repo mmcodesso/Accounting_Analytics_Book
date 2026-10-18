@@ -357,7 +357,7 @@ This is Step 8. A count that ignores a filter on the page looks plausible and is
 {{< book-checkpoint 13.2 lead="true" >}}
 
 ::: {.notes}
-The page already answers part of the controller's question: the discounts were concentrated in Furniture in the autumn. It cannot show what the discounts cost in margin, because margin is a ratio of totals and the report has no measure for it yet.
+The page already answers part of the controller's question: the discounts were concentrated in Furniture in the autumn. It cannot show what the discounts cost in gross margin percentage, which divides total gross margin by total revenue, because the report has no measure for a ratio of totals yet.
 :::
 
 # Honest Visuals
@@ -534,7 +534,7 @@ Most of this was descriptive analytics, with the first step toward diagnosis tha
 
 ## What the report still cannot answer
 
-- Margin is a ratio of totals, which no implicit measure gives
+- Gross margin percentage divides two totals, which no implicit measure does
 - The discount share needs a division that Average of Discount misstates
 - Periods are columns of the invoice table, so changes cannot be calculated
 - Chapter 14 adds a shared date table and DAX measures

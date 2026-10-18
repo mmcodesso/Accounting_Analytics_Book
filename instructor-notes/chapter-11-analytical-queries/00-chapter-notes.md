@@ -11,20 +11,21 @@
 
 | | |
 |---|---|
-| Part | Part III, Accounting Analytics with SQL: the third of four chapters. Chapter 9 queried one table and Chapter 10 joined and summarized tables; this chapter adds categories, periods, comparisons across rows and saved analyses. Chapter 12 builds the audit library from them |
+| Part | Part III, Accounting Analytics with SQL: the third of four chapters. Chapter 10 joined and summarized tables; this chapter adds categories, periods, comparisons across rows and saved analyses, and Chapter 12 builds the audit library from them |
 | Analytics types | Diagnostic: when the extra plant hours began and where they sit. The trailing measure is also a baseline for predictive work, and Exercises 11.5 and 11.6 are audit tests |
 | Tools | DB Browser for SQLite 3.13.1 on the working copy. The queries only read, except the views of Tutorial 11.3 and Exercises 11.1 and 11.5, which are written into the working copy |
 | Components | 3 guided tutorials, 6 exercises (2 for each perspective), 15 multiple-choice questions and a deck of 64 slides |
 | Files students need | CharlesRiver_Work.sqlite, made in Tutorial 9.1. Chapter11.sql is built through the tutorials; Chapter11-companion.zip holds it at the start of Tutorials 11.2 and 11.3 and at the end. Chapter11-exercises-sql.zip holds Ex 11.1.sql to Ex 11.6.sql |
-| Time | Class: about 270 minutes. Students: about 90 minutes of reading, 60 to 90 for each tutorial and 75 to 100 for each exercise (assign two or three). The times are estimates: time them yourself |
+| Time | Class: about 270, 240 or 120 minutes by plan; the plans do some or all of the tutorials in class, so these times overlap the students' own. Students: about 90 minutes of reading, 60 to 75 for Tutorial 11.1, 75 to 90 for each of Tutorials 11.2 and 11.3, and 75 to 100 for each exercise (assign two or three). All are provisional: time them yourself |
 
 The chapter depends on these conditions of the data:
 
-- Dates are text and a function's result has no type: of the 297 journal entries posted in 2026, `strftime('%Y', PostingDate) = '2026'` finds them all, and the test against the number finds 0.
+- Dates are text, and `strftime` returns text that SQLite does not convert in a comparison with a number: of the 297 journal entries posted in 2026, `strftime('%Y', PostingDate) = '2026'` finds them all, and the test against the number finds 0.
 - The time records end on 2026-12-11, 20 days before the month ends, because the last pay periods are open. The measure cuts the output at the same day. Indirect time ends a week earlier, on 2026-12-04, so the measure's last month is provisional.
 - The plant starts up in the first month: indirect time is almost absent for four months afterward, and one of them, 2024-03, has none at all.
 - Payroll is posted on pay dates with no accrual, so the largest months of the gap in account `1090` have three pay dates.
-- The only journal entries to the revenue accounts are the 6 year-end closes, and every CreatedDate carries a time. Unit margins do not tie but margin percentages do, and six requisitions have no approver.
+- The only journal entries to the product-line revenue accounts (`4010` to `4040` and `4080`) are the 3 closes of income to the income summary, JE-2024-000265, JE-2025-000287, JE-2026-000296. There are 6 year-end closes in all, and other accounts typed Revenue receive other entries, so the statement covers these five accounts only.
+- Every CreatedDate carries a time. Unit margins do not tie but margin percentages do, and six requisitions have no approver.
 
 ## What students should be able to do afterward
 
@@ -35,19 +36,19 @@ The chapter depends on these conditions of the data:
 5. Save an analysis as a view in the working copy and query it. Practiced in Tutorial 11.3 (Steps 6 to 8), Exercises 11.1 (5) and 11.5 (5), and question 13.
 6. Combine these into a monthly measure, cut off at the last day with records, and judge it. Practiced in Tutorial 11.3 (Steps 4, 5 and 8) and question 15. No exercise rebuilds the trailing measure; Exercise 11.2 applies the same pattern to revenue.
 
+The six outcomes follow the chapter's six learning objectives one for one.
+
 ## Preparing to teach
 
 **Before the first class**
 
-- Students need CharlesRiver_Work.sqlite from Tutorial 9.1 and DB Browser for SQLite 3.13.1. `SELECT sqlite_version();` shows the version; window functions need 3.25 or later.
-- Do the three tutorials yourself in order and save Chapter11.sql. Tutorial 11.3 writes a view into your working copy.
-- A late student takes Chapter11.sql from Chapter11-companion.zip, from the folder of the tutorial they start. Tutorial 11.1 needs only the working copy. Get the PowerPoint deck from the Downloads page; each tutorial has a checkpoint slide.
-- Open the model scripts once: each query has two comment lines and a result comment, and the notes at the end repeat the requirements and the checks. Exercises 11.1 and 11.5 create views in the working copy, so run the scripts there and not on the download.
-- Every query runs in a few seconds. Setup_Part3_Views.sql, in the companion zip, recreates the tutorial's view for the Part III case.
+- Students need CharlesRiver_Work.sqlite from Tutorial 9.1 and DB Browser for SQLite 3.13.1; `SELECT sqlite_version();` shows the version, and window functions need 3.25 or later.
+- Do the three tutorials yourself in order and save Chapter11.sql; Tutorial 11.3 writes a view into your working copy.
+- A late student takes Chapter11.sql from the folder of the tutorial they start in Chapter11-companion.zip; Tutorial 11.1 needs only the working copy. The PowerPoint deck is on the Downloads page.
+- Open the model scripts once: each query has two comment lines and a result comment, and the notes at the end repeat the requirements and the checks. Exercises 11.1 and 11.5 create views in the working copy, so run the scripts there and not on the download. Every query runs in a few seconds, and Setup_Part3_Views.sql, in the companion zip, recreates the tutorial's view for the Part III case.
 
 **Pitfalls that cost class time**
 
-- **A year as a number.** A test of `strftime` against `2026` returns no rows and no error; the message pane reports a result of no rows.
 - **A copy-and-edit slip.** Tutorial 11.3 builds each step by copying the one before. A missing comma between two CTEs stops with `near "MonthlyHours": syntax error`.
 - **A second run without the drop.** Run the CREATE VIEW again without its DROP VIEW and the pane says `view MonthlyLaborEfficiency already exists`.
 - **Write Changes forgotten.** The view exists in the open database at once but is saved only by **Write Changes**; closing the database and choosing Discard removes it.
@@ -55,7 +56,7 @@ The chapter depends on these conditions of the data:
 
 ## Teaching approaches
 
-**Plan A: lecture with live demonstration (three sessions of 90 minutes, 270 minutes in all).** It fits a lecture course with the exercises at home. Demonstrate the steps that carry the ideas and leave the rest to students.
+**Plan A: lecture with live demonstration (three sessions of 90 minutes, 270 minutes in all).** It fits a lecture course with the exercises at home. Demonstrate the steps that carry the ideas.
 
 | Session | Minutes | Activity | Slides |
 |---|---:|---|---|
@@ -71,7 +72,7 @@ The chapter depends on these conditions of the data:
 | 3 | 25 | The plant manager's questions again; summary; assign; quiz on questions 1, 6, 11 and 13 | 59 to 64 |
 | | 270 | Total | |
 
-**Plan B: lab first (two sessions of 120 minutes, 240 minutes in all, exercises as homework).** Students write the queries before they hear the vocabulary. It fits a computer lab; a pair that falls behind takes the next tutorial's start file.
+**Plan B: lab first (two sessions of 120 minutes, 240 minutes in all, exercises as homework).** Students write the queries before they hear the vocabulary. It fits a computer lab.
 
 | Session | Minutes | Activity | Slides |
 |---|---:|---|---|
@@ -85,7 +86,7 @@ The chapter depends on these conditions of the data:
 | 2 | 10 | The questions again; assign the exercises | 60 to 64 |
 | | 240 | Total | |
 
-**Plan C: flipped, with one 120-minute class.** Students read and build the tutorials at home, and the class opens with a quiz. It fits upper-level and graduate classes.
+**Plan C: flipped, with one 120-minute class.** Students read and build the tutorials at home, and the class opens with a quiz. It fits upper-level classes.
 
 | Minutes | Activity | Slides |
 |---:|---|---|
@@ -96,7 +97,7 @@ The chapter depends on these conditions of the data:
 | 10 | Discussion prompts 1 and 2; assign the exercises | 60 |
 | 120 | Total | |
 
-Plan A is the safest, because this chapter's stumbles are about reading a result, and a demonstration shows how. Plan B gives students ownership of the findings and needs a lab. Plan C leaves no time for demonstration and fails for students who arrive without a finished script.
+Plan A is the safest, because this chapter's stumbles are about reading a result, and a demonstration shows how. Plan B needs a lab. Plan C fails for students who arrive without a finished script.
 
 ![A chooser from a question about rows to the SQL feature that answers it.](../figures/chapter-11-analytical-queries/IF-11-0-A.pdf)
 
@@ -117,12 +118,12 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 **Stumbles to expect**
 
 - Step 1: without an ELSE the deductions fall into a group named NULL ($568,470.78); a `LIKE '%Earnings'` branch placed first takes the salaries into hourly pay ($3,342,735.61, 3 categories).
-- Step 2: without the LaborType filter only the overtime column changes: the year reads 20,547 hours where 20,030 is right.
+- Step 2: without the LaborType filter the query adds nonmanufacturing overtime and work dates. The overtime of 2026 reads 20,547 hours where 20,030 is right, and DaysWithTime changes in 16 of the 36 months, January 2024 from 13 to 23 days and January 2026 from 21 to 22. DirectHours and IndirectHours do not change, because their CASE expressions still restrict those sums.
 - Step 3: without `'start of month'` the month end reads 2027-01-10, 30 days away, not 20; `date('2026-01-31', '+1 month')` returns 2026-03-03.
 - Step 5: `strftime('%Y', ClosedDate) = 2026` finds 0 work orders, and 3,960 with the year as text.
-- Step 5, the dates: one work order closed in 2024 is completed 3 days before its release, without moving the average. Credit checking the dates and reading close-year cohorts, not a cause.
+- Step 5, the dates: one work order closed in 2024 is completed 3 days before its release, without moving the average. Credit checking the dates and reading cohorts, not a cause.
 
-**The checkpoint to look for.** The six bullets. A strong student names three views of one change: indirect time, overtime on direct labor and slower work orders.
+**The checkpoint to look for.** The six bullets. A strong student names three views of one change: indirect time, direct overtime and slower work orders.
 
 ### Guided Tutorial 11.2: Tracking the Gap Month by Month
 
@@ -171,7 +172,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 
 ## Difficult ideas and misconceptions
 
-**A function's result has no type.** Question 6, Tutorial 11.1 Step 5, Exercises 11.4 and 11.5. `strftime` returns text, so a year compared with a number finds nothing, and `IN (0, 6)` flags no weekend. Ask: what type does this function return?
+**A text result compared with a numeric literal.** Question 6, Tutorial 11.1 Step 5, Exercises 11.4 and 11.5. `strftime` returns text, and a function's result is not a column, so SQLite has no affinity to convert the number with. A year compared with a number finds nothing, and `IN (0, 6)` flags no weekend. Compare with `'2026'`, or CAST. Ask: what type does this function return, and is anything here a column?
 
 **An ELSE is a decision.** Question 1, Tutorial 11.1 Step 1, Exercise 11.1. A CASE without one sends the rest to NULL, and a CASE inside SUM needs `ELSE 0` or a NULL that COUNT skips. Ask: what should happen to a row that meets no condition?
 
@@ -179,7 +180,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 
 **A window keeps the rows.** Questions 7 and 14. `GROUP BY` returns one row for each group, `PARTITION BY` keeps every row, and the partition decides which rows a calculation sees while the order and the frame decide which of them it uses. Ask: which rows does this row's calculation read?
 
-**Tied rows share a total.** Question 11, slide 27. In the demonstration below, the Furniture items ranked by standard labor hours tie at 1.99 from row 7: both rows read a default running total of 16.50 and rank 7, while ROW_NUMBER gives 8 and 7 and the ROWS totals 16.50 and 14.51, in the order the window met the pair, which can differ from the result's order and between SQLite versions. Ask: what does the data decide, and what does the engine decide?
+**Tied rows share a total.** Question 11, slide 27. Below, the Furniture items ranked by standard labor hours tie at 1.99 from row 7: both rows read a default running total of 16.50 and rank 7, while ROW_NUMBER gives 8 and 7 and the ROWS totals 16.50 and 14.51, in an order the engine chooses. Ask: what does the data decide, and what does the engine decide?
 
 ![A mock of the demonstration of tied rows, the default window against ROWS UNBOUNDED PRECEDING.](../figures/chapter-11-analytical-queries/IF-11-0-B.pdf)
 
@@ -191,17 +192,16 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 
 **A trailing figure needs full windows.** Question 15, Tutorial 11.3 Steps 4 and 5. A frame counts rows, not months; partial windows are left out; the figure pools twelve months and is not an average of ratios; the last month is provisional. Ask: does this window hold twelve months?
 
-**A view is a query, not a result.** Question 13, Tutorial 11.3 Steps 6 to 8, Exercise 11.5 (5). It runs on whatever the file holds. A change to its tables can be refused at once (a dropped column it uses) or leave a view that fails or changes meaning when next queried. Ask: what would make today's view return something different tomorrow?
+**A view is a query, not a result.** Question 13, Tutorial 11.3 Steps 6 to 8, Exercise 11.5 (5). It runs on whatever the file holds, and a change to its tables can be refused at once or leave a view that fails or changes meaning later. Ask: what would make today's view return something different tomorrow?
 
 ## Discussion prompts
 
-1. **The monthly ratio swings and the trailing ratio rises. Which does the controller report, and what does each hide?** A good discussion reaches both together, the delay of a trailing figure, and the need for full windows.
+1. **The monthly ratio swings and the trailing ratio rises. Which does the controller report, and what does each hide?** A good discussion reaches the delay of a trailing figure and the need for full windows.
 2. **The largest months of the gap have three pay dates. Is the plant worse in those months?** It reaches the pay calendar against performance and the missing accrual.
-3. **Packing and Quality Assurance record several times their planned hours while the plant records less than plan. What do you test first?** It reaches how time is recorded against operations, and Chapter 12.
-4. **A view stores a query. When is that a control and when a risk?** It reaches one logic for every user, dependence on the tables, and why a view is not an audit record.
-5. **Why does the last month of the measure carry a warning?** It reaches the cut-off at the last day with records and indirect time ending earlier.
-6. **The journal entry flags of Exercise 11.5 mark entries for follow-up. Which would you drop or weigh differently, and what would you need to decide?** It reaches flags as screens, equal weights as an assumption, and follow-up as the finding.
-7. **Overtime is spread across the employees who recorded it. Is that good news for the plant manager's claim?** It reaches a claim not supported by the totals, an even spread as a pattern that itself needs explaining, and Chapter 12's surge days.
+3. **Packing and Quality Assurance record several times their planned hours while the plant records less than plan. What do you test first?** It reaches how time is recorded against operations.
+4. **A view stores a query. When is that a control and when a risk?** It reaches one logic for every user, dependence on the tables, and why a view is not a record.
+5. **The journal entry flags of Exercise 11.5 mark entries for follow-up. Which would you weigh differently?** It reaches flags as screens and equal weights as an assumption.
+6. **Overtime is spread across the employees who recorded it. Is that good news for the plant manager's claim?** It reaches an even spread as a pattern that needs explaining, and Chapter 12's surge days.
 
 ## Using the exercises
 
@@ -218,11 +218,11 @@ All six exercises are SQL scripts with a model answer in Chapter11-exercises-sql
 
 **Assignment bundles**
 
-- *Three tracks.* Financial students do Exercises 11.1 and 11.2, managerial students 11.3 and 11.4, auditing students 11.5 and 11.6. A swap of memos lets each track hear the others.
+- *Three tracks.* Financial students do Exercises 11.1 and 11.2, managerial students 11.3 and 11.4, auditing students 11.5 and 11.6.
 - *One exercise a session.* Take the basic one first: 11.3, 11.6, 11.2, 11.4, 11.5, 11.1.
 - *A light load.* Exercises 11.3 and 11.5 take about three hours and cover outcomes 1 to 5.
 
-**Grading and discussion.** Requirements (1) to (4) of every exercise suit grading from the script and the row counts, because their numbers have one answer. The notes and memos, Requirement (5) of Exercises 11.2 to 11.6 and the note of 11.1, suit class discussion. Collect the script, not a screenshot: its comment lines show the population and the expected result.
+**Grading and discussion.** Requirements (1) to (4) of every exercise suit grading from the script and the row counts, because their numbers have one answer. The notes and memos, Requirement (5) of Exercises 11.2 to 11.6 and the note of 11.1, suit class discussion. Collect the script, not a screenshot: its comment lines show the population and the expected result. Full credit asks only for what each requirement asks. The extras the guides add, such as freight or a decline's base in Exercise 11.2, a memo's two readings and next steps, or an ELSE, are a plus, named in What a strong answer says.
 
 ## Multiple-choice questions
 
@@ -235,9 +235,9 @@ Key: 1 D, 2 B, 3 C, 4 A, 5 D, 6 C, 7 A, 8 B, 9 D, 10 B, 11 A, 12 C, 13 D, 14 B, 
 | 3 | C | conditional aggregation passes the amounts of one category and zero for the others; B counts rows, and D is not an aggregate of the category. |
 | 4 | A | strftime returns text formatted by its pattern. |
 | 5 | D | the difference of two julianday values is a number of days. |
-| 6 | C | strftime returns text, which has no type to convert toward; compare with '2026' or CAST. |
-| 7 | A | an ordered aggregate window is a running total, restarting in each partition (each period appears once a year, so there are no ties). |
-| 8 | B | LAG with offset 12 over one row per month returns the same month a year earlier. |
+| 6 | C | strftime returns text, and this comparison does not convert the numeric literal; compare with '2026' or CAST. |
+| 7 | A | an ordered aggregate window is a running total, restarting in each partition (with one row for each fiscal year and period there are no ties). |
+| 8 | B | LAG with offset 12 over one row per month returns the same month a year earlier, on a row with at least twelve earlier rows (the first twelve return NULL). |
 | 9 | D | RANK gives ties the same number; ROW\_NUMBER numbers every row differently. |
 | 10 | B | WHERE runs before window functions; filter in an outer query (RANK \<= 3 keeps more than three rows if the third ties). |
 | 11 | A | the default window of an ordered aggregate runs through the current row and its peers, the rows tied with it; B describes ROWS UNBOUNDED PRECEDING. |
@@ -248,24 +248,20 @@ Key: 1 D, 2 B, 3 C, 4 A, 5 D, 6 C, 7 A, 8 B, 9 D, 10 B, 11 A, 12 C, 13 D, 14 B, 
 
 **Questions where a wrong option tempts**
 
-- **Question 1.** Option B says the query stops; SQLite returns NULL and carries on.
-- **Question 2.** Option A rewards the more specific condition; the first true one wins.
-- **Question 3.** Option B counts rows, and D puts the CASE around the sum.
 - **Question 6.** Options A and B blame the date; the cause is the type of the result.
 - **Question 7.** Option B is the whole-year total; the ORDER BY makes a running total.
 - **Question 10.** Options A and C offer syntax excuses for evaluation order.
 - **Question 11.** Option B describes `ROWS UNBOUNDED PRECEDING`; the default window runs through the peers.
-- **Question 12.** Option A credits CTEs with speed; the benefit is named steps.
 - **Question 14.** Option A treats `PARTITION BY` as a filter or a sort.
 - **Question 15.** Option C says a trailing measure always rises.
 - **Length.** The correct option is also the longest in 2 of the 15 questions (3 and 15), so wording alone can give it away. If you grade with these, ask students to explain their answer or reword the options.
 
-Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 1 to 3 make a quiz of CASE, questions 4 to 6 of dates, questions 7 to 11 and 14 of windows, and questions 12, 13 and 15 of CTEs, views and the measure.
+Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 1 to 3 cover CASE, 4 to 6 dates, 7 to 11 and 14 windows, and 12, 13 and 15 CTEs, views and the measure.
 
 ## Connections
 
-**Builds on.** Chapter 5's IFS and Chapter 6's SUMIFS and Show Values As, which CASE, conditional aggregation and the window functions repeat in SQL; Chapter 7's year-over-year comparison; Chapter 9's working copy and script habit; Chapter 10's joins, trial balance and hours comparison, which this chapter turns into a monthly measure; and Chapter 8's journal entry tests and Exercise 8.5 (Exercises 11.5 and 11.6).
+**Builds on.** Chapter 5's IFS and Chapter 6's SUMIFS and Show Values As, which CASE, conditional aggregation and windows repeat in SQL; Chapter 7's year-over-year comparison; Chapter 9's script habit; Chapter 10's joins, trial balance and hours comparison, which this chapter turns into a monthly measure; and Chapter 8's journal entry tests and Exercise 8.5, which Exercises 11.5 and 11.6 repeat.
 
-**Later chapters.** Chapter 12's audit library is built from these CTEs, views and window functions, and it takes up the questions about the time records that this chapter ends with. The Part III case uses the saved view. Chapter 14 rebuilds the prior-year comparison in DAX, Chapter 15 the trailing measure, and Chapter 16 the journal entry tests. Chapter 7's forecasting methods could project the trailing baseline.
+**Later chapters.** Chapter 12's audit library is built from these CTEs, views and window functions, and it takes up the questions about the time records that this chapter ends with. The Part III case uses the saved view. Chapter 14 rebuilds the prior-year comparison in DAX, Chapter 15 the trailing measure, and Chapter 16 the journal entry tests.
 
 **Appendices.** The quick reference lists CASE, the date functions and the window syntax beside Excel and DAX. **Appendix D** maps each exercise to the professional frameworks; each exercise guide names the competencies it practices.

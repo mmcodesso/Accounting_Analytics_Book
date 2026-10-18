@@ -12,7 +12,7 @@
 
 ## Purpose and learning outcomes
 
-The revenue standard asks a company to break revenue into categories that show how economic factors affect it, and offers product lines and types of customer as examples. This exercise asks students to prepare that first cut from InvoiceLines with PivotTables, to read it against the previous year, and to say what stands between an invoice-based schedule and the number in the financial statements. It practices two-dimensional PivotTables, Show Values As and a disclosure paragraph. The analytics type is descriptive.
+The revenue standard asks a company to break revenue into categories that show how economic factors affect it, and offers product lines and types of customer as examples. This exercise asks students to prepare that first cut from InvoiceLines with PivotTables, to read it against the previous year, and to say what stands between an invoice-based schedule and the number in the financial statements. It practices two-dimensional PivotTables, Show Values As and a disclosure paragraph. The exercise assumes a public business entity applying U.S. GAAP (ASC 606-10-50-5 and 55-91). An entity that is not one may elect not to give the quantitative disaggregation (ASC 606-10-50-7), but it must still disclose revenue by the timing of transfer and qualitative information on how economic factors affect its revenue, so the election does not remove all disaggregation. The analytics type is descriptive.
 
 By the end, students can:
 
@@ -30,7 +30,7 @@ By the end, students can:
 
 ## How to run it
 
-Individual, about 75 minutes: 15 on requirement 1, 25 on requirements 2 and 3, 20 on the paragraph, 15 on the reconciliation. Hold back the Show Values As route for the change column until a student has tried to compute it by hand. Collect the workbook and the paragraph.
+Individual, about 75 minutes: 15 on requirement 1, 25 on requirements 2 and 3, 20 on the paragraph, 15 on the reconciliation. Before students use **% Difference From** for the change column, which requirement (2) names, ask them to predict what it will show under the earlier year and why. Collect the workbook and the paragraph.
 
 ## Step-by-step solution
 
@@ -63,17 +63,17 @@ d. Drag **Σ Values** from **Columns** to **Rows**, below CustomerSegment.
 
 ### Requirement (3): The same comparison by region
 
-**Step 4. Repeat with Region.** Insert a third PivotTable with Region in **Rows** instead of CustomerSegment, and the same year filter and change field.
+**Step 4. Repeat with Region.** Insert a third PivotTable with Region in **Rows** instead of CustomerSegment, and the same year filter and change field, and read each region's change as a whole.
 
 **Check:** the changes are West +9.9%, Northeast +9.2%, Midwest -2.0% and South -7.2%, and the segments Wholesale +6.0%, Small Business +3.9%, Strategic -2.9%, Design Services -3.8% and Design Trade -6.7%. Total revenue changes +1.29%. **Watch for:** the design services row of the region table. It swings by more than 100 percent in one region (South: +240%; West: -70%) on a small base, so a region-by-product reading overstates the news.
 
 ### Requirement (4): The disclosure paragraph
 
-**Step 5. Write four to six sentences.** The model path: state the categories (product line and type of customer) and why; give the year's revenue and the shares (Furniture 58.5%, Lighting 20.2%, Textiles 11.0%, Accessories 6.3%, design services 4.1%; Wholesale 51.3% of revenue by customer type); name the largest combinations; summarize the changes; and present the region as supplementary.
+**Step 5. Write four to six sentences.** The model path: state the categories (product line and type of customer) and why; give the year's revenue and the shares (Furniture 58.5%, Lighting 20.2%, Textiles 11.0%, Accessories 6.3%, design services 4.1%; Wholesale 51.3% of revenue by customer type); name the largest combinations; summarize the changes; and present the region as supplementary, or as a category of its own with a reason.
 
 ### Requirement (5): What must be reconciled
 
-**Step 6. Build the ladder.** Start from the invoice lines ($29,756,420.08), add the cutoff invoices that the ledger records in fiscal 2026 ($4,582.37) and freight revenue, which has no invoice line ($212,820.03), to reach operating revenue ($29,973,822.48), then deduct sales returns and allowances ($242,764.56) to reach net revenue ($29,731,057.92).
+**Step 6. Build the ladder.** Start from the invoice lines ($29,756,420.08), add the cutoff invoices that the ledger records in fiscal 2026 ($4,582.37) and freight revenue, which has no invoice line ($212,820.03), to reach operating revenue ($29,973,822.48), then deduct sales returns and allowances ($242,764.56) to reach net revenue ($29,731,057.92). The ladder is as recorded, before correction of the cutoff error, which Exercise 6.1 traces by delivery date, and it does not validate recognition. Freight revenue is the net posted amount, $214,616.66 billed less $1,796.63 of freight credits on credit memos. The credit memos' subtotals post to sales returns and allowances, so the freight credits are not deducted again with that account.
 
 ## Expected results
 
@@ -86,13 +86,15 @@ d. Drag **Σ Values** from **Columns** to **Rows**, below CustomerSegment.
 | Total revenue, 2026; 2025 | $29,756,420.08; $29,376,702.28 | 4 |
 | Reconciling items to net revenue | $4,582.37; $212,820.03; -$242,764.56 | 6 |
 
-> **Instructor notes, Exercise 6.2:** 2026 shares of grand total: Wholesale-Furniture 31.68% (9,427,365.72), Strategic-Furniture 18.24% (5,426,213.53), Wholesale-Lighting 10.59% (3,149,776.65); then Strategic-Lighting 6.60% and Design Trade-Furniture 6.05%. Changes from 2025 for combinations with at least \$500,000 in 2025: increases Strategic-Lighting +13.3% (1,732,739 to 1,962,918) and Wholesale-Lighting +9.3% (2,882,869 to 3,149,777); decreases Strategic-Accessories -17.8% (693,226 to 569,622) and Design Trade-Furniture -11.4% (2,030,430 to 1,799,124). Segments: Wholesale +5.99%, Small Business +3.85%, Strategic -2.86%, Design Services -3.81%, Design Trade -6.66%; total +1.29%. Regions: West +9.9%, Northeast +9.2%, Midwest -2.0%, South -7.2%. Design Services buys only Services, so the segment and the product line coincide there. Requirement (5): the invoice-based revenue differs from the revenue the income statement reports by freight revenue (4050, which has no invoice line), sales returns and allowances (4060, the credit memos), and the three cutoff invoices of Exercise 6.1, which the ledger records in a different year from their invoice dates. A nonpublic entity may elect not to give the quantitative disaggregation (ASC 606-10-50-7); the exercise treats the disclosure as if it were required.
+> **Instructor notes, Exercise 6.2:** 2026 shares of grand total: Wholesale-Furniture 31.68% (9,427,365.72), Strategic-Furniture 18.24% (5,426,213.53), Wholesale-Lighting 10.59% (3,149,776.65); then Strategic-Lighting 6.60% and Design Trade-Furniture 6.05%. Changes from 2025 for combinations with at least \$500,000 in 2025: increases Strategic-Lighting +13.3% (1,732,739 to 1,962,918) and Wholesale-Lighting +9.3% (2,882,869 to 3,149,777); decreases Strategic-Accessories -17.8% (693,226 to 569,622) and Design Trade-Furniture -11.4% (2,030,430 to 1,799,124). Segments: Wholesale +5.99%, Small Business +3.85%, Strategic -2.86%, Design Services -3.81%, Design Trade -6.66%; total +1.29%. Regions: West +9.9%, Northeast +9.2%, Midwest -2.0%, South -7.2%. Design Services buys only Services, so the segment and the product line coincide there. Requirement (5): the invoice-based revenue differs from the revenue the income statement reports by freight revenue (4050, net of freight credits, which has no invoice line), sales returns and allowances (4060, the credit memos), and the three cutoff invoices of Exercise 6.1, which the ledger records in a different year from their invoice dates; the reconciliation is as recorded, before correction of the cutoff error. The exercise assumes a public business entity applying U.S. GAAP (ASC 606-10-50-5 and 55-91). An entity that is not one may elect not to give the quantitative disaggregation (ASC 606-10-50-7), but it must still disclose, at a minimum, revenue by the timing of transfer and qualitative information on how economic factors affect its revenue, so the election does not remove all disaggregation.
 
 ## What a strong answer says
 
 - **Requirements (1) and (2).** The three largest combinations and the four changes are read from the PivotTables, with the $500,000 floor stated.
-- **Requirement (4).** The categories follow how Charles River prices and manages the business: price lists by segment, promotions by item group and segment, goods recognized on delivery and design services billed by the hour. The region is supplementary because nothing is priced by it. The paragraph says the amounts are invoice-based.
-- **Requirement (5).** Three kinds of item: the cutoff invoices (a period question, settled by delivery), freight revenue (no invoice line) and returns (credit memos).
+- **Requirement (4).** The categories follow how Charles River prices and manages the business: price lists by segment, promotions by item group and segment, goods recognized on delivery and design services billed by the hour (ASC 606-10-55-90 asks an entity to consider how it presents its revenue for other purposes). The region is supplementary here because the price lists and promotions follow segment and item group, but the standard also names geographical region as an example (ASC 606-10-55-91), so a well-supported regional presentation is acceptable.
+- **Requirement (5).** Three kinds of item, listed with their amounts: the cutoff invoices (a period question, settled by delivery), freight revenue, net of freight credits (no invoice line), and returns (credit memos). The ladder is as recorded, before correction of the cutoff error.
+
+**A plus, not required.** The shares of revenue and the invoice basis stated in the paragraph, and a ranking of the regional changes with the same floor.
 
 A weak paragraph lists numbers without a reason for the categories, or presents the PivotTable total as the company's revenue.
 
@@ -110,9 +112,9 @@ A weak paragraph lists numbers without a reason for the categories, or presents 
 |---|---:|---|---|
 | Requirement 1: shares | 20 | Filtered to the year, shares of the grand total, three largest named | Wrong year or no ranking |
 | Requirement 2: changes | 25 | Year above group, **% Difference From**, floor applied, four combinations | Changes by hand, or no floor |
-| Requirement 3: region | 10 | Same method by region | Dollars instead of percent |
-| Requirement 4: paragraph | 25 | Categories with reasons, shares, changes, invoice basis | Numbers without reasons |
-| Requirement 5: reconciliation | 20 | Cutoff, freight and returns named with amounts | Items without amounts |
+| Requirement 3: region | 10 | Same method by region, each region's total change reported | Dollars instead of percent |
+| Requirement 4: paragraph | 25 | Categories with reasons, and the changes from the previous year | Numbers without reasons |
+| Requirement 5: reconciliation | 20 | Cutoff, freight and returns listed and quantified | Items without amounts |
 
 ## Extensions and discussion questions
 

@@ -36,7 +36,7 @@ By the end, students can:
 - trace an odd total to a source document type, a voucher and an EntryType;
 - explain why the entry does not belong in a quarterly measure, exclude it by a rule, and recompute the margins.
 
-**Competencies practiced.** CPA Evolution Core S2 M5 (risk of fraud and noncompliance); IMA Data Literacy, and Internal Control within Reporting and Control; IFAC IES 4 (a), professional skepticism and professional judgment; AACSB A5 part 5.2. The analytics type is descriptive, applied with an auditor's skepticism.
+**Competencies practiced.** CPA Evolution Core S1 M8 T3 to T4 (data mining and analysis of financial data); IMA Data Literacy and Data Analysis within Data Analytics and Insights; IFAC IES 4 (a), professional skepticism and professional judgment; AACSB A5 part 5.2. The analytics type is descriptive, applied with an auditor's skepticism.
 
 ## Before you assign
 
@@ -118,7 +118,7 @@ The margin at standard cost is {{ s3|pct(2) }} in {{ g.ql3 }} and {{ s4|pct(2) }
 
 {{ figure('IF-C1-5-B') }}
 
-**Step 7. State what the margins show.** On this measure the Furniture margin fell from {{ m3|pct(2) }} to {{ m4|pct(2) }}, a drop of {{ g.drop|num(2) }} points. Revenue fell {{ (-g.rev_change)|num(1) }}% from {{ g.ql3 }} to {{ g.ql4 }} while cost rose {{ g.cogs_change|num(1) }}%. The measure takes revenue before customer credits, which post to a shared account, and cost after the returned goods, so it overstates the margin, and a model answer says so. The cross-check at standard cost also falls, by {{ g.std_drop|num(2) }} points, but it is a separate measure (the invoice lines before returns), so it supports the direction of the change, not the level. That is the descriptive answer. Why it fell is the Part II question.
+**Step 7. State what the margins show.** On this measure the Furniture margin fell from {{ m3|pct(2) }} to {{ m4|pct(2) }}, a drop of {{ g.drop|num(2) }} points. Revenue fell {{ (-g.rev_change)|num(1) }}% from {{ g.ql3 }} to {{ g.ql4 }} while cost rose {{ g.cogs_change|num(1) }}%. The measure takes revenue before customer credits, which post to a shared account, and cost after the returned goods, so it overstates the margin, and a model answer says so. The cross-check at standard cost also falls, by {{ g.std_drop|num(2) }} points, but it is a separate measure (the invoice lines before returns), so it supports the direction of the change, not the level. For reference, the invoice lines at standard cost come to ${{ g.std3|money }} in {{ g.ql3 }} and ${{ g.std4|money }} in {{ g.ql4 }}, against posted shipment cost net of cost returns of ${{ g.cogs3|money }} and ${{ g.cogs4|money }}. The gaps, ${{ g.std_gap3|money }} and ${{ g.std_gap4|money }}, are differences between the two definitions (invoice and shipment timing, unmatched shipments, returns), not errors in the four tie-outs. That is the descriptive answer. Why it fell is the Part II question.
 
 ## Expected results
 
@@ -164,5 +164,5 @@ A weak answer reports the naive percentage as the result, removes one side of th
 ## Extensions and discussion questions
 
 - Net the revenue side of returns. The Furniture credit memo lines were ${{ g.ret3|money }} in {{ g.ql3 }} and ${{ g.ret4|money }} in {{ g.ql4 }}. The margin is then {{ g.net3|pct(2) }} and {{ g.net4|pct(2) }}. Does the fall survive?
-- Add the Furniture shipment lines of {{ g.ql4 }} with no invoice line to revenue at their order price (${{ g.unbilled.at_order_price|money }}). The margin of {{ g.ql4 }} would be {{ g.billed4|pct(2) }}, still below {{ g.ql3 }}. What does that say about the cutoff?
+- As a hypothetical sensitivity only, add the order-price amount of the Furniture shipment lines of {{ g.ql4 }} with no invoice line (${{ g.unbilled.at_order_price|money }}) to {{ g.ql4 }} revenue, leaving their recorded cost as it is. The margin would be {{ g.billed4|pct(2) }}, still below {{ g.ql3 }}. The calculation does not establish whether the revenue belongs in {{ g.ql4 }}. What order, shipment, delivery and billing evidence would you obtain to tell a timing difference from an omission or an item to correct?
 - Discuss: which test of Chapter 2's checklist, if any, would have flagged this before the margin was computed?

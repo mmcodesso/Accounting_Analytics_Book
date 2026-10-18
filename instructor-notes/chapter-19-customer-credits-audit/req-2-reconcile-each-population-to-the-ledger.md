@@ -12,7 +12,7 @@
 
 ## Purpose and learning outcomes
 
-Every later test assumes that the populations are complete, and Requirement 1's anti-joins cannot show that a document was never made. A reconciliation can: each document population is totaled by year from its own table and from the ledger, and the two sides must agree to the cent. Two-sided totals by year, without the closes, are a query. The analytics type is descriptive. The requirement also teaches the hub account: 2060 passes tens of millions a year and ends each year with a few thousand, so it must be reconciled flow by flow, and its balance named item by item.
+Every later test relies on the recorded populations, and a reconciliation identifies differences between the recorded document population and the ledger population: each is totaled by year from its own table and from the ledger, and the two sides must agree to the cent. Agreement supports completeness relative to those records, but cannot detect an event omitted from both. Use sequence checks, source documents and outside-system evidence before a broader completeness conclusion. Two-sided totals by year, without the closes, are a query. The analytics type is descriptive. The requirement also teaches the hub account: 2060 passes tens of millions a year and ends each year with a few thousand, so it must be reconciled flow by flow, and its balance named item by item.
 
 Students can reconcile credits, returns, refunds, clawbacks, receipts and applications to the accounts they post to (Part 1), roll the hub forward and name its items, reconcile commissions payable (Part 2), and state what was excluded and why (Part 3).
 
@@ -55,7 +55,7 @@ SUM(CASE WHEN a.AccountNumber = 4060 THEN gl.Debit ELSE 0 END)
 - A GrandTotal tied to `1020` alone: the difference is the part posted to `2060`, $220,131.88 in all.
 - `4060` read by account alone, as debits less credits over every source: zero in every year, because the close credits it back.
 
-**Step 2. Reconcile the returns (G2).** The return lines at standard cost against the debits to `1040` and the credits to the four cost of goods sold accounts. **Check:** 3 rows; the cost is $325,840.19 over the three years. **Watch for:** tying the cost to `5010` alone, which leaves $138,128.82 in the last year.
+**Step 2. Reconcile the returns (G2).** The return lines at standard cost against the debits to `1040` and the credits to the four cost of goods sold accounts. **Check:** 3 rows; the cost is $325,840.19 over the three years. **Watch for:** tying all returned cost to `5010` alone. In the last year that omits $42,102.68 posted to `5020` to `5040`: the total returned cost is $138,128.82 and the `5010` portion $96,026.14.
 
 **Step 3. Reconcile the refunds and the clawbacks (G3, G4).** Refunds against the credits to cash (`1010`) and the debits to `2060`; clawbacks against the debits to `2034` and the credits to `6290`, with the year's accruals and payments beside them. **Check:** 3 rows each; refunds total $45,028.75, $86,581.85, $85,107.82 and clawbacks $2,694.49, $3,768.06, $4,369.54. **Watch for:** every credit to `6290`, whatever its source. It reads $521,989.10 in the first year, the year's accruals, because the close credits the expense account for its net cost.
 
@@ -107,7 +107,7 @@ GROUP BY a.AccountNumber, je.EntryNumber, je.PostingDate
 ORDER BY a.AccountNumber, je.PostingDate;
 ```
 
-**Check:** 6 rows, one close a year on each account (`4060`: $589,524.29; `6290`: $1,650,773.32). The statement names the six closing entries, which move the year's result to equity, and the ledger rows after the last year-end, which hold supplier payments only.
+**Check:** 6 rows, one close a year on each account (`4060`: $589,524.29; `6290`: $1,650,773.32). The statement names the 6 account-level closing rows from the 3 year-end closing entries, which move the year's result to equity, and the ledger rows after the last year-end, which hold supplier payments only.
 
 **Step 9. Build the appendix version.** The Reconciliation sheet repeats each test as formulas on the Ledger Table: a total from the document Table, one from the ledger, and their difference.
 
@@ -128,14 +128,14 @@ ORDER BY a.AccountNumber, je.PostingDate;
 | Balance of `2034`, last year-end | $48,858.55 | 7 |
 | Closes excluded | 3 on `4060`, 3 on `6290` | 8 |
 
-> **Instructor notes, Requirement 2 (2024 / 2025 / 2026, all to the cent):** credits 158 / 232 / 222; SubTotal = 4060 145,655.35 / 201,104.38 / 242,764.56 (589,524.29); freight = 4050 1,227.26 / 1,109.93 / 1,796.63; tax = 2050 9,547.39 / 13,143.88 / 15,896.53 (38,587.80); GrandTotal 156,430.00 / 215,358.19 / 260,457.72 = Cr 1020 108,295.50 / 130,873.42 / 172,945.11 + Cr 2060 48,134.50 / 84,484.77 / 87,512.61. Returns at standard = 1040 76,390.25 / 111,321.12 / 138,128.82 (325,840.19); COGS credits 5010 40,502.86 / 73,787.18 / 96,026.14, 5020 16,781.43 / 17,985.54 / 25,386.87, 5030 13,125.13 / 12,655.71 / 11,366.42, 5040 5,980.83 / 6,892.69 / 5,349.39. Refunds 55 / 84 / 83 = 45,028.75 / 86,581.85 / 85,107.82 to 1010 and 2060. Clawbacks 2,694.49 / 3,768.06 / 4,369.54 to 2034 and 6290 (accruals 521,989.10 / 568,898.84 / 570,717.47; payments 470,066.75 / 566,286.93 / 565,561.09). Receipts = applications = 24,574,608.36 / 31,633,933.20 / 31,688,081.73, Dr 1010 and Cr 1020. 2060 at the year-ends 3,105.75 (CM-2024-000147 2,641.08; CM-2024-000158 464.67) / 1,008.67 (CM-2025-000329, -000375, -000376) / 3,413.46 (Issued CM-2026-000583 1,503.06, -000605 912.97, -000607 997.43). 2034 at 2026-12-31 48,858.55. Excluded: the closes on 4060 (3 rows, 589,524.29) and 6290 (3 rows).
+> **Instructor notes, Requirement 2 (2024 / 2025 / 2026, all to the cent):** credits 158 / 232 / 222; SubTotal = 4060 145,655.35 / 201,104.38 / 242,764.56 (589,524.29); freight = 4050 1,227.26 / 1,109.93 / 1,796.63; tax = 2050 9,547.39 / 13,143.88 / 15,896.53 (38,587.80); GrandTotal 156,430.00 / 215,358.19 / 260,457.72 = Cr 1020 108,295.50 / 130,873.42 / 172,945.11 + Cr 2060 48,134.50 / 84,484.77 / 87,512.61. Returns at standard = 1040 76,390.25 / 111,321.12 / 138,128.82 (325,840.19); COGS credits 5010 40,502.86 / 73,787.18 / 96,026.14, 5020 16,781.43 / 17,985.54 / 25,386.87, 5030 13,125.13 / 12,655.71 / 11,366.42, 5040 5,980.83 / 6,892.69 / 5,349.39. Refunds 55 / 84 / 83 = 45,028.75 / 86,581.85 / 85,107.82 to 1010 and 2060. Clawbacks 2,694.49 / 3,768.06 / 4,369.54 to 2034 and 6290 (accruals 521,989.10 / 568,898.84 / 570,717.47; payments 470,066.75 / 566,286.93 / 565,561.09). Receipts = applications = 24,574,608.36 / 31,633,933.20 / 31,688,081.73, Dr 1010 and Cr 1020. 2060 at the year-ends 3,105.75 (CM-2024-000147 2,641.08; CM-2024-000158 464.67) / 1,008.67 (CM-2025-000329, -000375, -000376) / 3,413.46 (Issued CM-2026-000583 1,503.06, -000605 912.97, -000607 997.43). 2034 at 2026-12-31 48,858.55. Excluded: the closes on 4060 (3 rows, 589,524.29) and 6290 (3 rows). Agreement among the recorded populations and the ledger supports completeness relative to those records and cannot detect an event omitted from both; sequence checks, source documents and outside-system evidence go further.
 
 ## What a strong answer says
 
 - **Every population ties to the cent, in every year, from both sides,** and the answer says which date each side uses.
 - **The hub is reconciled flow by flow,** and each year-end balance is named by credit.
 - **The exclusions are stated and justified:** the closes, and the rows after the last year-end.
-- **A tie is evidence of completeness, not of correctness:** the amounts are tested in Requirement 7.
+- **A tie is evidence that the recorded populations agree with the ledger,** not of completeness beyond the records or of correctness: the amounts are tested in Requirement 7.
 
 A weak answer reconciles totals over three years at once, ties the balance alone, or leaves the closes in.
 

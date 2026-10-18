@@ -14,5 +14,5 @@
      would show whether a control changed. Journal
      entries are the process to watch: their unexplained rate fell in {{ d.P }} and rose in {{ d.C }}, mostly because of single
      documents that fail several tests (the opening entry's {{ opening }} in {{ opening_year }}, the debt reclassifications' {{ reclass }} each in {{ reclass_years|join(' and ') }}),
-     while {% for name, v in stable %}{{ name }} ({{ v|join(', ') }}){% if loop.revindex == 2 %}, and {% elif not loop.last %}, {% endif %}{% endfor %} {{ still }}; payroll's unexplained
-     exceptions are {{ pr_left }} a year, so its rate is almost entirely the design finding. -->
+     while {% for name, v in stable %}{{ name }} ({{ v|join(', ') }}){% if loop.revindex == 2 %}, and {% elif not loop.last %}, {% endif %}{% endfor %} {{ still }}; payroll's rate of all exceptions
+     is almost entirely the design finding, and its unexplained exceptions are {{ pr_left }} a year. -->

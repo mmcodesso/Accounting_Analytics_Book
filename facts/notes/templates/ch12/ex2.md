@@ -4,8 +4,10 @@
      Tutorial 8.2. Account 1020 (AccountID {{ ar }}) at {{ asof }} is {{ ledger|money }}; the {{ difference|money }} difference is the opening-balance line of
      {{ entry }}, which no invoice supports (Chapter 8's finding). {{ n_negative }} invoices have a negative balance ({{ negative|money }} in all):
      credit memos on invoices that receipts also paid ({{ paid_in_full|count }} of them in full by the as-of date, {{ full_before|count }}
-     of those in full before their first credit), which post to account 2060 and are refunded ({{ refunded|count }} of the {{ n_negative }} by {{ asof }}),
-     so they are not receivables. Strata by customer:
+     of those in full before their first credit). The excess, {{ credited_2060|money }}, was credited to account 2060, and for {{ n_to_1020 }} of the invoices the
+     credit memo also reduced account 1020, by {{ to_1020|money }}, so a credit memo does not always post only to 2060. Refunds had settled {{ refunded|count }}
+     of the {{ n_negative }} by {{ asof }} ({{ refund_total|money }}), leaving {{ unrefunded|money }} in account 2060. The invoice formula leaves out the refunds, so these
+     negative balances are neither negative receivables nor the refund liability. Strata by customer:
      under 1,000, {{ strata[0].n }} customers, {{ strata[0].amount|money }}; 1,000-9,999, {{ strata[1].n }}, {{ strata[1].amount|money }}; 10,000-49,999, {{ strata[2].n }}, {{ strata[2].amount|money }}; 50,000 and over, {{ strata[3].n }},
      {{ strata[3].amount|money }}, {{ key_share|pct }} of the balance, the key items of Tutorial 8.2. Receipts not invoiced: {{ grni_lines|count }} receipt lines, {{ grni|money }}, the unrounded values added and rounded once
      (the lines rounded to the cent one by one add to {{ grni_shown|money }}; account

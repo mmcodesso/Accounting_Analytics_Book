@@ -11,7 +11,7 @@ After completing this chapter, you will be able to:
 
 1. Plan an integrated audit of a business cycle by mapping its documents and control points from the records, reconciling each population to the general ledger, and setting materiality and tolerable deviation rates.
 2. Assess the risks of the cycle, including the fraud risks of unauthorized credits, diverted refunds, and lapping, and link each risk to a test and to the evidence it needs.
-3. Distinguish tests of controls from substantive tests, and decide when a query of the whole population replaces a sample and when evidence outside the database still needs one.
+3. Distinguish tests of controls from substantive tests, and decide when a query of the whole population replaces a sample and when evidence outside the database requires document examination, using a sample or a census.
 4. Size an attribute sample, select it at random with key items taken in full, and evaluate the result with an upper deviation limit.
 5. Use descriptive and diagnostic analytics to explain the growth of returns and to rank refunds for follow-up, allowing for timing and for periods the data do not complete.
 6. Classify control deficiencies by likelihood, magnitude, and compensating controls, and report them to an audit committee with the action plans and the tests that will keep watching them.
@@ -141,7 +141,7 @@ The map comes from the records, not from a description of how the process should
 
 **Requirement 2: Reconcile each population to the ledger (Chapters 8 and 12).**
 
-Every later test assumes that the populations are complete. Two-sided totals by year, without the closes, are a query.
+Every later test relies on the recorded populations agreeing with the ledger. Two-sided totals by year, without the closes, are a query.
 
 - By fiscal year, reconcile the credits to the ledger: their subtotal to 4060, freight to 4050, tax to 2050, and their totals to the credits to receivables and 2060. Reconcile the returns' standard cost to inventory and to cost of goods sold by account, the refunds to cash and 2060, the clawbacks to 2034 and 6290, and the receipts and applications to cash and receivables.
 - Roll 2060 forward to each year-end and name the items in each balance, and reconcile 2034 at the end of fiscal 2026.
@@ -155,7 +155,7 @@ Every later test assumes that the populations are complete. Two-sided totals by 
 A planning workbook keeps its parameters in cells that every later test refers to, which is what Excel is for.
 
 - Compute overall materiality under the chief audit executive's condition, performance materiality at 75% of it, and a clearly trivial threshold at 5% of it.
-- Build an analytical expectation of fiscal 2026 returns from the 2025 return rate (the debits to account 4060 over the revenue that sales invoices posted to the product and service accounts), and compare it with the ledger. Explain why the 2024 rate would make a poorer expectation.
+- Build an analytical expectation of fiscal 2026 returns from the 2025 return rate (the debits to account 4060 over the revenue that sales invoices posted to the product and service accounts), and compare it with the ledger. Say what size of difference would lead you to investigate, and why. Explain why the 2024 rate would make a poorer expectation.
 - Brainstorm the fraud risks with @tbl-19-01 and AS 2401's three conditions, mapped to the people and documents of @fig-19-01.
 - Build a risk-and-control matrix: risk, assertion, control point, test, tool, and whether the evidence lies in the database or outside it.
 
@@ -181,7 +181,7 @@ Each test joins a document to the people who handled it and to the cash on the i
 
 The committee will want to see where returns grow and which refunds deserve a second look, and to move from a pattern to the documents behind it. That is a report.
 
-- Build Credits Analytics.pbix: credit lines with their reason, customer, approver, shipment date, and carrier; revenue from the invoice lines; Item, Customer, and Date; GLEntry and Account for the Tests tab; and the refunds with the flags of RefundFlags.csv. Add a Tests tab that ties credits to account 4060 by year.
+- Build Credits Analytics.pbix: credit lines with their reason, customer, approver, shipment date, and carrier; revenue from the invoice lines; Item, Customer, and Date; GLEntry and Account for the Tests tab; and the refunds with the flags of RefundFlags.csv. Add a Tests tab that ties credits to account 4060 by year. Turn off Auto date/time and Autodetect new relationships after data is loaded under Current File, as Tutorial 13.1 did, so that Power BI does not add hidden date tables or relationships you did not choose.
 - Show return rates by year, item group, product family, and reason, and compare rates by the month of the credit with rates by the month of the shipment. Explain why the last months and fiscal 2024 mislead.
 - Look for concentration by carrier, warehouse, and customer, as a share of each customer's sales.
 - Score each refund on its flags, one point for each, and let a reviewer drill through from the score to the refund, its credit, and its invoice.
@@ -189,7 +189,7 @@ The committee will want to see where returns grow and which refunds deserve a se
 
 
 
-Sampling still has a place when the evidence lies outside the database. The records cannot show whether a customer asked in writing for a refund, whether someone independent checked the payee, or whether anyone inspected the goods that came back damaged; those need documents, which are examined one at a time, in a sample or, when the population is small, all of them. AS 2315 (PCAOB, n.d.-b) and the American Institute of Certified Public Accountants' audit sampling guide (AICPA, 2025) set out the judgments involved: the risk of overreliance you accept, which sets the confidence level; the tolerable deviation rate, the highest rate at which you would still rely on the control; and the expected deviation rate. @tbl-19-03 gives the sample sizes the binomial distribution implies for large populations, with the number of deviations each size allows (the expected rate times the size, rounded up). After testing, the upper deviation limit for k deviations in a sample of n is `BETA.INV(confidence, k + 1, n - k)` in Excel while k is less than n (if every item deviates, it is 100%); if it exceeds the tolerable rate, the sample does not support reliance.
+Sampling still has a place when the evidence lies outside the database. The records cannot show whether a customer asked in writing for a refund, whether someone independent checked the payee, or whether anyone inspected the goods that came back damaged; those need documents, which are examined one at a time, in a sample or, when the population is small, all of them. AS 2315 (PCAOB, n.d.-b) and the American Institute of Certified Public Accountants' audit sampling guide (AICPA, 2025) set out the judgments involved: the risk of overreliance you accept, which sets the confidence level; the tolerable deviation rate, the highest rate at which you would still rely on the control; and the expected deviation rate. @tbl-19-03 gives the sample sizes the binomial distribution implies for large populations, with the number of deviations each size allows (the expected rate times the size, rounded up). After testing, the upper deviation limit for k deviations in a sample of n is `BETA.INV(confidence, k + 1, n - k)` in Excel for a whole number k less than n (if every item deviates, it is 100%); if it exceeds the tolerable rate, the sample does not support reliance.
 
 | Expected deviation rate | 95% confidence, 5% tolerable | 95% confidence, 10% tolerable | 90% confidence, 5% tolerable | 90% confidence, 10% tolerable |
 |-------------|-------------|-------------|-------------|-------------|
@@ -205,8 +205,8 @@ The selection and its evaluation are worksheet work, with the random selection C
 
 - Define three attributes that need evidence outside the database: a written request from the customer, a payee checked against the customer master by someone independent, and, for refunds of returns coded Damaged, an inspection record of the goods. The third applies only to the refunds of Damaged returns, so define its population and size its sample, or test it in full, on its own: a refund of another return is not a successful test of an inspection.
 - Choose the confidence level, tolerable deviation rate, and expected deviation rate, and take the sample size from @tbl-19-03.
-- From the refunds of fiscal 2024 to 2026, take the key items in full: every refund of $5,000 or more, and every refund to a customer whose refunds over the three years exceed $10,000. Evaluate the key items apart from the sample. Select the rest with RANDARRAY and SORTBY, freeze the selection with Paste Values, and record the date and parameters.
-- Write the evaluation rule before you test: the upper deviation limit for zero to three deviations, or up to one more than your plan allows if that is more.
+- Write the evaluation rule before you select or test anything: the upper deviation limit for zero to three deviations, or up to one more than your plan allows if that is more. Do not change it after you see the results.
+- From the refunds of fiscal 2024 to 2026, take the key items in full: every refund of $5,000 or more, and every refund to a customer whose refunds over the three years exceed $10,000. Evaluate the key items apart from the sample. Select the rest with RANDARRAY and SORTBY, freeze the selection with Paste Values, and record the selected IDs, the date, the parameters, and the method.
 - Apply the same sample to one attribute the data can test, the refund dated before the customer's payment as you defined it in Requirement 4, and compare the sample's conclusion with Requirement 4's result for the same remaining refunds. A sample drawn from three years does not show by itself how the controls operated at the end of 2026.
 - The database holds no documents, so you cannot complete the three attributes here. Deliver the sampling plan, the frozen selection, and the rule for evaluating it, and do not invent results.
 
@@ -217,7 +217,7 @@ The selection and its evaluation are worksheet work, with the random selection C
 
 - Recompute each credit line from its return, shipment, and invoice lines: the quantity no more than was shipped, the price and discount equal to the invoice's, and the credits on any invoice no more than its total. Recompute the tax on each credit at the rate its original invoice charged, and the amount of each clawback. Compare each credit's freight with the invoice's freight, recompute a share of it only under a stated freight-credit policy, and if no policy is available, report the limit of the test. List the open items in 2060 at the end of 2026.
 - Measure what returned goods were put back into inventory at, by reason.
-- Test for lapping: receipts applied to another customer's invoices, delays from receipt to deposit and from receipt to application, and receipts applied to invoices dated after them. Explain why a first-digit test does not suit these populations, using Chapter 8's criteria.
+- Test for lapping: receipts applied to another customer's invoices, delays from receipt to deposit and from receipt to application, and receipts applied to invoices dated after them. Explain, using Chapter 8's criteria, whether a first-digit test suits these populations.
 - Build a timeline of the largest refund, from the shipment to the last receipt on its invoice, with who did each step. Record a disposition, and list the evidence outside the database that would settle it.
 
 
@@ -225,9 +225,9 @@ The selection and its evaluation are worksheet work, with the random selection C
 
 ### Phase 3: Evaluate and Report
 
-A control deficiency exists when the design or operation of a control does not allow management or employees, in the normal course of their work, to prevent or detect misstatements on a timely basis. Its severity depends on whether there is a reasonable possibility that the control will fail to prevent or detect a misstatement, and on how large that misstatement could be, not on whether a misstatement actually occurred (PCAOB, n.d.-a). Compensating controls reduce the severity only if they operate precisely enough to catch what the deficient control would miss, and deficiencies that affect the same account, assertion, or component of internal control are evaluated in combination. @tbl-19-04 abridges the three classifications, and @fig-19-02 lays out the evaluation. Internal auditors then evaluate the significance of their findings and agree on action plans with management under the Global Internal Audit Standards of the Institute of Internal Auditors (IIA, 2024).
+A control deficiency exists when the design or operation of a control does not allow management or employees, in the normal course of their work, to prevent or detect misstatements on a timely basis. Its severity depends on whether there is a reasonable possibility that the control will fail to prevent or detect a misstatement, and on how large that misstatement could be, not on whether a misstatement actually occurred (PCAOB, n.d.-a). Compensating controls reduce the severity only if they operate precisely enough to catch what the deficient control would miss, and deficiencies that affect the same account, assertion, or component of internal control are evaluated in combination. @tbl-19-04 abridges the three classifications, and @fig-19-02 lays out the evaluation. Internal auditors then evaluate the significance of their findings and agree on action plans with management under the Global Internal Audit Standards of the Institute of Internal Auditors (IIA, 2024). The PCAOB classifications give this case a framework for comparison, and the engagement does not issue an external auditor's opinion on internal control over financial reporting.
 
-| Classification | Definition, abridged | What tips the severity | Who hears about it |
+| Classification | Abridged definition | What tips the severity | Who hears about it |
 |---------------|---------------------------------|-------------------------|---------------------|
 | Deficiency | A control's design or operation does not allow timely prevention or detection of misstatements | Likelihood and potential magnitude that do not merit the attention of those who oversee financial reporting | Management in writing, with notice to the audit committee |
 | Significant deficiency | Less severe than a material weakness, but important enough to merit the attention of those who oversee financial reporting | Likelihood, potential magnitude, and circumstances that merit that attention | Management and the audit committee, in writing |
@@ -248,7 +248,7 @@ An evaluation matrix computes each deficiency's exposure against the materiality
 
 
 
-**Requirement 9: Report to the audit committee.** Write a report of no more than three pages, with an appendix of exhibits, for the committee's November meeting. Open with an executive summary and an overall conclusion that says what the tests covered and what they could not. State the scope and how each population reconciled. Present each finding with its condition, criteria, cause, effect, rating, and recommendation, and report the clean results. Close with the action plans, each with an owner by role and a date, the response you expect from each owner, and where you expect them to disagree. The audit partners Cohen et al. (2020) interviewed describe managers who resist a finding of a weakness when no error has been detected and who argue that a review control would have caught the problem, so prepare the evidence for each compensating control they may point to.
+**Requirement 9: Report to the audit committee.** Write a report of no more than three pages, with an appendix of selected, condensed exhibits, for the committee's November meeting. Open with an executive summary and an overall conclusion that says what the tests covered and what they could not. State the scope and how each population reconciled. Present each finding with its condition, criteria, cause, effect, rating, and recommendation, and report the clean results. Close with the action plans, each with an owner by role and a date, the response you expect from each owner, and where you expect them to disagree. The audit partners Cohen et al. (2020) interviewed describe managers who resist a finding of a weakness when no error has been detected and who argue that a review control would have caught the problem, so prepare the evidence for each compensating control they may point to.
 
 
 
@@ -282,7 +282,7 @@ Before you submit, check that you have each of these:
 - Populations reconciled to the ledger, to the cent, before any test relies on them.
 - A map of the cycle built from the records rather than assumed, with what the records cannot show stated at each control point.
 - Every test with its population, its definition, and its result, clean or not.
-- Sampling used only where the evidence lies outside the database, with the rule for evaluating it written before the test.
+- Sampling used only where the evidence lies outside the database, with the rule for evaluating it written before the sample is drawn.
 - Timing and incomplete periods handled explicitly, and every measure taken as of the date that matters.
 - Deficiencies classified by likelihood, magnitude, and compensating controls rather than by counts, with the clean results reported too.
 - Findings worded as what the records show, with the evidence that would settle them, and continuing tests that will not flood the register.

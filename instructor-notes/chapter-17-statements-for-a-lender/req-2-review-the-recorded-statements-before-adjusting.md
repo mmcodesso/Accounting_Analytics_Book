@@ -43,8 +43,10 @@ Individual or pairs, about 150 minutes: 45 for the model, 30 for Balance and the
 
 a. Choose **Home > Get data > Excel workbook**, select the Tables for the ledger, the chart, the cost centers and the journal entries, and choose **Transform Data**.
 b. In GLEntry, merge JournalEntry on VoucherNumber and EntryNumber (**Home > Merge Queries**) and expand EntryType.
-c. Add IsYearEndClose with **Add Column > Custom Column**, then clear **Enable load** on JournalEntry.
+c. Add IsYearEndClose with **Add Column > Custom Column**, whose formula is `[EntryType] <> null and Text.StartsWith([EntryType], "Year-End Close")`, then clear **Enable load** on JournalEntry.
 d. Add the Date table of Tutorial 14.1, choose **Close & Apply**, and relate the Tables in **Model view**, many to one, **Single** direction.
+
+In the **Advanced Editor** the three steps read as below, a fragment of the GLEntry query, whose complete text is in the solution project.
 
 ```
     #"Merged Queries" = Table.NestedJoin(#"Changed Type1", {"VoucherNumber"}, JournalEntry, {"EntryNumber"}, "JournalEntry", JoinKind.LeftOuter)
@@ -72,19 +74,22 @@ RETURN
 
 ### Part 2: Flag the large changes
 
-**Step 3. Bring in the statement lines.** Load the Working TB Table of the package workbook as a second source, filter out its totals row, and relate its account number to the chart's.
+**Step 3. Bring in the statement lines.** Load the Working TB Table of the package workbook as a second source, filter out its totals row, and relate its account number to the chart's. Its steps read as below, a fragment that leaves out the Changed Type step and the LineOrder column.
 
 ```
     Source = Excel.Workbook(File.Contents("C:\CharlesRiver\Charles River Lender Package.xlsx"), null, true)
     WorkingTB_Table = Source{[Item="WorkingTB",Kind="Table"]}[Data]
+    #"Removed Other Columns" = Table.SelectColumns(#"Changed Type",{"AccountNumber", "AccountName", "AccountType", "StatementLine", "Statement", "Recorded2024", "Recorded2025", "Recorded2026", "Adj2024", "Adj2025", "Adj2026", "Adjusted2024", "Adjusted2025", "Adjusted2026"})
     #"Filtered Rows" = Table.SelectRows(#"Removed Other Columns", each [AccountNumber] <> null)
 ```
 
 **Check:** the matrix can group accounts by statement line. **Watch for:** the totals row. Power Query reads a Table's totals row as data, so a blank account number sits on the one side of the relationship and Desktop rejects it.
 
-**Step 4. Measure the change and set the threshold.** Choose **Modeling > New parameter > Numeric range** for the threshold (the model's series is `GENERATESERIES ( 0, 1000000, 25000 )`, with **Add slicer to this page**), and write the measures.
+**Step 4. Measure the change and set the threshold.** Choose **Modeling > New parameter > Numeric range** for the threshold (the model's series is `GENERATESERIES ( 0, 1000000, 25000 )`, with **Add slicer to this page**), and write the measures. Materiality reads Tutorial 14.3's Net Income.
 
 ```dax
+Balance 2025 = CALCULATE ( [Balance], REMOVEFILTERS ( 'Date' ), 'Date'[Date] = DATE ( 2025, 12, 31 ) )
+
 Balance 2026 = CALCULATE ( [Balance], REMOVEFILTERS ( 'Date' ), 'Date'[Date] = DATE ( 2026, 12, 31 ) )
 
 Change 2025 to 2026 = [Balance 2026] - [Balance 2025]
@@ -102,7 +107,7 @@ Is Above Threshold = IF ( [Absolute Change] > [Threshold Value], 1, 0 )
 Flag = IF ( [Absolute Change] > [Threshold Value], "Above threshold" )
 ```
 
-**Check:** the card titled "Threshold and materiality" shows materiality of $225,180.56 for 2026 and $256,717.74 for 2025, and the threshold reads the 2026 figure until the slider moves.
+**Check:** the card titled "Threshold and materiality" shows materiality of $225,180.56 for 2026 and $256,717.74 for 2025. With no value selected on the slicer, Threshold Value falls back to the exact materiality, a selected value overrides it, and clearing the selection restores it. The nearest step, $225,000.00, is a sensitivity, not the benchmark.
 
 **Step 5. Build the matrix and the flagged list.** On the Review page add the slicer ("Threshold (what-if)", set to **Single select**), the matrix ("Statement lines and accounts: year-end balances (debits less credits) and the change from 2025 to 2026") with the year-end balances, the change and Flag, and a table ("Changes above the threshold (right-click > Drill through > Postings)") filtered to the measure `Is Above Threshold` with its filter card, sorted by absolute change.
 
@@ -127,6 +132,8 @@ Opening Entry Amount = CALCULATE ( SUM ( GLEntry[Debit] ) - SUM ( GLEntry[Credit
 Postings after Opening = CALCULATE ( COUNTROWS ( GLEntry ), REMOVEFILTERS ( 'Date' ), GLEntry[EntryType] <> "Opening" || ISBLANK ( GLEntry[EntryType] ) ) + 0
 
 Moved since Opening = [Balance 2026] - CALCULATE ( [Opening Entry Amount], REMOVEFILTERS ( 'Date' ) )
+
+Postings = CALCULATE ( COUNTROWS ( GLEntry ), REMOVEFILTERS ( 'Date' ) ) + 0
 
 Document Postings = CALCULATE ( COUNTROWS ( GLEntry ), REMOVEFILTERS ( 'Date' ), GLEntry[SourceDocumentType] <> "JournalEntry" ) + 0
 

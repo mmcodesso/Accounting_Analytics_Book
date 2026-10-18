@@ -364,7 +364,7 @@ def ex2(b: Build) -> None:
             """,
             [Check("orphaned SourceLineIDs", 0, len)])
 
-    s.query("Requirement (3), an added test: postings whose line belongs to another invoice",
+    s.query("Beyond requirement (3), an added test: postings whose line belongs to another invoice",
             f"Population: the {num(n['tested'])} postings above; expected: no rows",
             f"""
             SELECT gl.GLEntryID, gl.SourceDocumentID, gl.SourceLineID,
@@ -413,11 +413,11 @@ def ex2(b: Build) -> None:
              f"SourceLineID {line['id']} is the invoice's line ({line['name']}, {line['qty']} units at "
              f"{money(line['price'])}). Requirement (3) extends the trace to the whole year: all "
              f"{num(n['tested'])} SalesInvoice postings of fiscal {year} that carry a SourceLineID point to an "
-             f"existing invoice line (the anti-join returns no rows), and each line belongs to the invoice the posting "
-             f"names. The header-level rows (receivable, freight, tax) carry no SourceLineID by design. The test "
-             f"shows that every line-level revenue posting points to an invoice line of the invoice it names; it does "
-             f"not show that every invoice line was posted, which needs the reverse anti-join, or that the amounts "
-             f"agree.")
+             f"existing invoice line (the anti-join returns no rows). The header-level rows (receivable, freight, tax) "
+             f"carry no SourceLineID by design. The test shows that each tested posting's line exists. It does not "
+             f"show that the line belongs to the invoice the posting names, which the added test beyond requirement "
+             f"(3) checks (it finds none on another invoice), that every invoice line was posted, which needs the "
+             f"reverse anti-join, that the amounts agree, or that the documents are genuine.")
 
 
 # --- Exercise 10.3 -------------------------------------------------------------------------------
@@ -1018,8 +1018,10 @@ def ex5(b: Build) -> None:
              + ", ".join(f"{k} on {w}" for w, k in n["orphan_by_wo"])
              + ", the work orders of finding 3. An orphaned key, not a missing one, so an IS NULL test alone would "
              f"miss them (the {word(n['no_op'])} entries with no key at all are Exercise 9.6). Integrity failure. "
-             f"Follow-up: correct the keys or the operations, and find out how the time system accepted an "
-             f"operation that does not exist.")
+             f"Follow-up: since these work orders have no operations at all, establish from the operation history "
+             f"and the source records whether the operation records are missing or the keys are wrong, correct what "
+             f"that evidence supports through an authorized change that keeps the exception trail, and find out how "
+             f"the time system accepted an operation that does not exist.")
 
 
 # --- Exercise 10.6 -------------------------------------------------------------------------------

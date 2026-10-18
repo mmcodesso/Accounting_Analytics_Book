@@ -267,7 +267,36 @@ def g1(d, claim):
     zero_accounts = [r[0] for r in d.q("SELECT a.AccountNumber FROM GLEntry g JOIN Account a ON a.AccountID = g.AccountID WHERE g.PostingDate < ? AND g.VoucherNumber NOT IN (?, ?) "
                                        "GROUP BY a.AccountID HAVING ROUND(SUM(g.Debit) - SUM(g.Credit), 2) = 0 ORDER BY a.AccountNumber", f"{d.N}-01-01", c1, c2)]
     claim(d.closes_of(d.P) and d.closes_of(d.F), "the closing entries of the earlier years are in the ledger")
+    # the delivery evidence of the cutoff invoices (invoices numbered in the report year but dated in the year before)
+    schema(d, claim, {"CreditMemo": ["CreditMemoDate", "SubTotal", "FreightCreditAmount"], "Shipment": ["ShipmentDate", "DeliveryDate"],
+                      "ShipmentLine": ["ShipmentLineID", "ShipmentID"]})
+    deliveries = []
+    for sid, number in d.q("SELECT SalesInvoiceID, InvoiceNumber FROM SalesInvoice WHERE InvoiceDate < ? AND InvoiceNumber LIKE ? ORDER BY InvoiceNumber",
+                           f"{y}-01-01", f"SI-{y}-%"):
+        got = d.q("SELECT DISTINCT s.ShipmentDate, s.DeliveryDate FROM SalesInvoiceLine l JOIN ShipmentLine sl ON sl.ShipmentLineID = l.ShipmentLineID "
+                  "JOIN Shipment s ON s.ShipmentID = sl.ShipmentID WHERE l.SalesInvoiceID = ? ORDER BY 1, 2", sid)
+        claim(len(got) > 0 and all(sh and dl and sh <= dl and sh[:4] == dl[:4] for sh, dl in got),
+              f"{number} has shipments with a delivery date on or after the shipment date, in the same year")
+        deliveries.append(dict(number=number, shipped=sorted({sh for sh, _ in got}), delivered=sorted({dl for _, dl in got}),
+                               shipped_year=min(sh for sh, _ in got)[:4]))
+    claim(len(deliveries) >= 2, "several invoices are numbered in the report year and dated in the year before")
+    # freight revenue (4050) is billed on the invoice header and reduced by the freight credits of credit memos, which post to 4050
+    # and not to 4060, whose balance is the credit memos' subtotals
+    freight_acct, returns_acct = d.account("4050"), d.account("4060")
+    freight_billed = d.one("SELECT ROUND(SUM(Credit) - SUM(Debit), 2) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? AND SourceDocumentType = 'SalesInvoice'",
+                           freight_acct, y)
+    freight_credits = d.one("SELECT ROUND(SUM(Debit) - SUM(Credit), 2) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? AND SourceDocumentType = 'CreditMemo'",
+                            freight_acct, y)
+    freight_net = d.one(f"SELECT ROUND(SUM(Credit) - SUM(Debit), 2) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? AND {d.no_closes()}", freight_acct, y)
+    memo_freight = d.one("SELECT ROUND(SUM(FreightCreditAmount), 2) FROM CreditMemo WHERE CreditMemoDate BETWEEN ? AND ?", f"{y}-01-01", f"{y}-12-31")
+    memo_subtotal = d.one("SELECT ROUND(SUM(SubTotal), 2) FROM CreditMemo WHERE CreditMemoDate BETWEEN ? AND ?", f"{y}-01-01", f"{y}-12-31")
+    returns_balance = d.one(f"SELECT ROUND(SUM(Debit) - SUM(Credit), 2) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? AND {d.no_closes()}", returns_acct, y)
+    claim(freight_credits > 0 and abs(freight_billed - freight_credits - freight_net) < 0.005,
+          "freight revenue (4050) is the freight billed on invoices less freight credits on credit memos")
+    claim(abs(memo_freight - freight_credits) < 0.005 and abs(memo_subtotal - returns_balance) < 0.005,
+          "the freight credits of the credit memos post to 4050, and 4060 holds the credit memos' subtotals only, so the freight credits are not deducted twice")
     return dict(c1=c1, c2=c2, earlier_close_f=" and ".join(d.closes_of(d.F)), earlier_close_p=" and ".join(d.closes_of(d.P)),
+                deliveries=deliveries, freight_billed=freight_billed, freight_credits=freight_credits, freight_net=freight_net,
                 rows_all=rows_all, rows_next=rows_next, rows_close=rows_close, kept=kept, cash=cash_bal, cash_all=cash_all,
                 cash_gap=round(cash_bal - cash_all, 2), cogs=[dict(number=n, name=nm, balance=b) for n, nm, b in cogs],
                 letters={c: col_letter(i + 1) for i, c in enumerate(TB_COLUMNS)}, n_accounts_all=d.one("SELECT COUNT(*) FROM Account"),
@@ -351,6 +380,13 @@ def g3(d, claim):
         if [r for r in d.q("PRAGMA table_info(ServiceTimeEntry)") if r[1] == "EmployeeID"] else None
     claim([r for r in d.q("PRAGMA table_info(ServiceTimeEntry)") if r[1] == "ExtendedCost"] and
           [r for r in d.q("PRAGMA table_info(ServiceTimeEntry)") if r[1] == "WorkDate"], "ServiceTimeEntry has ExtendedCost and WorkDate")
+    schema(d, claim, {"ServiceTimeEntry": ["WorkDate", "BillableHours", "NonBillableHours", "CostRateUsed", "ExtendedCost"]})
+    # the time-entry cost covers every hour recorded on a work date of the year, nonbillable hours included, so it is not
+    # the cost of the hours billed; neither it nor the salaries account is a matched service margin
+    time_all, time_billable, hours_nonbillable = d.q("SELECT ROUND(SUM(ExtendedCost), 2), ROUND(SUM(BillableHours * CostRateUsed), 2), ROUND(SUM(NonBillableHours), 2) "
+                                                     "FROM ServiceTimeEntry WHERE WorkDate BETWEEN ? AND ?", f"{y}-01-01", f"{y}-12-31")[0]
+    claim(hours_nonbillable > 0 and time_all > time_billable,
+          "the time-entry cost of the year includes nonbillable hours, so it exceeds the cost of the billable hours alone")
     # shares with Services left in the denominators, and the TBL code shared with another group
     with_services = {g: (x["revenue"] / total_rev, x["margin"] / total_margin) for g, x in groups.items()}
     flips = [g for g in PRODUCTS if (groups[g]["margin"] / (total_margin - groups["Services"]["margin"]) > groups[g]["revenue"] / (total_rev - groups["Services"]["revenue"]))
@@ -361,7 +397,15 @@ def g3(d, claim):
     tbl_furniture = dict((c, p) for c, _, p, _, _ in ranked)["TBL"]
     claim(any(r["grp"] != "Furniture" for r in tbl) and abs(tbl_all - tbl_furniture) > 0.005,
           "the product type code TBL is also used outside Furniture, and its margin differs by more than half a point when the Furniture filter is missing")
-    return dict(groups=groups, grand_revenue=total_rev, grand_margin=total_margin, grand_pct=total_margin / total_rev, types=ranked,
+    # adjacent types whose margin percentages display alike at two decimals although the unrounded values differ
+    ties = [dict(a=a[0], b=b[0], shown=round(100 * a[2], 2), a_pct=a[2], b_pct=b[2]) for a, b in zip(ranked, ranked[1:])
+            if round(100 * a[2], 2) == round(100 * b[2], 2) and a[2] != b[2]]
+    claim(len(ties) == 1, "exactly two adjacent Furniture product types display the same margin percentage at two decimals although their unrounded margins differ, so a sort on the displayed values can tie")
+    pos = {r[0]: i for i, r in enumerate(ranked)}
+    claim(all(2 <= pos[t["a"]] <= len(ranked) - 3 and 2 <= pos[t["b"]] <= len(ranked) - 3 for t in ties),
+          "the tied types are neither among the two highest nor among the two lowest, so the answer to requirement (3) does not depend on the tie")
+    return dict(groups=groups, grand_revenue=total_rev, grand_margin=total_margin, grand_pct=total_margin / total_rev, types=ranked, ties=ties,
+                time_all=time_all, time_billable=time_billable, hours_nonbillable=hours_nonbillable,
                 product_revenue=total_rev - groups["Services"]["revenue"], product_margin=total_margin - groups["Services"]["margin"],
                 type_gap_pts=100 * gap, with_services=with_services, flips=and_join(flips), tbl_all=tbl_all, tbl_furniture=tbl_furniture)
 
@@ -393,7 +437,22 @@ def g4(d, claim):
     top = max(out, key=lambda x: abs(x["c4"] - x["c3"]))
     same = [x["code"] for x in out if x is not top and x["p4"] < x["p3"] and x["c4"] < x["c3"]]
     claim(len(same) > 0, "another product type besides the one with the largest change in cost per unit has price and cost per unit that both fall")
+    # the four effects of the product-type bridge, to explain the quantity effect a student may sum by type and the cent of rounding
+    u4 = sum(x["u4"] for x in out)
+    price = sum(x["u4"] * (x["p4"] - x["p3"]) for x in out)
+    cost = -sum(x["u4"] * (x["c4"] - x["c3"]) for x in out)
+    volume = (u4 - u3) * fb["q3"]["M"] / u3
+    mix = sum((x["u4"] - u4 * x["share3"]) * x["m3"] for x in out)
+    combined = sum((x["u4"] - x["u3"]) * x["m3"] for x in out)
+    claim(abs(combined - (volume + mix)) < 1e-6,
+          "each type's unit change times its third-quarter margin per unit, summed over the types, is the volume effect plus the mix effect, so adding the mix effect to it counts the mix twice")
+    claim(abs(price + cost + volume + mix - fb["change"]) < 1e-6, "the four effects of the product-type bridge add up to the change in margin")
+    rounded_sum = round(sum(round(v, 2) for v in (price, cost, volume, mix)), 2)
+    rounded_change = round(fb["change"], 2)
+    claim(abs(rounded_sum - rounded_change) > 0.005 and abs(rounded_sum - rounded_change) < 0.015,
+          "the four effects rounded separately to cents sum to a cent away from the rounded change in margin")
     return dict(same_types=and_join(same), types=out, n_types=len(out), q3=fb["q3"]["M"], q4=fb["q4"]["M"], change=fb["change"], t_volume=e["volume"], t_mix=e["mix"],
+                combined=combined, rounded_sum=rounded_sum, rounded_change=rounded_change,
                 t_price=e["price_lists"] + e["promotions"], t_lists=e["price_lists"], t_promo=e["promotions"], promo_type=promo_type,
                 u3=u3, u4=fb["q4"]["U"], m3=fb["q3"]["m"], r3=fb["q3"]["R"], r4=fb["q4"]["R"], k3=fb["q3"]["C"], k4=fb["q4"]["C"])
 
@@ -478,7 +537,11 @@ def g6(d, claim):
         x[1] += r["D"]
     main_id = max(per_promo, key=lambda k: per_promo[k][0])
     claim(main_id == max(per_promo, key=lambda k: per_promo[k][1]), "the promotion with the most lines also has the most discount")
-    return dict(main_id=main_id, main_lines=per_promo[main_id][0], main_discount=per_promo[main_id][1], top10_key=top10_key, top10_name=top10_name, merged=merged, rank_name=rank_name, merged_total=by_name.get(merged, 0.0),
+    # the controls of Steps 4 and 6: the lines of each group, and those that carry a promotion
+    group_counts = [dict(group=g, promo=sum(1 for r in promo_lines if r["grp"] == g), lines=sum(1 for r in rows if r["grp"] == g)) for g in GROUPS]
+    claim(sum(x["promo"] for x in group_counts) == len(promo_lines) and sum(x["lines"] for x in group_counts) == len(rows),
+          "the groups' lines and promotion lines add up to the year's lines and promotion lines")
+    return dict(main_id=main_id, group_counts=group_counts, main_lines=per_promo[main_id][0], main_discount=per_promo[main_id][1], top10_key=top10_key, top10_name=top10_name, merged=merged, rank_name=rank_name, merged_total=by_name.get(merged, 0.0),
                 revenue=revenue, n_lines=len(rows), n_promo=len(promo_lines), promo_discount=sum(r["D"] for r in promo_lines), n_blank=len(rows) - len(promo_lines),
                 same=[dict(name=n, ids=and_join(ids)) for n, ids in same], names=info, late=late, late_names=and_join(info[k][0] for k in late),
                 backwards=backwards[0], backwards_start=info[backwards[0]][1], backwards_end=info[backwards[0]][2], n_customers=len({r["customer"] for r in rows}))

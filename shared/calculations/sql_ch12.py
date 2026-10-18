@@ -258,17 +258,28 @@ QUERIES = [
     ("price_tolerance",
      "-- Tutorial 12.2, test P2: invoice prices against order prices\n"
      "-- Population: invoice lines with a PO line; expected: none above 3%",
+     "WITH Prices AS (\n"
+     "    SELECT\n"
+     "        CAST(ROUND(pil.UnitCost * 100) AS INTEGER) AS InvoiceCents,\n"
+     "        CAST(ROUND(pol.UnitCost * 100) AS INTEGER) AS OrderCents\n"
+     "    FROM PurchaseInvoiceLine AS pil\n"
+     "        INNER JOIN PurchaseOrderLine AS pol\n"
+     "            ON pol.POLineID = pil.POLineID\n"
+     ")\n"
      "SELECT COUNT(*) AS InvoiceLines,\n"
-     "    SUM(CASE WHEN ABS(pil.UnitCost - pol.UnitCost) / pol.UnitCost\n"
-     "        > 0.03 THEN 1 ELSE 0 END) AS AboveThreePercent,\n"
-     "    SUM(CASE WHEN ABS(pil.UnitCost - pol.UnitCost) / pol.UnitCost\n"
-     "        > 0.02 THEN 1 ELSE 0 END) AS AboveTwoPercent,\n"
-     "    ROUND(MAX((pil.UnitCost - pol.UnitCost) / pol.UnitCost), 4)\n"
+     "    SUM(CASE WHEN OrderCents > 0\n"
+     "        AND ABS(InvoiceCents - OrderCents) * 100 > 3 * OrderCents\n"
+     "        THEN 1 ELSE 0 END) AS AboveThreePercent,\n"
+     "    SUM(CASE WHEN OrderCents > 0\n"
+     "        AND ABS(InvoiceCents - OrderCents) * 100 > 2 * OrderCents\n"
+     "        THEN 1 ELSE 0 END) AS AboveTwoPercent,\n"
+     "    ROUND(MAX((InvoiceCents - OrderCents) * 1.0 / OrderCents), 4)\n"
      "        AS LargestIncrease,\n"
-     "    ROUND(MIN((pil.UnitCost - pol.UnitCost) / pol.UnitCost), 4)\n"
-     "        AS LargestDecrease\n"
-     "FROM PurchaseInvoiceLine AS pil\n"
-     "    INNER JOIN PurchaseOrderLine AS pol ON pol.POLineID = pil.POLineID;"),
+     "    ROUND(MIN((InvoiceCents - OrderCents) * 1.0 / OrderCents), 4)\n"
+     "        AS LargestDecrease,\n"
+     "    SUM(CASE WHEN InvoiceCents IS NULL OR OrderCents IS NULL\n"
+     "        OR OrderCents <= 0 THEN 1 ELSE 0 END) AS NotTestable\n"
+     "FROM Prices;"),
     ("grni",
      "-- Tutorial 12.2, test P3: receipts not invoiced against account 2020\n"
      "-- Population: open receipt lines; expected: equal to the ledger",
@@ -318,7 +329,9 @@ QUERIES = [
     ("approvers",
      "-- Tutorial 12.2, test P6: who approves the purchase orders\n"
      "-- Population: all purchase orders; expected: approval shared",
-     "SELECT e.EmployeeID, e.JobTitle, COUNT(*) AS OrdersApproved\n"
+     "SELECT e.EmployeeID, e.JobTitle, COUNT(*) AS OrdersApproved,\n"
+     "    ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2)\n"
+     "        AS SharePercent\n"
      "FROM PurchaseOrder AS po\n"
      "    INNER JOIN Employee AS e ON e.EmployeeID = po.ApprovedByEmployeeID\n"
      "GROUP BY e.EmployeeID, e.JobTitle\n"
@@ -386,6 +399,7 @@ QUERIES = [
      "-- Tutorial 12.3, test H4: time paid to another person or unapproved\n"
      "-- Population: all earnings lines; expected: no rows",
      "SELECT 'Time paid to another employee' AS Test,\n"
+     "    prl.PayrollRegisterLineID, pr.PayrollRegisterID,\n"
      "    pr.EmployeeID AS PaidID, pe.JobTitle AS PaidTitle,\n"
      "    lt.EmployeeID AS WorkedID, we.JobTitle AS WorkedTitle,\n"
      "    we.TerminationDate AS WorkerLeft, prl.Amount\n"
@@ -393,6 +407,7 @@ QUERIES = [
      "WHERE lt.EmployeeID <> pr.EmployeeID\n"
      "UNION ALL\n"
      "SELECT 'Time paid on an unapproved clock entry',\n"
+     "    prl.PayrollRegisterLineID, pr.PayrollRegisterID,\n"
      "    pr.EmployeeID, pe.JobTitle, lt.EmployeeID, we.JobTitle,\n"
      "    we.TerminationDate, prl.Amount\n"
      + _EARNINGS +
@@ -439,7 +454,8 @@ QUERIES = [
     ("overtime_unapproved",
      "-- Tutorial 12.3, test H7: long overtime without an approval\n"
      "-- Population: overtime above half an hour; expected: no rows",
-     "SELECT e.JobTitle, e.TerminationDate, tc.WorkDate,\n"
+     "SELECT tc.TimeClockEntryID, tc.EmployeeID, e.JobTitle,\n"
+     "    e.TerminationDate, tc.WorkDate,\n"
      "    tc.OvertimeHours, tc.ClockOutTime, tc.ClockStatus,\n"
      "    oa.OvertimeApprovalID AS UnlinkedApproval,\n"
      "    ap.JobTitle AS ApprovedBy\n"
@@ -473,7 +489,7 @@ QUERIES = [
      "GROUP BY WorkYear\n"
      "ORDER BY WorkYear;"),
     ("late_by_year",
-     "-- Tutorial 12.3, test H9: direct time recorded after its operation\n"
+     "-- Tutorial 12.3, test H9: direct time dated after its operation ended\n"
      "-- Population: direct labor time; expected: a small share",
      "WITH SurgeDays AS (\n"
      "    SELECT tc.WorkDate\n"

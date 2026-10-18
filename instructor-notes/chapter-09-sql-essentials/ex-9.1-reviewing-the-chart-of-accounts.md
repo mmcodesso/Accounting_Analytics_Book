@@ -31,7 +31,7 @@ By the end, students can:
 
 ## How to run it
 
-Individual, about 75 minutes: 15 each for requirements (1) and (2), (3), (4), (5) and the memo. Every step follows one routine: leave a blank line at the end of `Ex 9.1.sql`, type the two comment lines and the query, select the query, click **Execute all/selected SQL** (Ctrl+Return) and read the message pane, which reports "Result: N rows returned" (with no thousands separator, and "1 rows" for a single row). Click **Save SQL file** at the end; Ctrl+S is **Write Changes** and saves the database. Steps 5, 8, 10 and 11 are the queries behind statements of the model answer (no postings to headers, inactive accounts or the allowance; what posts to account 1090). The exercise does not ask for them, so use them as hints or as credit for students who test their claims. Hold back the hint about parentheses until a student's answer to (4) has the wrong number of rows. Collect the script and the memo.
+Individual, about 75 minutes: 15 each for requirements (1) and (2), (3), (4), (5) and the memo. Every step follows one routine: leave a blank line at the end of `Ex 9.1.sql`, type the two comment lines and the query, select the query, click **Execute all/selected SQL** (Ctrl+Return) and read the message pane, which reports "Result: N rows returned" (with no thousands separator, and "1 rows" for a single row). Click **Save SQL file** at the end; Ctrl+S is **Write Changes** and saves the database. Steps 5, 8, 10 and 11 are the queries behind statements of the model answer (no postings to headers, inactive accounts or the allowance; what posts to account 1090). The exercise does not ask for them, so use them as hints, and count them as a plus for students who test their claims, never as a condition for full credit. Hold back the hint about parentheses until a student's answer to (4) has the wrong number of rows. Collect the script and the memo.
 
 ## Step-by-step solution
 
@@ -48,7 +48,7 @@ FROM Account
 ORDER BY AccountNumber;
 ```
 
-**Check:** 104 rows, one for each account, with no value in ParentAccountID on the top-level headers. **Watch for:** a missing ORDER BY goes unnoticed, because AccountID follows AccountNumber here and the rows still look sorted. Say that the order is not guaranteed.
+**Check:** 104 rows, one for each account, with no value in ParentAccountID on the top-level headers. **Watch for:** without ORDER BY, the database promises no order. Do not infer one from AccountID, because the IDs do not follow the account numbers (AccountID 92 is account 1090 and AccountID 93 is account 5080, while AccountID 90 is account 6250). Check that the query sorts on AccountNumber.
 
 ### Requirement (2): Types and subtypes
 
@@ -92,7 +92,7 @@ ORDER BY AccountNumber;
 
 **Check:** 10 rows. 8 have no ParentAccountID and head a section; the other 2 sit under a top-level header. **Watch for:** `'header'` in small letters returns 0 rows, because `=` compares text exactly. `ParentAccountID = NULL` returns 0 rows where `IS NULL` returns 8.
 
-**Step 5. Test the headers for postings.** Students copy the AccountID values from Step 4.
+**Step 5. Test the headers for postings.** The requirement does not ask for this test, which corroborates the structure. A student who runs it copies the AccountID values from Step 4.
 
 ```sql
 -- Requirement (3): postings to the header accounts
@@ -213,10 +213,10 @@ WHERE AccountID = 4;
 ## What a strong answer says
 
 - **Requirement (2).** The subtypes divide each type as a balance sheet and an income statement do, and every type has its own Header subtype for the accounts that group the rest.
-- **Requirement (3).** Two levels of headers: top-level headers head a section and two sub-headers sit under 1000 and 2000. None has a posting, as a grouping account should not.
+- **Requirement (3).** Two levels of headers: top-level headers head a section and two sub-headers sit under 1000 and 2000. The posting test of Step 5, which shows that none has a posting, as a grouping account should not, is a plus.
 - **Requirement (4).** Each of the 8 accounts is a contra account: the accumulated depreciation accounts and the allowance reduce assets with a credit, the distributions account reduces equity with a debit, and returns and discounts reduce revenue with a debit.
 - **Requirement (5).** Manufacturing salaries and factory overhead are not expensed in their own accounts. Both are charged to Manufacturing Cost Clearing, which payroll and overhead entries debit and which completions and closes relieve, so the cost reaches cost of goods sold through inventory and Manufacturing Variance.
-- **Requirement (6).** The structure in two sentences, then the two review points: the allowance account has no postings in the extract, to be read with Chapter 8's estimate of the allowance, and the discounts account is inactive and unused. It adds that empty header and inactive accounts do not rule out misclassified postings among the active ones.
+- **Requirement (6).** The structure in two sentences, then the points to review that the queries support, such as the inactive accounts (among them the discounts account) and whether they should stay on the chart. The posting tests of Steps 8 and 11 are a plus, showing that the inactive accounts are unused and that the allowance account has no postings in the extract (to be read with Chapter 8's estimate of the allowance), and so is the remark that empty header and inactive accounts do not rule out misclassified postings among the active ones.
 
 A weak memo lists query results without a conclusion, or calls the inactive accounts a defect.
 
@@ -235,10 +235,10 @@ A weak memo lists query results without a conclusion, or calls the inactive acco
 |---|---:|---|---|
 | Requirement 1: the sorted list | 10 | All columns, sorted | Unsorted or `SELECT *` |
 | Requirement 2: types and subtypes | 15 | Both queries and a description of the division | Queries without the description |
-| Requirement 3: headers | 15 | Query, IS NULL reading, the posting test and the structure | No posting test |
+| Requirement 3: headers | 15 | Header query, the headers with and without a ParentAccountID told apart, and what the difference means for the structure | List without the parent distinction or the structure |
 | Requirement 4: opposite balances | 15 | Grouped conditions, eight accounts, each named a contra account | Half of the test |
 | Requirement 5: inactive and manufacturing | 20 | Both lists, LIKE with IsActive, 1090 named with the reason | 1090 without the reason |
-| Requirement 6: memo | 25 | Structure and both review points with evidence | Structure only |
+| Requirement 6: memo | 25 | Structure and the points to review, each supported by a query | Structure only |
 
 ## Extensions and discussion questions
 

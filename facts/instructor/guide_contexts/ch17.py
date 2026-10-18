@@ -101,6 +101,8 @@ GUIDES = REPO / "facts" / "instructor" / "guides" / "chapter-17-statements-for-a
 # requirement guides' front matter must agree; g0 claims it for every guide written so far.
 PLAN = {1: 90, 2: 150, 3: 150, 4: 150, 5: 180, 6: 180, 7: 150, 8: 90, 9: 120}
 WEIGHTS = {1: 8, 2: 10, 3: 12, 4: 12, 5: 14, 6: 12, 7: 10, 8: 7, 9: 15}
+# ASU 2025-05 (Topic 326, July 2025): a real-world effective date that a roll of the data does not move.
+ASU_2025_05 = dict(effective="annual periods beginning after December 15, 2025", first_year=2026)
 
 
 def need(d, claim, *tables: str) -> None:
@@ -142,6 +144,14 @@ def quote(key: str) -> str:
     if len(hits) != 1:
         raise KeyError(f"{len(hits)} queries of LenderPackage.sql start with {key!r}")
     return hits[0]
+
+
+def heading(claim, key: str) -> str:
+    """The first comment line of the one query of LenderPackage.sql that starts with `key`, without its dashes: the heading
+    a guide names when it quotes only part of that query (U24, item 1)."""
+    hits = [first.removeprefix("-- ") for first, _, _ in script() if first.removeprefix("-- ").startswith(key)]
+    claim(len(hits) == 1, f"one query of LenderPackage.sql is headed {key!r}")
+    return hits[0] if hits else key
 
 
 def run(d, sql: str) -> list:
@@ -555,6 +565,15 @@ def g2(d, claim):
     claim("GENERATESERIES ( 0, 1000000, 25000 )" in _model_text("tables/Threshold.tmdl"), "the what-if series runs from zero to one million in steps of 25,000")
     claim("SELECTEDVALUE ( 'Threshold'[Threshold], [Materiality 2026] )" in measure_table()["Threshold Value"],
           "the threshold defaults to the controller's materiality")
+    # the what-if series steps by 25,000, so the exact materiality is not one of its values: with no single value selected
+    # the threshold falls back to it, a selected step overrides it, and the nearest step is a sensitivity (U24, item 5)
+    step_size = 25000
+    near = round(mat / step_size) * step_size
+    claim(abs(mat / step_size - round(mat / step_size)) > 1e-9 and abs(near - mat) < step_size / 2,
+          "the controller's materiality is not a value of the what-if series, and the nearest step lies within half a step of it")
+    close_step = [l for l in gl if l.startswith('#"Added Custom" =')]
+    m_close = re.search(r'"IsYearEndClose", each (.*)\),?$', close_step[0].rstrip()) if close_step else None
+    claim(m_close is not None, "the GLEntry query adds IsYearEndClose with a custom column")
     qs = questions_table()
     by_req = Counter(r[3] for r in qs)
     claim(len(qs) == 12 and set(by_req) == {"Requirement 3", "Requirement 4", "Requirement 5", "Requirement 9"},
@@ -579,12 +598,15 @@ def g2(d, claim):
         cash_ye=round(at_ye["1010"], 2), ap_last=round(-at_last["2010"], 2), ap_ye=round(-at_ye["2010"], 2),
         after=round(at_ye["1010"] - at_last["1010"], 2), only_je=only_je, unmoved=unmoved, posts_2030=posts_2030,
         m_gl=step(claim, gl, "Merged Queries", "Expanded JournalEntry", "Added Custom"),
-        m_wt=step(claim, wt, "Source", "WorkingTB_Table", "Filtered Rows"),
-        d_balance=dax(claim, "Balance"), d_change=dax(claim, "Balance 2026", "Change 2025 to 2026", "Absolute Change"),
+        m_wt=step(claim, wt, "Source", "WorkingTB_Table", "Removed Other Columns", "Filtered Rows"),
+        close_expr=m_close.group(1) if m_close else "", near=near, step_size=step_size,
+        d_balance=dax(claim, "Balance"),
+        d_change=dax(claim, "Balance 2025", "Balance 2026", "Change 2025 to 2026", "Absolute Change"),
+        d_ni=dax(claim, "GL Amount", "P&L Amount", "Net Income"),
         d_mat=dax(claim, "Materiality", "Materiality 2026"),
         d_flag=dax(claim, "Threshold Value", "Is Above Threshold", "Flag"),
         d_open=dax(claim, "Opening Entry Amount", "Postings after Opening", "Moved since Opening"),
-        d_je=dax(claim, "Document Postings", "Journal Entries Only"),
+        d_je=dax(claim, "Postings", "Document Postings", "Journal Entries Only"),
         series="GENERATESERIES ( 0, 1000000, 25000 )", dax_check=check, test2=test_block(claim, 2),
         t_threshold=title(claim, "review", "threshold"), t_card=title(claim, "review", "materiality"),
         t_matrix=title(claim, "review", "reviewMatrix"), t_above=title(claim, "review", "aboveTable"),
@@ -647,7 +669,9 @@ def g3(d, claim):
         ids_rows=ids[0], ids_amount=round(ids[1], 2), typed_rows=typed[0], typed_amount=round(typed[1], 2),
         extra=round(ids[1] - typed[1], 2), only_last=only_last, with_opening=with_opening, opening=comp["opening"],
         a3=adj["a"]["A3"], mat_c=n17.materiality(d, C), n_q3=sum(1 for first, _, _ in script() if first.startswith("-- Requirement 3:")),
-        f_open=open_f, f_window=cells["window"])
+        f_open=open_f, f_window=cells["window"],
+        h=dict(view=heading(claim, "Requirement 3: the open accruals at each year-end saved as a view"),
+               parts=heading(claim, "Requirement 3: account 2040 at each year-end split into its parts")))
 
 
 # --- Requirement 4: cutoff -----------------------------------------------------------------------------------------------------
@@ -714,7 +738,7 @@ def g4(d, claim):
         a2=a2, cal=cal, cal_short=[xr(pf["total"] - cal[0]), xr(pp["total"] - cal[1])], open_none=-open_none,
         single=single, single_over=xr(single - pc["total"]), full_next=full_next, ints=ints, l7=l7, l8=l8, f=f,
         std_c=cut[C]["std"], n_q4=sum(1 for first, _, _ in script() if first.startswith("-- Requirement 4:")),
-        mat_c=n17.materiality(d, C))
+        mat_c=n17.materiality(d, C), h=dict(l5=heading(claim, "Requirement 4: test L5")))
 
 
 # --- Requirement 5: the adjustments ---------------------------------------------------------------------------------------------
@@ -744,6 +768,13 @@ def g5(d, claim):
     claim(abs(adjusted_mat - mat_c) > 1000, "materiality on adjusted income differs from materiality on recorded income")
     r5 = n17.r5(d, claim)
     claim(r5["agg_share"] > 0.4 and r5["share"] < 0.35, "the passed items are close to half of materiality, and the recorded adjustments' effect on income about a third")
+    # P1 and P2 are estimates, P3 an exposure: the guide shows the two estimates apart from the exposure (U24, item 15)
+    p12 = xr(r5["p1"] + r5["p2"]["effect"])
+    p12_income = xr(r5["p1_income"] + r5["p2"]["income"])
+    claim(abs(p12 + r5["p3"]["effect"] - r5["aggregate"]) < 0.005 and abs(p12_income + r5["p3"]["effect"] - r5["agg_income"]) < 0.005,
+          "the combined screen is the two estimates plus the exposure, at the year-end and on the year's income")
+    claim(abs(r5["p3"]["effect"]) > abs(p12), "the exposure is larger than the two estimates together")
+    claim(d.C >= ASU_2025_05["first_year"], "ASU 2025-05 applies to the last fiscal year presented")
     # the saved views and queries of the model script
     with temp_view(d, "OpenReceivables"):
         p1 = run(d, quote("Requirement 5: passed item P1"))
@@ -765,7 +796,7 @@ def g5(d, claim):
         no_reversal=no_reversal, whole_a1=whole_a1, with_opening=with_opening, allowance=allowance, with_interest=with_interest,
         cur=cur, adjusted_mat=adjusted_mat, f=f, n_lines=len(lines), opening=opening, mat_c=mat_c, mat_p=mat_p,
         trivial=xr(mat_c * 0.05), a3_share=a["A3"]["C"] / mat_c, rate_top=BUCKETS[-1][1], n_q5=sum(1 for first, _, _ in script() if first.startswith("-- Requirement 5:")),
-        cogs_c=a["A1"]["C"])
+        cogs_c=a["A1"]["C"], p12=p12, p12_income=p12_income, asu=ASU_2025_05)
 
 
 # --- the cached values of the model workbook ---------------------------------------------------------------------------------
@@ -853,6 +884,11 @@ def g6(d, claim):
         n_lines=lines["lines"], n_entries=lines["entries"], totals_debit=lines["debit"],
         n_checks=sections["Requirement 6"], f=f, d_amount=dax(claim, "Adjustment Amount", "Adjusted P&L Amount", "Adjusted Net Income"),
         d_balance=dax(claim, "Largest Entry Imbalance", "Lines on Cash"),
+        # the measures Tests 3 to 5 read beyond the three of Step 7 (U24, item 1)
+        d_tests=dax(claim, "Adjustment Debits", "Adjustment Credits", "Entries", "Entries out of Balance",
+                    "Lines with Inconsistent Amounts", "Lines on Cash", "Workbook Adjusted Balance",
+                    "Workbook Adjusted Net Income", "Total Assets", "Workbook Recorded Balance",
+                    "Workbook Recorded Total Assets", "Accounts Disagreeing", "Adjusted Accounts Disagreeing"),
         m_adj=step(claim, adj_m, "Removed Other Columns", "Filtered Rows", "Changed Type1"),
         test3=test_block(claim, 3), test4=test_block(claim, 4), test5=test_block(claim, 5), dax_check=ck,
         t_cards=page[0], t_entries=page[1], t_agree=page[2], t_assets=page[3], t_income=page[4],
@@ -898,6 +934,14 @@ def g7(d, claim):
           "adjusted operating revenue differs from the ledger's by the revenue adjustment's effect on income")
     claim(adjusted_opr[C] > ledger_opr[C] and adjusted_opr[P] < ledger_opr[P],
           f"the cutoff adjustment raises {C} revenue and lowers {P} revenue")
+    # the schedule is operating revenue, before returns: the bridge to net revenue, and the segments with freight (U24, item 3)
+    returns = {y: n17.adjusted_income(d, y)["ret"] for y in (P, C)}
+    net_rev = {y: n17.adjusted_income(d, y)["net_rev"] for y in (P, C)}
+    claim(all(abs(adjusted_opr[y] - returns[y] - net_rev[y]) < 0.005 and returns[y] > 0 for y in (P, C)),
+          "operating revenue less the sales returns and allowances is net revenue, in both years")
+    r7n = n17.r7(d, claim)
+    claim(all(abs(sum(s[k] for s in r7n["segments"]) + r7n[f"fr_{k}"] - adjusted_opr[y]) < 0.005 for k, y in (("c", C), ("p", P))),
+          "the customer segments plus freight billed add up to operating revenue, in both years")
     # services
     eng = d.q("SELECT ServiceEngagementID, PlannedHours FROM ServiceEngagement WHERE Status <> 'Billed'")
     claim(len(eng) == 1, "one engagement is not Billed")
@@ -936,7 +980,10 @@ def g7(d, claim):
         over=over, five_total=xr(five[1]), five_principal=xr(five[0]), interest_left=xr(five[1] - five[0]),
         next_payments=xr(next_year[1]), next_principal=xr(next_year[0]),
         ledger_opr=ledger_opr, adjusted_opr=adjusted_opr, revenue_gap={y: xr(adjusted_opr[y] - ledger_opr[y]) for y in (P, C)},
-        short_hours=short_hours, payroll_only=xr(s_c["payroll"] - opening_2030),
+        short_hours=short_hours, payroll_only=xr(s_c["payroll"] - opening_2030), returns=returns, net_rev=net_rev,
+        h=dict(services=heading(claim, "Requirement 7: design services at each year-end"),
+               revenue=heading(claim, "Requirement 7: revenue by product line on the adjusted basis"),
+               engagements=heading(claim, "Requirement 7: design services worked and not billed")),
         f=f, n_q7=sum(1 for first, _, _ in script() if first.startswith("-- Requirement 7:")),
         n_sheet=len(sheets()))
 
@@ -971,9 +1018,23 @@ def g8(d, claim):
              periods=formula(claim, "Later Events", "B26"), notes=formula(claim, "Later Events", "B28"),
              full=formula(claim, "Later Events", "B22"), issues=formula(claim, "Later Events", "B37"))
     ledger_after = d.q("SELECT COUNT(*) FROM GLEntry WHERE PostingDate > ?", after)[0][0]
+    # a later invoice is a candidate, not a finding (U24, item 17): at the prior year-end, the receipts billed on invoices
+    # received after it were already in goods received not invoiced, recorded on receipt
+    ye_p = n17.ye(P)
+    later = d.q("SELECT COUNT(DISTINCT gr.GoodsReceiptID), COUNT(DISTINCT pi.PurchaseInvoiceID), "
+                "SUM(CASE WHEN NOT EXISTS (SELECT 1 FROM GLEntry g JOIN Account a ON a.AccountID = g.AccountID "
+                "WHERE g.SourceDocumentType = 'GoodsReceipt' AND g.SourceDocumentID = gr.GoodsReceiptID "
+                "AND a.AccountNumber = 2020 AND g.Credit > 0 AND g.PostingDate <= ?) THEN 1 ELSE 0 END) "
+                "FROM GoodsReceipt gr JOIN GoodsReceiptLine grl ON grl.GoodsReceiptID = gr.GoodsReceiptID "
+                "JOIN PurchaseInvoiceLine pil ON pil.GoodsReceiptLineID = grl.GoodsReceiptLineID "
+                "JOIN PurchaseInvoice pi ON pi.PurchaseInvoiceID = pil.PurchaseInvoiceID "
+                "WHERE gr.ReceiptDate <= ? AND pi.ReceivedDate > ?", ye_p, ye_p, ye_p)[0]
+    claim(later[0] > 0 and later[2] == 0,
+          f"every receipt of {P} billed on an invoice received after the year-end was in goods received not invoiced at it")
     return dict(share=share, split=split, split_word=n17.word(split), cash_ye=cash_ye, cash_last=cash_last, months=months, f=f,
                 cr_c=s_c["cr"], cr_p=s_p["cr"], qr_c=s_c["qr"], qr_p=s_p["qr"], ledger_after=ledger_after,
-                n_q8=sum(1 for first, _, _ in script() if first.startswith("-- Requirement 8:")), last=last)
+                n_q8=sum(1 for first, _, _ in script() if first.startswith("-- Requirement 8:")), last=last,
+                later_receipts=later[0], later_invoices=later[1])
 
 
 # --- Requirement 9: the package and the memo ---------------------------------------------------------------------------------------------

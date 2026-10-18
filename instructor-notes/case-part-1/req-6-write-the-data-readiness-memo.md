@@ -83,7 +83,7 @@ The model memo follows a fixed order, and its parts take these words:
 
 ### Phase 5: The recommendation and the appendix
 
-**Step 5. End with the next analysis.** A model recommends the diagnostic analysis of Part II, decomposing the change between 2026 Q3 and 2026 Q4 into volume, mix, price and cost effects by product, from the invoice lines and the item master, on the measure above. It asks the controller to settle three treatments first, the revenue side of returns, the lines invoiced in one quarter and shipped in another, and the unbilled shipments. State the decision the controller needs to make.
+**Step 5. End with the next analysis.** A model recommends the diagnostic analysis of Part II, decomposing the change between 2026 Q3 and 2026 Q4 into volume, mix, price and cost effects by product, from the invoice lines and the item master. That decomposition is of the invoice-line margin at standard cost, labeled as that measure. If it is to explain the posted ledger margin, the two measures are first reconciled for invoice and shipment timing, the unmatched shipments, the cost of returns, the customer credits and any difference in the cost basis. The model asks the controller to agree how returns are presented and which measure the diagnosis uses, and to investigate the invoice and shipment timing and the unbilled shipments under the recognition policy, keeping the order-price amount as a labeled sensitivity until then. State the decision the controller needs to make.
 
 **Step 6. Assemble the one-page appendix.** The data map of Requirement 2 and the reconciliation table of Requirement 4, on one page, readable on their own.
 
@@ -100,7 +100,7 @@ The model memo follows a fixed order, and its parts take these words:
 | Furniture shipment lines with no invoice line, 2026 Q4 | 4 | Step 2 |
 | Cutoff invoices; with Furniture lines | 9; 3 | Step 2 |
 
-For the instructor only: what the Part II diagnosis will find, in outline. Units of Furniture invoiced barely change (7,091.2300000000005 to 7,122.12, 0.4%); the standard cost per unit is about the same ($348.75 to $345.62); the average price falls from $604.03 to $583.64 per unit (-3.4%), and the promotional discounts on Furniture lines more than double. A good memo does not claim this; it recommends the analysis that will.
+For the instructor only: what the Part II diagnosis will find, in outline. Units of Furniture invoiced barely change (7,091.23 to 7,122.12, 0.4%); the standard cost per unit is about the same ($348.75 to $345.62); the average price falls from $604.03 to $583.64 per unit (-3.4%), and the promotional discounts on Furniture lines more than double. A good memo does not claim this; it recommends the analysis that will.
 
 ## What a strong answer says
 

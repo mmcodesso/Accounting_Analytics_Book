@@ -25,18 +25,18 @@ A budget-versus-actual report needs a budget at the grain of the actuals, and th
 
 By the end, students can:
 
-- say what one row of each budget table represents, and whether the tables add (chapter outcome 6);
+- say what one row of each budget table represents, and whether the tables add (outcome 6);
 - explain why a wide report breaks tidy principles and why the stored form suits analysis (outcome 6);
 - count blanks in two tables and judge them by what the rows are, not by their share (outcomes 4 and 5);
 - recommend the preparation steps for a budget-versus-actual comparison.
 
-**Competencies practiced.** CPA Evolution Core S1 M8 T2 (cleansing financial data) and Core S1 M4 (financial statement analysis and performance measures); IMA Data Literacy and Budgeting and Forecasting; IFAC IES 2 (b), management accounting, and IES 2 (i); AACSB A5 part 5.1.
+**Competencies practiced.** CPA Evolution Core S1 M8 T2 (cleansing financial data); IMA Data Literacy and Budgeting and Forecasting; IFAC IES 2 (b), management accounting, and IES 2 (i); AACSB A5 part 5.1.
 
 ## Before you assign
 
 - Students need CharlesRiver_Work.xlsx, the chapter's section on tidy data and Figure 2.6, and the PivotTable skills of Tutorial 2.2.
 - The exercise relies on these conditions: Budget has one row for each fiscal year, month, cost center and account; each Budget row equals the sum of the BudgetLine rows with the same key; BudgetLine also holds lines that Budget leaves out; and CostCenterID is blank on some rows of BudgetLine and of GLEntry, for different reasons.
-- The budget runs one year past the last year of actuals ({{ years[-1][0] }}), so a comparison covers only the years that have both.
+- The last complete operating year is {{ year }}. The budget extends through {{ years[-1][0] }}, while the actuals of {{ years[-1][0] }} are only a tail of supplier payments, so a comparison covers only the years that have both.
 - Requirement (3) invites students to quote raw counts. Decide beforehand that you want the rows classified, as Step 5 does.
 
 ## How to run it
@@ -69,9 +69,9 @@ b. Copy it down and filter the column for anything other than 0.
 
 ### Requirement (2): The report a manager asks for
 
-**Step 3. Sketch the wide report and name what it breaks.** Draw one cost center, {{ cc.name }}: its {{ cc.accounts }} accounts down the side and twelve month columns across the top.
+**Step 3. Sketch the wide report and name what it breaks.** Draw one cost center for fiscal {{ year }}, {{ cc.name }}: its {{ cc.accounts }} accounts down the side and twelve month columns across the top.
 
-**Check:** the stored table has {{ cc.rows }} rows for that cost center and year, one for each account and month. The wide report breaks two principles at once: the month is a variable stored in the column headers, and each row holds twelve observations. The tidy form is better for analysis because a new month is a new row, the month is a field to group and filter, and it joins to the actual results on fiscal year, fiscal period and account. The wide layout can still be made from the tidy one with a PivotTable, which is the direction students should take. **Watch for:** students who say a wide report is wrong. It is the right output and the wrong storage.
+**Check:** the stored table has {{ cc.rows }} rows for that cost center and year, one for each account and month. The wide report breaks two principles at once: the month is a variable stored in the column headers, and each row holds twelve observations. The tidy form is better for analysis because a new month is a new row, the month is a field to group and filter, and it joins to the actual results on fiscal year, fiscal period, account and cost center. The wide layout can still be made from the tidy one with a PivotTable, which is the direction students should take. **Watch for:** students who say a wide report is wrong. It is the right output and the wrong storage.
 
 ### Requirement (3): Rows without a cost center
 
@@ -84,15 +84,16 @@ b. Do the same on **GLEntry**, with `=COUNTBLANK(T3_GLEntry[CostCenterID])`.
 
 **Step 5. Find out which accounts the blanks are on.**
 
-a. Insert a PivotTable from **GLEntry** with AccountID in the **Rows** area, CostCenterID in the columns area, and the count of GLEntryID in **Values**.
+a. Insert a PivotTable from **GLEntry** with AccountID in the **Rows** area, CostCenterID in the columns area, and the count of GLEntryID in **Values** (Count, not Sum).
 b. Read the column for the blank cost center. A PivotTable ignores the worksheet's filters, so it must carry the blank entry itself.
 c. Next to the AccountIDs with blank entries, look up the AccountType and the account number in the **Account** worksheet, as in Tutorial 2.2 Step 5.
+d. For the money, add FiscalYear and VoucherNumber to the PivotTable's **Filters** area, keep {{ year }}, and clear the year's closing entries ({{ year_closes|join(' and ') }}) from VoucherNumber. Add Sum of Debit and Sum of Credit to **Values**, and compute the net expense of the blank and of all expense rows as debits less credits beside the PivotTable.
 
 **Check:** most of the blank ledger rows are on balance sheet accounts such as receivables, payables and cash, which do not use cost centers. Only {{ pl_blank|count }} expense rows are blank outside the year-end closes, and {{ close_blank }} more are in the closes, which a budget comparison excludes. In {{ year }}, {{ year_blank|count }} of {{ year_rows|count }} expense rows outside the closes ({{ row_share|pct(1) }}) have no cost center, but they are ${{ year_blank_amount|money }} of ${{ year_amount|money }} of expense ({{ money_share|pct(1) }}). The row count understates the money. They are on {{ n_actual_accounts }} accounts: the {{ n_extra }} that BudgetLine plans with no cost center, plus {{ other.name }}, which Budget puts in the {{ other.center }} cost center and the ledger posts with none. On those {{ n_extra }} accounts the actual of ${{ like|money }} is close to the budget of ${{ extra_total|money }}.
 
-**Step 6. Recommend how to handle them.** A model answer, in order: (1) compare at the grain of Budget, not of BudgetLine, or aggregate BudgetLine first, and never add the two; (2) leave the balance sheet lines out, because they are balances, not flows; (3) exclude the year-end closes from the actual side; (4) keep the rows with no cost center as an explicit "No cost center" bucket on both sides, so that totals still reconcile to the whole budget and the whole ledger; (5) decide where the interest account belongs, so the budget and the actual use the same cost center; (6) join on fiscal year, fiscal period and account.
+**Step 6. Recommend how to handle them.** A model answer, in order: (1) aggregate the relevant BudgetLine lines (revenue, cost of goods sold and operating expense) and the actual ledger rows separately to fiscal year, month or fiscal period, account and cost center, because Budget alone leaves out the {{ n_extra }} accounts BudgetLine plans with no cost center; use Budget as a control for the combinations it holds, and never add the two tables; (2) leave the balance sheet lines out, because they are balances, not flows; (3) exclude the year-end closes from the actual side; (4) keep the rows with no cost center as an explicit "No cost center" bucket on both sides; (5) decide where the interest account belongs, so the budget and the actual use the same cost center; (6) match on all four fields, keep the combinations that only one side has, and reconcile the totals before and after matching to the whole budget and the whole ledger.
 
-**Check:** the answer keeps the rows, names the bucket, and reconciles to a total.
+**Check:** the answer keeps the rows, names the bucket, matches on four fields, and reconciles to a total.
 
 ### Requirement (4): Write the memorandum
 

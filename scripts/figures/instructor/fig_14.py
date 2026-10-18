@@ -675,11 +675,12 @@ def if_14_1_a() -> Diagram:
     lw, rw = [176, 118], [88, 102, 140, 152]
     right_x = page + sum(lw) + 12 + 16
     right_w = 860 - right_x - page
-    tie = (f"<b>The ties at {y}-12.</b> The matrix totals {_signed(sum(now.values()))}. Assets {_money(now['Asset'])} equal liabilities "
-           f"{_money(-now['Liability'])} plus equity {_money(-now['Equity'])} plus the year's net income {_money(e['ni'])}, each with its sign reversed. "
-           f"Revenue and expense together, {_money(now['Revenue'] + now['Expense'])}, are that net income with its sign reversed.")
-    read = ("<b>Reading the second matrix.</b> Balance is the pre-closing balance sheet. Balance with Closes is the post-closing one: revenue and "
-            f"expense read zero and the year's income sits in equity. Balance on GL Amount leaves every close out, so income never reaches equity "
+    tie = (f"<b>The ties at {y}-12.</b> The matrix reads debits less credits and totals {_signed(sum(now.values()))}. Assets {_money(now['Asset'])} "
+           f"equal liabilities {_money(-now['Liability'])} plus equity {_money(-now['Equity'])}, their signs reversed, plus the year's net income "
+           f"{_money(e['ni'])}. Revenue and expense together read {_money(now['Revenue'] + now['Expense'])}, so that net income is their balance "
+           "with its sign reversed.")
+    read = ("<b>Reading the second matrix.</b> Balance is the pre-closing balance sheet. At this year-end Balance with Closes is the post-closing "
+            f"one, because the ledger holds the year's closes: revenue and expense read zero and the year's income sits in equity. Balance on GL Amount leaves every close out, so income never reaches equity "
             f"and revenue and expense hold all {n14.word(len(data.years))} years.")
     slicer_h = 56
     left_h = 36 + 12 + (len(rows) + 1) * pbi.ROW
@@ -785,7 +786,7 @@ def if_14_1_b() -> Diagram:
              f"{data.years[0]} and {data.years[1]}, which are dated before the as-of date and move each year's income to retained earnings, and leaves out "
              f"the two of {data.C}, dated on it (outlined). Equity then reads {_money(now['Equity'])} under Balance, {_money(kept['Equity'])} with "
              f"every close kept and {_money(gl['Equity'])} on GL Amount; revenue and expense read {_money(now['Revenue'] + now['Expense'])} "
-             f"(the net income of {data.C}), {_signed(kept['Revenue'] + kept['Expense'])} and {_money(gl['Revenue'] + gl['Expense'])} "
+             f"(minus the net income of {data.C}), {_signed(kept['Revenue'] + kept['Expense'])} and {_money(gl['Revenue'] + gl['Expense'])} "
              "(all years).", bottom + 12)
     return d
 
@@ -1288,7 +1289,8 @@ def if_14_5_b() -> Diagram:
     kit.legend(d, 0, ly + 22, [("The relationship set to Both for the calculation", CORAL, "dashed"), ("What the setting lets through", AMBER, "line")])
     kit.callout(d, f"<b>The selection came from the sales star and the result lands in the ledger.</b> Operating Expense carries no filter on Item, yet it reads "
                    f"{_money(services['opex'])}: Both lets the invoice lines filter Date, and Date filters GLEntry. The figure is the expense of "
-                   f"the {n14.word(services['days'])} days on which design services were invoiced, a number with no meaning.", 0, ly + 54, 860, "amber")
+                   f"the {n14.word(services['days'])} days on which design services were invoiced, neither a share of operating expense that "
+                   "belongs to Services nor Services' own cost.", 0, ly + 54, 860, "amber")
     return d
 
 

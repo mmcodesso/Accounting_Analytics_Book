@@ -100,7 +100,7 @@ B.  Students learn one business in depth and meet the same transactions in every
 C.  The Charles River database is the only dataset available in both Excel and SQLite formats.
 D.  Using a single dataset allows the book to avoid teaching SQL joins, which require multiple tables.
 
-**15.** A financial analyst uses a PivotTable to summarize invoiced revenue and gross margin by item group and fiscal quarter, using the Charles River SalesInvoiceLine and Item tables. The summary shows that the gross margin on Furniture declined in the most recent quarter. The analyst then breaks the decline down by product and customer segment and traces the largest changes to the underlying invoices to determine their cause. What type of analytics does this investigation represent?
+**15.** A financial analyst uses a PivotTable to summarize invoiced revenue and gross margin by item group and fiscal quarter, using the Charles River invoice, item, and customer tables. The summary shows that the gross margin on Furniture declined in the most recent quarter. The analyst then breaks the decline down by product and customer segment and traces the largest changes to the underlying invoices to determine their cause. What type of analytics does this investigation represent?
 
 A.  Descriptive analytics
 B.  Diagnostic analytics

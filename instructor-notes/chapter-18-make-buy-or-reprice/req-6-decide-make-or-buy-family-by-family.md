@@ -90,7 +90,7 @@ Effect at the quote   =(I10-B19*(1+Freight))*C10
 Direct, crew kept     =I10/(1+Freight)
 ```
 
-**Check:** BNH breaks even at $322.48 crew kept and $377.88 crew reduced, against a quote of $325: the quote beats only the second. **Watch for:** a break-even quote that ignores the freight: it equals the relevant cost, $332.16 with the crew kept.
+**Check:** BNH breaks even at $322.48 crew kept and $377.88 crew reduced, against a quote of $325: the quote beats only the second. These are annual operating break-evens. **Watch for:** a break-even quote that ignores the freight: it equals the relevant cost, $332.16 with the crew kept.
 
 **Step 5. Build the two-way Data Table.** A Data Table's input cells must be on its own sheet, so the two sensitivity inputs sit at the top of the sheet (B5, the quote adjustment, and B6, the share of the freed crew time removed), and column V reads them.
 
@@ -113,7 +113,7 @@ Column V   =(I10+CrewRemoved*CrewRate*K10-F10*(1+QuoteAdjustment)*(1+Freight))*C
 
 ### Part 5: What the numbers leave out
 
-**Step 7. Measure the materials the families draw, and list the terms.** Routine: type the query at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Q22 compares the standard material in the completions with the material issued to the families' work orders; its core is those issues:
+**Step 7. Measure the materials the families draw, and list the terms.** Routine: type the query at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Q22 compares the standard material in the completions with the material issued to the families' work orders. The block is a fragment, the `FamilyIssues` CTE, and the complete statement is Q22:
 
 ```sql
 FamilyIssues AS (
@@ -143,7 +143,7 @@ FamilyIssues AS (
 
 ## What a strong answer says
 
-- **The cost that stops.** Materials and the overhead that varies stop at once. The crew's time stops only if the crew is reduced in step with the hours freed, which is the production manager's decision. Supervision and depreciation stay.
+- **The cost that stops.** On the case's avoidability assumption, materials and the overhead that varies stop at once. The crew's time stops only if the crew is reduced in step with the hours freed, which is the production manager's decision. Supervision and depreciation stay.
 - **The two sentences on the CFO's view.** Absorption cost includes supervision, depreciation and the crew's idle hours, which do not stop when a family is bought, so it makes buying look better than it is. Relevant cost counts only what stops: BNH, NGT, TBL pass only with the crew reduced, and the others fail either way.
 - **The terms left out.** The minimum purchase (it would bind if sales fell), quality and the defect credit, lead time and inventory, designs and bills of material shared with a supplier, the price risk after two years, and the materials stock: the three families draw 24% of the year's issues, so buying them slows the drawdown of stock built up in the year.
 

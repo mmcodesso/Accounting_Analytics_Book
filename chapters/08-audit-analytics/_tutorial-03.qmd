@@ -80,11 +80,12 @@ b. Name the query `JournalLines`, and filter SourceDocumentType to JournalEntry 
 c. Merge JournalLines with **Accounts** on AccountID, with a left outer join, and expand AccountNumber and AccountName without the prefix.
 d. Use **Home > Choose Columns** to keep VoucherNumber, AccountNumber, AccountName, Debit, and Credit, and drag the column headers into that order.
 e. Choose **Home > Close & Load**, and rename the new worksheet `JournalLines`.
-f. On the JE Summary worksheet, type `Entry totals` in A15 and `Ledger debits` in A16, and enter these two formulas in B15 and B16:
+f. On the JE Summary worksheet, type `Entry totals` in A15, `Ledger debits` in A16, and `Ledger credits` in A17, and enter these three formulas in B15, B16, and B17:
 
    ```
    =SUM(JournalEntries[TotalAmount])
    =SUM(JournalLines[Debit])
+   =SUM(JournalLines[Credit])
    ```
 
 g. Add a worksheet named `Drilldown`. In A1, type `Entry number`, and in B1, type `JE-2024-000001`.
@@ -96,7 +97,7 @@ h. Type the headings `AccountNumber`, `AccountName`, `Debit`, and `Credit` in A3
 
 i. Type another entry number, such as `JE-2026-000296`, in B1 to see its lines, and then type `JE-2024-000001` again.
 
-B15 and B16 agree: the entries' headers and their ledger lines carry the same total, a control total for the population of journal entries. The formula in A4 spills the eighteen lines of the opening balance entry, the opening balances of Charles River's balance sheet, as @fig-08-08 shows. One of them is the debit to 1020 Accounts Receivable that you could not match to any invoice in Tutorial 8.2. Two independent tests, the reconciliation of the receivables and the test of the journal entries, have led to the same entry, and that makes the finding stronger.
+B15, B16, and B17 agree: the entries' headers carry the same total as the debits of their ledger lines, and the debits of those lines equal their credits, a control total for the population of journal entries. Agreement in total is not agreement entry by entry. A stronger test compares each entry's own debits and credits with its header, and looks for headers without lines, lines without headers, and approvers who are missing from the Employee table. The formula in A4 spills the eighteen lines of the opening balance entry, the opening balances of Charles River's balance sheet, as @fig-08-08 shows. One of them is the debit to 1020 Accounts Receivable that you could not match to any invoice in Tutorial 8.2. Two independent tests, the reconciliation of the receivables and the test of the journal entries, have led to the same entry, and that makes the finding stronger.
 
 ![The Ledger Lines of the Opening Balance Entry.](/visuals/svg/fig-08-08-journal-entry-drilldown.svg){#fig-08-08 fig-alt="A mock of the Drilldown worksheet, with the FILTER formula of cell A4 in the formula bar and the entry number JE-2024-000001 in B1. Eighteen spilled rows list the account number, account name, debit, and credit of each ledger line of the entry: cash, accounts receivable, inventories, prepaid expenses, and equipment on the debit side; accounts payable, accruals, accumulated depreciation, common stock, and retained earnings on the credit side. The accounts receivable line is outlined."}
 
@@ -116,6 +117,6 @@ The completed workpaper records the journal entry tests in a form that another a
 - the five flag columns and RiskScore calculate for every entry, and only one entry scores 4;
 - the PivotTables show the patterns behind the weekend depreciation entries and the year-end closes;
 - the Dispositions worksheet holds a disposition for every entry with a score of 1 or more;
-- the totals of the JournalEntries and JournalLines Tables agree, and the Drilldown worksheet shows the accounts receivable line of JE-2024-000001.
+- the totals of the JournalEntries and JournalLines Tables agree, the ledger's debits equal its credits, and the Drilldown worksheet shows the accounts receivable line of JE-2024-000001.
 
 The journal entry tests explained the flags on the recurring entries by their timing, which still leaves their amounts and approvals to be checked against their schedules before the entries are cleared. They did find approval exceptions to follow up, and they led back to the opening balance entry from two directions. That entry, created after its date, approved by its own creator, and carrying balances that the detail does not support, is the first item for the audit committee.

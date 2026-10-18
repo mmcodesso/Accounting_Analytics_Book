@@ -25,7 +25,7 @@ figures:
   - id: IF-16-0-D
     kind: diagram
     purpose: A board sketch of the order in which a reviewer takes the register's exceptions.
-    shows: "A short decision list from top to bottom. Expected every period, such as the year-end closes: disposition and evidence once, then check that it recurs. Recurs by design, such as registers approved by their own employee: one finding, change the control. Fails several tests, such as the opening entry: first. New this month: next. Everything else: by amount and age. Each box names its example from the register."
+    shows: "A short decision list from top to bottom. Expected every period, such as the year-end closes: disposition and evidence once, then check that it recurs. Recurs by design, such as registers approved by their own employee: one finding, change the control. Fails several tests, such as the opening entry: use the score as a first cue. New this month: next. Everything else: by amount and age. Each box names its example from the register."
     data: None; the chapter's rules for ordering the review, with examples from the register.
 ---
 {% set t1 = ch16_t1 %}
@@ -58,6 +58,8 @@ The chapter depends on these conditions of the data:
 
 ## What students should be able to do afterward
 
+These outcomes follow the chapter's six learning objectives one for one.
+
 1. Distinguish exceptions from anomalies and continuous auditing from continuous monitoring, and specify a test by its rule, population, frequency and expected result. Practiced in Tutorial 16.2 (Test 2), Exercises 16.5 and 16.6, and questions 1 to 3.
 2. Build an exception register in Power Query and extend it with a new test. Practiced in Tutorials 16.1 and 16.2, Exercise 16.2, and questions 4 to 6.
 3. Show counts and rates by test, month and year, and read a rate against its population. Practiced in Tutorial 16.2 (Steps 10 to 12), Exercises 16.3 and 16.4, and questions 6 and 7.
@@ -78,6 +80,7 @@ The chapter depends on these conditions of the data:
 
 **Pitfalls that cost class time**
 
+- **The new file's settings.** Tutorial 16.1 Step 1. With Autodetect new relationships left on, Power BI can relate Employee to PayrollRegister on the payee's EmployeeID, and the Accounting Manager's Registers Approved (Exercise 16.6) falls from {{ t2.pr.n|count }} to {{ t2.selfs.n }}.
 - **Rename before Append.** Tutorial 16.2 Step 6. A query that keeps OrderDate leaves EventDate empty on {{ t2.process_n['PO'] }} order exceptions.
 - **The week.** Tutorial 16.1 Step 4. `Date.DayOfWeek` without Monday as the first day flags {{ sunday_first }} entries in place of {{ weekend }}.
 - **Backdated.** If PostingDate is still Date/Time and CreatedDate is not cut to its date, every entry reads as backdated: {{ created_after }} of {{ total_je }}.
@@ -89,6 +92,8 @@ The chapter depends on these conditions of the data:
 {{ figure('IF-16-0-B') }}
 
 ## Teaching approaches
+
+The class slots are selected demonstrations and coached starts, not complete builds, and class work counts toward the students' times above. Plan A's exercise slot interprets results from prepared pages, and students finish each build outside class. Plan B assumes each start file is ready, or leaves time afterward. Plan C's slot compares interpretations from completed models.
 
 **Plan A: lecture with live demonstration (four sessions of 90 minutes, 360 minutes in all).** It fits a lecture course with the exercises at home.
 
@@ -137,7 +142,7 @@ The chapter depends on these conditions of the data:
 | 10 | Looking ahead to the appendix and the Part IV case | 65 to 67 |
 | 150 | Total | |
 
-Plan A is the safest: the stumbles are in a merge key and a filter, and a demonstration shows how. Plan B lets students meet the traps themselves and needs a lab. Plan C leaves no time to demonstrate, and fails for students who arrive without a finished file.
+Plan A is the safest, since a demonstration shows the stumbles in a merge key and a filter. Plan B needs a lab, and Plan C fails for students without a finished file.
 
 {{ figure('IF-16-0-A') }}
 
@@ -177,7 +182,7 @@ Plan A is the safest: the stumbles are in a merge key and a filter, and a demons
 | 10 | Population and rate | {{ t2.po.n|count }} orders, {{ t2.pr.n|count }} registers; a total row with no rate |
 | 11 | The heat map | January darkest; PR SelfApproved {{ t2.self_low }} to {{ t2.self_high }} in every month name; December JE AboveLimit {{ t2.december }}, the year-end closes |
 | 12 | Approvers | {{ t2.approvers[:5]|join(", ") }}, the rest by job title |
-| 13 | Drill-through | {{ t2.diaz_orders|capitalize }} PO AfterTermination orders, one approver, who approved only those |
+| 13 | Drill-through | The January cell of PO AfterTermination, all years: {{ t2.po_jan|length }} orders ({% for o in t2.po_jan %}{{ o.number }}, ${{ o.amount|money }}{{ "; " if not loop.last else "" }}{% endfor %}). The test has {{ t2.po_after|length }}, all by one approver, and {% for o in t2.po_other %}{{ o.number }} (${{ o.amount|money }}) is dated {{ o.date }}{% endfor %}, so all {{ t2.po_after|length }} would show a lost month filter |
 | 14 | Test 2 | the counts above for the eleven tests |
 
 **Stumbles to expect**
@@ -188,6 +193,7 @@ Plan A is the safest: the stumbles are in a merge key and a filter, and a demons
 - Step 9: the keys and flag columns left visible.
 - Step 11: the number removed from the cells, so the fill carries the meaning alone.
 - Step 12c: Edit interactions skipped.
+- Step 13: the detail lists every order of the test. Check the drill-through's **Keep all filters** setting, whose label and default the pinned release did not confirm.
 
 **The checkpoint to look for.** The five bullets. A strong student separates the January cluster, which asks how the controls work then, from the recurring row, which asks for a change to the control.
 
@@ -213,7 +219,7 @@ Plan A is the safest: the stumbles are in a merge key and a filter, and a demons
 - Step 8: the package saved over, or a test run without its comment line.
 - Step 9: the registers approved by their own employee reported document by document. The memo reports them once.
 
-**The checkpoint to look for.** The four bullets. A strong student calls the card a bound observed in the extract, proving neither a refresh nor a complete payroll.
+**The checkpoint to look for.** The four bullets. A strong student calls the card a bound observed in the extract, proving neither a refresh nor a complete payroll. **Grade the memo out of 20,** four points for each ask of Step 9: dated populations and test results; reviewed exceptions apart from open ones, follow-ups and deficiencies; findings with priorities; Data Through and the limits of an extract; change controls.
 
 ## Difficult ideas and misconceptions
 
@@ -271,7 +277,7 @@ All six exercises are Power BI work with a model answer in Chapter16-exercises-p
 - *One exercise a session.* Take the basic one first: 16.4, 16.1, 16.3, 16.5, 16.2, 16.6.
 - *A light load.* Exercises 16.4 and 16.1 take about two and a half hours and cover outcomes 3, 4 and 5.
 
-**Grading and discussion.** Exercises 16.1 to 16.4 suit grading from the saved report, with the Checks tab to compare a number. Exercises 16.5 and 16.6 are graded on their notes: the classification and the design question are the judgment. Exercises 16.3, 16.5 and 16.6 suit class discussion. Collect the .pbix, not screenshots: the queries, measures and display folders are the evidence.
+**Grading and discussion.** Exercises 16.1 to 16.4 suit grading from the saved report, with the Checks tab to compare a number. Exercises 16.5 and 16.6 are graded on their notes: the classification and the design question are the judgment. Exercises 16.3, 16.5 and 16.6 suit class discussion. Rubrics grade what each requirement asks, and anything beyond it is a plus. Collect the .pbix, not screenshots: the queries, measures and display folders are the evidence.
 
 {{ figure('IF-16-0-C') }}
 
@@ -300,4 +306,4 @@ Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 1
 
 **Later chapters.** The appendix on publishing and security secures and shares the package; its start folder also holds Audit Monitoring at the end of this chapter. The Part IV case builds a new report with the same Validation page, Tests tab and Data Through card. Part V's capstone cases draw on every tool of the book.
 
-**Appendices.** The appendix on Power BI in the browser rebuilds Chapter 13's model there. **Appendix D** maps each exercise to the professional frameworks; each exercise guide names the competencies it practices.
+**Appendices.** Appendix D maps each exercise to the professional frameworks.

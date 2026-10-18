@@ -93,7 +93,7 @@ WHERE SupplyMode = 'Manufactured'
 
 **Check:** 0 rows. **Watch for:** without the two ROUNDs the test returns 30 items whose parts look equal to their total on screen, because SQLite compares the stored binary values. A student who stops there reports a defect that does not exist.
 
-**Step 4. Look for a missing component.** An empty Step 3 means little unless this step is empty too. The exercise does not ask for this query; the model answer adds it, so give it as a hint or as credit.
+**Step 4. Look for a missing component.** An empty Step 3 means little unless this step is empty too. The exercise does not ask for this query. The model answer adds it, so give it as a hint, or count it as a plus, never as a condition for full credit. Keep the point for the class discussion.
 
 ```sql
 -- Requirement (3): items with a missing component, which the comparison would pass over
@@ -161,7 +161,7 @@ LIMIT 10;
 
 ## What a strong answer says
 
-- **Requirement (3).** The three parts add up to the conversion cost on every item, and no part is missing, so the standards are internally consistent. A strong answer adds that consistent is not the same as right: whether the standards fit how the plant works is a question for Chapters 10 to 12.
+- **Requirement (3).** The three parts add up to the conversion cost on every item, so the standards are internally consistent. The check for a missing component of Step 4, which shows that no part is missing and so that the comparison skipped no item, is a plus. A strong answer adds that consistent is not the same as right: whether the standards fit how the plant works is a question for Chapters 10 to 12.
 - **Requirement (4).** Rates differ by item, with no single plant rate, and they do not follow the item group. The labor cost of a unit is hours times an item's own rate.
 - **The description.** A standard cost is material plus conversion cost, and conversion is direct labor plus variable and fixed overhead. The highest conversion costs are all Furniture, the group with the most manufactured items.
 
@@ -171,7 +171,7 @@ A weak answer reads the 30 unrounded differences as errors in the standards, or 
 
 - **No SupplyMode filter.** *Symptom:* 266 rows, and NULL rates. *Response:* ask which items the requirement means.
 - **A check without ROUND.** *Symptom:* 30 "defects". *Response:* ask the student to add the parts of one row by hand.
-- **No companion check for NULL.** *Symptom:* "no rows, so no problem". *Response:* ask what the comparison does with a missing value.
+- **No companion check for NULL.** *Symptom:* "no rows, so no problem". *Response:* this is not a mistake against the requirement. Ask, as a point for discussion, what the comparison does with a missing value.
 - **The rate upside down.** *Symptom:* values near `0.04` or below. *Response:* ask what a rate per hour divides by.
 - **An ascending ranking.** *Symptom:* the top ten are Accessories, Lighting, and Textiles. *Response:* ask which direction puts the largest first.
 
@@ -181,7 +181,7 @@ A weak answer reads the 30 unrounded differences as errors in the standards, or 
 |---|---:|---|---|
 | Requirement 1: the filtered list | 10 | Correct filter and columns | No filter |
 | Requirement 2: material cost | 15 | Rounded calculation with an alias | Unrounded or no alias |
-| Requirement 3: the component test | 25 | Rounded test and the finding reported, with the check for a missing component or the reason it is needed | Rounded test and the finding only |
+| Requirement 3: the component test | 25 | The manufactured items, the rounded comparison and the result reported | Unrounded test, the wrong population, or no result reported |
 | Requirement 4: labor rate | 20 | Rate, sorted, range described | Rate without the description |
 | Requirement 5: highest conversion cost | 15 | DESC and LIMIT, group named | Unlimited list |
 | The description | 15 | Material, labor and overhead and what the checks show | Numbers without the structure |

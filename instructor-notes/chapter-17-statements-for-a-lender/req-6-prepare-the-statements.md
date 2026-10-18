@@ -12,11 +12,11 @@
 
 ## Purpose and learning outcomes
 
-Requirement 5 left a schedule of entries; this requirement turns it into the four statements the bank reads and shows that the package agrees with itself. The cash flow statement is where a reviewer looks hardest: no adjustment moves cash or changes how a cash flow is classified, so they may change lines of the reconciliation but no total. The workbook builds the statements; the Review file tests them by recomputing the balances from the ledger. The analytics type is descriptive, with a diagnostic test.
+This requirement turns Requirement 5's schedule into the four statements the bank reads and shows that the package agrees with itself. The cash flow statement is where a reviewer looks hardest: no adjustment moves cash or changes how a cash flow is classified, so they may change lines of the reconciliation but no total. The workbook builds the statements; the Review file tests them by recomputing the balances from the ledger. The analytics type is descriptive, with a diagnostic test.
 
 Students can prepare classified balance sheets and statements of income from the adjusted balances (Part 1), roll equity forward with the corrected year labeled restated (Part 2), prepare cash flows by the indirect method while disclosing what moved no cash (Part 3), and test the package against the ledger in a second tool (Part 4).
 
-**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts, and transactions); IMA Reporting and Control (financial statement preparation); IFAC IES 2 (a); AACSB A5 part 5.1 (technology integration: Excel).
+**Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts, and transactions); IMA Reporting and Control (financial statement preparation); IFAC IES 2 (a); AACSB A5 part 5.1 (technology integration: Excel and Power BI).
 
 ## Before you assign
 
@@ -40,7 +40,7 @@ Pairs, about 180 minutes: 50 for the balance sheets and income statements, 15 fo
 
 **Check:** total assets $39,373,005.22 and $31,858,224.86, equal to total liabilities and equity, so each check row is zero. **Watch for:** a retained earnings line without the year's net income, which the ledger has not closed. The check row then reads the income, $4,572,087.08 for 2026.
 
-**Step 2. Build the statements of income by function.** Lay out operating revenue to net income by function, with the loss on disposals and an income taxes line of zero (the ledger records none, so the net income below it is provisional until the tax expense is determined).
+**Step 2. Build the statements of income by function.** Lay out operating revenue to net income by function, with the loss on disposals and an income taxes line marked not determined and shown as zero. Net income equals income before income taxes only if the tax expense is determined to be zero, so it is provisional.
 
 **Check:** income before income taxes $4,572,087.08 and $5,057,894.81, the recorded income plus the schedule's effect. **Watch for:** the loss on a disposal, a debit on a revenue-type account. Adding it instead of subtracting it overstates income by $185,000.00 in 2026.
 
@@ -66,22 +66,9 @@ Purchases paid in cash are additions less equipment financed by a note. The scri
 
 ![A mock of the statement of cash flows, where the adjustments must change no total.](../figures/chapter-17-statements-for-a-lender/IF-17-6-A.pdf)
 
-**Check:** 2026 operating -$807,189.75, investing $0.00, financing -$134,120.55, change in cash -$941,310.30; 2025 $3,975,026.14, -$397,000.00, -$83,434.28, $3,494,591.86. Adjusted and recorded operating totals agree, which proves no adjustment moves cash. **Watch for:** three slips, each caught by the check row. Starting from recorded income leaves the sections $68,475.84 short in 2026; adding back only the expense account's depreciation, $303,666.63 short; leaving out the loss, $92,500.00 short.
+**Check:** 2026 operating -$807,189.75, investing $0.00, financing -$134,120.55, change in cash -$941,310.30; 2025 $3,975,026.14, -$397,000.00, -$83,434.28, $3,494,591.86. Adjusted and recorded operating totals agree, as offsetting cash lines would too, so Step 8's test of the lines on `1010` is the proof that no adjustment moves cash. **Watch for:** three slips, each caught by the check row. Starting from recorded income leaves the sections $68,475.84 short in 2026; adding back only the expense account's depreciation, $303,666.63 short; leaving out the loss, $92,500.00 short.
 
-**Step 5. Disclose what moved no cash.** This query lists the investing events that moved none:
-
-```sql
--- Requirement 6: the investing events that moved no cash, equipment financed by a note and disposals with no proceeds
--- Population: FixedAssetEvent; expected: equipment financed by notes 360,000.00 in 2024, 280,000.00 in 2026
-SELECT strftime('%Y', fe.EventDate) AS FiscalYear, fe.EventType,
-    fe.FinancingType, fa.AssetCode, fe.Amount, fe.ProceedsAmount
-FROM FixedAssetEvent AS fe
-    INNER JOIN FixedAsset AS fa ON fa.FixedAssetID = fe.FixedAssetID
-WHERE fe.FinancingType IN ('Note', 'None')
-ORDER BY fe.EventDate;
-```
-
-Read it by its financing column. In 2026 a $280,000.00 acquisition was financed by a note and one disposal brought no proceeds, so neither is a cash flow; the 2025 disposal had proceeds, which belong to investing; the 2024 row falls before the years presented. Add interest paid, income taxes paid (none recorded) and the noncash equipment below the statement.
+**Step 5. Disclose what moved no cash.** The script's second Requirement 6 query lists the investing events by FixedAssetEvent.FinancingType; read it by that column. In 2026 a $280,000.00 acquisition was financed by a note and one disposal brought no proceeds, so neither is a cash flow; the 2025 disposal had proceeds, which belong to investing; the 2024 row falls before the years presented. Add interest paid, income taxes paid (none recorded) and the noncash equipment below the statement.
 
 **Check:** interest paid $28,946.47 and $19,513.12; 2025 purchases paid in cash $425,000.00, proceeds $28,000.00; no purchase in 2026. **Watch for:** two errors. Reporting the note-financed equipment as a purchase puts $280,000.00 in investing, and balancing it with a financing inflow reports cash that never arrived. Interest paid taken from the adjusted expense, $29,584.46, is $637.99 too high: the interest accrual.
 
@@ -89,7 +76,7 @@ Read it by its financing column. In 2026 a $280,000.00 acquisition was financed 
 
 **Step 6. Load the adjustment lines beside the ledger.** In the Review file choose **Home > Get data > Excel workbook**, select the package workbook, choose the AdjustmentLines Table and **Transform Data**. Keep the columns the file reads, filter out the totals row, type YearEnd as a date and **Close & Apply**. In **Model view** relate AdjustmentLines[Account] to Account[AccountNumber] and AdjustmentLines[YearEnd] to Date[Date], Many to one, **Single**.
 
-**Check:** 111 lines. **Watch for:** the totals row, which Power Query reads as one more row. The count reads 112, an entry named Total with no year appears in the matrix, and debits and credits each gain $1,993,762.48: they still equal each other, so only the count and the matrix catch it.
+**Check:** 111 lines. **Watch for:** the totals row, which Power Query reads as one more row. The count reads 112 and an entry named Total appears in the matrix, while debits and credits, each $1,993,762.48 higher, still agree.
 
 **Step 7. Add the measures and the Package Tests page.** Under **Modeling > New measure**:
 
@@ -105,19 +92,20 @@ The page holds a card visual titled "The adjustment lines of the package workboo
 
 **Check:** the difference between adjusted income and the workbook's is zero for 2025 and 2026. **Watch for:** without the relationship to Account the adjusted income is the ledger's, and the difference equals the effect on income, $68,475.84 in 2026; with the adjustment added instead of subtracted it is $136,951.68.
 
-**Step 8. Run Tests 3 to 5 and the Checks tab.** In **DAX query view** type Tests 3 to 5 at the end of the Tests tab and choose **Run** for each: entries' debits and credits, lines on cash, and adjusted income and total assets against the workbook. An instructor check:
+**Step 8. Run Tests 3 to 5 and the Checks tab.** In **DAX query view** type Tests 3 to 5 at the end of the Tests tab and choose **Run** for each. Test 3 lists each entry's debits, credits and difference, and Test 5 sets adjusted income and total assets by year against the workbook. Test 4, on the measures of the Key Measures table's Package folder, reads:
 
-```
+```dax
+// Test 4: no adjustment touches cash, and no entry is out of balance
 EVALUATE
 ROW (
-    "Entries out of Balance", [Entries out of Balance],
     "Lines on Cash", [Lines on Cash],
-    "Net income difference 2026", CALCULATE ( [Net Income Difference], 'Date'[Year] = 2026 ),
-    "Adjusted accounts disagreeing 2026", CALCULATE ( [Adjusted Accounts Disagreeing], 'Date'[Year] = 2026 )
+    "Entries", [Entries],
+    "Entries out of Balance", [Entries out of Balance],
+    "Lines with Inconsistent Amounts", [Lines with Inconsistent Amounts]
 )
 ```
 
-**Check:** zero, zero, zero and zero; the 42 Checks rows of this requirement all agree. The project tests these numbers; how the page renders is visible only in Desktop.
+**Check:** each entry nets to zero, no line is on cash, and adjusted income and total assets agree with the workbook; the 42 Checks rows of this requirement all agree. The project tests these numbers; how the page renders is visible only in Desktop.
 
 ## Expected results
 

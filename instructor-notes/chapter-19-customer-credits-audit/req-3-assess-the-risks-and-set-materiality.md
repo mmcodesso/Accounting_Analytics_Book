@@ -90,18 +90,18 @@ ORDER BY gl.FiscalYear;
 
 **Check:** rates 0.533%, 0.685% and 0.816%; SQL test P1 returns the same three rows.
 
-**Step 4. Expect, compare, conclude.** The expectation is the last year's revenue times the previous year's rate; the difference is the recorded returns less the expectation, set against the two thresholds.
+**Step 4. Expect, compare, conclude.** The expectation is the last year's revenue times the previous year's rate; the difference is the recorded returns less the expectation. It is an unexplained difference, not an identified misstatement, so it is judged against the follow-up trigger the student states, and against performance materiality for context. The clearly trivial threshold governs the accumulation of identified misstatements and does not decide whether an analytical difference is investigated. The model sets its own trigger, 5% of the expectation, a case assumption for a one-rate expectation (its cell is separate from ClearlyTrivial, whatever the two amounts happen to be).
 
 ```
 =D15*C17
-=IF(ABS(B21)>PerformanceMateriality,"Investigate: the difference exceeds performance materiality",IF(ABS(B21)>ClearlyTrivial,"Investigate (Requirement 5): above clearly trivial, below performance materiality","Accept: the difference is clearly trivial"))
+=IF(ABS(B21)>AnalyticalFollowUp,"Investigate (Requirement 5): an unexplained difference above the follow-up trigger"&IF(ABS(B21)>PerformanceMateriality,", above performance materiality",", below performance materiality"),"Below the quantitative trigger; consider qualitative risk and expectation precision")
 ```
 
 ![A mock of the Materiality worksheet with the three thresholds and the expectation of returns, the end state of Parts 1 and 2.](../figures/chapter-19-customer-credits-audit/IF-19-3-A.pdf)
 
-**Check:** expected $203,762.47 against $242,764.56 recorded, a difference of $39,002.09 (19.1%); the conclusion text reads "Investigate (Requirement 5)". **Watch for:**
+**Check:** expected $203,762.47 against $242,764.56 recorded, a difference of $39,002.09 (19.1%), above the model's trigger ($10,188.12) and below performance materiality ($168,885.42); the conclusion reads "Investigate (Requirement 5): an unexplained difference above the follow-up trigger, below performance materiality". A difference under the trigger is never simply accepted: qualitative risk and the expectation's precision still count, and a test of positive and negative differences uses the magnitude. **Watch for:**
 
-- Comparing the difference with overall materiality: it is 17% of it, so "immaterial" tempts. Materiality is not the test for investigating; the clearly trivial threshold is, and the difference is above it and below performance materiality.
+- Comparing the difference with overall materiality: it is 17% of it, so "immaterial" tempts. Materiality is not the test for investigating, and neither is the clearly trivial threshold: the student's own trigger is, stated with its basis.
 - The first year's rate. It gives an expectation of $158,709.68 and recorded returns 53.0% above it, because the first year had no earlier sales to return, so its rate understates.
 
 ### Part 3: Risks and the matrix
@@ -125,12 +125,12 @@ ORDER BY gl.FiscalYear;
 | Expected; recorded; difference | $203,762.47; $242,764.56; $39,002.09 | 4 |
 | Control points covered by the matrix | 9 | 6 |
 
-> **Instructor notes, Requirement 3:** income before income taxes as recorded, 4,503,611.24: materiality 225,180.56, performance materiality 168,885.42, clearly trivial 11,259.03. Return rate on revenue (SalesInvoice postings to 4010-4040 and 4080: 27,313,074.43 / 29,372,768.96 / 29,761,002.45): 0.533% / 0.685% / 0.816%; 2026 expectation at the 2025 rate 203,762.47 against 242,764.56, a difference of +39,002.09 (+19.1%), above clearly trivial and below performance materiality: investigate (Requirement 5). The 2024 rate (expectation 158,709.68, +53.0%) understates, because fiscal 2024 had no earlier sales to return. Risk ratings: refunds high (cash leaves; a small team approves); credits high (revenue reduction and concealment); cash application moderate (lapping); clawbacks low in amount but part of employees' pay. A strong matrix sees that customer service records receipts, applies cash, approves credits, and approves clawbacks: incompatible duties.
+> **Instructor notes, Requirement 3:** income before income taxes as recorded, 4,503,611.24: materiality 225,180.56, performance materiality 168,885.42, clearly trivial 11,259.03. Return rate on revenue (SalesInvoice postings to 4010-4040 and 4080: 27,313,074.43 / 29,372,768.96 / 29,761,002.45): 0.533% / 0.685% / 0.816%; 2026 expectation at the 2025 rate 203,762.47 against 242,764.56, a difference of +39,002.09 (+19.1%). That is an unexplained difference, not an identified misstatement: it is above the follow-up trigger the case assumes (10,188.12, 5% of the expectation, its own cell and not the clearly trivial threshold, which governs the accumulation of identified misstatements) and below performance materiality, so investigate (Requirement 5); a difference under the trigger is not accepted as a conclusion, because qualitative risk and the expectation's precision still count. The 2024 rate (expectation 158,709.68, +53.0%) understates, because fiscal 2024 had no earlier sales to return. Risk ratings: refunds high (cash leaves; a small team approves); credits high (revenue reduction and concealment); cash application moderate (lapping); clawbacks low in amount but part of employees' pay. A strong matrix sees that customer service records receipts, applies cash, approves credits, and approves clawbacks: incompatible duties.
 
 ## What a strong answer says
 
 - **The base and the thresholds are right and visible:** income as the ledger records it, closes out, and three named cells that later formulas read.
-- **The expectation is judged, not just computed.** The difference is above clearly trivial and below performance materiality: investigate (Requirement 5 finds where), neither accept nor conclude.
+- **The expectation is judged, not just computed.** An unexplained difference above the student's stated trigger and below performance materiality: investigate (Requirement 5 finds where), neither accept nor conclude.
 - **The brainstorm uses the records:** the incompatible duties of customer service, the refund approvers with no preparer.
 - **The matrix plans the audit:** each risk has a control point, a test, a tool and where the evidence lies, rated by likelihood and magnitude.
 
@@ -139,7 +139,7 @@ A weak answer takes revenue or credits as the base, calls the difference immater
 ## Common mistakes and how to respond
 
 - **The closes left in.** *Symptom:* materiality `0.00`. *Response:* ask what the closing entry does to income.
-- **Difference against materiality.** *Symptom:* "immaterial, no work". *Response:* ask which threshold decides whether to look.
+- **Difference against materiality or clearly trivial.** *Symptom:* "immaterial, no work", or "above clearly trivial" as the reason. *Response:* ask what trigger decides whether to look, and what clearly trivial is for.
 - **The first year's rate.** *Symptom:* a difference of 53%. *Response:* ask how many earlier sales the first year had.
 - **Typed thresholds.** *Symptom:* later sheets disagree after a change. *Response:* ask where each formula reads the number.
 - **A matrix of SQL.** *Symptom:* no row says the evidence is outside the database. *Response:* ask what a query cannot show about a refund.
@@ -149,7 +149,7 @@ A weak answer takes revenue or credits as the base, calls the difference immater
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
 | Thresholds | 25 | Right base, three named cells | Right numbers typed in |
-| Expectation | 25 | Rates, expectation, both comparisons, the reasoned conclusion | Numbers without the conclusion |
+| Expectation | 25 | Rates, expectation, the difference, a stated trigger with its basis and the reasoned conclusion (performance materiality in context) | Numbers without the conclusion |
 | Brainstorm | 20 | Five schemes, with opportunity from the records | Generic opportunities |
 | Matrix | 30 | Nine points, tool and evidence location, ratings argued | Risks without tests or ratings |
 

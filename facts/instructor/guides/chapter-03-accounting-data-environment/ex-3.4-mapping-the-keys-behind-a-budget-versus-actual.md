@@ -26,13 +26,13 @@ A budget-versus-actual report looks simple: two columns of numbers side by side.
 
 By the end, students can:
 
-- name the primary key of CostCenter and say whether the cost centers form a hierarchy (chapter outcome 2);
+- name the primary key of CostCenter and say whether the cost centers form a hierarchy (outcome 2);
 - read the link from GLEntry to CostCenter at both ends and say what the optional end means for a report (outcome 3);
 - compare Budget with BudgetLine, and choose the one to join to the ledger and say why (outcome 5);
 - test that every budgeted account appears in the ledger, and say what a clean result does not show;
 - write a short assessment of the join path and its gaps.
 
-**Competencies practiced.** CPA Evolution BAR M10 (advanced data analytics, including data models and joins) and Core S1 M4 (financial statement analysis and performance measures); IMA Data Literacy, and Budgeting and Forecasting; IFAC IES 2 (b), management accounting, and IES 2 (i), using information technology to analyze data; AACSB A5 part 5.2.
+**Competencies practiced.** CPA Evolution BAR M10 (advanced data analytics, including data models and joins); IMA Data Literacy, and Budgeting and Forecasting; IFAC IES 2 (b), management accounting, and IES 2 (i), using information technology to analyze data; AACSB A5 part 5.2.
 
 ## Before you assign
 
@@ -64,7 +64,7 @@ Individual work, with a short class comparison of requirement (3), where answers
 
 **Step 2. Read the relationship between GLEntry and CostCenter.** The foreign key is GLEntry.CostCenterID, which refers to CostCenter.CostCenterID.
 
-**Check:** at the CostCenter end of the line the symbol is {{ gl_cc.parent_end }} (a circle and a bar): a ledger row has at most one cost center, and may have none. At the GLEntry end it is {{ gl_cc.child_end }}, because every cost center has ledger rows. No cost center ID in the ledger is missing from CostCenter. The optional end matters: {{ ch02_ex4.gl_blank|count }} of {{ ch02_ex4.gl_rows|count }} ledger rows ({{ ch02_ex4.gl_blank_share|pct(1) }}) have no cost center, mostly on balance sheet accounts, as Exercise 2.4 counted. A report by cost center leaves them out, so its total is not the ledger's total unless an unassigned line carries the rest. **Watch for:** blanks called orphans. A blank is allowed here. An orphan is a value that is filled in and has no match.
+**Check:** at the CostCenter end of the line the symbol is {{ gl_cc.parent_end }} (a circle and a bar): a ledger row has at most one cost center, and may have none. At the GLEntry end Figure 3.9 shows {{ gl_cc.child_end }}, and in this extract every cost center has ledger rows. A new cost center need not have any yet, so keep the diagram's reading apart from what the snapshot happens to contain. No cost center ID in the ledger is missing from CostCenter. The optional end matters: {{ ch02_ex4.gl_blank|count }} of {{ ch02_ex4.gl_rows|count }} ledger rows ({{ ch02_ex4.gl_blank_share|pct(1) }}) have no cost center, mostly on balance sheet accounts, as Exercise 2.4 counted. A report by cost center leaves them out, so its total is not the ledger's total unless an unassigned line carries the rest. **Watch for:** blanks called orphans. A blank is allowed here. An orphan is a value that is filled in and has no match.
 
 ### Requirement (3): Budget and BudgetLine
 
@@ -74,7 +74,7 @@ Individual work, with a short class comparison of requirement (3), where answers
 |---|---|---|
 | Primary key | BudgetID | BudgetLineID |
 | Foreign keys | CostCenterID, AccountID, ApprovedByEmployeeID | AccountID, CostCenterID, ItemID, WarehouseID, ApprovedByEmployeeID |
-| One row is | One fiscal year, month, cost center and account | One budgeted amount for an account and month, with the item and warehouse where they apply |
+| One row is | One fiscal year, month, cost center and account | One detailed budget amount for a fiscal year, month and account, with the cost center, item and warehouse where they apply; BudgetCategory and DriverType give its kind and basis (no two rows share the six fields in this extract, an observed grain, not a declared one) |
 | Rows | {{ budget_rows|count }} | {{ line_rows|count }} |
 | Accounts | {{ n_budget_accounts }}, revenue and expense only | {{ n_line_accounts }}, in four categories |
 | Blank cost center | None | {{ line_cc.blank|count }} rows |
@@ -105,7 +105,7 @@ c. Beside the Budget list, use XLOOKUP or COUNTIFS to look each AccountID up in 
 
 **Step 5. Outline half a page to one page.** A model assessment names the join path and then the gaps.
 
-The join: Budget and GLEntry are not related by a key. Leave the year-end close entries out of the ledger, summarize its expense rows (debits less credits) to fiscal year, period, cost center and account, and match that summary to Budget on the four columns, FiscalYear to FiscalYear, Month to FiscalPeriod, CostCenterID to CostCenterID and AccountID to AccountID. Budget already has one row at that grain, and its revenue accounts fall outside an expense report. Keep the combinations found on one side only. Each table also relates to CostCenter and to Account through its own foreign keys.
+The join: Budget and GLEntry are not related by a key. Leave the year-end close entries out of the ledger. They are the {{ n_closes }} journal entries whose EntryType begins with Year-End Close, and their ledger rows are the GLEntry rows whose SourceDocumentType is JournalEntry and whose SourceDocumentID is one of their JournalEntryIDs. VoucherType reads only JournalEntry, and a filter on a Description containing "close" would also catch an ordinary depreciation entry, so use EntryType, and keep the ordinary adjusting entries. Then summarize its expense rows (debits less credits) to fiscal year, period, cost center and account, and match that summary to Budget on the four columns, FiscalYear to FiscalYear, Month to FiscalPeriod, CostCenterID to CostCenterID and AccountID to AccountID. Budget already has one row at that grain, and its revenue accounts fall outside an expense report. Keep the combinations found on one side only. Each table also relates to CostCenter and to Account through its own foreign keys.
 
 {{ figure('IF-03-4-A') }}
 
@@ -146,7 +146,7 @@ A weak answer assumes a hierarchy, calls the blanks orphans, joins both budget t
 - **A row-to-row join.** *Symptom:* a budget total many times the budget. *Response:* ask how many ledger rows one budget row meets, and at what grain each side should be summed.
 - **AccountID tested against the account number.** *Response:* ask which Account column holds the key.
 - **The clean test read as coverage.** *Symptom:* "every budget line has actuals". *Response:* ask them to count the budget rows with a ledger row.
-- **Year-end closes forgotten.** *Symptom:* odd actuals in December. *Response:* ask what the close entries do to expense accounts.
+- **Year-end closes forgotten, or found by their description.** *Symptom:* odd actuals in December, or an ordinary entry left out. *Response:* ask what the close entries do to expense accounts, and which column of JournalEntry names them.
 
 ## Grading guide
 

@@ -28,8 +28,8 @@ from pbibuild.ex16 import group
 from pbibuild.model import DATE_FORMAT, MEASURES_TABLE, Column, Measure, Model, Query, Table, query_table
 from pbibuild.pbir import Page, Report, Visual, col, lit, meas, textbox
 from pbibuild.project import Project
-from pbibuild.reports import (CH14, MONEY, card, claim, code_after, dax_blocks, definitions, entered, hide, icon_rules,
-                              keep, money, one, rows, slicer)
+from pbibuild.reports import (CH14, MONEY, card, claim, code_after, condition, dax_blocks, definitions, entered, hide,
+                              icon_rules, keep, money, one, rows, slicer)
 
 from db import Data  # noqa: E402  (facts/ is on sys.path through pbibuild.reports)
 from notes import case4  # noqa: E402
@@ -48,6 +48,7 @@ STEPS = [("net_income", "Net income"), ("depreciation", "Depreciation"), ("recei
 WC = ["DSO", "DIO", "DPO", "Cash Conversion Cycle", "Materials Days", "Finished Goods Days"]
 GUARDED = ["DSO", "DSO without Opening", "DIO", "Materials Days", "Finished Goods Days", "DPO", "DPO without Opening",
            "Cash Conversion Cycle", "Cycle without Opening"]
+AVERAGED = ["DSO on Average Balance", "DIO on Average Balance", "Materials Days on Average Balance", "DPO on Average Balance"]
 ROLL = ["1020", "1040", "1045", "2010", "2020", "2050"]
 CH14_EX = CH14 / "_exercises.qmd"
 
@@ -671,7 +672,7 @@ def r2(b: Build) -> None:
         f"Clearing has a credit balance of {money(c['a1090'])} and sits, with 8020, among the other current assets.",
         f"Sales tax payable of {money(c['tax_c'])}, the tax billed less the tax on credit memos, is a current liability "
         f"that no recorded remittance has reduced. It is not all tax collected, since {c['unpaid_n']:,} taxable invoices "
-        f"unpaid at the year-end hold {money(c['unpaid_tax'])} of it. Cash net of it was {money(c['net'][-1])} at the "
+        f"with neither a cash application nor a credit memo at the year-end include {money(c['unpaid_tax'])} of tax. Cash net of it was {money(c['net'][-1])} at the "
         f"end of {y} ({money(c['net'][1])} a year earlier), a liquidity sensitivity rather than restricted cash.",
         f"The notes payable ({money(c['outstanding'])}, equal to the debt schedule) sit entirely in 2110, a Long-Term "
         f"Liability, although {money(c['due_next'])} of principal is due in {d.N}: reclassified to current, it lowers "
@@ -689,9 +690,10 @@ def r2(b: Build) -> None:
                     title="From net income to the change in cash, in the year selected",
                     filters=[keep("wfNoCash", step, ["Cash"], exclude=True), keep("wfYears", yr, years)],
                     sort=[(step, "Ascending")],
-                    alt_text="A waterfall from net income to the change in cash: the inventories absorb far more cash "
-                             "than the year earned, and the growth of the recorded sales tax payable and of the payables "
-                             "holds some of it back."))
+                    alt_text="Waterfall from net income to the change in cash for the selected fiscal year. The steps "
+                             "separate depreciation, receivables, inventories, payables, sales tax, other balances, "
+                             "investing and financing. Fiscal 2024 includes the opening entry and is not directly "
+                             "comparable with later years."))
     page.add(Visual("bridgeMatrix", "pivotTable", 800, 20, 460, 460, {"Rows": [step], "Columns": [yr], "Values": [M("Cash Effect")]},
                     title="The bridge by year (drill through on a step to its postings)",
                     filters=[keep("bmYears", yr, years), keep("bmNoCash", step, ["Cash"], exclude=True)]))
@@ -999,6 +1001,8 @@ def r3(b: Build) -> None:
         M("Materials Days on Average Balance"), M("DPO"), M("DPO on Average Balance")]},
         title="Year-end measures against the versions on the year's average balance", filters=[keep("wcAvgYears", yr, d.years)]))
     ends = c["ends"]
+    # the average-balance table is annual: a quarter picked in the line or the matrix must not put a quarter's flow in it
+    page.extra = {"visualInteractions": [{"source": s_, "target": "wcAverage", "type": "NoFilter"} for s_ in ("wcLine", "wcMatrix")]}
     page.add(answer("wcAnswer", 20, 860, 1240, 300, [
         f"From {first_q['label']} to {last['label']} the cycle grew from {first_q['ccc']:.1f} to {last['ccc']:.1f} days "
         f"({first_q['ccc_x']:.1f} to {last['ccc_x']:.1f} without the opening entry), and it grew mainly through "
@@ -1228,7 +1232,8 @@ def r4(b: Build) -> None:
         col("ShortfallPairs", "LastRequest"), col("ShortfallPairs", "DueDate"), col("ShortfallPairs", "RequisitionedQty"),
         col("ShortfallPairs", "IssuedQty")]}, title="The pairs requisitioned most often", sort=[(rc, "Descending")]))
     page.add(Visual("targetSlider", "slicer", 20, 470, 240, 100, {"Values": [td]}, title="Target days of materials supply",
-                    objects={"data": [{"properties": {"mode": lit("Single")}}]}))
+                    objects={"data": [{"properties": {"mode": lit("Single")}}],
+                             "general": [{"properties": {"filter": {"filter": condition(td, [c3["raw"]])}}}]}))     # the saved selection is the default
     page.add(card("whatIfCards", 280, 470, 560, 100, [meas(TD, f"{TD} Value"), M("Allowed Materials"), M("Excess Materials"),
                                                       M("Months of Issues in Excess")], units_none=True, size=12,
                   filters=[keep("wicYear", yr, [y])]))
@@ -1433,18 +1438,7 @@ def r5(b: Build) -> None:
     # the Findings table (Enter data): account, finding, amount (its effect on the ledger less the subledger where it
     # reconciles a difference), disposition in Chapter 8's terms, and the difference it reconciles
     cap = c["capital"]
-    findings = [
-        ["1020", f"Opening receivables with no invoice ({c['entry']})", c["opening_ar"], "Follow up", "Receivables"],
-        ["2010", f"Opening payables with no invoice ({c['entry']})", c["opening_ap"], "Follow up", "Payables"],
-        ["2010", "Invoices moved to notes payable still open in the subledger (PI " +
-         " and ".join(str(x["id"]) for x in cap) + "); close them against the notes", -c["notes_total"], "Expected", "Payables"],
-        ["1045", f"Opening materials with no item or cost detail ({c['entry']})", c["opening_materials"], "Follow up", ""],
-        ["1040", f"Opening finished goods with no item or cost detail ({c['entry']})", c["opening_fg"], "Follow up", ""],
-        ["2050", "No remittance of the sales tax recorded", c["tax_balance"], "Follow up", ""],
-        ["2110", f"Current portion of the notes classified as long-term (due {d.N})", c["current_portion"], "Misstatement", ""],
-        ["1010 and 2010", "Supplier payments posted after Data Through", c["after_amount"], "Expected", ""],
-        ["2030", "Payroll accrual not recorded at the year-end, an estimate the Part III case proposed and did not post",
-         c["accrual"], "Misstatement", ""]]
+    findings = case4.findings_rows(c, d)
     b.model.add(entered_table("Findings", [("Account", "string"), ("Finding", "string"), ("Amount", "double"),
                                            ("Disposition", "string"), ("Reconciles", "string")],
                               [[a, f_, f"{amt:.2f}", disp, rec] for a, f_, amt, disp, rec in findings], fmts={"Amount": MONEY}))
@@ -1516,10 +1510,10 @@ def r5(b: Build) -> None:
                "        \"Receivables Findings\", ROUND ( [Receivables Findings], 2 ),\n"
                "        \"Payables Difference\", ROUND ( [Payables Difference], 2 ),\n"
                "        \"Payables Findings\", ROUND ( [Payables Findings], 2 )\n    ),\n    'Date'[Year] = " + str(y) + "\n)")
-    tests = " || ".join(f"NOT ISBLANK ( [{n}] )" for n in GUARDED)
+    tests = " || ".join(f"NOT ISBLANK ( [{n}] )" for n in GUARDED + AVERAGED)
     later = ("VAR ThroughDate = [Data Through]\nVAR LaterQuarters =\n    FILTER ( VALUES ( 'Date'[YearQuarter] ), "
              "CALCULATE ( MAX ( 'Date'[Date] ) ) > ThroughDate )\nRETURN\n")
-    b.add_test("Test 5: every working-capital measure is blank after Data Through",
+    b.add_test("Test 5: the nine quarter-end turnover measures and the four average-balance measures are blank after Data Through",
                "EVALUATE\n" + later + "    ROW (\n        \"Quarters after Data Through\", COUNTROWS ( LaterQuarters ),\n"
                f"        \"Quarters with a value\", COUNTROWS ( FILTER ( LaterQuarters, {tests} ) ) + 0\n    )")
 
@@ -1659,15 +1653,20 @@ def r6(b: Build) -> None:
         "Dispositions: the opening balances, follow up (the prior system's schedules and confirmations, and for the "
         "inventories the stock and costing records and a count); the note invoices, expected (close them against the "
         "notes); the sales tax, follow up (the returns filed, the tax authority's account, the bank statements and "
-        f"reconciliation); the current portion and the unrecorded payroll accrual ({money(c5['accrual'])}, an estimate "
-        "the Part III case proposed), misstatements; the supplier payments after Data Through, expected.",
+        f"reconciliation); the current portion, a misstatement; the payroll accrual the Part III case proposed "
+        f"({money(c5['accrual'])} across accrued payroll, employer payroll taxes and benefits payable, an estimate not "
+        "posted in this file, so a separate finding that reconciles neither difference), a misstatement; the supplier "
+        "payments after Data Through, expected.",
         f"Controls over requisitions: one manager, the {c4['approver_title']}, approved every shortfall requisition, "
         f"{c4['self_requested']} of them his or her own, and the records do not show whether stock on hand or open "
         "orders were checked.",
-        "Controls over the report: the Tests tab, the reconciliations and the Data Through card must be rerun on every "
-        "refresh, because Data Through is a bound observed in the extract, not proof that the data are complete. The "
-        "Validation totals must agree with the ledger, and changes to the file should be reviewed before the committee "
-        "relies on it each quarter.",
+        "Controls over the report: for a later quarter, first approve the report date and update the fixed cutoffs of the "
+        "receivables and payables, the note invoices identified by hand, the debt and policy schedules, the Findings and "
+        "the written conclusions, because a refresh updates none of them. Then reconcile the refreshed populations and "
+        "document the exceptions, rerun the control totals, the bridge, the reconciliations and the late-period tests of "
+        "the Tests tab, and check the page filters, the interactions and the date labels before release. A successful "
+        "refresh, or a Data Through date, which is a bound observed in the extract, does not establish that the data are "
+        "complete or resolve an earlier finding.",
         ("Recommendation", True),
         "Settle the sales tax position first, because it decides how much of the cash is available. Check every "
         "shortfall requisition against stock on hand and open orders before it is converted, route it through the "

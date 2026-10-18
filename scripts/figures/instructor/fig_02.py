@@ -99,9 +99,9 @@ FINDINGS = [
     ("Blank tracking numbers", "Shipment, TrackingNumber (Step 2)", {"Completeness": "main"},
      ("error", "evidence should exist")),
     ("In Transit after the delivery date", "Shipment, Status and DeliveryDate (Step 3)",
-     {"Consistency": "main", "Timeliness": "also"}, ("error", "conflict, or overdue")),
+     {"Consistency": "main", "Timeliness": "also"}, ("judgment", "conflict, or overdue")),
     ("Invoice dated before first shipment", "SalesInvoice, InvoiceDate (Steps 6, 7)", {"Accuracy": "main"},
-     ("error", "dates out of order")),
+     ("judgment", "confirm terms, cutoff")),
     ("Customers that share a name", "Customer, CustomerName (Step 4)", {"Consistency": "main", "Accuracy": "also"},
      ("judgment", "compare the records")),
     ("Freight costs far above the average", "Shipment, FreightCost (Step 5)", {"Accuracy": "main"},
@@ -111,7 +111,7 @@ FINDINGS = [
     ("Ledger rows with no amount", "GLEntry, Debit and Credit (Step 7)", {"Accuracy": "main", "Consistency": "also"},
      ("judgment", "investigate and explain")),
     ("Small first and last periods", "GLEntry, FiscalPeriod (Step 6)", {"Timeliness": "main", "Completeness": "also"},
-     ("design", "the edge of the extract")),
+     ("judgment", "check the extract scope")),
 ]
 
 KINDS = {"error": ("Error", CORAL), "judgment": ("Judgment", AMBER), "design": ("By design", TEAL)}
@@ -194,9 +194,10 @@ def if_02_0_a() -> Diagram:
         kx += 32 + width + 18
     assert kx <= 860 + 18, kx
     d.text(f"<i>{NUMBER_WORDS[two]} of the {NUMBER_WORDS[count].lower()} findings touch two dimensions, so name the one the "
-           f"test examines and add the second when it applies. The small periods look like missing transactions "
-           f"(completeness) until you see that they sit at the edge of the extract (timeliness). The counts are in the "
-           f"tutorial guides.</i>", 0, ky + 34, 860, 52, size=SMALL, color=GRAY)
+           f"test examines and add the second when it applies. The In Transit rows conflict only if DeliveryDate records "
+           f"the actual delivery, and are overdue if it is expected. The small periods look like missing transactions "
+           f"(completeness), and sit at the edges of the extract (timeliness), which explains their size without showing "
+           f"that the records are complete. The counts are in the tutorial guides.</i>", 0, ky + 34, 860, 72, size=SMALL, color=GRAY)
     return d
 
 
@@ -309,12 +310,13 @@ def if_02_0_b() -> Diagram:
         d.text("<b>Correct the values</b>", col_x[c] + cell_w / 2 + 14, row_y[0] + cell_h + gap_y / 2 - 10, 160, 20,
                size=SMALL)
     bottom = row_y[1] + cell_h
-    kit.callout(d, "Reshaping (Power Query, a PivotTable) changes the layout and leaves every value as it is. Correcting "
-                   "a value changes the data and leaves the layout as it is. A dataset can need either, both or neither: "
-                   "these are different jobs.", 0, bottom + 16, 860, color="amber")
+    note_y = kit.callout(d, "Reshaping (Power Query, a PivotTable) changes the layout. With one value for each cost center and "
+                   "month, as here, every amount stays as it is, but a PivotTable adds up repeated keys, so check the keys "
+                   "and the totals before treating a pivot as a reshape. Correcting a value changes the data and leaves the "
+                   "layout as it is. A dataset can need either, both or neither.", 0, bottom + 16, 860, color="amber")
     d.text(f"<i>Amounts: the Charles River salaries budgets of three cost centers, fiscal {ctx.data().P}, as in Figure 2.6. "
            f"The wrong amount is the same amount with its last two whole-number digits swapped, added for the "
-           f"illustration; it is not in the data.</i>", 0, bottom + 78, 860, 36, size=SMALL, color=GRAY)
+           f"illustration; it is not in the data.</i>", 0, note_y + 8, 860, 36, size=SMALL, color=GRAY)
     return d
 
 
@@ -470,11 +472,12 @@ def if_02_2_a() -> Diagram:
                      ay + 4 + 26 * k + 8, 9, 7)
         ay += height + 8
     # The note beside the table.
-    kit.callout(d, f"The outlined periods sit at the edges of the extract. The records begin in the first period, and "
-                   f"fiscal {last_year} holds only {', '.join(last_types)} rows, which settle the year before: they are "
-                   f"not missing sales or purchases.", sheet_w + 18, 70, px - sheet_w - 36, color="amber")
+    kit.callout(d, f"The outlined periods sit at the edges of the extract. The first is the first period supplied, and "
+                   f"fiscal {last_year} holds only {', '.join(last_types)} rows, which settle invoices of the year before. "
+                   f"Check the extract's specification and the reporting period before reading a low count. The counts "
+                   f"alone do not show that the records are complete.", sheet_w + 18, 70, px - sheet_w - 36, color="amber")
     d.text(f"<i>Outlined: the first period of the first year and the last two periods of the data. Each holds far fewer "
-           f"rows than the {t2['typical']:,.0f} that a period typically holds.</i>", 0, bottom + 42, 860, 36, size=SMALL,
+           f"rows than the median period, {t2['typical']:,.0f} rows.</i>", 0, bottom + 42, 860, 36, size=SMALL,
            color=GRAY)
     return d
 

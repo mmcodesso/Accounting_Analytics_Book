@@ -474,7 +474,7 @@ def fig_14_11() -> Diagram:
     peak = max(opex)
     chart = pbi.line_chart(d, 0, 0, 860, 360, "Operating Expense and Expected Operating Expense by YearMonth",
                            months, [("Operating Expense", opex, BLUE), ("Expected Operating Expense", expected,
-                                                                         AMBER)],
+                                                                         AMBER, "dashed")],
                            "K", pbi.nice_ticks(0, peak, 4), every=3, legend=True)
     for i, m in enumerate(months):
         if m in spikes:
@@ -483,7 +483,9 @@ def fig_14_11() -> Diagram:
     d.text("<i>The expectation is blank for January 2024, which has no earlier month, so its line starts in "
            "February. Outlined: the months whose expense exceeds the expectation by more than a fifth, "
            "February 2024, whose expectation rests on the start-up month alone, and the six months with three "
-           "pay dates, from March 2024 on. The value axis starts at zero.</i>", 0, 372, 860, 56, size=SMALL, color=GRAY)
+           "pay dates, from March 2024 on. The value axis starts at zero. The expectation is drawn dashed here, so the "
+           "two lines differ by more than color. Power BI draws both solid unless a line's style is changed.</i>",
+           0, 372, 860, 76, size=SMALL, color=GRAY)
     return d
 
 

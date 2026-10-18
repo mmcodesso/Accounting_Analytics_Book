@@ -76,7 +76,7 @@ b. Enter the first query of the model answer, comment line included.
 
 c. Choose **Run**.
 
-**Check:** one row, {{ x.center_id }}, {{ x.center }}. Its manager of record is {{ x.manager.name }}, {{ an }} {{ x.manager.title|lower }}, and it has {{ x.in_unmapped }} employees. **Watch for:** `RELATEDTABLE`, which needs a relationship that Security does not have. An `EXCEPT` of the two lists of IDs also finds it and is accepted.
+**Check:** one row, {{ x.center_id }}, {{ x.center }}. Its manager of record is {{ x.manager.name }}, {{ an }} {{ x.manager.title|lower }}, and it has {{ x.in_unmapped }} employees. **Watch for:** `RELATEDTABLE`, a `CALCULATETABLE` shortcut, which cannot limit the unrelated Security table to the current cost center, so the query may run and miss it. An `EXCEPT` of the two lists of IDs finds it and is accepted.
 
 ### Requirement (3): Users mapped twice
 
@@ -124,7 +124,7 @@ c. Read the table, then choose **Stop viewing**.
 
 {{ figure('IF-AB-2-B') }}
 
-**Check:** all {{ x.n_employees }} employees appear, with their termination dates, while Employee itself shows only the {{ x.s_employees }} of the Sales cost center. No rule filters a table that no relationship reaches. In **Manage roles**, a rule of `FALSE ()` on AccessEmployees for Cost Center Managers empties it for the role, though its name and columns stay visible, which object-level security would hide too. Keeping the table out of the published file removes it. **Watch for:** the review run under a manager's role. It sees one cost center and one row of Security, so Requirement (2) returns nothing and the gap disappears. Run the review as the file's author.
+**Check:** all {{ x.n_employees }} employees appear, with their job titles, status and termination dates, while Employee itself shows only the {{ x.s_employees }} of the Sales cost center. No rule filters a table that no relationship reaches, and the Email column is exposed too, though this visual does not show it. In **Manage roles**, a rule of `FALSE ()` on AccessEmployees for Cost Center Managers empties it for the role, though its name and columns stay visible. **Watch for:** the review run under a manager's role. It sees one cost center and one row of Security, so Requirement (2) returns nothing and the gap disappears. Run the review as the file's author.
 
 ### Requirement (6): The note
 
@@ -157,7 +157,7 @@ EVALUATE ROW ( "Unmapped", {{ x.dax_unmapped }}, "Users matched", {{ x.dax_match
 ## What a strong answer says
 
 - **(2) to (4)** The review found one cost center without a user, {{ x.center }}, which agrees with Tutorial B.1, where no department manager sees it until the controller names its manager. It found no user mapped twice and no user who is unmatched, terminated or in another cost center.
-- **(5)** A manager sees every row of AccessEmployees, including the e-mail addresses and termination dates of {{ x.n_employees }} employees, because no rule or relationship filters it. The fix is leaving the table out of the published file, or a rule of `FALSE ()` for the role, which empties the table but leaves its name and columns visible.
+- **(5)** A manager sees every row of AccessEmployees, here the job titles, status and termination dates of {{ x.n_employees }} employees, because no rule or relationship filters it. Email is in the table too, and leaving a column off a visual protects nothing. The fix is leaving the table out of the published file, or a rule of `FALSE ()` for the role, which empties the table but leaves its name and columns visible.
 - **(6)** Run the review whenever the security table changes and at least quarterly, with the controller's approval recorded, and by someone other than the person who maintains the table.
 - The limits: the review tests status and cost center on the day it runs, and Email stands in for the sign-in name, which the service may spell differently.
 
@@ -165,7 +165,7 @@ A strong answer reports a clean review without calling it proof, and ties the fr
 
 ## Common mistakes and how to respond
 
-- **`RELATEDTABLE`.** *Symptom:* the query fails. *Response:* ask whether Security is related to CostCenter.
+- **`RELATEDTABLE`.** *Symptom:* an empty exception list, or an error. *Response:* ask which relationship would carry the cost center's filter to Security.
 - **A flag nobody tested.** *Symptom:* "zero flagged, so it works". *Response:* ask for the test rows and their flags.
 - **The wrong order.** *Symptom:* the unmatched test row reads {{ x.wrong_order }}. *Response:* ask what a missing employee's status is.
 - **Rows counted, not cost centers.** *Symptom:* a user whose mapping was typed twice is listed in (3), or appears twice in (4). *Response:* ask what (3) and (4) ask about, a cost center or a row.
@@ -178,12 +178,14 @@ A strong answer reports a clean review without calling it proof, and ties the fr
 
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
-| Requirement 1 | 10 | Seven columns, typed, unrelated | A related table |
+| Requirement 1 | 10 | Seven columns, unrelated | A related table |
 | Requirement 2 | 15 | The cost center left out, by name | The ID only |
-| Requirement 3 | 10 | The query, and its empty result explained | The query without a test |
-| Requirement 4 | 25 | One row per user, the lookups, a flag with the three tests in order | A flag with fewer tests |
-| Requirement 5 | 15 | All employees seen, the reason, a fix | The leak found without a fix |
-| Requirement 6 | 25 | Findings, a frequency with a trigger, the fix before publishing | One of the three |
+| Requirement 3 | 10 | The query, counting each user's cost centers, not rows | A query that counts rows |
+| Requirement 4 | 25 | One row per user, the matched employee's columns, a flag for the three failures | A flag with fewer tests, or one that mislabels the unmatched user |
+| Requirement 5 | 15 | The page viewed as the Sales Manager, and all employees seen | The page built but not viewed as the role |
+| Requirement 6 | 25 | Findings, a frequency, and what to do about AccessEmployees before publishing | One of the three |
+
+Typed columns, the reason for the leak, a trigger for the frequency and a test of the flag are a plus.
 
 ## Extensions and discussion questions
 

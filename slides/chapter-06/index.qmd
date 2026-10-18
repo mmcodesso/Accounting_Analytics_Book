@@ -299,7 +299,7 @@ Accessories, Lighting and Textiles barely move from quarter to quarter. Services
 
 ## The Furniture margin fell in the fourth quarter
 
-{{< book-figure fig-06-06 crop="0,0,1,0.579" >}}
+{{< book-figure fig-06-06 crop="0,0,1,0.579" alt="Detail of the RevenuePivot worksheet, filtered to fiscal 2026, with the four quarters and a Grand Total across the top. The revenue and margin rows of Accessories, Furniture, and Lighting are shown. The outlined Furniture margin row is lower in the fourth quarter than in the third, while the Accessories and Lighting margins barely change." >}}
 
 ::: {.notes}
 Furniture's margin is lower than the other product lines' in every quarter, and it falls further in the fourth. The grand total of the PivotTable equals the control total on the Profile worksheet. The Part I case measured the posted accounts, whose cost is the standard cost of the goods shipped less the goods returned, so its margins differ slightly from these but fall the same way.
@@ -328,7 +328,7 @@ The database has no trial balance table, as Chapter 3 showed, so you build one. 
 
 ## Debit and credit balances agree
 
-{{< book-figure fig-06-07 crop="0,0,1,0.415" >}}
+{{< book-figure fig-06-07 crop="0,0,1,0.415" alt="Detail of the TrialBalance worksheet. The first rows list cash, receivables, finished goods, materials, work in process, and prepaid expenses with their debit balances, and a Total Row closes the table. The outlined totals of the debit and credit balance columns are equal." >}}
 
 ::: {.notes}
 A calculated column subtracts credits from debits, and two more columns put each balance on its side. Equal totals are the trial balance's control total.
@@ -336,10 +336,10 @@ A calculated column subtracts credits from debits, and two more columns put each
 
 ## A common-size statement ties to the closing entry
 
-{{< book-figure fig-06-07 crop="0,0.415,1,0.585" >}}
+{{< book-figure fig-06-07 crop="0,0.415,1,0.499" alt="Detail of the IncomeStatement worksheet. The formula bar shows the SUMIFS formula, with a negative sign, for operating revenue in cell B2. The statement runs from operating revenue through sales returns, net revenue, cost of goods sold, gross margin, operating expenses, and operating income to net income, each line with its percentage of net revenue, and the net income row is outlined." >}}
 
 ::: {.notes}
-SUMIFS on AccountSubType builds each line, with the sign reversed for revenue, and each line is shown as a share of net revenue. Net income equals what the year's closing entry moved to retained earnings, and the balance sheet balances once net income is added to equity.
+SUMIFS on AccountSubType builds each line, with the sign reversed for revenue, and each line is shown as a share of net revenue. Net income equals what the year's closing entry moved to retained earnings, and the balance sheet balances once net income is added to equity. These are the fiscal 2026 amounts as recorded before closing, and the match with the closing entry tests internal consistency, not recognition.
 :::
 
 ## Watch out: an extract is only as complete as its dates {.watch-out}
@@ -464,7 +464,7 @@ A typical management package shows each significant variance, its components and
 - Match precision to the reader: cents in a workpaper, thousands in a memo
 
 ::: {.notes}
-Fractional quantities make per-unit measures consistent between quarters but not literal units, so a finding should not depend on whole units. The same summaries return in Parts III and IV: a PivotTable is a SQL GROUP BY, and a calculated field is a Power BI measure.
+An expectation built from last year's amount assumes that nothing relevant changed, management's explanations are corroborated with other evidence, and a difference below the threshold does not show that an amount is free of misstatement. Fractional quantities make per-unit measures consistent between quarters but not literal units, so a finding should not depend on whole units. The same summaries return in Parts III and IV: a PivotTable is a SQL GROUP BY, and a calculated field is a Power BI measure.
 :::
 
 # Looking Ahead

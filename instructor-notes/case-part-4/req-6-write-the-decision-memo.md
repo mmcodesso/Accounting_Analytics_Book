@@ -25,14 +25,14 @@ Students can:
 ## Before you assign
 
 - **From earlier work.** Requirements 1 to 5 with their pages, and the memos of the earlier cases as models. No new modeling: students write in a word processor.
-- **Length.** At most two pages with a one-page appendix of 5 exhibits. The model memo on the Memo page is about 770 words, an outline and not a finished memo.
+- **Length.** At most two pages with an appendix of up to three pages of 5 exhibits, each large enough to read and each naming the report page that holds its complete schedule. An exhibit may show a selection, such as the priority findings or the quarters that carry the argument. The model memo on the Memo page is about 770 words, an outline and not a finished memo.
 - **The model's view.** The recorded profit went into inventories, the growth of the recorded tax payable and of payables held cash up, the cash on the balance sheet may overstate what the company can use until the tax position is settled, and settling it comes first. Another recommendation from the same evidence earns full credit if it follows from the exhibits and states its limits.
 
 ## How to run it
 
 Individual, about 90 minutes in class or as a take-home: 15 to plan the evidence, 50 to draft, 25 to check every number against its page and the length. In a workshop, students swap drafts and review them against the grading guide. **Collect** the memo, the appendix and the .pbix.
 
-![How the memo and its one-page appendix are laid out, and which requirement and report page supplies each part.](../figures/case-part-4/IF-C4-6-A.pdf)
+![How the memo and its appendix are laid out, and which requirement and report page supplies each part.](../figures/case-part-4/IF-C4-6-A.pdf)
 
 ## Step-by-step solution
 
@@ -52,13 +52,13 @@ Individual, about 90 minutes in class or as a take-home: 15 to plan the evidence
 
 **Step 3. Financial reporting.** Net income was $4,503,611.24 but cash fell $941,310.30, from $9,383,566.10 to $8,442,255.80, after rising $3,494,591.86 the year before. Inventories absorbed $8,754,515.25, $4,250,904.01 more than the year earned, while the growth of the recorded sales tax payable ($1,932,519.29) and of payables ($821,074.85) held cash up. Restated, operating activities used $807,189.75, investing $0.00 and financing $134,120.55 in principal, with $280,000.00 of equipment acquired by a note disclosed apart. The balance sheet needs the tax position settled ($5,620,840.66 with no remittance recorded, so cash net of it is $2,821,415.14), $147,503.76 of notes reclassified to current, and support requested for the opening receivables ($380,000.00), payables ($2,096,371.12), materials ($3,587,025.70) and finished goods ($4,111,795.76), adjusted only if the evidence shows them wrong.
 
-**Step 4. Managerial accounting.** Receivables and payables barely moved (DSO 62.2 to 54.9 days, DPO without the opening line 66.2 to 65.7); the cycle grew from 173.7 to 425.7 days, mainly through inventory, materials at 422.1 days against the largest materials target of 28. The shortfall channel carried the build ($11,219,993.21 of receipts in 2026 against issues near $10,161,204.64), with 5,702 of 10,365 work order and item pairs requisitioned more than once. A target of 28 days leaves an excess of $10,972,164.25, about ten times the fall in cash even at 90 days; the estimate assumes issues continue and the stock is usable, and leaves out finished goods, 522 unordered requisitions and the open orders.
+**Step 4. Managerial accounting.** On recorded balances, DSO fell from 62.2 to 54.9 days. Without the unsupported opening balances, DSO fell from 57.4 to 50.5 and DPO changed from 66.2 to 65.7, so receivables and payables barely moved. The cycle grew from 173.7 to 425.7 days, mainly through inventory, materials at 422.1 days against the largest materials target of 28. The shortfall channel carried the build ($11,219,993.21 of receipts in 2026 against issues near $10,161,204.64), with 5,702 of 10,365 work order and item pairs requisitioned more than once. A target of 28 days leaves an excess of $10,972,164.25, about ten times the fall in cash even at 90 days; the estimate assumes issues continue and the stock is usable, and leaves out finished goods, 522 unordered requisitions and the open orders.
 
-**Step 5. Auditing.** Receivables reconcile to the open invoices except $380,000.00, and payables except $1,456,371.12. Dispositions: the opening balances and the sales tax, follow up, with the schedules, the returns filed, the tax authority's account and the bank reconciliation as outside evidence; the note invoices, expected; the current portion and the unrecorded payroll accrual ($383,044.82, the Part III case's proposed estimate), misstatements. One manager, the Production Manager, approved every shortfall requisition, and the records do not show whether stock on hand or open orders were checked. The report needs its Tests tab rerun and its Data Through card checked on every refresh.
+**Step 5. Auditing.** Receivables reconcile to the open invoices except $380,000.00, and payables except $1,456,371.12. Dispositions: the opening balances and the sales tax, follow up, with the schedules, the returns filed, the tax authority's account and the bank reconciliation as outside evidence; the note invoices, expected; the current portion, a misstatement, and the payroll accrual the Part III case proposed ($383,044.82, credited to accounts 2030, 2032, 2033), a separate proposal that reconciles neither difference. One manager, the Production Manager, approved every shortfall requisition, and the records do not show whether stock on hand or open orders were checked. For a later quarter, first approve the report date and update the cutoffs, the note identifiers, the debt and policy schedules, the Findings and the written conclusions, because a refresh updates none of them. Then reconcile the refreshed populations, rerun the tests and check the page filters and date labels. A refresh or an observed Data Through date alone does not establish completeness or resolve an earlier finding.
 
 **Step 6. Recommend.** Settle the sales tax position first. Check every shortfall requisition against stock on hand and open orders before conversion, route it through the supply plan with an approver outside production, and review the 522 open requisitions. Approve 2027 inventory targets and a purchase budget that draws the stock toward them. Present the restated cash flow with its disclosure, reclassify the notes' current portion and follow up the opening balances.
 
-**Step 7. Build the appendix.** One page, five numbered exhibits, each cited in the memo: the cash bridge for fiscal 2025 and 2026; the restated cash flow sections; the working-capital measures by quarter; the materials build by channel with the 2027 target; the findings with their dispositions. They come from the visuals titled "The bridge by year (drill through on a step to its postings)", "Cash flows by activity, as recorded and restated by the indirect method", "The measures at each quarter-end (icons: days of supply against the largest item target)", "Materials by year and channel" with "Targets tested at the end of fiscal 2026", and "Findings".
+**Step 7. Build the appendix.** One to three pages, five numbered exhibits, each cited in the memo and each naming the report page with its complete schedule: the cash bridge for fiscal 2025 and 2026; the restated cash flow sections; the working-capital measures by quarter; the materials build by channel with the 2027 target; the findings with their dispositions. They come from the visuals titled "The bridge by year (drill through on a step to its postings)", "Cash flows by activity, as recorded and restated by the indirect method", "The measures at each quarter-end (icons: days of supply against the largest item target)", "Materials by year and channel" with "Targets tested at the end of fiscal 2026", and "Findings".
 
 **Check:** the memo answers the controller's questions in the order asked, every number appears in an exhibit or a page, wording describes the records and not a person, and the length holds.
 
@@ -85,7 +85,7 @@ A strong memo makes choices and says what the data cannot show; a weak one repor
 
 ## Common mistakes and how to respond
 
-- **Too long.** *Symptom:* three pages or a squeezed font. *Response:* ask which finding the controller would miss least.
+- **Too long.** *Symptom:* a memo of three pages or a squeezed font. *Response:* ask which finding the controller would miss least.
 - **Organized by requirement.** *Symptom:* headings that read Requirement 1 to 5. *Response:* ask what the controller's questions were.
 - **Accusing or overstated wording.** *Symptom:* "unpaid" or "withheld" for the sales tax, or "collected" for tax that was billed. *Response:* ask what the ledger shows and what it cannot.
 - **Cash and profit confused.** *Symptom:* "the company lost money". *Response:* ask where the profit went.
@@ -100,7 +100,7 @@ A strong memo makes choices and says what the data cannot show; a weak one repor
 | Managerial accounting | 20 | Turnover, build, target with cash effect and assumptions | Results without assumptions |
 | Auditing | 25 | Reconciliations, dispositions, outside evidence, both sets of controls | Differences without dispositions |
 | Recommendation | 15 | Specific, ordered actions | A decision without actions |
-| Exhibits and traceability | 10 | 5 exhibits, cited, agreeing with the text | Missing or inconsistent |
+| Exhibits and traceability | 10 | 5 exhibits, readable, cited, naming their report pages, agreeing with the text | Missing or inconsistent |
 | Form and audience | 5 | Two pages, three sections, plain for the controller | Over length |
 
 ## Extensions and discussion questions

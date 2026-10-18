@@ -64,7 +64,7 @@ ORDER BY LaborTimeEntryID;
 
 **Check:** {{ g.direct }} rows, one a year. **Watch for:** without the LaborType condition the test returns {{ g.unfiltered|count }} rows, because {{ g.indirect|count }} indirect and {{ g.nonmfg|count }} non-manufacturing entries have no operation by design. `'Direct'` returns no rows, and `= NULL` returns none. The test also misses direct rows whose operation key points at no operation: {{ g.orphans }} exist, and a join finds them in Chapter 10.
 
-**Step 2. Look up the employees.** Steps 2 and 6 are lookups that support the findings.
+**Step 2. Look up the employees.** Steps 2 and 6 are lookups that support the findings. The requirements do not ask for them.
 
 ```sql
 -- Requirement (1): the employees on those rows
@@ -90,7 +90,7 @@ ORDER BY ClockStatus;
 
 **Check:** 2 rows, Approved and Pending.
 
-**Step 4. Count each status.** The message pane gives each count.
+**Step 4. Count each status.** The requirement asks only for the values, so these counts are a control of the model answer and a plus in a student's script. The message pane gives each count.
 
 ```sql
 -- Requirement (2): the time clock entries with ClockStatus Approved (count in the message pane)
@@ -156,7 +156,7 @@ ORDER BY TerminationDate;
 
 **Check:** {{ g.n_term }} rows, every one Terminated and IsActive 0.
 
-**Step 8. Test the other direction.** Is anyone Terminated or inactive without a date?
+**Step 8. Test the other direction.** Is anyone Terminated or inactive without a date? The requirement checks the columns within the employees who have a TerminationDate, so this reverse test is a plus.
 
 ```sql
 -- Requirement (3): employees without a TerminationDate who are Terminated or inactive
@@ -189,7 +189,7 @@ WHERE TerminationDate IS NULL
 
 - **Finding 1.** The direct rows with no operation are charged to their work orders, whose closes count them in actual direct labor, so they reach the variance (a cross-table fact the model answer states, beyond this chapter's queries). They cannot be traced to a routing step, so an operation-level comparison leaves them out, and the missing link does not show that the hours are wrong. Ask production which operation each belongs to, and why the system accepted direct time without one. A strong answer adds that IS NULL finds only blank keys.
 - **Finding 2.** The entries with no clock-out are Pending, yet each records hours, and some fall after the employee's termination. Hours without a complete record cannot be verified. Their linked labor records are non-manufacturing, with no work order, so the tests show a gap in the time and payroll support, not an effect on manufacturing cost, which would first need a trace of any allocation. Ask payroll who entered them, on what support, and whether and to whom they were paid. Chapter 12 tests it.
-- **Finding 3.** The three termination columns agree. A strong answer notes that this is the master table agreeing with itself, and asks payroll to confirm that no time or pay was recorded after each date, as Step 6 shows for one employee.
+- **Finding 3.** The three termination columns agree for every employee with a TerminationDate. The reverse test of Step 8, which finds no employee Terminated or inactive without a date, is a plus. A strong answer notes that this is the master table agreeing with itself, and asks payroll to confirm that no time or pay was recorded after each date, as Step 6 shows for one employee.
 
 A weak answer reports the counts without a consequence or a question, calls Pending a missing value, or says the missing clock-outs raised the manufacturing variance.
 
@@ -206,9 +206,9 @@ A weak answer reports the counts without a consequence or a question, calls Pend
 
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
-| Requirement 1: direct rows with no operation | 25 | Scoped test, the rows and their employees | Unscoped list |
-| Requirement 2: clock status and clock-outs | 25 | DISTINCT, counts, IS NULL with COALESCE, Pending kept apart | Missing clock-outs only |
-| Requirement 3: terminated employees | 20 | Both directions of the consistency test, grouped correctly | One direction |
+| Requirement 1: direct rows with no operation | 25 | Scoped test, and the rows with their employee, work order, date and hours | Unscoped list |
+| Requirement 2: clock status and clock-outs | 25 | DISTINCT on ClockStatus, and the entries with no clock-out found with IS NULL and shown with COALESCE | One of the two queries |
+| Requirement 3: terminated employees | 20 | The employees with a TerminationDate, with EmploymentStatus and IsActive checked within that list | List without checking the status and the flag |
 | Requirement 4: findings and questions | 30 | Each finding with what it shows about the records, whether an effect on manufacturing cost is shown or only possible, and a question for the right team | Findings without questions |
 
 ## Extensions and discussion questions

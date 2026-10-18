@@ -1,6 +1,6 @@
 ---
 note: ch06.ex2
-uses: [ch06.g2, ch06.ex1]
+uses: [ch06.g2, ch06.ex1, ch06.g1]
 title: Disaggregating Revenue by Segment and Product Line
 kind: exercise
 number: '6.2'
@@ -23,7 +23,7 @@ figures:
 
 ## Purpose and learning outcomes
 
-The revenue standard asks a company to break revenue into categories that show how economic factors affect it, and offers product lines and types of customer as examples. This exercise asks students to prepare that first cut from InvoiceLines with PivotTables, to read it against the previous year, and to say what stands between an invoice-based schedule and the number in the financial statements. It practices two-dimensional PivotTables, Show Values As and a disclosure paragraph. The analytics type is descriptive.
+The revenue standard asks a company to break revenue into categories that show how economic factors affect it, and offers product lines and types of customer as examples. This exercise asks students to prepare that first cut from InvoiceLines with PivotTables, to read it against the previous year, and to say what stands between an invoice-based schedule and the number in the financial statements. It practices two-dimensional PivotTables, Show Values As and a disclosure paragraph. The exercise assumes a public business entity applying U.S. GAAP (ASC 606-10-50-5 and 55-91). An entity that is not one may elect not to give the quantitative disaggregation (ASC 606-10-50-7), but it must still disclose revenue by the timing of transfer and qualitative information on how economic factors affect its revenue, so the election does not remove all disaggregation. The analytics type is descriptive.
 
 By the end, students can:
 
@@ -41,7 +41,7 @@ By the end, students can:
 
 ## How to run it
 
-Individual, about 75 minutes: 15 on requirement 1, 25 on requirements 2 and 3, 20 on the paragraph, 15 on the reconciliation. Hold back the Show Values As route for the change column until a student has tried to compute it by hand. Collect the workbook and the paragraph.
+Individual, about 75 minutes: 15 on requirement 1, 25 on requirements 2 and 3, 20 on the paragraph, 15 on the reconciliation. Before students use **% Difference From** for the change column, which requirement (2) names, ask them to predict what it will show under the earlier year and why. Collect the workbook and the paragraph.
 
 ## Step-by-step solution
 
@@ -74,17 +74,17 @@ d. Drag **Σ Values** from **Columns** to **Rows**, below CustomerSegment.
 
 ### Requirement (3): The same comparison by region
 
-**Step 4. Repeat with Region.** Insert a third PivotTable with Region in **Rows** instead of CustomerSegment, and the same year filter and change field.
+**Step 4. Repeat with Region.** Insert a third PivotTable with Region in **Rows** instead of CustomerSegment, and the same year filter and change field, and read each region's change as a whole.
 
 **Check:** the changes are {{ regions[0][0] }} {{ regions[0][1]|spct(1) }}, {{ regions[1][0] }} {{ regions[1][1]|spct(1) }}, {{ regions[2][0] }} {{ regions[2][1]|spct(1) }} and {{ regions[3][0] }} {{ regions[3][1]|spct(1) }}, and the segments {{ segments[0][0] }} {{ segments[0][1]|spct(1) }}, {{ segments[1][0] }} {{ segments[1][1]|spct(1) }}, {{ segments[2][0] }} {{ segments[2][1]|spct(1) }}, {{ segments[3][0] }} {{ segments[3][1]|spct(1) }} and {{ segments[4][0] }} {{ segments[4][1]|spct(1) }}. Total revenue changes {{ total_change|spct(2) }}. **Watch for:** the design services row of the region table. It swings by more than 100 percent in one region ({{ g.svc[0].region }}: {{ g.svc[0].change|spct(0) }}; {{ g.svc[1].region }}: {{ g.svc[1].change|spct(0) }}) on a small base, so a region-by-product reading overstates the news.
 
 ### Requirement (4): The disclosure paragraph
 
-**Step 5. Write four to six sentences.** The model path: state the categories (product line and type of customer) and why; give the year's revenue and the shares (Furniture {{ g.grp_share.Furniture|pct(1) }}, Lighting {{ g.grp_share.Lighting|pct(1) }}, Textiles {{ g.grp_share.Textiles|pct(1) }}, Accessories {{ g.grp_share.Accessories|pct(1) }}, design services {{ g.grp_share.Services|pct(1) }}; {{ g.seg_share[0][0] }} {{ g.seg_share[0][1]|pct(1) }} of revenue by customer type); name the largest combinations; summarize the changes; and present the region as supplementary.
+**Step 5. Write four to six sentences.** The model path: state the categories (product line and type of customer) and why; give the year's revenue and the shares (Furniture {{ g.grp_share.Furniture|pct(1) }}, Lighting {{ g.grp_share.Lighting|pct(1) }}, Textiles {{ g.grp_share.Textiles|pct(1) }}, Accessories {{ g.grp_share.Accessories|pct(1) }}, design services {{ g.grp_share.Services|pct(1) }}; {{ g.seg_share[0][0] }} {{ g.seg_share[0][1]|pct(1) }} of revenue by customer type); name the largest combinations; summarize the changes; and present the region as supplementary, or as a category of its own with a reason.
 
 ### Requirement (5): What must be reconciled
 
-**Step 6. Build the ladder.** Start from the invoice lines (${{ g.grand|money }}), add the cutoff invoices that the ledger records in fiscal {{ g.y }} (${{ g.cutoff|money }}) and freight revenue, which has no invoice line (${{ g.freight|money }}), to reach operating revenue (${{ g.opr|money }}), then deduct sales returns and allowances (${{ (ch06_ex1.contra|abs)|money }}) to reach net revenue (${{ ch06_ex1.net_rev|money }}).
+**Step 6. Build the ladder.** Start from the invoice lines (${{ g.grand|money }}), add the cutoff invoices that the ledger records in fiscal {{ g.y }} (${{ g.cutoff|money }}) and freight revenue, which has no invoice line (${{ g.freight|money }}), to reach operating revenue (${{ g.opr|money }}), then deduct sales returns and allowances (${{ (ch06_ex1.contra|abs)|money }}) to reach net revenue (${{ ch06_ex1.net_rev|money }}). The ladder is as recorded, before correction of the cutoff error, which Exercise 6.1 traces by delivery date, and it does not validate recognition. Freight revenue is the net posted amount, ${{ ch06_g1.freight_billed|money }} billed less ${{ ch06_g1.freight_credits|money }} of freight credits on credit memos. The credit memos' subtotals post to sales returns and allowances, so the freight credits are not deducted again with that account.
 
 ## Expected results
 
@@ -102,8 +102,10 @@ d. Drag **Σ Values** from **Columns** to **Rows**, below CustomerSegment.
 ## What a strong answer says
 
 - **Requirements (1) and (2).** The three largest combinations and the four changes are read from the PivotTables, with the $500,000 floor stated.
-- **Requirement (4).** The categories follow how Charles River prices and manages the business: price lists by segment, promotions by item group and segment, goods recognized on delivery and design services billed by the hour. The region is supplementary because nothing is priced by it. The paragraph says the amounts are invoice-based.
-- **Requirement (5).** Three kinds of item: the cutoff invoices (a period question, settled by delivery), freight revenue (no invoice line) and returns (credit memos).
+- **Requirement (4).** The categories follow how Charles River prices and manages the business: price lists by segment, promotions by item group and segment, goods recognized on delivery and design services billed by the hour (ASC 606-10-55-90 asks an entity to consider how it presents its revenue for other purposes). The region is supplementary here because the price lists and promotions follow segment and item group, but the standard also names geographical region as an example (ASC 606-10-55-91), so a well-supported regional presentation is acceptable.
+- **Requirement (5).** Three kinds of item, listed with their amounts: the cutoff invoices (a period question, settled by delivery), freight revenue, net of freight credits (no invoice line), and returns (credit memos). The ladder is as recorded, before correction of the cutoff error.
+
+**A plus, not required.** The shares of revenue and the invoice basis stated in the paragraph, and a ranking of the regional changes with the same floor.
 
 A weak paragraph lists numbers without a reason for the categories, or presents the PivotTable total as the company's revenue.
 
@@ -121,9 +123,9 @@ A weak paragraph lists numbers without a reason for the categories, or presents 
 |---|---:|---|---|
 | Requirement 1: shares | 20 | Filtered to the year, shares of the grand total, three largest named | Wrong year or no ranking |
 | Requirement 2: changes | 25 | Year above group, **% Difference From**, floor applied, four combinations | Changes by hand, or no floor |
-| Requirement 3: region | 10 | Same method by region | Dollars instead of percent |
-| Requirement 4: paragraph | 25 | Categories with reasons, shares, changes, invoice basis | Numbers without reasons |
-| Requirement 5: reconciliation | 20 | Cutoff, freight and returns named with amounts | Items without amounts |
+| Requirement 3: region | 10 | Same method by region, each region's total change reported | Dollars instead of percent |
+| Requirement 4: paragraph | 25 | Categories with reasons, and the changes from the previous year | Numbers without reasons |
+| Requirement 5: reconciliation | 20 | Cutoff, freight and returns listed and quantified | Items without amounts |
 
 ## Extensions and discussion questions
 

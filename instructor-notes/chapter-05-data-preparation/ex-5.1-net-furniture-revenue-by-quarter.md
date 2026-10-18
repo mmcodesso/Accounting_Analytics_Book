@@ -26,7 +26,7 @@ By the end, students can:
 
 - **Files and software.** The copy of Charles River Furniture Analysis.xlsx made after Tutorial 5.3, so that InvoiceLines, the Item Table and SalesInvoice exist. XLOOKUP is in every desktop Excel that Microsoft still supports.
 - **Data conditions.** The CreditMemo and CreditMemoLine Tables hold 612 memos and 637 lines, all years. Every credit memo line is for an item the workbook's Item Table keeps, so no lookup fails. Some memos hold lines of Furniture and of another item group, which matters for the header-total shortcut below.
-- **Check the Tutorial 5.3 workbook first.** The grid reads the Period and ItemGroup columns of InvoiceLines. A student who skipped Tutorial 5.3 needs the start or end file in Chapter05-companion.zip.
+- **Check the Tutorial 5.3 workbook first.** The grid reads the Period and ItemGroup columns of InvoiceLines. A student who skipped Tutorial 5.3 takes the workbook in the End of Chapter 5 folder of Chapter05-companion.zip, or takes the start file of Tutorial 5.3 and completes the tutorial first, because that start file has no InvoiceLines yet.
 - **Where the new columns go.** CreditMemoLine has its database columns first. The three new columns are CreditMemoDate in column O, Period in P and ItemGroup in Q.
 
 ## How to run it
@@ -44,7 +44,7 @@ b. In the **Navigator**, select the **Select multiple items** check box, select 
 c. Rename the queries `CreditMemo` and `CreditMemoLine`. In CreditMemo, check the icon of CreditMemoDate; if it shows a time, set the type to **Date** and choose **Replace current**.
 d. Choose **Home > Close & Load > Close & Load To**, select **Table** and **New worksheet**, and rename the worksheets `Ex 5.1 CreditMemo` and `Ex 5.1 CreditMemoLine`.
 
-**Check:** the Table Name box shows CreditMemo with 612 rows and CreditMemoLine with 637. **Watch for:** a plain **Close & Load**. No worksheets appear, because Excel loads several queries to the Data Model. Use **Data > Queries & Connections**, right-click each query and choose **Load To**.
+**Check:** the Table Name box shows CreditMemo with 612 rows and CreditMemoLine with 637. **Watch for:** a plain **Close & Load**. With Excel's default load settings no worksheets appear, because several queries loaded at once go to the Data Model. Use **Data > Queries & Connections**, right-click each query and choose **Load To**, then check the Table names and row counts.
 
 ### Requirement (2): Date, period and group on each credit line
 
@@ -54,13 +54,18 @@ d. Choose **Home > Close & Load > Close & Load To**, select **Table** and **New 
 =XLOOKUP([@CreditMemoID],CreditMemo[CreditMemoID],CreditMemo[CreditMemoDate],"No match")
 ```
 
-**Step 3. Add the period and the item group.** Add `Period` with `=YEAR([@CreditMemoDate])&"-Q"&ROUNDUP(MONTH([@CreditMemoDate])/3,0)`, and `ItemGroup` with:
+**Step 3. Add the period and the item group.** Add `Period` with the first formula below, and `ItemGroup` with the second:
 
 ```
+=YEAR([@CreditMemoDate])&"-Q"&ROUNDUP(MONTH([@CreditMemoDate])/3,0)
 =XLOOKUP([@ItemID],Item[ItemID],Item[ItemGroup],"No match")
 ```
 
-**Step 4. Count the failures.** On `Ex 5.1` enter `=COUNTIF(CreditMemoLine[[CreditMemoDate]:[ItemGroup]],"No match")`.
+**Step 4. Count the failures.** On `Ex 5.1` enter:
+
+```
+=COUNTIF(CreditMemoLine[[CreditMemoDate]:[ItemGroup]],"No match")
+```
 
 **Check:** zero, and the first period labels read like `2026-Q1`. **Watch for:** a lookup on CreditMemoLineID instead of CreditMemoID. The two ID ranges overlap, so most lines get a plausible date from the wrong memo and 25 lines read "No match". A small nonzero count is a symptom, not noise.
 
@@ -68,8 +73,8 @@ d. Choose **Home > Close & Load > Close & Load To**, select **Table** and **New 
 
 **Step 5. Build the grid.**
 
-a. On `Ex 5.1` put the fiscal year (2026) in B2, in blue as an input, and type the four period labels in B4 to E4 as text.
-b. Enter the first formula below in B5 and the second in B6, fill both across by copy and paste, and enter `=B5-B6` in B7. Add a Total column with SUM.
+a. On `Ex 5.1` put the fiscal year (2026) in B2 and label it as fixed. The flag of Step 6 reads it, but the four period labels, typed as text in B4 to E4, do not, so changing B2 alone would not update the grid.
+b. Enter the first formula below in B5 and the second in B6, then copy B5:B6 and paste it into C5:E6. Enter `=B5-B6` in B7, then copy B7 and paste it into C7:E7. In F5 to F7 sum columns B to E of the same row, and check all four quarters and the total.
 
 ```
 =SUMIFS(InvoiceLines[LineTotal],InvoiceLines[ItemGroup],"Furniture",InvoiceLines[Period],B$4)
@@ -93,9 +98,11 @@ Bring the flag to CreditMemoLine with an XLOOKUP on CreditMemoID, then count the
 
 **Check:** 14 memos dated 2026-01-03 to 2026-01-31, for invoices dated 2025-11-27 to 2025-12-31; 10 of their lines are Furniture, $13,289.90, all in 2026-Q1.
 
-**Step 7. Write the note.** Two or three sentences. The model answer assigns each credit to the quarter of its credit memo, because the ledger records it on that date and the schedule is one of recorded activity. It names the alternative, the quarter of the original invoice, which answers a different question, the net result of each quarter's sales, and belongs in a separate schedule, labeled and reconciled to this one. It says that neither choice changes the ledger and that the choice moves only $13,289.90 out of 2026-Q1. It adds that the credits are small and do not explain the change between the third and fourth quarters.
+**Step 7. Write the note.** Two or three sentences. The model answer assigns each credit to the quarter of its credit memo, because the ledger records it on that date and the schedule is one of recorded activity. It names the alternative, the quarter of the original invoice, which answers a different question, the net result of each quarter's sales, and belongs in a separate schedule, labeled and reconciled to this one. It says that neither choice changes the ledger, and that the credits are small and do not explain the change between the third and fourth quarters.
 
-**Check:** the note states which assignment the schedule uses.
+Two comparisons can follow from requirement (4), and the label must say which one is shown. The model answer's rows 17 and 18 move only the credits for invoices of earlier years out of the year: 2026-Q1 net revenue rises by $13,289.90 to $4,325,273.04, and the other quarters do not change. A full original-quarter view, which takes all 98 Furniture credit lines of the year to their invoices' quarters, also moves credits within 2026: $4,854.34 from 2026-Q2 to 2026-Q1, $16,436.39 from 2026-Q3 to 2026-Q2, and $13,487.91 from 2026-Q4 to 2026-Q3. Its net revenue reads $4,320,418.70, $4,565,449.72, $4,230,833.40 and $4,130,556.31 for the four quarters. Neither schedule changes a ledger posting or settles the accounting, which would need the credit date, the original invoice date and the transaction evidence kept apart.
+
+**Check:** the note states which assignment the schedule uses, and any comparison shown is labeled as the earlier-year credits only or as the full original-quarter view.
 
 ## Expected results
 
@@ -108,7 +115,8 @@ Bring the flag to CreditMemoLine with an XLOOKUP on CreditMemoID, then count the
 | Credit lines in the year; credits | | 98 | $161,086.15 | |
 | Lookups not matched | | | | 0 |
 | Credit memos of the year for invoices of earlier years; Furniture credits | | 14 | $13,289.90 | |
-| Net revenue of the third and fourth quarters with each credit assigned to its invoice's quarter | | | $4,230,833.40; $4,130,556.31 | |
+| Net revenue with only the earlier-year credits moved out of the year (rows 17 and 18), by quarter | | | | $4,325,273.04; $4,577,031.77; $4,227,884.92; $4,117,068.40 |
+| Net revenue with each credit assigned to its invoice's quarter (a separate view), by quarter | | | | $4,320,418.70; $4,565,449.72; $4,230,833.40; $4,130,556.31 |
 
 ![A mock of the quarterly grid of Exercise 5.1 with its check row and the earlier-year credits beneath it.](../figures/chapter-05-data-preparation/IF-05-1-A.pdf)
 
@@ -117,7 +125,7 @@ Bring the flag to CreditMemoLine with an XLOOKUP on CreditMemoID, then count the
 ## What a strong answer says
 
 - **Requirement (3).** The grid ties: billed revenue agrees with the earlier tutorial, credits are summed by credit memo date, and net is billed less credits.
-- **Requirement (4).** A stated choice with its reason. The ledger records a credit on the credit memo's date, so the credit memo's quarter suits a schedule of recorded activity. The invoice's quarter answers a different question, the net result of each quarter's sales, and goes in a separate schedule, labeled and reconciled to this one. Neither changes the ledger, and an adjustment to an earlier period would need accounting and transaction evidence, not a choice of schedule.
+- **Requirement (4).** A stated choice with its reason. The ledger records a credit on the credit memo's date, so the credit memo's quarter suits a schedule of recorded activity. The invoice's quarter answers a different question, the net result of each quarter's sales, and goes in a separate schedule, labeled and reconciled to this one. A plus: the comparison is labeled for what it moves, the earlier-year credits only or every credit of the year. Neither changes the ledger, and an adjustment to an earlier period would need accounting and transaction evidence, not a choice of schedule.
 - **The comparison.** Credits are at most 1.3% of billed revenue in any quarter, and net revenue still falls from the third to the fourth quarter under either assignment. The credits are not the story of the quarter, and the note should say so.
 
 A weak answer chooses an assignment without a reason, or concludes that the credits explain the fall.
@@ -136,13 +144,13 @@ A weak answer chooses an assignment without a reason, or concludes that the cred
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
 | Requirement 1: loading | 15 | Both Tables loaded as worksheets, date typed | Loaded to the Data Model |
-| Requirement 2: columns | 25 | Three lookups on the right keys and a count of "No match" | Values pasted, or no count |
+| Requirement 2: columns | 25 | CreditMemoDate and ItemGroup on each line on the right keys, by lookups or by left outer merges; a period label; a count of the rows that failed to match | Values pasted, or no count |
 | Requirement 3: the grid | 30 | SUMIFS with the period label, net by subtraction, ties to the earlier tutorial | Typed labels that miss, or credits added |
 | Requirement 4: earlier years | 30 | Flag by lookup, the memos counted, a stated assignment with a reason | Count without the reason |
 
 ## Extensions and discussion questions
 
-- Assign each credit to the quarter of its original invoice and compare: the net revenue of the third and fourth quarters becomes $4,230,833.40 and $4,130,556.31.
+- Assign each credit to the quarter of its original invoice and compare: the net revenue of the third and fourth quarters becomes $4,230,833.40 and $4,130,556.31. Reconcile the view to the main schedule through the credits that move between quarters.
 - Redo requirement (2) with Power Query merges instead of lookups, and compare the row counts before and after.
 - Discuss: Chapter 6 bridges the Furniture margin from billed revenue. Would net revenue change the bridge, and which credits would belong in it?
 - Discuss: every credit for an earlier year's invoice is dated in January. What would you ask the people who process returns?

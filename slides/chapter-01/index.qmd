@@ -90,7 +90,7 @@ Give students a minute to classify each question, alone or in pairs, before movi
 3. Predictive: a forecast built from historical trends
 4. Prescriptive: an optimization subject to constraints, as with Excel's Solver
 
-Descriptive is not "basic": most accounting analytics is descriptive, and a poorly built summary misleads as easily as a sophisticated model.
+Descriptive is not "basic": much accounting analytics is descriptive, and a poorly built summary misleads as easily as a sophisticated model.
 
 ::: {.notes}
 The value of analytics lies in the quality of the question and the rigor of the process, not in complexity. The book emphasizes descriptive, diagnostic and predictive work because accountants do it most often.

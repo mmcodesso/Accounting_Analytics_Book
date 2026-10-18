@@ -19,9 +19,13 @@ f. In C2, enter this formula, and fill it down to C37:
    =SUMIFS(InvoiceLines[LineTotal],InvoiceLines[InvoiceDate],">="&A2,InvoiceLines[InvoiceDate],"<"&EDATE(A2,1))
    ```
 
-g. Type `Control total` in A38, and enter `=SUM(C2:C37)-SUM(InvoiceLines[LineTotal])` in C38.
+g. Type `Control total` in A38, and enter this formula in C38:
 
-C38 is zero: every invoice line falls in one of the thirty-six months, so the series accounts for all of the revenue in InvoiceLines.
+   ```
+   =ROUND(SUM(C2:C37)-SUM(InvoiceLines[LineTotal]),2)
+   ```
+
+C38 is zero: every invoice line falls in one of the thirty-six months, so the series accounts for all of the revenue in InvoiceLines. The ROUND matters because Excel stores decimals in binary and a difference of zero can otherwise show as a residue far smaller than a cent.
 
 **Step 2. Chart the series.** A line chart suits a measure over time, as the section on charting in Chapter 6 explained.
 
@@ -85,8 +89,13 @@ d. In B42, enter the trend forecast for October, which is MonthIndex 34:
    In C42 and D42, enter the same formula with `$B36` and `$B37`.
 e. In B43:D43, enter `=AVERAGE($C$3:$C$34)`, the mean of the fitted months.
 f. In B44:D44, enter `=C23`, `=C24`, and `=C25`, the same months of 2025.
+g. Type `TREND check` in I40, and enter this formula in I41, keeping I41:I43 clear so that its three values can spill:
 
-Rows 42 to 44 now hold each method's forecast of the three months, made only from the months before October 2026, next to the actual revenue in row 41.
+   ```
+   =TREND($C$3:$C$34,$B$3:$B$34,$B$35:$B$37)
+   ```
+
+Rows 42 to 44 now hold each method's forecast of the three months, made only from the months before October 2026, next to the actual revenue in row 41. The three values that TREND spills into I41:I43 equal the trend forecasts in B42:D42, because the two functions fit the same line, and TREND returns all three months from one formula.
 
 **Step 7. Measure the forecast errors.**
 
@@ -105,7 +114,7 @@ a. Type `Forecast, 2027 Q1` in A47, and enter `=3*AVERAGE(C3:C37)` in B47, which
 b. Type `Low` in A48 and `High` in A49.
 c. Enter `=B47*(1-G43)` in B48 and `=B47*(1+G43)` in B49, a range based on the mean method's monthly error in the backtest.
 
-The forecast is close to the revenue of the last few quarters, and the range extends a few percent on either side of it. The range shows what a miss as large as the backtest's would mean for the quarter. It is not a confidence interval: three months of errors cannot say how likely a larger miss is.
+The forecast is close to the revenue of the last few quarters, and the range extends a few percent on either side of it. The range shows what a miss as large as the backtest's would mean for the quarter. It is not a confidence interval: three months of errors cannot say how likely a larger miss is. Three months are also a thin basis for choosing a method, so a forecast that will be relied on outside the company should be tested again from another forecast origin first.
 
 **Step 9. Document the forecast.**
 

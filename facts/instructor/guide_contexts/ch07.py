@@ -438,7 +438,23 @@ def g3(d, claim):
     claim(0.4 < ratio < 0.5, "the contribution margin ratio is between 40 and 50 percent, inside the data table's grid")
     claim(6_000_000 <= fixed <= 10_000_000 and 6_000_000 <= fixed2 <= 10_000_000, "both sets of fixed costs lie inside the data table's range of 6 to 10 million")
     grid_lo, grid_hi = 6_000_000 / 0.50, 10_000_000 / 0.40
-    return dict(ids=ids, variance=[(y, variance[y]) for y in d.years], reduction=round((variance[d.C] - variance[d.F]) / ratio, -3),
+    # the extension that treats half of the manufacturing variance as variable: the half leaves the fixed costs and enters the ratio,
+    # so the total modeled cost at the base-year revenue is unchanged (removing it from the fixed costs alone changes the baseline too)
+    v5080 = d.one("SELECT SUM(Debit - Credit) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? AND SourceDocumentType <> 'JournalEntry'", ids["5080"], d.C)
+    half = v5080 / 2
+    half_ratio, half_fixed = ratio - half / revenue, fixed2 - half
+    half_be, half_naive = half_fixed / half_ratio, half_fixed / ratio
+    claim(abs((half_fixed + (1 - half_ratio) * revenue) - (fixed2 + (1 - ratio) * revenue)) < 1e-6,
+          "with half of the manufacturing variance moved from the fixed costs to the ratio, the total modeled cost at the base-year revenue is unchanged")
+    claim(half_be < fixed2 / ratio and half_naive < half_be,
+          "break-even falls when half of the variance is treated as variable, and falls further if the half is removed from the fixed costs without changing the ratio")
+    # the JournalEntry exclusion is exact for the report year; an earlier year has another entry on the manufacturing variance account
+    other = lambda y: d.q(f"SELECT VoucherNumber, SUM(Debit - Credit) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? AND SourceDocumentType = 'JournalEntry' "
+                          f"AND {d.no_closes()} GROUP BY 1", ids["5080"], y)
+    claim(other(d.C) == [] and other(d.P) == [], "in the report year and the year before, the only journal entries on the manufacturing variance account are the year-end closes")
+    first = other(d.F)
+    claim(len(first) == 1 and first[0][1] > 0, "in the first year of the window one other journal entry, a debit, posts to the manufacturing variance account")
+    return dict(ids=ids, half_be=half_be, half_naive=half_naive, half_move=fixed2 / ratio - half_be, je_first=first[0][1], half=half, variance=[(y, variance[y]) for y in d.years], reduction=round((variance[d.C] - variance[d.F]) / ratio, -3),
                 per_point=round(fixed2 / ratio ** 2 / 100, -3), commission_effect=round(d.one("SELECT SUM(BudgetAmount) FROM BudgetLine WHERE FiscalYear = ? AND AccountID = ?", d.C, d.account("6290")) / ratio, -3), n_rows=n_rows, corner_low=6_000_000 / 0.40, corner_high=10_000_000 / 0.50,
                 grid_lo=grid_lo, grid_hi=grid_hi, cell=9_000_000 / 0.45, interest_subtype=interest, ratio=ratio, fixed2=fixed2,
                 lowest_ratio_row=6_000_000 / 0.50, highest_ratio_row=10_000_000 / 0.40)
@@ -524,9 +540,26 @@ def g4(d, claim):
     swap = [items[i][1] for i in lowest if i not in reduced]
     claim(len(swap) > 0 and all(A[k][i] < max(A[k][j] for j in reduced) for i in lowest if i not in reduced),
           "some items with the lowest unit contribution are made in full, because they use less Assembly time than the items Solver cuts")
+    # the two alternative unit costs of Step 3's Watch for: they change the objective and the shadow price, not the plan
+    from scipy.optimize import linprog
+    fixed_oh = dict(d.q("SELECT ItemID, StandardFixedOverheadCost FROM Item"))
+    variants = {"fixed": np.array([price[i] - (items[i][3] + fixed_oh[items[i][0]]) - rate * price[i] for i in range(n)]),
+                "commission": np.array([price[i] - items[i][3] for i in range(n)])}
+    alt = {}
+    for name, u in variants.items():
+        r = linprog(-u, A_ub=A, b_ub=cap, bounds=[(0, q) for q in demand], method="highs")
+        claim(r.status == 0 and float(np.max(np.abs(r.x - x))) < 1e-6,
+              f"with the {'fixed overhead kept in the unit cost' if name == 'fixed' else 'commission left out'}, Solver makes the same quantities of every item")
+        alt[name] = dict(objective=float(-r.fun), shadow=float(-r.ineqlin.marginals[k]))
+    claim(alt["fixed"]["objective"] < -res.fun < alt["commission"]["objective"]
+          and alt["fixed"]["shadow"] < shadow < alt["commission"]["shadow"],
+          "keeping the fixed overhead lowers the objective and the shadow price, and leaving the commission out raises both")
+    # the ends of the shadow price's range: the item made in part reaches its demand (above) or zero (below)
+    claim(abs(up - (demand[p] - x[p]) * A[k][p]) < 0.01 and abs(down - x[p] * A[k][p]) < 0.01,
+          "the shadow price's range ends where the item made in part reaches its demand (at the top) or zero (at the bottom)")
     first = 21
     last = first + n - 1
-    return dict(swap=swap, rate=rate, centers=centers_out, n_centers=len(centers), over=over, binding=short[k], allowed_up=float(up), allowed_down=float(down),
+    return dict(alt_fixed=alt["fixed"], alt_commission=alt["commission"], swap=swap, rate=rate, centers=centers_out, n_centers=len(centers), over=over, binding=short[k], allowed_up=float(up), allowed_down=float(down),
                 range_low=float(cap[k] - down), range_high=float(cap[k] + up), n_items=n, first_row=first, last_row=last, n_constraints=len(centers) + n,
                 part_code=items[p][1], part_qty=float(x[p]), part_demand=float(demand[p]), per_hour_part=float(unit[p] / A[k][p]),
                 n_reduced=len(reduced), n_whole=n - len(reduced), next_center=short[nxt], routing_ops=d.one("SELECT COUNT(*) FROM RoutingOperation"),
@@ -566,7 +599,38 @@ def g5(d, claim):
     claim(0.05 * avg_month < se_all and 0.05 * avg_month < fit([inv_month[m] for m in months[1:]], rev[1:])["se"],
           "five percent of an average month is below the standard error of either regression")
     rate_rows = [dict(segment=s, rate=lo) for s, lo, _ in rates]
-    return dict(account_id=acc, n_months=len(months), gl_rows=gl_rows, closes=closes, invoices_all=inv_all, se_all=se_all, five=0.05 * avg_month,
+    # The flagged months of the report year and the follow-up evidence for each: the lowest-rate segment's share of the commission
+    # base, the accrual rate, and the signed credit-memo adjustments posted in the month (the pair of offsetting months and any other)
+    com = dict(d.q("SELECT substr(PostingDate, 1, 7), SUM(Debit - Credit) FROM GLEntry WHERE AccountID = ? AND SourceDocumentType <> 'JournalEntry' "
+                   "GROUP BY 1", acc))
+    cm = fit(rev[:24], [com.get(m, 0.0) for m in months[:24]])
+    cur = []
+    for i in range(24, 36):
+        exp = cm["a"] + cm["b"] * rev[i]
+        cur.append(dict(month=months[i], name=MONTHS[int(months[i][5:]) - 1], diff=com.get(months[i], 0.0) - exp, pct=(com.get(months[i], 0.0) - exp) / exp))
+    flagged = [c for c in cur if abs(c["pct"]) > 0.03]
+    paired = set()
+    for a, b in zip(cur, cur[1:]):
+        if a in flagged and b in flagged and a["diff"] * b["diff"] < 0:
+            paired |= {a["month"], b["month"]}
+    low = rates[0][0]
+    year_low = d.one("SELECT SUM(CASE WHEN CustomerSegment = ? THEN CommissionBaseAmount ELSE 0 END) / SUM(CommissionBaseAmount) FROM SalesCommissionAccrual "
+                     "WHERE substr(AccrualDate, 1, 4) = ?", low, str(d.C))
+    for c in flagged:
+        amount, base, lowbase = d.q("SELECT SUM(CommissionAmount), SUM(CommissionBaseAmount), SUM(CASE WHEN CustomerSegment = ? THEN CommissionBaseAmount ELSE 0 END) "
+                                    "FROM SalesCommissionAccrual WHERE substr(AccrualDate, 1, 7) = ?", low, c["month"])[0]
+        rows_adj, adj_amount = d.q("SELECT COUNT(*), SUM(Debit - Credit) FROM GLEntry WHERE AccountID = ? AND SourceDocumentType = 'SalesCommissionAdjustment' "
+                                   "AND substr(PostingDate, 1, 7) = ?", acc, c["month"])[0]
+        c.update(share=lowbase / base, rate=amount / base, adj_rows=rows_adj, adj_amount=adj_amount, paired=c["month"] in paired)
+    singles = [c for c in flagged if not c["paired"]]
+    claim(len(flagged) == 3 and len(paired) == 2 and len(singles) == 1,
+          "three months of the report year are flagged, two of them consecutive with opposite signs and one with no offsetting partner")
+    claim(all((c["diff"] < 0) == (c["share"] > year_low) for c in flagged),
+          "in every flagged month the lowest-rate segment's share of the base lies on the side that predicts the sign of the difference "
+          "(a larger share, a lower accrual rate, less expense than the revenue predicts)")
+    claim(all(abs(c["adj_amount"]) < 0.25 * abs(c["diff"]) for c in flagged),
+          "the signed credit-memo adjustments posted in each flagged month are well under a quarter of its difference")
+    return dict(flags=flagged, singles=singles, year_low=year_low, low_name=low, account_id=acc, n_months=len(months), gl_rows=gl_rows, closes=closes, invoices_all=inv_all, se_all=se_all, five=0.05 * avg_month,
                 observations=24, rates=rate_rows, n_segments=len(rates), accrual_rows_all=d.one("SELECT COUNT(*) FROM SalesCommissionAccrual"),
                 low_segment=rates[0][0], high_segment=rates[-1][0], revenue_rows=sum(inv_month.values()))
 
@@ -606,5 +670,11 @@ def g6(d, claim):
     n_big = d.one("SELECT COUNT(*) FROM DemandForecast WHERE ABS(ForecastQuantity / BaselineForecastQuantity - 1) > 0.5")
     claim(n_big == 3 and n_off > 1000, "only three forecasts differ from their baseline by more than half, though many others are adjusted by a few percent")
     approvers = d.one("SELECT COUNT(DISTINCT ApprovedByEmployeeID) FROM DemandForecast")
+    # the size filter of Step 7 and the independent count of blank approvals find the same forecasts, and every ratio exists
+    blank_ids = {r[0] for r in d.q("SELECT DemandForecastID FROM DemandForecast WHERE IsCurrent = 1 AND ApprovedByEmployeeID IS NULL")}
+    big_ids = {r[0] for r in d.q("SELECT DemandForecastID FROM DemandForecast WHERE IsCurrent = 1 AND ABS(ForecastQuantity / BaselineForecastQuantity - 1) > 0.5")}
+    claim(blank_ids == big_ids and len(blank_ids) == 3, "the forecasts with no approver are exactly the three forecasts adjusted by more than half of their baseline")
+    claim(d.one("SELECT COUNT(*) FROM DemandForecast WHERE BaselineForecastQuantity IS NULL OR BaselineForecastQuantity = 0") == 0,
+          "no forecast has a zero or blank baseline quantity, so every ratio to the baseline exists")
     return dict(table=table, c26=c26, planner_adjusted=adjusted[1], unapproved=adjusted[2], n_off=n_off, n_big=n_big, approvers=approvers,
                 n_forecast_weeks=after_2026, methods=[dict(method=m[0], rows=m[1], low=m[3], high=m[4]) for m in methods])

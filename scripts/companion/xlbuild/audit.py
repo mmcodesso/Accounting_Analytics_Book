@@ -525,6 +525,14 @@ def t8_1(b: Build) -> None:
             s.ChartType = xl.XL_LINE_MARKERS
     assert sorted((s.Name, s.ChartType) for s in chart.SeriesCollection()) == \
         [("Actual", xl.XL_COLUMN_CLUSTERED), ("Expected", xl.XL_LINE_MARKERS)]
+    # The description says which digits fall below and above the expected share, so it is asserted from the data.
+    counts, n_all = fx.benford["all"]["counts"], fx.benford["all"]["n"]
+    assert all(counts[d] / n_all < math.log10(1 + 1 / d) for d in (1, 2)) and \
+        all(counts[d] / n_all > math.log10(1 + 1 / d) for d in range(5, 10)), "digits 1 and 2 below, 5 to 9 above"
+    shape.Title = "First-digit shares of the supplier payments"
+    shape.AlternativeText = ("First-digit shares for supplier payments. Actual shares are columns and the shares Benford's Law "
+                             "expects are a line. Digits 1 and 2 occur less often than expected, and digits 5 to 9 more often. "
+                             "The table above the chart gives the exact values and the MAD.")
 
     # Steps 7 and 8: full and partial payments, and the conformity of each.
     xl.add_column(pay, "Partial", "=[@Amount]<[@GrandTotal]")
@@ -972,9 +980,10 @@ def t8_3(b: Build) -> None:
         ("Reordered Columns", 'Table.ReorderColumns({prev},{"VoucherNumber", "AccountNumber", "AccountName", '
                               '"Debit", "Credit"})')]))
     xl.load_query(wb, "JournalLines", "JournalLines")
-    values(sm, {"A15": "Entry totals", "A16": "Ledger debits"})
-    formulas(sm, {"B15": "=SUM(JournalEntries[TotalAmount])", "B16": "=SUM(JournalLines[Debit])"})
-    sm.Range("B15:B16").NumberFormat = MONEY
+    values(sm, {"A15": "Entry totals", "A16": "Ledger debits", "A17": "Ledger credits"})
+    formulas(sm, {"B15": "=SUM(JournalEntries[TotalAmount])", "B16": "=SUM(JournalLines[Debit])",
+                  "B17": "=SUM(JournalLines[Credit])"})
+    sm.Range("B15:B17").NumberFormat = MONEY
     sm.Columns("A").ColumnWidth = 16
     sm.Columns("B").ColumnWidth = 18
     dd = xl.sheet(wb, "Drilldown")
@@ -1012,7 +1021,7 @@ def t8_3(b: Build) -> None:
                   f"Employees, and Accounts) and T3_GLEntry (query JournalLines); all {j['count']:,} entries posted "
                   f"in fiscal {b.year - 2} through {b.year}.",
         "Population check": f"{j['count']:,} entries; their TotalAmount, {money(j['total'])}, agrees with the debits "
-                            f"of the ledger's {j['lines']:,} JournalEntry lines (JE Summary, B15 and B16).",
+                            f"of the ledger's {j['lines']:,} JournalEntry lines, whose credits equal their debits (JE Summary, B15 to B17).",
         "Procedure": "Entries by creator and type, and by type and risk score (two PivotTables); five flags on each "
                      "entry (weekend creation, created after the posting date, same creator and approver, above the "
                      "approver's limit, round thousands); RiskScore is their sum. A disposition for every entry with "
@@ -1073,6 +1082,9 @@ def t8_3(b: Build) -> None:
     b.check(t, "entry totals (JE Summary!B15)", round(j["total"], 2), "='JE Summary'!B15")
     b.check(t, "ledger debits (JE Summary!B16)", round(j["debits"], 2), "='JE Summary'!B16")
     b.check(t, "entry totals less ledger debits", 0, "='JE Summary'!B15-'JE Summary'!B16")
+    assert abs(j["credits"] - j["debits"]) < 0.005, "the ledger's journal entry lines debit and credit the same total"
+    b.check(t, "ledger credits (JE Summary!B17)", round(j["credits"], 2), "='JE Summary'!B17")
+    b.check(t, "ledger debits less credits", 0, "='JE Summary'!B16-'JE Summary'!B17")
     b.check(t, "journal entry lines (rows of JournalLines)", j["lines"], "=ROWS(JournalLines[VoucherNumber])", 0, COUNT)
     b.check(t, f"lines of {opening} (spilled from Drilldown!A4)", j["drill"]["lines"], "=ROWS(Drilldown!A4#)", 0, COUNT)
     b.check(t, "its accounts receivable line (account 1020)", round(j["drill"]["ar"], 2),

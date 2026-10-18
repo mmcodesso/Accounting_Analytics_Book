@@ -21,7 +21,7 @@ Students can test authority, employment and separation of duties over a populati
 ## Before you assign
 
 - **Files.** CharlesRiver_Capstone.sqlite and Credits.sql, with the results of Requirements 1 and 2 behind it.
-- **Data conditions.** MaxApprovalAmount is a general limit, not a delegation of authority. An invoice can have several receipts and applications on different dates. Neither the credit memo nor the refund records a preparer. A credit on a paid invoice posts to `2060`, which is how a refund can precede the customer's payment.
+- **Data conditions.** MaxApprovalAmount is a general limit, not a delegation of authority. An invoice can have several receipts and applications on different dates. Neither the credit memo nor the refund records a preparer. The dataset splits each credit between `1020` and `2060` using the invoice's final payment information, so a `2060` credit does not show that the customer had funded it on the credit or refund date; that is how a refund can precede the payment.
 - **Verify first.** Run T1 to T12: each returns in a fraction of a second, T2 returns no rows and T4 three zeros.
 
 ## How to run it

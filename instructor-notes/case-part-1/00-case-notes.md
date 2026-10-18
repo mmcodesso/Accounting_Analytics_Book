@@ -17,7 +17,7 @@
 | Components | The case has 6 requirements, no tutorials, no milestones and no multiple-choice questions, and its deck has 31 slides |
 | Files students need | CharlesRiver_Work.xlsx, the working copy that Tutorial 2.1 makes from CharlesRiver.xlsx. The Downloads page lists no start file and no solution for this case; the model answers are in the files of this folder |
 | Deliverable | A memorandum of one to two pages to the controller, and a one-page appendix with the data map (Requirement 2) and the reconciliation table (Requirement 4) |
-| Time | Class: about 120 minutes in Plan A. Students: about four and a half hours, from 20 minutes for Requirement 1 to 60 minutes for each of Requirements 4 and 6 |
+| Time | The six requirements add up to about four and a half hours of student work, from 20 minutes for Requirement 1 to 60 minutes for each of Requirements 4 and 6. Plan A's 120 minutes and Plan B's 150 are class time that covers part of it; the rest is done outside class |
 
 The case depends on these conditions of the data, all visible in the workbook:
 
@@ -72,7 +72,7 @@ The case depends on these conditions of the data, all visible in the workbook:
 | 3. Debrief | 10 | Looking ahead to Part II | 30 |
 | | 120 | Total | |
 
-**Plan B: lab sessions (two sessions of 75 minutes, 150 minutes in all).** Students work in class and you circulate. It fits a computer lab or a course that does not want to depend on outside work. Requirement 4 is tight, so hand out the helper-column formulas of that guide at the start of session 2, and let the memo be written outside class.
+**Plan B: lab sessions (two sessions of 75 minutes, 150 minutes in all).** Students work in class and you circulate. It fits a computer lab. Requirement 4 is tight, so hand out the helper-column formulas of that guide at the start of session 2. Students still finish outside class any calculation they did not complete, and write the memo there.
 
 | Session | Minutes | Activity | Slides |
 |---|---:|---|---|
@@ -142,7 +142,7 @@ Three bundles:
 - **A shorter version for a course with little time.** Requirements 2 to 5 as a worksheet, graded on the numbers, and a memo of one page. It skips Requirement 1 and shortens Requirement 6 to the Auditing section and the recommendation.
 - **Teams of two or three.** One memo and one appendix for the team, plus an individual one-page reflection on Requirement 5.
 
-The deck's check slides on question types, cardinality and data quality dimensions suit class discussion. Requirements 4 and 5 suit grading from the tables and Requirement 6 from the memo. Collect, besides the book's deliverable, one page of working notes with Requirements 1, 3 and 5: the book's deliverable carries only Requirements 2, 4 and 6, and those three would otherwise go ungraded. This is a suggestion, not a rule of the case.
+The deck's check slides on question types, cardinality and data quality dimensions suit class discussion. Requirements 4 and 5 suit grading from the tables and Requirement 6 from the memo. The book's deliverable carries only Requirements 2, 4 and 6, so if all six weights are used, announce at the kickoff a brief workpaper with Requirement 1's two questions and workflow, Requirement 3's quarter choice and findings table, and Requirement 5's all-row table and closing-entry trace, with its length and due date. Otherwise say how those criteria will be judged from the memo or in class. This is a suggestion, not a rule of the case. Credit the required treatment of returns and timing in words, and do not require the optional credit-memo trace, the search for unbilled shipments or the status extension, unless students have the figures.
 
 ## Assessment rubric
 

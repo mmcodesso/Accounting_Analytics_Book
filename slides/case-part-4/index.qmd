@@ -23,7 +23,7 @@ The case puts the four Power BI chapters to work together. You build, profile an
 {{< book-deliverables >}}
 
 ::: {.notes}
-The memo carries the recommendation, the one-page appendix the five exhibits behind it, and the report the evidence: a reviewer should be able to refresh it and see its tests pass.
+The memo carries the recommendation, the appendix the five exhibits behind it, each readable and naming the report page with its complete schedule, and the report the evidence: a reviewer should be able to refresh it and see its tests pass.
 :::
 
 ## How your work will be judged
@@ -70,11 +70,11 @@ The second question also asks how the turnover has changed since the first year 
 
 - Internal audit will test the report, as it tested the package
 - So the file needs a Validation page and a Tests tab
-- And it shows the latest date that all its sources reach
+- And it shows Data Through for the working-capital posting streams
 - Findings state what the records show, not what anyone did
 
 ::: {.notes}
-Some balances will look wrong. Word each finding as what the records show, such as a balance that no document supports or a payment that the ledger does not record, until evidence from outside the database settles the question.
+Some balances will look wrong. Word each finding as what the records show, such as a balance that no document supports or a payment that the ledger does not record, until evidence from outside the database settles the question. Data Through is the earliest of the latest posting dates of the sales invoices, cash applications, supplier invoices and payments, goods receipts, material issues and shipments. Payroll is reported separately, and this observed bound does not establish that the data are complete.
 :::
 
 # The Data You Will Use
@@ -87,7 +87,7 @@ Some balances will look wrong. Word each finding as what the records show, such 
 - Review Exercises 8.2, 14.1, 15.1, 15.3, 15.4 and 16.1 first
 
 ::: {.notes}
-Import the Tables with Home > Get data > Excel workbook, under the query names the case gives, so that a reviewer can follow the model from its queries. The requirements combine the Part IV tutorials with the exercises listed, so a student who skipped one should review it before starting.
+The two loading options are Auto date/time and Autodetect new relationships after data is loaded, under Current File. Import the Tables with Home > Get data > Excel workbook, under the query names the case gives, so that a reviewer can follow the model from its queries. The requirements combine the Part IV tutorials with the exercises listed, so a student who skipped one should review it before starting.
 :::
 
 ## The queries the case builds
@@ -122,7 +122,7 @@ These are the model rules of Chapters 13 and 14. The descriptions matter here: t
 - Group the inventory policies by item before you merge them
 
 ::: {.notes}
-The missing schedules are evidence to request, not proof that the opening balances are wrong. Because the first year was the ledger's first, a figure for it built on an average balance or on the change from the opening says little. Supplier payments are the only postings after the latest year. The inventory policies hold one row for each item and warehouse, so without grouping every item appears twice.
+The missing schedules are evidence to request, not proof that the opening balances are wrong. Because the first year was the ledger's first, a figure for it built on an average balance or on the change from the opening says little. Supplier payments are the only postings after the latest year. The inventory policies hold one row for each item and warehouse, so without grouping an item with a policy at both warehouses appears twice and ItemID is no longer unique.
 :::
 
 ## Watch out: a ratio is only as good as its definition {.watch-out}
@@ -193,7 +193,7 @@ Add a channel column to Requisitions from each justification, and carry it into 
 - **Check:** the bridge ends exactly at the change in cash
 
 ::: {.notes}
-Assign each account to a step of the bridge from net income to the change in cash, and each step to an activity. Measure each step from the year's postings without the closes, not from two balances. Chart the year as a waterfall with its steps sorted, compare the year before, and drill through to find the entries that moved no cash. The standard on cash flows, ASC Topic 230, reports only cash receipts and payments and requires noncash activities to be disclosed. Then measure cash less the recorded sales tax payable, which is tax billed rather than tax collected and awaits the tax returns and bank evidence, and the principal due within a year on the notes outstanding at that date.
+Assign each account to a step of the bridge from net income to the change in cash, and each step to an activity. Measure each step from the year's postings without the closes, not from two balances. Chart the year as a waterfall with its steps sorted, compare the year before, and drill through to find the entries that moved no cash. The standard on cash flows, ASC Topic 230, excludes investing and financing activities that involve no cash from the statement's amounts and requires them to be disclosed separately, while the indirect method adjusts net income for noncash items such as depreciation and the loss on a disposal. Then measure cash less the recorded sales tax payable, which is tax billed rather than tax collected and awaits the tax returns and bank evidence, and the principal due within a year on the notes outstanding at that date.
 :::
 
 ## Check your understanding {.check}
@@ -209,15 +209,15 @@ Cash, or a noncash activity?
 Ask students which section of the statement of cash flows each belongs in, if any.
 :::
 
-## Only cash goes in the statement {.answer}
+## Cash flows and separate noncash disclosures {.answer}
 
 1. Cash: an operating activity
-2. No cash: disclosed, not reported in the statement
+2. Noncash investing and financing: disclose separately
 3. Cash: an investing activity
 4. Cash: a financing activity
 
 ::: {.notes}
-An activity that moves no cash is disclosed beside the statement, not reported in it. Requirement 2 asks you to find the case's own entries that moved no cash, and to restate the sections as the indirect method requires.
+An investing or financing activity that moves no cash is left out of the statement's amounts and disclosed beside it (ASC 230-10-50-3 to 50-6). Noncash items such as depreciation and gains or losses are a different matter, because under the indirect method they are adjustments that reconcile net income to operating cash flow. Requirement 2 asks you to find the case's own entries that moved no cash, and to restate the sections as the indirect method requires.
 :::
 
 ## Measure how fast working capital turns
@@ -243,7 +243,7 @@ Each measure divides a balance at a quarter-end by the ledger flow of the twelve
 - **Check:** the estimate states what it assumes and what it leaves out
 
 ::: {.notes}
-Chart the materials received and issued by month with receipts split by channel, and the build by item group and item. Group the work-order shortfall requisitions by their justification, build the same key for each issue line with `Text.From`, and compare what was requisitioned with what was used. A what-if parameter sets the target days of supply, with the largest materials target as its default. Test several targets and compare the excess with the year's fall in cash. The item chart shows a build, not each item's stock, and the 2027 target is the controller's to approve.
+Chart the materials received and issued by month with receipts split by channel, and the build by item group and item. Group the work-order shortfall requisitions by their justification, keeping the work order and the item, build the same key for each issue line with `Text.From`, and compare what was requisitioned with what was used. A what-if parameter sets the target days of supply, with the largest materials target as its default. Test several targets and compare the excess with the year's fall in cash. The item chart shows a build, not each item's stock, and the 2027 target is the controller's to approve.
 :::
 
 ## Test the balances behind the report
@@ -300,7 +300,7 @@ The financial reporting section covers the sales tax, the notes due within a yea
 
 - The file refreshes, and its Tests tab passes
 - The About page shows Data Through and what it does not prove
-- The appendix holds the five exhibits the case lists
+- The appendix holds the five exhibits the case lists, each readable and tied to its report page
 - The memo keeps to its length, and ends with a recommendation
 
 ::: {.notes}

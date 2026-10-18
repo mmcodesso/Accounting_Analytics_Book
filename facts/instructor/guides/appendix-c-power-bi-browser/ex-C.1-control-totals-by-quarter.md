@@ -25,7 +25,7 @@ figures:
 
 ## Purpose and learning outcomes
 
-Tutorial C.1's Validation page proved the model once, by fiscal year, on a page. The exercise proves it by quarter in a query kept in a file, which depends on no page and survives a redesign of the report. It is also the first use of measures in the browser. The four quarters must add to the year, and the one difference that remains is a lesson in rounding, not an error to chase. The analytics type is descriptive.
+Tutorial C.1's Validation page proved the model once, by fiscal year, on a page. The exercise proves it by quarter in a query kept in a file, which depends on no page and survives a redesign of the report. It is also further practice with the measures introduced in Tutorial C.3. The four quarters must add to the year, and the one difference that remains is a lesson in rounding, not an error to chase. The analytics type is descriptive.
 
 Students can:
 
@@ -45,7 +45,7 @@ Students can:
 
 ## How to run it
 
-Individual, about 60 minutes: 10 for (1), 15 for (2), 10 for (3), 10 for (4), 10 for (5), 5 spare. Hold back the rounding explanation until the totals are compared, and the promotion names until the quarter is found. Hint 1, after 10 minutes on (2): "Tutorial C.3's test groups by one column. Which two columns of SalesInvoice name a fiscal quarter?" Hint 2, for (4): "Which promotions invoice in the last three months?" Collect Tests.dax, with a comment line naming the exercise, and the short answers.
+Individual, about 60 minutes: 10 for (1), 15 for (2), 10 for (3), 10 for (4), 10 for (5), 5 spare. Hold back the rounding explanation until the totals are compared, and the promotion names until the quarter is found. Hint 1, after 10 minutes on (2): "Tutorial C.3's test groups by one column. Which two columns of SalesInvoice name a fiscal quarter?" Hint 2, for (4): "Which promotions invoice in the last three months?" Collect Tests.dax, with a comment line naming the exercise and each result in a comment under its query, so that the file still runs, and the short answers.
 
 ## Step-by-step solution
 
@@ -60,7 +60,7 @@ b. If the menu at the top right reads **Viewing**, open it and choose **Editing*
 
 a. Select **Key Measures** in the **Data** pane, and choose **New measure** on the ribbon.
 b. In the formula bar, replace the text with one formula below, and press Enter. Repeat for the other two.
-c. Select List Amount, then Discounts, and under **Properties > Formatting** turn on **Thousands separator**.
+c. Select List Amount, then Discounts, and under **Properties > Formatting** turn on **Thousands separator** and check that **Decimal places** reads 2.
 
 ```dax jinja
 {{ g.m_list }}
@@ -108,7 +108,7 @@ ROW ( "Discounts, current fiscal year", ROUND ( {{ g.dax_disc }}, 2 ) )
 
 **Step 5. Compute each quarter's share and name the promotions.** Divide each quarter's discounts by the year's.
 
-**Check:** quarter {{ top.q }} holds {{ share|pct(1) }}. The promotions are {% for name, v in top.promos[:2] %}{{ name }} (${{ v|money }}){{ " and " if not loop.last else "" }}{% endfor %}. The model has no promotion table, so accept the names from Chapter 6 and Exercise 13.3; a student who adds T7_PromotionProgram, as the appendix's last section describes, can show the amounts. **Watch for:** naming the third quarter because the Furniture promotion's dates are {{ g.autumn_start }} and {{ g.autumn_end }}. Its orders are invoiced through December, so the third quarter holds {{ (quarters[2].disc / year.disc)|pct(1) }} and the fourth the rest.
+**Check:** quarter {{ top.q }} holds {{ share|pct(1) }}. The promotions are {% for name, v in top.promos[:2] %}{{ name }} (${{ v|money }}){{ " and " if not loop.last else "" }}{% endfor %}. The model has no promotion table, so accept the names from Chapter 6 and Exercise 13.3, or from your own lookup of PromotionID and PromotionName, which the student task allows. Loading T7_PromotionProgram, as the appendix's last section describes, is an optional extension that can show the amounts. **Watch for:** naming the third quarter because the Furniture promotion's dates are {{ g.autumn_start }} and {{ g.autumn_end }}. Its orders are invoiced through December, so the third quarter holds {{ g.q3_share|pct(1) }} of the year's discounts and the fourth {{ g.q4_share|pct(1) }}, and the first two quarters together hold the remaining {{ g.q12_share|pct(1) }}.
 
 ### Requirement (5): Why a query remains evidence
 
@@ -128,7 +128,7 @@ ROW ( "Discounts, current fiscal year", ROUND ( {{ g.dax_disc }}, 2 ) )
 
 ## What a strong answer says
 
-- **(1), (2)** Three measures in Key Measures, two formatted; one query, twelve rows, in Tests.dax with a comment.
+- **(1), (2)** Three measures in Key Measures, two formatted with a thousands separator and two decimal places; one query, twelve rows, in Tests.dax with a comment, and the four rows of fiscal {{ y }} written as a comment with the date of the run.
 - **(3)** Three totals agree exactly and the fourth differs by a cent, with the cause named: sums of unrounded amounts, rounded separately.
 - **(4)** The quarter, its share, both promotions, and the remark that invoicing lags the order dates.
 - **(5)** The four points above. A strong answer adds that the test would catch a changed measure that no page shows.
@@ -155,7 +155,7 @@ ROW ( "Discounts, current fiscal year", ROUND ( {{ g.dax_disc }}, 2 ) )
 ## Extensions and discussion questions
 
 - Add an Invoices measure with DISTINCTCOUNT of SalesInvoiceID and extend the query. Why does it differ from the lines?
-- Explain the first quarter: {{ g.q1_old }} are promotions of the prior year invoiced in January, and the second quarter holds only {{ g.harbor }}, whose end date precedes its start (Exercise 13.3).
+- Explain the first quarter by promotion. It holds {{ g.q1_old }}, promotions of the prior year, together with the {{ g.harbor }}. The {{ g.q1_prior_last }} is invoiced through {{ g.q1_prior_last_day }}, so the prior-year promotions' invoices are not confined to January. The {{ g.harbor }} contributes ${{ g.harbor_q1|money }} to the first quarter and is the only promotion with discounts in the second. Its end date precedes its start, the data-quality issue of Exercise 13.3.
 - Add T7_PromotionProgram by the steps of the appendix's last section, relate it on PromotionID, and show the fourth quarter by promotion.
 - Discuss: when should a controller stop chasing a cent?
 - Discuss: where should a team keep its tests, and what does each place lose?

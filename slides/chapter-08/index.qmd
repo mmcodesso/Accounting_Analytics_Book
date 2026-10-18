@@ -174,12 +174,12 @@ Students start the audit workbook, reconcile the payments to the ledger, stratif
 {{< book-figure fig-08-02 >}}
 
 ::: {.notes}
-Most payments are small, but the top strata hold a large share of the value. The four largest payments went to two suppliers, each paying one invoice in full, so their disposition is to vouch them to the purchase order, the receiving record and the invoice approval.
+The four largest payments total about one percent of the population's value, but they warrant individual attention because of their size. The stratum just below them holds about a third of the value. Those four went to two suppliers, each paying one invoice in full, so their disposition is to vouch them to the purchase order, the receiving record and the invoice approval.
 :::
 
 ## Count the first digits and measure the MAD
 
-{{< book-figure fig-08-03 crop="0,0,1,0.503" >}}
+{{< book-figure fig-08-03 crop="0,0,1,0.503" alt="Detail of the Benford worksheet, with the COUNTIF formula of cell C2 in the formula bar. The table lists the digits 1 to 9, with the share Benford's Law expects, the count of payments, the actual share and the absolute difference for each digit, then a total row. The outlined MAD, the average of the nine differences, closes the table. The chart is not part of this detail." >}}
 
 ::: {.notes}
 COUNTIF counts the payments by first digit, and each share is compared with the expected share. The MAD of all payments falls in the marginally acceptable range.
@@ -187,7 +187,7 @@ COUNTIF counts the payments by first digit, and each share is compared with the 
 
 ## Fewer ones, and more high digits, than expected
 
-{{< book-figure fig-08-03 crop="0,0.503,1,0.497" >}}
+{{< book-figure fig-08-03 crop="0,0.503,1,0.497" alt="Detail of the chart of the first digits of the payments, with a column for each digit's actual share of the payments and a line for the share Benford's Law expects. The columns for the first three digits fall short of the line, and the columns for the digits from 4 on reach or exceed it. A legend and a note on how the differences and the MAD were calculated sit below. The table is not part of this detail." >}}
 
 ::: {.notes}
 The columns are the actual shares and the line Benford's expected shares. The pattern points to a subset worth splitting out.
@@ -241,7 +241,7 @@ Either the ledger holds an amount no invoice supports, or the detail misses invo
 - RANDARRAY and SORTBY shuffle the list; freeze it with Paste Values
 
 ::: {.notes}
-The PCAOB's confirmation standard requires confirming receivables from sales, or directly accessing a knowledgeable external source's information. Where neither is feasible, the auditor documents why and obtains external information indirectly through other substantive procedures. A selection that cannot be reproduced cannot be reviewed, so record its date and parameters.
+The PCAOB's confirmation standard requires confirming receivables from sales, or directly accessing a knowledgeable external source's information. Where neither is feasible, the auditor documents why and obtains external information indirectly through other substantive procedures. A reviewer needs the frozen sample and the documented method, so record its date and parameters.
 :::
 
 ## Check your understanding {.check}
@@ -360,7 +360,7 @@ Ask students what evidence would support each disposition.
 
 ## Expected, or follow up {.answer}
 
-1. Expected: they post on the month-end date itself
+1. Expected timing pattern, but verify the depreciation schedule and approval before clearing
 2. Expected in size, but request the closing-entry authority
 3. Follow up: ask why, and request the support
 4. Follow up, as a possible control deficiency: segregation of duties
@@ -397,7 +397,7 @@ A FILTER formula spills the entry's eighteen ledger lines from its number. The e
 
 ## Its receivables line has no invoice detail behind it
 
-{{< book-figure fig-08-08 crop="0,0,1,0.414" >}}
+{{< book-figure fig-08-08 crop="0,0,1,0.414" alt="Detail of the top of the Drilldown worksheet, with the FILTER formula of cell A4 in the formula bar and the entry number JE-2024-000001 in cell B1. The first five of the spilled ledger lines show the debits to cash, accounts receivable, finished goods inventory, materials inventory and prepaid expenses, each with a zero credit. The accounts receivable line, the amount no invoice supports, is outlined. The remaining lines of the entry are not part of this detail." >}}
 
 ::: {.notes}
 The outlined line is the receivables difference found in Tutorial 8.2. The journal entry test and the receivables reconciliation have led to the same entry from two directions.
@@ -429,7 +429,7 @@ The pairs still need their invoices and receipts to confirm that they are two ob
 - Check the numbers are unique, then compare the count with largest less smallest, plus one
 - Charles River's invoice, entry, order and receipt numbers run without gaps
 - A clean result is recorded as carefully as an exception
-- Check numbers follow all payments, so every gap is a payment of another kind
+- ACH and wire payments explain most check-number gaps, and two gaps relate to reused check numbers
 
 ::: {.notes}
 Matched against the payment numbers, every check gap is explained, except the numbers of the two checks that reused an earlier number, the pairs of Exercise 2.6.

@@ -78,7 +78,7 @@ Individual or pairs, about 60 minutes: 10 on the year columns (requirement 1), 1
 
 ### Requirement (4): The combined list
 
-**Step 4. List the invoices flagged by either test.** The model answer spills the list with one formula; a student without HSTACK filters the Table twice (NumberYearMatches FALSE, then BeforeOrder TRUE) and copies each result.
+**Step 4. List the invoices flagged by either test.** The model answer spills the list with one formula. A student without HSTACK clears every filter on the SalesInvoice Table, filters NumberYearMatches to FALSE and copies the {{ g.n_prefix|count }} rows, clears that filter, filters BeforeOrder to TRUE and appends the {{ g.n_before|count }} rows, and clears the filter again. Filters left on together combine, so the second list would show only the invoices that fail both tests, and here no invoice does. Keep the InvoiceNumber in both copies, so an invoice that both tests flag in another dataset is listed once.
 
 ```
 =SORT(FILTER(HSTACK(SalesInvoice[InvoiceNumber],SalesInvoice[InvoiceDate],SalesInvoice[OrderDate],SalesInvoice[NumberYear],SalesInvoice[NumberYearMatches],SalesInvoice[BeforeOrder]),(SalesInvoice[NumberYearMatches]=FALSE)+(SalesInvoice[BeforeOrder]=TRUE)),1)
@@ -110,7 +110,7 @@ Individual or pairs, about 60 minutes: 10 on the year columns (requirement 1), 1
 
 ## What a strong answer says
 
-- **Requirements (2) and (3).** Two counts, with the reason that a text year needs VALUE and that a lookup is checked for "No match" before its result is used.
+- **Requirements (2) and (3).** Two counts, with the reason that a text year needs VALUE. A plus: a count of "No match" on OrderDate before the flags are read, because an unmatched lookup would be flagged as before its order.
 - **Requirement (4).** The two tests find different invoices and together find exactly Tutorial 2.1's. The findings are consistent with invoices dated earlier than the events they record, which the evidence the memo requests would test.
 - **Requirement (5).** A cutoff risk with its limits. The six year-end invoices are the first numbers issued in each following year, yet dated before it began, which suggests dating back into the earlier period. The three invoices dated a day before their order cannot be explained by numbering. Neither test shows who dated them or why, so the memo asks for logs and shipping documents, and it does not call the invoices errors or fraud.
 
@@ -131,7 +131,7 @@ A weak answer reports counts without comparing them with Tutorial 2.1, or states
 |---|---:|---|---|
 | Requirement 1: extraction | 15 | MID and VALUE, a numeric column | Text left in the comparison |
 | Requirement 2: comparison | 20 | A flag column and a count of {{ g.n_prefix|count }} | Count without a flag column |
-| Requirement 3: order test | 20 | A lookup, a flag, a count of {{ g.n_before|count }} | Lookup failures not counted |
+| Requirement 3: order test | 20 | A lookup, a flag, a count of {{ g.n_before|count }} | A flag without a count |
 | Requirement 4: the list | 20 | All {{ w_both }} invoices, compared with Tutorial 2.1 | List without the comparison |
 | Requirement 5: the memo | 25 | Tests, results, cutoff effect, evidence to request, limits stated | Results without the limits |
 

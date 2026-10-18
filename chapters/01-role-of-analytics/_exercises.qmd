@@ -88,7 +88,7 @@
 
 **Table group:** O2C, P2P, and Accounting Core
 
-**Scenario.** You are a first-year auditor who has been assigned to plan the data analytics procedures for the Charles River engagement. Your senior has asked you to assess what data is available for three common audit tests: aging of receivables, testing for duplicate payments, and journal entry testing for management override of controls.
+**Scenario.** You are a first-year auditor who has been assigned to plan the data analytics procedures for the Charles River engagement. Your senior has asked you to assess what data is available for three common audit tests: aging of receivables, testing for duplicate payments, and journal entry testing for management override of controls, in which managers use their authority to bypass the controls that apply to everyone else.
 
 **Requirements.**
 
@@ -117,7 +117,7 @@
 
 (3) Write a brief assessment (three to five sentences) of whether the Charles River data provides sufficient information to test for three common fraud risk indicators: entries posted outside of normal business hours, entries with round-dollar amounts, and entries posted just below an approval threshold. For any indicator where the data may be insufficient, explain what additional information would be needed.
 
-(4) The JournalEntry table includes a ReversesJournalEntryID column. Write one paragraph explaining how this column could be used in an audit test for window dressing at period end.
+(4) The JournalEntry table includes a ReversesJournalEntryID column. Write one paragraph explaining how this column could be used in an audit test for window dressing, entries near the end of a period that make its results look better and are reversed soon after it closes.
 
 **Deliverable.** A written assessment of the journal entry data structure in the Charles River Accounting Core group, evaluating its suitability for audit testing of management override of controls.
 

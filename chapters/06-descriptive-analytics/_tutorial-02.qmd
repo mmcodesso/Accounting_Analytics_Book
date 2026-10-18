@@ -17,7 +17,7 @@ The InvoiceLines Table now ends with a StdCostAmount column, the standard cost o
 
 **Step 2. Create the PivotTable.**
 
-a. Select a cell in the InvoiceLines Table and choose **Insert > PivotTable**, and then **From Table/Range** if Excel offers a choice. Confirm that the source is the InvoiceLines Table, choose **New Worksheet**, and click **OK**. Rename the worksheet `RevenuePivot`.
+a. Select a cell in the InvoiceLines Table and choose **Insert > PivotTable**, and then **From Table/Range** if Excel offers a choice. Confirm that the source is the InvoiceLines Table, choose **New Worksheet**, leave **Add this data to the Data Model** unchecked, and click **OK**. Rename the worksheet `RevenuePivot`. A PivotTable built on the Data Model has no **Calculated Field** command, which Step 3 needs.
 b. In the **PivotTable Fields** pane, drag FiscalYear to **Filters**, Period to **Columns**, ItemGroup to **Rows**, and LineTotal to **Values**.
 c. Open the FiscalYear filter in cell B1 and select 2026.
 d. In the **Values** area, click **Sum of LineTotal**, choose **Value Field Settings > Number Format**, and choose **Number** with two decimals and a thousands separator.

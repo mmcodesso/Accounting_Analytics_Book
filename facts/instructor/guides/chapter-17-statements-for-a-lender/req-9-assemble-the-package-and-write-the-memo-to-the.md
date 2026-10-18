@@ -46,7 +46,7 @@ Individual work, because the memo is one voice; pairs can build the matters tabl
 
 ### Part 1: Assemble the package as a PDF
 
-**Step 1. Print the statements and notes from the workbook.** Order the pages: the four statements, then the notes on property and equipment, notes payable, revenue and accrued liabilities, and the note on the correction of {{ d.P }}. Put the date through which the data run (from the Documentation worksheet) and the word Draft on the first page, set the print areas and page breaks, and use Excel's own export to PDF.
+**Step 1. Print the statements and notes from the workbook.** Order the pages: the four statements, then the notes on property and equipment, notes payable, revenue and accrued liabilities, and the note on the correction of {{ d.P }}. Put the date through which the data run (from the Documentation worksheet) and the word Draft on the first page. On each worksheet that prints, select the statement or note block and choose **Page Layout > Print Area > Set Print Area**, set the orientation, scale it to fit one page wide, and set **Print Titles** for a block that runs over a page. Then use **File > Export > Create PDF/XPS** and read every page for clipped text, print too small to read, a missing draft mark or tax warning, and blank pages. The model workbook sets no print areas and the solution holds no PDF, so compare a student's PDF with the Statements and Notes worksheets.
 
 **Check:** the figures in the PDF equal the Statements and Notes worksheets, and every check cell of Requirements 6 and 7 is zero at the moment of printing. **Watch for:** a PDF printed from a stale refresh, or without the date and the draft mark: the package is a draft until the CFO releases it.
 
@@ -73,7 +73,7 @@ Individual work, because the memo is one voice; pairs can build the matters tabl
 | Sales tax | ${{ stax|money }} payable, tax billed rather than collected; no remittance recorded | Returns, bank statements, the tax authority's account | Paid outside the ledger: liability and cash both overstated; unpaid: penalties and interest; do not conclude |
 | Opening balances | Five lines, unchanged for {{ years }} years, payables equal to the opening cash | Suppliers' statements, confirmations, agreements | Equity ${{ equity|money }} higher if none of the five is real, a sensitivity and not an entry; keep them until evidence |
 
-Then the other matters the records point to, briefly: cash (no interest income and no bank reconciliation: confirm the balance with the bank), inventories (a count and a net realizable value review; the opening inventories of ${{ o_inv|money }} with no item detail, evidence to request and not a write-off; standards unchanged since {{ d.F }}, so a cost study, with a rebuilt standard raising manufactured finished goods by about ${{ reval_c|num(0) }} at the end of {{ d.C }} and ${{ reval_p|num(0) }} a year earlier, a sensitivity and no entry), and Requirement 8's later events and going concern. Add the passed items for approval (${{ g.passed|abs|money }} in aggregate, {{ g.passed_share|pct(0) }} of materiality), the changes to the year-end close (accrue payroll for days worked, review open accruals monthly, cut revenue off by delivery date, accrue interest monthly) and the recommendation: record A1, A2, A4, R1 and R2, A3 once the suppliers' evidence supports it and its period, and hold the package until every matter that could be material is settled or supported by a documented conclusion, with the notes completed and the CFO's approval.
+Then the other matters the records point to, briefly: cash (no interest income and no bank reconciliation: confirm the balance with the bank), inventories (a count and a net realizable value review; the opening inventories of ${{ o_inv|money }} with no item detail, evidence to request and not a write-off; standards unchanged since {{ d.F }}, so a cost study, with a rebuilt standard raising manufactured finished goods by about ${{ reval_c|num(0) }} at the end of {{ d.C }} and ${{ reval_p|num(0) }} a year earlier, a sensitivity and no entry), and Requirement 8's later events and going concern. Add the passed items for approval (two estimates and an exposure, a combined screen of ${{ g.passed|abs|money }}, {{ g.passed_share|pct(0) }} of materiality, not a measured misstatement), the changes to the year-end close (accrue payroll for days worked, review open accruals monthly, cut revenue off by delivery date, accrue interest monthly) and the recommendation: record A1, A2, A4, R1 and R2, A3 once the suppliers' evidence supports it and its period, and hold the package until every matter that could be material is settled or supported by a documented conclusion, with the notes completed and the CFO's approval.
 
 **Check:** the opening and the recommendation can be read alone; each matter has four parts. The appendix of three pages holds the schedule of adjustments with the passed items, the matters' numbers and the going-concern conditions.
 
@@ -81,7 +81,7 @@ Then the other matters the records point to, briefly: cash (no interest income a
 
 **Step 4. Read the draft as the CFO would.** Search it for words that assign intent, such as hidden, unpaid, kept and fraud, and rewrite each as what the records show. Count the pages: two for the memo, three for the appendix. The model memo runs {{ g.memo_words }} words in {{ g.memo_paragraphs }} paragraphs.
 
-**Check:** every number traces to the Memo worksheet or a requirement's result; no matter the ledger cannot settle carries a number in the statements.
+**Check:** every number traces to the Memo worksheet or a requirement's result. No new adjustment is booked for a matter the ledger cannot settle, and the recorded balances it cannot support stay as recorded, named in the memo and held for evidence.
 
 ## Expected results
 
@@ -90,7 +90,7 @@ Then the other matters the records point to, briefly: cash (no interest income a
 | Tax screen; as a multiple of materiality | about ${{ provision|num(0) }}; {{ g.multiple|num(1) }} | 2 |
 | Sales tax payable; debits from remittances | ${{ stax|money }}; none | 2 |
 | Equity effect if no opening balance is real | ${{ equity|money }} | 2 |
-| Passed items in aggregate | {{ sm(g.passed) }} | 3 |
+| Candidates to pass, their combined screen | {{ sm(g.passed) }} | 3 |
 
 {{ expected() }}
 
@@ -120,7 +120,7 @@ A weak answer opens with method, books a number for a matter the evidence cannot
 | Accuracy of numbers | 15 | Every number traces to the workbook | Numbers typed, one wrong |
 | Wording | 10 | Describes, never accuses; no number for what cannot be measured | Intent implied |
 | Passed items and close changes | 10 | Listed for approval; four close changes | One of the two |
-| Package PDF, appendix and length | 15 | Dated draft, two pages and three, appendix exhibits | Over length |
+| Package PDF, appendix and length | 15 | Dated draft, a memo of no more than two pages and an appendix of no more than three, the exhibits in the appendix | Over length |
 
 ## Extensions and discussion questions
 

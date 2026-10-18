@@ -36,7 +36,7 @@ By the end, students can:
 
 ## How to run it
 
-Individual, about 60 minutes: 15 on requirement 1, 15 on requirement 2, 15 on requirement 3 and 15 on the explanation. Hold back the shares-without-Services idea until students have seen the Services row. Collect the workbook and the explanation.
+Individual, about 60 minutes: 15 on requirement 1, 15 on requirement 2, 15 on requirement 3 and 15 on the explanation. Before students compute the shares that requirement (2) asks for, ask them to predict what the Services row, at a margin of 100 percent, will do to the denominators. Collect the workbook and the explanation.
 
 ## Step-by-step solution
 
@@ -58,15 +58,15 @@ c. Drag LineTotal, Margin and MarginPct to **Values**, rename them `Revenue`, `M
 
 ### Requirement (3): Furniture product types
 
-**Step 3. Switch to product type.** Build a second PivotTable with ItemGroup in **Filters** set to Furniture, ProductType in **Rows** and the three value fields, and sort the types by Margin % from largest to smallest. Read the two highest and the two lowest, and name them with the codes of Chapter 5.
+**Step 3. Switch to product type.** Copy the fiscal {{ d.C }} PivotTable of Step 1. In the copy, move ItemGroup from **Rows** to **Filters** and select Furniture, keep FiscalYear set to {{ d.C }}, and add ProductType to **Rows**. Sort the types by Margin % from largest to smallest, on the underlying values and not on the rounded display. Before ranking, check the Furniture totals: revenue ${{ g.groups.Furniture.revenue|money }} and margin ${{ g.groups.Furniture.margin|money }}. Read the two highest and the two lowest, and name them with the codes of Chapter 5.
 
-**Check:** the order is {% for t in g.types %}{{ t[0] }} ({{ t[1] }}) {{ t[2]|pct(2) }}{% if not loop.last %}, {% endif %}{% endfor %}. **Watch for:** the Furniture filter missing. TBL then mixes in the other lines that use the code, and its margin reads {{ g.tbl_all|pct(2) }} instead of {{ g.tbl_furniture|pct(2) }}.
+**Check:** the order is {% for t in g.types %}{{ t[0] }} ({{ t[1] }}) {{ t[2]|pct(2) }}{% if not loop.last %}, {% endif %}{% endfor %}. {% for t in g.ties %}{{ t.a }} and {{ t.b }} both display {{ t.shown|num(2) }} percent ({{ t.a_pct|pct(4) }} and {{ t.b_pct|pct(4) }} unrounded), so rank the unrounded values. Neither is among the two highest or the two lowest.{% endfor %} **Watch for:** the Furniture filter missing. TBL then mixes in the other lines that use the code, and its margin reads {{ g.tbl_all|pct(2) }} instead of {{ g.tbl_furniture|pct(2) }}.
 
 ### Requirement (4): The Services margin
 
-**Step 4. Explain it.** Three to five sentences. The model answer says that the PivotTable values every line at its item's standard cost, that the design-service items carry a standard cost of 0, and that the cost of a design service is the time of the design staff, recorded in the time records and in payroll. To measure the margin you need the cost of the hours behind the services billed. The model answer offers two measures: the time records' extended cost for the year (${{ time_cost|money }}, a margin of about {{ time_pct|pct(0) }}) or the year's Design Services salaries expense (${{ salaries|money }}, about {{ salaries_pct|pct(0) }}). The gap shows that the margin depends on the cost definition, which a report must state.
+**Step 4. Explain it.** Three to five sentences. The model answer says that the PivotTable values every line at its item's standard cost, that the design-service items carry a standard cost of 0, and that the cost of a design service is the time of the design staff, recorded in the time records and in payroll. To measure the margin you need a cost source for the hours behind the services billed, and its scope. The model answer offers two illustrative scopes, not matched service margins. One is the time records' extended cost for the year (${{ time_cost|money }}, a margin of about {{ time_pct|pct(0) }}), which covers every hour recorded on a work date of the year, nonbillable hours included. The other is the year's Design Services salaries expense (${{ salaries|money }}, about {{ salaries_pct|pct(0) }}), which covers the staff's whole pay whether or not the hours were billed. They differ in scope and in period, since hours worked are set against revenue billed. Neither is a margin until the work and billing periods agree and nonbillable capacity and overhead are treated on purpose, and a report must state the definition it uses.
 
-**Check:** the explanation names the missing standard cost and one cost source. **Watch for:** the 100 percent read as a finding. Neither of the two sources is loaded in the student workbook, so students describe the data they would ask for.
+**Check:** the explanation names the missing standard cost and one cost source with its scope. **Watch for:** the 100 percent read as a finding, and either ratio presented as the Services margin. Neither source is loaded in the student workbook, and the student text asks only for the data they would need, so students describe it. Computing a cost from tables outside the workbook is not required.
 
 ## Expected results
 
@@ -85,7 +85,9 @@ c. Drag LineTotal, Margin and MarginPct to **Values**, rename them `Revenue`, `M
 
 - **Requirement (2).** {{ more }} contribute more margin than revenue, because their margins are above Furniture's. The shares exclude Services, whose margin percentage is an artifact.
 - **Requirement (3).** The two highest types are {{ high[0][0] }} ({{ high[0][1] }}) and {{ high[1][0] }} ({{ high[1][1] }}) and the two lowest {{ low[0][0] }} ({{ low[0][1] }}) and {{ low[1][0] }} ({{ low[1][1] }}), with the margin spread across types small.
-- **Requirement (4).** The missing standard cost, the two cost definitions with their margins, and a statement that the report must say which one it uses.
+- **Requirement (4).** The missing standard cost, a defensible cost source and its scope, and a statement that the report must say which definition it uses.
+
+**A plus, not required.** The two scopes with their margins, the difference between them explained, and the work and billing periods, nonbillable capacity and overhead raised before either ratio is called a margin.
 
 A weak answer calls Services the most profitable line, or gives a cost number without a source.
 
@@ -104,7 +106,7 @@ A weak answer calls Services the most profitable line, or gives a cost number wi
 | Requirement 1: the PivotTable | 25 | Year filter, a calculated field for the dollar margin, correct percentages | Margins by group without the calculated field |
 | Requirement 2: the shares | 25 | Services excluded, lines with the larger margin share named | Shares with Services in the denominator |
 | Requirement 3: product types | 25 | Furniture filter, four types named with codes | Types without the filter |
-| Requirement 4: Services | 25 | Missing standard cost and a cost source, stated definition | The 100 percent explained without a source |
+| Requirement 4: Services | 25 | Missing standard cost and a cost source with its scope | The 100 percent explained without a source |
 
 ## Extensions and discussion questions
 

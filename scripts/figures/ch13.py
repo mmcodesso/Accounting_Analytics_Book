@@ -246,8 +246,10 @@ def fig_13_04() -> Diagram:
     _one_to_many("Item", "ItemID", "SalesInvoiceLine", "ItemID")
     _one_to_many("SalesInvoice", "SalesInvoiceID", "SalesInvoiceLine", "SalesInvoiceID")
     _one_to_many("Customer", "CustomerID", "SalesInvoice", "CustomerID")
-    item = pbi.model_table(d, "Item", 0, 66, ["ItemID", "ItemCode", "ItemName", "ItemGroup",
-                                             "ListPrice", "ProductType", "StandardCost"], w=150)
+    # Model view lists columns alphabetically; Item sits one row lower than SalesInvoiceLine's top, so that the line
+    # from Item's ItemID (its third column) to the lines' ItemID (their fourth) stays level.
+    item = pbi.model_table(d, "Item", 0, pbi.ROW, ["ItemCode", "ItemGroup", "ItemID", "ItemName",
+                                                  "ListPrice", "ProductType", "StandardCost"], w=150)
     sil = pbi.model_table(d, "SalesInvoiceLine", 222, 0, [
         "BaseListPrice", "Discount", "DiscountAmount", "ItemID", "LineTotal", "ListAmount",
         "PricingMethod", "PromotionID", "Quantity", "SalesInvoiceID", "SalesInvoiceLineID",

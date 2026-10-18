@@ -634,6 +634,7 @@ def r5(b: Build) -> None:
         M("Fewest Days after Shipment"), M("Average Days after Shipment"), M("Most Days after Shipment"),
         M("Lines Returned in a Later Year"), M("Credits Returned in a Later Year")], units_none=True, size=18))
     lag = ctx["lag"]
+    mat = ctx["mature"]
     others = [v[2] for k, v in months_ship.items() if k != dec_key]
     page.add(answer("timingAnswer", 20, 490, 800, 225, "why the last months and the first year mislead", [
         f"Returns come {lag['lo']} to {lag['hi']} days after shipment (mean {lag['mean']:.1f}; {lag['dlo']} to "
@@ -641,11 +642,13 @@ def r5(b: Build) -> None:
         f"earlier sales to return: by the month of the credit its first months are low and its rate, "
         f"{pct(rate_year[years[0]])}, understates. At the other end, the shipments of December {y_c} show "
         f"{pct(ctx['dec'], 2)}, against {pct(min(others), 2)} to {pct(max(others), 2)} for the other months of {y_c}, "
-        "because their returns arrive after the data end: censored, not good news.",
+        "because their returns arrive after the data end: immature, not good news.",
         f"By the year of the shipment the rates are " + " / ".join(pct(v) for v in ctx["by_ship_year"]) +
         f"; {ctx['cross']} return lines ({money(ctx['cross_amt'])}) came back in a later year than they shipped, and "
-        f"fiscal {years[0]} has no carry-in from {years[0] - 1}. Compare rates over complete windows: by the month of "
-        f"the shipment, leaving out the last month or two, and not against fiscal {years[0]}'s first months."]))
+        f"fiscal {years[0]} has no carry-in from {years[0] - 1}. Compare cohorts with equal follow-up under a stated rule: "
+        f"the last return is dated {mat['last_return']} and the longest lag is {mat['horizon']} days, so shipments after "
+        f"{mat['cutoff']} ({pct(mat['after_share'])} of shipped revenue) are immature and disclosed as excluded. Omitting "
+        "December alone does not establish maturity, and past lags do not prove that no later return can arrive."]))
     relayout(page, {"rateYears": 165})                                             # every year
     page.expect = ["Return Rate by Ship Date", dec_key, pct(ctx["dec"]), pct(ctx["by_ship_year"][-1]),
                    f"Average Days after Shipment, {lag['mean']:.1f} card", money(ctx["cross_amt"])]

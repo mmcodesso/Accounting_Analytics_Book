@@ -76,11 +76,11 @@ b. Add a **Matrix** with ItemGroup and ItemCode on **Rows** and Materials Build 
 **Step 2. Group the requisitions and build the key.**
 
 a. Choose **Reference** on Requisitions, name it `ShortfallPairs`, and keep the shortfall channel.
-b. Use **Group By** (**Advanced**) on Justification with the count, the quantity, the estimated value and the first and last dates.
-c. In Issues, add `PairKey` with **Add Column > Custom Column**, group Issues by it as `IssuedByPair`, and merge the issued quantity into the groups with **Home > Merge Queries** (**Left Outer**).
+b. Use **Group By** (**Advanced**) on Justification, WorkOrderNumber and ItemID with the count, the quantity and estimated value (sums), the first and last request dates, and the due and completed dates. Relate ShortfallPairs[ItemID] to Item, many to one, **Single** direction.
+c. In Issues itself, name the column `PairKey`, choose **Add Column > Custom Column**, enter only the expression below and set the type to Text. Choose **Reference** on Issues, name it `IssuedByPair`, group it by PairKey with the issued quantity and cost, and clear **Enable load**. Merge it into ShortfallPairs with **Home > Merge Queries** (**Left Outer**) on Justification and PairKey. Issues keeps one row for each issue line.
 
 ```m jinja
-{{ g.key_m }}
+{{ g.e_pair }}
 ```
 
 **Check:** {{ pairs|count }} pairs, {{ matched|count }} matched to issues and {{ unmatched }} with nothing issued. **Watch for:** two wrong versions. Grouping by work order alone gives {{ g.wo_groups|count }} groups and a maximum of {{ g.wo_most }}, against {{ most }} for a pair. An inner join drops the {{ unmatched }} unmatched pairs, so the groups hold {{ matched|count }} pairs in place of {{ pairs|count }}, and the {{ by_unit[0].plural }} requisitioned read {{ g.main_inner|num(1) }} in place of {{ by_unit[0].req|num(1) }}.
@@ -97,9 +97,9 @@ c. In Issues, add `PairKey` with **Add Column > Custom Column**, group Issues by
 
 **Step 5. Add the what-if.**
 
-a. Choose **Modeling > New parameter > Numeric range**, **Whole number**, named `Target Days`; keep **Add slicer to this page**.
-b. Add the measures below, with the largest materials target ({{ g.raw_target }} days, raw materials) as the default, a benchmark for the whole balance.
-c. Add a **Table** titled "{{ g.t_tested }}" filtered to {{ whatif[0].days }}, {{ whatif[1].days }} and {{ whatif[2].days }} days.
+a. Choose **Modeling > New parameter > Numeric range**, **Whole number**, named `Target Days`, with Minimum {{ g.s_min }}, Maximum {{ g.s_max }} and Increment {{ g.s_step }}. Keep **Add slicer to this page**.
+b. Add the measures below, with the largest materials target ({{ g.raw_target }} days, raw materials) as the default, a benchmark for the whole balance. Select it in the slicer, save, close and reopen the report, and check that the slicer and `Target Days Value` both show it.
+c. Add a **Table** titled "{{ g.t_tested }}" filtered to {{ whatif[0].days }}, {{ whatif[1].days }} and {{ whatif[2].days }} days, and set the slider's **Edit interactions** to **None** toward it, so the tested targets stay independent of the slider.
 
 ```dax jinja
 {{ g.d_target }}

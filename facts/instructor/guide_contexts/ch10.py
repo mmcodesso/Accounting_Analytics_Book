@@ -250,6 +250,15 @@ def tutorial_103(d, claim) -> dict:
               "JOIN ProductionCompletion pc ON pc.ProductionCompletionID = pcl.ProductionCompletionID "
               "JOIN Item i ON i.ItemID = pcl.ItemID GROUP BY 1 ORDER BY 1")
     claim(out[1][1] < out[0][1] and abs(out[2][1] / out[0][1] - 1) < 0.05, "output dips in the second year and ends within five percent of the first")
+    # Step 1 applies each item's one recorded standard (Item keeps no history) to every year. The completion lines of
+    # every year carry standard labor and conversion costs equal to the quantity times the item's current standard,
+    # which is what lets the tutorial say that the standards appear to have held.
+    # (Labor is rounded once, to the half cent; conversion is the sum of three rounded parts, so within 1.5 cents.)
+    off = d.q("SELECT SUBSTR(pc.CompletionDate, 1, 4), SUM(ABS(pcl.ExtendedStandardDirectLaborCost - pcl.QuantityCompleted * i.StandardDirectLaborCost) > 0.0051 "
+              "OR ABS(pcl.ExtendedStandardConversionCost - pcl.QuantityCompleted * i.StandardConversionCost) > 0.0151) FROM ProductionCompletionLine pcl "
+              "JOIN ProductionCompletion pc ON pc.ProductionCompletionID = pcl.ProductionCompletionID JOIN Item i ON i.ItemID = pcl.ItemID GROUP BY 1")
+    claim(len(off) == len(out) and all(n == 0 for _, n in off),
+          "the completion lines of every year carry the item's current standard labor and conversion costs, to within the rounding of each line")
     pay = d.q("SELECT pp.FiscalYear, prl.LineType, ROUND(SUM(prl.Hours), 0), ROUND(SUM(prl.Amount), 2) FROM PayrollRegisterLine prl "
               "JOIN PayrollRegister pr ON pr.PayrollRegisterID = prl.PayrollRegisterID "
               "JOIN PayrollPeriod pp ON pp.PayrollPeriodID = pr.PayrollPeriodID JOIN CostCenter cc ON cc.CostCenterID = pr.CostCenterID "
@@ -503,6 +512,13 @@ def g3(d, claim):
     with_segment = d.q("SELECT CustomerName FROM Customer GROUP BY CustomerName, CustomerSegment HAVING COUNT(*) > 1")
     claim(len(with_segment) == 1 and len(shared) == 2 and with_segment[0][0] in shared,
           "adding the segment to the grouping leaves one of the two shared names, because the other name's customers are in different segments")
+    # Step 4's query runs on the customers with orders: grouped by name and segment there, no name covers two customers
+    # (the merging name's customers are in different segments, and only one customer of the other name has orders).
+    orders_seg = rows(d, "SELECT c.CustomerName FROM SalesOrder so JOIN Customer c ON c.CustomerID = so.CustomerID "
+                         "GROUP BY c.CustomerName, c.CustomerSegment HAVING COUNT(DISTINCT c.CustomerID) > 1")
+    claim(orders_seg == 0, "among the customers with orders, grouping by name and segment finds no name shared by two customers")
+    pair_segment = d.one("SELECT CustomerSegment FROM Customer WHERE CustomerName = ? GROUP BY CustomerSegment HAVING COUNT(*) > 1",
+                         with_segment[0][0])
     hidden = next(n for n in shared if n != with_segment[0][0])
     merged = next(r for r in d.q("SELECT c.CustomerName, COUNT(*), AVG(o.OrderTotal) FROM SalesOrder o JOIN Customer c ON c.CustomerID = o.CustomerID "
                                  "GROUP BY c.CustomerName") if r[0] == hidden)
@@ -513,7 +529,8 @@ def g3(d, claim):
               "GROUP BY 1 ORDER BY 3 DESC")
     claim(seg[0][2] > 4 * seg[-1][2], "the largest segment's average order is more than four times the smallest's")
     return dict(n_customers=n_customers, n_lj=n_lj, lj_one=lj_one, fan=fan, true=true, avg_of_avgs=avg_of_avgs, overall=overall, n_min=n_min,
-                n_by_name=len(by_name), hidden=hidden, hidden_segment_pair=with_segment[0][0], merged_n=merged[1], merged_avg=merged[2],
+                n_by_name=len(by_name), hidden=hidden, hidden_segment_pair=with_segment[0][0], pair_segment=pair_segment,
+                orders_seg=orders_seg, merged_n=merged[1], merged_avg=merged[2],
                 id_ranks=ranks, name_rank=name_rank[0], seg_ratio=seg[0][2] / seg[-1][2], min_orders=MIN_ORDERS, top_first=by_id[0][1])
 
 
@@ -533,12 +550,16 @@ def g4(d, claim):
     unfav = top("AND gl.Description = 'Record unfavorable purchase variance'")
     claim([r[0] for r in all_desc] != [r[0] for r in right] and [r[0] for r in unfav] != [r[0] for r in right],
           "dropping the description condition, or keeping only the unfavorable postings, changes the five largest suppliers")
+    # With LIMIT 5 kept, the wrong variants show five rows, whose total is far below the all-supplier totals below.
+    no_desc_top5, unfav_top5 = round(sum(r[1] for r in all_desc), 2), round(sum(r[1] for r in unfav), 2)
     net = d.one("SELECT ROUND(SUM(Debit) - SUM(Credit), 2) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? AND Description LIKE '%purchase variance'", ppv, d.C)
     no_desc = d.one("SELECT ROUND(SUM(Debit) - SUM(Credit), 2) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? AND SourceDocumentType = 'PurchaseInvoice'", ppv, d.C)
     all_year = d.one("SELECT ROUND(SUM(Debit) - SUM(Credit), 2) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ?", ppv, d.C)
     claim(all_year == 0, "all the year's postings to 5060, with the closing entry, net to zero")
     unfav_total = d.one("SELECT ROUND(SUM(Debit) - SUM(Credit), 2) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? AND Description = 'Record unfavorable purchase variance'", ppv, d.C)
     claim(no_desc > net and unfav_total > net, "the tax rows raise the total above the variance, and the unfavorable rows alone are more than the net")
+    claim(no_desc_top5 < no_desc / 2 and unfav_top5 < unfav_total / 2,
+          "the five rows a LIMIT 5 query shows hold well under half of the all-supplier total of the same variant")
     like_fav = d.one("SELECT COUNT(*) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? AND Description LIKE '%favorable%'", ppv, d.C)
     postings = d.one("SELECT COUNT(*) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? AND Description LIKE '%purchase variance'", ppv, d.C)
     claim(like_fav == postings, "LIKE '%favorable%' matches the same postings as LIKE '%purchase variance', favorable and unfavorable")
@@ -574,6 +595,7 @@ def g4(d, claim):
         rates.append(dict(year=y, right=var / matched, wrong=var / everything))
     claim(all(r["wrong"] < r["right"] for r in rates), "dividing by the amount of every invoice line understates the rate in each year")
     return dict(right=right, right_ids=", ".join(str(r[0]) for r in right), all_desc_ids=", ".join(str(r[0]) for r in all_desc), unfav_ids=", ".join(str(r[0]) for r in unfav), all_desc=all_desc, unfav=unfav, no_desc=no_desc, all_year=all_year, unfav_total=unfav_total, net=net, like_fav=like_fav,
+                no_desc_top5=no_desc_top5, unfav_top5=unfav_top5,
                 n_suppliers=n_suppliers, top_share=top_share, line_total=line_total, unequal=unequal, tolerance=tolerance, n_all=n_all,
                 unmatched=unmatched, rates=rates, postings=postings)
 
@@ -586,7 +608,15 @@ def g5(d, claim):
     anti = d.one("SELECT COUNT(*) FROM GLEntry gl LEFT JOIN PayrollPayment pp ON pp.PayrollPaymentID = gl.SourceDocumentID "
                  "WHERE gl.SourceDocumentType = 'PayrollPayment' AND pp.PayrollPaymentID IS NULL")
     no_type = d.one("SELECT COUNT(*) FROM GLEntry gl LEFT JOIN PayrollPayment pp ON pp.PayrollPaymentID = gl.SourceDocumentID WHERE pp.PayrollPaymentID IS NULL")
-    claim(no_type > 1000 * anti, "without the document type, the anti-join flags every ledger row that is not a payroll payment")
+    claim(no_type > 1000 * anti, "without the document type, the anti-join flags a very large number of ledger rows")
+    # It keeps the rows whose numeric SourceDocumentID matches no PayrollPayment ID: the orphans and part of the other
+    # documents' rows, while other documents' rows whose ID equals a payment's drop out, so it is not the non-payroll population.
+    nonpay = d.one("SELECT COUNT(*) FROM GLEntry WHERE SourceDocumentType <> 'PayrollPayment'")
+    kept = d.one("SELECT COUNT(*) FROM GLEntry gl LEFT JOIN PayrollPayment pp ON pp.PayrollPaymentID = gl.SourceDocumentID "
+                 "WHERE pp.PayrollPaymentID IS NULL AND gl.SourceDocumentType <> 'PayrollPayment'")
+    claim(no_type == kept + anti and 0 < kept < nonpay,
+          "without the document type, the anti-join keeps the payroll orphans and only part of the other ledger rows, because rows "
+          "whose ID equals a payment's drop out")
     not_in = d.one("SELECT COUNT(*) FROM GLEntry WHERE SourceDocumentType = 'PayrollPayment' AND SourceDocumentID NOT IN (SELECT PayrollPaymentID FROM PayrollPayment)")
     claim(not_in == anti and d.one("SELECT COUNT(*) FROM PayrollPayment WHERE PayrollPaymentID IS NULL") == 0,
           "NOT IN gives the same rows here, because the payment key is never NULL")

@@ -30,6 +30,8 @@ Microsoft. (2026c). *Create report tooltips in Power BI*. Microsoft Learn. <http
 
 Microsoft. (2026d). *Drillthrough in Power BI reports: Navigate to detailed insights*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-drillthrough>
 
-Microsoft. (2026e). *Use field parameters in Power BI reports*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-field-parameters>
+Microsoft. (2026e). *Export data from a Power BI visualization*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-export-data>
 
-Microsoft. (2026f). *Visual calculations overview*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-visual-calculations-overview>
+Microsoft. (2026f). *Use field parameters in Power BI reports*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-field-parameters>
+
+Microsoft. (2026g). *Visual calculations overview*. Microsoft Learn. <https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-visual-calculations-overview>

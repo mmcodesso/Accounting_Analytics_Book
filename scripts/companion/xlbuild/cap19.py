@@ -63,6 +63,10 @@ AM = "Accounting Manager"
 # a customer whose refunds over the window exceed 10,000; the sampling parameters are 95% confidence, 5% tolerable,
 # 0% expected, so n = 59 from tbl-19-03 (Requirement 6).
 MATERIALITY, PERFORMANCE, TRIVIAL = 0.05, 0.75, 0.05
+# The analytical follow-up trigger is a case assumption of its own, the share of the expectation that a one-rate expectation is
+# assumed to support. Clearly trivial governs the accumulation of identified misstatements (AS 2810), not whether an unexplained
+# analytical difference is investigated (AS 2305), so the two are separate cells, whatever their amounts happen to be.
+FOLLOW_UP = 0.05
 KEY_AMOUNT, KEY_CUSTOMER = 5000, 10000
 CONFIDENCE, TOLERABLE, EXPECTED = 0.95, 0.05, 0.0
 TAIL = 0.05                     # the plausible draws: the tightest range with each tail below 5%
@@ -273,6 +277,7 @@ class Facts:
         return dict(revenue=rev, returns=ret, rates=rates, actual=ret[-1], exp=exp, diff=diff, diff_pct=ret[-1] / exp - 1,
                     exp_f=exp_f, diff_f=ret[-1] - exp_f, f_pct=ret[-1] / exp_f - 1,
                     above_trivial=abs(diff) > m["trivial"], above_perf=abs(diff) > m["perf"],
+                    follow_up=FOLLOW_UP * exp, above_follow_up=abs(diff) > FOLLOW_UP * exp,
                     first_shipment=self.one("SELECT MIN(ShipmentDate) FROM Shipment"))
 
     # --- Requirement 4 ---------------------------------------------------------------------------------------------
@@ -540,6 +545,12 @@ class Facts:
         above_invoice = sum(1 for m in self.cm.values() if m["gt"] > self.inv[m["inv"]]["gt"] + 0.005)
         rate = round(sum(m["tax"] for m in self.cm.values()) / sum(m["sub"] + m["freight"] for m in self.cm.values()), 3)
         tax_ok = sum(1 for m in self.cm.values() if abs(m["tax"] - round((m["sub"] + m["freight"]) * rate, 2)) < 0.006)
+        # the rate is first corroborated on the original invoices the credits reverse (SubTotal plus freight, half a cent)
+        orig = ",".join(str(i) for i in sorted({m["inv"] for m in self.cm.values()}))
+        inv_rate = self.one(f"SELECT ROUND(SUM(TaxAmount) / SUM(SubTotal + FreightAmount), 3) FROM SalesInvoice "
+                            f"WHERE SalesInvoiceID IN ({orig})")
+        inv_tax_off = self.one(f"SELECT COUNT(*) FROM SalesInvoice WHERE SalesInvoiceID IN ({orig}) AND "
+                               f"ABS(TaxAmount - ROUND((SubTotal + FreightAmount) * ?, 2)) > 0.005", inv_rate)
         with_freight = sum(1 for m in self.cm.values() if m["freight"] > 0.005)
         other = sum(1 for inv, day, a, e, rid in self.all_apps if self.rcpt[rid]["cust"] != self.inv[inv]["cust"])
         dep = [(iso(r["dep"]) - iso(r["date"])).days for r in self.rcpt.values() if r["dep"]]
@@ -555,6 +566,7 @@ class Facts:
         return dict(lines=len(lines), traced=traced, over=over, qty_off=qty_off, half_up=half_up, freight_over=freight_over,
                     price_off=price_off, total_off=total_off, twice=twice,
                     distinct_inv=distinct_inv, above_invoice=above_invoice, rate=rate, tax_ok=tax_ok,
+                    inv_rate=inv_rate, inv_tax_off=inv_tax_off,
                     with_freight=with_freight, other=other, dep_lo=min(dep), dep_hi=max(dep), lag_lo=min(lag),
                     lag_hi=max(lag), raw_lo=min(x for x, _ in raw), raw_hi=max(x for x, _ in raw),
                     raw_over=sum(1 for x, _ in raw if x > 2), not_full=not_full, early_receipts=len({rid for rid, _ in early}),
@@ -1153,7 +1165,8 @@ def documentation(b: ExerciseBuild, ws) -> int:
                       f"{f.C + 1} with supplier payments only, which the Ledger query leaves out. The cycle's last "
                       f"documents are a credit memo of {last_cm[:10]} and a refund of {last_rf[:10]}: returns of late "
                       f"{f.C} shipments and the {f.C + 1} refunds of {f.C} credits are not in the data, so rates for the "
-                      f"last months are incomplete (the case's second Watch out)."})
+                      f"last months are incomplete: compare cohorts with equal follow-up under an explicit cutoff rule "
+                      f"(the case's second Watch out)."})
     bold(ws, f"A{first}:A{r}")
     ws.Range(f"B{r}").WrapText = True
     b.found["doc_dates"] = first
@@ -1406,7 +1419,8 @@ def r1(b: ExerciseBuild) -> None:
          "=COUNTIF(Refunds[AboveLimit],TRUE)", "Requirement 4"),
         ("C7", "A refund only of a credit balance the customer has paid",
          "The refund date against the dates of the payments applied to the credited invoice.",
-         "Whether a payment had cleared the bank; the customer's request for the refund.",
+         "Independent bank evidence (the refund's ClearedDate is recorded but not verified, and nothing shows when a "
+         "customer's payment cleared); the customer's request for the refund.",
          "=COUNTIF(Refunds[BeforePayment],TRUE)", "Requirements 4, 6"),
         ("C8", "Refunds to the payer's own method or account, net of open balances",
          "The refund's method against the methods of the receipts on the invoice; the customer's open balances on "
@@ -1729,8 +1743,11 @@ def r3(b: ExerciseBuild) -> None:
              "A6": "Overall materiality", "B6": "=B4*B5",
              "A7": "Performance materiality rate", "B7": PERFORMANCE, "C7": "75% of materiality",
              "A8": "Performance materiality", "B8": "=B6*B7",
-             "A9": "Clearly trivial rate", "B9": TRIVIAL, "C9": "5% of materiality",
-             "A10": "Clearly trivial threshold", "B10": "=B6*B9"})
+             "A9": "Clearly trivial rate", "B9": TRIVIAL, "C9": "5% of materiality, to accumulate identified misstatements",
+             "A10": "Clearly trivial threshold", "B10": "=B6*B9",
+             "A11": "Analytical follow-up trigger rate", "B11": FOLLOW_UP,
+             "C11": "A case assumption: the share of the expectation a one-rate expectation supports",
+             "A12": "Analytical follow-up trigger", "B12": "=B11*B19"})
     fmt(ws, "B4", MONEY)
     fmt(ws, "B5", "0%")
     fmt(ws, "B7", "0%")
@@ -1738,20 +1755,25 @@ def r3(b: ExerciseBuild) -> None:
     fmt(ws, "B6", MONEY)
     fmt(ws, "B8", MONEY)
     fmt(ws, "B10", MONEY)
+    fmt(ws, "B11", "0%")
+    fmt(ws, "B12", MONEY)
     bold(ws, "A6:B6")
     bold(ws, "A8:B8")
     bold(ws, "A10:B10")
+    bold(ws, "A12:B12")
     xl.name_cell(wb, "Materiality", "Materiality!$B$6")
     xl.name_cell(wb, "PerformanceMateriality", "Materiality!$B$8")
     xl.name_cell(wb, "ClearlyTrivial", "Materiality!$B$10")
-    put(ws, {"A11": "The chart of accounts has no income tax account, so the income the ledger records is income before "
+    xl.name_cell(wb, "AnalyticalFollowUp", "Materiality!$B$12")
+    put(ws, {"A30": "The chart of accounts has no income tax account, so the income the ledger records is income before "
                     "income taxes. Materiality is not rounded, so every comparison uses the cells above."})
-    ws.Range("A11").WrapText = True
-    ws.Range("A11").Font.Italic = True
+    ws.Range("A30").WrapText = True
+    ws.Range("A30").Font.Italic = True
     b.check(t, f"income before income taxes, fiscal {f.C}", r2(m["income"]), "=Materiality!B4")
     b.check(t, "overall materiality", m["mat"], "=Materiality", 0.0001)
     b.check(t, "performance materiality", m["perf"], "=PerformanceMateriality", 0.0001)
     b.check(t, "clearly trivial", m["trivial"], "=ClearlyTrivial", 0.0001)
+    b.check(t, "analytical follow-up trigger rate", FOLLOW_UP, "=Materiality!B11", 1e-9, "0%")
 
     heading(ws, 13, f"Analytical expectation of fiscal {f.C} returns")
     header(ws, 14, 1, ["Item"] + [str(y) for y in f.years])
@@ -1773,14 +1795,15 @@ def r3(b: ExerciseBuild) -> None:
             ("A20", f"Recorded fiscal {f.C} returns (debits to 4060)", "B20", "=D16", MONEY),
             ("A21", "Difference, recorded less expected", "B21", "=B20-B19", MONEY),
             ("A22", "Difference as a percentage of the expectation", "B22", "=B21/B19", "0.0%"),
-            ("A23", "Against the clearly trivial threshold", "B23",
-             '=IF(ABS(B21)>ClearlyTrivial,"Above clearly trivial","Not above clearly trivial")', None),
+            ("A23", "Against the analytical follow-up trigger (a case assumption)", "B23",
+             '=IF(ABS(B21)>AnalyticalFollowUp,"Above the follow-up trigger","Below the follow-up trigger")', None),
             ("A24", "Against performance materiality", "B24",
              '=IF(ABS(B21)>PerformanceMateriality,"Above performance materiality","Below performance materiality")', None),
             ("A25", "Conclusion", "B25",
-             '=IF(ABS(B21)>PerformanceMateriality,"Investigate: the difference exceeds performance materiality",'
-             'IF(ABS(B21)>ClearlyTrivial,"Investigate (Requirement 5): above clearly trivial, below performance '
-             'materiality","Accept: the difference is clearly trivial"))', None),
+             '=IF(ABS(B21)>AnalyticalFollowUp,"Investigate (Requirement 5): an unexplained difference above the '
+             'follow-up trigger"&IF(ABS(B21)>PerformanceMateriality,", above performance materiality",", below '
+             'performance materiality"),"Below the quantitative trigger; consider qualitative risk and expectation '
+             'precision")', None),
             ("A27", f"Expectation of fiscal {f.C} returns at the {f.F} rate", "B27", "=D15*B17", MONEY),
             ("A28", "Difference, recorded less expected", "B28", "=B20-B27", MONEY),
             ("A29", "Difference as a percentage of the expectation", "B29", "=B28/B27", "0.0%")]
@@ -1797,8 +1820,13 @@ def r3(b: ExerciseBuild) -> None:
     b.check(t, f"expectation of {f.C} returns at the {f.P} rate", e["exp"], "=Materiality!B19", 0.005)
     b.check(t, "difference, recorded less expected", e["diff"], "=Materiality!B21", 0.005)
     b.check(t, "difference, percentage", e["diff_pct"], "=Materiality!B22", 5e-5, "0.0%")
-    b.check(t, "against clearly trivial", "Above clearly trivial" if e["above_trivial"] else "Not above clearly trivial",
-            "=Materiality!B23")
+    b.check(t, "analytical follow-up trigger", e["follow_up"], "=Materiality!B12", 0.005)
+    b.check(t, "against the follow-up trigger", "Above the follow-up trigger" if e["above_follow_up"]
+            else "Below the follow-up trigger", "=Materiality!B23")
+    b.check(t, "conclusion", "Investigate (Requirement 5): an unexplained difference above the follow-up trigger"
+            + (", above performance materiality" if e["above_perf"] else ", below performance materiality")
+            if e["above_follow_up"] else "Below the quantitative trigger; consider qualitative risk and expectation precision",
+            "=Materiality!B25")
     b.check(t, "against performance materiality",
             "Above performance materiality" if e["above_perf"] else "Below performance materiality", "=Materiality!B24")
     b.check(t, f"expectation at the {f.F} rate", e["exp_f"], "=Materiality!B27", 0.005)
@@ -1807,13 +1835,17 @@ def r3(b: ExerciseBuild) -> None:
         f"Materiality starts from a benchmark of 5% of fiscal {f.C} income before income taxes as the ledger records "
         f"it, {money(m['income'])}: {money(m['mat'])}, with performance materiality of {money(m['perf'])} and a "
         f"clearly trivial threshold of {money(m['trivial'])}, all case assumptions, and a fraud or governance risk can "
-        "matter below them. The chart of accounts has no income tax account, so the ledger's net income is the "
+        "matter below them. Clearly trivial governs the accumulation of identified misstatements; whether an analytical "
+        f"difference is investigated is a separate judgment, made here against a follow-up trigger of {money(e['follow_up'])} "
+        f"({pct(FOLLOW_UP, 0)} of the expectation, a case assumption for an expectation built from one rate). The chart of accounts has no income tax account, so the ledger's net income is the "
         "basis; the CFO's open questions on tax status do not change it for this audit.",
         f"At the {f.P} return rate ({pct(e['rates'][1], 3)} of the revenue sales invoices posted), fiscal {f.C} "
         f"returns would be expected at {money(e['exp'])}; the ledger records {money(e['actual'])}, "
-        f"{money(e['diff'])} or {pct(e['diff_pct'])} more. The difference is above clearly trivial and below "
-        "performance materiality, so it is not a misstatement in itself, but it calls for an explanation: Requirement "
-        "5 looks for where returns grow (by item group, reason, customer, and shipment month).",
+        f"{money(e['diff'])} or {pct(e['diff_pct'])} more. It is an unexplained difference, not an identified "
+        "misstatement. It is above the follow-up trigger and below performance materiality, so it calls for an "
+        "explanation: Requirement 5 looks for where returns grow (by item group, reason, customer, and shipment month). "
+        "A difference under the trigger would not simply be accepted: qualitative risk and the expectation's precision "
+        "still count.",
         f"The {f.F} rate ({pct(e['rates'][0], 3)}) would make a poorer expectation ({money(e['exp_f'])}: the recorded "
         f"returns are {pct(e['f_pct'])} above it). Fiscal {f.F} was the first year of operations in the data "
         f"(the first shipment is dated {e['first_shipment'][:10]}): it had no earlier sales to return, and returns "
@@ -1926,7 +1958,8 @@ def r3(b: ExerciseBuild) -> None:
          "Excel", "Database (dates); clearance is outside",
          f"{len(tt['before'])} refunds before the last application ({len(tt['before_rcpt'])} by receipt date)", "High"],
         ["A refund is diverted to another payee", "Occurrence of disbursements (fraud)", "C8",
-         "Refunds to the payer's method or a verified account, open balances offset first", "Refund method against the "
+         "Refunds to the payer's method or a verified account; the customer terms and applicable policy verified, and "
+         "eligible open balances offset before refund where those terms or the policy require or permit it", "Refund method against the "
          "receipts' methods; past-due balance on the refund date; sample for the payee check and the written request",
          "SQL; Excel sample", "Mostly outside: the payee, the bank account, and the request are in no table",
          "153 method mismatches; 124 refunds to customers past due by at least the refund", "High"],
@@ -2308,8 +2341,9 @@ def r4(b: ExerciseBuild) -> None:
         f"precede the last receipt, {len(tt['nothing_rcpt'])} of them any receipt; the {len(tt['same_day'])} the two "
         "definitions part on are dated the day of the last receipt, applied later, and the records hold no times, so "
         "their order that day is unknown; neither date shows when a payment cleared the bank. The cause is in how "
-        "credits post: a credit goes to receivables only for what the invoice's final payments leave unpaid, and the "
-        f"rest to 2060, so {cz['unpaid']} of the {cz['to_2060']} credits to 2060 were posted when nothing had been "
+        "credits post: the dataset's allocation uses the invoice's final payment information, a credit going to "
+        "receivables only for what the final payments leave unpaid and the rest to 2060, so a 2060 credit does not show "
+        f"that the customer had funded it by the credit or refund date; {cz['unpaid']} of the {cz['to_2060']} credits to 2060 were posted when nothing had been "
         "applied to the invoice, and nothing in the records shows the refund step checking the customer's payments "
         "before it pays out 2060.",
         f"Offset and method. On the refund date (as of that date: GrandTotal less the applications and credits dated by "
@@ -2343,10 +2377,11 @@ def r6(b: ExerciseBuild) -> None:
     t = "Requirement 6"
     s = f.sampling
     ws = new_sheet(b, "Sample")
-    widths(ws, {"A": 46, "B": 16, "C": 13, "D": 13, "E": 14, "F": 16, "G": 26, "H": 18, "I": 18, "J": 22, "K": 18})
+    widths(ws, {"A": 46, "B": 16, "C": 13, "D": 13, "E": 14, "F": 16, "G": 26, "H": 18, "I": 18, "J": 22, "K": 18,
+                "M": 52, "N": 30})
     title(ws, "Requirement 6: Sampling what the database cannot show",
-          "Refunds of fiscal 2024 to 2026: key items in full, a random selection of the rest frozen with Paste Values, "
-          "and the evaluation rule written before testing.")
+          "Refunds of fiscal 2024 to 2026: the plan and the evaluation rule first, then the key items in full and a random "
+          "selection of the rest frozen with Paste Values and a copy of the plan.")
     heading(ws, 4, "Attributes")
     merged_table(ws, 5, [1, 4, 5], ["Attribute", "Evidence needed", "A deviation is"], [
         ["A1. A written request from the customer", "The customer's request for the refund (letter, e-mail, or portal "
@@ -2438,12 +2473,13 @@ def r6(b: ExerciseBuild) -> None:
 
     # the evaluation rule, written before the test
     e0 = 33 + nk + 2
-    heading(ws, e0, "Evaluation rule, written before testing: the upper deviation limit for zero to three deviations")
+    heading(ws, e0, "Evaluation rule, written before the draw and the test: the upper deviation limit for zero to three "
+                    "deviations")
     header(ws, e0 + 1, 1, ["Deviations found in the sample", "Upper deviation limit", "Supports reliance at the "
                                                                                        "tolerable rate?"])
     for k in range(4):
         r = e0 + 2 + k
-        put(ws, {f"A{r}": k, f"B{r}": f"=BETA.INV(SampleConfidence,A{r}+1,SampleSize-A{r})",
+        put(ws, {f"A{r}": k, f"B{r}": f"=IF(A{r}=SampleSize,1,BETA.INV(SampleConfidence,A{r}+1,SampleSize-A{r}))",
                  f"C{r}": f'=IF(B{r}<=TolerableRate,"Yes","No")'})
         b.check(t, f"upper deviation limit, {k} deviations", s["udl"][k], f"=Sample!B{r}", 5e-6, "0.00%")
         b.check(t, f"supports reliance with {k} deviations", "Yes" if s["udl"][k] <= TOLERABLE else "No",
@@ -2451,8 +2487,9 @@ def r6(b: ExerciseBuild) -> None:
     fmt(ws, f"A{e0 + 2}:A{e0 + 5}", COUNT)
     fmt(ws, f"B{e0 + 2}:B{e0 + 5}", "0.00%")
     put(ws, {f"A{e0 + 6}": "Rule: rely on the control only if the upper deviation limit is at or below the tolerable "
-                           "rate; at n = 59 that means no deviation at all. The rule runs past what the plan allows, and "
-                           "BETA.INV holds while the deviations are fewer than the items (all deviating: 100%)."})
+                           "rate; at n = 59 that means no deviation at all. The rule runs past what the plan allows, "
+                           "BETA.INV holds while the deviations are fewer than the items, and the formula returns 100% "
+                           "when every item deviates. It is written before the draw and never backdated."})
     ws.Range(f"A{e0 + 6}").Font.Italic = True
 
     # the frozen selection
@@ -2478,6 +2515,50 @@ def r6(b: ExerciseBuild) -> None:
     ws.Range(f"B{s0 + 1}").AddComment(
         f"Drawn by Excel's RANDARRAY when this solution was built, on {pq.today()}, with\n{draw}\nand frozen with Paste "
         "Values (Requirement 6). Your own draw will differ; the evaluation below follows the draw.")
+    # the frozen plan: a copy, as values, of the planning cells at the moment the selection was frozen, with the counts that
+    # reconcile the selection (selected, distinct, found, eligible, tested); the evaluation reads these, not the live cells
+    rng = f"$B${first}:$B${last}"
+    kcol = f"$K${first}:$K${last}"
+    header(ws, s0 + 1, 13, ["Frozen plan", "Value"])
+    fr0 = s0 + 2
+    plan = [("Confidence level (frozen)", CONFIDENCE), ("Tolerable deviation rate (frozen)", TOLERABLE),
+            ("Expected deviation rate (frozen)", EXPECTED), ("Planned sample size (frozen)", n),
+            ("Deviations the plan allows (frozen)", 0), ("Key item: a refund of at least (frozen)", KEY_AMOUNT),
+            ("Key item: customer total over (frozen)", KEY_CUSTOMER), ("Refunds in the population (frozen)", len(f.rf)),
+            ("Key items (frozen)", len(s["key"])), ("Frozen on", serial(pq.today()))]
+    for i, (label, value) in enumerate(plan):
+        put(ws, {f"M{fr0 + i}": label, f"N{fr0 + i}": value})
+    r_conf, r_tol, r_exp, r_size, r_allow, r_ka, r_kc, r_pop, r_nkey, r_on = (fr0 + i for i in range(10))
+    fmt(ws, f"N{r_conf}:N{r_exp}", "0%")
+    fmt(ws, f"N{r_size}:N{r_allow}", COUNT)
+    fmt(ws, f"N{r_ka}:N{r_kc}", MONEY)
+    fmt(ws, f"N{r_pop}:N{r_nkey}", COUNT)
+    fmt(ws, f"N{r_on}", DATE)
+    ws.Range(f"N{fr0}:N{r_on}").Interior.Color = xl.LIGHT_FILL
+    ws.Range(f"M{fr0}").AddComment("Values copied when the selection was frozen. A change to any planning input makes the "
+                                   "selection stale: redraw it, or revalidate it against the new plan.")
+    g0 = r_on + 1
+    r_chg, r_sel, r_dis, r_fnd, r_elig, r_tst, r_acc, r_rule = (g0 + i for i in range(8))
+    elig = f"FILTER(Refunds[RefundNumber],{NOT_KEY})"
+    put(ws, {
+        f"M{r_chg}": "Plan changed since the freeze?",
+        f"N{r_chg}": (f'=IF(AND(SampleConfidence=N{r_conf},TolerableRate=N{r_tol},ExpectedRate=N{r_exp},'
+                      f'SampleSize=N{r_size},B16=N{r_allow},KeyAmount=N{r_ka},KeyCustomerTotal=N{r_kc},'
+                      f'B25=N{r_pop},B26=N{r_nkey}),"No","Yes: redraw or revalidate the selection")'),
+        f"M{r_sel}": "Items selected", f"N{r_sel}": f"=COUNTA({rng})",
+        f"M{r_dis}": "Distinct", f"N{r_dis}": f"=ROWS(UNIQUE({rng}))",
+        f"M{r_fnd}": "Found among the refunds", f"N{r_fnd}": f"=SUM(--ISNUMBER(XMATCH({rng},Refunds[RefundNumber])))",
+        f"M{r_elig}": "Eligible (not key items)", f"N{r_elig}": f"=SUM(--ISNUMBER(XMATCH({rng},{elig})))",
+        f"M{r_tst}": "Tested (valid, distinct, eligible, with an outcome)",
+        f"N{r_tst}": (f'=SUMPRODUCT(--ISNUMBER(XMATCH({rng},Refunds[RefundNumber])),--(COUNTIF({rng},{rng})=1),'
+                      f'--ISNUMBER(XMATCH({rng},{elig})),--IFERROR(({kcol}="Deviation")+({kcol}="No deviation")>0,FALSE))'),
+        f"M{r_acc}": "All intended items accounted for?",
+        f"N{r_acc}": (f'=IF(AND(N{r_sel}=N{r_size},N{r_dis}=N{r_sel},N{r_fnd}=N{r_sel},N{r_elig}=N{r_sel},'
+                      f'N{r_tst}=N{r_sel}),"Yes","No")'),
+        f"M{r_rule}": "Rule table reaches deviations allowed + 1?",
+        f"N{r_rule}": f'=IF(MAX(A{e0 + 2}:A{e0 + 5})>=B16+1,"Yes","No: extend the rule table")'})
+    fmt(ws, f"N{r_sel}:N{r_tst}", COUNT)
+    ws.Range(f"M{g0}:M{r_rule}").Font.Italic = True
     lk = lambda col, r: f"=XLOOKUP($B{r},Refunds[RefundNumber],Refunds[{col}])"  # noqa: E731
     for i in range(n):
         r = first + i
@@ -2497,43 +2578,52 @@ def r6(b: ExerciseBuild) -> None:
             0, COUNT)
     b.check(t, "selected refunds that are key items", 0, f"=SUM(--ISNUMBER(XMATCH({rng},INDEX(Sample!A32#,0,1))))", 0,
             COUNT)
+    b.check(t, "frozen plan: planned sample size", n, f"=Sample!N{r_size}", 0, COUNT)
+    b.check(t, "frozen plan: unchanged since the freeze", "No", f"=Sample!N{r_chg}")
+    b.check(t, "selection: items selected, distinct, found, eligible and tested", f"{n}/{n}/{n}/{n}/{n}",
+            f'=Sample!N{r_sel}&"/"&Sample!N{r_dis}&"/"&Sample!N{r_fnd}&"/"&Sample!N{r_elig}&"/"&Sample!N{r_tst}')
+    b.check(t, "selection: every intended item accounted for", "Yes", f"=Sample!N{r_acc}")
+    b.check(t, "rule table reaches deviations allowed + 1", "Yes", f"=Sample!N{r_rule}")
 
     # the data attribute applied to the sample, and the population
     v0 = last + 3
     heading(ws, v0, "D1 applied to the sample, and compared with the population test of Requirement 4")
     put(ws, {f"A{v0 + 1}": "Deviations in the sample", f"B{v0 + 1}": f'=COUNTIF(K{first}:K{last},"Deviation")',
-             f"A{v0 + 2}": "Sample deviation rate", f"B{v0 + 2}": f"=B{v0 + 1}/SampleSize",
-             f"A{v0 + 3}": "Upper deviation limit", f"B{v0 + 3}": f"=IF(B{v0 + 1}>=SampleSize,1,BETA.INV("
-                                                                   f"SampleConfidence,B{v0 + 1}+1,SampleSize-B{v0 + 1}))",
+             f"A{v0 + 2}": "Sample deviation rate", f"B{v0 + 2}": f'=IF(ISNUMBER(B{v0 + 3}),B{v0 + 1}/N{r_tst},"Not evaluable")',
+             f"A{v0 + 3}": "Upper deviation limit",
+             f"B{v0 + 3}": (f'=IF(N{r_chg}<>"No","Plan changed: redraw or revalidate the selection",'
+                            f'IF(OR(N{r_tst}=0,N{r_acc}<>"Yes",B{v0 + 1}>N{r_tst}),"Not evaluable: reconcile the selection '
+                            f'and finish the tests",IF(B{v0 + 1}=N{r_tst},1,BETA.INV(N{r_conf},B{v0 + 1}+1,N{r_tst}-B{v0 + 1}))))'),
              f"A{v0 + 4}": "The sample's conclusion",
-             f"B{v0 + 4}": f'=IF(B{v0 + 3}<=TolerableRate,"Supports reliance","Does not support reliance")',
+             f"B{v0 + 4}": f'=IF(ISNUMBER(B{v0 + 3}),IF(B{v0 + 3}<=N{r_tol},"Supports reliance","Does not support reliance"),B{v0 + 3})',
              f"A{v0 + 5}": "Remaining refunds dated before the last application (population test)",
              f"B{v0 + 5}": f"=SUM(--FILTER(Refunds[BeforePayment],{NOT_KEY}))",
              f"A{v0 + 6}": "Their rate", f"B{v0 + 6}": f"=B{v0 + 5}/B27",
              f"A{v0 + 7}": "Key items dated before the last application", f"B{v0 + 7}": "=COUNTIF(INDEX(A32#,0,7),TRUE)",
              f"A{v0 + 8}": "All refunds dated before the last application (Requirement 4)",
              f"B{v0 + 8}": "=COUNTIF(Refunds[BeforePayment],TRUE)",
-             f"A{v0 + 9}": "Deviations a sample of SampleSize expects", f"B{v0 + 9}": f"=SampleSize*B{v0 + 5}/B27",
+             f"A{v0 + 9}": "Deviations a sample of SampleSize expects", f"B{v0 + 9}": f"=N{r_size}*B{v0 + 5}/B27",
              f"A{v0 + 10}": "Plausible draws: lowest count (each tail below 5%)",
-             f"B{v0 + 10}": f"=XMATCH(TRUE,HYPGEOM.DIST(SEQUENCE(SampleSize+1,,0),SampleSize,B{v0 + 5},B27,TRUE)>=0.05)-1",
+             f"B{v0 + 10}": f"=XMATCH(TRUE,HYPGEOM.DIST(SEQUENCE(N{r_size}+1,,0),N{r_size},B{v0 + 5},B27,TRUE)>=0.05)-1",
              f"A{v0 + 11}": "Plausible draws: highest count",
-             f"B{v0 + 11}": f"=XMATCH(TRUE,HYPGEOM.DIST(SEQUENCE(SampleSize+1,,0),SampleSize,B{v0 + 5},B27,TRUE)>0.95)-1",
+             f"B{v0 + 11}": f"=XMATCH(TRUE,HYPGEOM.DIST(SEQUENCE(N{r_size}+1,,0),N{r_size},B{v0 + 5},B27,TRUE)>0.95)-1",
              f"A{v0 + 12}": "Probability of fewer than the lowest count",
-             f"B{v0 + 12}": f"=HYPGEOM.DIST(B{v0 + 10}-1,SampleSize,B{v0 + 5},B27,TRUE)",
+             f"B{v0 + 12}": f"=HYPGEOM.DIST(B{v0 + 10}-1,N{r_size},B{v0 + 5},B27,TRUE)",
              f"A{v0 + 13}": "Probability of no more than the highest count",
-             f"B{v0 + 13}": f"=HYPGEOM.DIST(B{v0 + 11},SampleSize,B{v0 + 5},B27,TRUE)",
+             f"B{v0 + 13}": f"=HYPGEOM.DIST(B{v0 + 11},N{r_size},B{v0 + 5},B27,TRUE)",
              f"A{v0 + 14}": "Upper deviation limit at the lowest count",
-             f"B{v0 + 14}": f"=BETA.INV(SampleConfidence,B{v0 + 10}+1,SampleSize-B{v0 + 10})",
+             f"B{v0 + 14}": f"=BETA.INV(N{r_conf},B{v0 + 10}+1,N{r_size}-B{v0 + 10})",
              f"A{v0 + 15}": "Upper deviation limit at the expected count",
-             f"B{v0 + 15}": f"=BETA.INV(SampleConfidence,ROUND(B{v0 + 9},0)+1,SampleSize-ROUND(B{v0 + 9},0))",
+             f"B{v0 + 15}": f"=BETA.INV(N{r_conf},ROUND(B{v0 + 9},0)+1,N{r_size}-ROUND(B{v0 + 9},0))",
              f"A{v0 + 16}": "Upper deviation limit at the highest count",
-             f"B{v0 + 16}": f"=BETA.INV(SampleConfidence,B{v0 + 11}+1,SampleSize-B{v0 + 11})",
+             f"B{v0 + 16}": f"=BETA.INV(N{r_conf},B{v0 + 11}+1,N{r_size}-B{v0 + 11})",
              f"A{v0 + 17}": "Probability that a sample finds no deviation",
-             f"B{v0 + 17}": f"=HYPGEOM.DIST(0,SampleSize,B{v0 + 5},B27,FALSE)",
+             f"B{v0 + 17}": f"=HYPGEOM.DIST(0,N{r_size},B{v0 + 5},B27,FALSE)",
              f"A{v0 + 18}": "Comparison",
-             f"B{v0 + 18}": f'=IF(AND(B{v0 + 4}="Does not support reliance",B{v0 + 8}>0),"The sample agrees with the '
+             f"B{v0 + 18}": f'=IF(NOT(ISNUMBER(B{v0 + 3})),"Not compared: the sample is not evaluable",'
+                            f'IF(AND(B{v0 + 4}="Does not support reliance",B{v0 + 8}>0),"The sample agrees with the '
                             f'population test: neither supports reliance on the control","The sample and the population '
-                            f'disagree: investigate")'})
+                            f'disagree: investigate"))'})
     fmt(ws, f"B{v0 + 1}", COUNT)
     fmt(ws, f"B{v0 + 2}:B{v0 + 3}", "0.0%")
     fmt(ws, f"B{v0 + 5}", COUNT)
@@ -2605,13 +2695,15 @@ def r6(b: ExerciseBuild) -> None:
         f"deviation allowed. The {len(s['key'])} key items ({money(s['key_total'])}: {series(r['num'] for r in s['key'])}) "
         "are every refund of $5,000 or more and every refund to a customer whose refunds over the three years exceed "
         f"$10,000; they are examined in full. The other {len(s['rest'])} refunds ({money(s['rest_total'])}) were put in "
-        f"random order with SORTBY and RANDARRAY, the first {n} kept and frozen with Paste Values on {pq.today()}. "
+        f"random order with SORTBY and RANDARRAY, the first {n} kept and frozen with Paste Values on {pq.today()}, with a "
+        "copy of the plan beside the selection (columns M and N): a changed input means a new selection, and the bound "
+        "uses the frozen selection's tested count. "
         f"A sample of {n} is {pct(s['share'])} of {len(s['rest'])}: the large-population table is conservative here, "
         "and a finite-population correction would allow a smaller sample. A1 and A2 apply to every refund; A3 "
         "applies only to the refunds of Damaged returns and needs a population of its own (below). The draw covers "
         f"fiscal {f.F} to {f.C}, so it supports a conclusion on the three years together; a conclusion as at the end "
         f"of {f.C} also needs evidence that the controls did not change.",
-        f"Rule, written before testing. The upper deviation limit at {n} is {pct(s['udl'][0], 2)} for no deviation, "
+        f"Rule, written before the draw. The upper deviation limit at {n} is {pct(s['udl'][0], 2)} for no deviation, "
         f"{pct(s['udl'][1], 2)} for one, {pct(s['udl'][2], 2)} for two, and {pct(s['udl'][3], 2)} for three. Only "
         "zero deviations supports reliance at 5%; one deviation in any attribute means the control cannot be relied "
         "on. BETA.INV holds while the deviations are fewer than the items; if every item deviated, the limit would be "
@@ -2800,15 +2892,17 @@ def r7(b: ExerciseBuild) -> None:
         ("Credit lines whose price or discount differs from the invoice line's", f"{sb['price_off']}", "Clean"),
         ("Credit lines whose LineTotal is not ROUND(Q x P x (1 - D), 2) (SQLite)",
          f"{len(sb['total_off'])} (credit line {', '.join(map(str, sb['total_off']))})",
-         "A half-cent rounding, not an error"),
+         "A one-cent difference at an exact half-cent tie: state the rounding convention and document it"),
         ("Credit lines whose LineTotal is not the exact product rounded half up",
          f"{len(sb['half_up'])} (credit line{'s' if len(sb['half_up']) != 1 else ''} "
          f"{', '.join(map(str, sb['half_up']))})", "Exact half-cents rounded down: no single rounding rule, not an error"),
         ("Credits per invoice; credits above their invoice's total", f"{sb['distinct_inv']} credits on "
          f"{sb['distinct_inv']} invoices; {sb['above_invoice']}", "Clean"),
-        (f"Tax at {sb['rate']:.1%} of SubTotal plus freight", f"{sb['tax_ok']} of {len(f.cm)} (a test on SubTotal alone "
-         f"falsely flags the {sb['with_freight']} credits with freight)",
-         "Clean (the rate is read from the credits themselves: a diagnostic)"),
+        (f"Original invoices whose tax is not {sb['rate']:.1%} of SubTotal plus freight", f"{sb['inv_tax_off']} of {len(f.cm)}",
+         "Clean (the rate and its taxability still need the approved policy)"),
+        (f"Credit tax at {sb['rate']:.1%} of SubTotal plus freight credited", f"{sb['tax_ok']} of {len(f.cm)} (a test on "
+         f"SubTotal alone falsely flags the {sb['with_freight']} credits with freight)",
+         "Clean at the rate the original invoices corroborate (the credits' own effective rate is a diagnostic)"),
         ("Freight credits above the invoice's freight", f"{sb['freight_over']}",
          "Clean (an upper bound: no freight policy in the records)"),
         ("Receipts applied to another customer's invoices", f"{sb['other']}", "Clean"),
@@ -2830,20 +2924,22 @@ def r7(b: ExerciseBuild) -> None:
         f"Damaged were restocked at {money(sum(f.restock.get(('Damaged', y), 0.0) for y in f.years))} over three "
         f"years ({money(f.restock.get(('Damaged', f.C), 0.0))} in fiscal {f.C}), and with Quality Concern "
         f"{money(sum(f.restock.get((x, f.C), 0.0) for x in dq))} in fiscal {f.C}; the chart has no write-down "
-        f"account. The {fr['n']} return lines of less than one unit are costed below standard ({money(fr['gap'])}, "
-        f"{money(fr['gap_dq'])} of it Damaged and Quality Concern). These are gross flows, not the inventory still "
+        f"account. {fr['n']} complete returns of shipment lines of less than one unit are recorded at the quantity times the "
+        f"shipment line's already extended cost, {money(fr['gap'])} below quantity times the unit standard cost "
+        f"({money(fr['gap_dq'])} of it Damaged and Quality Concern); that pattern explains how the records were produced, "
+        "not that the valuation is correct, so the recorded amounts are reconciled, the differences listed apart, and the "
+        "costing policy requested. These are gross flows, not the inventory still "
         "held: a valuation question for the inventory at the year-end (lower of cost and net realizable value), to "
         "settle with the inspection records and the stock on hand, below performance materiality but worth an "
         "inspection step.",
-        "First digits. A first-digit test is a weak procedure here, by Chapter 8's criteria, though no minimum count "
-        "rules it out: the credits and refunds are subsets selected by events (a return, then the part of a credit "
-        "posted to customer deposits), and their amounts follow the invoice lines they reverse. With "
-        f"{len(f.rf)} refunds, a population that followed Benford's Law exactly would show a MAD of about "
-        f"{f.first_digits['chance_rf']:.4f} by chance alone, beyond the 0.015 of nonconformity, and the {len(f.cm)} "
-        f"credits about {f.first_digits['chance_cm']:.4f}; their MADs, {f.first_digits['mad_rf']:.4f} and "
-        f"{f.first_digits['mad_cm']:.4f}, are of that size, so a departure could not be told from chance. The tests "
-        "that fit are the recomputation of each credit and the comparison of each refund with its credit and "
-        "payments."], span=5)
+        "First digits. By Chapter 8's criteria these populations are not established as suitable for a first-digit "
+        "conformity test: the credits and refunds are event-selected reversals of invoice amounts (a return, then the "
+        "part of a credit posted to customer deposits), and their amounts follow the invoice lines they reverse. As an "
+        f"optional extension the chapter does not teach, {len(f.rf)} refunds that followed Benford's Law exactly would "
+        f"show a MAD of about {f.first_digits['chance_rf']:.4f} by chance, and {len(f.cm)} credits about "
+        f"{f.first_digits['chance_cm']:.4f}, against actual MADs of {f.first_digits['mad_rf']:.4f} and "
+        f"{f.first_digits['mad_cm']:.4f}. The tests that fit are the recomputation of each credit and the comparison "
+        "of each refund with its credit and payments."], span=5)
 
 
 # --- Requirement 8: the evaluation of deficiencies -------------------------------------------------------------------
@@ -2890,14 +2986,15 @@ def r8(b: ExerciseBuild) -> None:
         ["D3", "Refunds approved above the approver's recorded authority", "C6", "Design, provisional (no delegation "
          "in the records)", *tref("T7"), against,
          "Reasonably possible: Staff Accountants and Administrative Specialists with a limit of $0 approve refunds.",
-         "Each refund equals its credit's 2060 part; the credits are clean. No control over the payee.", "D4, D6",
+         "Each refund equals its credit's 2060 part; the credits are clean. No independently tested payee-verification "
+         "control is evidenced in this extract; obtain the policy, workflow and operating evidence.", "D4, D6",
          "Significant deficiency (combined with D4 and D6), provisional", "Control deficiency: report"],
         ["D4", "Refunds dated before the last application of the customer's payments to the credited invoice", "C7",
          "Design, provisional (the refund step as recorded)", *tref("T9"),
          against, "Reasonably possible: credits on unpaid invoices go to 2060, and nothing in the records shows the "
                   "refund step checking payment.",
-         f"None found: the last application came {min(tt['wait'])} to {max(tt['wait'])} days later, which no control "
-         "required.",
+         f"Later applications are recorded ({min(tt['wait'])} to {max(tt['wait'])} days after the refund); the extract "
+         "does not establish what funding check the refund process required or performed.",
          "D3, D6", "Significant deficiency (combined with D3 and D6), provisional", "Control deficiency: report"],
         ["D5", "No offset of past-due balances before a refund (refunds to customers past due by at least the refund)",
          "C8", "Not established: no policy in the records", *tref("T12"), against,
@@ -2916,7 +3013,8 @@ def r8(b: ExerciseBuild) -> None:
          "An evidence gap: the records cannot show that the preparer differs from the approver; a design deficiency if "
          "the system keeps no preparer.",
          "None in the records.", "D3, D4", "Evidence gap; combines with D3 and D4 if the system keeps no preparer",
-         "Control deficiency: report"],
+         "Evidence gap: obtain preparer/workflow logs and system-design evidence; determine and report a deficiency only "
+         "if supported."],
         ["D7", f"The {am}'s concentration: commission rates, accruals, and payments; refunds within limit, "
                "including the largest; all payroll registers (Chapters 12 and 16)", "C5, C6",
          "Design, provisional (no independent review in the records)",
@@ -2932,8 +3030,10 @@ def r8(b: ExerciseBuild) -> None:
                                                          f'ReturnLines[FiscalYear],{cy})',
          '=SUMIFS(ReturnLines[ExtendedStandardCost],ReturnLines[ReasonCode],"Damaged")',
          f'=SUMIFS(ReturnLines[ExtendedStandardCost],ReturnLines[ReasonCode],"Damaged",ReturnLines[FiscalYear],{cy})',
-         against, "Possible overstatement of inventory by part of the restocked cost.", "None: no write-down account.",
-         "", "Valuation follow-up", "Follow up"],
+         against, "Possible overstatement of inventory by part of the restocked cost.",
+         "No write-down evidence was identified in the inspected records. Obtain condition, disposition, "
+         "inventory-on-hand and valuation evidence before concluding whether a write-down was required or recorded "
+         "elsewhere.", "", "Valuation follow-up", "Follow up"],
     ]
     names = ["ID", "Pattern", "Control point", "Design or operation", "Frequency, three years", f"Frequency, {cy}",
              "Exposure, three years", f"Exposure, {cy}", f"{cy} exposure against materiality", "Likelihood of a "
@@ -2994,10 +3094,10 @@ def r8(b: ExerciseBuild) -> None:
         ["G2", "D3, D4, D6", "Customer refunds and 2060: occurrence of disbursements", refunds_c,
          f"=SUMIFS(Refunds[Amount],Refunds[FiscalYear],{cy})", pot, "Refund equals the credit's 2060 part; clean "
                                                                      "credits.",
-         "Significant deficiency", "Cash leaves on a record that no one with recorded authority approved, before the "
-                                   "customer's payments were applied, with no preparer recorded (an evidence gap until "
-                                   "the system's design is known): a fraud risk factor, although the magnitude is well "
-                                   "below materiality."],
+         "Significant deficiency", "Cash leaves on a record approved above the recorded general limits (effective "
+                                   "delegation and enforcement unverified), before the customer's payments were applied, "
+                                   "with no preparer recorded (an evidence gap until the system's design is known): a "
+                                   "fraud risk factor, although the magnitude is well below materiality."],
         ["G3", "D7", "Commissions, refunds, and payroll: segregation of duties",
          f'=SUMIFS(Refunds[Amount],Refunds[ApproverTitle],"{am}",Refunds[FiscalYear],{cy})',
          f"=SUMIFS(Refunds[Amount],Refunds[FiscalYear],{cy})", pot, "Clawbacks complete and accurate.", "Deficiency",
@@ -3055,8 +3155,10 @@ def r8(b: ExerciseBuild) -> None:
     last = b.found.get("recon_last", 120)
     clean = [
         ["Populations reconcile to the ledger (every difference on the Reconciliation sheet)",
-         f'=SUMPRODUCT((LEFT(Reconciliation!A5:A{last},10)="Difference")*IFERROR(ABS(Reconciliation!C5:E{last}),0))',
-         "Sum of the absolute differences: zero to the cent"],
+         (f'=LET(mask,LEFT(Reconciliation!A5:A{last},10)="Difference",d,FILTER(Reconciliation!C5:E{last},mask),'
+          f'ok,FILTER(ISNUMBER(Reconciliation!C5:E{last}),mask),IF(AND(ok),SUM(ABS(d)),'
+          f'"Not evaluable: missing or erroneous difference"))'),
+         f'=IF(ISNUMBER(C{r + 1}),IF(C{r + 1}<0.005,"Reconciles to the cent","Investigate differences"),C{r + 1})'],
         ["Clawbacks complete, at the line total and the accrual's rate, correctly rounded, on the credit's date",
          "=" + "+".join(f"Tests!H{T[k]}" for k in ("T16", "T17", "T18", "T19", "T20")), "Exceptions: none"],
         ["Approvers within their employment dates", f"=Tests!H{T['T6']}", "Exceptions: none"],
@@ -3065,8 +3167,9 @@ def r8(b: ExerciseBuild) -> None:
          "Exceptions: none"],
         ["One refund per refunded credit", f"=Tests!H{T['T14']}+Tests!H{T['T15']}", "Exceptions: none"],
         ["Credits recomputed from their return, shipment, and invoice lines", "Clean (Timeline, Credits.sql)",
-         "Quantities, prices, and discounts agree, with a few cent-level rounding variants; tax as a diagnostic; "
-         "freight only against the invoice's"],
+         "Quantities, prices, and discounts agree, with a few cent-level rounding variants; tax at the rate the original "
+         "invoices corroborate; freight only against the invoice's; the costing of returns of less than one unit is "
+         "reconciled but not settled (D8)"],
         ["Lapping: receipts, deposits, and applications", "Clean (Timeline, Credits.sql)", "No trace of lapping"],
     ]
     k0 = r + 1
@@ -3075,6 +3178,7 @@ def r8(b: ExerciseBuild) -> None:
         fmt(ws, f"C{k0 + i}", "#,##0.00" if i == 0 else COUNT)
         b.check(t, f"clean result: {clean[i][0][:60].lower()}", 0.0 if i == 0 else 0, f"=Deficiencies!C{k0 + i}",
                 0.005 if i == 0 else 0, "#,##0.00" if i == 0 else COUNT)
+    b.check(t, "clean result: the reconciliation's conclusion", "Reconciles to the cent", f"=Deficiencies!E{k0}")
     st1, st3, st4 = stat(tt["cm_above"], "gt"), stat(tt["rf_above"], "amt"), stat(tt["before"], "amt")
     all_c = r2(sum(x["gt"] for x in cr_c))
     text_block(ws, r, MA, [
@@ -3146,14 +3250,18 @@ def r9(b: ExerciseBuild) -> None:
         f"To the audit committee, November {f.C + 1} meeting. Internal audit tested the customer credits cycle (sales "
         f"returns, credit memos, customer refunds, commission clawbacks, and cash application) over fiscal {f.F} to "
         f"{f.C}, and states its conclusions on controls as at the end of fiscal {f.C}.",
-        "Overall conclusion. The recorded populations agree with the ledger to the cent in every year, every credit "
-        "recomputes from its return, shipment, and invoice within the limits we state (cent-level rounding, tax as a "
-        "diagnostic, freight only against the invoice's), and the lapping tests found no trace, on the definitions "
-        "we state; the customer's requests, the payee checks, the inspection of returned goods, the bank clearance "
-        "of refunds, and the operation of the compensating controls lie outside the database and remain untested, so "
-        "this report gives no assurance on them. The records show, however, that the approval limits did not stop "
-        f"approvals above them: {c1['n']} credits ({money(c1['amt'])}) and {r3_['n']} "
-        f"refunds ({money(r3_['amt'])}) were approved by employees whose recorded approval limit is $0, and "
+        "Overall conclusion. The recorded populations agree with the ledger to the cent in every year, which supports "
+        "completeness relative to those records and cannot detect an event omitted from both; every credit "
+        "recomputes from its return, shipment, and invoice within the limits we state (cent-level rounding, tax first "
+        "corroborated on the original invoices, freight only against the invoice's), and the lapping tests found no "
+        "trace, on the definitions we state. The customer's requests, the payee checks, the inspection of returned "
+        "goods, independent bank evidence (the database records each refund's ClearedDate, which we did not "
+        "independently verify, and no bank evidence for refunds paid or funds received was supplied), and the operation "
+        "of the compensating controls lie outside the database and remain untested, so "
+        "this report gives no assurance on them. The records show, however, approvals above the recorded general "
+        "limits, with the effective delegation and its enforcement unverified: "
+        f"{c1['n']} credits ({money(c1['amt'])}) and {r3_['n']} "
+        f"refunds ({money(r3_['amt'])}) were approved by employees whose recorded general limit is $0, and "
         f"{r4_['n']} refunds ({money(r4_['amt'])}) were dated before the customer's payments on the credited invoice "
         f"had been applied ({len(tt['before_rcpt'])} before the last receipt, by the receipts' own dates). We rate "
         "two significant deficiencies, one over credits and one over refunds, and one deficiency in the "
@@ -3165,14 +3273,15 @@ def r9(b: ExerciseBuild) -> None:
         f"({money(sum(a['amt'] for a in f.adj))}), and {len(f.rcpt):,} receipts ({money(rec_total)}) with "
         f"{len(f.all_apps):,} applications, all tested in full. Each population reconciles to its ledger accounts by "
         "year with no difference (appendix: Reconciliation). Materiality starts from a benchmark of 5% of fiscal "
-        f"{f.C} income before income taxes as the ledger records it, {money(m['mat'])}. Sampling was "
-        "used only for what the records cannot show (the customer's request, an independent payee check, and the "
-        "inspection of damaged goods, which needs a population of its own); the plan and the frozen selection are "
-        "in the appendix, and the documents have been requested."], span=7)
+        f"{f.C} income before income taxes as the ledger records it, {money(m['mat'])}. We prepared the A1 to A3 "
+        "documentary testing plan (the customer's request, an independent payee check, and the inspection of damaged "
+        "goods, which needs a population of its own) and froze the selection; both are in the appendix. The documents "
+        "were not supplied, so these attributes remain untested, and the listed documents must be requested. D1 was "
+        "demonstrated on database records and compared with the full remainder."], span=7)
     heading(ws, r, "Findings")
     r += 1
     findings = [
-        ["F1. Credits approved above recorded authority, in the department that handles the customer's cash (D1, D2)",
+        ["F1. Credits approved above the recorded general limits, in the department that handles the customer's cash (D1, D2)",
          f"{c1['n']} credits ({money(c1['amt'])}; {c1['cur']} in fiscal {f.C}, {money(c1['cur_amt'])}) were approved by "
          "customer service representatives whose approval limit is $0. On "
          f"{c2['n']} credits the approver had also applied cash to the credited invoice.",
@@ -3184,8 +3293,8 @@ def r9(b: ExerciseBuild) -> None:
          "received in the warehouse at invoice prices.", "Significant deficiency (provisional)",
          "Approve a delegation of authority for credits and enforce it in the system; have credits approved by "
          "someone who does not record or apply the customer's cash."],
-        ["F2. Refunds approved without recorded authority and dated before the customer's payments were applied, "
-         "with no preparer recorded (D3, D4, D6)",
+        ["F2. Refunds approved above the recorded general limits (effective delegation and enforcement unverified) "
+         "and dated before the customer's payments were applied, with no preparer recorded (D3, D4, D6)",
          f"{r3_['n']} refunds ({money(r3_['amt'])}) were approved above the approver's limit by Staff Accountants and "
          f"Administrative Specialists (limit $0). {r4_['n']} refunds ({money(r4_['amt'])}; {r4_['cur']} in fiscal "
          f"{f.C}) were dated before the last application of the customer's payments to the credited invoice, "
@@ -3221,7 +3330,8 @@ def r9(b: ExerciseBuild) -> None:
          "of the open balances the customer's terms allow to be offset.", "No refund policy in the records.",
          "An anomaly, not a misstatement: consistent with a diverted refund, and with a legitimate refund by another "
          "method.",
-         "Follow up", "Adopt a refund policy: original instrument or verified account, open balances offset first."],
+         "Follow up", "Verify the customer terms and applicable policy; offset eligible open balances before refund "
+         "where those terms or the policy require or permit it."],
         ["F5. Damaged goods restocked at standard cost (D8)",
          f"Damaged returns were restocked at standard cost ({money(sum(f.restock.get(('Damaged', y), 0.0) for y in f.years))}"
          f" over three years; with Quality Concern {money(sum(f.restock.get((x, f.C), 0.0) for x in ('Damaged', 'Quality Concern')))}"
@@ -3245,8 +3355,9 @@ def r9(b: ExerciseBuild) -> None:
         "The reconciliations of every population, the completeness and accuracy of the clawbacks, the approvers' "
         "employment dates, the separation of the refund approver from the credit approver, one refund per credit, "
         "the recomputation of every credit (quantity, price, and discount, with a few cent-level rounding variants; "
-        "tax as a diagnostic on a rate the invoices share; freight only against the invoice's, since no freight "
-        "policy is in the records), and the lapping tests (no receipt applied to another customer's invoice; "
+        "tax at the rate the original invoices corroborate, whose legal correctness needs the approved policy; freight "
+        "only against the invoice's, since no freight policy is in the records), and the lapping tests (no receipt "
+        "applied to another customer's invoice; "
         "deposits within two days) found no exception. The "
         "receipts applied to invoices dated after them are customer deposits held in 2060, not lapping."], span=7)
     heading(ws, r, "Action plans (proposed, for the owners to accept)")
@@ -3258,13 +3369,15 @@ def r9(b: ExerciseBuild) -> None:
          "the credits above $0 and propose a threshold with a second approver above it."],
         ["Have credits approved by someone who does not record or apply the customer's cash", "Customer service "
          "manager", f"{f.C + 2}-03-31", "Will point to the warehouse receipt as the compensating control",
-         "The receipt shows that goods came back, not that the credit's amount or the customer's cash was right; "
-         "show the credits whose approver applied the invoice's cash."],
+         "The receiving record documents a return; it needs authenticating, with inspection evidence, before it shows "
+         "that the goods arrived, in the stated condition, or justified the credit, and it says nothing of who handled "
+         "the customer's cash; show the credits whose approver applied the invoice's cash."],
         ["Book credits on unpaid invoices against the receivable, and release refunds only after cleared payment",
          "Controller", f"{f.C + 2}-03-31", "Agree; a change to the posting rule",
          "Little disagreement expected; show the refunds dated before the payment and the credits posted to 2060 on "
          "unpaid invoices."],
-        ["Pay refunds to the original instrument or a verified account, offsetting open balances first",
+        ["Verify the customer terms and applicable policy, pay refunds to the original instrument or a verified "
+         "account, and offset eligible open balances before a refund where those terms or the policy require or permit it",
          "Accounting manager", f"{f.C + 2}-03-31", "Will point to the review of each credit balance",
          "The review did not stop refunds before payment or to customers past due by at least the refund; show its "
          "precision with those counts."],

@@ -36,7 +36,8 @@ The PivotTable now shows the five Furniture totals of the third and fourth quart
 
 a. Check the MarginPct box to add it to **Values**, or create it again if it does not appear.
 b. Create the calculated fields in @tbl-06-05, as you did in Tutorial 6.2.
-c. Format the per-unit fields as numbers and MarginBeforeDiscountPct as a percentage.
+c. Format the per-unit fields as numbers with two decimals, and MarginPct and MarginBeforeDiscountPct as percentages with two decimals.
+d. Drag Sum of MarginPct in the **Values** area to just below Sum of CostPerUnit, so that the rows follow the order of @fig-06-08.
 
 | Name | Formula |
 |---|---|
@@ -53,7 +54,7 @@ The formula of MarginBeforeDiscountPct is:
 =(LineTotal+DiscountAmount-StdCostAmount)/(LineTotal+DiscountAmount)
 ```
 
-Read the two columns side by side, as @fig-06-08 does. The quantity sold barely changed, and neither did the list price or the standard cost per unit. The price per unit fell, and the promotional discounts more than doubled. The margin before discounts, which adds the discounts back to revenue, did not fall at all. In this comparison at standard cost, the drivers point to one dominant component, the larger promotional discounts. The bridge in the next steps measures it separately from the smaller volume, mix, and price-list effects.
+Read the two columns side by side, as @fig-06-08 does. The quantity sold barely changed, and neither did the list price or the standard cost per unit. The price per unit fell, and the promotional discounts more than doubled. The margin before discounts, which adds the discounts back to revenue, did not fall at all. In this comparison at standard cost, the drivers point to one dominant component, the larger promotional discounts. The bridge in the next steps measures it separately from the smaller volume, mix, and price-list effects. The gray column in the figure is an annotation that shows each change, which you read from the two columns, and the PivotTable does not produce it.
 
 ![The Furniture Driver PivotTable for the Third and Fourth Quarters.](/visuals/svg/fig-06-08-furniture-drivers.svg){#fig-06-08 fig-alt="A mock of the Drivers worksheet. A PivotTable filtered to the Furniture item group shows, for 2026-Q3 and 2026-Q4 side by side, the sums of Quantity, ListAmount, LineTotal, DiscountAmount, and StdCostAmount, the calculated fields PricePerUnit, ListPerUnit, CostPerUnit, MarginPct, and MarginBeforeDiscountPct. A gray column beside the PivotTable gives the change from Q3 to Q4 of each measure. The DiscountAmount row, which more than doubles, the PricePerUnit row, which falls, and the MarginBeforeDiscountPct row, which rises slightly, are outlined."}
 
@@ -66,8 +67,9 @@ b. In B4, type an equal sign, click the 2026-Q3 value of Sum of Quantity on the 
    =GETPIVOTDATA("Sum of Quantity",Drivers!$A$3,"Period","2026-Q3")
    ```
 
-c. Fill B4:C8 in the same way, clicking the matching value of the PivotTable for each cell.
-d. Type `Margin` in A9, enter `=B6-B8` in B9, and copy it to C9.
+c. If Excel writes an ordinary cell reference such as `=Drivers!B5` instead, choose **PivotTable Analyze > Options** and check **Generate GetPivotData**, a setting of Excel itself, and then click the value again.
+d. Fill B4:C8 in the same way, clicking the matching value of the PivotTable for each cell.
+e. Type `Margin` in A9, enter `=B6-B8` in B9, and copy it to C9.
 
 B4:C9 now hold the totals of both quarters and their margins, each linked to the PivotTable by GETPIVOTDATA. The formulas name the period but not the item group, so they return Furniture totals only while the ItemGroup filter in B1 of the **Drivers** worksheet shows Furniture.
 
@@ -84,10 +86,11 @@ d. Type the bridge labels `2026-Q3 margin`, `Volume`, `Mix`, `Price lists`, `Pro
    - B20: `=-C4*(C14-B14)`
    - B21: `0`, with the note `Each item has one standard cost` in C21
    - B22: `=C9`
-   - B23: `=B16+SUM(B17:B21)-B22`
-e. Format B16:B23 as numbers with no decimals.
+   - B23: `=ROUND(B16+SUM(B17:B21)-B22,2)`, and in C23 `=IF(B23=0,"PASS","INVESTIGATE")`
+e. Format B16:B22 as numbers with no decimals, and B23 as a number with two decimals. The cells keep their full precision, so only the display of B16:B22 is rounded and the check still compares to the cent.
+f. To see that the check works, add `+0.1` to the formula in B17, and confirm that B23 reads 0.10 and C23 reads INVESTIGATE. Then remove the `+0.1`.
 
-B23 is zero: the effects account for the whole change in margin. The volume effect is a small gain, because slightly more units were sold. The mix and price-list effects are small. The promotions effect is a loss larger than the entire decline in margin. It is slightly smaller than the increase in discount dollars on the **Drivers** worksheet, because the volume effect values the extra units at the third quarter's margin per unit, which already deducts that quarter's discount per unit.
+B23 is zero and C23 reads PASS: the effects account for the whole change in margin. The bridge explains the change in margin dollars. The margin rate, which fell by about a point and a half, is a separate measure, and the bars do not decompose it directly. The volume effect is a small gain, because slightly more units were sold. The mix and price-list effects are small. The promotions effect is a loss larger than the entire decline in margin. It is slightly smaller than the increase in discount dollars on the **Drivers** worksheet, because the volume effect values the extra units at the third quarter's margin per unit, which already deducts that quarter's discount per unit.
 
 **Step 6. Chart the bridge as a waterfall.** Chart types are compared in the section on charting earlier in this chapter; a waterfall suits a change that is built from parts.
 
@@ -121,7 +124,7 @@ The Documentation worksheet now states the answer to the controller's question i
 
 **Checkpoint.** Check that:
 
-- the Check cell, B23 on the Bridge worksheet, is zero;
+- the Check cell, B23 on the Bridge worksheet, is zero to the cent, and C23 reads PASS;
 - the promotions effect is larger than the decline in margin, and the volume, mix, and price-list effects are small by comparison;
 - the margin before discounts does not fall from the third quarter to the fourth;
 - promotion 8 accounts for most of the Furniture discounts in both quarters, and promotion 9 adds to them in the fourth.

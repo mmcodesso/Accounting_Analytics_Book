@@ -110,6 +110,14 @@ or relationship needed by both appears whole in each. The crop is cut from the b
 so a change to the figure flows into it, but a change to its layout can move what the crop shows: look at
 the detail slides again after the figure changes.
 
+A detail takes the figure's alt text with "Detail of: " before it, which still names the parts the crop
+leaves out. `alt` gives the detail alt text of its own, written from what the crop shows and as qualitative
+as the book's, and `scripts/slides/pptx_finish.py` gives the PowerPoint picture the same text:
+
+```markdown
+{{< book-figure fig-09-05 crop="0,0.1876,1,0.6118" alt="Detail of the Execute SQL tab with ..." >}}
+```
+
 **Table.** A native, editable table from the chapter, with "Table 1.2 · Caption" above it (a caption's first
 sentence, when it goes on to define the table's symbols; put the definitions in the notes). `columns` and
 `rows` narrow it, each a comma-separated list of headers or first-column values; `rows` keeps every row

@@ -17,7 +17,7 @@ The case uses a new workbook that reads from CharlesRiver.xlsx, so the analysis 
 
 ## The Situation
 
-It is early 2027. Your analysis in Chapter 7 showed that the Furniture Seasonal Promotion would have needed about a third more orders to pay for itself, and that orders in its months rose only slightly, far short of that. The comparison could not show what would have sold without the promotion. The approved 2027 budget includes no promotions. The sales team has now come back with a broader proposal. In each of the last three years, Charles River ran three promotions: one on a collection of items in the spring, one on an item group in the fall, and one on a customer segment in November. The team proposes to repeat the 2026 calendar in 2027 at the same rates:
+It is early 2027. Your analysis in Chapter 7 showed that the Furniture Seasonal Promotion would have needed about a third more volume, at the same mix, to pay for itself, and that the volume ordered in its months rose only slightly, far short of that. The comparison could not show what would have sold without the promotion. The approved 2027 budget includes no promotions. The sales team has now come back with a broader proposal. In each of the last three years, Charles River ran three promotions: one on a collection of items in the spring, one on an item group in the fall, and one on a customer segment in November. The team proposes to repeat the 2026 calendar in 2027 at the same rates:
 
 - the Harbor Collection Promotion, 8 percent off the items of the Harbor collection in March and April;
 - the Furniture Seasonal Promotion, 10 percent off every Furniture item in September and October;
@@ -127,7 +127,7 @@ Close the memo with your recommendation on the proposal.
 
 
 
-**Deliverable.** A decision memorandum of no more than two pages. Add a one-page appendix of exhibits: the promotion cost by year, the gross-to-net schedule, the volume comparison, the break-even results, and the summary of exceptions. Submit the case workbook as well, with its Documentation sheet complete.
+**Deliverable.** A decision memorandum of no more than two pages. Add a one-page appendix that summarizes five numbered exhibits: the promotion cost by year, the gross-to-net schedule, the volume comparison, the break-even results, and the summary of exceptions. Submit the case workbook as well, with its Documentation sheet complete and the full schedules, eligible-line counts, assumptions, and source traces on named worksheets. The appendix names the worksheet behind each exhibit, in a readable font.
 
 
 ## What a Strong Submission Includes

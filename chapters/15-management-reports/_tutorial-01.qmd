@@ -70,7 +70,7 @@ c. Give the chart the title `Promotional discounts by promotion`.
 
 @fig-15-03 shows the page. The Furniture Seasonal Promotion gave away several times as much as any other promotion invoiced in 2026, and two promotions of fiscal 2025 still appear, because their last orders were invoiced early in 2026.
 
-![The Promotions Page.](/visuals/svg/fig-15-03-promotions-page.svg){#fig-15-03 fig-alt="A mock of a Power BI report page named Promotions, with a year slicer set to 2026. On the left, a waterfall chart starts with a tall column for revenue at list price, steps down for price lists and overrides and then by a much smaller amount for promotions, and ends with a total column for net revenue. On the right, a bar chart of promotional discounts by promotion, sorted from largest, in which the Furniture Seasonal Promotion is far larger than the Harbor Collection, Design Trade Customer, and two fiscal 2025 promotions below it."}
+![The Promotions Page.](/visuals/svg/fig-15-03-promotions-page.svg){#fig-15-03 fig-alt="A mock of a Power BI report page named Promotions, with a year slicer set to 2026. At the top, a waterfall chart starts with a tall column for revenue at list price, steps down for price lists and overrides and then by a much smaller amount for promotions, and ends with a total column for net revenue. Below it, a bar chart of promotional discounts by promotion, sorted from largest, in which the Furniture Seasonal Promotion is far larger than the Harbor Collection, Design Trade Customer, and two fiscal 2025 promotions below it."}
 
 **Step 7. Build the drill-through page.**
 

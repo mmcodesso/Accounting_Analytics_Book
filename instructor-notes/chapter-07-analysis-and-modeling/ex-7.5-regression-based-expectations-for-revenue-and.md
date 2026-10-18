@@ -7,12 +7,12 @@
 | Perspective | Auditing |
 | Tools | Excel |
 | Time | About 90 minutes |
-| Solution file | Chapter07-exercises.zip: Chapter 7 Exercises - Solutions.xlsx, sheets Ex 7.5, Ex 7.5 Revenue36, Ex 7.5 Revenue35 and Ex 7.5 Commission, with the queries GLCommission and SalesCommissionAccrual |
+| Solution file | Chapter07-exercises.zip: Chapter 7 Exercises - Solutions.xlsx, sheets Ex 7.5, Ex 7.5 Revenue36, Ex 7.5 Revenue35 and Ex 7.5 Commission, with the queries GLCommission, SalesCommissionAccrual and AccrualDates |
 | Release | First edition, dataset release v2027.1 (fiscal 2024–2026) |
 
 ## Purpose and learning outcomes
 
-Chapter 1 described a regression-based expectation as a substantive analytical procedure. This exercise tests two of them: one that cannot reach the precision an auditor needs, and one that can, and whose flags need an explanation. It practices a monthly series, a regression with and without an influential month, a threshold set in advance and a follow-up that goes to the records. The analytics type is predictive, in the auditor's use.
+Chapter 1 described a regression-based expectation as a substantive analytical procedure. This exercise compares an imprecise revenue expectation with a more closely fitted commission expectation. A threshold set in advance identifies differences for follow-up, but a high R Square or an unflagged month does not by itself establish sufficient evidence. The reliability of the data, the precision required and corroborating records must also be assessed. It practices a monthly series, a regression with and without an influential month, a threshold set in advance and a follow-up that goes to the records. The analytics type is predictive, in the auditor's use.
 
 By the end, students can:
 
@@ -20,7 +20,7 @@ By the end, students can:
 - set a regression-based expectation from earlier years and flag the months that differ by more than a stated threshold (outcome 6);
 - follow up a flagged pair of months to the records and reconcile an expense to its source documents (outcome 6).
 
-**Competencies practiced.** CPA Evolution Core S2 M9 (audit procedures, analytical procedures and audit data analytics) and BAR M10; IMA Statistical Analysis, Applied Forecasting, and Predictive & Prescriptive Analytics; IFAC IES 2 (f) and IES 4 (a); AACSB A5 part 5.1.
+**Competencies practiced.** CPA Evolution Core S2 M9 (audit procedures, analytical procedures and audit data analytics) and BAR M10; IMA Statistical Analysis, Applied Forecasting, and Predictive & Prescriptive Analytics; IFAC IES 2 (f) and IES 4 (a); AACSB A5 parts 5.1 and 5.2.
 
 ## Before you assign
 
@@ -38,7 +38,7 @@ Individual, about 90 minutes: 20 for the monthly table (requirement 1), 20 for t
 
 **Step 1. Import the commission postings.** Choose **Data > Get Data > From File > From Excel Workbook**, select T3_GLEntry and click **Transform Data**. Name the query `GLCommission`, filter AccountID to 104 and SourceDocumentType to exclude JournalEntry, add the column `Amount` as `[Debit] - [Credit]`, and load it.
 
-**Step 2. Build the table on a worksheet named `Ex 7.5`.** In A4 `=DATE(2024,1,1)`, below it `=EDATE(A4,1)` to row 39, then:
+**Step 2. Build the table on a worksheet named `Ex 7.5`.** Use columns A to D for `Month`, `Revenue`, `InvoiceCount` and `CommissionExpense`. In A4 `=DATE(2024,1,1)`, below it `=EDATE(A4,1)` to row 39, then in B4, C4 and D4, filled down to row 39:
 
 ```
 =SUMIFS(InvoiceLines[LineTotal],InvoiceLines[InvoiceDate],">="&$A4,InvoiceLines[InvoiceDate],"<"&EDATE($A4,1))
@@ -46,7 +46,15 @@ Individual, about 90 minutes: 20 for the monthly table (requirement 1), 20 for t
 =SUMIFS(GLCommission[Amount],GLCommission[PostingDate],">="&$A4,GLCommission[PostingDate],"<"&EDATE($A4,1))
 ```
 
-Add control totals in row 40 against the Tables.
+Add the control totals in row 40 against the Tables, with money rounded to the cent so that a binary residue of a fraction of a cent does not show as a difference, and counts compared exactly:
+
+```
+B40  =ROUND(SUM(B4:B39)-SUM(InvoiceLines[LineTotal]),2)
+C40  =SUM(C4:C39)-ROWS(SalesInvoice[SalesInvoiceID])
+D40  =ROUND(SUM(D4:D39)-SUM(GLCommission[Amount]),2)
+```
+
+The controls are in the model answer and are a plus in grading.
 
 **Check:** 36 months, the controls at zero, 20,914 invoices in all, 28,570 commission postings. **Watch for:** the closing entries left in. They credit the account at each year-end, so December looks wrong.
 
@@ -58,7 +66,7 @@ Add control totals in row 40 against the Tables.
 
 ### Requirement (3): The commission expectation
 
-**Step 4. Fit the earlier years and project the report year.** Regress commission expense (D4:D27) on revenue (B4:B27), the 24 months of 2024 and 2025. In E28:E39 enter `=$K$18+$K$19*B28`, where K18 and K19 hold the intercept and the slope.
+**Step 4. Fit the earlier years and project the report year.** Regress commission expense (D4:D27) on revenue (B4:B27), the 24 months of 2024 and 2025. Label J18 `Intercept` and J19 `Slope`, enter `=INTERCEPT(D4:D27,B4:B27)` in K18 and `=SLOPE(D4:D27,B4:B27)` in K19, and compare them with the ToolPak's coefficients. In E28:E39 enter `=$K$18+$K$19*B28`, which uses the unrounded coefficients.
 
 **Check:** intercept $3,141.90, slope 0.01780 (a commission rate of that many dollars per dollar of revenue), R Square 0.954.
 
@@ -70,23 +78,24 @@ Add control totals in row 40 against the Tables.
 
 ![The 2026 commission differences against the senior's threshold, to show the offsetting pair and the quiet months.](../figures/chapter-07-analysis-and-modeling/IF-07-5-A.pdf)
 
-**Step 6. Read the signs.** January and February are consecutive months with opposite signs that nearly offset: a shift between the two months is one explanation, and the records test it.
+**Step 6. Follow up the flags.** Import and load T27_SalesCommissionAccrual as `SalesCommissionAccrual` first (**Close & Load To**, **Table**, new worksheet), because the follow-up reads it. January and February are consecutive months with opposite signs that nearly offset. A shift between the two months is one hypothesis to test, and the offsetting signs do not establish it. March has no offsetting partner and needs the same evidence.
 
-a. Compare each accrual's date with its invoice's date. 9 of 27,933 accruals differ, 6 of them across a month-end: timing does not explain the pair.
-b. Compute the accrual rate and the lowest-rate segment's share of the commission base by month (SUMIFS on CommissionAmount and CommissionBaseAmount by AccrualDate). The lowest-rate segment is Wholesale.
+a. Compare each accrual's date with its invoice's date. In a reference query of SalesCommissionAccrual, merge SalesInvoice on SalesInvoiceID with a left outer join, expand InvoiceDate, check that the row count is unchanged and no key is unmatched, and add one column that compares AccrualDate with InvoiceDate and one that compares their month starts. 9 of 27,933 accruals differ, 6 of them across a month-end: timing does not explain the pair.
+b. Compute the accrual rate and the lowest-rate segment's share of the commission base by month (SUMIFS on CommissionAmount and CommissionBaseAmount by AccrualDate), the weighted rate being total commission over total base. The lowest-rate segment is Wholesale.
+c. Compare each flagged month's accruals with the signed SalesCommissionAdjustment postings in GLCommission.
 
-**Check:** Wholesale was 62% of January's commission base against 41% of February's (51% for the year), so the accrual rate was 1.83% against 2.02%. A regression on total revenue cannot see the mix.
+**Check:** Wholesale was 62% of January's commission base against 41% of February's (51% for the year), so the accrual rate was 1.83% against 2.02%. A regression on total revenue cannot see the mix. In March the share was 43% and the rate 1.98%, the direction that a month above the expectation needs. The signed adjustments posted in the flagged months are -$441.38 in January (22 rows), -$278.32 in February (16 rows), -$314.94 in March (21 rows), each well under a quarter of that month's difference, so they do not explain the flags either. The mix is consistent with the signs, and recomputing a sample of accruals would test it.
 
 ### Requirement (5): The reconciliation
 
-**Step 7. Import the accruals and reconcile.** Import T27_SalesCommissionAccrual, then in a block beside the table total the accruals dated in the report year and the ledger's postings by source document type:
+**Step 7. Reconcile the accruals to the ledger.** In a block beside the table, total the accruals dated in the report year (SalesCommissionAccrual, loaded in Step 6) and the ledger's postings by source document type:
 
 ```
 =SUMIFS(SalesCommissionAccrual[CommissionAmount],SalesCommissionAccrual[AccrualDate],">="&DATE(2026,1,1),SalesCommissionAccrual[AccrualDate],"<"&DATE(2027,1,1))
 =SUMIFS(GLCommission[Amount],GLCommission[FiscalYear],2026,GLCommission[SourceDocumentType],"SalesCommissionAdjustment")
 ```
 
-**Check:** accruals $570,717.47, less 232 SalesCommissionAdjustment rows ($4,369.54), equal the ledger's $566,347.93. The source document type that explains the difference is SalesCommissionAdjustment, which reverses commissions on credit memos.
+**Check:** accruals $570,717.47 plus the 232 signed SalesCommissionAdjustment postings (-$4,369.54) equal the ledger's $566,347.93. The postings are already negative, so they are added, not subtracted. The source document type that explains the difference is SalesCommissionAdjustment, which reverses commissions on credit memos.
 
 ### Memo
 
@@ -105,15 +114,15 @@ b. Compute the accrual rate and the lowest-rate segment's share of the commissio
 | March: difference; percent | +$1,634.59; +3.3% | 5 |
 | Accruals dated in 2026; adjustments; ledger | $570,717.47; $4,369.54; $566,347.93 | 7 |
 
-> **Instructor notes, Exercise 7.5:** revenue on invoice count: R2 0.725 with January 2024, 0.432 without it (slope about 3,563 per invoice); the residual standard error without January 2024 is about 128,000, roughly 5% of average monthly revenue (2,429,667), so the expectation cannot reliably detect a 5% misstatement. Commission (GL 6290) on revenue, fitted 2024-2025: intercept 3,141.90, slope 0.01780, R2 0.954. 2026 differences above 3%: January -2,187 (-4.3%), February +2,067 (+4.8%), March +1,635 (+3.3%); all other months within 2.5%. The January and February differences nearly offset, but not through timing: every SalesCommissionAccrual row is dated on its invoice's date except 9 of 27,933 (the invoices dated before their first shipment, Tutorial 2.1; 6 of them in another month). The accrual records point to the customer mix: commission rates run from 1.5% (Wholesale) to 4% (design services), and Wholesale was 62% of January's commission base against 41% of February's (51% for the year), so the accrual rate was 1.83% against 2.02%, which one regression slope cannot follow. Evidence: the accruals by customer segment and month, and the credit-memo adjustments. 2026 accruals 570,717.47 less SalesCommissionAdjustment rows (232, from credit memos) 4,369.54 = GL 566,347.93.
+> **Instructor notes, Exercise 7.5:** revenue on invoice count: R2 0.725 with January 2024, 0.432 without it (slope about 3,563 per invoice); the residual standard error without January 2024 is about 128,000, roughly 5% of average monthly revenue (2,429,667), so the expectation cannot reliably detect a 5% misstatement. Commission (GL 6290) on revenue, fitted 2024-2025: intercept 3,141.90, slope 0.01780, R2 0.954. 2026 differences above 3%: January -2,187 (-4.3%), February +2,067 (+4.8%), March +1,635 (+3.3%); all other months within 2.5%. The January and February differences nearly offset, but not through timing: every SalesCommissionAccrual row is dated on its invoice's date except 9 of 27,933 (the invoices dated before their first shipment, Tutorial 2.1; 6 of them in another month). The accrual records are consistent with the customer mix: commission rates run from 1.5% (Wholesale) to 4% (design services), and Wholesale was 62% of January's commission base against 41% of February's (51% for the year), so the accrual rate was 1.83% against 2.02%, which one regression slope cannot follow. Evidence: the accruals by customer segment and month, and the credit-memo adjustments. 2026 accruals 570,717.47 plus the signed SalesCommissionAdjustment postings (232 rows, from credit memos) -4,369.54 = GL 566,347.93.
 
 ## What a strong answer says
 
 - **Requirement (2).** The fit looks good with the first month and much worse without it. The standard error is larger than five percent of an average month, so differences of that size are lost in the scatter. The expectation is not precise enough for a substantive procedure at that level.
-- **Requirement (4).** The commission expectation fits closely, so a three percent threshold flags few months. For each flagged month the evidence is the accrual dates, the rates applied (the customer mix) and the credit-memo adjustments. The accrual dates do not explain the offsetting pair, the customer mix is consistent with it, and recomputing a sample of accruals would test that. A stronger expectation would multiply each segment's revenue by its rate.
+- **Requirement (4).** The commission expectation fits closely, so a three percent threshold flags few months. For each flagged month the evidence is the accrual dates, the rates applied (the customer mix) and the credit-memo adjustments. The accrual dates do not explain the offsetting pair, the customer mix is consistent with it and with the third flagged month, and recomputing a sample of accruals would test that. A stronger expectation would multiply each segment's revenue by its rate.
 - **The memo.** It reports flags as items to follow up, not as misstatements, and says how the reconciliation to the source documents closes.
 
-A weak answer calls the offsetting pair "timing" without looking at the dates, or concludes that the commission is misstated because two months are flagged.
+A weak answer calls the offsetting pair "timing" without looking at the dates, or concludes that the commission is misstated because 3 months are flagged.
 
 ## Common mistakes and how to respond
 
@@ -128,7 +137,7 @@ A weak answer calls the offsetting pair "timing" without looking at the dates, o
 
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
-| Requirement 1: monthly table | 15 | Three series, controls at zero, closing entries excluded | Controls missing |
+| Requirement 1: monthly table | 15 | Three series, closing entries excluded | A series missing, or the closes left in |
 | Requirement 2: revenue regressions | 20 | Both fits, standard error compared with five percent | R Square only |
 | Requirement 3: expectation | 15 | Fitted to the earlier years, applied to the report year | Fitted to all months |
 | Requirement 4: flags and follow-up | 25 | Flags correct, signs noticed, specific evidence | Generic evidence |

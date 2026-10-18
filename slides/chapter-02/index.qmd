@@ -115,7 +115,7 @@ Knowing where data comes from tells you what to expect of it. Each source has it
 - ERP data is integrated but not immune to entry, setup and validation errors; external data gives you less control
 
 ::: {.notes}
-When a sub-ledger and the ledger disagree, the difference is an audit finding. In one field study, analyzing a bank's procurement event logs revealed unapproved payments and segregation-of-duties violations that conventional procedures had missed.
+When a sub-ledger and the ledger disagree, the difference is investigated. A documented timing or scope difference is not an error, while an unexplained one may point to an error or a control problem. In one field study, analyzing a bank's procurement event logs revealed unapproved payments and segregation-of-duties violations that conventional procedures had missed.
 :::
 
 # Data Quality Dimensions
@@ -152,7 +152,7 @@ A clean result on one dimension says nothing about the others. The checklist lat
 {{< book-figure fig-02-03 >}}
 
 ::: {.notes}
-Each panel uses real Charles River records: blank tracking numbers, a supplier invoice number used twice, shipments still marked In Transit years after their delivery date, and an unusually large freight cost. The tutorial that follows finds each of them.
+Each panel uses real Charles River records: blank tracking numbers, a supplier invoice number used twice, shipments still marked In Transit years after their delivery date, and an unusually large freight cost. Tutorial 2.1 practices these problem types, with same-name customers for the duplicate screen, and Exercise 2.6 investigates the repeated supplier invoice number shown here.
 :::
 
 ## Blanks and outliers call for judgment
@@ -232,7 +232,7 @@ Students first copy CharlesRiver.xlsx to CharlesRiver_Work.xlsx and work in the 
 {{< book-figure fig-02-05 >}}
 
 ::: {.notes}
-Because an order can ship in parts, each invoice is compared with the earliest shipment on its order. A handful of invoices are dated before any shipment, an accuracy problem that also matters for revenue cutoff; the No shipment rows are design services, which never ship.
+Because an order can ship in parts, each invoice is compared with the earliest shipment on its order. A handful of invoices are dated before any shipment, a potential accuracy problem that also matters for revenue cutoff; the No shipment rows are design services, which never ship.
 :::
 
 ## Checkpoint
@@ -281,7 +281,7 @@ Relational tables like Charles River's are tidy by design, which is why the next
 - **Completeness**: every recorded sales invoice produced its ledger postings
 - **Accuracy**: the amounts posted for each invoice agree with its total
 - At Charles River, every sales invoice reconciles to its postings
-- Reconciling a sub-ledger to the ledger is one of the most common audit tests
+- Reconciling a sub-ledger to the ledger is a common audit test
 
 ::: {.notes}
 {{< include /_shared/fragments/_source-to-ledger-traceability.qmd >}}
@@ -312,7 +312,7 @@ Totals at the bottom of the GLEntry worksheet test consistency at the aggregate 
 {{< book-checkpoint 2.2 >}}
 
 ::: {.notes}
-The small periods sit at the edges of the extract, and the latest fiscal year holds only supplier payments that settle prior-year invoices, so they do not belong in an analysis of the years under review. The zero-amount rows all come from one source document type.
+The small periods sit at the edges of the extract. The first month belongs to the first fiscal year and stays in its analysis, while the latest fiscal year holds only supplier payments that settle prior-year invoices, which stay out of the annual totals of the years under review. The zero-amount rows all come from one source document type.
 :::
 
 # Data Quality Across the Charles River Table Groups

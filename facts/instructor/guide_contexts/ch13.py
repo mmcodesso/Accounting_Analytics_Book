@@ -271,6 +271,15 @@ def g2(d, claim):
     claim(len(shared) == 2 and all(r[3] == 2 for r in shared), "two customer names belong to two CustomerIDs each")
     both = [r for r in shared if sum(1 for k in by_key if by_key[k][0] == r[0]) == 2]
     claim(len(both) == 1, "one of the shared names has revenue under both its CustomerIDs in the current year")
+    # Exercise 13.2 Step 3b's detail table groups by name, segment and region (and the key, once it is not summed)
+    other = [r for r in shared if r not in both]
+    other_ids = [int(x) for x in str(other[0][1]).split(" and ")] if other else []
+    single_none = [k for k in other_ids if k not in by_key]
+    claim(len(single_none) == 1, "one of the other shared name's two CustomerIDs has no revenue in the current year")
+    pairs = lambda name: d.one("SELECT COUNT(DISTINCT CustomerSegment || '|' || Region) FROM Customer WHERE CustomerName = ?", name)
+    claim(pairs(both[0][0]) == 2, "the merged name's two customers differ in segment or region, so a summed key leaves two rows")
+    claim(other and pairs(other[0][0]) == 1,
+          "the other shared name's two customers share a segment and a region, so a summed key adds their IDs on one row")
     # a ranking over every year, written the way a student who leaves the year out of the ranking would see it
     all_key = [r[0] for r in d.q(f"SELECT c.CustomerID {base} GROUP BY 1 ORDER BY SUM(l.LineTotal) DESC LIMIT ?", TOP_N)]
     wrong_sum = sum(by_key.get(k, ("", 0))[1] for k in all_key)
@@ -284,7 +293,8 @@ def g2(d, claim):
     all_rev = d.one("SELECT SUM(LineTotal) FROM SalesInvoiceLine")
     claim(largest / all_rev < 0.01, "against the all-years total the largest customer would hold under one percent")
     return dict(y=y, all_rev=all_rev, largest_all=largest / all_rev, revenue=revenue, sum_key=sum_key, sum_name=sum_name, shared=shared, merged_id_sum=both[0][2],
-                merged_ids=both[0][1], n_names=n_names, n_customers=n_customers, wrong_sum=wrong_sum,
+                merged_ids=both[0][1], single_none=single_none[0], single_id_sum=other[0][2],
+                n_names=n_names, n_customers=n_customers, wrong_sum=wrong_sum,
                 wrong_overlap=len(set(all_key) & set(top_key)), threshold=0.05 * revenue, largest=largest, dax_rank=dax_rank)
 
 
@@ -316,6 +326,13 @@ def g3(d, claim):
     claim(d.one("SELECT PromotionName FROM PromotionProgram WHERE PromotionID = 8") == "Furniture Seasonal Promotion",
           "promotion 8, the one the quoted DAX test counts, is the Furniture Seasonal Promotion")
     claim("PromotionProgram.PromotionID" in _model_text("relationships.tmdl"), "the project relates the lines to PromotionProgram on PromotionID")
+    # Step 6's copy of the matrix (item groups on columns): a group with no discount in the year shows zero, from its
+    # lines in the (Blank) row alone
+    by_group = d.q("SELECT i.ItemGroup, SUM(l.Quantity * l.UnitPrice * l.Discount), SUM(l.PromotionID IS NOT NULL) FROM SalesInvoiceLine l "
+                   "JOIN SalesInvoice si ON si.SalesInvoiceID = l.SalesInvoiceID JOIN Item i ON i.ItemID = l.ItemID "
+                   "WHERE si.InvoiceDate BETWEEN ? AND ? GROUP BY 1", f"{y}-01-01", f"{y}-12-31")
+    claim(all(r[2] == 0 for r in by_group if not r[1]),
+          "every item group with no discount in the current year has no promotion line, so its only cell is in the (Blank) row")
     return dict(y=y, blank_all=blank_all, promos_all=promos_all, promos_now=promos_now, n_promotions=n_promotions,
                 m_promo=m_promo, promo_type=promo_type, untyped=untyped, dax_late=dax_late)
 
@@ -369,6 +386,10 @@ def g5(d, claim):
           "the project holds the four Profile queries, none of them loaded into the model")
     claim(d.one("SELECT COUNT(*) FROM Item") <= TOP_ROWS and d.one("SELECT COUNT(*) FROM Customer") <= TOP_ROWS,
           "the Item and Customer Tables fit inside the first 1,000 rows, so both profile bases agree")
+    keys = {"SalesInvoiceLine": ("SalesInvoiceLineID", "SalesInvoiceID", "ItemID"), "SalesInvoice": ("SalesInvoiceID", "CustomerID"),
+            "Item": ("ItemID",), "Customer": ("CustomerID",)}
+    claim(all(d.one(f"SELECT COUNT(*) FROM {t} WHERE {c} IS NULL") == 0 for t, cs in keys.items() for c in cs),
+          "none of the keys that relate the four Tables is empty (Step 5's conclusion)")
     small = ["PriceListLineID", "ShipmentLineID", "PriceOverrideApprovalID"]
     n_all = d.one("SELECT COUNT(*) FROM SalesInvoiceLine")
     for col in small:
@@ -400,4 +421,10 @@ def g6(d, claim):
                          "monthsFromZero" / "visual.json").read_text(encoding="utf-8"))
     alt = visual["visual"]["visualContainerObjects"]["general"][0]["properties"]["altText"]["expr"]["Literal"]["Value"].strip("'")
     claim(alt.startswith("Monthly revenue over three years"), "the revised page's line chart carries the alternative text the guide quotes")
-    return dict(y=y, f=d.F, shown=rev - services, dax_ratio=dax_ratio, revised_title=revised_title, alt_example=alt)
+    # the revised card without its year filter: the page has none, so it would total every year
+    all_disc, all_list = d.q("SELECT SUM(Quantity * UnitPrice * Discount), SUM(Quantity * BaseListPrice) FROM SalesInvoiceLine")[0]
+    cur_disc = d.one("SELECT SUM(l.Quantity * l.UnitPrice * l.Discount) FROM SalesInvoiceLine l JOIN SalesInvoice si "
+                     "ON si.SalesInvoiceID = l.SalesInvoiceID WHERE si.InvoiceDate BETWEEN ? AND ?", f"{y}-01-01", f"{y}-12-31")
+    claim(all_disc > cur_disc, "without its year filter the revised card would show more discounts than the current year's")
+    return dict(y=y, f=d.F, shown=rev - services, dax_ratio=dax_ratio, revised_title=revised_title, alt_example=alt,
+                all_disc=all_disc, all_list=all_list)

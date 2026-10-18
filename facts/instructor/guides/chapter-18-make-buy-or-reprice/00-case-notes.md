@@ -38,8 +38,8 @@ figures:
 | Tools | SQL in DB Browser for SQLite, Excel (Goal Seek, Data Tables and, optionally, Solver) and Power BI Desktop. Where the choice is clear the requirement says why a tool fits; where it is not, students choose and explain |
 | Components | Ten requirements in four phases, with a milestone after each; no tutorials, exercises or questions. The deck has {{ c.slides }} slides. The model answer is three files: MakeBuy.sql ({{ c.n_queries }} queries), Make Buy Reprice.xlsx ({{ c.n_sheets }} worksheets) and the Power BI project Product Costs ({{ c.n_pages }} pages, {{ c.checks }} checks) |
 | Files students need | CharlesRiver.sqlite, copied as CharlesRiver_Capstone.sqlite; CharlesRiver.xlsx; and the three files they build. Solutions: Chapter18-capstone-sql.zip, Chapter18-capstone-excel.zip and Chapter18-capstone-pbi.zip |
-| Deliverables | The script; the workbook; the explorer; a memo of two pages with an appendix of three and a decision table |
-| Time | Class: about {{ meta.minutes }} minutes in Plan A. Students: about {{ c.student_hours }} hours in all, from 90 minutes for Requirements 1, 3 and 10 to 180 for Requirement 4 |
+| Deliverables | The script; the workbook; the explorer; a memo of at most two pages, including the decision table, with at most three pages of exhibits |
+| Time | Class: about {{ meta.minutes }} minutes in Plan A. Students: a planning estimate of {{ c.required }} for the required work, from 90 minutes for Requirements 1, 3 and 10 to 180 for Requirement 4, plus {{ c.solver_minutes }} minutes for the optional growth test. The estimates assume students fluent in the prerequisite tools, are not measured times, count class work toward the total, and leave setup and debugging to be budgeted apart |
 
 The case depends on these conditions of the data, all visible in the files students build:
 
@@ -83,7 +83,7 @@ The case depends on these conditions of the data, all visible in the files stude
 
 ## Teaching approaches
 
-**Plan A: take-home work with five class touchpoints ({{ meta.minutes }} minutes in class).** It fits a course that wants the work done outside class and catches the errors that compound: the fan-out, the units, the crew assumption and the standards. The risk is a late start, so assign Requirements 1 to 3 at the kickoff.
+**Plan A: take-home work with five class touchpoints ({{ meta.minutes }} minutes in class).** It fits a course that wants the work done outside class and catches the errors that compound: the fan-out, the units, the crew assumption and the standards. The risk is a late start, so assign Requirements 1 to 3 at the kickoff. Class work counts toward the students' hours.
 
 | Touchpoint | Minutes | Activity | Slides |
 |---|---:|---|---|
@@ -107,7 +107,7 @@ The case depends on these conditions of the data, all visible in the files stude
 | 5. Debrief | 10 | Looking ahead | {{ s.ahead }} |
 | | {{ meta.minutes }} | Total | |
 
-**Plan B: lab sessions (four sessions of 150 minutes, 600 minutes in all).** Students work in class on the data-heavy phases and you circulate. It fits a computer lab. Requirements 6 to 10 are done outside class; use touchpoints 4 and 5 of Plan A for them.
+**Plan B: lab sessions (four sessions of 150 minutes, 600 minutes in all).** Students work in class on the data-heavy phases and you circulate. It fits a computer lab. Requirements 6 to 10 are done outside class; use touchpoints 4 and 5 of Plan A for them, 100 more minutes in class and 700 in all.
 
 | Session | Minutes | Activity | Slides |
 |---|---:|---|---|
@@ -234,12 +234,12 @@ Every requirement is part of the case, and each phase uses what the one before f
 
 {{ figure('IF-18-0-A') }}
 
-Four bundles:
+Four bundles. Publish the deliverable and the rubric of the bundle you assign, because the weights below cover the full case, and have a reduced bundle's memo cover only what the bundle contains:
 
-- **The full case (the default).** All ten requirements, graded with the rubric below. About {{ c.student_hours }} hours.
+- **The full case (the default).** All ten requirements, graded with the rubric below. About {{ c.required }} of work, with the optional growth test on top.
 - **A managerial accounting version.** Requirements 1 to 4 and 6 to 8, with the decision table and a one-page memo, in the script and the workbook only. It leaves out the explorer and the standards.
 - **An analytics version.** Requirements 1 to 5 and 10: the costs, the explorer and a memo on what the three views show. It leaves out the decisions on the quote and the prices.
-- **Teams of three.** One student leads each tool (SQL for Requirements 1 to 3, Excel for 4 and 6 to 9, Power BI for 5), the memo is shared, and each writes a one-page reflection on the crew assumption.
+- **Teams of three.** One student leads each tool (SQL for Requirements 1 to 3, Excel for 4 and 6 to 9, Power BI for 5), the memo is shared, and each writes a one-page reflection on the crew assumption and explains in class one calculation that another member built.
 
 The check slides suit class discussion. Requirements 1 and 3 suit grading from the script, because each ends in totals that agree or do not; Requirements 4 and 6 from the workbook; Requirement 5 from the Tests tab; Requirements 9 and 10 from the written work. A fast way to grade is to read the memo's decision table, then trace one number in each row back to the workbook.
 
@@ -256,7 +256,7 @@ The check slides suit class discussion. Requirements 1 and 3 suit grading from t
 | 7. Freed capacity | {{ c.weights[7] }} | Hours freed by work center, the comparison with unused capacity, the remaining families' cost |
 | 8. Prices | {{ c.weights[8] }} | Floor prices, the volume each increase can lose, the evidence and its limits |
 | 9. Standards | {{ c.weights[9] }} | The rate on normal capacity, the revaluation with its sensitivities, the evidence for error or estimate |
-| 10. The memo | {{ c.weights[10] }} | A decision table, page limits, the crew decision left open, a usable recommendation |
+| 10. The memo | {{ c.weights[10] }} | A decision table, the page maximums, the crew decision left open, a usable recommendation |
 | Total | 100 | |
 
 Four criteria run through every requirement.
@@ -268,7 +268,7 @@ Four criteria run through every requirement.
 | Judgment | The crew assumption explicit, the unused capacity treated as the plant's cost, error and estimate told apart | Requirements 6, 7 and 9 |
 | Communication | A memo two people who disagree can act on, ending in what only the production manager can decide | Requirement 10 |
 
-Each requirement guide has its own grading table out of 100; scale it by the weight above to place it in the case grade.
+Each requirement guide has its own grading table out of 100; scale it by the weight above to place it in the case grade. Full credit goes to what the requirement asks. Named cells, Tables, documentation and the extensions are a plus, and a supported alternative (keeping all six families with staged increases, for example) earns the same credit as the model answer. A concise submission below the page maximums earns full credit.
 
 ## Connections
 

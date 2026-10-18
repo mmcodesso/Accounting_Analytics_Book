@@ -287,6 +287,29 @@ def prior_year_end(d) -> dict:
                 total=round(f_cost + share, 2), mfg=round(mfg, 2))
 
 
+@lru_cache(maxsize=None)
+def prior_split(d) -> dict:
+    """The prior year's work paid in the current fiscal year, in the lines of its correcting entry: Manufacturing's whole cost
+    (it was debited to 1090), the other cost centers' gross pay (their salary accounts) and their employer costs (6060), each
+    rounded to cents, with any cent left over on 6060 so that the lines add up to the total."""
+    pr = prior_year_end(d)
+    share = pr["cross"]["inside"] / pr["cross"]["days"]
+    mfg_all = other_gross = other_employer = 0.0
+    for pid, weight in ((pr["full"]["id"], 1.0), (pr["cross"]["id"], share)):
+        for is_mfg, gross, employer in d.q(
+                "SELECT c.CostCenterName = 'Manufacturing', SUM(pr.GrossPay), SUM(pr.EmployerPayrollTax + pr.EmployerBenefits) "
+                "FROM PayrollRegister pr JOIN CostCenter c ON c.CostCenterID = pr.CostCenterID "
+                "WHERE pr.PayrollPeriodID = ? GROUP BY 1", pid):
+            if is_mfg:
+                mfg_all += (gross + employer) * weight
+            else:
+                other_gross += gross * weight
+                other_employer += employer * weight
+    mfg, gross, employer = round(mfg_all, 2), round(other_gross, 2), round(other_employer, 2)
+    residual = round(pr["total"] - (mfg + gross + employer), 2)
+    return dict(mfg=mfg, other_gross=gross, other_employer=round(employer + residual, 2), residual=residual)
+
+
 def hour_based(d, year: int) -> float:
     """Exercise 12.1's allocation: the hourly labor of `year`'s work paid in the next fiscal year, by work date, with its
     share of the hourly employees' employer costs, plus the salaried pay and its employer costs by working day."""
@@ -343,7 +366,7 @@ def r1(d, claim):
     n_exc = sum(r[1] for r in exc)
     claim(len({r[1] for r in exc}) == 1, "every exception type has the same number of exceptions")
     claim(all(r[2] == r[1] for r in exc), "every exception is Open")
-    claim(all(r[3] == 0 and r[4] == 0 for r in exc), "no exception was reviewed (ReviewedByEmployeeID is NULL on every row)")
+    claim(all(r[3] == 0 and r[4] == 0 for r in exc), "no exception has a reviewer or a review date recorded (ReviewedByEmployeeID and ReviewedDate are NULL on every row)")
     cal_rows, centers, cal_first, cal_last = d.q("SELECT COUNT(*), COUNT(DISTINCT WorkCenterID), MIN(CalendarDate), "
                                                  "MAX(CalendarDate) FROM WorkCenterCalendar")[0]
     year = str(d.C)
@@ -481,6 +504,17 @@ def r2(d, claim):
     flagged = d.one(PLANT + "SELECT COUNT(ae.AttendanceExceptionID) FROM PlantEntries pe LEFT JOIN AttendanceException ae "
                     "ON ae.TimeClockEntryID = pe.TimeClockEntryID WHERE pe.DayType = 'Surge'")
     claim(flagged == 0, "no surge entry was flagged")
+    # What the stored Off Shift Clocking exceptions are on, and what else sits on the plant's ordinary entries.
+    off_centers = sorted({r[0] for r in d.q("SELECT cc.CostCenterName FROM AttendanceException ae JOIN TimeClockEntry tc ON "
+                                            "tc.TimeClockEntryID = ae.TimeClockEntryID JOIN Employee e ON e.EmployeeID = tc.EmployeeID "
+                                            "JOIN CostCenter cc ON cc.CostCenterID = e.CostCenterID WHERE ae.ExceptionType = 'Off Shift Clocking'")})
+    claim(d.one(PLANT + "SELECT COUNT(*) FROM PlantEntries pe JOIN AttendanceException ae ON ae.TimeClockEntryID = pe.TimeClockEntryID "
+                "WHERE ae.ExceptionType = 'Off Shift Clocking'") == 0 and "Manufacturing" not in off_centers,
+          "no Off Shift Clocking exception sits on a plant entry, so the stored examples are not Manufacturing's")
+    plant_flagged = d.q(PLANT + "SELECT ae.ExceptionType, COUNT(*) FROM PlantEntries pe JOIN AttendanceException ae "
+                        "ON ae.TimeClockEntryID = pe.TimeClockEntryID GROUP BY 1 ORDER BY 1")
+    claim(plant_flagged and all(r[0] != "Off Shift Clocking" for r in plant_flagged),
+          "the exceptions on the plant's entries are of other types than Off Shift Clocking")
     approved = d.one(PLANT + "SELECT COUNT(*) FROM PlantEntries pe JOIN OvertimeApproval oa ON oa.OvertimeApprovalID = "
                      "pe.OvertimeApprovalID WHERE pe.DayType = 'Surge' AND oa.Status = 'Approved'")
     claim(approved == meals["Surge"][0], "every surge entry's overtime is approved")
@@ -489,9 +523,9 @@ def r2(d, claim):
                              "r.ScheduledEndTime)) * 1440) > ?), SUM((julianday(pe.ClockOutTime) - julianday(r.RosterDate || ' ' "
                              "|| r.ScheduledEndTime)) * 1440 > ?) FROM PlantEntries pe JOIN EmployeeShiftRoster r ON "
                              "r.EmployeeShiftRosterID = pe.EmployeeShiftRosterID WHERE pe.DayType = 'Ordinary'", threshold, threshold)[0]
-    n_exc, open_exc, reviewed, first = d.q("SELECT COUNT(*), SUM(Status = 'Open'), COUNT(ReviewedByEmployeeID), MIN(WorkDate) "
-                                           "FROM AttendanceException")[0]
-    claim(open_exc == n_exc and reviewed == 0, "all exceptions are Open and none was reviewed")
+    n_exc, open_exc, reviewed, first = d.q("SELECT COUNT(*), SUM(Status = 'Open'), COUNT(ReviewedByEmployeeID) + COUNT(ReviewedDate), "
+                                           "MIN(WorkDate) FROM AttendanceException")[0]
+    claim(open_exc == n_exc and reviewed == 0, "all exceptions are Open with no reviewer or review date recorded")
     pwac = [r[0] for r in d.q("SELECT tc.ClockStatus FROM AttendanceException ae JOIN TimeClockEntry tc ON tc.TimeClockEntryID = "
                               "ae.TimeClockEntryID WHERE ae.ExceptionType = 'Paid Without Approved Clock'")]
     claim(set(pwac) == {"Pending"}, "the Paid Without Approved Clock exceptions are on Pending clock entries")
@@ -567,7 +601,7 @@ def r2(d, claim):
                 over_weeks=[(w, v) for w, v in over_weeks], surge_weeks=s_n, other_weeks=o_n, other_over=o_over,
                 center_over=s_cw, center_over_weeks=s_cwk, other_center_over=o_cw,
                 worst=dict(week=worst[0][0], center=worst[0][1].replace(" Work Center", ""), share=worst[0][2]),
-                beyond_raw=beyond_raw,
+                beyond_raw=beyond_raw, off_centers=off_centers, plant_flagged=plant_flagged,
                 n_reasons=word(len(reasons)), per_reason=reasons[0][1], cite=cite,
                 weekdays=[(WEEKDAYS[k], weekdays.get(k, 0)) for k in range(1, 6)], late_week=late_week)
 
@@ -674,6 +708,10 @@ def r4(d, claim):
                    "AND b.BudgetCategory = 'Revenue' AND i.SupplyMode = 'Manufactured'", d.C)
     made = d.one("SELECT SUM(pcl.QuantityCompleted) FROM ProductionCompletionLine pcl JOIN ProductionCompletion pc "
                  "ON pc.ProductionCompletionID = pcl.ProductionCompletionID WHERE substr(pc.CompletionDate, 1, 4) = ?", str(d.C))
+    # The budget's standard hours, each item's budget units weighted by its own standard labor hours (not the completed
+    # product mix applied to an aggregate ratio).
+    budget_std = d.one("SELECT SUM(b.Quantity * i.StandardLaborHoursPerUnit) FROM BudgetLine b JOIN Item i ON i.ItemID = b.ItemID "
+                       "WHERE b.FiscalYear = ? AND b.BudgetCategory = 'Revenue' AND i.SupplyMode = 'Manufactured'", d.C)
     products = ("Furniture", "Lighting", "Textiles", "Accessories")
     marks = ",".join("?" * len(products))
     ratios = []
@@ -721,6 +759,8 @@ def r4(d, claim):
                        "AND g.FiscalYear = ?", d.account("1090"), d.C)
     dep_c, dep_n = round(sum(months_c), 2), round(sum(months_n), 2)
     claim(abs(dep_c - ledger_dep) < 0.005, f"the schedule's {d.C} depreciation equals the ledger")
+    claim(d.one("SELECT COUNT(*) FROM FixedAsset WHERE DepreciationDebitAccountID = ? AND ResidualValue <> 0", d.account("1090")) == 0,
+          "every asset depreciated to 1090 has a residual value of zero, so cost over useful life is the monthly charge")
     claim(len(set(months_n)) == 1, f"every month of {d.N} carries the same depreciation")
     ending = [a for a in dep["assets"] if a["end"] // 12 == d.N and not a["disposal"]]
     claim(len(ending) == 1, f"one asset reaches the end of its life in {d.N}")
@@ -747,6 +787,11 @@ def r4(d, claim):
     levels = [1.0, round(ys[0]["ratio"], 2), round(ys[-1]["ratio"], 3)]
     need = [std * k for k in levels]
     claim(max(need) < capacity, "no scenario needs overtime for capacity")
+    claim(budget_std > capacity and budget_std > 1.5 * max(need),
+          "the budget's volume, weighted by each item's standard labor hours, needs more than the regular capacity and far more than any scenario")
+    claim(abs(budget_std / (std * budget / made) - 1) < 0.02,
+          "weighting the budget's units by item gives within two percent of the aggregate ratio times the completed standard hours, "
+          "so the conclusion does not depend on the product mix")
     premium = ys[-1]["premium"]
     overhead = salary * (1 + b) + foh + dep_n
     labor = [h * r * (1 + b) for h in need]
@@ -770,6 +815,7 @@ def r4(d, claim):
     claim(ind_end < last_work(d) and direct_common < std_common,
           "indirect time ends before the other time records, and direct time stays within the standard hours to that day as well")
     return dict(std=std, released=released, conv_rate=released / std, budget=word(round(budget / made)),
+                budget_units=budget, budget_ratio=budget / made, budget_std=budget_std, budget_over=budget_std - capacity,
                 forecast_low=word(math.floor(min(ratios))), forecast_high=word(math.ceil(max(ratios))),
                 rate=r, burden=b, salary=salary, titles=titles, foh=foh, acct=d.account("1090"),
                 jan=months_c[0], changes=changes, dep_c=dep_c, monthly_n=months_n[0], dep_n=dep_n,
@@ -861,6 +907,34 @@ def r5(d, claim):
     other_gross = round(p["gross"] - mfg["gross"], 2)
     other_employer = round(p["tax"] + p["ben"] - (mfg["amount"] - mfg["gross"]), 2)
     claim(abs(mfg["amount"] + other_gross + other_employer - p["accrual"]) < 0.005, "the three debits add up to the accrual")
+    # The cost centers' amounts, each rounded to cents, need not add up to the accrual rounded once.
+    centers_sum = round(sum(c["amount"] for c in p["centers"]), 2)
+    claim(0 < abs(centers_sum - p["accrual"]) <= 0.05,
+          "the cost centers' amounts, each rounded to cents, differ from the accrual rounded once by a cent or two")
+    # The completions dated after the time records end, and in the accrual's window, released standard conversion cost to 1090.
+    a1090 = d.account("1090")
+
+    def completed(first: str) -> dict:
+        n, cost = d.q(f"SELECT COUNT(DISTINCT pc.ProductionCompletionID), SUM(pcl.ExtendedStandardConversionCost) {COMPLETIONS} "
+                      "WHERE pc.CompletionDate BETWEEN ? AND ?", first, f"{d.C}-12-31")[0]
+        credit = d.one("SELECT SUM(Credit - Debit) FROM GLEntry WHERE AccountID = ? AND SourceDocumentType = 'ProductionCompletion' "
+                       "AND PostingDate BETWEEN ? AND ?", a1090, first, f"{d.C}-12-31")
+        claim(n > 0 and abs(cost - credit) < 0.005,
+              f"the completions dated from {first} released their standard conversion cost to 1090, to the cent")
+        return dict(n=n, cost=cost, ledger=credit)
+    after_time = completed((date.fromisoformat(last_work(d)) + timedelta(days=1)).isoformat())
+    in_window = completed(p["left_start"])
+    claim(in_window["n"] <= after_time["n"] and in_window["cost"] < after_time["cost"],
+          "the accrual's window starts after the time records end, so it holds fewer completions than the days after the last time record")
+    split = prior_split(d)
+    claim(abs(split["mfg"] - prior["mfg"]) < 0.005 and abs(split["residual"]) <= 0.02,
+          "the prior year's correcting entry splits into Manufacturing's cost and the other cost centers' gross pay and employer costs, "
+          "with at most a cent or two of rounding left over")
+    # The modeled effects reconcile: assets added less liabilities added equal the change in equity, opening and current.
+    open_equity = delivered[1] - prior["total"]
+    end_equity = open_equity + effect
+    claim(abs((uninv - p["accrual"]) - end_equity) < 0.005,
+          "the receivables added less the liability added equal the change in opening equity plus the change in the year's income")
     # The supplier invoices dated in the prior year and received in this one: each must have been accrued before the
     # year-end for the wording ("not a payables cutoff item") to hold.
     a2040 = d.account("2040")
@@ -886,7 +960,9 @@ def r5(d, claim):
                 liab_ni=liab_ni, liab_cl=liab_cl, mfg_all_in=mfg["amount"], mfg_employer=round(mfg["amount"] - mfg["gross"], 2),
                 other_gross=other_gross, other_employer=other_employer,
                 share_under=next(x for x in (0.002, 0.005, 0.01) if share < x) if share < 0.01 else 0.01,
-                holidays=[day_month(h) for h in holidays], asv=asv)
+                holidays=[day_month(h) for h in holidays], asv=asv, centers_sum=centers_sum, after_time=after_time,
+                in_window=in_window, split=split, open_equity=open_equity, end_equity=end_equity,
+                after_first=day_month((date.fromisoformat(last_work(d)) + timedelta(days=1)).isoformat()))
 
 
 # --- Requirement 6 -------------------------------------------------------------------------------

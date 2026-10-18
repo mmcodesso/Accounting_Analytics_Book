@@ -49,15 +49,15 @@ b. Merge OpenPayables with **PaidByInvoice** on PurchaseInvoiceID, with a left o
 c. Replace `null` in PaidTotal with `0`, add a custom column `OpenBalance` with `[GrandTotal] - [PaidTotal]`, set its type to **Decimal Number** and round it to `2` places with **Transform > Rounding > Round**.
 d. Filter OpenBalance to values greater than 0, then load the query to a worksheet as a Table.
 
-**Check:** 3,462 invoices with a total of $4,781,095.54. **Watch for:** the rounding step left out. The sums of payments leave residues of a fraction of a cent, so 301 fully paid invoices look open and the total moves by cents.
+**Check:** 3,462 invoices with a total of $4,781,095.54. **Watch for:** the rounding step left out. Floating-point residues of a tiny fraction of a cent can make fully paid invoices look open, and how many do depends on the order in which the payments are added, so a total displayed to cents can still look right while the count of invoices is wrong. The rounded result is 3,462 invoices.
 
 ### Requirement (2): The ledger balance
 
-**Step 3. Import account 2010.** Import **T3_GLEntry** with **Transform Data**, never **Load**, and name the query `LedgerAP`. Filter AccountID equal to `22` and PostingDate before `2027-01-01`, then add a custom column `Amount` with `[Credit] - [Debit]` (the sign of a liability) and load it. On the worksheet `Ex 8.2` calculate the balance and the invoice total:
+**Step 3. Import account 2010.** Import **T3_GLEntry** with **Transform Data**, never **Load**, and name the query `LedgerAP`. Filter AccountID equal to `22` and PostingDate before `2027-01-01`, then add a custom column `Amount` with `[Credit] - [Debit]` (the sign of a liability) and load it. On the worksheet `Ex 8.2` put the open invoice detail in F6 and the ledger balance in F7:
 
 ```
-=SUM(LedgerAP[Credit])-SUM(LedgerAP[Debit])
-=SUM(OpenPayables[OpenBalance])
+F6 =SUM(OpenPayables[OpenBalance])
+F7 =SUM(LedgerAP[Credit])-SUM(LedgerAP[Debit])
 ```
 
 **Check:** the balance of account 2010 is $6,237,466.66 on 80,071 rows, against $4,781,095.54 of open invoices. **Watch for:** the AccountID typed as the account number (an AccountID of 2010 returns nothing), and the date filter left out. The 263 payments of 2027 then pull the balance down by $271,327.17, and the reconciliation shows an extra difference of that size.
@@ -74,13 +74,22 @@ c. Double-click the Sum of Amount for JournalEntry. **Show Details** lists three
 
 ### Requirement (4): The reconciling items
 
-**Step 5. Reconcile.** On `Ex 8.2` list the ledger balance, the three entries and the invoices (layout in the figure). Look the description up and read the invoice number from it, then take each amount from the ledger with a sign that makes the sum work:
+**Step 5. Reconcile.** On `Ex 8.2`, lay out the bridge from the ledger balance (F7) to the open invoices (F6) in the cells below. Enter the vouchers of the three journal entries in B13:B15 (JE-2024-000001, JE-2024-000103 and JE-2026-000001). Enter the description formula in C13 and copy it through C15, enter the signed item formula in F13 and copy it through F15, and complete the bridge in F12 and F16 to F18.
 
 ```
-=XLOOKUP(B13,JournalEntries[EntryNumber],JournalEntries[Description])
-=--TEXTBEFORE(TEXTAFTER(C14,"invoice ")," ")
-=-SUMIFS(LedgerAP[Amount],LedgerAP[VoucherNumber],B13)
-=ROUND(F16-F17,2)
+F12 =F7
+C13 =XLOOKUP(B13,JournalEntries[EntryNumber],JournalEntries[Description])
+F13 =-SUMIFS(LedgerAP[Amount],LedgerAP[VoucherNumber],B13)
+F16 =F12+SUM(F13:F15)
+F17 =F6
+F18 =ROUND(F16-F17,2)
+```
+
+The descriptions of the two Debt Reclass entries name the PurchaseInvoiceID (3160 and 21692), not the formatted invoice number. A student can read the two IDs from C14:C15 into D14:D15 and look up the invoice numbers in E14:E15 with an XLOOKUP on OpenPayables. In Microsoft 365 the ID can be extracted by formula instead, an optional route, because older versions of Excel lack TEXTBEFORE and TEXTAFTER.
+
+```
+D14 =--TEXTBEFORE(TEXTAFTER(C14,"invoice ")," ")
+E14 =XLOOKUP(D14,OpenPayables[PurchaseInvoiceID],OpenPayables[InvoiceNumber])
 ```
 
 The model answer's items are the opening entry (less the credit that has no invoice detail) and the two reclassifications (added back, because the detail still shows the invoices as open).
@@ -122,13 +131,13 @@ The model answer's items are the opening entry (less the credit that has no invo
 ## What a strong answer says
 
 - **Requirement (4).** The opening balance is unsupported by the extract's detail, and whether it belongs in the ledger or in missing invoice detail depends on the conversion records. The reclassifications are explained by recorded entries, which the note agreements should support, and the fix belongs in the invoice detail. The orders were created and approved by one person for more than ten times that person's limit, which goes to Exercise 8.5 and to the chief financial officer.
-- **Requirement (5).** Objective, both balances, three explained items, no unexplained difference, and a conclusion that separates the reclassifications (a fix in the detail) from the opening balance (goes to the audit committee with the receivables finding).
+- **Requirement (5).** Both balances, three explained items and no unexplained difference. As a plus, an objective and a conclusion that separate the reclassifications (a fix in the detail) from the opening balance (goes to the audit committee with the receivables finding), with the request for the conversion-date detail.
 
 A weak answer calls the opening balance an error and proposes to correct the ledger, or leaves the two reclassified invoices on the open list as if they were owed to the supplier.
 
 ## Common mistakes and how to respond
 
-- **No rounding.** *Symptom:* hundreds of open invoices with balances of a fraction of a cent. *Response:* ask what the cent is for in a reconciliation.
+- **No rounding.** *Symptom:* more open invoices than the rounded count, some with balances of a tiny fraction of a cent. *Response:* ask what the cent is for in a reconciliation.
 - **No date cutoff on the ledger.** *Symptom:* an extra difference equal to the later payments. *Response:* ask which payments a December balance may include.
 - **The account number as AccountID.** *Symptom:* an empty query. *Response:* ask which key the GLEntry table holds.
 - **A liability with debits less credits.** *Symptom:* a negative balance and mirror-image items. *Response:* ask which side increases a liability.
@@ -144,7 +153,7 @@ A weak answer calls the opening balance an error and proposes to correct the led
 | Requirement 2: LedgerAP | 15 | Account and cutoff right, sign of a liability | Cutoff missing |
 | Requirement 3: PivotTable and Show Details | 20 | Source types, the journal entry rows listed | PivotTable without the rows |
 | Requirement 4: items and orders | 25 | Each item explained, the correction placed, orders traced | Items without orders |
-| Requirement 5: workpaper | 20 | Zero difference, conclusion, request for the detail | No conclusion |
+| Requirement 5: workpaper | 20 | Ledger balance, open invoices, each reconciling item with its explanation, the unexplained difference shown as zero | An item without its explanation |
 
 ## Extensions and discussion questions
 

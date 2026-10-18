@@ -41,8 +41,8 @@ By the end, students can:
 ## Before you assign
 
 - **From earlier work.** Requirements 1 to 5 complete, with their tables. No new data and no new Excel. Students write the memo and the appendix in a word processor; the model answer keeps its memo on a `Memo` sheet with the exhibits linked to the analysis sheets, which a student need not copy.
-- **Length.** The memo is at most two pages and the appendix one. The model memorandum is a little under a thousand words, about what two pages hold.
-- **The model's view.** It recommends declining the calendar as proposed: no promotion {{ reached }} its break-even increase, and the calendar would cost about ${{ cost|num(0) }} of contribution against the {{ x.plan_year }} budget. Students may reach a different recommendation from the same evidence; grade the reasoning, not the verdict, as long as it follows from the exhibits and states its limits.
+- **Length.** The memo is at most two pages and the appendix one. The model memorandum is a little under a thousand words, about what two pages hold. The `Memo` sheet is model text, not a print layout, and a word count does not prove pagination, so check the pages in the word-processing document.
+- **The model's view.** It recommends declining the calendar as proposed: no promotion {{ reached }} its break-even increase, and the calendar would cost about ${{ cost|num(0) }} of contribution against the {{ x.plan_year }} budget. Students may reach a different recommendation from the same evidence, including a supported deferral or a capped pilot; grade the reasoning and the limits, not the verdict, as long as it follows from the exhibits.
 
 ## How to run it
 
@@ -66,26 +66,26 @@ Individual, about 60 minutes in class or as a take-home: 10 to plan the evidence
 
 ### Phase 2: The three sections and the close
 
-**Step 3. Financial reporting.** In three short paragraphs: the cost in all, ${{ r2.total|money }}, and by year ({% for y in r2.years %}${{ y.disc|money }} in {{ y.year }}, {{ y.share|pct(2) }} of billed revenue{% if not loop.last %}; {% endif %}{% endfor %}); the ledger records revenue net, so account {{ x.discount_account }} is unused and the income statement shows no sign of the cost, which only a gross-to-net schedule reveals; and the lag from order to invoice, which puts ${{ r2.q4|money }} ({{ r2.q4_share|pct(0) }}) of the proposed promotions' ${{ r2.prop_total|money }} in the fourth quarter.
+**Step 3. Financial reporting.** In three short paragraphs: the cost in all, ${{ r2.total|money }}, and by year ({% for y in r2.years %}${{ y.disc|money }} in {{ y.year }}, {{ y.share|pct(2) }} of billed revenue{% if not loop.last %}; {% endif %}{% endfor %}); the ledger records revenue net, so account {{ x.discount_account }} is unused, reported revenue is already lower, and the income statement does not separately identify the promotional reduction, which only a gross-to-net schedule shows; and the lag from order to invoice, which puts ${{ r2.q4|money }} ({{ r2.q4_share|pct(0) }}) of the proposed promotions' ${{ r2.prop_total|money }} in the fourth quarter.
 
-**Step 4. Managerial accounting.** The differences from expectation run from {{ x.lift_low|spct }} to {{ x.lift_high|spct }}, none outside the scope's normal variation on an informal screen and none near its break-even, and no first order came through a promotion. The comparisons cannot show what would have sold without a promotion, and the memo says so. The break-evens run from {{ x.be_low|pct(0) }} to {{ x.be_high|pct(0) }}. The proposed calendar would cost about ${{ r4.cost|money }} of discounts, ${{ r4.contribution|money }} of contribution, against a {{ x.plan_year }} budget that plans no promotion, a sensitivity on the report year's billed volume and mix that leaves out the discount on orders not yet billed. State the volume basis, and that the budget's quantities were not used. Offer one alternative, a small, capped test with a comparison group and a review afterward, at a discount below the {{ discount|pct(1) }} at which the largest measured difference (promotion {{ x.best.id }}'s, applied to Furniture) would just pay for it. That rate is a sensitivity, not an optimal discount.
+**Step 4. Managerial accounting.** The differences from expectation run from {{ x.lift_low|spct }} to {{ x.lift_high|spct }}, none outside the scope's normal variation on an informal screen and none near its break-even, and no first order came through a promotion. The comparisons cannot show what would have sold without a promotion, and the memo says so. The three proposed promotions require increases of {% for p in x.proposal %}{{ p.be|pct(1) }} for {{ p.label }}{% if not loop.last %}{{ ', and ' if loop.index == 2 else ', ' }}{% endif %}{% endfor %} in the stated model. The optional all-nine historical comparison spans {{ x.be_low|pct(1) }} to {{ x.be_high|pct(1) }}, supplementary corroboration and not a further student deliverable. The proposed calendar would cost about ${{ r4.cost|money }} of discounts, ${{ r4.contribution|money }} of contribution, against a {{ x.plan_year }} budget that plans no promotion, a sensitivity on the report year's billed volume and mix that leaves out the discount on orders not yet billed. State the volume basis, and that the budget's quantities were not used. A capped, measured pilot can be supported if its costs, comparison group, approval conditions and review date are stated. The {{ discount|pct(4) }} result is a hypothetical ceiling at the unproven {{ best_year }} {{ x.best.label }} comparison, applied to Furniture, and it is not evidence that a Furniture pilot below that rate would break even. Grade the rationale and the limits, including a supported recommendation to defer or decline.
 
-**Step 5. Auditing.** The exceptions with their dispositions (the collection promotions' dates as a likely master-data error, the two out-of-scope lines as a likely incomplete item master, each with the record that would confirm it), the concentration of approvals in one role and the pending overrides billed with no completed approval, and the conditions that would make a promotion safe to run. Classify the findings provisionally as design or operation, and say what would settle each.
+**Step 5. Auditing.** The exceptions with their dispositions (the collection promotions' dates as a likely master-data error and a possible date-validation or calendar-maintenance weakness, the two out-of-scope lines as a likely incomplete item master, each with the record that would confirm it), the concentration of approvals in one role and the pending overrides billed with no completed approval, and the conditions that would make a promotion safe to run. Classify the findings provisionally as design or operation, and say what would settle each.
 
-**Step 6. Recommend.** Decline the calendar as proposed, with the cost and the reason in one sentence. Say what would change the answer: evidence of a lift near a break-even, or a promotion designed to be measured. A test is offered only after the control changes of Step 5.
+**Step 6. Recommend.** Decline the calendar as proposed, with the cost and the reason in one sentence. Say what would change the answer: evidence of a lift near a break-even, or a promotion designed to be measured. A pilot is offered only with Step 4's conditions and after the control changes of Step 5.
 
-**Step 7. Build the appendix.** One page, five exhibits: the cost by year (R2 Cost), the gross-to-net schedule (R2 Gross to Net), the volume comparison (R3 Volume), the break-even results (R4 Model) and the summary of exceptions (R5 Controls). Each exhibit is numbered and cited in the memo.
+**Step 7. Build the appendix.** One page, five exhibits: the cost by year (R2 Cost), the gross-to-net schedule (R2 Gross to Net), the volume comparison (R3 Volume), the break-even results (R4 Model) and the summary of exceptions (R5 Controls). Each exhibit is numbered, cited in the memo, and names the worksheet behind it.
 
-**Check:** the memo names the report year's calendar and its {{ proposed }} promotions ({% for p in x.proposal %}{{ p.label }} at {{ p.rate|pct(0) }}{% if not loop.last %}, {% endif %}{% endfor %}), every number in it appears in an exhibit or a workbook cell, and the length holds.
+**Check:** the memo names the proposed {{ x.plan_year }} calendar, assessed using {{ x.year }} billed evidence, and its {{ proposed }} promotions ({% for p in x.proposal %}{{ p.label }} at {{ p.rate|pct(0) }}{% if not loop.last %}, {% endif %}{% endfor %}), every number in it appears in an exhibit or a workbook cell, and the length holds.
 
 ## Expected results
 
 | Memo section | Numbers a correct memo carries | Source |
 |---|---|---|
 | Financial reporting | ${{ r2.total|money }} in all; {{ r2.years[0].share|pct(2) }} to {{ r2.years[-1].share|pct(2) }} of revenue; {{ r2.q4_share|pct(0) }} in the fourth quarter | R2 |
-| Managerial accounting | Differences {{ x.lift_low|spct }} to {{ x.lift_high|spct }}; break-evens {{ x.be_low|pct(0) }} to {{ x.be_high|pct(0) }}; ${{ r4.contribution|money }} of contribution | R3, R4 |
+| Managerial accounting | Differences {{ x.lift_low|spct }} to {{ x.lift_high|spct }}; break-evens {% for p in x.proposal %}{{ p.be|pct(1) }}{% if not loop.last %}, {% endif %}{% endfor %} for the three proposed promotions; ${{ r4.contribution|money }} of contribution | R3, R4 |
 | Auditing | {{ r5.good|capitalize }} of {{ r5.promos }} promotions pass the date test; {{ r5.oos }} out-of-scope lines; {{ r5.approved }} approvals by one employee | R5 |
-| Recommendation | Decline as proposed, with at most a capped test priced below the {{ discount|pct(1) }} sensitivity, after the controls | R4, R5 |
+| Recommendation | Decline (or defer) as proposed. A capped, measured pilot only with its costs, comparison group, approval conditions and review date, after the controls. The {{ discount|pct(1) }} sensitivity is a hypothetical ceiling | R4, R5 |
 
 {{ expected() }}
 
@@ -104,7 +104,7 @@ What separates strong from weak: a strong memo makes choices. It leaves out the 
 - **Too long.** *Symptom:* three pages or a squeezed font. *Response:* ask which finding the controller would miss least, and move detail to the appendix.
 - **A requirement-by-requirement report.** *Symptom:* headings that read Requirement 1 to 5. *Response:* ask what the controller's four questions were, and organize by them.
 - **No recommendation, or a hedged one.** *Symptom:* "it depends". *Response:* ask what the student would do tomorrow, and what would change that.
-- **A break-even presented as a forecast.** *Symptom:* "the promotion will need a third more orders". *Response:* ask what the measured differences were.
+- **A break-even presented as a forecast.** *Symptom:* "the promotion will generate a third more volume". *Response:* ask what the measured differences were, and note that the model's lift is volume at a fixed mix, not a count of orders.
 - **Overclaiming the customer test.** *Symptom:* "promotions never attract customers". *Response:* ask what a data set that begins in the first year can show.
 - **Blame.** *Symptom:* a named individual at fault. *Response:* ask what design would have prevented it, and use the role.
 - **Numbers that disagree.** *Symptom:* the memo and an exhibit differ by rounding or by year. *Response:* have the student trace each number to its cell and fix one source.
@@ -117,7 +117,7 @@ What separates strong from weak: a strong memo makes choices. It leaves out the 
 | Financial reporting | 20 | Cost, share, reason the ledger hides it, timing | Cost without the reason |
 | Managerial accounting | 25 | Volume and customers, break-evens, cost against the plan, volume basis, alternative | Results listed without a conclusion |
 | Auditing | 20 | Exceptions, dispositions, design or operation, conditions | Exceptions without causes |
-| Recommendation | 15 | A decision with its reason, limits and a measured next step | A decision without limits |
+| Recommendation | 15 | A decision, including a supported deferral, with its reason, limits and a measured next step | A decision without limits |
 | Exhibits and traceability | 10 | Five exhibits, cited, agreeing with the text | Exhibits missing or inconsistent |
 | Form and audience | 10 | At most two pages, three sections, plain for the controller | Over length or unorganized |
 

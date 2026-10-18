@@ -143,7 +143,27 @@ class WorkbookQuery(Query):
         q._counts["Changed Type"] = 1
         return q
 
+    @classmethod
+    def named(cls, name: str, item: str, column: str, mtype: str = "type number") -> "WorkbookQuery":
+        """A one-cell query on a defined name of the workbook (Source and Navigation, Kind DefinedName), the cell's value
+        in one column, typed and then guarded: the query fails unless it returns one number above 0 and at most 1."""
+        q = cls(name)
+        q.columns = {column: mtype}
+        q.source = ("workbook-name", item, column, mtype)
+        return q
+
     def m(self, path: str) -> str:
+        if self.source[0] == "workbook-name":
+            _, item, column, mtype = self.source
+            value = f"#\"Changed Type\"{{0}}[{column}]"
+            return pq.steps_query([
+                ("Source", f"Excel.Workbook(File.Contents({pq.m_string(NEUTRAL_WB)}), null, true)"),
+                (f"{item}_DefinedName", f"Source{{[Item={pq.m_string(item)},Kind=\"DefinedName\"]}}[Data]"),
+                ("Renamed Columns", pq.rename([("Column1", column)])),
+                ("Changed Type", pq.transform_types([(column, mtype)])),
+                ("Checked Value",
+                 f"if Table.RowCount(#\"Changed Type\") = 1 and {value} > 0 and {value} <= 1 then #\"Changed Type\" "
+                 f"else error {pq.m_string(f'{item} must hold one number above 0 and at most 1')}")])
         _, table, types = self.source
         nav = f"{table}_Table"
         return pq.steps_query([
@@ -228,9 +248,10 @@ MEASURES = [
      "The share of the margin of the items selected that the top N items earn, N being the rank on the axis."),
     ("Capacity", "Available Hours", "SUM ( 'Work Centers'[AvailableHours] )", "#,0.00",
      "Hours available in WorkCenterCalendar in the base year."),
-    ("Capacity", "Practical Share", "0.8", "0%", "Practical capacity as a share of the available hours, typed at the "
-     "case's 80% (tbl-18-02). The item costs come from the workbook at its own Assumptions value, so change both "
-     "together."),
+    ("Capacity", "Practical Share", "SELECTEDVALUE ( 'Model Parameters'[PracticalShare] )", "0%",
+     "Practical capacity as a share of the available hours, read from the workbook's Assumptions sheet (the name "
+     "PracticalUsed) through the Model Parameters query, so the capacity page and the item costs use one value. Blank "
+     "unless the query returns exactly one value, which the query accepts only above 0 and up to 1."),
     ("Capacity", "Practical Capacity", "[Available Hours] * [Practical Share]", HOURS, "Available hours at the practical share."),
     ("Capacity", "Routing Time Used", "SUM ( 'Routing Time'[Hours] )", HOURS,
      "Routing time of the base year's completions: run hours per unit times the units, plus setup per work order."),
@@ -332,6 +353,7 @@ def r5(b: Build) -> None:
     fam = WorkbookQuery.table("FamilyResults", wb, "FamilyResults").select(
         ["Family", "ItemGroup", "Closes", "TotalVariance", "UnitsCompleted", "VariancePerUnit"])
     ledger = WorkbookQuery.table("Ledger5080", wb, "Ledger5080")
+    params = WorkbookQuery.named("Model Parameters", "PracticalUsed", "PracticalShare")
 
     unit_cost = {"StandardCost": "none", "AbsorptionCost": "none", "TimeDrivenCost": "none", "ItemID": "none"}
     m.add(query_table(ic, formats={c: MONEY for c in keep_ic[6:] if c != "Units"} | {"Units": "#,0.00"},
@@ -349,6 +371,7 @@ def r5(b: Build) -> None:
     m.add(query_table(fam, formats={"TotalVariance": MONEY, "VariancePerUnit": MONEY, "UnitsCompleted": "#,0.00"},
                       summarize={"VariancePerUnit": "none"}))
     m.add(query_table(ledger, formats={"Variance5080": MONEY}))
+    m.add(query_table(params, formats={"PracticalShare": "0%"}, summarize={"PracticalShare": "none"})).hidden = True
     m.relate("SalesInvoiceLine.SalesInvoiceID", "SalesInvoice.SalesInvoiceID")
     m.relate("SalesInvoiceLine.ItemID", "ItemCosts.ItemID")
     m.relate("Routing Time.WorkCenter", "Work Centers.WorkCenter")
@@ -401,8 +424,9 @@ def r5(b: Build) -> None:
         "cost of the plant, shown on the Capacity page. Purchased finished goods carry their standard cost in every "
         "view. Choose a view in the slicer of the Families page; with none selected, the measures use Standard.",
         f"Sources: the ItemCosts Table of {WORKBOOK} (one row per finished good, from Requirement 4), and its Activity, "
-        "Calendar, PayClass, Debits1090, FamilyResults, and Ledger5080 Tables (pasted there from MakeBuy.sql); the "
-        f"invoice lines and invoices of CharlesRiver.xlsx. The invoices run through {last_invoice}, and the work order "
+        "Calendar, PayClass, Debits1090, FamilyResults, and Ledger5080 Tables (pasted there from MakeBuy.sql), and the "
+        "practical share its Assumptions sheet names PracticalUsed (save the workbook after recalculating it, then "
+        "refresh); the invoice lines and invoices of CharlesRiver.xlsx. The invoices run through {last_invoice}, and the work order "
         f"closes through {last_close}.",
         "The blank: design services have no row in the item cost Table, so their lines show as a (Blank) family. They "
         "carry no standard cost, so they are left out of the Families and Concentration pages (a page filter keeps "
@@ -560,6 +584,8 @@ def r5(b: Build) -> None:
     n_lines, n_inv = d.one("SELECT COUNT(*) FROM SalesInvoiceLine"), d.one("SELECT COUNT(*) FROM SalesInvoice")
     blank_lines = d.one("SELECT COUNT(*) FROM SalesInvoiceLine l JOIN Item i ON i.ItemID = l.ItemID "
                         "WHERE i.ItemType <> 'Finished Good'")
+    b.check(t, "Model Parameters rows (the practical share, one value)", 1, "COUNTROWS ( 'Model Parameters' )", 0)
+    b.check(t, "practical share read from the workbook (the case's 80%)", ch18.PRACTICAL, "[Practical Share]", 1e-9)
     b.check(t, "ItemCosts rows (every finished good)", n_fg, "COUNTROWS ( ItemCosts )", 0)
     b.check(t, "SalesInvoiceLine rows", n_lines, "COUNTROWS ( SalesInvoiceLine )", 0)
     b.check(t, "SalesInvoice rows", n_inv, "COUNTROWS ( SalesInvoice )", 0)

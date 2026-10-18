@@ -15,7 +15,7 @@ The chapter says that the Charles River file declares no foreign keys, so the re
 
 By the end, students can:
 
-- state a foreign key as child table, column, parent table and key, and say which links cross table groups (chapter outcome 2);
+- state a foreign key as child table, column, parent table and key, and say which links cross table groups (outcome 2);
 - test a relationship in Excel and report its orphans, counting blanks separately;
 - decide for each blank whether the relationship allows it;
 - use a PivotTable of distinct values to test a foreign key in a table of hundreds of thousands of rows;
@@ -27,7 +27,7 @@ By the end, students can:
 
 - Students need CharlesRiver_Work.xlsx, Tutorial 2.2's Step 5 (the PivotTable of AccountID tested against the chart) and the chapter's sections on keys.
 - The exercise relies on these conditions. The file declares no foreign keys. Every filled-in key of the 12 relationships of the model answer finds its parent (0 orphans). 4 of them have blanks by design, and each blank has a reason. GLEntry has 815,921 rows.
-- The large tables are the practical problem. A lookup in every row of GLEntry makes Excel unresponsive, so the PivotTable method is required there. It also works for any foreign key with a few hundred distinct values at most: 211 customers in SalesOrder, 211 items in SalesOrderLine, 71 accounts and 10 cost centers in GLEntry. A key that is nearly distinct in every row, such as the shipment line on an invoice line, is not shortened by a PivotTable, and a whole-column lookup takes minutes. Tell students to choose their six relationships with that in mind, and to let Excel finish.
+- The large tables are the practical problem. A lookup in every row of GLEntry can make Excel slow or unresponsive, depending on the computer and the Excel version, so the PivotTable method is the one to use there. It also works for any foreign key with a few hundred distinct values at most: 211 customers in SalesOrder, 211 items in SalesOrderLine, 71 accounts and 10 cost centers in GLEntry. A key that is nearly distinct in every row, such as the shipment line on an invoice line, is not shortened by a PivotTable, and a whole-column lookup can take minutes. Tell students to choose their six relationships with that in mind, and to let Excel finish.
 - Hold the trace until the extension. The relationship between GLEntry and its source documents is not a foreign key, and it is the one place where this data holds an orphan.
 
 ## How to run it
@@ -40,7 +40,7 @@ Individual work. For about 90 minutes: 15 listing the relationships (requirement
 
 ### Requirement (1): List the relationships
 
-**Step 1. Write each foreign key from the diagrams.** Use Figures 3.7 and 3.9, and write child table, foreign key, parent table and primary key. The model list has 12, of which 3 cross table groups: SalesOrderLine.ItemID to Item, GLEntry.AccountID to Account and GLEntry.CostCenterID to CostCenter.
+**Step 1. Write each foreign key from the diagrams.** Use Figures 3.7 and 3.9, and write child table, foreign key, parent table and primary key. The model list has 12, of which 2 cross table groups: SalesOrderLine.ItemID to Item and GLEntry.CostCenterID to CostCenter. GLEntry.AccountID to Account stays inside the Accounting Core.
 
 | Child.column | Parent.column | Where it sits |
 |---|---|---|
@@ -53,7 +53,7 @@ Individual work. For about 90 minutes: 15 listing the relationships (requirement
 | SalesInvoiceLine.ShipmentLineID | ShipmentLine.ShipmentLineID | Order-to-Cash |
 | CashReceiptApplication.SalesInvoiceID | SalesInvoice.SalesInvoiceID | Order-to-Cash |
 | CashReceipt.SalesInvoiceID | SalesInvoice.SalesInvoiceID | Order-to-Cash |
-| GLEntry.AccountID | Account.AccountID | cross-group, into the Accounting Core |
+| GLEntry.AccountID | Account.AccountID | Accounting Core |
 | GLEntry.CostCenterID | CostCenter.CostCenterID | cross-group, into Organizational Planning |
 | Account.ParentAccountID | Account.AccountID | Accounting Core, self-reference |
 
@@ -67,7 +67,7 @@ Individual work. For about 90 minutes: 15 listing the relationships (requirement
 =IF(D2="","blank",IF(COUNTIFS(Customer!A:A,D2)=0,"orphan","ok"))
 ```
 
-Copy it down, then count the labels:
+The Table fills the column down (clear any filter first). In a cell outside the column, count the labels:
 
 ```text
 =COUNTIF(L:L,"orphan")
@@ -77,9 +77,9 @@ Copy it down, then count the labels:
 
 **Step 3. Test the large table with a PivotTable.** For GLEntry, do not copy a formula down 815,921 rows.
 
-a. Insert a PivotTable from **GLEntry** with AccountID in **Rows**. It lists 71 distinct accounts, where the chart holds 104.
-b. Next to the PivotTable, look each listed AccountID up in the AccountID column of **Account** (XLOOKUP or COUNTIFS).
-c. Count the misses.
+a. Insert a PivotTable from **GLEntry**, on a new worksheet, with AccountID in **Rows** and GLEntryID in **Values**, summarized by Count rather than Sum. It lists 71 distinct accounts, where the chart holds 104.
+b. Next to the PivotTable, look each listed AccountID up in the AccountID column of **Account** (XLOOKUP or COUNTIFS), leaving out the Grand Total and any (blank) row.
+c. Count the misses, and add their Count of GLEntryID to report the ledger rows affected.
 
 **Check:** the result is 0 orphans. Repeat for CostCenterID: the PivotTable lists 10 cost centers and a (blank) row for the 115,623 ledger rows with none, which is the optional relationship of Exercise 2.4. **Watch for:** testing AccountID against the AccountNumber column. AccountID and AccountNumber are different numbers, and the test flags all 71 accounts the ledger uses. The pair to match is the key in both tables.
 
@@ -122,7 +122,7 @@ What a clean result tells the audit team: every key that is filled in finds its 
 
 | Quantity | Value | Where |
 |---|---:|---|
-| Relationships tested; crossing table groups | 12; 3 | Step 1 |
+| Relationships tested; crossing table groups | 12; 2 | Step 1 |
 | Orphaned keys among them | 0 | Step 4 |
 | Relationships with blanks | 4 | Step 4 |
 | Distinct accounts in the ledger; in the chart | 71; 104 | Step 3 |
@@ -161,6 +161,6 @@ A weak answer reports violations that are blanks or childless parents, reports o
 
 - Test the source-document trace. For each source type that names a table, check that every SourceDocumentID exists in it. 19 types name a table; the one exception is 6 of the 16,394 ledger rows typed PayrollPayment, whose payments do not exist. The type PayrollSummary names no table, because its key is a code between 1,001,001 and 1,077,010.
 - Plant an orphan in a copy of one worksheet, and show that your test finds it. Why is that a better test of the test than a clean result?
-- Test one relationship the diagrams do not show, such as the order line key on an invoice line.
+- Test one relationship the diagrams do not show, such as SalesOrderLine.PromotionID to PromotionProgram.PromotionID. Count the blanks apart, because most order lines carry no promotion.
 - Discuss: if the file declared and enforced its foreign keys, what would you still test? (Part III returns to this with the trace.)
 - Discuss: what does a clean result tell you about the accuracy of the data? (Chapter 2's four dimensions help: this test speaks to consistency, not accuracy.)

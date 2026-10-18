@@ -1594,10 +1594,12 @@ approved the credit, and every return was received in the warehouse by someone o
 {v['nothing']['n']} of them before any application; by the receipts' dates, {rcpt['n']} ({money(rcpt['amt'])}),
 {v['nothing_rcpt']['n']} of them before any receipt, and the {v['same']['n']} the definitions part on are dated the day
 of the last receipt, whose order on that day the records cannot show; neither date shows when the cash cleared the
-bank (T6). The cause is in
-T7: {v['unpaid_2060']} of the {v['to_2060']} credits posted to 2060 were posted before any cash had been applied to the
-invoice ({v['unrcpt_2060']} before any receipt was dated), so a refundable balance appeared in 2060 before the cash that
-supports it. {v['pd2']['n']} refunds were
+bank (T6), and the test is a retrospective screen: it flags a refund only once a later application is recorded, so it
+does not show that a refund was supported when approved. The cause is in T7: the dataset allocates each credit using the
+invoice's final payment information, so a 2060 credit does not show that the customer had funded it by the credit or
+refund date; {v['unpaid_2060']} of the {v['to_2060']} credits posted to 2060 were posted before any cash had been applied
+to the invoice ({v['unrcpt_2060']} before any receipt was dated), so a refundable balance appeared in 2060 before the
+cash that supports it. {v['pd2']['n']} refunds were
 paid to customers whose past-due balance was at least the refund ({money(v['pd2']['amt'])}), and {v['mism']['n']} went
 by a method none of the invoice's receipts used, an anomaly to follow up (T10). The clawbacks are complete and at the
 accrual's rate; the {len(off)} amounts T8 lists are exact half-cent products that SQLite's ROUND, in binary floating
@@ -1735,28 +1737,35 @@ FROM Lines;""",
                    lambda r: r.value("LineTotalOff")),
              Check("the lines", ",".join(str(x) for x in v["half"]), lambda r: str(r.value("LinesOff")))])
     tax_sub = len(sub["tax_sub_flags"])
-    s.query("Requirement 7, test S2: each credit recomputed: its invoice, lines, tax, freight, and total",
-            "Population: every credit memo; expected: none above its invoice, tax on SubTotal plus freight",
+    s.query("Requirement 7, test S2: each credit recomputed against its original invoice: tax, lines, freight, and total",
+            "Population: every credit memo and its original invoice; expected: the invoice's tax corroborated, then the credit's",
             """\
-WITH Rate AS (
-    SELECT ROUND(SUM(TaxAmount) / SUM(SubTotal + FreightCreditAmount), 3)
-        AS TaxRate
-    FROM CreditMemo
-),
-Credits AS (
+WITH Credits AS (
     SELECT cm.CreditMemoID, cm.OriginalSalesInvoiceID, cm.SubTotal,
         cm.FreightCreditAmount, cm.TaxAmount, cm.GrandTotal,
         si.GrandTotal AS InvoiceTotal, si.FreightAmount AS InvoiceFreight,
+        si.SubTotal AS InvoiceSubTotal, si.TaxAmount AS InvoiceTax,
         (SELECT SUM(cml.LineTotal)
          FROM CreditMemoLine AS cml
          WHERE cml.CreditMemoID = cm.CreditMemoID) AS LinesTotal
     FROM CreditMemo AS cm
         INNER JOIN SalesInvoice AS si
             ON si.SalesInvoiceID = cm.OriginalSalesInvoiceID
+),
+Rate AS (
+    SELECT ROUND(SUM(InvoiceTax)
+            / SUM(InvoiceSubTotal + InvoiceFreight), 3) AS TaxRate,
+        ROUND(SUM(TaxAmount)
+            / SUM(SubTotal + FreightCreditAmount), 3) AS CreditRate
+    FROM Credits
 )
 SELECT COUNT(*) AS Credits,
     COUNT(DISTINCT OriginalSalesInvoiceID) AS Invoices,
     (SELECT TaxRate FROM Rate) AS TaxRate,
+    (SELECT CreditRate FROM Rate) AS CreditRate,
+    SUM(CASE WHEN ABS(InvoiceTax - ROUND((InvoiceSubTotal + InvoiceFreight)
+        * (SELECT TaxRate FROM Rate), 2)) > 0.005 THEN 1 ELSE 0 END)
+        AS InvoiceTaxOff,
     SUM(CASE WHEN GrandTotal > InvoiceTotal + 0.005 THEN 1 ELSE 0 END)
         AS AboveInvoice,
     SUM(CASE WHEN ABS(SubTotal - LinesTotal) > 0.004 THEN 1 ELSE 0 END)
@@ -1776,7 +1785,12 @@ SELECT COUNT(*) AS Credits,
 FROM Credits;""",
             [Check("credits", v["n_cm"], lambda r: r.value("Credits")),
              Check("distinct invoices", sub["distinct_inv"], lambda r: r.value("Invoices")),
-             Check("tax rate, percent", round(100 * sub["rate"], 1), lambda r: round(100 * r.value("TaxRate"), 1), 0.05),
+             Check("tax rate on the original invoices, percent", round(100 * sub["inv_rate"], 1),
+                   lambda r: round(100 * r.value("TaxRate"), 1), 0.05),
+             Check("the credits' own effective rate, percent (a diagnostic)", round(100 * sub["rate"], 1),
+                   lambda r: round(100 * r.value("CreditRate"), 1), 0.05),
+             Check("original invoices whose tax is not the rate on SubTotal plus freight", sub["inv_tax_off"],
+                   lambda r: r.value("InvoiceTaxOff")),
              Check("above the invoice", sub["above_invoice"], lambda r: r.value("AboveInvoice")),
              Check("SubTotal not the lines", v["n_cm"] - sub["sub_ok"], lambda r: r.value("SubTotalNotLines")),
              Check("tax off", v["n_cm"] - sub["tax_ok"], lambda r: r.value("TaxOff")),
@@ -2096,29 +2110,37 @@ ORDER BY StepDate, StepOrder, Document;""",
 The recorded credits test clean. Every one of the {sub['lines']} credit lines traces to its return, shipment, and
 invoice lines, none returns more than was shipped or credits more than was returned, no shipment line was returned
 twice, and price and discount equal the invoice line's (S1); LineTotal is ROUND(Q x P x (1 - D), 2) except a
-half-cent on line {', '.join(str(x) for x in v['half'])}, an exact half-cent product, while by exact decimal rounding
-half up lines {', '.join(str(x) for x in v['half_up'])} are a cent lower: rounding, not errors. The {v['n_cm']} credits
-are on as many invoices, none above its invoice, with SubTotal equal to the lines and tax at {sub['rate']:.1%} of
-SubTotal plus freight on all of them (S2), a rate read from the credits' own totals, which every invoice's tax
-corroborates (the same rate on SubTotal plus freight), though whether it is right in law lies outside the records; a test
-on SubTotal alone would flag the {v['with_freight']} credits with freight. No freight credit exceeds the invoice's
+one-cent difference on line {', '.join(str(x) for x in v['half'])}, caused by an exact half-cent tie ({'; '.join(
+    f"line {h['id']}: exact product {h['exact']}, stored {h['stored']}, SQLite's ROUND {h['sqlite']}" for h in v['half_info'])}),
+while by exact decimal rounding half up lines {', '.join(str(x) for x in v['half_up'])} are a cent lower: rounding
+differences to document with the convention stated, not errors. The {v['n_cm']} credits are on as many invoices, none
+above its invoice, with SubTotal equal to the lines. Each credit is joined to its original invoice, whose tax is
+first corroborated at {sub['inv_rate']:.1%} of its SubTotal plus freight (all {v['n_cm']} original invoices agree within
+half a cent), and then the credit's tax is that rate on SubTotal plus freight credited, on all of them (S2); the credits' own
+effective rate is a diagnostic that agrees, and whether the rate and the taxability are right in law needs the approved
+policy or other independent evidence. A test on SubTotal alone would flag the {v['with_freight']} credits with freight.
+No freight credit exceeds the invoice's
 freight, an upper bound and not a recomputation, since no freight policy for partial returns is in the records: the
 answer reports that limit and asks for the policy. 2060 holds {len(items)} Issued credits at the year-end
 (S3). Returned goods go back at standard cost, and the chart has no write-down account: Damaged
 {money(v['dmg_total'])}, Damaged and Quality Concern {money(v['both'])} ({money(v['both_c'])} in {d.C}), a valuation
-follow-up, since these are flows and not the stock still held (S4); {v['n_frac']} lines of less than one unit sit
-{money(v['frac_gap'])} below standard.
+follow-up, since these are flows and not the stock still held (S4). {v['n_frac']} complete returns of shipment lines of
+less than one unit are recorded at the quantity times the shipment line's extended cost, {money(v['frac_gap'])} below
+quantity times the unit standard cost (return line {v['frac_example']['line']} of {v['frac_example']['ret']} returns all
+{v['frac_example']['qty']:.2f} units at {v['frac_example']['unit']} a unit, which proportionate costing reverses at
+{v['frac_example']['proportionate']}, and it is recorded at {v['frac_example']['recorded']}). The pattern explains how the
+records were produced; it does not establish that the valuation is correct, so reconcile the recorded amounts, list the
+differences apart, and obtain the costing policy.
 
 Lapping (S5): no receipt is applied to another customer's invoice, deposits follow receipts within {lap['dep_hi']}
 days, and every receipt is fully applied. Applications come {lap['raw_lo']} to {lap['raw_hi']} days after their receipt,
 and the {lap['raw_over']} that come more than two days after it are all of receipts dated before their invoice: allowing
 for those, every application falls within {lap['lag_hi']} days of the later of the receipt and invoice dates; the {lap['early_receipts']} receipts applied to invoices dated after them are deposits held
-in 2060, not lapping, as far as these tests reach. A first-digit test is a weak procedure here, on Chapter 8's
-criteria, though no minimum count rules it out: the credits and refunds are subsets selected by events (a return, then
-the part of a credit posted to customer deposits), their amounts follow the invoice lines they reverse, and each
-credit is capped by its invoice; with {v['n_rf']} refunds, a population that followed Benford's Law exactly would show a
-MAD of about {v['chance_rf']:.4f} by chance alone, beyond the {v['threshold']} of nonconformity, and the {v['n_cm']}
-credits about {v['chance_cm']:.4f}, so a departure could not be told from chance.
+in 2060, not lapping, as far as these tests reach. The credits and refunds are event-selected reversals of invoice
+amounts (a return, then the part of a credit posted to customer deposits), so on Chapter 8's criteria they are not
+established as suitable for a first-digit conformity test. As an optional extension, {v['n_rf']} refunds that followed
+Benford's Law exactly would show a MAD of about {v['chance_rf']:.4f} by chance, beyond the {v['threshold']} of
+nonconformity, and {v['n_cm']} credits about {v['chance_cm']:.4f}.
 
 Timeline (S6): {v['timeline']}. Disposition: follow up, not a conclusion. Evidence outside the database that would
 settle it: {v['payee']}; a confirmation from the customer of the credit and the refund; the receiving and inspection

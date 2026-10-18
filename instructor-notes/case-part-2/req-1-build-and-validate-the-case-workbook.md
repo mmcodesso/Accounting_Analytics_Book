@@ -48,7 +48,14 @@ Individual work, about 90 minutes: 10 on the Documentation and Parameters sheets
 a. Add a worksheet named `Parameters` with the columns Parameter, Value, Name and Description.
 b. Type `0.08`, `0.1` and `0.12` as the proposal's rates, format them as percentages and color them blue.
 c. Name the three cells `HarborRate`, `FurnitureRate` and `DesignTradeRate` with the Name Box.
-d. Add `CommissionRate`. Typing Tutorial 7.3's value is enough. The model answer recomputes it so a refresh keeps it current: the report year's commission expense (a `LedgerActivity` query of the ledger grouped by account, year and source, with `ReportYear` a named input cell) divided by the year's invoice-line revenue.
+d. Add the named cells `ReportYear`, `FirstYear` as `=ReportYear-2` and `PlanYear` as `=ReportYear+1`. `ReportYear` is a constant of this case, not a selector, because the ledger queries filter the report year and the two before it.
+e. Add `CommissionRate`, formatted `0.000%`. Typing Tutorial 7.3's value is enough, and the ratio itself is better because it stays exact:
+
+```
+=566347.93/29756420.08
+```
+
+The model answer computes the same ratio, so a refresh keeps it current, from the report year's commission expense (the `LedgerActivity` query of Step 6e) over the year's invoice-line revenue:
 
 ```
 =SUMIFS(LedgerActivity[Debit],LedgerActivity[AccountNumber],6290,LedgerActivity[FiscalYear],ReportYear,LedgerActivity[SourceDocumentType],"<>JournalEntry")-SUMIFS(LedgerActivity[Credit],LedgerActivity[AccountNumber],6290,LedgerActivity[FiscalYear],ReportYear,LedgerActivity[SourceDocumentType],"<>JournalEntry")
@@ -68,7 +75,7 @@ c. In every query check the Changed Type step: date columns as Date, and Freight
 **Step 4. Build OrderLines.**
 
 a. Import T10_SalesOrderLine as `OrderLines`. In its Changed Type step set Discount to **Decimal Number** and PromotionID to **Whole Number**, each with **Replace current**.
-b. Choose **Home > Merge Queries**, merge with `Orders` on SalesOrderID, and expand OrderDate and CustomerID with "Use original column name as prefix" cleared.
+b. Choose **Home > Merge Queries**, merge with `Orders` on SalesOrderID (Left Outer, the default, which keeps every line), and expand OrderDate and CustomerID with "Use original column name as prefix" cleared.
 c. Merge `Items` on ItemID and expand ItemCode, ItemName, ItemGroup, CollectionName and StandardCost; merge `Customers` on CustomerID and expand CustomerSegment; merge `Promotions` on PromotionID and expand ScopeType, the three Promo columns, DiscountPct, EffectiveStartDate and EffectiveEndDate.
 d. Choose **Add Column > Custom Column** five times: `OrderYear` as `Date.Year([OrderDate])`, `OrderMonth` as `Date.Month([OrderDate])`, `ListAmount` as `[Quantity] * [BaseListPrice]`, `GrossAmount` as `[Quantity] * [UnitPrice]` and `DiscountAmount` as `[GrossAmount] * [Discount]`.
 
@@ -83,13 +90,14 @@ d. Choose **Add Column > Custom Column** five times: `OrderYear` as `Date.Year([
 a. Import T3_GLEntry with **Transform Data**. Filter SourceDocumentType to SalesInvoice and PostingDate to the report year, merge `Accounts` for AccountNumber, choose **Transform > Group By**, select **Advanced**, and group by AccountNumber with the sum of Credit and the sum of Debit. Name it `RevenuePostings`.
 b. Import T77_BudgetLine, filter BudgetCategory to Revenue, merge `Items` (ItemCode, ItemGroup, CollectionName, ListPrice) and add `ListAmount` as `[Quantity] * [ListPrice]`. Name it `BudgetPrices`.
 c. Import T8_PriceOverrideApproval as `Overrides` and merge `Employees` twice, once on RequestedByEmployeeID and once on ApprovedByEmployeeID, renaming the expanded columns for the requester and the approver.
-d. Choose **Home > Close & Load > Close & Load To**. A query that only feeds others, here `Invoices`, is loaded with **Only Create Connection**; load the rest as Tables on new worksheets and rename each worksheet after its query. The dialog's choice applies to every query loaded at once, so load the connection-only queries separately.
+d. Choose **Home > Close & Load > Close & Load To**. A query that only feeds others, here `Invoices`, is loaded with **Only Create Connection**; load the rest as Tables on new worksheets and rename each worksheet and its Table after its query, because the formulas use the Table names. The dialog's choice applies to every query loaded at once, so load the connection-only queries separately.
+e. For the live commission rate and Requirement 2's all-years test of the discount account, import T3_GLEntry again with **Transform Data** as `LedgerActivity`. Keep the case's three fiscal years, add `JournalEntry` as the VoucherNumber of journal-entry postings (null otherwise), merge `Accounts`, keep the Revenue and Expense accounts, and group by account, fiscal year, source document type and `JournalEntry` with the count of rows and the sums of Debit and Credit. A student who types the rate and tests only `RevenuePostings` has the narrower test, acceptable if stated.
 
 **Check:** `RevenuePostings` has 8 rows, one for each account the report year's sales invoices post to: 1020, 2050, 4010, 4020, 4030, 4040, 4050, 4080. `BudgetPrices` has 9,616 of the 31,426 budget rows.
 
 ### Phase 3: The completeness checks
 
-**Step 7. Compare each query with its source.** Build `SourceCounts` from the workbook's own list of Tables (the Name and Data columns the Navigator is built from), filtered to the Tables above, with a custom column `Rows` as `Table.RowCount([Data])`. Beside each loaded query on the Documentation sheet put:
+**Step 7. Compare each query with its source.** Build `SourceCounts` in a blank query from the source workbook, never from the case workbook's own loaded Tables, which would check a query against itself. `Excel.Workbook(File.Contents(path), null, true)` lists the source Tables, so keep Kind equal to Table and the Names above, add `Rows` as `Table.RowCount([Data])`, and for T77_BudgetLine add `RevenueRows`, the row count of its Revenue lines. Beside each loaded query on the Documentation sheet put:
 
 ```
 =ROWS(OrderLines[SalesOrderLineID])
@@ -110,7 +118,14 @@ and a final column that tests whether the two agree. For `BudgetPrices` compare 
 =SUM(RevenuePostings[Debit])      against      =SUM(RevenuePostings[Credit])
 ```
 
-`LinesAgree` is a calculated column in `Orders`: `=ABS([@OrderTotal]-[@LinesTotal])<0.005`, with `LinesTotal` a SUMIFS of the order's lines.
+`LinesTotal` and `LinesAgree` are calculated columns in `Orders`, and `LinesTotal` must exist before `LinesAgree` uses it:
+
+```
+LinesTotal: =SUMIFS(OrderLines[LineTotal],OrderLines[SalesOrderID],[@SalesOrderID])
+LinesAgree: =ABS([@OrderTotal]-[@LinesTotal])<0.005
+```
+
+Each lookup key must also be unique, or a merge repeats rows: `=ROWS(Items[ItemID])-ROWS(UNIQUE(Items[ItemID]))` is zero for every lookup. Count the unmatched lookups too. A matching row count shows that no row was lost or doubled, not that every line found its real-world match.
 
 **Check:** the order lines total $87,500,091.56 and equal the orders' total, with no order disagreeing with its lines. No line without a promotion carries a discount, in 22,269 order lines or 27,933 billed lines. The distinct Discount values in `OrderLines` are 0, 0.08, 0.1, 0.12. The postings' debits and credits are both $31,924,034.93. **Watch for:** the no-discount checks run before the type correction. They pass trivially, because every rate has already become 0; the list of distinct rates is the check that catches the type trap. The 20,619 lines with no promotion are the population those checks test.
 

@@ -53,7 +53,7 @@ Individual work, about 120 minutes: 25 for the freed hours, 15 for the compariso
 
 ### Part 1: The hours freed and the use afterwards
 
-**Step 1. Return the hours freed with Q23.** Routine: type the query at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. It sums each work center's run and setup hours for the families to buy over FamilyActivity, once per work center; the Cutting column shows the pattern:
+**Step 1. Return the hours freed with Q23.** Routine: type the query at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. It sums each work center's run and setup hours for the families to buy over FamilyActivity, once per work center. The block is a fragment, the Cutting column, and the complete statement is Q23:
 
 ```sql
 ROUND(SUM(CASE WHEN Family IN ('FUR-BNH', 'FUR-NGT', 'FUR-TBL')
@@ -82,7 +82,7 @@ Use after        {{ g.f.use_after }}
 Unused, in positions   {{ g.f.unused_pos }}
 ```
 
-**Check:** on the completions basis the plant leaves {{ unused_h|num(1) }} practical hours unused, {{ unused_positions|num(2) }} position-equivalents, against {{ freed_positions|num(2) }} freed by buying ({{ sales_positions|num(2) }} on Requirement 6's sales basis). So fitting the crew to the work is the larger question, and the two reductions add up only if both can be made. The production manager is right that idle capacity is not the products' fault, but it is still a cost. **Watch for:** the hours read as a staffing plan. They are annual hours from standard times, and the year's rough-cut plan puts {{ weeks.plant }} of its {{ weeks.weeks }} weeks above the plant's available hours and {{ weeks.centers }} work-center weeks above their own (up to {{ weeks.center_peak.share|pct(1) }} at {{ weeks.center_peak.name }}), so a position-equivalent is not a removable job until the weeks, skills and coverage are checked.
+**Check:** on the completions basis the plant leaves {{ unused_h|num(1) }} practical hours unused, {{ unused_positions|num(2) }} position-equivalents, against {{ freed_positions|num(2) }} freed by buying ({{ sales_positions|num(2) }} on Requirement 6's sales basis). So fitting the crew to the work is the larger question, and the two reductions add up only if both can be made. The production manager is right that idle capacity is not the products' fault, but it is still a cost. **Watch for:** the hours read as a staffing plan. They are annual hours from standard times. The rough-cut plan's {{ weeks.weeks }} weekly buckets from {{ weeks.first }} through {{ weeks.through }} (to the week of the last time record, a subset of the year's plan) put {{ weeks.plant }} weeks above the plant's available hours and {{ weeks.centers }} work-center weeks above their own (up to {{ weeks.center_peak.share|pct(1) }} at {{ weeks.center_peak.name }}). Across all {{ weeks.all.weeks }} buckets that start in the year, the last ending {{ weeks.all.ends }}, the counts are {{ weeks.all.plant }} and {{ weeks.all.centers }}. Planned hours are not recorded work, so a position-equivalent is not a removable job until the weeks, skills and coverage are checked.
 
 ### Part 3: If the crew is kept
 
@@ -151,8 +151,10 @@ A weak answer reports the freed hours without the comparison, or presents Solver
 | Hours freed and use | 25 | By work center, setup included, practical capacity | Run hours, or available hours |
 | Comparison with unused capacity | 25 | Hours and positions, with the meaning for the decision | Numbers without the meaning |
 | The crew-kept case | 20 | What stays, and how the remaining families' cost moves | Only the absorption effect |
-| Solver test (optional, scaled if skipped) | 25 | Model, binding center, shadow price, check against the minimum | Model without the check |
+| Solver test (optional) | 25 | Model, binding center, shadow price, check against the minimum | Model without the check |
 | Documentation | 5 | Sources and the saved model | Missing |
+
+Without the Solver test, score the required components out of 75, divide the points earned by 75 and multiply by 100, then apply the case weight; a student who skips it takes no penalty.
 
 ## Extensions and discussion questions
 

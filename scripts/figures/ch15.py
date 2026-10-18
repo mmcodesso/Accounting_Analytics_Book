@@ -375,7 +375,7 @@ def fig_15_10() -> Diagram:
     assert abs(measure[-1] - visual[-1]) < 1e-9 and all(abs(a - b) > 0.001 for a, b in zip(measure[:-1], visual[:-1]))
     chart = pbi.line_chart(d, 0, 0, 860, 360, "Hours per standard hour, trailing twelve months, 2025", months,
                            [("Measure (DATESINPERIOD)", measure, BLUE),
-                            ("Visual calculation on an axis starting in January 2025", visual, AMBER)],
+                            ("Visual calculation on an axis starting in January 2025", visual, AMBER, "dashed")],
                            "ratio", [1.0, 1.2, 1.4, 1.6, 1.8], legend=True)
     xs, y_of = chart["xs"], chart["y_of"]
     step = chart["width"] / 12
@@ -384,7 +384,7 @@ def fig_15_10() -> Diagram:
     d.text("Measure", xs[0] - 30, y_of(measure[0]) + 6, 70, 20, size=SMALL, color=BLUE, align="center")
     d.text("Visual calculation", xs[7] - 20, y_of(max(visual[7], visual[8])) - 26, 130, 20, size=SMALL, color=AMBER)
     d.text("<i>Inside the dashed frame: January to November 2025, when the visual calculation's window holds fewer than twelve "
-           "months. The two agree from December 2025. The value axis starts at 1.0.</i>", 0, 370, 860, 40,
+           "months. The two agree from December 2025. The visual calculation is the dashed line, and the value axis starts at 1.0.</i>", 0, 370, 860, 40,
            size=SMALL, color=GRAY)
     return d
 
@@ -397,11 +397,14 @@ def fig_15_11() -> Diagram:
     months = [m for m in p["months"] if m >= "2024-12"]
     series = [ttm(m) for m in months]
     assert [f"{ttm(m):.2f}" for m in ("2024-12", "2025-12", "2026-12")] == ["1.18", "1.41", "1.51"]
-    pbi.canvas(d, 0, 0, 860, 650)
-    pbi.frame(d, 16, 16, 450, 80, None)
-    pbi.card(d, 22, 22, 216, 68, "Hours per Standard Hour TTM", f"{series[-1]:.2f}")
-    pbi.card(d, 244, 22, 216, 68, "Hours per Standard Hour 2024", f"{ttm('2024-12'):.2f}")
-    pbi.line_chart(d, 478, 16, 366, 280, "Hours per Standard Hour TTM", months,
+    work_last = one("SELECT MAX(WorkDate) FROM LaborTimeEntry")[0]
+    indirect_last = one("SELECT MAX(WorkDate) FROM LaborTimeEntry WHERE LaborType = 'Indirect Manufacturing'")[0]
+    assert work_last == "2026-12-11" and indirect_last == "2026-12-04"
+    pbi.canvas(d, 0, 0, 860, 678)
+    pbi.frame(d, 16, 16, 450, 104, "December 2026 is provisional")
+    pbi.card(d, 22, 44, 216, 68, "Hours per Standard Hour TTM", f"{series[-1]:.2f}")
+    pbi.card(d, 244, 44, 216, 68, "Hours per Standard Hour 2024", f"{ttm('2024-12'):.2f}")
+    pbi.line_chart(d, 478, 16, 366, 304, "Hours per Standard Hour TTM", months,
                    [("TTM", series, BLUE)], "ratio", [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6], every=6)
     wc = q("SELECT COALESCE(wc.WorkCenterName, '(Blank)'), SUM(l.RegularHours + l.OvertimeHours) "
            "FROM LaborTimeEntry l LEFT JOIN WorkOrderOperation o ON o.WorkOrderOperationID = l.WorkOrderOperationID "
@@ -409,7 +412,7 @@ def fig_15_11() -> Diagram:
            "WHERE l.LaborType = 'Direct Manufacturing' AND l.WorkDate BETWEEN '2026-01-01' AND '2026-12-31' "
            "GROUP BY 1 ORDER BY 2 DESC")
     assert wc[0][0] == "Packing Work Center"
-    pbi.bar_chart(d, 16, 110, 450, 186, "Direct Hours by WorkCenterName, 2026",
+    pbi.bar_chart(d, 16, 134, 450, 186, "Direct Hours by WorkCenterName, 2026",
                   [n.replace(" Work Center", "") for n, _ in wc], [v for _, v in wc], "K",
                   pbi.nice_ticks(0, wc[0][1], 3), label_w=118)
     # Overtime share by job title and year, a clustered column chart drawn here.
@@ -419,7 +422,7 @@ def fig_15_11() -> Diagram:
                            "SUM(l.RegularHours + l.OvertimeHours) FROM LaborTimeEntry l JOIN Employee e "
                            "ON e.EmployeeID = l.EmployeeID WHERE l.LaborType <> 'NonManufacturing' GROUP BY 1, 2"):
         shares[(t, y)] = ot / tot
-    ix, iy, iw, ih = pbi.frame(d, 16, 310, 828, 320, "Overtime Share by JobTitle and Year")
+    ix, iy, iw, ih = pbi.frame(d, 16, 334, 828, 320, "Overtime Share by JobTitle and Year")
     years, colors = ["2024", "2025", "2026"], [GRAY, BLUE, TEAL]
     lx = ix
     for yname, color in zip(years, colors):
@@ -444,8 +447,10 @@ def fig_15_11() -> Diagram:
                align="center")
     assert all(shares[(t, "2026")] > 1.5 * shares[(t, "2024")] for t in titles)
     d.text("<i>The plant page of Tutorial 15.3. The card sets the trailing figure at December 2026 beside the "
-           "2024 level; the (Blank) work center holds the few direct lines without an operation.</i>", 0, 660, 860,
-           40, size=SMALL, color=GRAY)
+           "2024 level, and its title says that December 2026 is provisional: direct time and output run to "
+           "December 11, 2026, and indirect time to December 4, 2026, so the ratio is an observed-records diagnostic, not a "
+           "labor efficiency variance. The (Blank) work center holds the few direct lines without an "
+           "operation.</i>", 0, 684, 860, 56, size=SMALL, color=GRAY)
     return d
 
 

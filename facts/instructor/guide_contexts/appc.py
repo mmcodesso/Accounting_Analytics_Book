@@ -6,7 +6,8 @@ that extend the model of Tutorial C.1: control totals by quarter (C.1), discount
 changed and restored through version history (C.3).
 
 There is NO companion file and NO solution project: the projects open only in Desktop, and the browser steps were read in the
-author's own service account (drafts/appendix-c-service-results.md). The model answers therefore come from three places, and the
+author's own service account (the sanitized record facts/instructor/observations/appendix-c-service-observations-2026-10-06.md, dated
+author-session evidence that the public numerical checks below do not establish). The model answers therefore come from three places, and the
 guides say which:
 
 - the book's tutorials and exercises (the labels and the steps),
@@ -49,10 +50,15 @@ from notes import appendix_c as nc
 
 REPO = Path(__file__).resolve().parents[3]
 APPENDIX = REPO / "appendices" / "c-power-bi-browser"
-# The author keeps the log in drafts/ (moved to drafts/old/ on 2026-10-14); read whichever exists.
-LOG = next((path for path in (REPO / "drafts" / "appendix-c-service-results.md",
+# The dated observation record of the author's service test. The sanitized, versioned copy in the repository is the one the
+# checks read; the author's own log (drafts/ is gitignored, and it moved to drafts/old/ on 2026-10-14) is the fallback. The record
+# is evidence from one account on one day: a check that finds the phrases in it shows the guides quote it, not that the
+# interface still behaves so (the chapter note says so, and asks for a repeat run with a student account).
+OBSERVATIONS = REPO / "facts" / "instructor" / "observations" / "appendix-c-service-observations-2026-10-06.md"
+LOG = next((path for path in (OBSERVATIONS,
+                              REPO / "drafts" / "appendix-c-service-results.md",
                               REPO / "drafts" / "old" / "appendix-c-service-results.md") if path.exists()),
-           REPO / "drafts" / "appendix-c-service-results.md")
+           OBSERVATIONS)
 READ_ON = "October 6, 2026"          # the day the author's service account was read (CLAUDE.md, the author's log)
 CHOOSE_DATA_ITEMS = 164             # the items Choose data listed in the author's test: each Table and its worksheet
 UPLOAD_MB = 123                     # what the service reported for the workbook ("Upload successful (123 MB)")
@@ -112,6 +118,27 @@ def year_lines(d, year: int | None = None) -> list[dict]:
     return rows if year is None else [r for r in rows if r["year"] == year]
 
 
+def c1_query() -> str:
+    """The query of Exercise C.1, requirement (2): one row for each fiscal quarter (Exercise C.3 claims it reads [Revenue])."""
+    return "\n".join([
+        "// Exercise C.1, requirement (2): the control totals of each quarter",
+        "EVALUATE",
+        "SUMMARIZECOLUMNS (",
+        "    SalesInvoice[FiscalYear],",
+        "    SalesInvoice[Period],",
+        '    "Invoice lines", [Invoice Lines],',
+        '    "Revenue", ROUND ( [Revenue], 2 ),',
+        '    "List amount", ROUND ( [List Amount], 2 ),',
+        '    "Discounts", ROUND ( [Discounts], 2 )',
+        ")",
+        "ORDER BY SalesInvoice[FiscalYear], SalesInvoice[Period]"])
+
+
+def day_label(date: str) -> str:
+    """An ISO date as prose writes it, month first without the year ('March 6')."""
+    return f"{c13.MONTHS[int(date[5:7]) - 1]} {int(date[8:10])}"
+
+
 def log_has(*phrases: str) -> bool:
     text = LOG.read_text(encoding="utf-8") if LOG.is_file() else ""
     return all(p in text for p in phrases)
@@ -127,7 +154,7 @@ def chapter(d, claim):
     n_q, longest = mcq_facts()
     claim(n_q == 8, "the appendix has eight multiple-choice questions (the key's rationales and the note's plans use their numbers)")
     claim((step_count(1), step_count(2), step_count(3)) == (11, 9, 5), "Tutorials C.1, C.2 and C.3 have eleven, nine and five steps")
-    claim(LOG.is_file(), "the author's service test log is in drafts (the guides cite what it read)")
+    claim(LOG.is_file(), "the dated observation record of the author's service test is in the repository (the guides cite what it read)")
     n_tables = d.one("SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")
     claim(2 * n_tables == CHOOSE_DATA_ITEMS,
           "twice the tables of the database is the number of items the author's test read in Choose data (each Table and its worksheet)")
@@ -139,7 +166,7 @@ def chapter(d, claim):
           "Discount is zero in the first rows the profile reads and takes several values over the entire data set")
     claim(len({r["promo"] for r in rows[:c13.TOP_ROWS]}) == 1, "PromotionID is empty on every one of the first 1,000 lines")
     claim(log_has("Upload successful (123 MB)", "CharlesRiver 1.xlsx"),
-          "the log records the upload size and the renamed copy that the note quotes")
+          "the observation record has the upload size and the renamed copy that the note quotes (one account, one day: not a check of today's interface)")
     promo_text = tutorial_text(2)
     claim("select LineTotal, ListAmount, and DiscountAmount" in promo_text,
           "Tutorial C.2 builds its cards from the columns LineTotal, ListAmount and DiscountAmount, not from a measure")
@@ -199,26 +226,37 @@ def g1(d, claim):
           "the Harbor Collection Promotion's end date is before its start date (Exercise 13.3's master-data error)")
     q2_ids = sorted({r["promo"] for r in rows if r["quarter"] == 2 and r["promo"] is not None})
     claim(q2_ids == [7], "the second quarter's discounts all come from the Harbor Collection Promotion")
+    # the first quarter by promotion: the prior year's promotions are not all confined to January
+    q1_detail = []
+    for pid in q1_ids:
+        sub = [r for r in rows if r["quarter"] == 1 and r["promo"] == pid]
+        q1_detail.append(dict(name=promos[pid]["name"], prior=int(promos[pid]["start"][:4]) < y,
+                              last=max(r["date"] for r in sub), disc=c13.total(sub, "disc")))
+    prior_q1 = [p for p in q1_detail if p["prior"]]
+    claim([p["name"] for p in q1_detail if not p["prior"]] == [harbor["name"]],
+          "the first quarter's discounts come from promotions of the prior year and from the Harbor Collection Promotion")
+    latest_prior = max(prior_q1, key=lambda p: p["last"])
+    claim(latest_prior["last"][5:7] >= "03",
+          "one prior-year promotion is still invoiced in March, so the prior-year promotions' invoices are not confined to January")
+    harbor_q1 = next(p for p in q1_detail if not p["prior"])
+    claim(abs(harbor_q1["disc"] - c13.total([r for r in rows if r["promo"] == 7 and r["quarter"] == 1], "disc")) < 1e-6,
+          "the Harbor Collection Promotion contributes to the first quarter and, alone, to the second")
+    year_total = c13.total(rows, "disc")
+    q3_share, q4_share = quarters[2]["disc_cents"] / year_total, quarters[3]["disc_cents"] / year_total
+    q12_share = (quarters[0]["disc_cents"] + quarters[1]["disc_cents"]) / year_total
+    claim(q4_share > q3_share > q12_share and abs(q3_share + q4_share + q12_share - 1) < 1e-9,
+          "the fourth quarter holds most of the year's discounts, the third the next most, and the first two together the least")
     claim(all(p["scope"] == "ItemGroup" for p in (c13.autumn_promotion(d),))
           and c13.autumn_promotion(d)["start"][5:7] == "09", "the Furniture promotion starts in September")
     dax_disc = check_expr(claim, "2026 discounts")
     dax_lines = check_expr(claim, "2026 invoice lines")
-    query = "\n".join([
-        "// Exercise C.1, requirement (2): the control totals of each quarter",
-        "EVALUATE",
-        "SUMMARIZECOLUMNS (",
-        "    SalesInvoice[FiscalYear],",
-        "    SalesInvoice[Period],",
-        '    "Invoice lines", [Invoice Lines],',
-        '    "Revenue", ROUND ( [Revenue], 2 ),',
-        '    "List amount", ROUND ( [List Amount], 2 ),',
-        '    "Discounts", ROUND ( [Discounts], 2 )',
-        ")",
-        "ORDER BY SalesInvoice[FiscalYear], SalesInvoice[Period]"])
+    query = c1_query()
     return dict(y=y, m_list=m_list, m_disc=m_disc, m_lines=m_lines, m_rev=m_rev, query=query, n_rows=len(periods), n_cols=6,
                 quarters=quarters, q1=quarters[0], q4=quarters[3], rounded_sum=rounded_sum, cent=abs(cent), by_q=by_q,
                 line_rounded=line_rounded,
                 q1_old=and_list(q1_old), n_q1_old=len(q1_old), dax_disc=dax_disc, dax_lines=dax_lines,
+                q1_prior_last=latest_prior["name"], q1_prior_last_day=day_label(latest_prior["last"]),
+                harbor_q1=harbor_q1["disc"], q3_share=q3_share, q4_share=q4_share, q12_share=q12_share,
                 autumn_start=c13.MONTHS[int(c13.autumn_promotion(d)["start"][5:7]) - 1],
                 autumn_end=c13.MONTHS[int(c13.autumn_promotion(d)["end"][5:7]) - 1],
                 harbor=harbor["name"])
@@ -319,8 +357,9 @@ def g3(d, claim):
     claim("select LineTotal, ListAmount, and DiscountAmount" in tutorial_text(2) and "Revenue" in tutorial_text(2),
           "Tutorial C.2's cards read the columns LineTotal and ListAmount (renamed Revenue and At list price), not the Revenue measure, so no page changes when the measure does")
     claim("Tests.dax" in tutorial_text(3), "Tutorial C.3 keeps its test in Tests.dax")
+    claim("[Revenue]" in c1_query(), "Exercise C.1's query reads the Revenue measure, so a changed measure changes its Revenue column")
     claim(log_has("Save to version history", "Version history"),
-          "the log read the two version history commands on the model editor's File menu")
+          "the observation record read the two version history commands on the model editor's File menu (not their windows)")
     dax_rev = check_expr(claim, "2026 line total")
     dax_list = check_expr(claim, "2026 list amount")
     return dict(y=y, years=years, m_rev=m_rev, changed=changed, dax_rev=dax_rev, dax_list=dax_list, book_query=book_query())

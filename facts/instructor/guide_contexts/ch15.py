@@ -170,6 +170,34 @@ def query_tab(name: str) -> str:
     return (MODEL / "DAXQueries" / f"{name}.dax").read_text(encoding="utf-8").strip()
 
 
+# The Custom Column expressions of Exercise 15.6 as the guide tells a student to type them (the expression only, the
+# type set to True/False): the two work centers compared by key, and each test null when either side is missing.
+SAME_WORK_CENTER = ("if [OperationWorkCenterID] = null or [ClockWorkCenterID] = null\n"
+                    "then null\n"
+                    "else [OperationWorkCenterID] = [ClockWorkCenterID]")
+AFTER_END = ("if [ActualEndDate] = null or [WorkDate] = null then null\n"
+             "else [WorkDate] > [ActualEndDate]")
+# The model answer built before the review of 2026-10-16 compared the work-center names and guarded the end date alone
+# (the same answers on this data). A project built since then holds SAME_WORK_CENTER and AFTER_END, so once the
+# solution projects are rebuilt this claim can drop the two older forms.
+SAME_WORK_CENTER_BEFORE = "if [OperationWorkCenter] = null or [ClockWorkCenter] = null then null else [OperationWorkCenter] = [ClockWorkCenter]"
+AFTER_END_BEFORE = "if [ActualEndDate] = null then null else [WorkDate] > [ActualEndDate]"
+
+
+def _squash(text: str) -> str:
+    return " ".join(text.split())
+
+
+def custom_expression(claim, lines: list[str], column: str, allowed: tuple[str, ...]) -> str:
+    """The expression of a Custom Column step of the project, and a claim that it is one the guide's text allows."""
+    found = [l for l in lines if f'Table.AddColumn(' in l and f'"{column}", each ' in l]
+    claim(len(found) == 1, f"the solution project's LaborPaths query has the custom column {column}")
+    m = re.search(r'"' + column + r'", each (.*)\),?$', found[0]) if found else None
+    claim(m is not None and _squash(m.group(1)) in {_squash(a) for a in allowed},
+          f"the project's {column} step holds the expression the guide prints (or the form built before the review of 2026-10-16)")
+    return m.group(1) if m else ""
+
+
 def exercise_counts() -> dict[str, int]:
     persp, current, counts = {"Financial": "financial", "Managerial": "managerial", "Auditing": "auditing"}, None, {}
     for line in (CHAPTER / "_exercises.qmd").read_text(encoding="utf-8").splitlines():
@@ -289,11 +317,18 @@ def g1(d, claim):
     postings = {v: d.one("SELECT COUNT(*) FROM GLEntry WHERE VoucherNumber = ?", v) for v in {k["number"] for k in kept if not k["close"]}}
     now = next(k for k in kept if not k["close"] and k["year"] == y)
     before = next(k for k in kept if not k["close"] and k["year"] == d.P)
+    # the lower prior-year loss is a lower carrying amount plus the cash proceeds, not the proceeds alone
+    e_now, e_before = n15.disposal(d, now["number"]), n15.disposal(d, before["number"])
+    carrying_gap = (e_now["cost"]["amount"] - e_now["acc"]["amount"]) - (e_before["cost"]["amount"] - e_before["acc"]["amount"])
+    claim(carrying_gap > 0 and e_before["proceeds"] > 0 and
+          abs(carrying_gap + e_before["proceeds"] - (e_now["loss"] - e_before["loss"])) < 0.005,
+          "the prior year's loss is lower than the current year's by a lower carrying amount plus the cash proceeds")
     claim(postings[now["number"]] == 3 and postings[before["number"]] == 4, "the current year's loss entry has three postings and the prior year's four")
     query = query_tab("Ex 15.1")
     claim(now["number"] in query and "RELATED ( Account[AccountNumber] )" in query, "the Ex 15.1 tab filters the current year's entry and brings the account columns with RELATED")
     return dict(y=y, acct_number=acct[1], acct_name=acct[2], kept=kept, kept_now=[k for k in kept if k["year"] == y], n_postings_now=postings[now["number"]],
-                n_postings_before=postings[before["number"]], query=query, m_pl=measure(claim, "P&L Amount"), m_gl=measure(claim, "GL Amount"),
+                n_postings_before=postings[before["number"]], carrying_gap=carrying_gap, query=query,
+                m_pl=measure(claim, "P&L Amount"), m_gl=measure(claim, "GL Amount"),
                 t_ledger=visual_title(claim, "ledgerDetail", "ledgerTable"),
                 dax_now=check_expr(claim, f"{y} entry on the drill-through page"),
                 dax_all=check_expr(claim, "entries listed without a year filter (requirement 5)"),
@@ -458,7 +493,7 @@ def g5(d, claim):
           "the mean benchmark has a smaller quarter error than both recorded forecasts")
     claim(all(m < 100 * note["errors"]["mean"]["monthly"] for _, m in recorded),
           "both recorded forecasts have a smaller average monthly error than the mean benchmark")
-    return dict(y=y, first=first, q4=q4, with_start=with_start, n_all=len(months), n_date=12 * (d.N - d.F + 1),
+    return dict(y=y, first=first, version=version(), q4=q4, with_start=with_start, n_all=len(months), n_date=12 * (d.N - d.F + 1),
                 col=column_line(claim, "Date", "MonthStart"),
                 t_jan=visual_title(claim, "ex155", "forecastFromJanuary"), t_feb=visual_title(claim, "ex155", "forecastFromFebruary"),
                 t_actual=visual_title(claim, "ex155", "actualQ4"),
@@ -510,13 +545,43 @@ def g6(d, claim):
     non_direct = sum(r[2] for r in rows if r[0] == str(y) and r[1] != DIRECT)
     pack_hours = sum(r[2] for r in direct if r[0] == str(y) and r[7] and r[3] == packing)
     pack_off = sum(r[2] for r in direct if r[0] == str(y) and r[7] and r[3] == packing and r[4] != packing)
+    # the (Blank) operation row when neither the direct-time filter nor the operation filter is applied: the non-direct
+    # lines and the direct lines whose operation is missing
+    unmatched_hours = sum(r[2] for r in no_op if r[0] == str(y))
+    blank_row = non_direct + unmatched_hours
+    claim(unmatched_hours > 0, "some direct hours of the year have no operation, so they sit in the (Blank) row too")
+    # the disagreement by work center of the operation, the latest year: a count and a rate answer different questions
+    by_center = []
+    for name in sorted({r[3] for r in direct if r[0] == str(y) and r[7]}):
+        lines = [r for r in direct if r[0] == str(y) and r[7] and r[3] == name]
+        off = [r for r in lines if r[4] != name]
+        by_center.append(dict(name=name, lines=len(lines), differ=len(off), hours=sum(r[2] for r in lines),
+                              off_hours=sum(r[2] for r in off), share_lines=len(off) / len(lines),
+                              share_hours=sum(r[2] for r in off) / sum(r[2] for r in lines)))
+    top = lambda key: max(by_center, key=lambda c: c[key])["name"]   # noqa: E731
+    claim(top("differ") == top("off_hours") == packing,
+          "Packing has the largest number of disagreeing lines and the largest hours off the diagonal")
+    claim(top("share_lines") == top("share_hours") and top("share_lines") != packing,
+          "one work center other than Packing has the largest share of lines and of hours that disagree")
+    claim(len(by_center) == 5, "five work centers have direct time with an operation in the year")
+    indirect_total = d.one("SELECT SUM(RegularHours + OvertimeHours) FROM LaborTimeEntry WHERE LaborType = ? AND substr(WorkDate, 1, 4) = ?",
+                           INDIRECT, str(y))
     lp = table_m("LaborPaths")
+    for key in ("OperationPaths", "ClockPaths", "WorkCenter"):
+        pk = {"OperationPaths": "WorkOrderOperationID", "ClockPaths": "TimeClockEntryID", "WorkCenter": "WorkCenterID"}[key]
+        table = {"OperationPaths": "WorkOrderOperation", "ClockPaths": "TimeClockEntry", "WorkCenter": "WorkCenter"}[key]
+        claim(d.one(f"SELECT COUNT(*) = COUNT(DISTINCT {pk}) FROM {table}") == 1, f"the merge key {pk} is unique in {table}")
     return dict(y=y, by_year=by_year, n_all=n_all, n_inner=n_inner, n_blank=sum(x["blank"] for x in by_year), blank_now=now["blank"],
                 packing=packing, assembly=assembly, main=main, swap=swap, pack_off_share=pack_off / pack_hours, non_direct=non_direct,
+                unmatched_hours=unmatched_hours, blank_row=blank_row, by_center=by_center, indirect_total=indirect_total,
+                top_lines=top("differ"), top_share=top("share_lines"),
+                same_expr=SAME_WORK_CENTER, after_expr=AFTER_END,
+                m_both=measure(claim, "Lines on Both Paths"), m_dhours=measure(claim, "Disagreeing Hours"),
                 m_op=steps(claim, expression_m("OperationPaths"), "Removed Other Columns", "Changed Type1"),
                 m_clock=steps(claim, expression_m("ClockPaths"), "Removed Other Columns"),
                 m_merges=steps(claim, lp, "Merged Queries", "Expanded OperationPaths", "Merged Queries2", "Expanded ClockPaths"),
-                m_tests=steps(claim, lp, "Added Custom", "Added Custom1"),
+                m_tests=(custom_expression(claim, lp, "SameWorkCenter", (SAME_WORK_CENTER, SAME_WORK_CENTER_BEFORE)),
+                         custom_expression(claim, lp, "AfterOperationEnd", (AFTER_END, AFTER_END_BEFORE))),
                 m_lines=measure(claim, "Path Lines"), m_hours=measure(claim, "Path Hours"), m_differ=measure(claim, "Disagreeing Lines"),
                 m_share=measure(claim, "Share After Operation End"),
                 t_year=visual_title(claim, "ex156", "disagreeByYear"), t_matrix=visual_title(claim, "ex156", "pathMatrix"),

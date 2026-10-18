@@ -1,7 +1,7 @@
 """Instructor figures of Appendix C (guides in facts/instructor/guides/appendix-c-power-bi-browser/).
 
 The appendix is the last unit.  It has NO solution file: the projects open only in Desktop, and the browser steps were read
-in the author's own Power BI service account on October 6, 2026 (drafts/appendix-c-service-results.md).  So the mocks draw the
+in the author's own Power BI service account on October 6, 2026 (the sanitized record facts/instructor/observations/appendix-c-service-observations-2026-10-06.md).  So the mocks draw the
 service as the book's own mocks of this appendix do (scripts/figures/appendix_c.py: the service's top bar, the model editor's
 DAX query view, the report editor's menu bar, panes and page tabs, with no Desktop ribbon), and every value comes from the
 dataset through the guides' own contexts (appC.g1 to appC.g3) and the registered notes (appendix_c.ex1 to appendix_c.ex3),
@@ -158,7 +158,7 @@ def if_ac_0_a() -> Diagram:
     d = Diagram("Which Plan Fits the Class")
     minutes = _plans()
     guide = GUIDE.read_text(encoding="utf-8")
-    for phrase in ("Step 2 of C.1 (Choose data)", "Step 7 (**Create a semantic model only**)", "Step 3 of C.3 (**New measure**)", "C.1 Steps 1 to 4 on your account",
+    for phrase in ("not your instructor account", "**Choose data** (Steps 1 and 2 of C.1)", "**Create a semantic model only**", "**New measure** (Step 3 of C.3)", "C.1 Steps 1 to 4 on your account",
                    "C.1 Steps 7 to 9", "The differences of C.2: the card, the display units, the sort", "Without Pro.", "Students then do the exercises in Desktop"):
         assert phrase in guide, f"the guide no longer says: {phrase}"
     questions = [
@@ -172,7 +172,7 @@ def if_ac_0_a() -> Diagram:
         ("amber", f"<b>Plan C ({minutes['C']} minutes), or Desktop</b><br>The instructor shows C.1 Steps 1 to 4 and 7 to 9, the differences of "
                   "C.2 (the card, the display units, the sort) and the measure and test of C.3.<br>Students: Exercises C.1 to C.3 in Desktop."),
         ("teal", f"<b>Plan A ({minutes['A']} minutes) or Plan B ({minutes['B']} minutes), with Exercise C.3 done by hand</b><br>Tutorials: C.1, C.2 "
-                 "and C.3.<br>Exercises: C.1 and C.2; C.3 Steps 2, 3 and 5, with the formula retyped and no version history."),
+                 "and C.3.<br>Exercises: C.1 and C.2; C.3 by the manual route, with the formula and the baseline result recorded first, the formula retyped and no version history."),
         ("teal", f"<b>Plan A ({minutes['A']} minutes) or Plan B ({minutes['B']} minutes), every step</b><br>Tutorials: C.1, C.2 and C.3.<br>"
                  "Exercises: C.1 to C.3, with C.3's <i>Save to version history</i> and <i>Version history</i>."),
     ]
@@ -206,7 +206,8 @@ def if_ac_0_a() -> Diagram:
     bottom = tops[3] + row_h[3]
     _note(d, f"Plan A, Plan B and Plan C are the plans of the Teaching approaches below. Teal: students work in the service; amber: the instructor shows it; "
              "gray: students use Desktop. A Pro license matters only for the version history of Exercise C.3, and a tenant setting beats a license. "
-             "Before the term, test the second question with a student-licensed account: Step 2 and Step 7 of Tutorial C.1 and Step 3 of Tutorial C.3.",
+             "Before the term, test the second question with a student-licensed account, not an instructor account: the upload and Choose data, Power Query's Save, Editing, "
+             "DAX Run, a report save, and version history if Exercise C.3 is assigned.",
           bottom + 12)
     return d
 
@@ -433,7 +434,7 @@ def if_ac_2_a() -> Diagram:
     assert series[0][0] == none, "the flat line of the segment with no discounts is drawn last, on top of the others"
     ticks = pbi.nice_ticks(0, max(max(v) for _, v, _, _ in series), 4)
     chart_w = 852 - 8 - side_w - 12 - 4
-    _lines_chart(d, 8, c_y, chart_w, c_h, "Discounts by Month and CustomerSegment", months, series, ticks)
+    _lines_chart(d, 8, c_y, chart_w, c_h, f"Promotional discounts by customer segment fiscal {y0}", months, series, ticks)
     _data_pane(d, 8 + chart_w + 12, c_y, side_w, c_h, [names[k] for k in ("m_rev", "m_list", "m_disc", "m_lines")], inset=True)
     bottom = top + canvas_h
     pbi.page_tabs(d, 4, bottom + 4, ["Sales and Discounts", "Validation", "Ex C.2"], "Ex C.2")
@@ -468,7 +469,7 @@ def if_ac_3_a() -> Diagram:
     assert "LineTotal" in g["m_rev"] and "ListAmount" in g["changed"], "the change swaps the column the measure sums"
     runs = [
         ("Run 1: before the change", "Save a version", TEAL, rev, "The baseline."),
-        ("Run 2: after the change", "Change the Revenue formula", AMBER, lst, f"Up by ${pbi.amount(diff)}. The card is unchanged: it reads a column, not the measure."),
+        ("Run 2: after the change", "Change the Revenue formula", AMBER, lst, f"Up by ${pbi.amount(diff)}. The card is unchanged: it sums a column, not the measure."),
         ("Run 3: after the restore", "Restore the version", TEAL, rev, "Equal to run 1: the restore is proved by the test."),
     ]
     stub, bw, bh, gap = 104, 176, 276, 114                     # 104 + 3 x 176 + 2 x 114 = 860
@@ -508,13 +509,14 @@ def if_ac_3_a() -> Diagram:
             "A reason, unless someone typed it",
             "A review before a change takes effect"], "coral"),
         ("A project under version control adds", [
-            "Every change, with its author and a message",
-            "A review before a change is merged: Chapter 16's change control"], "blue"),
+            "Committed changes, with their author and a message",
+            "A review before a change is merged: Chapter 16's change control",
+            "Not every service edit, only what is committed"], "blue"),
     ]
     board = kit.board(d, cols, x=0, y=bh + 28, w=860, gap=14)
     _note(d, f"The three results of the Expected results: the test of Tests.dax for fiscal {data.C}, before the change, after Revenue sums ListAmount in place of "
-             "LineTotal, and after the restore. The test reads the measure; the page's cards read the columns, so they do not move. Highlighted: "
-             "the test after the change, the only place it shows. Below: what a saved version keeps, what it leaves out, and what a project under "
+             "LineTotal, and after the restore. The test reads the measure. Other queries or visuals using [Revenue] also change; these column-based cards "
+             "do not. Highlighted: the test after the change. Below: what a saved version keeps, what it leaves out, and what a project under "
              "version control adds. The window of Save to version history and the restore control were not read in the author's test, so the "
              "figure draws their effect, not their windows.", board["bottom"] + 12)
     return d

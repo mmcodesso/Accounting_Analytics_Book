@@ -48,7 +48,13 @@ b. In A4 to A12 enter the PromotionIDs 1 to 9, one for each row of the Promotion
 =XLOOKUP($A4,PromotionProgram[PromotionID],PromotionProgram[PromotionCode])
 ```
 
-In D4 enter `=COUNTIFS(SalesInvoiceLine[PromotionID],$A4)`, in E4 `=SUMIFS(SalesInvoiceLine[LineTotal],SalesInvoiceLine[PromotionID],$A4)` and in F4 the same SUMIFS on DiscountAmount. Fill each down. In row 13 enter `Total` and a SUM for D, E and F.
+In D4 enter `=COUNTIFS(SalesInvoiceLine[PromotionID],$A4)`, in E4 the SUMIFS below, and in F4 the same SUMIFS on DiscountAmount:
+
+```
+=SUMIFS(SalesInvoiceLine[LineTotal],SalesInvoiceLine[PromotionID],$A4)
+```
+
+Fill each down. In row 13 enter `Total` and a SUM for D, E and F.
 
 **Check:** 2,108 promotion lines with a LineTotal of $6,326,390.36 and a DiscountAmount of $723,253.29. **Watch for:** a student who filters the Table by hand instead of writing formulas. The summary then cannot refresh.
 
@@ -69,9 +75,14 @@ b. Select F4 to F12 and choose **Home > Conditional Formatting > Data Bars**.
 =COUNTIFS(SalesInvoiceLine[PromotionID],$A4,SalesInvoiceLine[Discount],"<>"&H4)
 ```
 
-Add two integrity rows below the summary: `=COUNTIFS(SalesInvoiceLine[PromotionID],"",SalesInvoiceLine[Discount],"<>0")` for discounts with no promotion, and `=COUNTIFS(SalesInvoiceLine[PromotionID],"<>")-D13` for promotion lines the summary leaves out.
+The model answer adds two integrity rows below the summary, which the requirement does not ask for. The first counts discounts with no promotion, and the second the promotion lines the summary leaves out.
 
-**Check:** every cell of column I and both integrity rows show 0, so no promotion was applied at a rate other than the rate the PromotionProgram Table records for it. **Watch for:** a student who reports a clean test as a finished audit. It shows that the lines' rates agree with that Table, not that the Table's rates were authorized, or that a line was eligible or billed within the promotion's dates.
+```
+=COUNTIFS(SalesInvoiceLine[PromotionID],"",SalesInvoiceLine[Discount],"<>0")
+=COUNTIFS(SalesInvoiceLine[PromotionID],"<>")-D13
+```
+
+**Check:** every cell of column I shows 0, and so do the integrity rows, so no promotion was applied at a rate other than the rate the PromotionProgram Table records for it. **Watch for:** a student who reports a clean test as a finished audit. It shows that the lines' rates agree with that Table, not that the Table's rates were authorized, or that a line was eligible or billed within the promotion's dates.
 
 ### Requirement (4): The largest promotion
 
@@ -114,7 +125,7 @@ Then look up its PromotionCode, ScopeType, ItemGroup, DiscountPct, EffectiveStar
 
 ## What a strong answer says
 
-- **Requirement (3).** Zero differences, stated with the test's three parts, and the limit: the test compares rates, not dates or eligibility.
+- **Requirement (3).** Zero differences, with the limit that the test compares rates, not dates or eligibility. The two integrity rows of Step 4 (discounts with no promotion, promotion lines left out of the summary) are a plus.
 - **Requirement (4).** The promotion, its scope, its rate and its dates, taken from the PromotionProgram Table by lookup, not typed.
 - **Requirement (5).** The memo separates what the data show from what the workbook cannot yet show, and lists the odd dates as questions.
 
@@ -135,13 +146,13 @@ A weak answer says the promotions were all valid, or corrects the end dates.
 |---|---:|---|---|
 | Requirement 1: the summary | 25 | One row for each promotion, built with lookups and COUNTIFS or SUMIFS, with totals that tie | Correct but typed or filtered by hand |
 | Requirement 2: shares and bars | 15 | Absolute reference, shares add to 100 percent, bars on the discount column | Relative reference or no bars |
-| Requirement 3: the test | 20 | A count for each promotion and a stated result | Count without the integrity rows |
+| Requirement 3: the test | 20 | A count for each promotion and a stated result | Counts for some promotions only, or no stated result |
 | Requirement 4: the largest | 15 | Promotion, scope, rate and dates by lookup | Typed from memory |
 | Requirement 5: the memo | 25 | The four paragraphs, the limit of the test, the dates as questions | Findings without the limit, or the dates corrected |
 
 ## Extensions and discussion questions
 
-- Add a column for the average rate paid, LineTotal divided by the price before discount, and compare it with DiscountPct.
+- Add a PrePromotionAmount column to the invoice lines, `=ROUND([@Quantity]*[@UnitPrice],2)`, and for each promotion divide its total DiscountAmount by its total PrePromotionAmount. Call the result the amount-weighted effective discount rate, compare it with DiscountPct, and explain the small differences that rounding each line makes.
 - Count each promotion's lines by pricing method with a mixed-reference grid, as Tutorial 4.2 does.
 - Discuss: Chapter 5 brings the invoice date onto the lines. Which promotions would you test first, and why?
 - Discuss: promotion 8 straddles two quarters. What do you expect that to do to a margin bridge?

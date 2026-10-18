@@ -24,7 +24,7 @@ figures:
 
 ## Purpose and learning outcomes
 
-The income statement cannot say where the cash went, so the requirement bridges net income to the change in cash, finds the entries that moved no cash and restates the sections as the indirect method requires (ASC Topic 230 reports only cash receipts and payments and discloses noncash activities apart). Its technical lessons are KEEPFILTERS and the difference between a flow and a difference of balances. The analytics type is descriptive, with diagnostic work in the drill-through.
+The income statement cannot say where the cash went, so the requirement bridges net income to the change in cash, finds the entries that moved no cash and restates the sections as the indirect method requires (ASC Topic 230 leaves investing and financing activities that move no cash out of the statement's amounts and discloses them apart, while the indirect method adjusts net income for noncash items such as depreciation and losses; paragraphs 230-10-45-28 and 230-10-50-3 to 50-6, to read before quoting). Its technical lessons are KEEPFILTERS and the difference between a flow and a difference of balances. The analytics type is descriptive, with diagnostic work in the drill-through.
 
 Students can:
 
@@ -58,10 +58,14 @@ The Checks tab proves every value; colors, order and the drill-through button ar
 
 ### Part 2: The bridge columns and the measure
 
-**Step 2. Add Step and Activity to Account.** In Power Query, choose **Add Column > Custom Column** for `Step`, an if-then-else chain on account numbers first and subtypes after, and for `Activity`; sort Step by a step-order column, as Tutorial 15.1 sorted its Steps table.
+**Step 2. Add Step and Activity to Account.** In Power Query, choose **Add Column > Custom Column**. Name the column `Step`, enter only the first expression below, an if-then-else chain on account numbers first and subtypes after, and set the type to Text. Add `Activity` from the second, and a whole-number `StepOrder` that numbers the steps from Net income to Debt and equity. After **Close & Apply**, select Account[Step] and choose **Column tools > Sort by column > StepOrder**, as Tutorial 15.1 sorted its Steps table.
 
 ```m jinja
-{{ g.m_step }}
+{{ g.e_step }}
+```
+
+```m jinja
+{{ g.e_activity }}
 ```
 
 **Check:** `1030` falls in Receivables, `1090` and `8020` in Other current assets, `2110` in Debt and equity by default. **Watch for:** cash among the steps. They then sum to zero, because every entry balances: the other accounts' effects add up to the change in cash, and the cash step is its opposite.
@@ -76,7 +80,7 @@ The Checks tab proves every value; colors, order and the drill-through button ar
 
 ### Part 3: The waterfall and the first year
 
-**Step 4. Chart the year.** Add a **Waterfall chart** with Step on **Category** and Cash Effect on **Y-axis**, titled "{{ g.t_waterfall }}", and a **Slicer** (**Tile**, **Single select**) on Year. Filter out the Cash step in **Filters on this visual**, sort the steps in their order, and add a **Matrix** of the bridge by year titled "{{ g.t_bridge }}".
+**Step 4. Chart the year.** Add a **Waterfall chart** with Step on **Category** and Cash Effect on **Y-axis**, titled "{{ g.t_waterfall }}", and a **Slicer** (**Tile**, **Single select**) on Year. Filter out the Cash step in **Filters on this visual**, sort the steps in their order, and add a **Matrix** of the bridge by year titled "{{ g.t_bridge }}". Limit Year on both the slicer and the waterfall to the complete years of the window, save the latest as the selection, and keep the note on {{ d.F }} beside the chart. {{ d.N }} stays out, because its postings are a few supplier payments and not a year.
 
 **Check:** {{ d.C }}: net income {{ sm(cur.net_income) }}, inventories {{ sm(cur.inventories) }}, change in cash {{ sm(cur.cash) }}, from ${{ cash_from|money }} to ${{ cash_to|money }}. {{ d.P }}: inventories {{ sm(pri.inventories) }} and cash up {{ sm(pri.cash) }}. **Watch for:** reading {{ d.F }} like {{ d.P }}. The opening entry is a {{ d.F }} posting, so the bridge starts from zero cash, shows {{ sm(first.cash) }} and puts {{ sm(first.financing) }} in financing; without it the change is {{ sm(first_x.cash) }} from an opening cash line of ${{ open_cash|money }}.
 
@@ -100,7 +104,7 @@ The Checks tab proves every value; colors, order and the drill-through button ar
 
 **Step 7. Measure what the cash is worth.** Add `Cash Net of Sales Tax`, `Sales Tax Payable` and `Principal Due within a Year` as cards titled "{{ g.t_cards }}".
 
-**Check:** cash net of the recorded tax payable (${{ tax_c|money }}) is ${{ net[-1]|money }}, a liquidity sensitivity (tax billed, not all collected). The notes are ${{ outstanding|money }}, and ${{ due_next|money }} falls due in {{ d.N }} yet sits in `2110`. **Watch for:** the schedule filtered through Date, which drops {{ g.beyond_lines }} payments past the table's end and reads ${{ g.inside|money }}, or on PaymentDate alone, which at an earlier year-end counts a note not yet originated.
+**Check:** cash net of the recorded tax payable (${{ tax_c|money }}) is ${{ net[-1]|money }}, a liquidity sensitivity (tax billed, not all collected). The notes are ${{ outstanding|money }}, and ${{ due_next|money }} falls due in {{ d.N }} yet sits in `2110`. The principal measures clear the filter on Date and count payments after the as-of date on the notes originated by it (the origination date comes from the debt agreements). **Watch for:** the schedule filtered through Date, which drops {{ g.beyond_lines }} payments past the table's end and reads ${{ g.inside|money }}, or on PaymentDate alone, which at an earlier year-end counts a note not yet originated.
 
 **Instructor check.** In **DAX query view**, compare this with the Expected results.
 

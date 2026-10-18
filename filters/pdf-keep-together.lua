@@ -15,7 +15,8 @@
 -- ("**Step 5. ...**") moves too, so it never sits alone at the foot of a page either. So it does when the block sits
 -- inside one of the step's first actions ("a. Type this formula in B28:" and the formula), where the room is asked
 -- for before the label. Any other step label asks for room for itself and the first lines of its step
--- (\aaKeepLabel), so a label never ends a page with its actions on the next. Lines are counted
+-- (\aaKeepLabel), so a label never ends a page with its actions on the next, and so does any paragraph that is only
+-- a bold label, such as an exercise's title line or its "**Requirements.**" (with a heading right before it). Lines are counted
 -- as printed: a code line longer than WRAP characters wraps (breaklines), a paragraph line holds about TEXT_LINE
 -- characters, and PADDING_LINES lines are added for the shading's padding and the space around the block (the
 -- lead-in adds one for the space after it), so the estimate errs on the side of moving the block.
@@ -109,6 +110,13 @@ local function is_step_label(block)
     and length(pandoc.utils.stringify(block)) <= LEAD_CHARS
 end
 
+-- a paragraph that is only a bold label, such as an exercise's "**Requirements.**" or its title line
+-- ("**Exercise 1.6: Evaluating Journal Entry Data for Audit Purposes**")
+local function is_bold_label(block)
+  return block ~= nil and block.t == 'Para' and #block.content == 1 and block.content[1].t == 'Strong'
+    and length(pandoc.utils.stringify(block)) <= LEAD_CHARS
+end
+
 -- the bold line that opens a tutorial's steps ("**Step-by-step instructions.**")
 local function is_instructions(block)
   return block ~= nil and block.t == 'Para' and #block.content > 0 and block.content[1].t == 'Strong'
@@ -180,6 +188,14 @@ function Blocks(blocks)
           wanted = wanted + #previous.content + math.ceil(chars / TEXT_LINE) + 1
                    + math.ceil(length(pandoc.utils.stringify(blocks[i - 2])) / TEXT_LINE) + 1
           table.insert(result, #result - 1, pandoc.RawBlock('latex', '\\aaNeedspace{' .. wanted .. '\\baselineskip}'))
+        elseif first_item == 1 and is_bold_label(blocks[i - 2]) and not is_instructions(blocks[i - 2]) then
+          -- the same for any other bold label right before that list (Exercise 6.6's "Requirements." before its
+          -- first requirement and that requirement's formula): the room is asked for before the label
+          wanted = wanted + #previous.content + math.ceil(chars / TEXT_LINE) + 1
+                   + math.ceil(length(pandoc.utils.stringify(blocks[i - 2])) / TEXT_LINE) + 1
+          local at = #result
+          while at > 1 and result[at] ~= blocks[i - 2] do at = at - 1 end
+          table.insert(result, at, pandoc.RawBlock('latex', '\\aaNeedspace{' .. wanted .. '\\baselineskip}'))
         elseif first_item ~= nil then
           -- ask for the room at the start of the first of those items, so they move with the code
           wanted = wanted + (#previous.content - first_item + 1) + math.ceil(chars / TEXT_LINE) + 1
@@ -223,6 +239,25 @@ function Blocks(blocks)
         end
         table.insert(result, #result - back + 1,
                      pandoc.RawBlock('latex', '\\' .. macro .. '{' .. wanted .. '\\baselineskip}'))
+        changed = true
+      elseif is_bold_label(block) and not is_instructions(block) and blocks[i + 1] ~= nil
+          and blocks[i + 1].t ~= 'CodeBlock' and blocks[i + 1].t ~= 'Header' then
+        -- any other bold label line: room for it and the first lines after it, like a step label, or, when a code
+        -- block sits in the first items of the list after it (Exercise 6.6's "(1) ..." and its formula), room for
+        -- everything up to the block, which would otherwise take its lead-in to the next page and leave the label
+        local wanted = math.ceil(length(pandoc.utils.stringify(block)) / TEXT_LINE) + 1
+        local nested = nested_code_lines(blocks[i + 1])
+        local macro = nested ~= nil and 'aaNeedspace' or 'aaKeepLabel'
+        wanted = wanted + (nested or LABEL_FOLLOW)
+        local back = 0
+        if blocks[i - 1] ~= nil and blocks[i - 1].t == 'Header' then
+          back, wanted = 1, wanted + HEADER_LINES
+        end
+        table.insert(result, #result - back + 1,
+                     pandoc.RawBlock('latex', '\\' .. macro .. '{' .. wanted .. '\\baselineskip}'))
+        -- and no break right after it: a list that follows would otherwise invite one (LaTeX's \@beginparpenalty)
+        table.insert(result, block)
+        block = pandoc.RawBlock('latex', '\\aaNoBreakAfter')
         changed = true
       elseif is_callout(block) then
         local wanted = math.ceil(text_lines(block.content)) + CALLOUT_PADDING

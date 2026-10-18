@@ -16,7 +16,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 (1) Build a matrix with FiscalYear on rows, ItemGroup on columns, and LineTotal as values, with row and column totals. Compare the fiscal 2026 row, item group by item group, with the revenue by item group you calculated in Chapter 6, and its total with the fiscal 2026 line total of the Validation page.
 
-(2) Import T16_SalesInvoice again as a query named `InvoiceHeaders`, keep SalesInvoiceID, InvoiceDate, SubTotal, FreightAmount, TaxAmount, and GrandTotal, and add a FiscalYear custom column. Before you choose the columns, make sure FreightAmount has the decimal number type, as Discount does in Step 3 of Tutorial 13.1. Do not relate it to the other tables. Build a table visual of SubTotal by fiscal year from InvoiceHeaders, and compare it with the line totals by fiscal year.
+(2) Import T16_SalesInvoice again as a query named `InvoiceHeaders`, keep SalesInvoiceID, InvoiceDate, SubTotal, FreightAmount, TaxAmount, and GrandTotal, and add a FiscalYear custom column. Before you choose the columns, make sure FreightAmount has the decimal number type, as Discount does in Step 3 of Tutorial 13.1. After loading, set the new FiscalYear to **Don't summarize**, as Step 9 of Tutorial 13.1 did for the years of SalesInvoice. Do not relate it to the other tables. Build a table visual of SubTotal by fiscal year from InvoiceHeaders, and compare it with the line totals by fiscal year.
 
 (3) Add FreightAmount, TaxAmount, and GrandTotal to the table visual. Explain why the line totals reconcile to SubTotal but not to GrandTotal, and which of the four amounts is revenue from the sale of goods and services.
 
@@ -41,7 +41,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 (3) Find every customer name that belongs to more than one CustomerID, and state how much revenue each of those customers produced in fiscal 2026.
 
-(4) Calculate the share of fiscal 2026 revenue held by the largest customer and by the top ten, and state whether any customer reaches the policy's threshold.
+(4) Calculate the share of fiscal 2026 revenue held by the largest customer and by the top ten, and state whether any customer exceeds the policy's threshold.
 
 (5) Explain why the Top N filter should be stated on the page, where the reader can see it, or in the visual's title, and write the title you would give the corrected visual.
 
@@ -68,9 +68,9 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 (4) One promotion's end date is earlier than its start date. Identify it, and explain how its invoice lines can still carry the promotion.
 
-(5) Write a short memo to the marketing manager stating what the promotions of fiscal 2026 gave away, when, and on which item groups, and what the report cannot yet show about whether they paid off.
+(5) Add a second matrix of fiscal 2026 discounts with PromotionName on rows and ItemGroup in place of Month. Then write a short memo to the marketing manager stating what the promotions of fiscal 2026 gave away, when, and on which item groups, and what the report cannot yet show about whether they paid off.
 
-**Deliverable.** The matrix on the Ex 13.3 page and a half-page memo.
+**Deliverable.** The two matrices on the Ex 13.3 page and a half-page memo.
 
 
 
@@ -127,7 +127,7 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 **Table group:** Order-to-Cash, with the Item and Customer tables from Master Data
 
-**Scenario.** A colleague has drafted a page for the board. It has a pie chart of fiscal 2026 revenue by item group with five slices and no labels, a card titled "Average discount" showing Average of Discount for fiscal 2026, a line chart of revenue by month from January 2024 to December 2026 on the default axis, a line and clustered column chart of revenue and discounts by month of fiscal 2026, and, on that chart only, a filter in the Filters pane that excludes the Services item group, mentioned nowhere on the page. The controller asks you to review it before it goes out.
+**Scenario.** A colleague has drafted a page for the board. It has a pie chart of fiscal 2026 revenue by item group with five slices and no labels, a card titled "Average discount" showing Average of Discount for fiscal 2026 as a percentage, a line chart of revenue by month from January 2024 to December 2026 on the default axis, a line and clustered column chart of revenue and discounts by month of fiscal 2026, and, on that chart only, a filter in the Filters pane that excludes the Services item group, mentioned nowhere on the page. The controller asks you to review it before it goes out.
 
 **Requirements.**
 

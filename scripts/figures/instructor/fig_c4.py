@@ -279,7 +279,7 @@ def if_c4_0_a() -> Diagram:
     gap_x, ew = 12.0, (860 - 12.0 * 4) / 5
     ah = 182.0
     d.box("", 0, ay, 860, ah, fill=WHITE, stroke=GRAY, stroke_width=1.5, rounded=False, dashed=True)
-    d.text("<b>The one-page appendix</b> (Requirement 6): five numbered exhibits, each made in an earlier requirement", 10, ay + 4, 800, 22, size=SMALL)
+    d.text("<b>The appendix</b>, up to three pages (Requirement 6): five numbered exhibits, each made in an earlier requirement", 10, ay + 4, 800, 22, size=SMALL)
     for k, ex in enumerate(exhibits):
         x0 = k * (ew + gap_x)
         label = ex["text"][0].upper() + ex["text"][1:]
@@ -426,11 +426,11 @@ def if_c4_6_a() -> Diagram:
     chip3 = 116.0
     ax = c3x + chip3 + arrow
     assert ax + AW <= 860, ax + AW
-    top = 30.0
+    top = 42.0
     d = Diagram("The Layout of the Memo and Its Appendix")
     d.text("<b>The memo</b>: page 1", p1x, 0, PW, 22, size=SMALL)
     d.text("<b>The memo</b>: page 2", p2x, 0, PW, 22, size=SMALL)
-    d.text("<b>The appendix</b>: one page", ax, 0, AW, 22, size=SMALL)
+    d.text("<b>The appendix</b>:<br>up to three pages", ax, 0, AW, 36, size=SMALL)
     for x, w, h in ((p1x, PW, PH), (p2x, PW, PH), (ax, AW, AH)):
         d.box("", x, top, w, h, fill=WHITE, stroke=GRAY, stroke_width=1.5, rounded=False)
 
@@ -513,13 +513,14 @@ def if_c4_3_b() -> Diagram:
     qs = r3["qs"]
     labels = [q["label"] for q in qs]
     series = {"dso": [q["dso"] for q in qs], "dio": [q["dio"] for q in qs], "dpo": [q["dpo"] for q in qs], "ccc": [q["ccc"] for q in qs]}
+    unrounded = {k: [q["raw"][k] for q in qs] for k in series}              # a movement is the difference of the unrounded measures, rounded once
     for q in qs:
         assert abs(q["dso"] + q["dio"] - q["dpo"] - q["ccc"]) < 0.25, "the cycle is DSO plus DIO less DPO (each rounded to one decimal)"
-    rise = lambda k: series[k][-1] - series[k][0]                          # noqa: E731
+    rise = lambda k: round(unrounded[k][-1] - unrounded[k][0], 1)          # noqa: E731
     span = lambda k: max(series[k]) - min(series[k])                       # noqa: E731
     assert rise("dio") > 200 and rise("ccc") > 200 and all(b > a for a, b in zip(series["ccc"], series["ccc"][1:])), "DIO and the cycle rise steeply, quarter after quarter"
     assert span("dso") < 10 and span("dpo") < 25 and span("dso") < rise("dio") / 20 and span("dpo") < rise("dio") / 10, "DSO and DPO stay nearly flat"
-    assert abs(rise("ccc") - (rise("dso") + rise("dio") - rise("dpo"))) < 0.25
+    assert abs(rise("ccc") - (rise("dso") + rise("dio") - rise("dpo"))) < 0.11
     first = qs[0]
     assert first["end"] == f"{ctx.data().F}-12-31", "the first quarter with a full twelve months is the last of the first year"
     open_ar, open_ap = r5["opening_ar"], r5["opening_ap"]
@@ -738,7 +739,7 @@ def _heads(head: str, width: float, bold: bool = True) -> str:
 
 def _table_visual(d: Diagram, x: float, y: float, title: str, headers: list[str], widths: list[float], rows: list[list[str]],
                   aligns: list[str] | None = None, title_lines: int | None = None, head_lines: int = 1, row_h: float = ROW,
-                  total: list[str] | None = None) -> dict:
+                  total: list[str] | None = None, clip_margin: float | dict = 16) -> dict:
     """A table visual: a title (one line or two), a header row, the rows (banded) and an optional bold total row.  aligns names
     each column's side ("left" for text, "right" for numbers and dates).  A header may break over head_lines lines, with <br>
     where it breaks.  Returns the cell geometry keyed (row, column) with row -1 for the headers, and the visual's bottom and
@@ -766,7 +767,8 @@ def _table_visual(d: Diagram, x: float, y: float, title: str, headers: list[str]
             d.box("", ix, ry, sum(widths), 1, fill=INK, stroke=INK, rounded=False)
         for c, (value, cx, wd) in enumerate(zip(row, xs, widths)):
             plain = r % 2 == 0 or is_total
-            shown = esc(_clip(value, wd, margin=8 if aligns[c] == "right" else 16, bold=is_total))
+            margin = clip_margin.get(c, 16) if isinstance(clip_margin, dict) else clip_margin
+            shown = esc(_clip(value, wd, margin=8 if aligns[c] == "right" else margin, bold=is_total))
             d.box(f"<b>{shown}</b>" if is_total else shown, cx, ry, wd, row_h,
                   fill=WHITE if plain else GRAY_TINT, stroke=WHITE if plain else GRAY_TINT, size=SMALL, align=aligns[c], rounded=False)
             geometry[(r, c)] = (cx, ry, wd, row_h)
@@ -1428,9 +1430,11 @@ def _camel_break(name: str, width: float) -> str:
     return name[:k] + "<br>" + name[k:]
 
 
-def if_c4_5_a() -> Diagram:
-    """The Reconciliations page: the roll-forward matrix by source document with the JournalEntry column outlined, the cards that set each
-    ledger balance against its open items, the billing and the aged payables, and the Findings table."""
+def _recon(part: str) -> Diagram:
+    """The Reconciliations page in two figures, so that each prints at the frame's scale. The upper part: the roll-forward matrix by source
+    document with the JournalEntry column outlined, and the cards that set each ledger balance against its open items. The lower part: the
+    billing and the aged payables, and the Findings table."""
+    assert part in ("upper", "lower")
     g = ctx.values("case4.g5")
     r5 = ctx.values("case4.r5")
     data = ctx.data()
@@ -1524,35 +1528,54 @@ def if_c4_5_a() -> Diagram:
         return tb, tg
 
     def findings(d: Diagram, y: float) -> dict:
-        w_f = [104, 0, 92, 104, 86]
+        w_f = [136, 0, 92, 104, 86]
         w_f[1] = 860 - 2 * pad - 12 - sum(w_f)
         return _table_visual(d, pad, y, t_findings, ["Account", "Finding", "Amount", "Disposition", "Reconciles"], w_f, rows_f, aligns=["left", "left", "right", "left", "left"],
-                             title_lines=1, row_h=rh - 2)
+                             title_lines=1, row_h=rh - 2, clip_margin={1: 52})
 
-    def draw(d: Diagram) -> tuple[dict, dict, dict, dict, dict, float]:
+    def draw_upper(d: Diagram) -> tuple[dict, dict, dict, float]:
         p1, p2, y = roll_visual(d, pad)
         cv = cards_row(d, y + 6)
-        tb, tg = tables_row(d, cv["bottom"] + 6)
-        fv = findings(d, max(tb["bottom"], tg["bottom"]) + 6)
-        return p1, p2, cv, tb, fv, fv["bottom"]
+        return p1, p2, cv, cv["bottom"]
 
-    bottom = draw(Diagram("probe"))[-1]
+    def draw_lower(d: Diagram) -> tuple[dict, float]:
+        tb, tg = tables_row(d, pad)
+        fv = findings(d, max(tb["bottom"], tg["bottom"]) + 6)
+        return fv, fv["bottom"]
+
+    bottom = (draw_upper if part == "upper" else draw_lower)(Diagram("probe"))[-1]
     canvas_h = bottom + 12
-    note = (f"Report view, page {_page_name(page)}, the matrix and the cards filtered to {C} and the billing table to the window's {len(years)} years. The matrix is one visual drawn in "
-            "two panes, columns 1 to 6 and the rest after scrolling right. Outlined in coral: the JournalEntry column, which no subledger document in the extract supports, and the two "
-            "differences. The Findings table lists its rows by its first column. Total rows, the sales tax matrix and the page's text box are not drawn.")
+    if part == "upper":
+        note = (f"Report view, page {_page_name(page)}, the upper part, the matrix and the cards filtered to {C}. The matrix is one visual drawn in "
+                "two panes, columns 1 to 6 and the rest after scrolling right. Outlined in coral: the JournalEntry column, which no subledger document in the extract supports, and the two "
+                "differences. Total rows are not drawn. The billing and aging tables, the Findings table, the sales tax matrix and the page's text box are in the lower part or not drawn.")
+    else:
+        note = (f"Report view, page {_page_name(page)}, the lower part, the billing table filtered to the window's {len(years)} years. The Findings table lists its rows by its first column, "
+                "as a table without a sort of its own does, and its full text is in the table of Step 6. The roll-forward matrix, the cards, the sales tax matrix and the page's text box "
+                "are not drawn.")
     assert canvas_h + 34 + kit.height_for(note, 860, SMALL, pad=8) <= 980, f"the page needs {canvas_h + 34 + kit.height_for(note, 860, SMALL, pad=8):.0f} px"
-    d = Diagram("The Reconciliations Page")
+    d = Diagram("The Reconciliations Page, Roll-Forward and Cards" if part == "upper" else "The Reconciliations Page, Cutoff, Aging and Findings")
     pbi.canvas(d, 0, 0, 860, canvas_h)
-    p1, p2, cv, tb, fv, _ = draw(d)
-    gx, gy, gw, gh = p1["geometry"][(0, j_col)]
-    d.outline(gx + 1, gy - 1, gw - 2, len(accts) * rh + 2, CORAL, width=2.5, front=True)
-    for i in (2, 5):
-        cx, cy, cwid, ch = cv["cards"][i]
-        d.outline(cx + 1, cy + 1, cwid - 2, ch - 2, CORAL, width=2.5, front=True)
+    if part == "upper":
+        p1, p2, cv, _ = draw_upper(d)
+        gx, gy, gw, gh = p1["geometry"][(0, j_col)]
+        d.outline(gx + 1, gy - 1, gw - 2, len(accts) * rh + 2, CORAL, width=2.5, front=True)
+        for i in (2, 5):
+            cx, cy, cwid, ch = cv["cards"][i]
+            d.outline(cx + 1, cy + 1, cwid - 2, ch - 2, CORAL, width=2.5, front=True)
+    else:
+        draw_lower(d)
     _tabs(page, d, canvas_h + 4)
     _note(d, note, canvas_h + 34)
     return d
+
+
+def if_c4_5_a() -> Diagram:
+    return _recon("upper")
+
+
+def if_c4_5_c() -> Diagram:
+    return _recon("lower")
 
 
 FIGURES = {
@@ -1566,5 +1589,6 @@ FIGURES = {
     "IF-C4-4-A": if_c4_4_a,
     "IF-C4-5-A": if_c4_5_a,
     "IF-C4-5-B": if_c4_5_b,
+    "IF-C4-5-C": if_c4_5_c,
     "IF-C4-6-A": if_c4_6_a,
 }

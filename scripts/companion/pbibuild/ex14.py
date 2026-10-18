@@ -477,22 +477,28 @@ def ex5(b: Build) -> None:
         f"(1) Customer Rows is {ctx['customers']} for every group: the Customer table, which a filter on Item or Date "
         "does not reach, because the filter flows from Customer to the lines, not back. Customers Invoiced is the "
         f"distinct count on the fact table ({inv}; {ctx['n_invoiced']} in all). Customer Rows Both equals Customers "
-        "Invoiced: Both lets the lines filter Customer. A report uses the distinct count on the fact table; Both "
-        "gives the same answer here but changes every measure that uses the relationship.",
+        "Invoiced: Both lets the lines filter Customer. A report uses the distinct count on the fact table, which "
+        "needs no change to the model. CROSSFILTER changes the direction only inside the calculation that calls it; "
+        "setting the stored relationship to Both in Model view could change other calculations and visuals that use "
+        "it, so this exercise leaves the model unchanged.",
         f"(2) Operating Expense is {money(ctx['opex'])} for every group. With Both on the Date relationship, a "
         "selection on Item filters Date to the days with an invoice of that group, and the ledger follows: " +
         "; ".join(f"{x['group']} {money(x['opex'])} ({x['days']} days)" for x in others) +
         f"; Services {money(sv['opex'])} ({sv['days']} days). The Services figure is the operating expense of the "
-        f"{ctx['services_word']} days on which design services were invoiced, a number with no meaning: a selection in "
-        "one fact table has filtered the other, as the Watch out on two fact tables warns.",
+        f"{ctx['services_word']} days on which design services were invoiced. It is neither a share of the year's "
+        "operating expense that belongs to Services nor Services' own cost: a selection in one fact table has filtered "
+        "the other, as the Watch out on two fact tables warns.",
         "(3) REMOVEFILTERS: " + "; ".join(f"{s['group']} {pct(s['rf'], 2)}" for s in ctx["shares"]) +
         "; total 100%. ALL ( SalesInvoiceLine ): " + "; ".join(f"{s['group']} {pct(s['all'], 2)}" for s in ctx["shares"]) +
         f"; total {pct(ctx['all_total'], 2)}, the share of fiscal {y} in {ctx['years']} years of revenue "
         f"({money(ctx['every'])}), because ALL on the fact table removes the year as well.",
-        "(4) Review list: relationships set to Both (compare a count with and without CROSSFILTER); a count taken from a "
-        "dimension or header table (compare it with a distinct count on the facts); ALL on a fact table inside a share "
-        "(the shares must total 100%); inactive relationships used without USERELATIONSHIP; (Blank) members (count the "
-        "unmatched keys); measures that keep the closing entries (Exercise 14.6)."]
+        "(4) Review list: relationships set to Both (inspect the cross filter direction in Model view, then compare one "
+        "known slice with CROSSFILTER set to Single and to Both); a count taken from a dimension or header table "
+        "(compare it with a distinct count on the facts); ALL on a fact table inside a share (the shares must total "
+        "100%); inactive relationships used without USERELATIONSHIP (inspect which relationships are active and the "
+        "measure's formula, then compare the two dates on a line known to cross a year, because equal totals alone do "
+        "not show the cause); (Blank) members (count the unmatched keys); measures that keep the closing entries "
+        "(Exercise 14.6)."]
     comment = "\n".join("// " + line for n in notes for line in _wrap(n, 110))
     b.project.queries["Ex 14.5"] = "\n\n".join([q1, q2, q3, comment]) + "\n"
     _keep_checks_last(b)

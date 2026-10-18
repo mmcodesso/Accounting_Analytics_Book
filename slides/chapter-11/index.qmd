@@ -85,11 +85,11 @@ The julianday difference is the SQL counterpart of subtracting one date from ano
 
 - Modifier order matters: adding a month to the 31st can land in the month after next
 - Apply 'start of month' first whenever you step from month to month
-- Date functions return text, so compare their result with text, not a number
+- strftime and date return text; julianday returns a number. Compare results with the matching type
 - Other systems name these functions differently, so date logic travels least well
 
 ::: {.notes}
-A function's result is not a column, so SQLite converts nothing: a year from strftime compared with a bare number finds no rows. SQL Server, for example, uses YEAR, DATEADD and DATEDIFF.
+strftime returns text, and a function's result is not a column, so it has no column affinity to convert the number with: `strftime('%Y', PostingDate) = 2026` finds no rows. Compare with '2026', or CAST the result to INTEGER. A value's type and an expression's conversion rules are different ideas. SQL Server, for example, uses YEAR, DATEADD and DATEDIFF.
 :::
 
 # Turning Rows into Columns with Conditional Aggregation
@@ -149,7 +149,7 @@ Students classify the manufacturing payroll and tie it to the ledger, pivot the 
 
 ## Indirect time almost vanishes for four months
 
-{{< book-figure fig-11-02 crop="0,0.464,1,0.329" >}}
+{{< book-figure fig-11-02 crop="0,0.464,1,0.329" alt="Detail of the result grid of the monthly labor time query, the first eight months, January to August 2024, with the columns WorkMonth, DaysWithTime, DirectHours, IndirectHours and OvertimeHours. January has more indirect than direct hours. The IndirectHours of February to May, outlined, are far lower than in the months that follow, and indirect time climbs from June." >}}
 
 ::: {.notes}
 The start-up month has more indirect than direct hours, and then indirect time almost disappears from February to May of the first year before becoming a large part of every month from the summer. The query groups the labor time by month and puts direct, indirect and overtime hours in columns of their own.
@@ -157,7 +157,7 @@ The start-up month has more indirect than direct hours, and then indirect time a
 
 ## Direct overtime rose; indirect overtime stayed flat
 
-{{< book-figure fig-11-03 crop="0,0.4357,1,0.3917" >}}
+{{< book-figure fig-11-03 crop="0,0.4357,1,0.3917" alt="Detail of the result grid of the overtime shares by month, the twelve months of 2026, with the columns WorkMonth, DirectOvertimeShare and IndirectOvertimeShare. The direct share, outlined, is a quarter or more in most months, with two dips, while the indirect share stays below a tenth." >}}
 
 ::: {.notes}
 The overtime share of direct labor is a quarter or more in most months of the latest year, up from about a tenth in the first half of the first year. The share of indirect labor stays at about a twelfth throughout.
@@ -216,10 +216,10 @@ Ranking the Furniture items by standard labor hours per unit shows the first tie
 
 ## A partition groups the rows; a frame slides
 
-{{< book-figure fig-11-04 crop="0,0.385,1,0.615" >}}
+{{< book-figure fig-11-04 >}}
 
 ::: {.notes}
-The year-to-date total restarts in January because each fiscal year is its own partition. The outlined frame, the current month and the two before it, slides down the column to give a moving three-month total.
+The year-to-date total restarts in January because each fiscal year is its own partition. The outlined frame, the current month and the two before it, slides down the column to give a moving three-month total. That moving total has no year partition, so in January it reaches back into December: the figure's January 2026 row adds November and December 2025.
 :::
 
 ## Frames, named windows and offsets
@@ -296,7 +296,7 @@ Students calculate the monthly gap in the clearing account with a year-to-date t
 
 ## The year-to-date gap grew in each year
 
-{{< book-figure fig-11-05 crop="0,0.3662,1,0.4578" >}}
+{{< book-figure fig-11-05 crop="0,0.3662,1,0.4578" alt="Detail of the result grid of the monthly gap in account 1090 for the twelve months of fiscal 2026, with the columns FiscalYear, FiscalPeriod, Gap and GapYearToDate. The outlined year-to-date column starts at the January gap and grows every month to the December total." >}}
 
 ::: {.notes}
 The gap is the actual cost charged to the clearing account less the standard cost released by completions, without the work order closes. The year-to-date total restarts each January, and its December figure grew in each year.
@@ -304,7 +304,7 @@ The gap is the actual cost charged to the clearing account less the standard cos
 
 ## The largest months have three pay dates
 
-{{< book-figure fig-11-06 crop="0,0.4897,1,0.3411" >}}
+{{< book-figure fig-11-06 crop="0,0.4897,1,0.3411" alt="Detail of the result grid that keeps the three largest months of each year, nine rows with the columns FiscalYear, FiscalPeriod, Gap, PayDates and GapRank. The PayDates cells that show three pay dates are outlined. They include the month ranked first in every year and some of the months ranked second or third, and the other months have two." >}}
 
 ::: {.notes}
 The largest month of each year has three pay dates, because payroll is recorded on the pay date with no month-end accrual. The first year also has two pay dates fewer than the later years, part of why its gap was smaller.
@@ -445,12 +445,12 @@ Output counts standard hours only up to the last day with time records, so the o
 {{< book-figure fig-11-09 >}}
 
 ::: {.notes}
-After Write Changes, the view appears under Views on the Database Structure tab of the working copy, with its six columns.
+CREATE VIEW makes the view appear under Views on the Database Structure tab, with its six columns. Write Changes then saves it in the working-copy file.
 :::
 
 ## The measure for the year, queried from the view
 
-{{< book-figure fig-11-10 crop="0,0,1,0.7637" >}}
+{{< book-figure fig-11-10 >}}
 
 ::: {.notes}
 The monthly ratio swings from month to month, while the trailing figures change slowly. Each trailing figure pools twelve months' hours and standard hours, and the December row covers only the days to the last time record, with its indirect time ending a week before its direct time, so it is provisional. Counted to the last day of indirect time on both sides, its total is a little lower. Indirect hours per standard hour have levelled off, while the trailing direct figure creeps up and the trailing total peaks in the tenth month.
@@ -488,7 +488,7 @@ The trailing measure reached its highest point late in the latest year. The audi
 ## Summary
 
 - CASE classifies rows; a CASE inside an aggregate turns categories into columns
-- Date functions group by period, find period ends and count days, in text
+- strftime groups dates into periods; date finds period ends; julianday differences count elapsed days
 - Window functions rank, accumulate and compare rows while keeping them
 - CTEs name the steps of a long query; a view saves it for every month's run
 - The monthly measure combines them, cut off at the last day with time records

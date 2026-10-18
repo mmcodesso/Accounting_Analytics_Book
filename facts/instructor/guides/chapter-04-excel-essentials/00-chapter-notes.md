@@ -36,12 +36,14 @@ figures:
 The chapter depends on these conditions of the data:
 
 - The invoice lines ({{ t1.lines|count }}) belong to {{ t1.invoices|count }} invoices, and the lines add up to the invoice subtotals (${{ t1.line_total|money }}), so Tutorial 4.1's control total difference is zero.
-- Power Query types a column from its first 200 rows. The first 200 invoice lines carry no promotion, so Discount can arrive as a whole number, and FreightAmount is whole on the first 200 invoices and fractional later.
+- Power Query types a column from its first 200 rows, with automatic type detection on, as it is by default. The first 200 invoice lines carry no promotion, so Discount can arrive as a whole number, and FreightAmount is whole on the first 200 invoices and fractional later.
 - {{ t1.items_sold }} of the {{ t1.items_all }} items have a list price and are kept. The {{ t1.n_programs }} promotion programs run at three rates, and promotion {{ t3.promo.id }}, the {{ t3.promo.name }}, has the most lines ({{ t3.promo.lines|count }}) and the most discount dollars (${{ t3.promo.discount|money }}).
 - Promotions {{ odd_ids }} end on or before their start dates. Exercise 4.2 asks students to report these as questions, not to correct them, and Chapter 8 and the Part II case return to them.
 - The exercises add a shipment extract with blank tracking numbers and stale In Transit statuses, and a price override table with {{ ch04_g6.blank }} Pending requests and one approver. Each exercise guide lists its own conditions.
 
 ## What students should be able to do afterward
+
+These outcomes are this guide's own. They follow the chapter's six learning objectives in order, outcome 1 serving objective 1 and so on, each stated with what practices it.
 
 1. Explain why a workbook's structure is a control, citing the spreadsheet error research. Practiced in the Documentation worksheet of Tutorial 4.3, Exercise 4.1 (5), Exercise 4.5 (2), and questions 13 and 14.
 2. Build an analysis workbook with Power Query, Tables, structured references and calculated columns. Practiced in Tutorial 4.1, Exercises 4.2 to 4.6, and questions 1, 3, 6 and 7.
@@ -137,7 +139,7 @@ Plan A is the safest. Plan B trades the vocabulary lecture for ownership of the 
 **Stumbles to expect**
 
 - Step 6: students skip the check, then see a zero discount. Ask them to read the type icon before loading.
-- Step 7: the plain **Close & Load**, which loads several new queries to the Data Model. Use **Close & Load To**, **Table** and **New worksheet**.
+- Step 7: the plain **Close & Load**, which with Excel's default load settings loads several new queries to the Data Model. Use **Close & Load To**, **Table** and **New worksheet**.
 - Step 9: the new column header typed away from the Table, so it does not join it. It must be in the first empty cell right of the last header.
 - Step 10: students read the zero difference as proof that nothing is missing. Remove one invoice and its lines in a thought experiment and ask what the difference shows.
 
@@ -249,7 +251,7 @@ All six exercises are Excel builds with a model answer in Chapter04-exercises.zi
 - *One exercise a session.* Take them in the order 4.2, 4.1, 4.3, 4.4, 4.5, 4.6, from the lightest to the longest.
 - *A light load.* Exercises 4.2 and 4.5 take about 150 minutes and cover outcomes 2 to 6. Add Exercise 4.1 for the grid and outcome 1.
 
-**Grading and discussion.** Each exercise guide holds a rubric. Exercises 4.1, 4.3 and 4.4 suit grading from the workbook, since the formulas are the evidence. Exercises 4.2, 4.5 and 4.6 end in a memo and suit a class discussion of what a clean or odd result does and does not show. Collect the workbook, not a screenshot. The exercises work in a copy of the analysis workbook, and Exercises 4.5 and 4.6 in a new one.
+**Grading and discussion.** Each exercise guide holds a rubric, and its full-credit column asks only for what the requirement asks. Extra work, such as the integrity rows of Exercise 4.2 or the completed invoice trace of Exercise 4.6, is named as a plus in What a strong answer says. Exercises 4.1, 4.3 and 4.4 suit grading from the workbook, since the formulas are the evidence. Exercises 4.2, 4.5 and 4.6 end in a memo and suit a class discussion of what a clean or odd result does and does not show. Collect the workbook, not a screenshot. The exercises work in a copy of the analysis workbook, and Exercises 4.5 and 4.6 in a new one.
 
 ## Multiple-choice questions
 

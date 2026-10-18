@@ -149,7 +149,7 @@ The CFO's comparison joins invoice lines, items, work orders, their closes, and 
 
 **Requirement 2: Take the overhead apart (Chapters 7, 10, and 11).**
 
-"Overhead at a third of its cost" is a claim about cost behavior, and cost behavior is tested, not assumed. SQL extracts what flowed into account 1090 and what the standards released from it; the regressions belong in the workbook, as in Chapter 7.
+"Overhead at a third of its cost" compares totals and leaves cost behavior open, and cost behavior is tested, not assumed. SQL extracts what flowed into account 1090 and what the standards released from it; the regressions belong in the workbook, as in Chapter 7.
 
 - Split the 2026 inputs to 1090 into direct and indirect labor, regular and overtime, salaries, employer taxes and benefits, the Factory Overhead entries, and depreciation, and set them against the standard cost that completions released, by labor and overhead. Express both per standard hour.
 - Extract each input by month, January 2024 to December 2026, with the standard hours completed each month, and test which inputs move with output from February 2024 on. Explain what including January 2024, and the months with three pay dates, would do to the test.
@@ -197,7 +197,7 @@ Each cost is a formula over a handful of inputs that the decision makers will wa
 
 The CFO and the production manager will want to move between families and items, and between the three views, while they talk. That is a report, not a workbook, and Power BI already has the patterns you need.
 
-- Create Product Costs.pbix. Load the item cost Table from the workbook and the invoice lines and invoices from CharlesRiver.xlsx, add a year column, and relate the lines to the item costs. Design services have no row in the cost table, so decide how the report treats that blank, as Chapter 13 taught.
+- Create Product Costs.pbix. Load the item cost Table from the workbook and the invoice lines and invoices from CharlesRiver.xlsx, add a year column, and relate the lines to the item costs. Design services have no row in the cost table, so decide how the report treats that blank, as Chapter 13 taught. Turn off Auto date/time and Autodetect new relationships after data is loaded under Current File, as Tutorial 13.1 did, so that Power BI does not add hidden date tables or relationships you did not choose.
 - Enter a Costing View table with Enter data, and write a Product Cost measure that switches on the view selected, as the Steps table of Tutorial 15.1 switched its measure, with Margin and Margin % beside it.
 - Build a Families page with a matrix of families by view, a chart of items ranked by margin under the view a slicer selects, and a Capacity page from the workbook's capacity table.
 - Add an About page, a Validation page that reproduces control totals from earlier chapters, and a Tests tab that checks the totals of each view against the workbook.
@@ -207,7 +207,7 @@ The CFO and the production manager will want to move between families and items,
 
 ### Phase 3: Make, Buy, or Reprice
 
-The test for one family is in @fig-18-02. What matters is which costs stop if Charles River stops making the family. Materials and the overhead that varies with output stop at once. The crew's time stops costing money only if the crew is reduced; otherwise buying adds the supplier's price to costs the company keeps paying, unless the hours freed have another use, as growth would give them in Requirement 7. Whichever test a family passes, buying it pays only if the saving over the two years the prices are fixed covers the one-time costs.
+The test for one family is in @fig-18-02. What matters is which costs stop if Charles River stops making the family. Materials and the overhead that varies with output stop at once. The crew's time stops costing money only if the crew is reduced; otherwise buying adds the supplier's price to costs the company keeps paying, unless the hours freed have another use, as growth would give them in Requirement 7. The test assumes that the hours freed have no other quantified use, so a supported alternative use is weighed separately, with the supplier's terms and the cost of the transition. Whichever test a family passes, buying it pays only if the saving over the two years the prices are fixed covers the one-time costs.
 
 ![The make-or-buy test for one family.](/visuals/svg/fig-18-02-make-or-buy-test.svg){#fig-18-02 fig-alt="A flowchart for one family. If the delivered quote, price plus inbound freight, is below materials plus factory overhead, buy if the terms, quality, and minimum volume are acceptable and two years of savings cover the tooling. If not, but it is below that cost plus the crew time the family uses, buy only if the crew will be reduced in step with the hours freed and two years of savings cover tooling and severance; if the crew stays, keep making, unless the freed hours have another use. If the quote is above both, keep making and test the price against the margin floor, repricing if it falls below."}
 
@@ -242,12 +242,12 @@ Actual absorption cost is not a relevant cost. It includes supervision, deprecia
 **Requirement 8: Reprice the families below the floor (Chapter 7).**
 
 - Use Goal Seek for the price at which each family reaches the margin floor of @tbl-18-02 on its time-driven cost, and compute the increase and the share of volume the increase could lose before the family earns less contribution than it does now, measuring contribution over the relevant cost with the crew kept.
-- Set those figures against what the records show about how Charles River's customers respond to price: test whether order volume rose in the months of past promotions, a screen that can reveal a large response but cannot measure how customers would answer an increase, and check the dates and use of the price lists, as Exercise 8.6 did. Recommend increases, and how the lists should be rebuilt.
+- Set those figures against what the records show about how Charles River's customers respond to price: test whether order volume, measured as a list-price-weighted order-value proxy for volume, rose in the months of past promotions, a screen that can reveal a large response but cannot measure how customers would answer an increase, and check the dates and use of the price lists, as Exercise 8.6 did. Recommend increases, and how the lists should be rebuilt.
 - Show how the answer changes for any family you would buy in Requirement 6.
 
 ::: {.callout-tip .in-practice icon=false}
 ## In Practice
-Price is the most powerful lever on profit, and often the least managed. On the average economics of more than two thousand companies, a 1% improvement in price, with no loss of volume, would raise operating profit by 11.1%, three to four times the effect of a 1% gain in volume (Marn & Rosiello, 1992). The authors traced how the price a customer finally pays falls from the list price through discounts to the invoice price, and then through cash discounts, allowances, rebates, and freight to what they called the pocket price. Chapter 15's gross-to-net waterfall traced the invoice part of that path for Charles River, from list price to net revenue.
+Price is the most powerful lever on profit, and often the least managed. On the average economics of more than two thousand companies, a 1% improvement in price, with no loss of volume, would raise operating profit by 11.1%, three to four times the effect of a 1% gain in volume (Marn & Rosiello, 1992). The authors traced how the price a customer finally pays falls from the list price through discounts to the invoice price, and then through cash discounts, allowances, rebates, and freight to what they called the pocket price. Chapter 15's gross-to-net waterfall traced the first part of that path for Charles River, from list value to recorded net revenue. A complete pocket-price analysis may also need off-invoice concessions and transaction costs.
 :::
 
 
@@ -286,7 +286,7 @@ Before you submit, check that you have each of these:
 
 - Every figure reconciled to account 5080 and to the inputs to 1090, with the populations and units stated.
 - Cost behavior tested before any cost is called variable or committed, with the records that cannot carry the test named.
-- A different cost for each question: absorption for neither decision, relevant costs for make or buy, time-driven costs for pricing, and standards on normal capacity for inventory (Noreen, 1991; Balakrishnan et al., 2012a).
+- A different cost for each question: the absorption proxy for neither decision of this case, relevant costs for make or buy, time-driven costs for the pricing floor and the capacity question, and standards on normal capacity for inventory (Noreen, 1991; Balakrishnan et al., 2012a).
 - The crew assumption made explicit, with the break-even quotes and the one-time costs.
 - Price increases set beside the volume they can afford to lose and the evidence on how customers respond.
 - Standards proposed on a stated capacity, with their effect on the fiscal 2026 statements measured, the evidence that would show whether those statements need correcting named, and both reported to the CFO.
@@ -300,7 +300,7 @@ This case brought back earlier answers. Chapters 10 to 12 found more hours paid 
 
 ## Looking Ahead
 
-This case asked what the plant's products cost, and found that the answer depends on the question. Requirements 1 and 3 were descriptive analytics, in the terms of @tbl-01-01: what the families earned and what they used of the plant. Requirements 2 and 4 were diagnostic: why the variance grew and where the cost really sits. Requirements 7 and 8 were predictive, estimating what freed capacity, growth, and higher prices would do. And the recommendations on making, buying, repricing, and the standards were prescriptive, as decisions usually are.
+This case asked what the plant's products cost, and found that the answer depends on the question. Requirements 1 and 3 were descriptive analytics, in the terms of @tbl-01-01: what the families earned and what they used of the plant. Requirements 2 and 4 were diagnostic: why the variance grew and where the cost really sits. Requirements 7 and 8 were predictive, estimating what freed capacity, growth, and higher prices would do under stated assumptions: forward-looking scenario and optimization work, not validated forecasts of demand. And the recommendations on making, buying, repricing, and the standards were prescriptive, as decisions usually are.
 
 Decisions like these are rarely made once. Quotes expire, crews change, and prices move, so the workbook and the explorer you built are tools for the next round as much as answers to this one. A plant that measures its costs on practical capacity every year sees idle capacity while it is still small, and a company that reviews its standards every year never has to explain three years of stale ones at once.
 

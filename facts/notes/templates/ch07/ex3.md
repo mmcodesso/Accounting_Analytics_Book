@@ -4,6 +4,6 @@
      the budget files under Operating Expense but the income statement shows below operating income) = {{ fixed|money }}; a student who keeps the interest
      models profit after interest rather than operating income, with break-even about {{ interest_effect|money }} higher (the budget is reasonable because salaries,
      rent, depreciation, and the other recurring accounts came within a few percent of actual, as Tutorial 7.2 showed). Break-even revenue
-     {{ breakeven|money }}; margin of safety {{ safety|money }} ({{ safety_pct|pct }}). Adding {% for n, name, amount in added %}{{ 'and ' if loop.last }}{{ n }} {{ name }} {{ amount|money }}{{ ', ' if not loop.last }}{% endfor %} (total {{ added_total|money }}): break-even {{ breakeven2|money }}, margin of safety {{ safety2_pct|pct }}. Goal Seek for operating
+     {{ breakeven|money }}; margin of safety {{ safety|money }} ({{ safety_pct|pct }}). Adding {% for n, name, amount in added %}{{ 'and ' if loop.last }}{{ n }} {{ name }} {{ amount|money }}{{ ', ' if not loop.last }}{% endfor %} (total {{ added_total|money }}): break-even {{ breakeven2|money }}, margin of safety {{ safety2_pct|pct }} (the exercise treats these items as fixed-equivalent costs, which the totals do not establish). Goal Seek for operating
      income of 4,000,000 under (4): revenue {{ goal|money }}; without the added items it would be {{ goal_without|money }}. Treating Services' design staff
      as fixed and all product standard cost as variable are further simplifications worth naming. -->

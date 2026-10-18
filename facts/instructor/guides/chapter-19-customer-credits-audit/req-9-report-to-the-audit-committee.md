@@ -53,7 +53,7 @@ Individual or pairs, about 150 minutes: 20 for the key figures and the conclusio
 
 **Check:** the block holds six figures: the four counts of Requirement 4, the number of significant deficiencies ({{ g.figs[4][1] }}) and the overall classification. **Watch for:** a count with no definition. A committee member who recomputes the refunds before payment by the receipts' dates finds {{ g.before_def[1] }}, not {{ g.before_def[0] }}; the report names the definition.
 
-**Step 2. Write the conclusion.** Two or three sentences, in this order: what the tests covered (the populations reconcile to the ledger by year, every credit recomputes within the stated limits of rounding, tax and freight, the lapping tests found no trace, on the definitions stated); what they could not reach (the customers' requests, the payee checks, the inspection of returned goods, the bank clearance of refunds and the operation of the compensating controls, with no assurance on them); and the finding (credits and refunds approved above the recorded limits, whether by a gap in design or in operation still to be settled, rated provisionally as two significant deficiencies, with no material weakness identified and one refund under follow-up).
+**Step 2. Write the conclusion.** Two or three sentences, in this order: what the tests covered (the populations reconcile to the ledger by year, which supports completeness relative to those records only, every credit recomputes within the stated limits of rounding, tax and freight, the lapping tests found no trace, on the definitions stated); what they could not reach (the customers' requests, the payee checks, the inspection of returned goods, independent bank evidence, since the database records each refund's ClearedDate and it was not verified, and the operation of the compensating controls, with no assurance on them); and the finding (credits and refunds approved above the recorded general limits, with effective delegation and enforcement unverified, whether by a gap in design or in operation still to be settled, rated provisionally as two significant deficiencies, with no material weakness identified and one refund under follow-up).
 
 **Check:** the conclusion says what was not tested before it gives a rating. **Watch for:** assurance words ("the controls are effective"), accusation words, and the three-year amount set against materiality: the first pattern's ${{ g.d1_3y|money }} exceeds ${{ g.mat|money }}, but materiality is the year's judgment, and the year's exposure is ${{ g.d1_26|money }}.
 
@@ -69,7 +69,7 @@ Individual or pairs, about 150 minutes: 20 for the key figures and the conclusio
 
 **Check:** every finding has all six elements, the condition carries its count and definition, the effect says whether a misstatement is reasonably possible, and the rating is provisional. **Watch for:** a finding without a cause ("not yet known" is an answer when it is true), and a condition worded as an act.
 
-**Step 4. State the scope, the reconciliations and the clean results.** The populations ({{ g.popn.returns }} returns, {{ g.popn.credits }} credits, {{ g.popn.refunds }} refunds, {{ g.popn.clawbacks }} clawbacks), the materiality of ${{ g.popn.mat|money }} and its base, the statement that sampling was used only for evidence outside the database with the documents requested, and a paragraph of the clean results.
+**Step 4. State the scope, the reconciliations and the clean results.** The populations ({{ g.popn.returns }} returns, {{ g.popn.credits }} credits, {{ g.popn.refunds }} refunds, {{ g.popn.clawbacks }} clawbacks), the materiality of ${{ g.popn.mat|money }} and its base, a statement that the documentary testing plan (A1 to A3) was prepared and its selection frozen, that the documents were not supplied so those attributes remain untested and must be requested, and that D1 was shown on database records and compared with the full remainder, and a paragraph of the clean results.
 
 **Check:** each population reconciles by year with no difference, and the clean results list the tests that found nothing. **Watch for:** a report of exceptions only.
 
@@ -89,7 +89,7 @@ Individual or pairs, about 150 minutes: 20 for the key figures and the conclusio
 
 **Watch for:** an action with no owner or date, and an owner assumed to agree.
 
-**Step 6. Fit the pages.** Three pages and an appendix of at most three. The model's text (conclusion, findings, clean results and action plans) runs to about {{ g.narrative|count }} words; count yours, then cut the findings' prose before the clean results.
+**Step 6. Fit the pages.** Three pages and an appendix of at most three, of selected, condensed exhibits (the map, the reconciliation, the test results, the sample plan, the evaluation, the action plans), not every workbook sheet. The model's text (conclusion, findings, clean results and action plans) runs to about {{ g.narrative|count }} words; count yours, then cut the findings' prose before the clean results.
 
 ## Expected results
 

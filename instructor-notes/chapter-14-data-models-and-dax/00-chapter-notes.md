@@ -36,6 +36,8 @@ The chapter depends on these conditions of the data:
 5. Compare periods with time intelligence. Practiced in Tutorial 14.3 (Step 7), Exercises 14.3 and 14.4, and question 14.
 6. Model the ledger so that closes and signs are handled once, and test measures against control totals. Practiced in Tutorial 14.3 (Steps 3, 5, 6 and 9), Exercises 14.1 and 14.6, and questions 13 and 15.
 
+These outcomes are this guide's own, and they follow the chapter's six learning objectives one for one, in the same order.
+
 ## Preparing to teach
 
 **Before the first class**
@@ -44,7 +46,7 @@ The chapter depends on these conditions of the data:
 - Do the three tutorials yourself in order and save Charles River Reports.pbix. Tutorial 14.3 loads the ledger with **Transform Data**, and **Close & Apply** takes several minutes: tell students to start it before a break.
 - A student who lacks the Chapter 13 report, or falls behind, takes Charles River Reports from Chapter14-companion.zip, from the folder of the tutorial they start. Its README gives the steps: open the .pbip, point the queries at CharlesRiver.xlsx (**Home > Transform data > Data source settings > Change Source**), choose **Home > Refresh**, and **File > Save as** a .pbix. The deck has a checkpoint slide for each tutorial.
 - Tell students to save a copy after Tutorial 14.3, such as `Ch14 Exercises.pbix`, for the exercises: one page or query tab and one display folder of measures for each.
-- Open the model answer once. Its pages are Sales and Discounts, Validation, Review, Margins and Income Statement (the end of the tutorials), Ex 14.1 to Ex 14.4 and Notes. Exercises 14.5 and 14.6 are DAX query view tabs, Ex 14.5 and Control Totals, beside Tests and Checks. After **Home > Refresh**, the Checks tab runs 288 checks of the tutorials and exercises with **Run**.
+- Open the model answer once. Its pages are Sales and Discounts, Validation, Review, Margins and Income Statement (the end of the tutorials), Ex 14.1 to Ex 14.4 and Notes. Exercises 14.5 and 14.6 are DAX query view tabs, Ex 14.5 and Control Totals, beside Tests and Checks. After **Home > Refresh**, choose **Run** on the Checks tab. It holds 331 checks, 288 of them for this chapter's tutorials and exercises and the rest carried over from Chapter 13's, and its Agrees column shows the result of the run, which is the evidence that the model passed.
 - If a student's window shows separate Build and Format panes instead of Visualizations, the on-object interaction preview is on. The tutorials describe the default panes.
 
 **Pitfalls that cost class time**
@@ -112,7 +114,7 @@ The chapter depends on these conditions of the data:
 | 10 | Looking ahead to Chapter 15 | 66, 67 |
 | 150 | Total | |
 
-Plan A is the safest: the stumbles are about reading context, and a demonstration shows how. Plan B lets students meet the traps themselves and needs a lab. Plan C leaves no time to demonstrate, and fails for students who arrive without a finished model.
+Plan A is the safest: the stumbles are about reading context, and a demonstration shows how. Plan B lets students meet the traps themselves and needs a lab. Plan C leaves no time to demonstrate, and fails for students who arrive without a finished model. The tutorials take students about 60 to 75 minutes for Tutorial 14.1, 75 to 90 for Tutorial 14.2 and 90 to 105 for Tutorial 14.3, more than Plans A and B give them in class, so both plans assume that students finish the steps the class does not reach outside class. Tell them which steps are due at each point, and do not expect all six exercises to fit the class plan.
 
 ![What each tutorial adds to the model, so an instructor sees where each exercise attaches.](../figures/chapter-14-data-models-and-dax/IF-14-0-A.pdf)
 
@@ -125,18 +127,18 @@ Plan A is the safest: the stumbles are about reading context, and a demonstratio
 | Step | Look for | Value |
 |---|---|---|
 | 1 | The merge | 27,933 lines, every one matched |
-| 2, 3 | The Date table | 1,461 rows, 2024-01-01 to 2027-12-31; MonthName sorted by MonthNumber |
+| 2, 3 | The Date table | 1,461 rows, 2024-01-01 to 2027-12-31; MonthName sorted by MonthNumber; Year and MonthNumber set to Don't summarize |
 | 4 | Relationships | Item, Customer and Date to the lines, many to one, **Single** |
 | 5, 6 | Visuals re-pointed; SalesInvoice not loaded | no error on any page |
 | 7 | Keys hidden | no key in the **Data** pane |
-| 8 | The Validation page | 2024: 9,040 lines, $27,313,723.48, 6,735 invoices; 2025: 9,371 lines, $29,376,702.28, 7,008 invoices; 2026: 9,522 lines, $29,756,420.08, 7,171 invoices |
+| 8 | The Validation page: lines, line total, list amount, discounts | 2024: 9,040, $27,313,723.48, $30,596,029.91, $126,607.64; 2025: 9,371, $29,376,702.28, $33,030,575.85, $234,534.72; 2026: 9,522, $29,756,420.08, $33,589,137.45, $362,110.75 |
 
 **Stumbles to expect**
 
 - Step 4: a relationship accepted with the wrong cardinality or direction, or an old relationship not deleted, which leaves two paths: look for a dashed line in **Model view**. Until Step 5, the year slicer of Sales and Discounts filters nothing.
 - Step 5: a field or a visual filter left on SalesInvoice, especially on the Review page's charts. Step 6 then shows an error.
 - Step 5d: the slicer or the monthly charts not set back to 2026, so every year shows.
-- Step 3: Date left with a time, or the sort order forgotten, so April sorts first.
+- Step 3: Date left with a time, or the sort order forgotten, so April sorts first. Year left at its default, Sum, which shows as Sum of Year in the Validation table after Step 5.
 
 **The checkpoint to look for.** The three bullets. A strong student says the totals are unchanged and says what that does not prove (offsetting changes, Tutorial 4.1 Step 10).
 
@@ -243,7 +245,7 @@ All six exercises are Power BI work with a model answer in Chapter14-exercises-p
 - *One exercise a session.* Take the basic one first: 14.6, 14.3, 14.1, 14.5, 14.4, 14.2.
 - *A light load.* Exercises 14.1 and 14.4 take about two hours and forty-five minutes and cover outcomes 3 to 6.
 
-**Grading and discussion.** The pages of Exercises 14.1 to 14.4 suit grading from the saved report, and the tabs of Exercises 14.5 and 14.6 from the query text, with the Checks tab to compare a number. The notes suit class discussion, and Exercise 14.6's conclusion suits peer review. Collect the .pbix, not screenshots: the measures, the display folders and the query tabs are the evidence.
+**Grading and discussion.** The pages of Exercises 14.1 to 14.4 suit grading from the saved report, and the tabs of Exercises 14.5 and 14.6 from the query text, with the Checks tab to compare a number. The notes suit class discussion, and Exercise 14.6's conclusion suits peer review. Collect the .pbix, not screenshots: the measures, the display folders and the query tabs are the evidence. Grade what each requirement asks. The model answers go further in places, such as the Services revenue by year in the check of Exercise 14.2's matrix, the contra accounts never posted in Exercise 14.1, or the formats of Exercise 14.3's measures, and those count as a plus, not as conditions for full credit.
 
 ![A mock of the Checks tab, the quick way to compare a student's number with the model answer.](../figures/chapter-14-data-models-and-dax/IF-14-0-C.pdf)
 

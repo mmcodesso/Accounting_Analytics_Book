@@ -554,8 +554,9 @@ ORDER BY ItemGroup, UnitMargin DESC;""",
     s.answer("Requirement (2)", """\
 RANK gives tied rows the same rank and skips the ranks that follow (1, 2, 2, 4); DENSE_RANK gives ties the same rank
 without a gap (1, 2, 2, 3); ROW_NUMBER numbers every row once, breaking ties arbitrarily unless the ORDER BY decides
-them. They differ only where two items of a group share a unit margin. Here no two items in a group share one, so the
-three columns agree on every row (step 2 counts no differences), and the top three by any of them are the same items.""")
+them. They can differ when a group contains ties, at the tied rows and at the rows after them: RANK leaves a gap after
+a tie and DENSE_RANK does not. Here no two items in a group share a unit margin, so the three columns agree on every
+row (step 2 counts no differences), and the top three by any of them are the same items.""")
     lines = "; ".join(f"{g} {t[1]} ({money(t[3])}, range {money(ranges[g][0])} to {money(ranges[g][1])})"
                       for g, t in top.items())
     s.answer("Requirement (5)", f"""\

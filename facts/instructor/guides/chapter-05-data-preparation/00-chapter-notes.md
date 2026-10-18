@@ -51,6 +51,8 @@ The chapter depends on these conditions of the data:
 5. Build a repeatable Power Query workflow with merges and custom columns. Practiced in Tutorial 5.3, in the loading steps of Exercises 5.1, 5.5 and 5.6, and in questions 10 to 13. No exercise requires a merge; Exercise 5.1 allows one, so ask for it as an extension.
 6. Tell a meaningful blank, an invalid value and missing information apart, and report a clean result as a finding. Practiced in Tutorial 5.3 (Step 6), Exercises 5.2, 5.3, 5.4 and 5.6, and questions 8, 9 and 15.
 
+These outcomes are this guide's own. Outcomes 1 to 5 follow the chapter's five learning objectives in order, and outcome 6 comes from the section Missing, Meaningful, and Invalid Values, which no objective names.
+
 ## Preparing to teach
 
 **Before the first class**
@@ -64,13 +66,13 @@ The chapter depends on these conditions of the data:
 
 - **The first empty cell.** A new column starts in the first empty cell right of the last header, or it does not join the Table. On the Item Table the new columns are {{ item.ProductType }} and {{ item.CodeCheck }}, on SalesInvoice {{ si.FiscalYear }} to {{ si.StandardTerms }}, and on SalesInvoiceLine the lookups of Tutorial 5.2 run from {{ sil.InvoiceDate }} to {{ sil.ProductType }}. Step 5 of Tutorial 5.2 counts "No match" over those six adjacent columns, so a column inserted between them is counted too.
 - **Fill against paste.** Tutorial 5.2's Furniture formula uses `B$44`; copy and paste it, as Chapter 4 taught.
-- **Two queries, one load.** In Tutorial 5.3 Step 6 the choice of **Close & Load To**, **Table** and **New worksheet** applies to both new queries. A plain **Close & Load** sends them to the Data Model.
+- **Two queries, one load.** In Tutorial 5.3 Step 6 the choice of **Close & Load To**, **Table** and **New worksheet** applies to both new queries. With Excel's default load settings a plain **Close & Load** sends them to the Data Model. The fix is **Data > Queries & Connections**, right-click each query, **Load To**, and then a check of the Table names and row counts.
 - **The merge dialog.** The **Use original column name as prefix** box is cleared on every expansion, or later formulas cannot find the plain names. The match message is an estimate. The loaded row count shows whether a line was repeated, and only a left anti merge that returns no rows shows that every line found its match.
 - **Zero-based and one-based.** MID counts from one and Text.Middle from zero. The product type starts at 5 in Excel and 4 in M.
 
 ## Teaching approaches
 
-**Plan A: lecture with live demonstration (two sessions of 90 minutes, 180 minutes in all).** It fits a lecture course with a projector and lab or home time for the tutorials. You demonstrate the steps that carry the ideas and leave the rest to students.
+**Plan A: lecture with live demonstration (two sessions of 90 minutes, 180 minutes in all).** It fits a lecture course with a projector and lab or home time for the tutorials. You demonstrate the steps that carry the ideas and leave the rest to students. The tutorial estimates above add up to more than the class time given to the tutorials, so students finish each tutorial at home, about an hour and a half of work in all, and a student who falls behind starts the next tutorial from its start file in Chapter05-companion.zip.
 
 | Session | Minutes | Activity | Slides |
 |---|---:|---|---|
@@ -196,7 +198,9 @@ Plan A is the safest. Plan B trades the vocabulary lecture for ownership of the 
 - Step 3d: the prefix box left checked, so later formulas cannot find the plain names.
 - Step 4c: the merge with Customer made before the CustomerID column exists. Step 3 adds it.
 - Step 5: the type of each new column not set, or Text.Middle started at 5.
-- Step 6a: a plain **Close & Load**, which sends the queries to the Data Model.
+- Step 6a: a plain **Close & Load**, which with Excel's default load settings sends the queries to the Data Model.
+
+**The test Step 6 names.** Step 6 says that a left anti merge on each key that returns no rows would show that every line found its match. Tutorial 5.2's "No match" count already shows it for the invoice and the item, but nothing in the tutorials tests the customer key, and the Furniture totals cannot. Demonstrate it in a copy of the workbook: right-click **InvoiceLines**, choose **Reference**, merge the new query with **Customer** on CustomerID with the join kind **Left Anti**, and load it to a worksheet. It loads no rows. The same test with SalesInvoice on SalesInvoiceID and with Item on ItemID also returns none, and each of the three keys appears once in its Table, which is what keeps a line from being repeated.
 
 **The checkpoint to look for.** The four bullets. A strong student says that agreement with the lookups is consistency, not proof, and that the Furniture totals test the item group and the quarter, not the customer segment.
 
@@ -249,7 +253,7 @@ All six exercises are Excel builds with a model answer in Chapter05-exercises.zi
 - *One exercise a session.* Take them in the order 5.2, 5.1, 5.3, 5.4, 5.5, 5.6, from the lightest to the longest.
 - *A light load.* Exercises 5.2 and 5.5 take about 135 minutes and cover outcomes 1 to 6, with outcome 5 only through loading. Add Exercise 5.3 for the grid and the rule.
 
-**Grading and discussion.** Each exercise guide holds a rubric. Exercises 5.1, 5.3 and 5.4 suit grading from the workbook. Exercises 5.2, 5.5 and 5.6 end in a memo and suit a class discussion of what a match or a clean result does and does not show. Collect the workbook, not a screenshot.
+**Grading and discussion.** Each exercise guide holds a rubric, and its full-credit column asks only for what the requirement asks. Extra checks, such as a lowered threshold in Exercise 5.3 or a control on a supplier with business in Exercise 5.6, are named as a plus in What a strong answer says. Exercises 5.1, 5.3 and 5.4 suit grading from the workbook. Exercises 5.2, 5.5 and 5.6 end in a memo and suit a class discussion of what a match or a clean result does and does not show. Collect the workbook, not a screenshot.
 
 ## Multiple-choice questions
 

@@ -55,7 +55,7 @@ ORDER BY Status;
 
 **Check:** {{ status|length }} rows: {{ status[0][0] }} and {{ status[1][0] }}. The next step counts them.
 
-**Step 2. Count each status.** The message pane gives each count.
+**Step 2. Count each status.** The requirement asks only for the values, so these counts are a control of the model answer and a plus in a student's script. The message pane gives each count.
 
 ```sql
 -- Requirement (1): the shipments with Status Delivered (count in the message pane)
@@ -152,7 +152,7 @@ WHERE Status = 'In Transit' AND DeliveryDate >= '2026-12-31';
 
 ## What a strong answer says
 
-- **Requirement (4).** The SQL counts reproduce the Excel filters of Tutorial 2.1, with the one In Transit shipment dated on the cutoff accounted for. Both tests are written as conditions that a reviewer reads in plain text, so the same script runs on a later extract once its cutoff date is changed, and the results are checked again. An Excel filter stays with its workbook too, but its conditions sit in each column's filter menu and apply to whatever rows the sheet holds.
+- **Requirement (4).** The SQL counts reproduce the Excel filters of Tutorial 2.1. The counts by status of Step 2 and the one In Transit shipment dated on the cutoff, accounted for in Step 6, are a plus. Both tests are written as conditions that a reviewer reads in plain text, so the same script runs on a later extract once its cutoff date is changed, and the results are checked again. An Excel filter stays with its workbook too, but its conditions sit in each column's filter menu and apply to whatever rows the sheet holds.
 - **Requirement (5).** The blank tracking number is a completeness test: ask why the number was not recorded and whether the carrier's records hold it. The status after the delivery date is a consistency, or timeliness, test: ask who updates the status on delivery, whether DeliveryDate records the delivery or the date expected, and what evidence of delivery exists. A DeliveryDate does not prove delivery.
 
 A weak answer calls the blanks inaccurate, or gives a test but no question for the process owner.
@@ -170,7 +170,7 @@ A weak answer calls the blanks inaccurate, or gives a test but no question for t
 
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
-| Requirement 1: values and counts | 15 | DISTINCT for both columns, counts from the pane | Values without counts |
+| Requirement 1: status and carrier values | 15 | DISTINCT for both columns, with the values reported | One column, or an incomplete list |
 | Requirement 2: no tracking number | 20 | IS NULL, sorted, count and date range reported | Count only |
 | Requirement 3: In Transit past due | 25 | Both conditions, the right boundary, count and oldest date | Boundary off by one |
 | Requirement 4: comparison | 20 | Counts agree with Tutorial 2.1 and the reason SQL reruns more easily | Counts without the reason |

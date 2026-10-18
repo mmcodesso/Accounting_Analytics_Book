@@ -267,6 +267,15 @@ def g1(d, claim):
              if d.one("SELECT COUNT(*) FROM GLEntry g JOIN Account a ON a.AccountID = g.AccountID WHERE a.AccountNumber = ?", n) == 0]
     claim(0 < len(never) < len(contra), "some of the contra accounts have no postings in any year, and some have balances")
     posted = [dict(number=n, name=name, balance=have[n]) for n, name, t, nb in contra if n in have]
+    # the three measures at the latest year-end: the same liabilities, a total of zero in each
+    kept, none = n14.by_type(d, asof, "all"), n14.by_type(d, asof, "none")
+    claim(all(abs(b["Liability"] - right["Liability"]) < 0.005 for b in (kept, none)),
+          "the liabilities are the same under the three balance measures at the latest year-end")
+    claim(all(abs(sum(b.values())) < 0.005 for b in (right, kept, none)), "each of the three balance measures totals zero")
+    # at a month-end with no close dated on it, the measure that keeps the closes equals Balance
+    june = n14.month_end(y, 6)
+    claim(all(abs(n14.by_type(d, june, "all")[t] - n14.by_type(d, june)[t]) < 0.005 for t in TYPES),
+          "at a month-end inside the year, the balance with the closes kept equals Balance")
     return dict(y=y, f=d.F, asof=asof, month_asset=month["Asset"], month_expense=month["Expense"], right_asset=right["Asset"],
                 by_nb_asset=by_nb["Asset"], over_asset=over["Asset"], by_nb_revenue=by_nb["Revenue"], over_revenue=over["Revenue"],
                 dep=dep, contra_rev=contra_rev, never=never, n_never=len(never), posted=posted, n_posted=len(posted),
@@ -301,7 +310,22 @@ def g2(d, claim):
     c2 = n14.ex2(d, claim)
     claim(c2["ch12"]["n"] == c2["late"][-1]["invoices"] + len(c2["added"]) and not c2["dropped"],
           "Chapter 12's count is this table's invoices of the current year plus the invoices it adds")
+    # a table of the crossing lines without the line key groups the lines that share invoice and dates
+    cross = [r for r in rows if r["shipped"] and r["shipped"][:4] != r["date"][:4]]
+    keys: dict[tuple, list[dict]] = {}
+    for r in cross:
+        keys.setdefault((r["number"], r["date"], r["shipped"]), []).append(r)
+    pairs = [v for v in keys.values() if len(v) > 1]
+    claim(len(pairs) == 1 and len(pairs[0]) == 2,
+          "one invoice among the crossing lines has two lines with the same invoice and ship dates, and no other repeats")
+    pair = pairs[0] if pairs else [dict(number="", date="", shipped="", rev=0.0, id=0)] * 2
+    cross_total = sum(r["rev"] for r in cross)
+    claim(abs(cross_total - sum(x["amount"] for x in c2["late"] + c2["early"])) < 0.005,
+          "the crossing lines total the amounts of the two kinds")
     return dict(y=y, f=d.F, p=d.P, inactive=inactive, n_noguard=n_noguard, n_services=n_services,
+                n_rows_noid=len(keys), pair_number=pair[0]["number"], pair_date=pair[0]["date"], pair_shipped=pair[0]["shipped"],
+                pair_amounts=[r["rev"] for r in pair], pair_total=sum(r["rev"] for r in pair), cross_total=cross_total,
+                relates_item=relationship(claim, "ShippedLines.ItemID", "Item.ItemID"),
                 m_headers=steps(claim, expression_m("ShipmentHeaders"), "Removed Other Columns"),
                 m_lines=steps(claim, expression_m("ShipmentLines"), "Removed Other Columns"),
                 m_merges=steps(claim, shipped_m, "Merged Queries1", "Merged Queries2"),
@@ -367,7 +391,17 @@ def g4(d, claim):
               "a volume effect at the current margin per unit leaves Bridge Check equal to the change in units times the change in margin per unit")
         wrong.append(dict(label=f"Q{qn}", lists=lists_wrong, check=check_wrong, volume_check=volume_check))
     claim(abs(wrong[-1]["volume_check"]) > 1, "a volume effect at the current margin per unit leaves a visible Bridge Check in the fourth quarter")
-    return dict(y=y, wrong=wrong, m_units=measure(claim, "Units"), m_pq=measure(claim, "Margin PQ"),
+    # the first quarter of the data has no quarter before it: DATEADD finds no dates, so Margin PQ and the volume effect
+    # are blank (a blank times a number is blank), while the other effects take a blank per-unit amount as zero and add
+    # up to the whole margin, so Bridge Check is still zero although nothing is compared
+    first = n14.pick(d, group="Furniture", year=d.F, quarter=1)
+    u = n14.total(first, "qty")
+    lst, rev, disc, cost = (n14.total(first, k) for k in ("list", "rev", "disc", "cost"))
+    mix, lists, promo = lst - cost, -(lst - rev - disc), -disc
+    claim(u > 0 and abs(mix + lists + promo - (rev - cost)) < 0.005,
+          "in the first quarter of the data, with no quarter before it, the mix, price-list and promotion effects add up "
+          "to the whole margin, so Bridge Check is zero")
+    return dict(y=y, wrong=wrong, first_quarter=f"{d.F}-Q1", m_units=measure(claim, "Units"), m_pq=measure(claim, "Margin PQ"),
                 m_volume=measure(claim, "Volume Effect"), m_mix=measure(claim, "Mix Effect"),
                 m_lists=measure(claim, "Price List Effect"), m_promo=measure(claim, "Promotion Effect"),
                 m_check=measure(claim, "Bridge Check"),
@@ -424,7 +458,15 @@ def g6(d, claim):
                     "WHERE g.SourceDocumentType = 'SalesInvoice' AND a.AccountName = 'Freight Revenue' AND substr(g.PostingDate, 1, 4) = ?", str(y))
     claim(abs(every_revenue - ledger - freight) < 0.005 and freight > 0,
           "the sales invoices also post freight revenue, so a test over every revenue account exceeds the item groups' by the freight")
+    m_gl = measure(claim, "GL Amount")
+    # Requirement 3's temporary GL Amount: the tutorial's measure without its filter on the closing entries
+    kept_closes = "GL Amount = SUM ( GLEntry[Debit] ) - SUM ( GLEntry[Credit] )"
+    claim(re.sub(r"\s+", " ", m_gl).startswith("GL Amount = CALCULATE ( SUM ( GLEntry[Debit] ) - SUM ( GLEntry[Credit] ), ")
+          and "IsYearEndClose" in m_gl, "the project's GL Amount is that sum with the filter on the closing entries")
+    claim("[GL Amount]" in query.split('"Invoice revenue in the ledger')[1].split("ROW (")[0]
+          and 'SourceDocumentType] = "SalesInvoice"' in query,
+          "the ledger revenue test uses GL Amount on the sales invoices' postings only")
     return dict(y=y, query=query, debits_net=debits_net, no_close=no_close, every_revenue=every_revenue, freight=freight,
-                m_gl=measure(claim, "GL Amount"), m_ni=measure(claim, "Net Income"),
+                m_gl=m_gl, m_gl_kept=kept_closes, m_ni=measure(claim, "Net Income"),
                 dax_gap=check_expr(claim, "Ledger less invoice lines", prefix=True),
                 dax_fail=check_expr(claim, "(3) GL Amount keeping the closes (changed, then undone): net income reads 0, the test fails"))

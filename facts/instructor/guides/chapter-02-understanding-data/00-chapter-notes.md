@@ -27,7 +27,7 @@ figures:
 | | |
 |---|---|
 | Part | Part I, Foundations of Accounting Analytics: the second of three chapters, closed by a comprehensive case |
-| Analytics types | None is named. The tests are descriptive (counts, totals, comparisons of what is recorded), and they come before any of the four types |
+| Analytics types | None is named. The chapter uses descriptive data-quality checks (counts, totals, comparisons of what is recorded) to prepare later descriptive, diagnostic, predictive and prescriptive analyses |
 | Tools | Excel only, in the working copy: filters, sorting, PivotTables, COUNTIFS, MINIFS, SUMIFS, XLOOKUP and a few totals. No SQL or Power BI |
 | Components | {{ unit.tutorials|length }} guided tutorials, {{ n_exercises }} exercises ({{ per_perspective }} for each perspective), {{ n_questions }} multiple-choice questions and a deck of {{ slides }} slides |
 | Files students need | CharlesRiver.xlsx, from the Charles River Accounting Dataset (Excel) link on the Downloads page, and the working copy CharlesRiver_Work.xlsx that Tutorial 2.1 has them make. The Downloads table lists no start files and no solutions for Chapter 2; the guides in this folder hold the model answers |
@@ -38,11 +38,13 @@ The chapter depends on these conditions of the data, all visible in the workbook
 - Shipments with no TrackingNumber number {{ ch02_t1.blank|count }} of {{ ch02_t1.ship_rows|count }}, with every carrier. Shipments marked In Transit number {{ ch02_t1.in_transit|count }}, each with a DeliveryDate on or before the last date in the data.
 - Customer names shared by two customers: {{ ch02_t1.n_pairs }}.
 - Invoices dated before the first shipment on their order: {{ ch02_t1.n_before }}. Invoices with no shipment, because they bill design services: {{ ch02_t1.no_ship|count }}.
-- Items with no ListPrice, by design: {{ ch02_t1.blank_items }}; items sold: {{ ch02_t1.sellable|count }}.
-- The ledger has {{ ch02_t2.gl_rows|count }} rows, and debits equal credits. Its first period and its last two are small, and the last fiscal year holds only supplier payments. Rows with neither a debit nor a credit: {{ ch02_t2.zero[1] }}.
+- Items with no ListPrice, by design: {{ ch02_t1.blank_items }}; items with a list price: {{ ch02_t1.sellable|count }}.
+- The ledger has {{ ch02_t2.gl_rows|count }} rows, and debits equal credits. Its first period and its last two are small: the first is the extract's first month and part of the period, and the last fiscal year holds only supplier payments. Rows with neither a debit nor a credit: {{ ch02_t2.zero[1] }}.
 - Supplier invoice numbers that appear twice for one supplier: {{ ch02_ex6.invoice_numbers }}. Check numbers that repeat: {{ ch02_ex6.checks }} (Exercise 2.6).
 
 ## What students should be able to do afterward
+
+These outcomes are this guide's own and are numbered differently from the chapter's six learning objectives. Outcome 1 serves objective 1, outcome 2 objective 2, outcome 3 objective 3, outcomes 4 and 5 objective 4, and outcome 6 objectives 5 and 6.
 
 1. Classify data as quantitative or qualitative and as structured, semi-structured or unstructured, and say why the book's tools are built for structured data. Practiced in questions 4 and 7 and the check slides; no exercise asks for it directly.
 2. Name the sources of accounting data and say how a sub-ledger and the ledger should agree. Practiced in Exercises 2.2 and 2.5 and questions 9, 10 and 13.
@@ -62,7 +64,7 @@ The chapter depends on these conditions of the data, all visible in the workbook
 
 **Pitfalls that cost class time**
 
-- GLEntry has {{ ch02_t2.gl_rows|count }} rows, about {{ gl_share|pct(0) }} of a worksheet. A formula copied down every row makes Excel unresponsive. The tutorial summarizes with a PivotTable for this reason, and Step 4 of Tutorial 2.2 types `Total` one row below the data so the Table does not grow.
+- GLEntry has {{ ch02_t2.gl_rows|count }} rows, about {{ gl_share|pct(0) }} of a worksheet. A formula copied down every row can make Excel slow or unresponsive, depending on the computer. The tutorial summarizes with a PivotTable for this reason, and Step 4 of Tutorial 2.2 types `Total` one row below the data so the Table does not grow.
 - Tutorial 2.1, Step 6: MINIFS returns a serial number until the result is formatted as a date, and students then read it as a wrong date. The same step returns 0 when an order has no shipment, which Step 7 turns into "No shipment".
 - Whole-column COUNTIFS and SUMIFS on PurchaseInvoice and DisbursementPayment (Exercise 2.6) take a while. Tell students to wait.
 - Filters left on: ask students to clear a filter before the next worksheet. And a clean result: several students will think it means they did the test wrong, so say early that a test that finds nothing is a finding and the memo must record it.

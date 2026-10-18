@@ -117,8 +117,10 @@ def facts_6_1(y: int) -> dict:
                     "AND SourceDocumentID = ?", sid)
         shipped = _q("SELECT DISTINCT s.ShipmentDate FROM SalesInvoiceLine l JOIN ShipmentLine sl ON sl.ShipmentLineID = l.ShipmentLineID "
                      "JOIN Shipment s ON s.ShipmentID = sl.ShipmentID WHERE l.SalesInvoiceID = ? ORDER BY 1", sid)
+        delivered = _q("SELECT DISTINCT s.DeliveryDate FROM SalesInvoiceLine l JOIN ShipmentLine sl ON sl.ShipmentLineID = l.ShipmentLineID "
+                       "JOIN Shipment s ON s.ShipmentID = sl.ShipmentID WHERE l.SalesInvoiceID = ? ORDER BY 1", sid)
         odd.append(dict(id=sid, number=number, date=d, group=groups[0], amount=sum(r["lt"] for r in mine),
-                        posted=[p[0] for p in posted], shipped=[s[0] for s in shipped]))
+                        posted=[p[0] for p in posted], shipped=[s[0] for s in shipped], delivered=[s[0] for s in delivered]))
     std = sum(r["std"] for r in rows if r["grp"] != "Services")
     product = sum(r["lt"] for r in rows if r["grp"] != "Services")
     total = sum(r["lt"] for r in rows)
@@ -557,11 +559,12 @@ def ex6_1(b: ExerciseBuild) -> None:
     # written answers: (2), (5), and (6)
     e1, e2 = f["earlier"]
     odd = f["odd"]
-    early = [i for i in odd if any(s[:4] == str(y - 1) for s in i["shipped"])]
+    early = [i for i in odd if any(s[:4] == str(y - 1) for s in i["delivered"])]       # the delivery date decides the period
     later = [i for i in odd if i not in early]
     assert len(early) == 1 and later and all(len(set(i["posted"])) == 1 for i in odd), odd
+    assert all(i["delivered"] and [s[:4] for s in i["shipped"]] == [s[:4] for s in i["delivered"]] for i in odd), odd
     e = early[0]
-    later_dates = sorted({s for i in later for s in i["shipped"]})
+    later_dates = sorted({s for i in later for s in i["delivered"]})
     posted = odd[0]["posted"][0]
     diffs = [r for r in f["recon"] if r["diff"] != 0]
     net = L["net"]
@@ -580,7 +583,7 @@ def ex6_1(b: ExerciseBuild) -> None:
         f"{money(f['debits'])}."],
         note="The earlier closing entries are on the JournalEntries worksheet (EntryType Year-End Close); their figures "
              "were also checked against CharlesRiver.sqlite when the solution was built.")
-    ship_note = ("Shipment dates and posting dates come from the Shipment, ShipmentLine, and GLEntry tables of "
+    ship_note = ("Shipment dates, delivery dates, and posting dates come from the Shipment, ShipmentLine, and GLEntry tables of "
                  "CharlesRiver.sqlite, which this workbook does not load; they were queried when the solution was built.")
     row = model_answer(ws, row, "Model answer, requirement (5): the reconciling differences", [
         f"{words(len(diffs), True)} accounts exceed the {y} revenue of their item groups in InvoiceLines: "
@@ -591,12 +594,15 @@ def ex6_1(b: ExerciseBuild) -> None:
         + f". The ledger posted them on {posted}, in fiscal {y}; InvoiceLines assigns them to fiscal {y - 1} by their "
         "invoice dates.",
         "Neither the invoice number nor the invoice date should decide the period. Revenue is recognized when control "
-        "of the goods passes to the customer, which the book takes to be delivery for Charles River, and every "
-        f"shipment is delivered in the year it ships. The shipment records show that only {e['number']} shipped in {y - 1} (on "
-        f"{e['shipped'][0]}), so its {money(e['amount'])} belongs in fiscal {y - 1} and is a revenue cutoff error in "
-        f"the ledger; the other {words(len(later))} shipped on {', '.join(later_dates)}, so the ledger's period is right and their "
-        f"invoice dates are wrong. Freight revenue (4050, {money(-f['bal'].get(4050, 0.0))}) is billed on the invoice "
-        "header and has no invoice line, so it is not part of the comparison."], note=ship_note)
+        "of the goods passes to the customer, which the book takes to be delivery for Charles River, so the delivery date "
+        f"decides, and every shipment is delivered in the year it ships. The shipment records show that only {e['number']} was "
+        f"delivered in {y - 1} (shipped on {e['shipped'][0]}, delivered on {e['delivered'][0]}), so its {money(e['amount'])} belongs in fiscal "
+        f"{y - 1} and is a revenue cutoff error in the ledger; the other {words(len(later))} were delivered on {', '.join(later_dates)}, "
+        "so the ledger's period is right and their invoice dates are wrong. The shipment dates fall in the same years here, but "
+        f"they are not the same dates as the delivery dates. Freight revenue (4050, {money(-f['bal'].get(4050, 0.0))}) is the freight billed "
+        "on the invoice headers less the freight credits on credit memos, and it has no invoice line, so it is not part of the "
+        "comparison. The credit memos' subtotals post to sales returns and allowances, so the freight credits are not deducted twice."],
+        note=ship_note)
     row = model_answer(ws, row, "Model answer, requirement (6): memo to the controller", [
         f"To: Controller. From: Staff accountant. Subject: Fiscal {y} income statement from the general ledger.",
         f"I prepared the attached income statement from the pre-closing trial balance at December 31, {y}: every "
@@ -604,8 +610,9 @@ def ex6_1(b: ExerciseBuild) -> None:
         f"debit and credit balances of {money(f['debits'])} each). Net income is {money(L['ni'])}, "
         f"{pct(L['ni'] / net, 2)} of net revenue, and it equals the amount closing entry {c2} moved to retained "
         f"earnings; the balance sheet balances once net income is added to equity (assets {money(f['assets'])}). "
+        "The statement and the reconciliation are as recorded, before correction of the cutoff error described below. "
         "These checks show that the statement agrees with the ledger and its closing entry, not that the ledger "
-        "holds every transaction.",
+        "holds every transaction or recognizes every amount in the right period.",
         f"The common-size statement shows the cost structure: of each dollar of net revenue ({money(net)}), cost of "
         f"goods sold takes {pct(-L['cogs'] / net, 1)}, leaving a gross margin of {pct(L['gm'] / net, 1)}; operating "
         f"expenses take {pct(-L['opex'] / net, 1)}, so operating income is {pct(L['oi'] / net, 1)}, and other items "
@@ -619,10 +626,12 @@ def ex6_1(b: ExerciseBuild) -> None:
         f"Product revenue in the ledger agrees with the invoice lines except for "
         f"{money(sum(r['diff'] for r in diffs))} in {words(len(diffs))} accounts: {words(len(odd))} invoices dated in "
         f"{' and '.join(sorted({month_name(i['date']) for i in odd}, key=lambda m: MONTH_ORDER.index(m)))} {y - 1} "
-        f"but numbered and posted in {y}. One of them, {e['number']} ({money(e['amount'])}), shipped in {y - 1} and is "
+        f"but numbered and posted in {y}. One of them, {e['number']} ({money(e['amount'])}), was delivered in {y - 1} and is "
         "a cutoff error that belongs in the prior year. It is small relative to the year's revenue, but its materiality "
         "should be judged with the other misstatements found and any qualitative factors, and the invoicing and posting "
-        f"dates should be reviewed at every year-end. The other {words(len(later))} shipped in {month_name(later_dates[0])} "
+        "dates should be reviewed at every year-end. Correcting it would also reach the related receivable, sales tax and "
+        "cost-of-sales entries, which should be investigated before corrected amounts are used. "
+        f"The other {words(len(later))} were delivered in {month_name(later_dates[0])} "
         f"{later_dates[0][:4]}, so only their invoice dates are wrong."])
 
 
@@ -838,11 +847,13 @@ def ex6_2(b: ExerciseBuild) -> None:
     model_answer(ws, row, "Model answer, requirement (5): differences to reconcile", [
         f"The invoice lines total {money(f['total'])} in fiscal {y}. Adding the {money(cutoff)} of the "
         f"{words(len(g['odd']))} invoices the ledger records in {y} although they are dated in {y - 1} (Exercise 6.1) "
-        f"gives the product revenue accounts; adding freight revenue, {money(freight)} in account 4050, which has no "
+        f"gives the product revenue accounts; adding freight revenue, {money(freight)} in account 4050 (the freight billed on the "
+        f"invoice headers less the freight credits on credit memos), which has no "
         f"invoice line, gives operating revenue of {money(g['lines']['opr'])}; deducting sales returns and "
         f"allowances, {money(returns)} in account 4060, gives the net revenue of {money(g['lines']['net'])}. A "
         "disclosure would also need the cutoff invoices assigned on the basis the Company uses, delivery, which "
-        "Exercise 6.1 shows moves only one of them into the prior year."], last_col=c0 - 2)
+        "Exercise 6.1 shows moves only one of them into the prior year. The reconciliation is as recorded, before "
+        "correction of that error, and it does not validate recognition."], last_col=c0 - 2)
 
 
 def checks_6_2(b: ExerciseBuild) -> None:
@@ -952,13 +963,16 @@ def ex6_3(b: ExerciseBuild) -> None:
         f"The PivotTable shows Services at a {pct(g['pct'], 0)} margin because it values every line at the item's "
         "standard cost, and the design-service items carry a StandardCost of 0. The cost of a design service is the "
         "time of the design staff, which is paid through payroll and recorded in the time records and the ledger, not "
-        "in the item master, so the invoice lines cannot show it. To measure the margin you need the cost of the hours "
-        f"behind the services billed: for example, ServiceTimeEntry.ExtendedCost for {y} work dates "
-        f"({money(f['time_cost'])}, a margin of about {pct(f['time_pct'], 0)} on {money(g['revenue'])} of revenue), or "
+        "in the item master, so the invoice lines cannot show it. To measure the margin you need a cost source for the hours "
+        f"behind the services billed, and its scope. Two illustrative scopes, not matched service margins, are "
+        f"ServiceTimeEntry.ExtendedCost for {y} work dates "
+        f"({money(f['time_cost'])}, a margin of about {pct(f['time_pct'], 0)} on {money(g['revenue'])} of revenue), "
+        "which includes nonbillable hours, and "
         f"the {y} Design Services salaries in account 6280 ({money(f['salaries'])}, about "
-        f"{pct(f['salaries_pct'], 0)}). The gap between the two (time charged to engagements against all of the "
-        "staff's pay, including unbilled time) shows that the answer depends on the cost definition, which the "
-        "report must state."], last_col=6,
+        f"{pct(f['salaries_pct'], 0)}), the staff's whole pay whether or not the hours were billed. They differ in scope "
+        "and in period, since hours worked are set against revenue billed, and neither is a margin until the work and "
+        "billing periods agree and nonbillable capacity and overhead are treated on purpose. The answer depends on the "
+        "cost definition, which the report must state."], last_col=6,
         note="ServiceTimeEntry and account 6280 are not loaded in this workbook; their totals were queried from "
              "CharlesRiver.sqlite when the solution was built.")
 
@@ -1213,7 +1227,8 @@ def ex6_5(b: ExerciseBuild) -> None:
         "lines such as Services are flagged for differences that matter less in dollars. A threshold based on a "
         "tolerable amount derived from materiality, or an expectation that reflects known changes such as the "
         f"promotions of {y}, would treat them differently; prior-year revenue is also a weak expectation, because it "
-        "ignores growth and known events."], last_col=7)
+        "ignores growth and known events. A difference below the thresholds does not show that an amount is free of "
+        "misstatement."], last_col=7)
     pick = sv[-1] if sv else fl[0]
     model_answer(ex, row, "Model answer, requirement (5): follow-up of one flagged difference", [
         f"{lab(pick)}: recorded revenue of {money(pick['act'])} against an expectation of {money(pick['exp'])} "

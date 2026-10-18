@@ -308,7 +308,7 @@ Phase 2 builds the costs the decisions use. The workbook's item costs feed the e
 
 ## Three costing views charge products differently
 
-{{< book-figure fig-18-01 crop="0,0,1,0.6200" >}}
+{{< book-figure fig-18-01 crop="0,0,1,0.6200" alt="Detail of the top of the costing-views diagram: what the plant paid for in a year, crew, supervision, equipment and factory overhead, feeds three columns, standard costing, actual absorption and time-driven costing. Under each is how it charges products: the standard rate times the standard hours of the output, in concept all of the year's cost divided by the units made, and the capacity cost rate times the routing time used plus factory overhead." >}}
 
 ::: {.notes}
 Standard costing charges each product a rate per standard hour. Actual absorption, in concept, charges all of the year's cost divided by the units made, and the case can only approximate it. Time-driven costing charges each product for the capacity it uses at the cost of practical capacity, plus the factory overhead. Kaplan and Anderson suggest, as a rule of thumb, that practical capacity is about four-fifths of theoretical capacity, or a little more. All three are views for managers; what inventory may carry is the question of Requirement 9.
@@ -316,7 +316,7 @@ Standard costing charges each product a rate per standard hour. Actual absorptio
 
 ## What each view leaves out of product cost
 
-{{< book-figure fig-18-01 crop="0,0.6200,1,0.3800" >}}
+{{< book-figure fig-18-01 crop="0,0.6200,1,0.3800" alt="Detail of the lower part of the costing-views diagram, with each column named. Standard costing leaves out the variance, which Charles River charges to cost of goods sold. Actual absorption, in concept, leaves nothing out, because idle time is spread into the cost of every unit. Time-driven costing leaves out the unused capacity, which is reported as a cost of the plant. A note under each column says what the view is good for or what it cannot do." >}}
 
 ::: {.notes}
 Read the columns in the same order. Standard costing sends everything else to the variance, which Charles River charges to cost of goods sold; actual absorption, in concept, leaves nothing out, so idle time is spread into every unit and unit cost rises whenever volume falls; time-driven costing reports unused capacity as a cost of the plant. Cooper and Kaplan argued that the resources supplied but not used should appear as that cost, visible to the managers who can act on it.
@@ -366,7 +366,7 @@ Ask students why one cost cannot answer all four: each answers a different quest
 1. Relevant cost: the costs that stop if the family is bought
 2. Time-driven cost, on practical capacity
 3. A standard on normal capacity
-4. Neither decision: it spreads idle capacity into every unit
+4. Neither decision of this case: it spreads idle capacity into every unit
 
 ::: {.notes}
 The chapter's criteria pair the costs and questions the same way. Computing each cost, and showing where the views disagree, is the work of Requirements 4 and 6.
@@ -395,28 +395,28 @@ These are self-checks, not answers. A cost that cannot be traced from the explor
 Phase 3 makes the decisions: make or buy for each quoted family, the value of the capacity buying would free, and the prices of the families still made.
 :::
 
-## Compare the quote with the costs that stop
+## Compare the quote with the costs that stop (1 of 3)
 
-{{< book-figure fig-18-02 crop="0,0,1,0.4473" >}}
+{{< book-figure fig-18-02 crop="0,0,1,0.4473" alt="Detail of the top of the make-or-buy flowchart: the delivered quote, price plus inbound freight, goes to the first question, whether it is below materials plus factory overhead, the cost that stops even if the crew stays. Yes leads to Buy, if the terms, quality and minimum volume are acceptable and two years of savings cover the tooling. No leads down to the second question, whether the quote is below that cost plus the crew time the family uses." >}}
 
 ::: {.notes}
 Start from the delivered quote, the price plus inbound freight. If it is below materials and the factory overhead that varies, the cost that stops even if the crew stays, buy, provided the terms, quality and minimum volume are acceptable and two years of savings cover the tooling. If not, ask whether it is below that cost plus the crew time the family uses.
 :::
 
-## The crew decides the middle case
+## The crew decides the middle case (2 of 3)
 
-{{< book-figure fig-18-02 crop="0,0.3241,1,0.3112" >}}
+{{< book-figure fig-18-02 crop="0,0.3241,1,0.3112" alt="Detail of the middle of the flowchart: the second question, whether the quote is below the cost plus the crew time, leads on Yes to a third question, whether the crew will be reduced in step with the hours freed. Yes there leads to Buy, with the crew plan, if two years of savings cover tooling and severance. No continues down toward Keep making, as does a No on the second question, along the left edge." >}}
 
 ::: {.notes}
 If the quote is below that cost plus the crew time, buy only if the crew will be reduced in step with the hours freed and two years of savings cover tooling and severance. If the quote is above both costs, the flowchart goes straight to keeping the family and testing its price.
 :::
 
-## Otherwise keep making, and test the price
+## Otherwise keep making, and test the price (3 of 3)
 
-{{< book-figure fig-18-02 crop="0,0.6483,1,0.3517" >}}
+{{< book-figure fig-18-02 crop="0,0.6483,1,0.3517" alt="Detail of the bottom of the flowchart: Keep making, and test the price against the margin floor, leads to the last box, Below the floor? Reprice, and weigh the volume the increase could cost. A second Keep making box, on the right, adds that the family stays unless the freed hours have another use, because buying adds cost while the crew stays, and that the price is tested too." >}}
 
 ::: {.notes}
-If the crew stays, buying adds the supplier's price to costs the company keeps paying, so keep making, unless the freed hours have another use, as growth would give them. Every family kept is tested against the margin floor, and a family below it is repriced, weighing the volume the increase could cost.
+If the crew stays, buying adds the supplier's price to costs the company keeps paying, so keep making, unless the freed hours have another use, as growth would give them. The test assumes no quantified benefit from another use of those hours, so a supported alternative use is weighed separately, with the supplier's terms and the cost of the transition. Every family kept is tested against the margin floor, and a family below it is repriced, weighing the volume the increase could cost.
 :::
 
 ## Decide make or buy, family by family
@@ -466,7 +466,7 @@ Measure the freed hours on the year's completions, the base of the capacity tabl
 - **Check:** each increase is set beside the volume it can afford to lose
 
 ::: {.notes}
-Measure contribution over the relevant cost with the crew kept, and compute the share of volume each increase could lose before the family earns less contribution than it does now. Test whether order volume rose in the months of past promotions, a screen that cannot measure how customers would answer an increase, and check the dates and use of the price lists. Recommend increases and how the lists should be rebuilt, and show how the answer changes for any family you would buy. Marn and Rosiello showed price to be the most powerful lever on profit: on average economics, a small price gain with no loss of volume would raise operating profit several times as much as the same gain in volume. Chapter 15's gross-to-net waterfall traced Charles River's price from list to net revenue.
+Measure contribution over the relevant cost with the crew kept, and compute the share of volume each increase could lose before the family earns less contribution than it does now. Test whether order volume, measured as a list-price-weighted order-value proxy for volume, rose in the months of past promotions, a screen that cannot measure how customers would answer an increase, and check the dates and use of the price lists. Recommend increases and how the lists should be rebuilt, and show how the answer changes for any family you would buy. Marn and Rosiello showed price to be the most powerful lever on profit: on average economics, a small price gain with no loss of volume would raise operating profit several times as much as the same gain in volume. Chapter 15's gross-to-net waterfall traced Charles River's price from list value to recorded net revenue, which is not yet the pocket price.
 :::
 
 ## Check your understanding {.check}
@@ -484,13 +484,13 @@ Ask students what would have to happen for each cost to stop.
 
 ## Each cost has its answer {.answer}
 
-1. It stops at once
-2. It stops at once
+1. It stops at once, on the case's avoidability assumption
+2. It stops at once, on the same assumption
 3. It stops only if the crew is reduced in step with the hours freed
 4. It stays, and falls on the families that remain
 
 ::: {.notes}
-This is the test of the flowchart. Which families pass it, under each crew case, is the work of Requirement 6.
+This is the test of the flowchart. The first two answers rest on the case's avoidability assumption, that purchases and the overhead that varies follow the family's volume. Which families pass it, under each crew case, is the work of Requirement 6.
 :::
 
 ## Milestone 3: before you hand it in
@@ -583,11 +583,11 @@ This case brought back earlier answers. Chapters 10 to 12 found more hours paid 
 
 - Descriptive: what the families earned and used of the plant
 - Diagnostic: why the variance grew and where the cost really sits
-- Predictive: what freed capacity, growth and higher prices would do
+- Predictive: what freed capacity, growth and higher prices would do under stated assumptions
 - Prescriptive: whether to make, buy or reprice, and the standards
 
 ::: {.notes}
-These are the four types of analytics of Chapter 1. Requirements 1 and 3 were descriptive, 2 and 4 diagnostic, and 7 and 8 predictive; the recommendations were prescriptive, as decisions usually are.
+These are the four types of analytics of Chapter 1. Requirements 1 and 3 were descriptive, 2 and 4 diagnostic, and 7 and 8 predictive as scenarios, not forecasts of demand; the recommendations were prescriptive, as decisions usually are.
 :::
 
 ## The next round

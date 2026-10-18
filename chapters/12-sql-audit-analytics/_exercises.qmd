@@ -60,17 +60,17 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 **Table group:** Manufacturing
 
-**Scenario.** Tutorial 11.2 showed Packing and Quality Assurance recording several times their planned hours, and Tutorial 12.3 showed that much of the time was recorded after operations had ended, and that the months of 2024 with little indirect time are recorded like the others. The plant manager asks what the work-center comparison looks like when only the time recorded while each operation was open is counted, and what the plant was doing in the first months of 2024.
+**Scenario.** Tutorial 11.2 showed Packing and Quality Assurance recording several times their planned hours, and Tutorial 12.3 showed that much of the time was recorded after operations had ended, and that the months of 2024 with little indirect time are recorded like the others. The plant manager asks what the work-center comparison looks like when only the time dated while each operation was open is counted, and what the plant was doing in the first months of 2024.
 
 **Requirements.**
 
-(1) For each direct labor time entry, flag whether it was recorded on or before the operation's ActualEndDate, and count the entries dated before the operation's ActualStartDate, which would also fall outside the time the operation was open. Keep the entries with no valid operation, and count them as a group of their own.
+(1) For each direct labor time entry, flag whether its work date is on or before the operation's ActualEndDate, and count the entries dated before the operation's ActualStartDate, which would also fall outside the time the operation was open. Keep the entries with no valid operation, and count them as a group of their own.
 
-(2) Repeat the work-center comparison of Tutorial 11.2, with the planned hours of each work center and year, and two recorded-to-planned ratios: one for all direct hours, and one for the hours recorded while the operation was open.
+(2) Repeat the work-center comparison of Tutorial 11.2, with the planned hours of each work center and year, and two recorded-to-planned ratios: one for all direct hours, and one for the hours dated while the operation was open.
 
 (3) Rank the work centers by each ratio, and describe how the ranking changes.
 
-(4) For each month from January to July 2024, count the work orders released and total the units completed and the manufactured units shipped. Explain what may account for the little indirect time from February to May 2024 and what evidence would confirm it. Find the month in which the share of direct time recorded after its operation ended first passed a quarter.
+(4) For each month from January to July 2024, count the work orders released and total the units completed and the manufactured units shipped. Explain what may account for the little indirect time from February to May 2024 and what evidence would confirm it. Find the month in which the share of direct time dated after its operation ended first passed a quarter.
 
 (5) Write a short memo (one half page) to the plant manager: what the operation-level data can and cannot support, and what should change in how time is recorded.
 

@@ -89,7 +89,14 @@ Tooling                    {{ g.f.tooling }}
 Two-year effect            {{ g.f.two_years }}
 ```
 
-**Check:** {{ hours|num(0) }} routing hours are {{ positions|num(2) }} positions of {{ pos_hours|num(1) }} hours. Severance is ${{ severance|num(0) }} a position, ${{ severance_total|num(0) }} in all; tooling is ${{ tooling|num(0) }}. Two years of ${{ gain|num(0) }} less those costs leave ${{ net|num(0) }}, before taxes and undiscounted. With the crew kept the same purchase costs ${{ kept_cost|num(0) }} a year. **Watch for:**
+**Check:** {{ hours|num(0) }} routing hours are {{ positions|num(2) }} positions of {{ pos_hours|num(1) }} hours. Severance is ${{ severance|num(0) }} a position, ${{ severance_total|num(0) }} in all; tooling is ${{ tooling|num(0) }}. Two years of ${{ gain|num(0) }} less those costs leave ${{ net|num(0) }}, before taxes and undiscounted. With the crew kept the same purchase costs ${{ kept_cost|num(0) }} a year.{% if g.gate %} The sheet also gives each family its own one-time cost and two-year effect, and the buy flag requires that effect to be positive as well as the annual one:
+
+```jinja
+One-time cost     {{ g.f.once }}
+Two-year effect   {{ g.f.two }}
+```
+
+Each family to buy covers its own one-time costs: {% for q in buy %}{{ q.short }} {{ sg(q.two_year) }}{{ ", " if not loop.last }}{% endfor %} over the two years.{% endif %} **Watch for:**
 
 - Positions on the available hours of a position: {{ g.pos_wrong|num(2) }} positions and ${{ g.sev_wrong|num(0) }} of severance.
 - One year of savings against the one-time costs: a net of ${{ g.net_one|num(0) }}; two years with no one-time costs read ${{ g.net_free|num(0) }}.
@@ -107,7 +114,7 @@ Effect at the quote   {{ g.f.gs_kept }}
 Direct, crew kept     {{ g.f.be_kept }}
 ```
 
-**Check:** {{ g.example }} breaks even at ${{ buy[0].be_kept|num(2) }} crew kept and ${{ buy[0].be_reduced|num(2) }} crew reduced, against a quote of ${{ buy[0].price|num(0) }}: the quote beats only the second. **Watch for:** a break-even quote that ignores the freight: it equals the relevant cost, ${{ buy[0].kept|num(2) }} with the crew kept.
+**Check:** {{ g.example }} breaks even at ${{ buy[0].be_kept|num(2) }} crew kept and ${{ buy[0].be_reduced|num(2) }} crew reduced, against a quote of ${{ buy[0].price|num(0) }}: the quote beats only the second. These are annual operating break-evens{% if g.gate %}; to cover its one-time costs in the two years the quote for {{ g.example }} must fall below ${{ buy[0].be_two_years|num(2) }} (column Z of the model, for the crew fully reduced){% endif %}. **Watch for:** a break-even quote that ignores the freight: it equals the relevant cost, ${{ buy[0].kept|num(2) }} with the crew kept.
 
 **Step 5. Build the two-way Data Table.** A Data Table's input cells must be on its own sheet, so the two sensitivity inputs sit at the top of the sheet (B5, the quote adjustment, and B6, the share of the freed crew time removed), and column V reads them.
 
@@ -130,7 +137,7 @@ Column V   {{ g.f.sens }}
 
 ### Part 5: What the numbers leave out
 
-**Step 7. Measure the materials the families draw, and list the terms.** Routine: type the query at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Q22 compares the standard material in the completions with the material issued to the families' work orders; its core is those issues:
+**Step 7. Measure the materials the families draw, and list the terms.** Routine: type the query at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Q22 compares the standard material in the completions with the material issued to the families' work orders. The block is a fragment, the `FamilyIssues` CTE, and the complete statement is Q22:
 
 ```sql
 FamilyIssues AS (
@@ -160,7 +167,7 @@ FamilyIssues AS (
 
 ## What a strong answer says
 
-- **The cost that stops.** Materials and the overhead that varies stop at once. The crew's time stops only if the crew is reduced in step with the hours freed, which is the production manager's decision. Supervision and depreciation stay.
+- **The cost that stops.** On the case's avoidability assumption, materials and the overhead that varies stop at once. The crew's time stops only if the crew is reduced in step with the hours freed, which is the production manager's decision. Supervision and depreciation stay.
 - **The two sentences on the CFO's view.** Absorption cost includes supervision, depreciation and the crew's idle hours, which do not stop when a family is bought, so it makes buying look better than it is. Relevant cost counts only what stops: {{ buy|map(attribute='short')|join(', ') }} pass only with the crew reduced, and the others fail either way.
 - **The terms left out.** The minimum purchase (it would bind if sales fell), quality and the defect credit, lead time and inventory, designs and bills of material shared with a supplier, the price risk after two years, and the materials stock: the three families draw {{ share|pct(0) }} of the year's issues, so buying them slows the drawdown of stock built up in the year.
 

@@ -42,8 +42,9 @@ Students can:
 ## Before you assign
 
 - **Files.** Make Buy Reprice.xlsx with Requirements 2 and 4, and MakeBuy.sql on CharlesRiver_Capstone.sqlite.
-- **Data conditions.** The finished goods on the opening entry have no item detail, so the stock is rebuilt from completions less shipments plus returns, which counts it as made since the opening only if shipments drew on new production first. The ledger records no income tax, and the year-end closes net revenue and expense to zero.
+- **Data conditions.** The finished goods on the opening entry have no item detail, so the stock is rebuilt from completions less shipments plus returns, which counts it as made since the opening only if shipments drew on new production first. The ledger records no income tax, and the closes net revenue and expense to zero.
 - **Verify first.** The plan figures typed on Assumptions must equal the records: the sheet's three checks (B19:B21) read TRUE.
+- **Authority.** Topic 330, Subtopic 10, section 30 (initial measurement), and Topic 250, Subtopic 10, sections 20, 45 and 50 (definitions, reporting of errors and changes in estimate, disclosures). Read the Codification itself before teaching a definitive conclusion. Charles River is not treated as an SEC registrant, so Staff Accounting Bulletins 99 and 108 only illustrate what else bears on materiality.
 
 ## How to run it
 
@@ -63,29 +64,22 @@ Depreciation    {{ g.f.depreciation }}
 Rate            {{ g.f.rate }}
 ```
 
-**Check:** {{ p.direct|num(2) }} + {{ p.variable|num(2) }} + {{ p.indirect|num(2) }} + {{ p.supervision|num(2) }} + {{ p.depreciation|num(2) }} = {{ new_rate|num(2) }} an hour, on {{ plan_stdh|num(2) }} standard hours at {{ plan_hours|num(2) }} hours per standard hour and a labor rate of {{ rate|num(2) }} with {{ burden|pct(2) }} burden. **Watch for:** supervision without the burden, a rate of {{ g.rate_nb|num(2) }}, and the base year's depreciation instead of the plan year's, {{ g.rate_dep|num(2) }}. Q27 returns the plan year's depreciation of the assets charged to the clearing account, ${{ plan_dep|num(2) }}:
+**Check:** {{ p.direct|num(2) }} + {{ p.variable|num(2) }} + {{ p.indirect|num(2) }} + {{ p.supervision|num(2) }} + {{ p.depreciation|num(2) }} = {{ new_rate|num(2) }} an hour, on {{ plan_stdh|num(2) }} standard hours at {{ plan_hours|num(2) }} hours per standard hour and a labor rate of {{ rate|num(2) }} with {{ burden|pct(2) }} burden. **Watch for:** supervision without the burden, a rate of {{ g.rate_nb|num(2) }}, and the base year's depreciation instead of the plan year's, {{ g.rate_dep|num(2) }}. Q27 returns the plan year's depreciation of the assets charged to the clearing account, ${{ plan_dep|num(2) }}.
 
-```sql
-SELECT ROUND(SUM(Monthly * (ToMonth - FromMonth + 1)), 2)
-    AS PlanYearDepreciation
-FROM InPlanYear
-WHERE ToMonth >= FromMonth;
-```
-
-**Step 2. Compare it with the other rates.** The current rate is the conversion released per standard hour, the time-driven rate adds the unused capacity's cost back, and the actual rate is the year's inputs per standard hour.
+**Step 2. Compare it with the other rates.** Put the rates on one basis, the standard hours completed. The current rate is the standard conversion released. The time-driven rate is the Factory Overhead entries plus the committed cost of the routing time used, and leaves out the unused capacity. The actual rate is all the inputs to `1090`, so it adds the unused capacity's cost to the time-driven conversion. The committed cost per practical routing hour, ${{ g.rates.td_rate|num(2) }}, is a separate rate.
 
 ```jinja
 Current   {{ g.f.current }}
 Actual    {{ g.f.actual }}
 ```
 
-**Check:** the proposed rate ${{ new_rate|num(2) }} against ${{ current|num(2) }} today, ${{ td_std|num(2) }} time-driven and ${{ actual|num(2) }} actual. A standard on actual cost would carry the idle capacity and the hours recorded above the routings into inventory, and Topic 330 charges abnormal costs of that kind to the period.
+**Check:** the proposed rate ${{ new_rate|num(2) }} against ${{ current|num(2) }} today, ${{ td_std|num(2) }} time-driven and ${{ actual|num(2) }} actual; the time-driven rate plus the unused capacity's ${{ g.rates.unused_per_hour|num(2) }} an hour is the actual rate. A standard on actual cost would carry the capacity left unused and the hours recorded above the routings into inventory. Topic 330 charges abnormal costs, such as idle facility expense, to the period, but hours above the routings count only if the routing standard, the normal support work and the actual conditions show them abnormal, which the records do not settle.
 
 {{ figure('IF-18-9-A') }}
 
 ### Part 2: The stock and its revaluation
 
-**Step 3. Rebuild the stock at each year-end (Q28 and Q29).** Routine: type the query at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Q28 returns the units of each manufactured finished good at the three year-ends; Q29 totals them, leaving out the items with a negative balance. The core of Q29 sums the movements up to each year-end:
+**Step 3. Rebuild the stock at each year-end (Q28 and Q29).** Routine: type the query at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Q28 returns the units of each manufactured finished good at the three year-ends; Q29 totals them, leaving out the items with a negative balance. The block is a fragment of Q29 (run the complete query), the sum of the movements up to each year-end:
 
 ```sql
 OnHand AS (
@@ -96,7 +90,7 @@ OnHand AS (
 )
 ```
 
-**Check:** Q28 returns {{ g.n_q28|count }} rows, Q29 {{ g.n_items|join(', ') }} items at the three year-ends. {% for n in g.neg %}{{ n[1] }} goes negative at the end of {{ n[0] }}{{ "; " if not loop.last else "." }}{% endfor %} The opening stock was drawn on, and item-level opening balances would say which layers remain. Only manufactured finished goods revalue, because purchased ones are carried at their receipt cost. Paste Q28 into the Table OnHand and add the standard hours, conversion and standard cost per unit by lookup.
+**Check:** Q28 returns {{ g.n_q28|count }} rows, Q29 {{ g.n_items|join(', ') }} items at the three year-ends. {% for n in g.neg %}{{ n[1] }} goes negative at the end of {{ n[0] }}{{ "; " if not loop.last else "." }}{% endfor %} The opening stock was drawn on, and item-level opening balances would say which layers remain. Paste Q28 into the Table OnHand and add the standard hours, conversion and standard cost per unit by lookup.
 
 **Step 4. Revalue at the proposed rate.** The revaluation is the standard hours in stock at the new rate, less the conversion already in them.
 
@@ -109,16 +103,7 @@ Revaluation      {{ g.f.reval }}
 
 ### Part 3: The effect on the statements
 
-**Step 5. Measure it against the screen (Q30 and Q31).** Q30 returns income before income taxes for each year, leaving the closes out:
-
-```sql
-WHERE a.AccountType IN ('Revenue', 'Expense')
-    AND gl.FiscalYear BETWEEN 2024 AND 2026
-    AND gl.VoucherNumber NOT IN (
-        SELECT EntryNumber
-        FROM JournalEntry
-        WHERE EntryType LIKE 'Year-End Close%')
-```
+**Step 5. Measure it against the screen (Q30 and Q31).** Q30 returns income before income taxes for each year, leaving the closes out of revenue and expense.
 
 Q31 returns the opening entry's finished goods, ${{ opening_fg|num(2) }}, which has no item detail and is left out. The effects follow from the revaluations: retained earnings at the start of the prior year, each year's income, and each balance.
 
@@ -149,9 +134,9 @@ Q31 returns the opening entry's finished goods, ${{ opening_fg|num(2) }}, which 
 
 - **The rate.** Normal capacity at the plan volume, with supervision and depreciation spread over it; a standard on actual cost would capitalize idle capacity.
 - **The effect.** The balance effects exceed the screen and the income effects do not, at either end of the normal-capacity range; with no indirect hours the prior year's balance falls below it.
-- **Materiality is more than the screen.** The nature of the item, its aggregate with other misstatements, the line items and periods it touches, and the tax effect the ledger cannot supply bear on it.
-- **Evidence before correction.** Would the standards in use, the normal capacity of those years and the costs known when each set of statements was prepared have given a materially different inventory under Topic 330? Name the period costs and volumes, the variances' disposition, counts and item-level opening balances.
-- **The recommendation.** A material prior-period error: revised statements, with inventories, retained earnings and income corrected and the correction disclosed. A change in estimate: the new standard from now on. An error immaterial to the earlier years: corrected in the next statements only if recording it there would not itself materially misstate that year, judged on amount and nature, and otherwise by revising the comparatives (ASC Topic 250). The decision is the CFO's, and the shareholders hear which.
+- **Materiality is more than the screen.** The item's nature, its aggregate with other misstatements, the lines and periods it touches, and the tax effect the ledger cannot supply.
+- **Evidence before correction.** Would the standards in use, the normal capacity of those years and the costs then known have given a materially different inventory under Topic 330? Name the period costs and volumes, the variances' disposition, counts and item-level opening balances.
+- **The recommendation.** A material prior-period error: revised statements, with the correction disclosed. A change in estimate: the new standard from now on. An error immaterial to the earlier years: corrected in the next statements only if recording it there would not itself materially misstate that year, judged on amount and nature, and otherwise by revising the comparatives (ASC Topic 250). The decision is the CFO's, and the shareholders hear which.
 
 A weak answer calls the revaluation an error, or stops at the screen.
 

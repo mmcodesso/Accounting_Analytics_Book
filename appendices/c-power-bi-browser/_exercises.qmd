@@ -2,7 +2,7 @@
 
 ## Applied Exercises
 
-Work on the exercises in the Charles River Reports semantic model and report you built in the browser, after Guided Tutorial C.3 and before Tutorial 14.1, which removes the SalesInvoice fields they use. Build the visuals an exercise asks for on a report page named after it (such as `Ex C.2`), and keep each query you write in your Tests.dax file, under a comment line that names the exercise, with the result it gave.
+Work on the exercises in the Charles River Reports semantic model and report you built in the browser, after Guided Tutorial C.3 and before Tutorial 14.1, which removes the SalesInvoice fields they use. Build the visuals an exercise asks for on a report page named after it (such as `Ex C.2`), and keep each query you write in your Tests.dax file, under a comment line that names the exercise. Write each result in a comment below its query, so that the file still runs, with the date and time zone of the run, the workspace and model, the dataset release ({{< var dataset.version >}}), and any filters. When you run a query again after a change, keep the first result and add the new one below it.
 
 ### Financial Accounting Exercises
 
@@ -14,13 +14,13 @@ Work on the exercises in the Charles River Reports semantic model and report you
 
 **Requirements.**
 
-(1) In the model editor, add three measures to Key Measures: `List Amount` and `Discounts`, which sum ListAmount and DiscountAmount, and `Invoice Lines`, which counts the rows of SalesInvoiceLine with COUNTROWS. Format the two amounts with a thousands separator.
+(1) In the model editor, add three measures to Key Measures: `List Amount` and `Discounts`, which sum ListAmount and DiscountAmount, and `Invoice Lines`, which counts the rows of SalesInvoiceLine with COUNTROWS. Format the two amounts with a thousands separator and two decimal places.
 
 (2) In DAX query view, write a query that returns, for each FiscalYear and Period of SalesInvoice, the invoice lines, revenue, list amount, and discounts, with the amounts rounded to the cent. Run it, and record the four rows of fiscal 2026.
 
 (3) Add up the four quarters of fiscal 2026, and compare the sums with the fiscal 2026 row of the Validation page. Record any difference, and explain it.
 
-(4) Say which quarter of fiscal 2026 carries the largest share of the year's discounts, give the share, and name the promotions behind it.
+(4) Say which quarter of fiscal 2026 carries the largest share of the year's discounts, give the share, and name the promotions behind it. Use Chapter 6 and Exercise 13.3, or your instructor's lookup of PromotionID and PromotionName, to name the promotions. You do not need to load another table for the required answer, and adding T7_PromotionProgram and checking its relationship is an optional extension.
 
 (5) Explain why a test kept as a query in Tests.dax remains evidence after someone changes the report's pages, and why in the browser it must be kept outside DAX query view.
 
@@ -36,17 +36,19 @@ Work on the exercises in the Charles River Reports semantic model and report you
 
 **Requirements.**
 
-(1) Use the Discounts measure of Exercise C.1, or create it in Key Measures if you have not done that exercise.
+(1) Use the Discounts measure of Exercise C.1, or create it in Key Measures if you have not done that exercise, with a thousands separator and two decimal places.
 
 (2) On a page `Ex C.2`, add a year slicer as tiles set to fiscal 2026 and a matrix of Discounts with CustomerSegment on **Rows** and Month on **Columns**.
 
 (3) Add a line chart of Discounts by Month with CustomerSegment in **Legend**, and check that its months are in order.
 
-(4) Name the segment whose discounts peak in November, and the promotion that explains it. Name the months in which the other segments' discounts peak, and the promotion behind them.
+(4) Name the segment whose discounts peak in November, and the promotion that explains it. Name the months in which the other segments' discounts peak, and the promotion behind them. Use Chapter 6 and Exercise 13.3, or your instructor's lookup of PromotionID and PromotionName, to name the promotions. You do not need to load another table for the required answer, and adding T7_PromotionProgram and checking its relationship is an optional extension.
 
 (5) Say which segment received no discounts at all, and in two sentences what the pattern means for a promotion calendar aimed at one segment.
 
-**Deliverable.** The page, and the answers to requirements (4) and (5).
+(6) Title the line chart `Promotional discounts by customer segment fiscal 2026`, and add alt text that describes the comparison between the segments and says which segment received no discounts. Choose **Save this report**, reopen the page `Ex C.2` in Reading view, and confirm that fiscal 2026 is still selected, that the matrix has a row for each customer segment and a column for each month of the year, and that the chart runs from January to December 2026.
+
+**Deliverable.** The saved page, a readable screenshot of it or its matrix copied into a table, in the place your instructor approves, and the answers to requirements (4) and (5).
 
 ### Auditing Exercises
 
@@ -54,7 +56,7 @@ Work on the exercises in the Charles River Reports semantic model and report you
 
 **Table group:** Order-to-Cash
 
-**Scenario.** Internal audit wants evidence that the model built in the browser can be returned to a known state after a mistake. The exercise needs a Pro license, because version history does, and a model that only you are editing. Do requirements (1) to (4) in one sitting. Without a Pro license, do requirements (2), (3), and (5), restore the formula by hand from your notes, and run the test a third time.
+**Scenario.** Internal audit wants evidence that the model built in the browser can be returned to a known state after a mistake. The exercise needs a Pro license, because version history does, and a model that only you are editing. Do requirements (1) to (4) in one sitting. Without a Pro license, take the manual route. In place of requirement (1), copy the Revenue formula, the model's name, and its workspace into Tests.dax, and do requirements (2) and (3). In place of requirement (4), retype the recorded formula, run the test a third time, and label the method manual repair. In requirement (5), say that you repaired the formula by hand, and still explain what version history records and what it does not.
 
 **Requirements.**
 

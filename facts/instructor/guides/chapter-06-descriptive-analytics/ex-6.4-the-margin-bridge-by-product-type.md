@@ -37,11 +37,11 @@ By the end, students can:
 
 - **Files and software.** The copy of the analysis workbook made after Tutorial 6.3, with its Bridge worksheet, which the comparison reads.
 - **Data conditions.** All {{ g.n_types }} Furniture product types sell in both quarters. The quantities are fractional, so the per-unit measures are totals divided by totals and are not literal units.
-- **A definition to hand out.** The volume effect uses the Furniture margin per unit of the third quarter for the change in total units, and the mix effect uses each type's own third-quarter margin per unit. A student who defines volume by type gets a bridge that does not add up.
+- **A definition to hand out.** The requested four-effect bridge computes the volume effect once, from the change in total units at the Furniture margin per unit of the third quarter, and the mix effect separately, from each type's own third-quarter margin per unit. Summing each type's unit change times its own third-quarter margin per unit gives one quantity effect (${{ g.combined|money }}) that already contains both. Do not add a separate mix effect to it.
 
 ## How to run it
 
-Individual or pairs, about 90 minutes: 15 on the PivotTable (requirement 1), 25 on the per-unit measures (2), 25 on the four effects and the check (3), 15 on the comparison (4) and 10 on the recommendation (5). Give the effect formulas only when a pair has tried the check cell and found it nonzero. Collect the workbook and the comparison.
+Individual or pairs, about 90 minutes: 15 on the PivotTable (requirement 1), 25 on the per-unit measures (2), 25 on the four effects and the check (3), 15 on the comparison (4) and 10 on the recommendation (5). The effect formulas are printed in the task. Before students enter them, ask each pair to explain what each formula measures and to predict the sign of the cost effect. Collect the workbook and the comparison.
 
 ## Step-by-step solution
 
@@ -53,6 +53,19 @@ a. Insert a PivotTable from the InvoiceLines Table on a new worksheet named `Ex 
 b. Open the **Column Labels** filter and keep only {{ d.C }}-Q3 and {{ d.C }}-Q4.
 c. Drag Quantity, LineTotal and StdCostAmount to **Values**, and remove the Grand Total column at the right, which adds the two quarters. Keep the Grand Total row at the bottom.
 d. Read the values into a table below with GETPIVOTDATA, or paste them as values.
+
+**Layout of the worksheet.** Put the headings in row 19 and the eight product types in A20:A27, with the Furniture totals in row 28. Use B to D for the third-quarter quantity, line total and standard cost, E to G for the same fourth-quarter values, H to J for the third-quarter price, cost and margin per unit, K to M for the fourth-quarter values, N for the third-quarter share of units, and O to Q for the price, cost and mix effects. Sum B to G over the eight types in row 28, and calculate the per-unit values of the total row from those totals. Never sum per-unit amounts.
+
+```
+B28   =SUM(B20:B27)   and the same for C28 to G28
+H28   =C28/B28
+I28   =D28/B28
+J28   =(C28-D28)/B28
+K28   =F28/E28
+L28   =G28/E28
+M28   =(F28-G28)/E28
+N28   =SUM(N20:N27)   which reads 100 percent
+```
 
 **Check:** Furniture totals of {{ g.u3|num(2) }} then {{ g.u4|num(2) }} units, revenue ${{ g.r3|money }} then ${{ g.r4|money }}, standard cost ${{ g.k3|money }} then ${{ g.k4|money }}. **Watch for:** values pasted with the Furniture filter off, so the types include other lines that use the same codes.
 
@@ -82,14 +95,21 @@ Cost effect    =-E20*(L20-I20)
 Mix effect     =(E20-$E$28*N20)*J20
 ```
 
-Then compute the volume effect once, from the totals, and check the sum:
+Then summarize the bridge below the table, from row 32, with the volume effect computed once from the totals:
 
 ```
-Volume   =(E28-B28)*J28
-Check    =ROUND(B39-B34,2)
+B32   =C28-D28            third-quarter margin
+B33   =F28-G28            fourth-quarter margin
+B34   =B33-B32            change in margin
+B35   =SUM(O20:O27)       price effect
+B36   =SUM(P20:P27)       cost effect
+B37   =(E28-B28)*J28      volume effect
+B38   =SUM(Q20:Q27)       mix effect
+B39   =SUM(B35:B38)       sum of the four effects
+B40   =ROUND(B39-B34,2)   check
 ```
 
-In the model answer B39 holds the sum of the four effects and B34 the change in margin.
+The effects reconcile at full precision. Rounded separately to cents they sum to -${{ (g.rounded_sum|abs)|money }}, while the rounded change is -${{ (g.rounded_change|abs)|money }}, so the check rounds the difference and the bridge takes no one-cent balancing plug.
 
 **Check:** the check reads zero. The effects are price -${{ (price|abs)|money }}, cost +${{ cost|money }}, volume +${{ volume|money }} and mix +${{ mix|money }}, summing to the change of -${{ (change|abs)|money }}. **Watch for:** the cost sign. A rise in cost per unit reduces margin, so the cost effect carries a minus in front of the rise, and a wrong sign leaves the check off by twice the cost effect.
 
@@ -132,11 +152,13 @@ In the model answer B39 holds the sum of the four effects and B34 the change in 
 - **Requirement (4).** The change in margin is the same, and so is volume. The rest is divided differently because the level differs: items within a type change price and cost together, and that appears as price and cost by type and as mix for Furniture as a whole. The cost effect is not a cost change.
 - **Requirement (5).** A stated level with a reason. The Furniture level keeps cost at zero and mix at the item level, and the type level serves the assortment planners, labeled. A strong answer adds that a price effect is not by itself evidence of a price change.
 
+**A plus, not required.** The combined quantity effect (${{ g.combined|money }}) identified as the volume effect plus the mix effect.
+
 A weak answer reads the cost effect as evidence of rising costs, or recommends a level without saying what each effect means at it.
 
 ## Common mistakes and how to respond
 
-- **Volume by type.** *Symptom:* the check is nonzero and mix does not offset it. *Response:* ask which margin per unit values the change in total units.
+- **Volume by type.** *Symptom:* the check is off by exactly the mix effect. *Response:* each type's unit change times its own third-quarter margin per unit already contains the mix, so ask which two effects it combines and what adding the mix again counts twice.
 - **The cost sign.** *Symptom:* the check is off by twice the cost effect. *Response:* ask what a higher cost per unit does to margin.
 - **Grand totals in the table.** *Symptom:* a ninth row of the Furniture total is summed with the types. *Response:* ask what the sum of the sum is.
 - **A pasted PivotTable with the filter off.** *Symptom:* quantities that differ from Tutorial 6.3's. *Response:* compare the totals with the Bridge.

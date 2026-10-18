@@ -14,9 +14,9 @@ figures:
     data: The customer chosen by the Difficult ideas context (one with about ten orders), with its numbers of orders and lines; the diagram carries those two counts and no amounts.
   - id: IF-03-0-B
     kind: diagram
-    purpose: A decision tree that sorts a column into primary key, foreign key, bridge key or the source-document trace.
-    shows: A vertical tree of four yes-or-no questions. Does the column identify the rows of its own table? Yes leads to primary key, with SalesOrderID in SalesOrder as the example. Does it hold the key values of another table? Yes leads to foreign key, with CustomerID in SalesOrder, and a side branch asks whether the same column reaches into another table group, which makes it a bridge key, with ItemID in SalesOrderLine. Does the meaning of its value depend on another column? Yes leads to a logical reference, not a key, with SourceDocumentID in GLEntry read together with SourceDocumentType. Each leaf shows its example as a small table header (the logical reference shows SourceDocumentType and SourceDocumentID together), and the leaf for the logical reference is drawn with the dashed amber style that the chapter's diagrams use for the trace. A column that none of the questions fits is an ordinary column.
-    data: The examples named in the chapter (SalesOrder, SalesOrderLine, GLEntry); no counts.
+    purpose: A decision tree that sorts a column into primary key, the source-document trace, foreign key (with its self-reference and bridge-key branches) or an ordinary column.
+    shows: A vertical tree of three yes-or-no questions, asked in an order that keeps a self-reference and the trace from being misread. Is it the column chosen to identify each row of its own table? Yes leads to primary key, with SalesOrderID in SalesOrder as the example, and a note that a column can play more than one role. Does a type column in the same row say which table its value refers to? Yes leads to the source-document trace, read as two columns together and not one foreign key, with SourceDocumentType and SourceDocumentID in GLEntry, drawn in the dashed amber style of the chapter's trace. Does each filled-in value refer to a row of one fixed table, its own included? Yes leads to foreign key, with CustomerID in SalesOrder, and a side question asks which table it refers to. Its own table makes a self-reference (ParentAccountID in Account; Employee.ManagerID is another), another table group makes a bridge key (ItemID in SalesOrderLine), and neither leaves an ordinary foreign key. A no to all three is an ordinary column, with OrderDate and OrderNumber, which is unique but is not the key the table uses.
+    data: The examples named in the chapter (SalesOrder, SalesOrderLine, GLEntry, Account, Employee); no counts.
 ---
 # Chapter 3: The Accounting Data Environment
 
@@ -37,11 +37,13 @@ The chapter depends on these conditions of the data:
 
 - The database has {{ n_tables }} tables, each with one integer surrogate key in its first column and no declared foreign keys, so every relationship is logical and has to be tested. The file declares three types (INTEGER, REAL and TEXT): dates are text and flags are 0 and 1.
 - Unique indexes protect OrderNumber, InvoiceNumber, EntryNumber and AccountNumber, but not PurchaseInvoice.InvoiceNumber, which is the supplier's own number.
-- The {{ ch03_ex6.n_tests }} foreign keys of Exercise 3.6 have {{ ch03_ex6.n_orphans }} orphaned values. The one orphan in the data is in the source-document trace: {{ orphan_rows }} ledger rows typed PayrollPayment point to payments that do not exist. The trace is also ambiguous without its type: the key of the traced invoice, {{ invoice_id }}, finds {{ same_id_rows }} ledger rows of {{ same_id_types }} source types.
+- The {{ ch03_ex6.n_tests }} foreign keys of Exercise 3.6 have {{ ch03_ex6.n_orphans }} orphaned values. One source type of the trace has exceptions: {{ orphan_rows }} ledger rows typed PayrollPayment point to payments that do not exist. The trace is also ambiguous without its type: the key of the traced invoice, {{ invoice_id }}, finds {{ same_id_rows }} ledger rows of {{ same_id_types }} source types.
 - {{ no_orders }} customers have no orders (all inactive), {{ unsold }} items with a list price were never ordered, {{ unshipped|count }} invoice lines (design services) have no shipment line, and {{ uninvoiced }} shipment lines were never invoiced.
 - GLEntry has {{ gl_rows|count }} rows and is the largest worksheet, so it filters slowly. The sale of Tutorial 3.2 exists as the chapter tells it: invoice {{ ch03_t2.inv.number }} for {{ ch03_t2.customer.name }}, one of {{ ch03_t2.order.invoices }} invoices of order {{ ch03_t2.order.number }}.
 
 ## What students should be able to do afterward
+
+These outcomes are this guide's own. They follow the chapter's six learning objectives in order, outcome 1 serving objective 1 and so on, each stated with what practices it.
 
 1. Explain how the database stores accounting data: tables, rows, columns, and the three types that the SQLite file declares, with dates as text, flags as 0 and 1, and NULL for a missing value. Practiced in questions 13 and 14 and in the data dictionary of Exercise 3.2.
 2. Name the primary key of a table and the foreign keys that connect it, and say which relationships the file declares (none) and which the data follow. Practiced in Tutorial 3.1 (Steps 2 and 3), Exercises 3.1, 3.2, 3.4, 3.5 and 3.6, and questions 1, 2, 8 and 9.
@@ -193,7 +195,7 @@ Plan A is the safest. Plan B costs the vocabulary lecture but makes the junction
 
 {{ figure('IF-03-0-A') }}
 
-**The trace is not a foreign key.** Question 12 tempts with it uses two columns. The point is that the target table depends on the type, so the key alone is ambiguous, as the live filter in Tutorial 3.2 shows. {{ orphan_rows }} PayrollPayment rows point to a payment that does not exist.
+**The trace is not a foreign key.** Question 12 tempts with it uses two columns. The point is that the target table depends on the type, so the key alone is ambiguous, as the live filter in Tutorial 3.2 shows. {{ orphan_rows }} ledger rows typed PayrollPayment point to a payment that does not exist.
 
 **One sale, several documents.** Students expect the invoice to hold the whole sale. The shipment posts the cost, the invoice the revenue, the receipt the cash, the application the settlement and the commission accrual the commission.
 
@@ -208,7 +210,7 @@ Plan A is the safest. Plan B costs the vocabulary lecture but makes the junction
 
 ## Using the exercises
 
-All six exercises end in a one-page written deliverable. There is no solution workbook; the model answers are in each exercise's guide. The outcome column uses the numbers of the list at the top of this note.
+All six exercises end in short written deliverables: Exercise 3.5 allows one to two pages, Exercise 3.4 half a page to a page, and the others about a page. There is no solution workbook; the model answers are in each exercise's guide. The outcome column uses the numbers of the list at the top of this note.
 
 | Exercise | Perspective | Tool | Time | Difficulty | Outcome |
 |---|---|---|---:|---|---|

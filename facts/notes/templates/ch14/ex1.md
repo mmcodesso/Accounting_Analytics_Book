@@ -1,6 +1,6 @@
 <!-- Instructor notes, Exercise 14.1 (Desktop 2.158 reference model through the local engine, and SQL): (2) at {{ d.C }}-12 (AsOf
      {{ asof }}): Asset {{ now.Asset|money }}; Liability {{ now.Liability|money }}; Equity {{ now.Equity|money }}; Revenue {{ now.Revenue|money }}; Expense {{ now.Expense|money }};
-     total {{ total|money }}. Revenue and expense together {{ (-ni)|money }}, the net income of fiscal {{ d.C }}; {{ liab|money }} + {{ equity|money }} + {{ ni|money }}
+     total {{ total|money }}. Revenue and expense together {{ (-ni)|money }}, the negative of the net income of fiscal {{ d.C }}; with that sign reversed, {{ liab|money }} + {{ equity|money }} + {{ ni|money }}
      = {{ now.Asset|money }}, Chapter 6's balance sheet. (3) {{ d.C }}-06: Asset {{ mid.Asset|money }}; Liability {{ mid.Liability|money }}; Equity {{ mid.Equity|money }};
      Revenue {{ mid.Revenue|money }}; Expense {{ mid.Expense|money }}; {{ d.F }}-12: Asset {{ first.Asset|money }}; Liability {{ first.Liability|money }}; Equity {{ first.Equity|money }};
      Revenue {{ first.Revenue|money }}; Expense {{ first.Expense|money }} (net income {{ ni_first|money }}); both total 0. The closes of {{ d.F }} and {{ d.P }} are dated

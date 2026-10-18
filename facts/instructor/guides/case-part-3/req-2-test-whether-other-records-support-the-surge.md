@@ -97,7 +97,7 @@ WITH Meals AS (
 
 **Check:** the surge entries were rostered {{ rostered }} hours on {{ shifts|join(' and ') }} by the {{ creator_title }}, {{ lead }} days ahead, and clocked {{ clocks|join(' and ') }}, {{ clocked }} hours: {{ early }} minutes early and {{ late }} late. Roster equals clock on {{ equal.Ordinary[1]|count }} of {{ equal.Ordinary[0]|count }} ordinary entries and on {{ equal.Surge[1] }} surge entries. **Watch for:** the roster's time without its date reads as a day in the year `2000`, and the minutes run to millions (the smallest is {{ g.no_date_min|num }}); the clock-out taken as a time of day makes the late shift leave early, {{ g.tod_late[0]|num }} minutes.
 
-**Step 4. Infer the rule behind the Off Shift Clocking exceptions and apply it.** The {{ n_off }} exceptions are clock-ins at {{ off_in }} against a start of {{ off_start }}, {{ g.minutes_rule }} minutes after it. They point to a rule on arrival, but cannot show its threshold, whether it tests departures or whether approved overtime is exempt, which only the configuration shows. RuleMinutes, Timing (minutes rounded with `ROUND`) and Flagged feed a query that counts arrivals, departures and flags.
+**Step 4. Infer the rule behind the Off Shift Clocking exceptions and apply it.** The {{ n_off }} exceptions are clock-ins at {{ off_in }} against a start of {{ off_start }}, {{ g.minutes_rule }} minutes after it. They point to a rule on arrival, but cannot show its threshold, whether it tests departures or whether approved overtime is exempt, which only the configuration shows. RuleMinutes, Timing (minutes rounded with `ROUND`) and Flagged feed a query that counts arrivals, departures, any attendance exception and Off Shift exceptions.
 
 ```sql
     SUM(CASE WHEN t.Arrival >= (SELECT Minutes FROM RuleMinutes)
@@ -106,7 +106,7 @@ WITH Meals AS (
         THEN 1 ELSE 0 END) AS LateDepartures,
 ```
 
-**Check:** surge entries: {{ g.by_type.Surge[2] }} late arrivals, {{ g.by_type.Surge[3]|count }} late departures, {{ g.by_type.Surge[4] }} flagged; ordinary: {{ g.by_type.Ordinary[2] }} (date-shifted entries, Requirement 1), {{ g.by_type.Ordinary[3]|count }} and {{ g.by_type.Ordinary[4] }}. On that rule the design fails, because surge arrivals are early and nothing compares the approved late departures with a roster or plan, a finding to confirm against the configuration. The operation fails in the recorded review: all {{ exceptions }} exceptions are Open, none reviewed, {{ wrong }} naming the wrong employee. **Watch for:** applying the rule to departures flags all {{ g.by_type.Surge[3]|count }} surge entries and reverses the finding. Unrounded minutes leave exact two-hour departures a fraction of a second either side and give {{ g.raw_ordinary|count }}, and in whole minutes `>=` gives {{ g.ge_ordinary|count }}. An ungrouped Flagged CTE changes nothing here.
+**Check:** surge entries: {{ g.by_type.Surge[2] }} late arrivals, {{ g.by_type.Surge[3]|count }} late departures, {{ g.by_type.Surge[4] }} with any attendance exception; ordinary: {{ g.by_type.Ordinary[2] }} (date-shifted entries, Requirement 1), {{ g.by_type.Ordinary[3]|count }} and {{ g.by_type.Ordinary[4] }}. The {{ n_off }} Off Shift Clocking exceptions are on {{ off_centers|join(' and ')|lower }} employees, so OffShiftException is zero for both day types and the {{ g.by_type.Ordinary[4] }} ordinary entries carry other types. On that rule the design fails, because surge arrivals are early and nothing compares the approved late departures with a roster or plan, a finding to confirm against the configuration. The operation fails in the recorded review: all {{ exceptions }} exceptions are Open with no reviewer or review date recorded, {{ wrong }} naming the wrong employee, though evidence of a review may exist outside the dataset. **Watch for:** applying the rule to departures flags all {{ g.by_type.Surge[3]|count }} surge entries and reverses the finding. Unrounded minutes leave exact two-hour departures a fraction of a second either side and give {{ g.raw_ordinary|count }}, and in whole minutes `>=` gives {{ g.ge_ordinary|count }}.
 
 ### Part 3: The plans and the approvals
 
@@ -148,7 +148,7 @@ ORDER BY pe.DayType DESC;
 
 ### Part 4: The matrix
 
-**Step 7. Grade each test for independence, and name two explanations.** Place every test in one result column and mark whether its record is independent of the {{ creator_title }} and the time clock. Attendance and punches support the hours but come from the clock. Clock-in times, rosters and approvals contradict them and come from the clock or the {{ creator_title }}. The calendar, the plan and the output lie outside the clock trail, their independence from that manager not established, and none supports the hours as recorded. Absences are silent. Two explanations fit, the hours worked and entered as a block or not worked as recorded, and evidence outside the database would separate them.
+**Step 7. Grade each test for independence, and name two explanations.** Place every test in one result column. Supports means agreement with a specified recorded feature, such as attendance or a timestamp, and does not establish that all {{ clocked|num(1) }} recorded hours were worked. Judge each record's independence of the time clock and of the {{ creator_title }} separately, and mark it not established where its provenance is not shown. Attendance and punches support the hours but come from the clock. Clock-in times, rosters and approvals contradict them and come from the clock or the {{ creator_title }}. The calendar, the plan and the output lie outside the clock trail, their independence from that manager not established, and none supports the hours as recorded. Absences are silent. Two explanations fit, the hours worked and entered as a block or not worked as recorded, and evidence outside the database would separate them.
 
 {{ figure('IF-C3-2-A') }}
 
@@ -158,7 +158,7 @@ ORDER BY pe.DayType DESC;
 |---|---|---|
 | Surge and ordinary days | {{ s.days }}; {{ o.days }} | 1 |
 | Minutes early and late on surge days | {{ early }}; {{ late }} | 3 |
-| Surge entries flagged by the rule | {{ g.by_type.Surge[4] }} | 4 |
+| Surge entries with any attendance exception | {{ g.by_type.Surge[4] }} | 4 |
 | Surge approvals citing an ended operation | {{ cite.Surge.ended|count }} of {{ cite.Surge.approvals|count }} | 6 |
 
 {{ expected() }}
@@ -167,12 +167,12 @@ ORDER BY pe.DayType DESC;
 
 - **Corroboration and independence.** Agreement from one system, contradiction from the rest, and no record shown to be independent of the {{ creator_title }}.
 - **The control.** A candidate rule with its limits, a design failure to confirm against the configuration, and an operation failure in the recorded review.
-- **Wording.** Unsupported, never fictitious.
+- **Wording.** Unsupported hours, with no fictitious hours or blame asserted beyond the evidence. "These records do not prove the hours were fictitious" is acceptable, and the claim, evidence, limits and recommendation are graded, not one word.
 
 ## Common mistakes and how to respond
 
 - **A window without the clock-in time, or the cost center as the headcount.** *Symptom:* the largest group equals the attendance; no day has everyone present. *Response:* ask what makes a group, and who has a time clock.
-- **The rule applied to departures.** *Symptom:* everything would have been flagged. *Response:* ask what the system's own exceptions tested.
+- **A departure rule stated as the configured control.** *Symptom:* everything would have been flagged, with no sign that this is a sensitivity. *Response:* ask what the system's own exceptions tested. A labeled departure sensitivity is fine.
 - **Plan tests on the item rows, or without the cut-off.** *Symptom:* a load of a few hundredths, or a row after the data. *Response:* ask how often a center's hours repeat.
 - **Fictitious, or proven.** *Symptom:* "the hours were faked", or "attendance proves them". *Response:* ask which record is independent and what each explanation predicts.
 
@@ -182,7 +182,7 @@ ORDER BY pe.DayType DESC;
 |---|---:|---|---|
 | Surge against ordinary days | 20 | All measures; window correct; hourly headcount | A measure wrong |
 | Roster and clock | 15 | Minutes early and late; rostered against clocked | Dates or times mishandled |
-| Control reperformance | 20 | Rule inferred with its limits, minutes rounded; design and operation | Applied to departures, or one failure |
+| Control reperformance | 20 | Rule inferred with its limits, minutes rounded; design and operation | Takes an unverified departure rule as the configured control, mixes a labeled departure sensitivity up with the observed Off Shift exceptions, or finds one failure |
 | Plans and approvals | 15 | Cut-off, hours once a week, operations tested | A fan-out |
 | Matrix and explanations | 30 | Result and independence for each test; two explanations; outside evidence | No independence |
 

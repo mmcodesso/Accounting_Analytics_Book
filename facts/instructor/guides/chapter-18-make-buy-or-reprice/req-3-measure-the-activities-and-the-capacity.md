@@ -52,7 +52,7 @@ Pairs, about 90 minutes: 35 for the activity view, 10 for the per-thousand table
 
 ### Part 1: Each family's activities
 
-**Step 1. Build the activity view at the grain of the work order.** Completions are summed to the work order first (`Done`), the routing is attached to it once (`Orders`), and the issue lines are counted for the work order (`Issues`). The families then sum those, and `Hours` multiplies run hours per unit by the units and adds each work order's setup once. The model saves the result as the view FamilyActivity (Q15).
+**Step 1. Build the activity view at the grain of the work order.** Completions are summed to the work order first (`Done`), the routing is attached to it once (`Orders`), and the issue lines are counted for the work order (`Issues`). The families then sum those, and `Hours` multiplies run hours per unit by the units and adds each work order's setup once. The model saves the result as the view FamilyActivity (Q15). The block is a fragment, the first three CTEs, and the complete statement is Q15 in MakeBuy.sql.
 
 ```sql
 Done AS (
@@ -111,7 +111,7 @@ ORDER BY Family;
 
 **Step 3. Return the hours available.** Q19 sums WorkCenterCalendar's AvailableHours by work center for the year. **Check:** {{ g.n_q19|count }} rows, one for each work center.
 
-**Step 4. Set the routing time beside the capacity.** The practical capacity is the assumed share of the available hours (`0.80` typed in the `Centers` CTE; the workbook reads it from the Assumptions sheet), the routing time is run plus setup, and a plant row adds the centers.
+**Step 4. Set the routing time beside the capacity.** The practical capacity is the assumed share of the available hours (`0.80` typed in the `Centers` CTE; the workbook reads it from the Assumptions sheet), the routing time is run plus setup, and a plant row adds the centers. The block is a fragment of Q20, its `Centers` and `Rows` CTEs and the final SELECT (the `Available` and `Used` CTEs above them are in MakeBuy.sql); run the complete query.
 
 ```sql
 Centers AS (
@@ -151,7 +151,7 @@ ORDER BY COALESCE(WorkCenterID, 99)
 
 ### Part 3: Say what routing time measures
 
-**Step 5. Write the two sentences.** Routing time is the right measure because it is what the products should take, measured independently of the time recorded, which drifted toward Packing and Quality Assurance and was often recorded after the operation ended. It leaves out the indirect activity routings do not list (maintenance, training, rework, scheduling) and the hours recorded above the routings that Part III found, and it takes the routings as right. So the unused capacity of Requirement 4 is an estimate from standard times, not a finding that those hours went unworked.
+**Step 5. Write the two sentences.** Routing time is the right measure because it is what the products should take, measured independently of the time recorded, which drifted toward Packing and Quality Assurance and was often recorded after the operation ended. It leaves out the indirect activity routings do not list (maintenance, training, rework, scheduling) and the hours recorded above the routings that Part III found, and it takes the routings as right. So the unused capacity of Requirement 4 is an estimate from standard times, not a finding that those hours went unworked. It is the practical hours supplied less the run and setup hours the routings call for. It does not show that every indirect hour was idle or that a position can be removed, because normal support, maintenance, training and coverage need separate evaluation, and the practical share already allows for some normal nonproductive time.
 
 {{ figure('IF-18-3-B') }}
 

@@ -61,6 +61,8 @@ c. Merge Approvers again on CreatedByEmployeeID, expand EmployeeName and rename 
 
 **Check:** 9 self-approved orders, 13 above the limit and 3 approved after termination; 11 orders score 2 and 3 score 1. **Watch for:** the blank guard left out of AfterTermination. An empty cell compares as earlier than any date, so the flag is TRUE for nearly every order.
 
+Employee.MaxApprovalAmount is the current recorded limit, so AboveLimit assumes that it also applied on the order date. Ask for the delegation policy and the history of the limits before concluding that an approval exceeded the authority then in force. Check the approver matches too: every approver here is an Employee row with a recorded limit, so no order drops out, but a left merge that finds no approver leaves a blank limit, and missing authority is reported separately from an exceeded one.
+
 **Step 3. Record a disposition for each flagged order.** Sort by RiskScore, filter to 1 or more, paste the rows as values with **Paste Special > Values** and add a `Disposition` column and a provisional `Design or operation` column, as in Tutorial 8.3 Step 5. The model answer's groups:
 
 - 2 note-financed capital purchases, created and approved by the purchasing manager (limit $25,000.00): follow up, possibly design and operation; ask for the board's approval.
@@ -73,7 +75,7 @@ c. Merge Approvers again on CreatedByEmployeeID, expand EmployeeName and rename 
 
 ### Requirement (3): Supplier invoices
 
-**Step 4. Build InvoiceApprovals.** Import **T37_PurchaseInvoice** as `InvoiceApprovals`, merge Approvers on ApprovedByEmployeeID, expand the name, title and limit, add `AboveLimit` as `=[@GrandTotal]>[@ApproverLimit]` and list the invoices whose ApproverTitle is not Chief Financial Officer. **Check:** 8 of 40,204 invoices have another approver (40,196 were approved by the chief financial officer), together $646,691.67. They fall into three groups:
+**Step 4. Build InvoiceApprovals.** Import **T37_PurchaseInvoice** as `InvoiceApprovals`, merge Approvers on ApprovedByEmployeeID, expand the name, title and limit, add `AboveLimit` as `=[@GrandTotal]>[@ApproverLimit]` (the current-limit caveat of Step 2 applies here too) and list the invoices whose ApproverTitle is not Chief Financial Officer. **Check:** 8 of 40,204 invoices have another approver (40,196 were approved by the chief financial officer), together $646,691.67. They fall into three groups:
 
 - Melinda Murphy, Product Analyst, limit $0.00: 4 invoices. Not on the records: a role with no recorded approval authority, so request the delegation policy.
 - Daniel Odom, Production Supervisor, limit $5,000.00: 2 invoices, within the limit. Not without the policy: a role outside purchasing and accounting usually confirms receipt, so request the policy that says who may approve invoices.

@@ -15,10 +15,11 @@ from collections import defaultdict
 
 from pbibuild.model import Query, query_table
 from pbibuild.pbir import Page, Visual, _ref, agg, col, lit, textbox
-from pbibuild.reports import (MONEY, Build, _aliased, card, claim, keep, money, one, rows, slicer, value_axis)
+from pbibuild.reports import (MONEY, Build, _aliased, card, claim, entered, keep, money, one, rows, slicer, value_axis)
 from notes import ch13  # noqa: E402  (facts/ is on the path once pbibuild.reports is imported)
 
 MONTHS = ch13.MONTHS
+PROFILE_FIGURES = "Ex 13.5 Profile Figures"   # the table attached to Exercise 13.5's memo (Enter data)
 FY = col("SalesInvoice", "FiscalYear")
 LT, DA, LA = (agg("SalesInvoiceLine", c) for c in ("LineTotal", "DiscountAmount", "ListAmount"))
 
@@ -237,15 +238,20 @@ def ex3(b: Build) -> None:
     b.model.relate("SalesInvoiceLine.PromotionID", "PromotionProgram.PromotionID")
     levels = [col("PromotionProgram", c) for c in ("PromotionName", "EffectiveStartDate", "EffectiveEndDate")]
     count = agg("SalesInvoiceLine", "SalesInvoiceLineID", "count")
-    page = b.report.add(Page("ex133", "Ex 13.3"))
+    page = b.report.add(Page("ex133", "Ex 13.3", height=1000))
     page.add(Visual("promotionMatrix", "pivotTable", 20, 20, 1240, 400,
                     {"Rows": levels, "Columns": [col("SalesInvoice", "Month")], "Values": [DA, count]},
                     title=f"Promotional discounts and invoice lines by promotion and month, fiscal {y}",
                     filters=[keep("promotionMatrixYear", FY, [y])], extra=expand_all(levels), active=("Rows",)))
+    # (5) the item groups: a copy of the matrix with ItemGroup in place of Month, the discounts only, the year kept
+    page.add(Visual("promotionGroups", "pivotTable", 20, 440, 1240, 250,
+                    {"Rows": [levels[0]], "Columns": [col("Item", "ItemGroup")], "Values": [DA]},
+                    title=f"Promotional discounts by promotion and item group, fiscal {y}",
+                    filters=[keep("promotionGroupsYear", FY, [y])]))
     cur, early, bad = ctx["current"], ctx["earlier"], ctx["invalid"]
     after = "; ".join(f"{p['short']} (ends {p['end']}): {p['after']} of {p['n']} lines invoiced after it, in "
                       + " and ".join(p["after_months"]) for p in cur + early)
-    page.add(answer("answer", 20, 440, 1240, 270, "Exercise 13.3", [
+    page.add(answer("answer", 20, 710, 1240, 270, "Exercise 13.3", [
         f"(2) The (Blank) row holds the {ctx['blank']:,} lines of fiscal {y} that carry no promotion "
         f"({money(ctx['blank_rev'])} of revenue, no discount): a meaningful blank (Chapter 5), not a broken key.",
         f"(3) Lines invoiced after the promotion's end date: {after}. All of the late lines of "
@@ -270,7 +276,8 @@ def ex3(b: Build) -> None:
     # the matrix scrolls sideways (twelve months of two values), so the values checked are from its first months
     peak = max(bad["months"], key=lambda m: m["disc"])
     page.expect = ["PromotionName", "Count of SalesInvoiceLineID", money(peak["disc"]), f"Expanded {names[bad['id']]}",
-                   f"Expanded {names[top['id']]}", "Model answer: Exercise 13.3"]
+                   f"Expanded {names[top['id']]}", f"Promotional discounts by promotion and item group, fiscal {y}",
+                   "Model answer: Exercise 13.3"]
 
     t = "Exercise 13.3"
     fy = year_of(y)
@@ -373,7 +380,7 @@ def ex5(b: Build) -> None:
         b.model.stage(Query.navigator(name, b.xlsx, number, table, corrections=fix))
     top, n, inv = ch13.TOP_ROWS, ctx["n"], ctx["invoices"]
     share = lambda k, of: f"{k:,} ({k / of:.1%})"
-    page = b.report.add(Page("ex135", "Ex 13.5", height=900))
+    page = b.report.add(Page("ex135", "Ex 13.5", height=1480, display_option="FitToWidth"))
     # Requirements (2) and (3): every column that has empty values, on both bases, from the census of the raw Tables
     left = [
         "Profile of the four sales Tables, CharlesRiver.xlsx, as Power Query profiles them: empty values in every "
@@ -422,14 +429,69 @@ def ex5(b: Build) -> None:
         f"under the {ctx['collection']} promotion). The other Item blanks (the routing, the accounts, and the product "
         "attributes) depend on each item's type and supply mode, so read them by those before calling them errors.", "",
         ("Conclusion for the file", True),
-        "Every line finds its invoice, item, and customer, and none of those keys is empty. The blanks are explained except "
-        "the ones marked for follow-up, Quantity is fractional, and two customer names belong to two customers each, "
-        "so the report groups by key. The profile describes the Tables; it does not show why an exception occurred."]
+        "The profile describes the empty values, the distinct values, and how the first rows differ from the whole "
+        "Tables, and the attached table below holds its figures. None of the keys that relate the Tables is empty, the "
+        "blanks are explained except the ones marked for follow-up (the Settled invoices without a PaymentDate are to "
+        "be followed up, not corrected), Quantity is fractional, and two customer names belong to two customers each, "
+        "so the report groups by key. A profile does not test whether each key finds its row in the related table or "
+        "whether the transactions were authorized, and it does not show why an exception occurred. Those need checks "
+        "of their own."]
+    keys = {"Profile_Lines": ("SalesInvoiceLineID", "SalesInvoiceID", "ItemID"),
+            "Profile_Invoices": ("SalesInvoiceID", "CustomerID"), "Profile_Items": ("ItemID",),
+            "Profile_Customers": ("CustomerID",)}
+    claim(all(not set(keys[t["query"]]) & {c["name"] for c in t["columns"]} for t in ctx["census"]),
+          "none of the keys that relate the four Tables has an empty value")
     page.add(answer("memo", 20, 20, 610, 860, "Exercise 13.5, profile memo", left))
     page.add(textbox("memoRight", 650, 20, 610, 860, right, size=10))
+    # Requirement (5): the figures of (2) and (3) in a table attached to the memo. The Profile queries do not load, so
+    # the readings are typed into a table with Home > Enter data, as a reader records them, one row per column with
+    # empty values or a distinct count asked for, and both bases side by side.
+    cell = lambda k, of: f"{k:,} ({k / of:.1%})"
+    distinct = {("Profile_Lines", "PricingMethod"): (ctx["methods"], ctx["methods"], "the same on both bases"),
+                ("Profile_Lines", "Discount"): (ctx["discounts_top"], ctx["discounts"],
+                                                 "zero only on the top rows; changes materially"),
+                ("Profile_Invoices", "Status"): (len(ctx["top_statuses"]), len(ctx["statuses"]),
+                                                 "Settled only on the top rows; changes materially")}
+    comments = {"ShipmentLineID": "the Base List lines, design services that ship nothing: meaningful",
+                "PriceListLineID": "the same Base List lines, priced from the base list: meaningful",
+                "PromotionID": "lines sold without a promotion: meaningful; changes materially",
+                "PriceOverrideApprovalID": "lines priced without an approved override: meaningful",
+                "PaymentDate": "open invoices: meaningful; Settled invoices without a date: follow-up; changes materially",
+                "ListPrice": "items bought, not sold",
+                "CollectionName": "Accessories, services and some Furniture items; the Furniture ones a follow-up"}
+    figures = []
+    for tbl in ctx["census"]:
+        q, whole = tbl["query"], tbl["n"] <= top
+        same = f"both bases agree (every row is in the top {top:,})" if whole else ""
+        for c in tbl["columns"]:
+            dv = distinct.get((q, c["name"]))
+            note = comments.get(c["name"], "depends on the item's type and supply mode" if q == "Profile_Items" else "")
+            figures.append([q, c["name"], f"{tbl['n']:,}", cell(c["top"], tbl["top_n"]), cell(c["full"], tbl["n"]),
+                            str(dv[0]) if dv else "", str(dv[1]) if dv else "",
+                            "; ".join(x for x in (note, dv[2] if dv else "", same) if x)])
+        for (dq, dc), (dt, da, why) in distinct.items():
+            if dq == q and dc not in {c["name"] for c in tbl["columns"]}:
+                figures.append([q, dc, f"{tbl['n']:,}", cell(0, tbl["top_n"]), cell(0, tbl["n"]), str(dt), str(da), why])
+        if not tbl["columns"]:
+            figures.append([q, "(no column)", f"{tbl['n']:,}", "", "", "", "",
+                            f"no empty values; CustomerName has {ctx['names']} distinct values for {ctx['customers']} "
+                            "customers" if q == "Profile_Customers" else "no empty values"])
+    claim(sum(len(t["columns"]) for t in ctx["census"]) + len(distinct) <= len(figures),
+          "the attached table holds every column with empty values and the three distinct counts")
+    fig_cols = [("QueryName", "Query"), ("ColumnName", "Column"), ("RowCount", "Rows"), ("EmptyTop", f"Empty, top {top:,}"),
+                ("EmptyAll", "Empty, entire data set"), ("DistinctTop", f"Distinct, top {top:,}"),
+                ("DistinctAll", "Distinct, entire data set"), ("Comment", "Comment")]
+    b.model.add(entered(PROFILE_FIGURES, [(c, "string") for c, _ in fig_cols], figures))
+    page.add(Visual("profileFigures", "tableEx", 20, 900, 1240, 560,
+                    {"Values": [(col(PROFILE_FIGURES, c), shown) for c, shown in fig_cols]},
+                    title=f"Attached table: the profile figures, as recorded from Column profile, on the top {top:,} rows and on the entire data set",
+                    objects={"columnWidth": [{"properties": {"value": lit(380)},
+                                              "selector": {"metadata": f"{PROFILE_FIGURES}.Comment"}}],
+                             "values": [{"properties": {"wordWrap": lit(True)}}]}))
     page.expect = ["Model answer: Exercise 13.5, profile memo", "Why the first rows mislead"]
 
     t = "Exercise 13.5"
+    b.check(t, "attached table: one row per column recorded", len(figures), f"COUNTROWS ( '{PROFILE_FIGURES}' )", 0)
     first = f"TOPN ( {top}, SalesInvoiceLine, SalesInvoiceLine[SalesInvoiceLineID], ASC )"
     b.check(t, "SalesInvoiceLine rows (the model's copy of Profile_Lines)", n, "COUNTROWS ( SalesInvoiceLine )", 0)
     b.check(t, "PromotionID empty, entire data set", ctx["promo"],
@@ -463,7 +525,9 @@ def ex6(b: Build) -> None:
     y, first = b.year, b.data.F
     ig, month = col("Item", "ItemGroup"), col("SalesInvoice", "Month")
     avg = agg("SalesInvoiceLine", "Discount", "avg")
-    # (1) the draft, exactly as described
+    # (1) the draft, exactly as described: Discount formatted as a percentage first (Column tools > Format), so the
+    # card shows its average the way the draft presents it; the format leaves the average and its weighting unchanged
+    b.model.tables["SalesInvoiceLine"].column("Discount").fmt = "0.00%"
     draft = b.report.add(Page("ex136d", "Ex 13.6 Draft"))
     draft.add(Visual("pie", "pieChart", 20, 20, 420, 320, {"Category": [ig], "Y": [LT]}, objects=labels(False),
                      filters=[keep("pieYear", FY, [y])]))

@@ -7,4 +7,4 @@
      5 B: keys used by relationships are set not to summarize, so the field lands in Categories; drag it to Value and choose Count (Distinct).
      6 D: the chart is sorted by its values; More options > Sort by > Month, then Sort ascending.
      7 C: Power Query Online's Save applies its changes to the model; Close & Apply is Desktop's.
-     8 A: Power Query Online also types each column from its first 200 rows, where Discount is zero. -->
+     8 A: with automatic type detection enabled, Power Query Online types each column from its first 200 rows, where Discount is zero. -->

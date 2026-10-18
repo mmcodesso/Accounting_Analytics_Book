@@ -3,8 +3,8 @@
      reliably detect a 5% misstatement. Commission (GL 6290) on revenue, fitted {{ d.F }}-{{ d.P }}: intercept {{ a|money }}, slope {{ b|num(5) }}, R2 {{ r2|num(3) }}.
      {{ d.C }} differences above 3%: {% for r in flagged %}{{ r.month }} {{ '{:+,.0f}'.format(r.diff) }} ({{ r.pct|spct }}){{ ', ' if not loop.last }}{% endfor %}; all other months within {{ within }}.
      The {{ pair[0] }} and {{ pair[1] }} differences nearly offset, but not through timing: every SalesCommissionAccrual row is dated on its
-     invoice's date except {{ misdated|count }} of {{ accrual_rows|count }} (the invoices dated before their first shipment, Tutorial 2.1; {{ other_month|count }} of them in another month). The accrual records point to the
+     invoice's date except {{ misdated|count }} of {{ accrual_rows|count }} (the invoices dated before their first shipment, Tutorial 2.1; {{ other_month|count }} of them in another month). The accrual records are consistent with the
      customer mix: commission rates run from {{ low|pct(1) }} (Wholesale) to {{ high|pct(0) }} (design services), and Wholesale was {{ share[0]|pct(0) }} of {{ pair[0] }}'s commission
      base against {{ share[1]|pct(0) }} of {{ pair[1] }}'s ({{ share_year|pct(0) }} for the year), so the accrual rate was {{ rate[0]|pct(2) }} against {{ rate[1]|pct(2) }}, which one regression slope
-     cannot follow. Evidence: the accruals by customer segment and month, and the credit-memo adjustments. {{ d.C }} accruals {{ accruals|money }} less SalesCommissionAdjustment
-     rows ({{ adj_rows|count }}, from credit memos) {{ adj_amount|money }} = GL {{ gl|money }}. -->
+     cannot follow. Evidence: the accruals by customer segment and month, and the credit-memo adjustments. {{ d.C }} accruals {{ accruals|money }} plus the signed SalesCommissionAdjustment
+     postings ({{ adj_rows|count }} rows, from credit memos) -{{ adj_amount|money }} = GL {{ gl|money }}. -->

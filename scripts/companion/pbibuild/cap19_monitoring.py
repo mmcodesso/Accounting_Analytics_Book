@@ -10,13 +10,18 @@ note describes: for BeforePayment the applications are grouped by invoice for th
 CashAndCredit they are grouped by invoice and applier and merged on the credit's invoice and approver. The two new
 exception queries are appended to the Exceptions query's Source step, and the Tests table gains four rows.
 
-The historical exceptions of the new tests that share a supported cause are linked to a finding: a Design Findings table (Enter data, one
-row per new test, naming the finding, the period it covers, through the end of the audited year, and the date by which
-its design is to be fixed) is merged into the register by TestID; an exception dated within the period is covered by
-the finding and stays in the register, and Open Exceptions leaves the covered exceptions out, so the review sees every
-exception dated after the period, before the fix as well as after it, and a finding closes only on a retest. The refund method and the missing offset stay anomaly
-tests: columns of CustomerRefund, outside the register, on a page of their own. Data Through takes the last credit and
-refund dates as well (the date stays payroll's), and a Change Log table (Enter data) records the change.
+The historical exceptions of the new tests that share a supported cause are linked to a finding. A Findings table (Enter
+data, one row for each supported cause, credits and refunds) holds the finding, its assessment (design or operation), its
+owner, the period it covers (through the end of the audited year), the date its fix is due, and blank fields for the date the
+fix is made, the retest date and result and the closure approval, which the supplied case leaves unresolved. A Finding
+Exceptions table (Enter data) maps each historical exception, by TestID and DocumentNumber, to its finding, so coverage is a
+reviewed mapping and not a date rule: an exception dated within the period but absent from the mapping is open for review.
+A mapped exception stays in the register, Open Exceptions leaves the mapped exceptions out, and the review sees every
+exception dated after the period or not yet mapped, before the fix as well as after it. A finding is open until the fix is
+made, a retest after the fix passes and the closure is approved; a target date reached with no fix leaves it open. The
+refund method and the missing offset stay anomaly tests: columns of CustomerRefund, outside the register, on a page of their
+own. Data Through takes the last credit and refund dates as well (the date stays payroll's), and a Change Log table (Enter
+data) records the change.
 
 Checks: every value of the instructor notes of Requirement 10 and Milestones 2 and 3 that the file shows, computed by
 facts/notes/ch19.py (the case's definitions) and facts/notes/ch16.py (the register), and the chain's checks over the
@@ -45,10 +50,17 @@ NEW_TESTS = [("CM AboveLimit", "Credit above its approver's limit", "Credit memo
 FIX_BY = "2027-12-31"           # the action plans' date (Requirement 9): the delegation of authority and the refund rule
 # the findings cover the exceptions dated through the end of the audited year (ch19.year_end(d.C)); a later exception, before
 # the fix as well as after it, stays open for review, and a finding closes on a retest, not on FIX_BY
-FINDINGS = {"CM": "Credits approved above the recorded general limits (no delegation of authority in the records), by "
-                  "customer service staff who also apply the cash",
-            "RF": "Refunds approved above the recorded limits (no delegation of authority in the records), and dated "
-                  "before the customer's payments were applied to the credited invoice"}
+# one row for each cause Requirement 8 supports: (FindingID, the finding, its assessment, the owner by role); the fix date, retest
+# date and result and closure approval stay blank in the supplied case
+FINDINGS = [("F-CM", "Credits approved above the recorded general limits (effective delegation and enforcement unverified), by "
+                     "customer service staff who also apply the cash",
+             "Design, provisional: the delegation of authority and the system's enforcement are not in the records",
+             "Customer service manager"),
+            ("F-RF", "Refunds approved above the recorded general limits (effective delegation and enforcement unverified), and "
+                     "dated before the customer's payments were applied to the credited invoice",
+             "Design, provisional: the delegation of authority and the refund step's checks are not in the records",
+             "Accounting manager")]
+FINDING_OF = {"CM": "F-CM", "RF": "F-RF"}          # a test's historical exceptions are mapped to the finding of its process
 CHANGE_DATE = "2027-09-30"      # the end of the audit's fieldwork (the case is set in September 2027)
 
 POPULATION = """SWITCH (
@@ -70,6 +82,28 @@ DATA_THROUGH = """MINX (
     [Value]
 )"""
 OPEN = "CALCULATE ( [Exceptions], ISBLANK ( Exceptions[Disposition] ), Exceptions[Covered] = 0 )"
+OPEN_FINDINGS = """COUNTROWS (
+    FILTER (
+        Findings,
+        ISBLANK ( Findings[ImplementedDate] )
+            || ISBLANK ( Findings[RetestDate] )
+            || Findings[RetestResult] <> "Passed"
+            || ISBLANK ( Findings[ClosureApprovedDate] )
+    )
+)"""
+FINDING_STATUS = """VAR FixMade = MAX ( Findings[ImplementedDate] )
+VAR RetestMade = MAX ( Findings[RetestDate] )
+VAR Outcome = SELECTEDVALUE ( Findings[RetestResult] )
+VAR ApprovedOn = MAX ( Findings[ClosureApprovedDate] )
+RETURN
+    SWITCH (
+        TRUE (),
+        ISBLANK ( FixMade ), "Open: fix not yet made",
+        ISBLANK ( RetestMade ), "Open: fix not yet retested",
+        Outcome <> "Passed", "Open: retest not passed",
+        ISBLANK ( ApprovedOn ), "Open: closure not yet approved",
+        "Closed"
+    )"""
 
 
 def set_measure(b: Build, name: str, dax: str) -> str:
@@ -179,18 +213,26 @@ def r10(b: Build) -> None:
     reg.parts += [cmx, rfx]                                   # the Source step's Table.Combine, two more queries
     # the design findings (Enter data), merged by TestID: an exception dated by FixBy is covered by its finding
     covers = ch19.year_end(d.C)
-    rows = [[tid, FINDINGS[tid[:2]], covers, FIX_BY] for tid, *_ in NEW_TESTS]
-    m.add(Table("Design Findings", [Column("TestID", "string"), Column("Finding", "string"),
-                                    Column("CoversThrough", "dateTime", fmt="Short Date"),
-                                    Column("FixBy", "dateTime", fmt="Short Date")], entered=rows, hidden=True))
-    m.query_order.append("Design Findings")
-    dfq = Query("Design Findings")
-    dfq.columns = {"TestID": "type text", "Finding": "type text", "CoversThrough": "type date", "FixBy": "type date"}
-    reg.merge(dfq, "TestID", "TestID", ["Finding", "CoversThrough", "FixBy"])
-    reg.custom("Covered", "if [CoversThrough] <> null and [EventDate] <= [CoversThrough] then 1 else 0", "Int64.Type")
-    m.tables["Exceptions"] = query_table(reg, formats={"Amount": MONEY, "CoversThrough": "Short Date",
-                                                       "FixBy": "Short Date"},
-                                         summarize={"EmployeeID": "none", "Covered": "none"})
+    rows = [[fid, text, assess, owner, covers, FIX_BY, None, None, None, None] for fid, text, assess, owner in FINDINGS]
+    m.add(Table("Findings", [Column("FindingID", "string"), Column("Finding", "string"), Column("Assessment", "string"),
+                             Column("Owner", "string"), Column("CoversThrough", "dateTime", fmt="Short Date"),
+                             Column("TargetDate", "dateTime", fmt="Short Date"),
+                             Column("ImplementedDate", "dateTime", fmt="Short Date"),
+                             Column("RetestDate", "dateTime", fmt="Short Date"), Column("RetestResult", "string"),
+                             Column("ClosureApprovedDate", "dateTime", fmt="Short Date")], entered=rows))
+    m.query_order.append("Findings")
+    mapped = [[x["test"], x["doc"], FINDING_OF[x["test"][:2]], CHANGE_DATE] for x in new_register(d)]
+    m.add(Table("Finding Exceptions", [Column("TestID", "string"), Column("DocumentNumber", "string"),
+                                       Column("FindingID", "string"), Column("MappedOn", "dateTime", fmt="Short Date")],
+                entered=mapped, hidden=True))
+    m.query_order.append("Finding Exceptions")
+    mq = Query("Finding Exceptions")
+    mq.columns = {"TestID": "type text", "DocumentNumber": "type text", "FindingID": "type text", "MappedOn": "type date"}
+    reg.merge(mq, ["TestID", "DocumentNumber"], ["TestID", "DocumentNumber"], ["FindingID"])
+    reg.custom("Covered", "if [FindingID] <> null then 1 else 0", "Int64.Type")
+    m.tables["Exceptions"] = query_table(reg, formats={"Amount": MONEY},
+                                         summarize={"EmployeeID": "none", "Covered": "none", "FindingID": "none"})
+    m.relate("Exceptions.FindingID", "Findings.FindingID")
     for q in (apps, last, appliers, receipts, methods, invoices, credits, dates, due, cmx, rfx):
         m.stage(q)
     t_cm = m.add(query_table(cm, formats={"GrandTotal": MONEY, "ApproverLimit": MONEY},
@@ -214,8 +256,19 @@ def r10(b: Build) -> None:
     set_measure(b, "Open Exceptions", OPEN)
     set_measure(b, "Data Through", DATA_THROUGH)
     add_measure(b, "Design Finding Exceptions", "CALCULATE ( [Exceptions], Exceptions[Covered] = 1 )", COUNT,
-                "Exceptions dated within the period their test's design finding covers: reported once, as the finding, "
-                "and kept in the register.")
+                "Exceptions mapped to a finding: reported once, as the finding, and kept in the register. Coverage is "
+                "not remediation.")
+    add_measure(b, "Open Findings", OPEN_FINDINGS, COUNT,
+                "Findings not yet closed: closure needs the fix made, a passed retest after it and the closure approved. "
+                "A target date reached with no fix leaves a finding open.")
+    add_measure(b, "Closed Findings", "COUNTROWS ( Findings ) - [Open Findings]", COUNT,
+                "Findings whose fix was made, retested successfully and approved for closure.")
+    add_measure(b, "Finding Status", FINDING_STATUS, None,
+                "The first step a finding has not yet met: the fix, the retest, a passed result, the closure approval.")
+    add_measure(b, "Mapped After Period", "COUNTROWS ( FILTER ( Exceptions, Exceptions[Covered] = 1 && "
+                "Exceptions[EventDate] > RELATED ( Findings[CoversThrough] ) ) )", COUNT,
+                "Mapped exceptions dated after the period their finding covers: expected none, since later exceptions "
+                "stay open for review until they are reviewed and mapped.")
     add_measure(b, "Method Mismatch Refunds", "CALCULATE ( COUNTROWS ( CustomerRefund ), CustomerRefund[MethodMismatch] = 1 )",
                 COUNT, "Anomaly test: refunds by a method no receipt on the credited invoice used.")
     add_measure(b, "Method Mismatch Amount", "CALCULATE ( SUM ( CustomerRefund[Amount] ), CustomerRefund[MethodMismatch] = 1 )",
@@ -231,10 +284,12 @@ def r10(b: Build) -> None:
             "Added CM AboveLimit, CM CashAndCredit, RF AboveLimit, and RF BeforePayment (CreditMemo, CustomerRefund, "
             "CM Exceptions, RF Exceptions appended to Exceptions)", "Requirement 10: the credits cycle audit"],
            [CHANGE_DATE, "Population", "Added the processes Credit memos and Refunds", "Rates per 1,000 for the new tests"],
-           [CHANGE_DATE, "Design Findings and Open Exceptions",
-            f"The new tests' exceptions dated through {covers} are covered by two design findings, to be fixed by "
-            f"{FIX_BY}, and left out of Open Exceptions",
-            "Report the historical exceptions once; review every later one, and close a finding on a retest"],
+           [CHANGE_DATE, "Findings, Finding Exceptions and Open Exceptions",
+            f"Two findings (credits, refunds) with owner, assessment, period and due date, and the {len(mapped)} historical "
+            f"exceptions dated through {covers} mapped to them; Open Exceptions leaves the mapped ones out and Open "
+            f"Findings counts the findings not closed",
+            "Report the historical exceptions once; review every later or unmapped one, and close a finding only after "
+            "the fix, a passed retest and approval"],
            [CHANGE_DATE, "CustomerRefund anomaly columns", "MethodMismatch and OffsetMissed, outside the register",
             "Anomalies are reasons to look, not rule failures"],
            [CHANGE_DATE, "Data Through", f"Added the last credit memo and refund dates; still {ctx['through']} (payroll)",
@@ -248,11 +303,11 @@ def r10(b: Build) -> None:
         "    \"Population\", [Population],\n    \"Rate per 1,000\", ROUND ( [Rate per 1,000], 1 )\n)\n"
         "ORDER BY Tests[TestID], 'Date'[Year]")
     b.tests.append(
-        "// Test 6: the register keeps one row per test and document, and the design findings cover the new tests' past\n"
+        "// Test 6: the register keeps one row per test and document, the findings cover the new tests' past, and no finding is closed\n"
         "EVALUATE\nROW (\n    \"Rows\", COUNTROWS ( Exceptions ),\n"
         "    \"Test and document pairs\", COUNTROWS ( SUMMARIZE ( Exceptions, Exceptions[TestID], Exceptions[DocumentNumber] ) ),\n"
-        "    \"Reviewed\", [Reviewed Exceptions],\n    \"Covered by a design finding\", [Design Finding Exceptions],\n"
-        "    \"Open\", [Open Exceptions]\n)")
+        "    \"Reviewed\", [Reviewed Exceptions],\n    \"Mapped to a finding\", [Design Finding Exceptions],\n"
+        "    \"Open\", [Open Exceptions],\n    \"Open findings\", [Open Findings]\n)")
     b.project.queries["Tests"] = "\n\n".join(b.tests) + "\n"
     if "Checks" in b.project.queries:
         b.project.queries["Checks"] = b.project.queries.pop("Checks")
@@ -320,14 +375,16 @@ def r10(b: Build) -> None:
         "Rows": [test_col], "Columns": [year_col], "Values": [M("Exceptions"), M("Population"), M("Rate per 1,000")]},
         title="The credits cycle's tests by year", filters=[keep("newTestIds", test_col, new_ids)]))
     page.add(card("registerCards", 20, 235, 1240, 110, [M("Exceptions"), M("Reviewed Exceptions"),
-                                                        M("Design Finding Exceptions"), M("Open Exceptions")]))
+                                                        M("Design Finding Exceptions"), M("Open Exceptions"),
+                                                        M("Open Findings")]))
     page.add(Visual("findings", "tableEx", 20, 360, 1240, 260, {"Values": [
-        col("Exceptions", "TestID"), col("Exceptions", "Finding"), col("Exceptions", "CoversThrough"),
-        col("Exceptions", "FixBy"), M("Design Finding Exceptions"), M("Open Exceptions")]},
-        title="Design findings: reported once; later exceptions stay open for review",
-        filters=[keep("findingTests", col("Exceptions", "TestID"), new_ids)],
-        objects={"columnWidth": [{"properties": {"value": lit(560)}, "selector": {"metadata": "Exceptions.Finding"}}],
-                 "values": [{"properties": {"wordWrap": lit(True)}}]}))      # each finding wraps in its column
+        col("Findings", "FindingID"), col("Findings", "Finding"), col("Findings", "Assessment"), col("Findings", "Owner"),
+        col("Findings", "CoversThrough"), col("Findings", "TargetDate"), M("Finding Status"),
+        M("Design Finding Exceptions")]},
+        title="Findings: each supported cause once; later and unmapped exceptions stay open for review",
+        objects={"columnWidth": [{"properties": {"value": lit(w)}, "selector": {"metadata": f"Findings.{k}"}}
+                                 for k, w in (("Finding", 360), ("Assessment", 240), ("Owner", 140))],
+                 "values": [{"properties": {"wordWrap": lit(True)}}]}))      # each long text wraps in its column
     tests_ = {x_["name"]: x_ for x_ in ctx["tests"]}
     page.add(answer("cycleAnswer", 20, 635, 1240, 400, "the continuing tests", [
         "Four rule tests join the register: " + "; ".join(
@@ -335,17 +392,21 @@ def r10(b: Build) -> None:
             f"{' / '.join(f'{v:.1f}' for v in x_['rates'])}, {x_['rate']:.1f} over the three years)" for x_ in ctx["tests"]) +
         f". Populations: credits {' / '.join(str(v) for v in ctx['pop_c'])}, refunds {' / '.join(str(v) for v in ctx['pop_r'])}. "
         f"The register grows from {ctx['old']} to {ctx['new']} rows, and each test and document pair is still unique.",
-        f"Findings: the {len(new)} historical exceptions of the new tests share the causes Requirement 8 supports, so they "
-        "are linked to two findings, one for credits and one for refunds (approvals above the recorded general limits, "
-        "with no delegation of authority in the records), and each stays in the register with its document. The "
-        "findings record Requirement 8's provisional evaluation, which looked past the register to the records behind "
-        "it, as Tutorial 16.3 assumed for its dispositions. The flags alone would support only a follow-up. The "
-        f"findings cover the exceptions dated through {covers} and are to be fixed by "
-        f"{FIX_BY}; Open Exceptions leaves the covered ones out and stays at {sum(1 for e in old if not e['disposition'])}, "
-        "so the new tests do not flood the review, while any later exception, before the fix as well as after it, stays "
-        "open for review. A finding closes when a retest after the fix shows the control works, not on its planned date; "
-        "after the fix, the two authority tests should fall to zero, and CashAndCredit and BeforePayment are the ones that "
-        f"would catch the next case. The Date table ends {date_end}: extend it before exceptions after that date arrive.",
+        f"Findings: the {len(new)} historical exceptions of the new tests share the causes Requirement 8 supports, so each "
+        "is mapped to one of two findings, credits or refunds (approvals above the recorded general limits, with the "
+        "effective delegation and its enforcement unverified), and stays in the register with its document. A Findings row "
+        "holds the assessment, the owner, the period covered and the due date, with the fix date, retest and closure "
+        "approval blank. The findings record Requirement 8's provisional evaluation, which looked past the register to the "
+        "records behind it, as Tutorial 16.3 assumed for its dispositions. The flags alone would support only a follow-up. "
+        f"The findings cover the exceptions dated through {covers} and are to be fixed by "
+        f"{FIX_BY}; Open Exceptions leaves the mapped ones out and stays at {sum(1 for e in old if not e['disposition'])}, "
+        "so the new tests do not flood the review, while any later or unmapped exception stays open for review. Both "
+        "findings are open: a finding closes only when the fix is made, a retest after it passes and the closure is "
+        "approved, never on its planned date, and coverage is not remediation. BeforePayment is a retrospective timing "
+        "screen: it flags a refund only after an application dated later is recorded, so it does not show that a refund "
+        "was supported when approved and can miss an unpaid invoice with no later application; a separate as-of "
+        "supported-balance test addresses that. After remediation all four rule tests remain subject to retest and "
+        f"monitoring. The Date table ends {date_end}: extend it before exceptions after that date arrive.",
         f"Data Through stays {ctx['through']}, set by payroll's last pay date (the rest of December's work belongs to the "
         f"two pay periods marked Open, scheduled to pay in January {d.C + 1}). It is the earliest of the processes' last "
         "dates, which bounds what the tests can have seen but does not show that every record through it was loaded. The "
@@ -354,7 +415,8 @@ def r10(b: Build) -> None:
         "the change, and Tests 5 and 6 in the Tests tab are rerun with Tests 1 to 4 before the file is used."]))
     cmab = tests_["CM AboveLimit"]
     page.expect = ["CM AboveLimit", "RF BeforePayment", f"{cmab['rates'][-1]:.1f}", f"{cmab['n']:,}",
-                   f"Design Finding Exceptions, {len(new)} card", "Model answer: the continuing tests", FIX_BY[:4]]
+                   f"Design Finding Exceptions, {len(new)} card", f"Open Findings, {len(FINDINGS)} card",
+                   "Model answer: the continuing tests", FIX_BY[:4]]
 
     # the Anomalies page
     page = b.report.add(Page("anomalies", "Anomalies"))
@@ -384,10 +446,12 @@ def r10(b: Build) -> None:
     page.add(answer("logAnswer", 20, 440, 1240, 200, "the change under change control", [
         "The change was made in the Power BI project under version control, on its own branch, and the reviewer approves "
         "it from the list of changed lines before it is merged: the queries CreditMemo, CustomerRefund, CM Exceptions, "
-        "RF Exceptions and their inputs, the Exceptions query's Source step and its Design Findings merge, the Tests, "
-        "Design Findings, and Change Log tables, and the measures Population, Open Exceptions, and Data Through.",
+        "RF Exceptions and their inputs, the Exceptions query's Source step and its Finding Exceptions merge, the Tests, "
+        "Findings, Finding Exceptions, and Change Log tables, and the measures Population, Open Exceptions, Open Findings, "
+        "and Data Through.",
         "Tests 1 to 6 are rerun before the file is used: Test 2 now lists fifteen tests, Test 5 the new tests by year, "
-        "and Test 6 the register's rows, reviewed, covered, and open exceptions. No copy of the .pbix leaves internal audit."]))
+        "and Test 6 the register's rows, reviewed, mapped, and open exceptions and the open findings. No copy of the .pbix "
+        "leaves internal audit."]))
     page.expect = ["Changes to this file", "Data Through", "Population", CHANGE_DATE]
 
     # checks
@@ -412,7 +476,7 @@ def r10(b: Build) -> None:
             b.check(s, f"{x_['name']} exceptions {y}", n, f"CALCULATE ( [Exceptions], {f}, 'Date'[Year] = {y} )", 0)
             b.check(s, f"{x_['name']} rate per 1,000 {y}", round(rate, 6),
                     f"CALCULATE ( [Rate per 1,000], {f}, 'Date'[Year] = {y} )", 0.0001)
-        b.check(s, f"{x_['name']} exceptions covered by its design finding", x_["n"],
+        b.check(s, f"{x_['name']} exceptions mapped to its finding", x_["n"],
                 f"CALCULATE ( [Design Finding Exceptions], {f} )", 0)
         b.check(s, f"{x_['name']} open exceptions (none is dated after {covers})", 0,
                 f"CALCULATE ( [Open Exceptions], {f} ) + 0", 0)
@@ -427,10 +491,16 @@ def r10(b: Build) -> None:
     b.check(s, "last credit memo date", ctx["cm_last"], 'FORMAT ( MAX ( CreditMemo[CreditMemoDate] ), "yyyy-mm-dd" )')
     b.check(s, "last refund date", ctx["rf_last"], 'FORMAT ( MAX ( CustomerRefund[RefundDate] ), "yyyy-mm-dd" )')
     b.check(s, "Change Log rows", len(log), "COUNTROWS ( 'Change Log' )", 0)
-    b.check(s, "Design Findings rows", len(rows), "COUNTROWS ( 'Design Findings' )", 0)
-    b.check(s, "covered exceptions dated after the period their finding covers", 0,
-            "COUNTROWS ( FILTER ( Exceptions, Exceptions[Covered] = 1 && Exceptions[EventDate] > Exceptions[CoversThrough] ) ) + 0",
-            0)
+    b.check(s, "Findings rows (one for each supported cause)", len(rows), "COUNTROWS ( Findings )", 0)
+    b.check(s, "Finding Exceptions rows (one for each historical exception)", len(mapped), "COUNTROWS ( 'Finding Exceptions' )", 0)
+    b.check(s, "open findings (nothing is fixed, retested or approved in the supplied case)", len(rows), "[Open Findings]", 0)
+    b.check(s, "closed findings", 0, "[Closed Findings] + 0", 0)
+    b.check(s, "status of the first finding", "Open: fix not yet made",
+            f"CALCULATE ( [Finding Status], Findings[FindingID] = \"{FINDINGS[0][0]}\" )")
+    b.check(s, "mapped exceptions dated after the period their finding covers", 0, "[Mapped After Period] + 0", 0)
+    for fid, *_ in FINDINGS:
+        b.check(s, f"exceptions mapped to {fid}", sum(1 for x in mapped if x[2] == fid),
+                f"CALCULATE ( [Design Finding Exceptions], Findings[FindingID] = \"{fid}\" )", 0)
     # the anomaly tests (Requirement 4's values, kept outside the register)
     for label, key, n_dax, a_dax in (("method mismatch", "mism", "[Method Mismatch Refunds]", "[Method Mismatch Amount]"),
                                      ("offset missed (past due at least the refund)", "pd2", "[Offset Missed Refunds]",

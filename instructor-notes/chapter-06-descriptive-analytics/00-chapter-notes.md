@@ -28,6 +28,8 @@ The chapter depends on these conditions of the data:
 
 ## What students should be able to do afterward
 
+The six outcomes follow the chapter's learning objectives in order.
+
 1. Describe a column with statistical functions and show its shape with a histogram. Practiced in Tutorial 6.1 (Steps 3 to 5 and 8 to 9), Exercise 6.6 (requirements 1 and 2) and questions 1 to 3 and 6.
 2. Calculate conditional totals and test them against a control total. Practiced in Tutorial 6.1 (Steps 3, 6 and 7), Exercises 6.1 (requirements 3 and 5), 6.5 (requirement 2) and 6.6 (requirement 1), and questions 4 and 5.
 3. Build PivotTables and PivotCharts across two or more dimensions and choose a chart that fits the question. Practiced in Tutorial 6.2, Exercises 6.2, 6.3, 6.5 (requirement 1) and 6.6 (requirements 2 to 4), and questions 6 and 8 to 10.
@@ -47,10 +49,11 @@ The chapter depends on these conditions of the data:
 
 **Pitfalls that cost class time**
 
-- **Two filters on the year.** The report year in Tutorial 6.1 is a named cell. A PivotTable has its own FiscalYear filter, and changing the parameter does not change it. Students who "update the year" see the Profile worksheet move and the PivotTables stay.
+- **Two filters on the year.** The report year in Tutorial 6.1 is a named cell. A PivotTable has its own FiscalYear filter, and changing the parameter does not change it. Students who "update the year" see the Profile worksheet move and the PivotTables stay. A new PivotTable does not inherit another's selection either, so each exercise PivotTable needs the year selected.
+- **The Data Model box.** A PivotTable created with **Add this data to the Data Model** checked has no **Calculated Field** command.
 - **The shared pivot cache.** Calculated fields belong to the pivot cache, so MarginPct appears in every PivotTable built from the InvoiceLines Table. A PivotTable built from a pasted range does not have it, and a student who lacks it recreates the field.
 - **Σ Values.** A second value field sends **Σ Values** to the Columns area. Dragging it to Rows is a step the tutorials give once, and students forget it in the exercises.
-- **GETPIVOTDATA reads what the PivotTable shows.** The Bridge returns Furniture totals only while the ItemGroup filter says Furniture.
+- **GETPIVOTDATA reads what the PivotTable shows.** The Bridge returns Furniture totals only while the ItemGroup filter says Furniture. A plain cell reference means **PivotTable Analyze > Options > Generate GetPivotData** is off.
 - **Refresh after the query.** A new query column may need a second **Refresh All** once the query has finished loading, because background refresh can update a PivotTable before its query ends. A second click while the query still runs repeats the problem.
 - **Load To.** In Exercise 6.1 **Only Create Connection** applies to both new queries, so TrialBalance is loaded afterward from **Data > Queries & Connections**.
 
@@ -73,7 +76,7 @@ The chapter depends on these conditions of the data:
 | 2 | 5 | Interpreting results; looking ahead; assign the exercises | 56 to 64 |
 | | 180 | Total | |
 
-**Plan B: lab first (one session of 150 minutes).** Students build the workbook before the vocabulary, so the control total and the bridge arrive as results they produced. It fits a computer lab. Students work in pairs and take the next start file when they fall behind. The ledger section is not covered: assign Exercise 6.1 for the next session.
+**Plan B: lab first (one session of 150 minutes).** Students build the workbook before the vocabulary, so the control total and the bridge arrive as results they produced. It fits a computer lab. Students work in pairs and take the next start file when they fall behind. The tutorials take about 165 minutes in full against the 110 the plan gives the builds, so students prepare before class or finish at home, and the session does not promise that first-time users complete every step. The ledger section is not covered: assign Exercise 6.1 for the next session.
 
 | Minutes | Activity | Slides |
 |---|---:|---|
@@ -124,7 +127,7 @@ Plan A is the safest. Plan B trades the lecture for ownership of the workbook an
 
 - Step 1: the name typed in the cell, not the **Name Box**, so ReportYear is undefined and every formula errors.
 - Step 4: a FILTER with no match returns #CALC!.
-- Step 6: a group name typed with a stray space, so SUMIFS returns zero for that row.
+- Step 6: a group name typed with a stray space, so SUMIFS returns zero for that row. Also C17 without ROUND, which can read -0.00 because of a residue below a cent.
 - Step 7: the SUM ranges still end at the old last row, so the differences stay nonzero after Services is added. That is the lesson of the step.
 - Step 8: the open-ended last bin formula missing, so the bins do not add up.
 
@@ -172,14 +175,14 @@ Plan A is the safest. Plan B trades the lecture for ownership of the workbook an
 | Step | Look for | Value |
 |---|---|---|
 | 2, 3 | Quantity, per-unit measures and margins, third then fourth quarter | 7,091.23 then 7,122.12 units; price per unit $604.03 then $583.64; discounts $96,353.72 then $217,460.47; margin before discounts 43.53% then 43.73% |
-| 4, 5 | The bridge | Margin $1,810,257.09; volume +$7,885.63; mix -$3,317.93; price lists +$1,073.25; promotions -$120,687.02; cost 0; margin $1,695,211.02; B23 reads 0 |
+| 4, 5 | The bridge | Margin $1,810,257.09; volume +$7,885.63; mix -$3,317.93; price lists +$1,073.25; promotions -$120,687.02; cost 0; margin $1,695,211.02; B23 reads zero and C23 reads PASS |
 | 7 | Discounts by promotion | Promotion 8 in both quarters (167 then 409 lines), promotion 9 in the fourth quarter only |
 
 **Stumbles to expect**
 
 - Step 2: the grand totals left on, so a column that adds the two quarters sits among the values.
 - Step 4: a typed cell reference instead of the click. The formulas name the period and not the item group, so they read the Furniture filter.
-- Step 5: a bridge formula that points at the wrong quarter's column, which B23 shows as a nonzero check.
+- Step 5: a bridge formula that points at the wrong quarter's column, which B23 shows as a nonzero check and C23 as INVESTIGATE. After the test with `+0.1`, students forget to remove it.
 - Step 6: the first and last bars not set as totals, so the waterfall climbs from zero and shows no decline.
 - Step 7: SalesInvoiceLineID summed instead of counted.
 
@@ -199,7 +202,7 @@ Plan A is the safest. Plan B trades the lecture for ownership of the workbook an
 
 **A balanced trial balance is not a complete one.** Equal balances, and net income equal to the closing entry, test arithmetic. The extract holds 526 rows dated after the fiscal year-end, and the ledger balances with or without them, so only the date filter protects the result (questions 11 and 12). Ask: which check would have caught an unfiltered extract?
 
-**Which date decides the period?** In Exercise 6.1 the ledger exceeds the invoice lines by $3,233.18 in account 4010 and two smaller amounts, because three invoices are dated in the earlier year. Students pick the invoice date or the number. The answer is delivery, when control passes, and only one of the three shipped in the earlier year.
+**Which date decides the period?** In Exercise 6.1 the ledger exceeds the invoice lines by $3,233.18 in account 4010 and two smaller amounts, because three invoices are dated in the earlier year. Students pick the invoice date or the number. The answer is delivery, when control passes, and only one of the three was delivered in the earlier year. The shipment dates fall in the same years here, but the delivery date is the evidence.
 
 ![The revenue ladder of the chapter, from the invoice lines of the Profile worksheet to the net revenue of the income statement.](../figures/chapter-06-descriptive-analytics/IF-06-0-A.pdf)
 
@@ -207,7 +210,7 @@ Plan A is the safest. Plan B trades the lecture for ownership of the workbook an
 
 ![The same change in the Furniture margin decomposed at two levels, for the discussion of Exercise 6.4.](../figures/chapter-06-descriptive-analytics/IF-06-0-C.pdf)
 
-**An expectation that is the prior year.** Question 15 rules out replacing the expectation with last year's recorded amount, yet Exercise 6.5 uses last year as its expectation. The exercise names the weakness (no growth, no known events), and the question concerns what the auditor must do first: develop the expectation and set the acceptable difference in advance.
+**An expectation that is the prior year.** Question 15's option C is copying last year's revenue without considering known changes or the reliability of the data, yet Exercise 6.5 uses last year as a deliberately simple expectation and names its weakness. The question concerns what the auditor must do first: develop the expectation and set the acceptable difference in advance. The weakness is the unexamined shortcut, not prior-year data.
 
 ## Discussion prompts
 
@@ -239,7 +242,7 @@ All six exercises are Excel builds with a model answer in the workbook of Chapte
 - *One exercise a session.* Take them in the order 6.3, 6.2, 6.5, 6.6, 6.4, 6.1, from the lightest to the longest.
 - *A light load.* Exercises 6.3 and 6.5 take about two hours and cover outcomes 3 to 5. Add Exercise 6.1 for the ledger and the control totals.
 
-**Grading and discussion.** Each exercise guide holds a rubric. Exercises 6.3 and 6.5 suit grading from the workbook. Exercises 6.1, 6.2, 6.4 and 6.6 end in a memo or paragraph and suit class discussion. Collect the workbook, not a screenshot.
+**Grading and discussion.** Each exercise guide holds a rubric. Exercises 6.3 and 6.5 suit grading from the workbook. Exercises 6.1, 6.2, 6.4 and 6.6 end in a memo or paragraph and suit class discussion. A rubric's full-credit cell asks only for what the requirement asks. Extras are named in each guide as a plus. Collect the workbook, not a screenshot.
 
 ## Multiple-choice questions
 
@@ -256,12 +259,12 @@ Key: 1 B, 2 C, 3 A, 4 D, 5 A, 6 C, 7 D, 8 B, 9 C, 10 A, 11 D, 12 B, 13 C, 14 A, 
 | 7 | D | a calculated field applies its formula to sums, so Quantity\*UnitPrice multiplies two sums. |
 | 8 | B | % of Column Total shows each group's share of the quarter's revenue. |
 | 9 | C | GETPIVOTDATA names the value by field and item, so layout changes do not break it. |
-| 10 | A | a PivotTable reads its pivot cache, which updates only on refresh. |
+| 10 | A | a PivotTable reads its pivot cache, which a refresh must update. |
 | 11 | D | the year-end closing entry debits the Furniture revenue account on December 31, so the quarter's net credit turns negative. |
 | 12 | B | the closing entries zero the revenue and expense accounts, so the income statement cannot be prepared from the closed balances; a pre-closing trial balance leaves them out. |
 | 13 | C | each item has one standard cost, so the cost effect at standard is zero. |
 | 14 | A | margin before discounts rising while margin falls shows that the larger discounts more than offset the other effects, which on balance raised the margin; the bridge separates those effects. |
-| 15 | B | the auditor develops the expectation and sets the acceptable difference before evaluating it. |
+| 15 | B | the auditor develops the expectation and sets the acceptable difference before evaluating it; copying the previous year's revenue without considering known changes or the reliability of the data (C) is the shortcut, not the procedure. |
 
 **Questions where a wrong option tempts**
 
@@ -271,7 +274,7 @@ Key: 1 B, 2 C, 3 A, 4 D, 5 A, 6 C, 7 D, 8 B, 9 C, 10 A, 11 D, 12 B, 13 C, 14 A, 
 - **Question 11.** Option A, credit memos, is a plausible business reason. The closing entry is the cause.
 - **Question 12.** Option C says the closes fall after the cutoff. They are dated December 31; the later rows are supplier payments.
 - **Question 14.** Options B and C blame cost and volume, which are nearly unchanged.
-- **Question 15.** Option A is the independence failure. Option C is the prior-year shortcut that Exercise 6.5 uses and criticizes.
+- **Question 15.** Option A is the independence failure. Option C is the unexamined prior-year shortcut: Exercise 6.5 uses last year's quarter as a deliberately simple expectation and names its weakness.
 
 Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 1 to 6 make a quiz of the functions and charts, questions 7 to 10 of PivotTables, and questions 11 to 15 of the ledger and the bridge.
 

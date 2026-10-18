@@ -37,10 +37,10 @@ By the end, students can:
 
 ## Before you assign
 
-- **A new workbook.** Students start a new workbook, so the Table is PriceOverrideApproval. In the solution file the sheets are Ex 4.6, Ex 4.6 PriceOverrideApproval and Ex 4.6 Employee, and the Employee query keeps three columns of T74_Employee. A student may instead look the names up in CharlesRiver.xlsx, as the exercise says.
+- **A new workbook.** Students start a new workbook, so the Table is PriceOverrideApproval. In the solution file the sheets are Ex 4.6, Ex 4.6 PriceOverrideApproval and Ex 4.6 Employee, and the Employee query keeps three columns of T74_Employee. A student may instead look the names up in CharlesRiver.xlsx, as the exercise says, by reading them from its Employee worksheet or with an XLOOKUP into its Employee Table, which works only while that workbook is open.
 - **Data conditions.** There are {{ requests|count }} requests: {{ approved|count }} Approved and {{ pending|count }} Pending. Every approval was made by one employee, the {{ approver.title }} (EmployeeID {{ approver.id }}), who is also a requester. The Pending requests have no approver and no approval date, and the same employee made all of them.
 - **Dates.** RequestDate and ApprovedDate are set to the Date type with Replace current, as in Tutorial 4.1, Step 6.
-- **Hint.** Make sure students know a Pending request still has an ApprovedUnitPrice. It is a requested price, not an approved one.
+- **Hint.** Make sure students know a Pending request still has an amount in ApprovedUnitPrice. It is not an approved price, and it is not the requested one either, because it differs from RequestedUnitPrice on every Pending request. Treat it as an amount the extract records despite the Pending status, and have students ask the data owner what it represents.
 
 ## How to run it
 
@@ -73,8 +73,20 @@ d. Choose **Home > Close & Load > Close & Load To**, select **Table** and **New 
 
 a. Select the data cells with A2 active and add a rule with **Home > Conditional Formatting > New Rule**, **Use a formula to determine which cells to format**: `=${{ g.letters.ApprovedByEmployeeID }}2=""`, with an amber fill.
 b. Add a second rule, `=${{ g.letters.RequestedByEmployeeID }}2=${{ g.letters.ApprovedByEmployeeID }}2`, with a coral fill.
-c. On `Ex 4.6` enter `=COUNTIFS(PriceOverrideApproval[ApprovedByEmployeeID],"")` and `=COUNTIFS(PriceOverrideApproval[SelfApproved],TRUE)`.
-d. Choose **Table Design > Insert Slicer**, select **Status**, and enter `=SUBTOTAL(103,PriceOverrideApproval[PriceOverrideApprovalID])` and the same on ApprovedByEmployeeID. Click each status and record the results, then **Clear Filter**.
+c. Insert a worksheet named `Ex 4.6` and enter the two counts:
+
+   ```
+   =COUNTIFS(PriceOverrideApproval[ApprovedByEmployeeID],"")
+   =COUNTIFS(PriceOverrideApproval[SelfApproved],TRUE)
+   ```
+
+d. Choose **Table Design > Insert Slicer**, select **Status**, and on `Ex 4.6` enter the count of the rows in view, then the same on ApprovedByEmployeeID:
+
+   ```
+   =SUBTOTAL(103,PriceOverrideApproval[PriceOverrideApprovalID])
+   ```
+
+   Click each status and record the results, then **Clear Filter**.
 
 **Check:** {{ g.blank|count }} blank approvers, all Pending; {{ self_approved|count }} requests approved by the requester, all Approved. The slicer shows {{ approved|count }} requests with an approver on Approved, and {{ pending|count }} with none on Pending. The two groups do not overlap, because a blank approver never equals the requester.
 
@@ -87,6 +99,8 @@ a. In a header row type `RequestedByEmployeeID`, `EmployeeName`, `JobTitle`, `Re
 ```
 =XLOOKUP($A24,Employee[EmployeeID],Employee[EmployeeName])
 ```
+
+A student who did not load the Employee query reads the names and job titles from the Employee worksheet of CharlesRiver.xlsx and types them beside the IDs, because the grid has no local Employee Table to look them up in.
 
 b. In the next columns enter the four counts for the row (here the requester is in $A24):
 
@@ -118,11 +132,16 @@ The Pending requests' prices fall inside the approved range here, so the error w
 
 ### Requirement (6): The memo
 
-**Step 7. Find out whether the pending requests were used.** On the SalesInvoiceLine Table, filter SalesOrderLineID on the lines of the pending requests and compare UnitPrice with the ApprovedUnitPrice.
+**Step 7 (optional, an instructor demonstration). Find out whether the pending requests were used.** Requirement (6) asks students only to propose this procedure, and the new workbook holds no invoice lines. The solution file's follow-up block reads the SalesInvoiceLine Table of the tutorials, because it shares the analysis workbook. To show the trace in a new workbook, or to check a student who goes further:
 
-**Check:** {% for p in g.pending %}request {{ p.id }} (order line {{ p.line }}): {{ p.lines }} invoice line{{ '' if p.lines == 1 else 's' }}, {{ p.at_price }} at the pending price{{ '; ' if not loop.last else '.' }}{% endfor %} All are billed under {{ g.pending[0].methods }} pricing, not an override.
+a. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesRiver.xlsx, select **T17_SalesInvoiceLine** and click **Transform Data**. Rename the query `SalesInvoiceLine`.
+b. Choose **Home > Choose Columns** and keep SalesInvoiceLineID, SalesOrderLineID, UnitPrice, PricingMethod, PriceListLineID and PriceOverrideApprovalID.
+c. Choose **Home > Close & Load > Close & Load To**, select **Table** and **New worksheet**.
+d. Filter SalesOrderLineID on the order lines of the pending requests ({{ lines|join(', ') }}) and compare each UnitPrice with the request's ApprovedUnitPrice. Record the invoice line IDs and their pricing evidence.
 
-**Step 8. Outline the half page.** Exception 1: the {{ approver.title }} approved {{ self_approved|count }} of their own {{ own|count }} requests, and no other approver appears in the records, so they show no independent review of those requests. Exception 2: requests {{ ids }} are Pending, with no approver, and were all requested by the same person; the {{ g.pending_lines }} lines were invoiced at the pending prices. Why it matters: a control whose only recorded approver is also a requester gives no independent check of that person's prices, and the records show no step that kept an unapproved price off an invoice. Whether the policy requires another approval, or another review compensates, is the first thing to ask. Follow-up: obtain the pricing policy and authority matrix; inspect the reasons and customer agreements for a sample of self-approved overrides; confirm the pending prices on the invoice lines; recommend an independent approver and a system block on unapproved prices.
+**Check:** {% for p in g.pending %}request {{ p.id }} (order line {{ p.line }}) has invoice line{{ '' if p.lines == 1 else 's' }} {{ p.line_ids }}, priced under {{ p.methods }}{{ '; ' if not loop.last else '.' }}{% endfor %} Each UnitPrice equals the amount in ApprovedUnitPrice on its Pending record, and every one of these lines has a blank PriceOverrideApprovalID. Price equality alone does not show that the pending record was applied.
+
+**Step 8. Outline the half page.** Exception 1: the {{ approver.title }} approved {{ self_approved|count }} of their own {{ own|count }} requests, and no other approver appears in the records, so they show no independent review of those requests. Exception 2: requests {{ ids }} are Pending, with no approver, and were all requested by the same person. If the trace of Step 7 is done, it adds that their order lines were invoiced at the amounts recorded in ApprovedUnitPrice. Why it matters: a control whose only recorded approver is also a requester gives no independent check of that person's prices. The extract records {{ self_approved|count }} self-approvals and {{ pending|count }} Pending requests without an approver, so obtain the authorization policy, the price-list history in effect and the approval evidence before concluding whether a billed price was unauthorized or a preventive control failed. Whether the policy requires another approval, or another review compensates, is the first thing to ask. Follow-up: obtain the pricing policy and authority matrix; inspect the reasons and customer agreements for a sample of self-approved overrides; trace the pending requests' order lines to the invoice lines; recommend an independent approver and a system block on unapproved prices.
 
 **Check:** the memo describes exceptions, not misconduct.
 
@@ -145,7 +164,7 @@ The Pending requests' prices fall inside the approved range here, so the error w
 
 - **Requirement (3).** The two exceptions are different: a blank approver is a missing approval, and a self-approval is an approval without independence.
 - **Requirement (4).** A grid whose someone-else column tests the Status, and the observation that every requester but one was approved by the {{ approver.title }}.
-- **Requirement (6).** The design weakness, the pending prices on the invoices, and a follow-up that names evidence, with no accusation.
+- **Requirement (6).** The design weakness, and a follow-up that names evidence, including a way to find whether the pending requests were billed (the invoice lines filtered on their order lines), with no accusation. A completed trace that finds the lines and their pricing methods is a plus, not a condition for full credit.
 
 A weak answer concludes that the control worked because every approved request has an approver.
 
@@ -167,7 +186,7 @@ A weak answer concludes that the control worked because every approved request h
 | Requirement 3: exceptions | 20 | Helper column, two rules, counts, slicer check | One exception |
 | Requirement 4: grid | 25 | All four counts with the Status test, names and titles | The pending approvals counted |
 | Requirement 5: range | 10 | Approved requests only | The whole Table |
-| Requirement 6: memo | 25 | Both exceptions, the design reason, and the follow-up | Findings without follow-up |
+| Requirement 6: memo | 25 | Both exceptions, the design reason, and follow-up procedures that include how to find whether the pending requests were billed | Findings without follow-up |
 
 ## Extensions and discussion questions
 

@@ -234,7 +234,7 @@ def fig_03_06() -> Diagram:
           "table a posting came from, and SourceDocumentID holds the key of the row in that table "
           "(payroll summary postings carry a code instead). Because one column can point to several "
           "tables, no single foreign key can describe the link. It is a logical link that analysts "
-          "test. A few PayrollPayment rows point to payments that do not exist.", 600, 0, 260, 214,
+          "test. A few ledger rows typed PayrollPayment point to payments that do not exist.", 600, 0, 260, 214,
           fill=AMBER_TINT, stroke=AMBER, align="left", valign="top")
     sources = [("SalesInvoice", "SalesInvoiceID", "Order-to-Cash", ["InvoiceNumber", "GrandTotal"]),
                ("PurchaseInvoice", "PurchaseInvoiceID", "Procure-to-Pay",
@@ -259,7 +259,9 @@ def fig_03_07() -> Diagram:
     C0, C1, C2, W = 0, 290, 580, 240
     cu = table(d, "Customer", C1, 20, [("PK", "CustomerID"), ("", "CustomerName"),
                                        ("", "CustomerSegment")], w=W)
-    it = table(d, "Item", C2, 20, [("PK", "ItemID"), ("", "ItemCode"), ("", "ItemName")], w=W,
+    # Two rows only, so that the line from Item down to SalesOrderLine is long enough for its two endpoints to read
+    # apart (the gap matches the one from Customer to SalesOrder).
+    it = table(d, "Item", C2, 20, [("PK", "ItemID"), ("", "ItemName")], w=W,
                focus=False, group="Master Data")
     so = table(d, "SalesOrder", C1, 182, [("PK", "SalesOrderID"), ("", "OrderNumber"),
                                           ("FK", "CustomerID"), ("", "OrderDate")], w=W)

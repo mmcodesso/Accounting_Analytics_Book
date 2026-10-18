@@ -27,7 +27,7 @@ b. Drag CostCenterID from **BudgetLine** onto CostCenterID in **CostCenter**.
 c. Drag BudgetDate from **BudgetLine** onto Date in the **Date** table.
 d. Hide the two keys of BudgetLine.
 
-@fig-15-07 shows the result. BudgetLine and GLEntry are two fact tables sharing three dimensions, so a visual grouped by cost center or account can place the budget beside the ledger.
+@fig-15-07 shows the result. BudgetLine and GLEntry are two fact tables sharing three dimensions, so a visual grouped by cost center or account can place the budget beside the ledger. Each of the three relationships should read many to one, with the budget on the many side and a single filter direction, which holds when the key in Account, CostCenter, and Date is unique and never blank in its own table.
 
 ![The Budget Beside the Ledger in Model View.](/visuals/svg/fig-15-07-budget-model.svg){#fig-15-07 fig-alt="A mock of Power BI's Model view. BudgetLine and GLEntry are two fact tables. Account, CostCenter, and Date each relate to both, many to one, with arrows pointing toward the fact tables. BudgetLine relates to Date on BudgetDate, the first day of each month, and GLEntry on PostingDate."}
 
@@ -139,6 +139,8 @@ c. Type the formula below in the formula bar, and click **Back to report**.
 ```
 YTD Variance = RUNNINGSUM ( [Variance to Flexed] )
 ```
+
+A visual calculation reads the rows in the order the visual shows them, so leave the table sorted by YearMonth, oldest first, with one row for each month. Sorting by an amount would change what the running sum adds up.
 
 The year-to-date column climbs in January, falls through June, climbs again in July, and falls for the rest of the year to the total of Step 9, within a cent: each month is flexed at its own month's budgeted commission rate, which differs from the year's rate only in its last digits. January and July are the months with three pay dates, which Chapter 11 traced to payroll recorded when it is paid: against a budget that spreads salaries evenly, they look unfavorable, and every other month looks favorable. A reader in July would have seen operating expense close to the flexed budget for the year to date, and the months between show the payroll timing behind that near-zero total. @fig-15-06 showed this calculation in the editor.
 

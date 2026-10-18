@@ -25,7 +25,7 @@ The exercise asks whether the ledger is complete before the financial statements
 
 By the end, students can:
 
-- total debits and credits across a large worksheet and judge the result (chapter outcome 4);
+- total debits and credits across a large worksheet and judge the result (outcome 4);
 - read a PivotTable of periods and tell the edges of an extract from missing transactions (outcome 3);
 - say what equal totals and a full list of source types do and do not show (outcome 6);
 - write a one-page completeness assessment with a figure behind every statement.
@@ -70,7 +70,7 @@ c. Filter to the latest fiscal year and read the SourceDocumentType of its rows.
 
 {{ figure('IF-02-2-A') }}
 
-**Check:** {{ periods }} periods. The ordinary ones hold between {{ ordinary_min|count }} and {{ ordinary_max|count }} rows, and the typical one about {{ typical|num(0) }}. Three are far smaller:
+**Check:** {{ periods }} periods. The ordinary ones hold between {{ ordinary_min|count }} and {{ ordinary_max|count }} rows, and the median of all the periods is {{ typical|num(0) }}. Three are far smaller:
 
 | FiscalYear | FiscalPeriod | Rows |
 |---:|---:|---:|
@@ -78,7 +78,7 @@ c. Filter to the latest fiscal year and read the SourceDocumentType of its rows.
 | {{ r[0] }} | {{ r[1] }} | {{ r[2]|count }} |
 {% endfor %}
 
-The first is the start of the records, the start-up month that Chapter 7 names. The last two hold only supplier payments (DisbursementPayment) that settle invoices of the year before, so they are the edge of the extract and not missing sales or purchases. They do not belong in an analysis of the years under review. **Watch for:** "missing transactions" as the explanation, and a memo that mentions the small periods without the reason.
+The first is the first month of the extract, the start-up month that Chapter 7 names; the records do not say when the company began. It is part of the first fiscal year, so it stays in an analysis of the years under review, and its low volume is a question for the extract's specification, not evidence of missing records. The last two hold only supplier payments (DisbursementPayment) that settle invoices of the year before. They fall outside the years under review and stay out of their annual totals, but a procedure on settlements after year-end uses them. **Watch for:** "missing transactions" as the explanation, and a memo that mentions the small periods without the reason.
 
 ### Requirement (3): Source types
 
@@ -86,7 +86,7 @@ The first is the start of the records, the start-up month that Chapter 7 names. 
 
 **Check:** {{ n_source }} source types, from {{ largest[0] }} ({{ largest[1]|count }} rows) down to {{ smallest[0] }} ({{ smallest[1]|count }}). The six that the exercise names ({{ exercise_types }}) are all present, in every fiscal year under review. In the latest fiscal year only the payments appear. If a type that should post were missing from a period in which the activity took place, that would be a completeness problem: a whole cycle that failed to post.
 
-**Step 5. Say what a full list shows and does not show.** A model answer: every source type appears in every fiscal year under review, so no cycle is absent from the ledger. The list cannot show that every document of each type posted, or that each posted in full. Only a test that starts from the documents can. For example, {{ unposted.MaterialIssue }} material issue headers have no ledger rows and no lines, so there was nothing to post; a count of source types would not reveal them, and a student cannot be expected to find them in Excel. By contrast, all {{ invoices|count }} sales invoices reconcile to the receivable that their rows debit, which is the evidence behind the chapter's traceability section.
+**Step 5. Say what a full list shows and does not show.** A model answer: every source type that appears in the ledger appears in every fiscal year under review. That shows activity from each of those sources, not that every expected cycle is there or that every transaction posted. Only a test that starts from the documents can show that each posted, in full. For example, {{ unposted.MaterialIssue }} material issue headers have no ledger rows and no lines, though all carry the status Issued; whether they are valid empty documents or missing detail needs the source records and an explanation of the status. A count of source types would not reveal them, and students need not hunt for them (an instructor extension). By contrast, all {{ invoices|count }} sales invoices reconcile to the receivable that their rows debit, which is the evidence behind the chapter's traceability section. It cannot test a sale that was never invoiced.
 
 **Check:** the answer names what the test shows (each cycle posts) and what it does not (each document posted, accurately and in the right period).
 
@@ -96,7 +96,7 @@ The first is the start of the records, the start-up month that Chapter 7 names. 
 
 ### Requirement (4): Write the memo
 
-**Step 7. Outline a one-page memo.** A strong memo has a header and the purpose, then the conclusion up front. The conclusion says that the tests found no gap in the years under review (the ledger balances in total, every period has entries, the edges are explained and every source type appears) and that a completeness conclusion for the financial statements still needs a test that starts from the documents, the extract's specification and the source system's control totals. A table follows with one row per test (what was tested, the result with its figure, and what it shows), then the limits (balance in total, types not documents) and a closing line on what would close the gap, such as a document-to-ledger reconciliation.
+**Step 7. Outline a one-page memo.** The scenario's statements are for fiscal {{ d.C }}, so the memo reads the tests on the whole extract as profiling and draws its conclusion for fiscal {{ d.C }}. A strong memo has a header and the purpose, then the conclusion up front. The conclusion says that the tests found no gap in the years under review (the ledger balances in total, every period has entries, the edges are explained and every source type appears) and that a completeness conclusion for the financial statements still needs a test that starts from the documents, the extract's specification and the source system's control totals. A table follows with one row per test (what was tested, the result with its figure, and what it shows), then the limits (balance in total, types not documents) and a closing line on what would close the gap, such as a document-to-ledger reconciliation.
 
 **Check:** every statement in the memo has a number or a worksheet behind it.
 
@@ -117,7 +117,7 @@ The first is the start of the records, the start-up month that Chapter 7 names. 
 ## What a strong answer says
 
 - **Requirement (1).** The totals, the rounded difference, and the limit: balance in total does not show that no entry is missing.
-- **Requirement (2).** The date range, the three small periods with their cause, and the conclusion that they are the edges of the extract and fall outside the years under review.
+- **Requirement (2).** The date range, the three small periods with their cause, and the conclusion that the first is the extract's first month and stays in the period, while the last two are payments after it.
 - **Requirement (3).** The source types present, the years in which they appear, and what a full list does and does not show.
 - **Requirement (4).** A memo with evidence for each claim and a stated limit.
 
@@ -127,7 +127,7 @@ A weak answer reports "the ledger is complete" from the totals alone, or explain
 
 - **Balance read as completeness.** *Symptom:* "debits equal credits, so nothing is missing". *Response:* ask what an entry left out with both of its sides would do to the totals.
 - **The edges read as gaps.** *Symptom:* "the ledger is missing transactions in the last periods". *Response:* ask what source type is in them.
-- **The first period ignored.** *Symptom:* the memo mentions only the last two. *Response:* ask why the first period is small and what the data begins with.
+- **The first period ignored, or dropped.** *Symptom:* the memo mentions only the last two, or leaves the first month out of the year. *Response:* ask why the first period is small, what the data begins with, and whether its rows belong to the year.
 - **Formulas on every row.** *Symptom:* Excel stops responding. *Response:* ask what a PivotTable does with the same rows.
 - **Rows counted instead of amounts.** *Symptom:* a count of Debit cells reported as a total. *Response:* ask what a SUM shows that a count does not.
 - **Source types listed without a conclusion.** *Symptom:* the list pasted into the memo. *Response:* ask what the reader should conclude from it.
@@ -138,7 +138,7 @@ A weak answer reports "the ledger is complete" from the totals alone, or explain
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
 | Requirement 1: totals and balance | 20 | Both totals, a rounded difference and the limit of the test | Totals without a conclusion or a limit |
-| Requirement 2: date range and periods | 30 | Range, the three small periods and their cause, the edges separated from the years under review | Periods noted without the cause, or the edges called gaps |
+| Requirement 2: date range and periods | 30 | Range, the three small periods and their cause, the payments after year-end separated from the years under review | Periods noted without the cause, or the edges called gaps |
 | Requirement 3: source types | 25 | Types present by year, and what a full list does not show | The list without the interpretation |
 | Requirement 4: memo | 25 | One page, conclusion first, a figure behind every statement | Narrative without figures |
 

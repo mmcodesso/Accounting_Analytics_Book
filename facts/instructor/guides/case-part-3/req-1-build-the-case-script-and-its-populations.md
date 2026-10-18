@@ -81,9 +81,9 @@ FROM TimeClockPunch;
 - `COUNT(*)` where `COUNT(EmployeeShiftRosterID)` belongs reports the roster as complete: count each column by name, or the blanks never appear.
 - Profiling the calendar by its date alone reads {{ g.cal_dates|count }} dates in {{ g.cal[0]|count }} rows and looks like duplicates. The key is the work center and the date; the model counts the pair with `||` and gets {{ g.cal[4]|count }}.
 
-**Step 3. Profile the other three tables the same way.** Roster: employees rostered twice on one date. Exceptions: group by type, severity and status, and count the reviewer. Calendar: group by exception reason and day type, and total the working days and available hours of {{ d.C }}.
+**Step 3. Profile the other three tables the same way.** Roster: employees rostered twice on one date. Exceptions: group by type, severity and status, and count the reviewer and the review date. Calendar: group by exception reason and day type, and total the working days and available hours of {{ d.C }}.
 
-**Check:** see Expected results. The exceptions are {{ exceptions }} in {{ exc_types|length }} types, {{ per_type }} of each, all Open and none reviewed.
+**Check:** see Expected results. The exceptions are {{ exceptions }} in {{ exc_types|length }} types, {{ per_type }} of each, all Open, with no reviewer and no review date (WithReviewDate is zero, as Reviewed is, though a missing reviewer and a missing review date are different gaps).
 
 ### Part 3: The links
 

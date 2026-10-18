@@ -2,7 +2,7 @@
 
 **Context and objective.** In this tutorial, you will publish Charles River Reports to the Power BI service, assign a colleague to the role of Guided Tutorial B.1, and test the role in the service, where it applies to real sign-ins rather than the names you typed in View as. Then you will complete internal audit's memo with a recommendation on how the package should be shared.
 
-**Prerequisites.** You need Charles River Reports.pbix as you left it at the end of Guided Tutorial B.1. If you start here, download Charles River Reports as it stands at the end of Guided Tutorial B.1 from [Companion Files](#sec-companion-files): a Power BI project that you point at your copy of CharlesRiver.xlsx, refresh, and save as Charles River Reports.pbix, as that page explains. Steps 1 to 4 need a work or school account, a shared workspace in which you are an Admin, such as a test workspace your instructor provides, and a colleague in the same organization. Each of you needs a Power BI Pro or Premium Per User license, and in a Premium Per User workspace both of you need Premium Per User. With a free license you can publish to My workspace but not share, so the roles have no one to apply to. If you lack any of these, read Steps 1 to 4 and do Step 5, which needs none of them.
+**Prerequisites.** You need Charles River Reports.pbix as you left it at the end of Guided Tutorial B.1. If you start here, download Charles River Reports as it stands at the end of Guided Tutorial B.1 from [Companion Files](#sec-companion-files): a Power BI project that you point at your copy of CharlesRiver.xlsx, refresh, and save as Charles River Reports.pbix, as that page explains. Steps 1 to 4 need a work or school account, a shared workspace in which you are an Admin, such as a test workspace your instructor provides, and a colleague in the same organization. Each of you needs a Power BI Pro or Premium Per User license, and in a Premium Per User workspace both of you need Premium Per User. With a free license you can publish to My workspace but not share, so the roles have no one to apply to. Use an exercise workspace that your institution approves and that holds only synthetic course material. Give each pair its own workspace, or save the file under a name unique to your pair before you publish it, because republishing replaces the semantic model of the same name (Microsoft, 2025b). Your colleague must not already hold the Admin, Member, or Contributor role in the workspace or Write permission on the semantic model, directly or through a group, and must not already belong to a role of the model, such as Finance, that would change what the test shows. If you lack any of these, read Steps 1 to 4 and do Step 5, which needs none of them.
 
 **Step-by-step instructions.**
 
@@ -18,10 +18,10 @@ The security table now maps you to Sales and your colleague to Warehouse. A chan
 **Step 2. Publish the report.**
 
 a. Choose **Home > Publish**, and sign in if you are asked.
-b. Select a shared workspace in which you are an Admin, and click **Select**.
+b. Select the exercise workspace in which you are an Admin, and click **Select**. If Desktop asks you to confirm replacing a semantic model, stop unless it is your own copy of this file.
 c. Open the link that Power BI Desktop shows when publishing succeeds.
 
-Publishing puts two items in the workspace, the report and the semantic model, both named Charles River Reports. The roles travel inside the model, but their members do not: in the service, the role has no one in it yet. A free license lets you publish only to My workspace, where nothing can be shared.
+Publishing puts two items in the workspace, the report and the semantic model, both named after the file. The roles travel inside the model, but their members do not: in the service, the role has no one in it yet. A free license lets you publish only to My workspace, where nothing can be shared.
 
 **Step 3. Assign the role and test it as yourself.**
 
@@ -35,19 +35,19 @@ The header names the role and the person it is applied as, and the report shows 
 
 **Step 4. Test with your colleague, then remove the test access.**
 
-a. In the workspace, choose **Manage access**, and then **Add people or groups**.
+a. In the workspace, choose **Manage access**, write down who already has access and through which role or group, and then choose **Add people or groups**.
 b. Add your colleague with the **Viewer** role, and select **Add**.
 c. Ask your colleague to sign in again, and to open the report and its Budget and About pages.
 d. Record what your colleague sees, and the name on the Who Am I card.
-e. In **Manage access**, remove your colleague from the workspace, and under the semantic model's **Security** remove both of you from **Cost Center Managers**.
+e. Using your record from step a, remove only what this test added: your colleague's workspace access, and the two memberships of **Cost Center Managers** under the semantic model's **Security**, yours and your colleague's. Keep any access that was already there, and if it comes through a group, or you cannot restore it safely, ask your instructor to finish the cleanup.
 f. In Desktop, delete the two rows you added in Step 1, choose **Home > Close & Apply**, and publish again to the same workspace.
-g. Ask your colleague to sign in again, confirm that the report no longer opens, and record any other access that still opens it.
+g. Ask your colleague to sign in again, and confirm that the report opens only if your record from step a shows access that was already there. Record any other access that still opens it.
 
-Your colleague, a Viewer, sees only Warehouse, with the colleague's sign-in name on the Who Am I card. Workspace access, role membership, and the rows of the security table are separate grants, so the test ends by removing each one it created.
+Your colleague, a Viewer, sees only Warehouse, with the colleague's sign-in name on the Who Am I card. If your colleague sees every row instead, another grant, such as a higher workspace role, access through a group, or the Finance role, is in play, and your record from step a shows where to look. Workspace access, role membership, and the rows of the security table are separate grants, so the test ends by removing each one it created and leaving what was there before.
 
 **Step 5. Recommend how the package is shared.** Add a section to internal audit's memo of Guided Tutorial B.1. The Viewer role of Step 4 served the test, not the design the memo recommends.
 
-a. Recommend how the department managers reach the package, through the app or a workspace role, and the workspace role of the controller's staff who maintain it.
+a. Recommend how the department managers reach the package, through the app or a workspace role, and the workspace role of the controller's staff who maintain it. Say which app settings you would allow, keeping **Access to hidden content** off and granting sharing and Build permission only for a need the controller documents (Microsoft, 2026e), and how internal audit will check what an approved manager can open and see.
 b. Recommend where the Income Statement and Validation pages belong, given that row-level security cannot hide a page and app audiences show whole reports.
 c. Recommend how the semantic model is refreshed, and who watches the refresh history.
 d. Recommend whether Publish to web should be allowed, and whether the package should carry a sensitivity label.
@@ -56,7 +56,7 @@ d. Recommend whether Publish to web should be allowed, and whether the package s
 
 **Checkpoint.** Before you send the memo, confirm the following:
 
-- Your results were recorded while the test access was in place, and your colleague's workspace access, both role memberships, and the two test rows were then removed, with the report published again.
+- Your results were recorded while the test access was in place. Then only the temporary grants were removed (your colleague's workspace access, both role memberships, and the two test rows), the report was published again, and the access that remains matches your initial record.
 - Testing as the role shows Sales for you, your colleague sees Warehouse, or, without a license, your memo explains what each test would show.
 - The memo recommends how each kind of reader reaches the package, a home for the finance pages, a refresh owner, and a position on Publish to web and labels.
 

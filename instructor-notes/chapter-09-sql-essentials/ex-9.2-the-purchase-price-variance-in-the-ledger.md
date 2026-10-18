@@ -111,7 +111,7 @@ LIMIT 10;
 
 ![A mock of the ten largest unfavorable purchase variances of the year, with the tie-break visible.](../figures/chapter-09-sql-essentials/IF-09-2-A.pdf)
 
-**Check:** 10 rows, the largest $796.29 dated 2026-01-31 on voucher V0101-2026-020853, then $783.75 and $752.40. Two postings share $670.89, so their order depends on the tie-break; the tenth amount is not tied, so the ten postings are the same for everyone. **Watch for:** without the year condition the ranking mixes fiscal years and starts at $858.99. `ORDER BY Debit` without DESC starts at $0.01. Sorting on Credit leaves the rows in no order, because every unfavorable posting has a credit of zero. The description must be typed exactly as stored; `'Unfavorable purchase variance'` returns no rows.
+**Check:** 10 rows, the largest $796.29 dated 2026-01-31 on voucher V0101-2026-020853, then $783.75 and $752.40. Two postings share $670.89, so their order depends on the tie-break; the tenth amount is not tied, so the ten postings are the same for everyone. The requirement does not ask for a tie-break, so accept either order of the two. The date and voucher number of the model query make the order reproducible, which is a plus. **Watch for:** without the year condition the ranking mixes fiscal years and starts at $858.99. `ORDER BY Debit` without DESC starts at $0.01. Sorting on Credit leaves the rows in no order, because every unfavorable posting has a credit of zero. The description must be typed exactly as stored; `'Unfavorable purchase variance'` returns no rows.
 
 ### Requirement (5): Counting each description
 
@@ -170,6 +170,7 @@ WHERE AccountID = 55 AND FiscalYear = 2026
 
 - **Requirement (2).** The close is excluded because it clears the account, so the year nets to zero with it; a journal entry that adjusted the variance would stay. This is the trap of Tutorial 9.2 and of the Part I case.
 - **Requirement (3).** The account holds two kinds of cost: the invoice price against the purchase-order price at which the goods were received (goods received not invoiced is cleared at the receipt value), and purchase tax that cannot be recovered.
+- **Requirement (4).** The ten postings, largest first, with their dates and voucher numbers. A tie-break that fixes the order of the two equal amounts is a plus.
 - **Requirement (5).** A credit means the supplier billed below the order price, a favorable variance. A handful of one-cent debits and credits on lines billed at the order price are rounding (three one-cent credits and seven one-cent debits).
 - **Requirement (6).** Purchase price variance arises when a supplier invoice is posted, from PurchaseInvoice documents; manufacturing variance arises when a work order closes, from WorkOrderClose documents. One measures buying, the other making.
 
@@ -182,7 +183,7 @@ A weak answer calls the account a loss, or misses that the total includes the cl
 - **A LIKE on favorable.** *Symptom:* 19,659 rows in place of 7,270. *Response:* ask what the word unfavorable contains.
 - **A description typed from memory.** *Symptom:* no rows. *Response:* run DISTINCT on Description and copy it.
 - **The sort in the wrong direction or column.** *Symptom:* cents, or no order. *Response:* ask what ASC means and what Credit holds on these rows.
-- **No tie-break.** *Symptom:* two students list the fifth and sixth postings in a different order. *Response:* add the date and voucher number.
+- **No tie-break.** *Symptom:* two students list the fifth and sixth postings in a different order. *Response:* both are right, since the two share an amount. Show how a date and voucher number make the order reproducible.
 
 ## Grading guide
 
@@ -191,7 +192,7 @@ A weak answer calls the account a loss, or misses that the total includes the cl
 | Requirement 1: the AccountID | 10 | AccountID found by account number | Read from the grid |
 | Requirement 2: types and close | 20 | Both queries, the close identified and the exclusion explained | Close found, no reason |
 | Requirement 3: descriptions | 20 | DISTINCT on the right population, two kinds of cost | Descriptions listed only |
-| Requirement 4: ranking | 20 | Exact description, DESC, tie-break, LIMIT | Ranking without a tie-break |
+| Requirement 4: ranking | 20 | Account, year and exact description, Debit DESC and LIMIT 10, with either order of the two equal amounts | Wrong population, direction or number of postings |
 | Requirement 5: counts | 15 | Three counts, and what a credit means | Counts only |
 | Requirement 6: comparison | 15 | Source documents and the buying and making contrast | Definitions without the contrast |
 

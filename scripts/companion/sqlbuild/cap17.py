@@ -2075,6 +2075,87 @@ def r7(b: Build) -> None:
              Check("Issued credit memos", n["issued_n"], lambda r: r.rows[0][3]),
              Check(f"equal to 2060 at {ye(C)}", n["credits"][-1], lambda r: r.rows[0][4])])
 
+    # the services at each year-end (U24, item 9): every engagement started by the date, the hours worked through it
+    # against the hours billed on invoices first posted by it, in hours and in amount, so that work billed after a
+    # year-end shows as unbilled at that year-end
+    svc = n["svc_ye"]
+    s.query("Requirement 7: design services at each year-end, the hours worked through it against the hours billed on "
+            "invoices posted by it",
+            f"Population: every engagement started by each year-end; expected: {', '.join(str(x['n']) for x in svc)} "
+            "engagements, no difference in hours or amount",
+            f"""
+            WITH {sub(year_ends(d.years), 12)},
+            Posted AS (
+                SELECT SourceDocumentID AS SalesInvoiceID,
+                    MIN(PostingDate) AS PostingDate
+                FROM GLEntry
+                WHERE SourceDocumentType = 'SalesInvoice'
+                GROUP BY SourceDocumentID
+            ),
+            Worked AS (
+                SELECT ye.AsOfDate, t.ServiceEngagementID,
+                    SUM(t.BillableHours) AS Hours,
+                    SUM(t.BillableHours * se.HourlyRate) AS Amount
+                FROM YearEnds AS ye
+                    INNER JOIN ServiceTimeEntry AS t
+                        ON t.WorkDate <= ye.AsOfDate
+                    INNER JOIN ServiceEngagement AS se
+                        ON se.ServiceEngagementID = t.ServiceEngagementID
+                GROUP BY ye.AsOfDate, t.ServiceEngagementID
+            ),
+            Billed AS (
+                SELECT ye.AsOfDate, bl.ServiceEngagementID,
+                    SUM(bl.BilledHours) AS Hours,
+                    SUM(bl.LineAmount) AS Amount
+                FROM ServiceBillingLine AS bl
+                    INNER JOIN SalesInvoiceLine AS sil
+                        ON sil.SalesInvoiceLineID = bl.SalesInvoiceLineID
+                    INNER JOIN Posted AS p
+                        ON p.SalesInvoiceID = sil.SalesInvoiceID
+                    INNER JOIN YearEnds AS ye
+                        ON p.PostingDate <= ye.AsOfDate
+                GROUP BY ye.AsOfDate, bl.ServiceEngagementID
+            ),
+            ByEngagement AS (
+                SELECT ye.AsOfDate, se.ServiceEngagementID,
+                    COALESCE(w.Hours, 0) AS HoursWorked,
+                    COALESCE(b.Hours, 0) AS HoursBilled,
+                    COALESCE(w.Amount, 0) AS AmountWorked,
+                    COALESCE(b.Amount, 0) AS AmountBilled
+                FROM YearEnds AS ye
+                    INNER JOIN ServiceEngagement AS se
+                        ON se.StartDate <= ye.AsOfDate
+                    LEFT JOIN Worked AS w
+                        ON w.AsOfDate = ye.AsOfDate
+                        AND w.ServiceEngagementID = se.ServiceEngagementID
+                    LEFT JOIN Billed AS b
+                        ON b.AsOfDate = ye.AsOfDate
+                        AND b.ServiceEngagementID = se.ServiceEngagementID
+            )
+            SELECT AsOfDate, COUNT(*) AS Engagements,
+                ROUND(SUM(HoursWorked), 2) AS HoursWorked,
+                ROUND(SUM(HoursBilled), 2) AS HoursBilled,
+                ROUND(SUM(AmountWorked), 2) AS AmountWorked,
+                ROUND(SUM(AmountBilled), 2) AS AmountBilled,
+                SUM(CASE WHEN ABS(HoursWorked - HoursBilled) > 0.005
+                    THEN 1 ELSE 0 END) AS HourDifferences,
+                SUM(CASE WHEN ABS(AmountWorked - AmountBilled) > 0.005
+                    THEN 1 ELSE 0 END) AS AmountDifferences
+            FROM ByEngagement
+            GROUP BY AsOfDate
+            ORDER BY AsOfDate;
+            """,
+            [Check("year-ends", [ye(y) for y in d.years], lambda r: r.col("AsOfDate")),
+             Check("engagements started by each year-end", [x["n"] for x in svc], lambda r: r.col("Engagements")),
+             Check("engagements whose hours differ", [0] * len(svc), lambda r: r.col("HourDifferences")),
+             Check("engagements whose amounts differ", [0] * len(svc), lambda r: r.col("AmountDifferences")),
+             *[Check(f"hours worked through {x['asof']}", x["worked"], lambda r, k=k: r.col("HoursWorked")[k])
+               for k, x in enumerate(svc)],
+             *[Check(f"hours billed by {x['asof']}", x["billed"], lambda r, k=k: r.col("HoursBilled")[k])
+               for k, x in enumerate(svc)],
+             *[Check(f"amount billed by {x['asof']}", x["billed_amount"], lambda r, k=k: r.col("AmountBilled")[k], 0.01)
+               for k, x in enumerate(svc)]])
+
     engs = n["engs"]
     s.query("Requirement 7: design services worked and not billed, the engagements not fully billed",
             f"Population: ServiceEngagement, ServiceTimeEntry, ServiceBillingLine; expected: {money(n['billable'])} "

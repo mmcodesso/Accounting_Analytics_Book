@@ -50,7 +50,7 @@ B.  Use VLOOKUP on the SalesOrder Table, because XLOOKUP cannot search more than
 C.  Sort both Tables by date and copy the order dates across to the invoice lines.
 D.  Look up the invoice's SalesOrderID first, and then use it to look up the order date.
 
-**7.** A sales order can have several shipments. An analyst uses XLOOKUP to bring a shipment date onto each order. What is the problem, and what is the better approach?
+**7.** A sales order can have several shipments. An analyst wants to bring the earliest shipment date onto each order and uses XLOOKUP. What is the problem, and what is the better approach?
 
 A.  XLOOKUP cannot return dates from another Table; use VLOOKUP instead.
 B.  XLOOKUP returns the sum of the shipment dates; use AVERAGEIFS instead.

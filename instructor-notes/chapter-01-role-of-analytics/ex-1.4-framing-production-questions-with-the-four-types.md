@@ -11,14 +11,14 @@
 
 ## Purpose and learning outcomes
 
-This exercise turns the chapter's four types from definitions into a skill: writing a question that really is descriptive, diagnostic, predictive or prescriptive, and checking that the workbook can answer it. Writing the question is the first stage of the workflow, and the memo is the last. Students also meet the limits of a dataset, because a good-sounding production question about scrap or downtime has no data behind it here. The exercise uses all four types, and it is the main practice for chapter outcomes 1 and 2.
+This exercise turns the chapter's four types from definitions into a skill: writing a question that really is descriptive, diagnostic, predictive or prescriptive, and checking that the workbook can answer it. Writing the question is the first stage of the workflow, and the memo is the last. Students also meet the limits of a dataset, because a good-sounding production question about scrap or downtime has no data behind it here. The exercise uses all four types, and it is the main practice for outcome 1.
 
 By the end, students can:
 
-- write a production question of each type and say why it has that type (chapter outcome 1);
+- write a production question of each type and say why it has that type (outcome 1);
 - name the table group and worksheets that hold the data for each question;
 - explain why a prescriptive question is the hardest to answer, in terms of data, assumptions and judgment;
-- order the questions by complexity in a short memo and recommend which to tackle first (chapter outcome 2).
+- order the questions by complexity in a short memo and recommend which to tackle first.
 
 **Competencies practiced.** CPA Evolution Core S1 M8 T3 to T4 (data mining and analysis of financial data); IMA Data Analysis, and Decision Analysis; IFAC IES 2 (b), management accounting, and IES 3 (a), evaluating data from several sources; AACSB A5 part 5.2.
 
@@ -49,7 +49,7 @@ A useful variation: students swap their four questions and classify each other's
 |---|---|---|
 | Descriptive | What happened? | A summary of recorded data |
 | Diagnostic | Why did it happen? | A decomposition, a comparison of segments, or a trace to documents |
-| Predictive | What might happen? | An expectation or forecast from historical patterns, about a future period |
+| Predictive | What might happen? | An expectation or forecast from historical patterns, about an outcome not yet known, usually in a future period |
 | Prescriptive | What should we do? | A recommended action that optimizes an objective under constraints |
 
 **Step 2. Compare with a model set.**
@@ -79,7 +79,7 @@ A model assignment: the descriptive question needs Manufacturing and Master Data
 
 **Step 4. Write two or three sentences on data, assumptions and judgment.** A model outline:
 
-1. *Data.* It needs the other three types first: a baseline of what happened, an explanation of the costs, and a forecast of demand. It also needs the figures for its objective and constraints, such as the contribution margin of each item and the hours of each work center. List price less StandardCost is not that margin, because the standard cost of a manufactured item includes fixed overhead and actual prices are net of discounts.
+1. *Data.* It needs a decision, an objective, constraints and inputs it can defend. Descriptive, diagnostic or predictive work often supplies or checks those inputs, such as a baseline of what happened, an explanation of the costs and a forecast of demand, though not every project completes each as a separate stage. It also needs the figures for its objective and constraints, such as the contribution margin of each item and the hours of each work center. List price less StandardCost is not that margin, because the standard cost of a manufactured item includes fixed overhead and actual prices are net of discounts.
 2. *Assumptions.* It assumes setup and run times stay as routed, that capacity is available as the calendar says, and that the forecast holds. The dataset has planned hours and a calendar with maintenance days, but no record of actual downtime, defects or scrap, so these assumptions cannot be tested here.
 3. *Judgment.* Someone must choose the objective and the trade-offs, such as margin against service or overtime, and must explain the recommendation to people who will act on it.
 
@@ -89,7 +89,7 @@ A model assignment: the descriptive question needs Manufacturing and Master Data
 
 **Step 5. Outline a half-page to one-page memo.** A strong memo has a header and a one-sentence purpose; the four questions in order of complexity (descriptive, diagnostic, predictive, prescriptive), each with its type and its table groups; a recommendation of the first question to tackle; and the reason.
 
-The usual recommendation is the descriptive question: it needs one group, it answers quickly, it checks that the data can be trusted, and its result is the baseline for the diagnostic question. A recommendation to start with the diagnostic question is also acceptable, when the manager's worry is already visible in the data and the memo says so. Starting with the prescriptive question is not, because its inputs do not exist yet.
+The usual recommendation is the descriptive question: it uses Manufacturing and Item from Master Data, it answers quickly, and its result is the baseline for the diagnostic question. Building it is also a chance to look at the underlying records, though a summary by itself does not show that the data can be trusted. A recommendation to start with the diagnostic question is also acceptable, when the manager's worry is already visible in the data and the memo says so. Starting with the prescriptive question is acceptable only when the memo explains where its inputs would come from and what limits them.
 
 **Check:** the order of the questions is by complexity, and the recommendation has a reason.
 
@@ -103,9 +103,9 @@ A student who answers the model questions finds these values.
 | Units completed, Lighting, Q3 2026 and Q4 2026 | 4,699.67 and 6,106.82 | Step 2 |
 | Units completed, Textiles, Q3 2026 and Q4 2026 | 845.90 and 1,188.32 | Step 2 |
 | Units completed, all groups, Q3 2026 and Q4 2026 | 12,732.11 and 14,753.35 | Step 2 |
-| Units completed in 2024 | 52,263 | Step 2 |
-| Units completed in 2025 | 48,961 | Step 2 |
-| Units completed in 2026 | 51,160 | Step 2 |
+| Units completed in 2024 | 52,263.03 | Step 2 |
+| Units completed in 2025 | 48,960.83 | Step 2 |
+| Units completed in 2026 | 51,160.06 | Step 2 |
 | Total variance on work orders closed in 2024 | 1,297,051.56 | Step 2 |
 | Total variance on work orders closed in 2025 | 1,861,950.08 | Step 2 |
 | Total variance on work orders closed in 2026 | 2,265,636.88 | Step 2 |
@@ -123,12 +123,12 @@ Only the descriptive and diagnostic figures can be computed from the data at thi
 - **Requirement (3).** Reasons in terms of the inputs it needs, the assumptions behind it and the choices it asks for, and a remark that the data lack actual downtime and scrap.
 - **Requirement (4).** An ordered memo with a choice and a reason.
 
-A weak answer writes "why" questions and calls them descriptive, writes a "predictive" question about the past, or names worksheets from memory.
+A weak answer writes "why" questions and calls them descriptive, writes a "predictive" question that only summarizes the record, or names worksheets from memory.
 
 ## Common mistakes and how to respond
 
 - **A descriptive question that asks why.** *Symptom:* "Why did output fall?" *Response:* ask whether the answer is a total or an explanation.
-- **A predictive question with no future.** *Symptom:* "What was the average yield?" *Response:* ask which period the answer is about.
+- **A "predictive" question that only summarizes.** *Symptom:* "What was the average yield?" *Response:* ask what the answer would estimate that is not already recorded.
 - **A prescriptive question with no decision or constraint.** *Symptom:* "What should we do about variance?" *Response:* ask what is chosen, and what limits the choice.
 - **A question the data cannot answer.** *Symptom:* scrap rate, defect rate, machine downtime. *Cause:* the tables hold plans and standards only. *Response:* ask which worksheet holds it, then help rewrite the question for what the data has.
 - **The wrong group.** *Symptom:* work order data placed in Order-to-Cash. *Response:* point to Table 1.3.

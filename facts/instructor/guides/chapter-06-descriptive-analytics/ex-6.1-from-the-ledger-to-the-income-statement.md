@@ -32,7 +32,7 @@ This exercise starts from the other record of revenue, the general ledger, and a
 
 By the end, students can:
 
-- build a pre-closing trial balance from GLEntry, with a date filter, the closing entries left out and Group By, and show that its debit and credit balances agree (chapter outcome 6);
+- build a pre-closing trial balance from GLEntry, with a date filter, the closing entries left out and Group By, and show that its debit and credit balances agree (outcome 6);
 - turn it into a common-size income statement with SUMIFS by AccountSubType, and tie net income to the closing entry and the balance sheet to equity (outcomes 6 and 2);
 - reconcile the ledger's product revenue to InvoiceLines, identify the invoices behind the differences and say which date should decide their period (outcome 5).
 
@@ -40,13 +40,13 @@ By the end, students can:
 
 ## Before you assign
 
-- **Files and software.** The copy of Charles River Furniture Analysis.xlsx made after Tutorial 6.3, with InvoiceLines and the SalesInvoice Table of Tutorial 5.1. Requirement 5 reads shipment dates from the ShipmentLine and Shipment worksheets of CharlesRiver_Work.xlsx. The model answer uses FILTER, CHOOSECOLS and HSTACK (Microsoft 365 or Excel 2024). Run the Group By yourself first: the ledger is large.
+- **Files and software.** The copy of Charles River Furniture Analysis.xlsx made after Tutorial 6.3, with InvoiceLines and the SalesInvoice Table of Tutorial 5.1. Requirement 5 reads shipment dates from the ShipmentLine and Shipment worksheets of CharlesRiver_Work.xlsx. The model answer uses FILTER, CHOOSECOLS and HSTACK (Microsoft 365 or Excel 2024).
 - **Data conditions.** T3_GLEntry holds {{ g.rows_all|count }} rows. {{ g.rows_next|count }} of them are dated after {{ asof }}, all supplier payments, and {{ g.rows_close|count }} belong to the two closing entries {{ g.c1 }} and {{ g.c2 }}. The earlier closes ({{ g.earlier_close_f }}; {{ g.earlier_close_p }}) zeroed the revenue and expense accounts of the earlier years, so those accounts show only fiscal {{ d.C }}. The chart of accounts has {{ g.n_accounts_all|count }} accounts and {{ accounts }} have postings.
 - **Column letters.** The loaded TrialBalance Table runs from AccountID in column {{ g.letters.AccountID }} through AccountSubType in {{ g.letters.AccountSubType }}, with the three calculated columns in {{ g.letters.Balance }}, {{ g.letters.DebitBalance }} and {{ g.letters.CreditBalance }}.
 
 ## How to run it
 
-Individual, or pairs for the reconciliation, about 120 minutes: 35 on the query (requirement 1), 15 on the columns and Total Row (2), 20 on the statement (3), 15 on the checks (4), 20 on the reconciliation (5) and 15 on the memo (6). Hold back the shipment path of requirement 5 until students have named the two dates that could decide the period. Collect the workbook and memo.
+Individual, or pairs for the reconciliation, about 120 minutes: 35 on the query (requirement 1), 15 on the columns and Total Row (2), 20 on the statement (3), 15 on the checks (4), 20 on the reconciliation (5) and 15 on the memo (6). Before students follow the shipment path that requirement 5 prints, ask them to name the two dates that could decide the period. Collect the workbook and memo.
 
 ## Step-by-step solution
 
@@ -54,10 +54,10 @@ Individual, or pairs for the reconciliation, about 120 minutes: 35 on the query 
 
 **Step 1. Import the two Tables.**
 
-a. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesRiver.xlsx, and in the **Navigator** select **T3_GLEntry** and **T1_Account**.
+a. Choose **Data > Get Data > From File > From Excel Workbook**, select CharlesRiver.xlsx, and in the **Navigator** check **Select multiple items** and select **T3_GLEntry** and **T1_Account**.
 b. Click **Transform Data**, not **Load**, and rename the queries `TrialBalance` and `ChartOfAccounts`.
 
-**Step 2. Filter before you group.** In TrialBalance, filter PostingDate to dates before `2027-01-01` with the column's date filters. Then filter VoucherNumber with the text filter that excludes a value, once for {{ g.c1 }} and once for {{ g.c2 }}.
+**Step 2. Filter before you group.** In TrialBalance, check that PostingDate has the Date type, and filter it to dates before `2027-01-01` with the column's date filters. Then filter VoucherNumber with the text filter that excludes a value, once for {{ g.c1 }} and once for {{ g.c2 }}, as two filters or one filter joined by **And**. Joined by **Or**, it keeps every row.
 
 **Step 3. Group by account.** Choose **Transform > Group By** and **Advanced**, group by AccountID, and add two aggregations: `Debit`, the sum of Debit, and `Credit`, the sum of Credit.
 
@@ -76,7 +76,9 @@ c. Sort by AccountNumber.
 a. Choose **Home > Close & Load > Close & Load To**, select **Only Create Connection** and click **OK**. The choice applies to both queries.
 b. Open **Data > Queries & Connections**, right-click **TrialBalance**, choose **Load To**, and load it as a **Table** on a **New worksheet** named `TrialBalance`.
 
-**Check:** the Table has {{ accounts }} rows. **Watch for:** a plain **Close & Load**, which sends both queries to the Data Model.
+Check on **Table Design** that the Table is named `TrialBalance`, as the formulas expect.
+
+**Check:** the Table has {{ accounts }} rows. **Watch for:** a plain **Close & Load**, which with Excel's default load settings sends both queries to the Data Model.
 
 ### Requirement (2): Balances and the Total Row
 
@@ -116,7 +118,11 @@ B10  =B8+B9
 
 **Step 9. Check net income against the closing entry.** Import **T2_JournalEntry** as a query named `JournalEntries` (or read the entry on the JournalEntry worksheet of CharlesRiver.xlsx). Look up the TotalAmount of {{ g.c2 }} and subtract it from B10.
 
-**Step 10. Check the balance sheet.** Enter `=SUMIFS(TrialBalance[Balance],TrialBalance[AccountType],"Asset")` for the assets, the same with `"Liability"` and `"Equity"` for the other two with the sign reversed, add B10 to equity, and compute the difference with `ROUND`.
+**Step 10. Check the balance sheet.** Enter this formula for the assets, the same with `"Liability"` and `"Equity"` for the other two with the sign reversed, add B10 to equity, and compute the difference with `ROUND`.
+
+```
+=SUMIFS(TrialBalance[Balance],TrialBalance[AccountType],"Asset")
+```
 
 **Check:** net income less the closing entry is zero, and assets (${{ assets|money }}) equal liabilities (${{ liabilities|money }}) plus equity (${{ equity|money }}) plus net income.
 
@@ -135,11 +141,11 @@ B10  =B8+B9
 
 {{ figure('IF-06-1-B') }}
 
-**Check:** each difference equals one invoice, and the ledger posted all of them on {{ posted }}. {{ early.number }} shipped on {{ early.shipped }}, in fiscal {{ d.P }}, so its ${{ early.amount|money }} is a cutoff error. The other {{ others }} shipped {{ others_shipped }}, so only their dates are wrong. **Watch for:** the invoice number taken as evidence. Delivery decides, because control passes then.
+**Check:** each difference equals one invoice, and the ledger posted all of them on {{ posted }}. The shipment records give {% for x in g.deliveries %}{{ x.number }}, shipped {{ x.shipped|join(' and ') }} and delivered {{ x.delivered|join(' and ') }}{{ '; ' if not loop.last }}{% endfor %}. {{ early.number }} was delivered in fiscal {{ d.P }}, so its ${{ early.amount|money }} is a cutoff error. The other {{ others }} were delivered in fiscal {{ d.C }}, so only their dates are wrong. **Watch for:** the invoice number, or the shipment date, taken as the evidence. Delivery decides, because control passes then.
 
 ### Requirement (6): The memo
 
-Outline: the statement and its basis, the two checks, the cost structure, then the reconciling items. Net revenue is ${{ net_rev|money }}; cost of goods sold takes {{ (-cogs / net_rev)|pct(2) }}, so gross margin is {{ (gm / net_rev)|pct(2) }}; operating expenses take {{ (-opex / net_rev)|pct(2) }}, so operating income is {{ (oi / net_rev)|pct(2) }} and net income {{ (ni / net_rev)|pct(2) }}.
+Outline: the statement and its basis, the two checks, the cost structure, then the reconciling items. The memo labels the statement and the reconciliation as recorded, before any correction of the errors found, and says the closing-entry check tests consistency, not recognition. Correcting the cutoff error would also reach the related receivable, sales tax and cost entries. Freight revenue is net of freight credits (${{ g.freight_billed|money }} billed less ${{ g.freight_credits|money }}), and the credit memos' subtotals post to sales returns, so the credits are not deducted twice. Net revenue is ${{ net_rev|money }}; cost of goods sold takes {{ (-cogs / net_rev)|pct(2) }}, so gross margin is {{ (gm / net_rev)|pct(2) }}; operating expenses take {{ (-opex / net_rev)|pct(2) }}, so operating income is {{ (oi / net_rev)|pct(2) }} and net income {{ (ni / net_rev)|pct(2) }}.
 
 ## Expected results
 
@@ -160,15 +166,15 @@ Outline: the statement and its basis, the two checks, the cost structure, then t
 {% for r in recon %}
 | Account {{ r.account }} less {{ r.group }} revenue | ${{ r.diff|money }} | 11 |
 {% endfor %}
-| Freight revenue (account {{ g.acct.freight }}, no invoice line) | ${{ freight|money }} | 12 |
+| Freight revenue (account {{ g.acct.freight }}, net of freight credits, no invoice line) | ${{ freight|money }} | 12 |
 
 {{ expected() }}
 
 ## What a strong answer says
 
 - **Requirement (2).** The earlier closes zeroed the revenue and expense accounts, the balance sheet accounts carry forward, and the {{ d.C }} closes are left out so the statement can be prepared.
-- **Requirement (5).** Three invoices numbered for fiscal {{ d.C }}, dated in fiscal {{ d.P }}, posted in {{ d.C }}. Delivery decides the period, and the shipment records show one cutoff error and two wrong dates. Freight revenue has no invoice line.
-- **Requirement (6).** Every ratio ties to the statement, the checks are called tests of arithmetic and not of completeness, and cost of goods sold includes freight-out and the two variances, which is why the gross margin is below the margin at standard cost.
+- **Requirement (5).** Three invoices numbered for fiscal {{ d.C }}, dated in fiscal {{ d.P }}, posted in {{ d.C }}. Delivery decides the period, and the shipment records show one cutoff error and two wrong dates. Freight revenue, net of freight credits, has no invoice line.
+- **Requirement (6).** Every ratio ties to the statement, which is labeled as recorded, before correction of the cutoff error, and cost of goods sold includes freight-out and the two variances, which is why the gross margin is below the margin at standard cost.
 
 A weak memo lists the statement without reading it, or calls the cutoff differences "errors" without saying which ones.
 
@@ -187,12 +193,11 @@ A weak memo lists the statement without reading it, or calls the cutoff differen
 | Requirement 1: the query | 25 | Filters before the Group By, merge without prefix, loaded as a Table | Closes or date filter missing, or loaded to the Data Model |
 | Requirement 2: columns and Total Row | 15 | Three columns, equal totals, written explanation | Totals without the explanation |
 | Requirement 3: the statement | 20 | SUMIFS by subtype, signs, both other-item subtypes, percentages | Typed values, or one subtype missing |
-| Requirement 4: the checks | 15 | Both checks, rounded, stated as arithmetic only | One check |
+| Requirement 4: the checks | 15 | Both checks made and their results stated | One check |
 | Requirement 5: reconciliation | 15 | Three invoices, delivery date, one cutoff error | Invoices found without the period argument |
-| Requirement 6: the memo | 10 | Cost structure, checks and reconciling items | Descriptive only |
+| Requirement 6: the memo | 10 | Cost structure, checks and reconciling items, labeled as recorded | Descriptive only |
 
 ## Extensions and discussion questions
 
 - Find the closing entries by EntryType and posting date instead of typing their numbers.
 - Discuss: the ledger balances with and without the later supplier payments. What would a completeness test look like?
-- Discuss: Tutorial 12.1 tests the cutoff for every invoice. What would you ask the shipping department?

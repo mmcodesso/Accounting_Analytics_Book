@@ -11,11 +11,11 @@
 
 ## Purpose and learning outcomes
 
-An auditor decides which data can support analytics before running any. The exercise asks for that decision across four table groups, using the tests of both tutorials plus one new test, and for a classification of every problem by dimension and by what it does to an audit procedure. Students also meet a finding that is not a data quality problem at all but a control matter. The tests are descriptive and prepare the audit analytics of Chapters 8 and 12.
+An auditor decides which data can support analytics before running any. The exercise asks for that decision across four table groups, using the tests of both tutorials plus one new test, and for a classification of every problem by dimension and by what it does to an audit procedure. Students also meet a finding that is a missing-evidence problem and a possible authorization exception at once. The tests are descriptive and prepare the audit analytics of Chapters 8 and 12.
 
 By the end, students can:
 
-- apply the dimension tests to four table groups and report each result with a count (chapter outcomes 2 and 4);
+- apply the dimension tests to four table groups and report each result with a count (outcomes 2 and 4);
 - classify a finding by dimension and by its effect on an audit procedure, such as revenue cutoff (outcome 3);
 - separate a finding about the data from a finding about a control (outcome 5);
 - recommend which tables are suitable for audit analytics and on what conditions.
@@ -112,14 +112,14 @@ The values lie between $4,990.92 and $4,993.92, just under $5,000, which is the 
 
 | Finding | Dimension | Effect on audit procedures |
 |---|---|---|
-| Invoices dated before the first shipment (9) | Accuracy | Revenue cutoff: a date wrong or billing before shipment moves revenue between periods |
+| Invoices dated before the first shipment (9) | Accuracy | Revenue cutoff: a timing exception to investigate (the terms, the shipment and delivery evidence, the recognition policy). None crosses a year from its first shipment, and the order-level screen can miss lines shipped later |
 | Blank list prices (43) | By design | None; limit price tests to the items sold |
 | Debits equal credits; no unmatched AccountID | Consistency (clean) | The ledger can be totalled and joined to the chart |
 | Rows with no amount (128) | Accuracy and consistency | Exclude or explain; they change no total but should not be read as payments |
-| First period and last two small | Timeliness | Keep the edges out of analytics of the years under review |
+| First period and last two small | Timeliness | The first is the extract's first month and stays in the period; the last two are payments after year-end, out of the annual totals but used for settlement work |
 | Requisitions with no approver (6) | Completeness, and a control matter | Approval testing: follow up as an exception |
 
-**Step 10. Outline the memo.** A strong memo has a header and the purpose; a conclusion up front (which tables are suitable and on what conditions); a table by group and dimension, as above; the tests that found nothing; and a recommendation for each table: Order-to-Cash usable with the dates noted, Master Data usable for the items sold, the Accounting Core usable for the years under review with the edges excluded, and Procure-to-Pay usable with the requisition exceptions reported separately.
+**Step 10. Outline the memo.** A strong memo has a header and the purpose; a conclusion up front (which tables are suitable and on what conditions); a table by group and dimension, as above; the tests that found nothing; and a recommendation for each table: Order-to-Cash usable with the dates noted, Master Data usable for the items sold, the Accounting Core usable for the years under review with the payments after year-end kept out of their totals, and Procure-to-Pay usable with the requisition exceptions reported separately.
 
 **Check:** the memo fits a page and gives a verdict for each group.
 
@@ -152,7 +152,7 @@ A weak answer lists counts with no classification, treats every finding as an er
 - **Impact missing.** *Symptom:* "accuracy problem" and nothing more. *Response:* ask which procedure the problem would distort.
 - **A clean result left out.** *Symptom:* no mention of the totals or the references. *Response:* ask what the senior learns from them.
 - **No verdict.** *Symptom:* findings without a recommendation by table. *Response:* ask which tables the senior could use tomorrow.
-- **The edges kept in.** *Symptom:* the small periods analysed as trends. *Response:* ask what the rows in them are.
+- **The edges misread.** *Symptom:* the payments after year-end counted in annual totals, or the first month dropped. *Response:* ask what the rows in each small period are and which year they belong to.
 
 ## Grading guide
 

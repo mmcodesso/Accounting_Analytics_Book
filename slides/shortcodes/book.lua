@@ -4,6 +4,7 @@
 --
 --   {{< book-figure fig-01-02 >}}                 the figure, with "Figure 1.2 · <caption>" under it
 --   {{< book-figure fig-03-07 crop="0,0,1,0.56" >}}   a detail: left, top, width, height as fractions
+--   {{< book-figure fig-03-07 crop="0,0,1,0.56" alt="Detail of ..." >}}   with alt text for what the detail shows
 --   {{< book-table tbl-01-02 columns="Tool,Main Workflow Stages" rows="SQL,Microsoft Excel" >}}
 --   {{< book-objectives >}} or {{< book-objectives 1-3 >}}  {{< book-terms >}}  {{< book-exercises >}}
 --   {{< book-steps 1.1 >}}  {{< book-checkpoint 1.1 answers="hide" >}}
@@ -95,6 +96,9 @@ local function book_figure(args, kwargs)
     name = name:gsub('(%.%w+)$', '.crop-' .. crop_key(crop) .. '%1')
     caption, alt = caption .. ' (detail)', 'Detail of: ' .. alt
   end
+  -- alt="..." describes what the slide shows, for a detail whose crop leaves out parts the figure's own alt
+  -- text names; scripts/slides/pptx_finish.py gives the PowerPoint picture the same text.
+  alt = value(kwargs, 'alt') or alt
   -- PowerPoint cannot draw the SVG's HTML labels, so it gets the PNG exported from the same source.
   if quarto.doc.is_format('pptx') then name = name:gsub('%.svg$', '.png') end
   local attributes = 'fig-alt="' .. alt .. '"'

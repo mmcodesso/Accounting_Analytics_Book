@@ -12,7 +12,7 @@ figures:
   - id: IF-01-2-A
     kind: diagram
     purpose: The path of the traced sale through the seven worksheets, with the one-to-many links and the ledger postings.
-    shows: Left to right, boxes for SalesOrder (with its lines), Shipment, SalesInvoice, CashReceipt and CashReceiptApplication, each carrying the document number and date of the traced sale. Labels on the arrows give how many shipments and invoices the order has and how many invoices the receipt paid. Beneath them a GLEntry box receives dashed amber arrows from the shipment, the invoice, the receipt and the application, each labeled with the accounts debited and credited. The sales order and its lines have no arrow to the ledger, and a note says so.
+    shows: Left to right, boxes for SalesOrder (with its lines), Shipment, SalesInvoice, CashReceipt and CashReceiptApplication, each carrying the document number and date of the traced sale. Labels on the arrows place the traced documents among the order's shipments and invoices and the invoices the receipt paid (for example "1 of" the order's shipments). Beneath them a GLEntry box receives dashed amber arrows from the shipment, the invoice, the receipt and the application, each labeled with the accounts debited and credited. The sales order and its lines have no arrow to the ledger, and a note says so.
     data: The traced sale of Figure 1.6 and its order, shipment, receipt and application, from the Expected results table of this guide.
   - id: IF-01-2-B
     kind: excel-mock
@@ -30,7 +30,7 @@ The exercise makes one idea concrete: a ledger posting is the last step of a bus
 
 By the end, students can:
 
-- name the business event that creates a row in each of the seven worksheets (chapter outcome 5);
+- name the business event that creates a row in each of the seven worksheets (outcome 5);
 - say which of those events post to the ledger and which do not;
 - explain, in a paragraph per table, what the table records and how it leads to the next step;
 - identify SourceDocumentType as the column that says what kind of document created a ledger row, and say what SourceDocumentID and SourceLineID add;
@@ -152,9 +152,9 @@ The traced shipment posts {% for r in ship_gl %}{{ 'debit' if r.debit else 'cred
 
 ## What a strong answer says
 
-- **Requirement (1).** An event for each table, with its date column, and the observation that the order and its lines come first and post nothing.
+- **Requirement (1).** An event for each table, and the observation that the order and its lines come first and post nothing. Naming each table's date column is a plus.
 - **Requirement (2).** Each paragraph says what the table records and what it leads to, notes the parts (an order shipped and invoiced in parts, a receipt that pays several invoices), and says which events post.
-- **Requirement (3).** SourceDocumentType, with its values (SalesInvoice, JournalEntry, PayrollSummary and so on), and SourceDocumentID and SourceLineID to complete the trace.
+- **Requirement (3).** SourceDocumentType, with its values (SalesInvoice, JournalEntry, PayrollSummary and so on). Naming SourceDocumentID and SourceLineID, which complete the trace, is a plus.
 - **Requirement (4).** What only the invoice has (customer, dates, status, item detail) and what only the ledger has (account, period, cost center, other documents), and why reconciliation needs both.
 
 A weak answer retells the headers of the worksheets, draws a one-to-one chain, or says the ledger "contains" the sales order.
@@ -173,9 +173,9 @@ A weak answer retells the headers of the worksheets, draws a one-to-one chain, o
 
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
-| Requirement 1: an event for each of the seven worksheets | 25 | Seven events, with dates, as events | Descriptions of tables, or a worksheet missing |
-| Requirement 2: a paragraph per table | 35 | What each table records and how it links to the next, with the posting noted | Paragraphs that do not link, or a one-to-one chain |
-| Requirement 3: the origin column | 15 | SourceDocumentType, with the document ID and line columns | Another column, or the type without the explanation |
+| Requirement 1: an event for each of the seven worksheets | 25 | Seven events, written as events | Descriptions of tables, or a worksheet missing |
+| Requirement 2: a paragraph per table | 35 | What each table records and how it links to the next | Paragraphs that do not link, or a one-to-one chain |
+| Requirement 3: the origin column | 15 | SourceDocumentType, or VoucherType, which repeats it in this release, with a correct explanation of its values | Another column, or the type without the explanation |
 | Requirement 4: the comparison | 25 | What each holds, and why both are needed | A list with no reason |
 
 ## Extensions and discussion questions

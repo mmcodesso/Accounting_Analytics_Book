@@ -37,12 +37,12 @@ By the end, students can:
 ## Before you assign
 
 - **Files and software.** The copy of AuditAnalytics.xlsx made after Tutorial 8.3 (End of Chapter 8 in Chapter08-companion.zip), with the Aging worksheet, the Buckets Table in F3:G8 and the OpenInvoices and LedgerAR queries. The chapter's tutorials already need XLOOKUP, so older versions of Excel will not do.
-- **Data conditions.** GLEntry has no rows for AccountID {{ g.allowance_id }} (1030) or AccountID {{ g.bad_debt_id }} (6170). Account 1020 exceeds the {{ n|count }} open invoices by the opening line of {{ entry }}. Of the open invoices, {{ small|count }} have balances under $10: {{ g.n_old }} are 61 or more days past due, and {{ g.current.number }} (${{ g.current.balance|money }}) is not yet due.
-- **Verify first.** Tutorial 8.2's checkpoint should hold: Aging!C9 equals the sum of the OpenBalance column and Aging!C13 equals the opening balance. The loss rates are the credit department's assumption, not Charles River's experience.
+- **Data conditions.** GLEntry has no rows for AccountID {{ g.allowance_id }} (1030) or AccountID {{ g.bad_debt_id }} (6170). Account 1020 exceeds the {{ n|count }} open invoices by the opening line of {{ entry }}. Of the open invoices, {{ small|count }} have balances under $10: {{ g.n_old }} are 61 or more days past due, and {{ g.current.number }} (${{ g.current.balance|money }}) is not yet due. Requirement (3) asks for two cases, the write-off of all {{ small|count }} as a hypothetical and a recommended case, graded separately.
+- **Verify first.** Tutorial 8.2's checkpoint should hold: Aging!C9 equals the sum of the OpenBalance column and Aging!C13 equals the opening balance.
 
 ## How to run it
 
-Individual, about 90 minutes: 25 on requirement (1), 15 on (2), 15 on (3), 15 on (4) and 20 on the memo (5). Hold back the point of requirement (2) until a student has the larger allowance, then ask who the customer is. Give the write-off sequencing hint for (4) only after students post the entry. Collect the workbook and the memo.
+Individual, about 90 minutes: 25 on requirement (1), 15 on (2), 15 on (3), 15 on (4) and 20 on the memo (5). Hold back the point of requirement (2) until a student has the larger allowance, then ask who the customer is. Give the write-off sequencing hint for (4) only after students post the entry.
 
 {{ figure('IF-08-1-A') }}
 
@@ -93,7 +93,7 @@ c. In E9 total E4:E8 with SUM.
 =SUMIF(OpenInvoices[OpenBalance],"<10")
 ```
 
-To list the invoices without disturbing the Table, the model answer spills them, oldest first, with one formula. Students may copy a filtered view instead.
+The model answer spills the list, oldest first, with one formula, and students may copy a filtered view instead.
 
 ```
 =LET(k,OpenInvoices[OpenBalance]<10,SORTBY(FILTER(HSTACK(OpenInvoices[InvoiceNumber],OpenInvoices[CustomerName],OpenInvoices[DueDate],OpenInvoices[DaysPastDue],OpenInvoices[Bucket],OpenInvoices[OpenBalance]),k),FILTER(OpenInvoices[DaysPastDue],k),-1))
@@ -101,23 +101,33 @@ To list the invoices without disturbing the Table, the model answer spills them,
 
 **Check:** {{ small|count }} invoices totaling ${{ small_total|money }}. One is current; the other {{ g.n_old }} are 61 or more days past due, from ${{ low|money }} to ${{ high|money }}.
 
-**Step 6. Show the aging without them.** Build a second table below the list with the columns Bucket, Invoices, Open balance, Written off, Invoices after, Balance after, Loss rate and Expected loss after. In the model answer these are in A35:H40, and the three working formulas for the Current row are below. Adjust the cell references to your layout.
+**Step 6. Show the aging without them.** Below the list of Step 5, build a second table. In the model answer its headings are in A34:H34 (adjust the row numbers to your layout): Bucket, Invoices, Open balance, Write-off count, Invoices after, Balance after, Loss rate and Expected loss after. A35:C35 repeat Aging!A4:C4, E35 is `=B35-D35`, and the others are below. Copy row 35 through row 39, put `Total` in A40, add B35:F39 and H35:H39 by column, and leave G40 blank.
 
 ```
-=COUNTIFS(OpenInvoices[Bucket],A35,OpenInvoices[OpenBalance],"<10")
-=C35-SUMIFS(OpenInvoices[OpenBalance],OpenInvoices[Bucket],A35,OpenInvoices[OpenBalance],"<10")
-=ROUND(F35*G35,2)
+D35 =COUNTIFS(OpenInvoices[Bucket],A35,OpenInvoices[OpenBalance],"<10")
+F35 =C35-SUMIFS(OpenInvoices[OpenBalance],OpenInvoices[Bucket],A35,OpenInvoices[OpenBalance],"<10")
+G35 =XLOOKUP(A35,Buckets[Bucket],Buckets[LossRate])
+H35 =ROUND(F35*G35,2)
 ```
 
-**Check:** writing off all {{ small|count }} lowers the expected loss from ${{ loss|money }} to ${{ g.after_all|money }}, and the two oldest buckets fall from {{ g.old_before }} invoices to {{ g.old_after }}. **Watch for:** the current invoice written off with the rest. It is a whole invoice not yet due, so a small-balance policy would keep it.
+**Check:** writing off all {{ small|count }}, the required hypothetical, removes ${{ small_total|money }} and lowers the expected loss from ${{ loss|money }} to ${{ g.after_all|money }}. The two oldest buckets fall from {{ g.old_before }} invoices to {{ g.old_after }}.
+
+For the recommended case, copy the table below it (A43:H49 in the model answer) and add the criterion `OpenInvoices[DaysPastDue],">=61"` to the COUNTIFS of D44 and the SUMIFS of F44.
+
+```
+D44 =COUNTIFS(OpenInvoices[Bucket],A44,OpenInvoices[OpenBalance],"<10",OpenInvoices[DaysPastDue],">=61")
+F44 =C44-SUMIFS(OpenInvoices[OpenBalance],OpenInvoices[Bucket],A44,OpenInvoices[OpenBalance],"<10",OpenInvoices[DaysPastDue],">=61")
+```
+
+**Check:** the {{ g.n_old }} old balances total ${{ g.old_total|money }}, the expected loss falls to ${{ g.after_old|money }} and the gross supported receivables are ${{ g.gross_after|money }}. {{ g.current.number }} (${{ g.current.balance|money }}) stays in the Current row. **Watch for:** the all-{{ small|count }} case given as the recommendation. A small-balance policy would keep a whole invoice not yet due, even though the two cases differ in the allowance by only ${{ g.case_diff|money }}.
 
 ### Requirement (4): The entry and the standard
 
 **Step 7. Draft the entry.** Dated {{ asof }}: debit 6170 Bad Debt Expense and credit 1030 Allowance for Doubtful Accounts for ${{ loss|money }}. Add a check that debits equal credits and a count of the GL rows in the two accounts.
 
-**Check:** the count is {{ g.gl_rows }}, so this would be the first allowance in the extract. If the {{ g.n_old }} old balances are then written off under a small-balance policy, the write-off is charged to the allowance (debit 1030, credit 1020, ${{ g.old_total|money }}), which leaves ${{ g.remaining|money }}. The invoices that remain need ${{ g.after_old|money }}, so ${{ g.topup|money }} more is debited to 6170. Accept either order if the ending allowance is right.
+**Check:** the count is {{ g.gl_rows }}, so this would be the first allowance in the extract. If the {{ g.n_old }} old balances are then written off, the sequence matters. With the estimate recorded first, the write-off is charged to the allowance (debit 1030, credit 1020, ${{ g.old_total|money }}), which leaves ${{ g.remaining|money }}, and ${{ g.topup|money }} more is debited to 6170. With the write-off first, against a zero allowance, the later expense and allowance entry is ${{ g.seq_after|money }}. Both end with gross supported receivables of ${{ g.gross_after|money }} and an allowance of ${{ g.after_old|money }}.
 
-**Step 8. Tie the rates to the standard.** The FASB standard (2016) accepts an aging schedule and requires the estimate to reflect the risk of loss even when it is remote. It requires no estimate only where the adjusted information gives an expectation of no nonpayment, which the absence of write-offs does not show. Its illustration starts from historical loss rates for each bucket and adjusts them for current conditions and reasonable and supportable forecasts. The data hold no write-off history, so the proposed rates are not Charles River's own experience: they should be documented, raised if customers' conditions or the forecast worsen, lowered only with evidence, and revisited at each reporting date. The practical expedient for current receivables (FASB, 2025), which holds the year-end conditions constant, and the private-company election to consider later collections are not elected, as the exercise assumes.
+**Step 8. Tie the rates to the standard.** The FASB standard (2016) accepts an aging schedule and requires the estimate to reflect the risk of loss even when it is remote, adjusting historical bucket rates for current conditions and reasonable and supportable forecasts. The data hold no write-off history, so the proposed rates are not Charles River's own experience: document them, raise them if conditions or forecasts worsen, lower them only with evidence, and revisit them at each reporting date. The practical expedient for current receivables (FASB, 2025) and the private-company election to consider later collections are not elected, as the exercise assumes.
 
 ### Requirement (5): The memo
 
@@ -132,15 +142,17 @@ To list the invoices without disturbing the Table, the model answer spills them,
 {% endfor %}
 | Allowance from the aging | ${{ loss|money }} | 2 |
 | Opening balance, loss at 40 percent, combined allowance | ${{ opening|money }}; ${{ g.opening_loss|money }}; ${{ loss_with|money }} | 3 |
-| Open invoices under $10, and their total | {{ small|count }}; ${{ small_total|money }} | 5 |
-| Old balances written off, and the expected loss after all ten go | ${{ g.old_total|money }}; ${{ g.after_all|money }} | 6 |
-| Allowance left after charging the old balances, and the top-up | ${{ g.remaining|money }}; ${{ g.topup|money }} | 7 |
+| Count and total of the open invoices under $10 | {{ small|count }}; ${{ small_total|money }} | 5 |
+| All {{ small|count }} written off: removed, expected loss after | ${{ small_total|money }}; ${{ g.after_all|money }} | 6 |
+| The {{ g.n_old }} old ones written off: removed, expected loss after, gross receivables after | ${{ g.old_total|money }}; ${{ g.after_old|money }}; ${{ g.gross_after|money }} | 6 |
+| Allowance left after the write-off, the top-up, the entry if the write-off is first | ${{ g.remaining|money }}; ${{ g.topup|money }}; ${{ g.seq_after|money }} | 7 |
 
 {{ expected() }}
 
 ## What a strong answer says
 
 - **Requirement (2).** The larger allowance as a sensitivity, the reasons the balance cannot be aged (no customer, no dates, no receipt applied to it), the request for the conversion-date detail, and a statement that any correction is a decision for management and the auditor.
+- **Requirement (3).** The all-{{ small|count }} calculation as the hypothetical, and a separate recommended case that keeps the current invoice and says why.
 - **Requirement (4).** The entry with its accounts and amount, the statement that the rates are an assumption without Charles River's history behind them, and a reason to adjust them (current conditions, forecasts).
 - **Requirement (5).** A recommendation in the first paragraph, an estimate that is not padded with the unsupported balance, and a limit on what the extract can show.
 
@@ -152,7 +164,7 @@ A weak answer books the larger allowance, calls the balance uncollectible, or le
 - **The opening balance aged and reserved.** *Symptom:* the entry or memo uses the larger allowance. *Response:* ask which customer owes it.
 - **A rate range outside the Table.** *Symptom:* the structured reference does not resolve. *Response:* ask where the Buckets Table ends.
 - **The entry reversed.** *Symptom:* a credit to expense. *Response:* ask which account the estimate reduces.
-- **All {{ small|count }} small balances written off.** *Symptom:* the current invoice vanishes from the aging. *Response:* ask whether it is a residual or an invoice.
+- **The all-{{ small|count }} case taken as the recommendation.** *Symptom:* the memo writes off the current invoice with the rest. *Response:* credit the hypothetical, then ask whether the current invoice is a residual or an invoice.
 - **No sequencing.** *Symptom:* a write-off to expense and an unchanged allowance. *Response:* ask what the allowance is for.
 - **A memo that restates the tutorial.** *Symptom:* no recommendation. *Response:* ask what you want the controller to do.
 
@@ -161,14 +173,14 @@ A weak answer books the larger allowance, calls the balance uncollectible, or le
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
 | Requirement 1: loss rates and expected loss | 25 | LossRate in the Buckets Table, lookup formula, correct total | Right total with typed values |
-| Requirement 2: the opening balance | 25 | Sensitivity computed, reasons given, detail requested | Computed but aged as a receivable |
-| Requirement 3: small balances | 15 | List, total and the aging after write-off | List without the aging |
+| Requirement 2: the opening balance | 25 | Sensitivity computed, reasons given for why its age cannot be known | Computed but aged as a receivable |
+| Requirement 3: small balances | 15 | List, total, the aging with all written off, and a separate recommended aging | List without the aging, or one case only |
 | Requirement 4: the entry and the standard | 15 | Accounts and amount right, rates tied to the standard | Entry without the standard |
 | Requirement 5: memo | 20 | Recommendation, estimate, opening balance, small balances | One topic missing |
 
 ## Extensions and discussion questions
 
 - Build a data table of the allowance against the 1-30 days rate and the over 90 days rate, as in Tutorial 7.3. Which rate does the answer depend on?
-- Aged by segment, is the allowance more concentrated in some customers than in others? Use the CustomerBalances query.
+- Aged by segment, is the allowance concentrated in some customers? Add CustomerSegment to OpenInvoices as in Exercise 8.3, apply the loss rates, and group the estimated losses by segment.
 - Discuss: who should own the loss rates, the credit department that proposes them or the controller who signs the estimate?
 - Discuss: Exercise 8.2 finds the same pattern in payables. Why is an unsupported liability a different kind of risk from an unsupported asset?

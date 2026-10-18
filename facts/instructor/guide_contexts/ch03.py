@@ -442,6 +442,17 @@ def ex1(d, claim):
     split = d.one("SELECT COUNT(*) FROM (SELECT GoodsReceiptLineID FROM PurchaseInvoiceLine WHERE GoodsReceiptLineID IS NOT NULL GROUP BY 1 HAVING COUNT(*) > 1)")
     claim(split > 0, "some receipt lines are billed on more than one invoice line")
     same = d.q("SELECT SourceDocumentType, COUNT(*) FROM GLEntry WHERE SourceDocumentID = ? GROUP BY 1 ORDER BY 2 DESC, 1", pid)
+    # a receipt line billed in part: the invoice line clears only the goods received not invoiced of the quantity it bills
+    part = d.q("SELECT pi.PurchaseInvoiceID, pi.InvoiceNumber, pil.PILineID, pil.Quantity, grl.QuantityReceived, pil.LineTotal, grl.ExtendedStandardCost "
+               "FROM PurchaseInvoice pi JOIN PurchaseInvoiceLine pil USING (PurchaseInvoiceID) JOIN GoodsReceiptLine grl USING (GoodsReceiptLineID) "
+               "WHERE pi.Status = 'Paid' AND (SELECT COUNT(*) FROM PurchaseInvoiceLine x WHERE x.PurchaseInvoiceID = pi.PurchaseInvoiceID) = 1 "
+               "AND pil.Quantity < grl.QuantityReceived - 0.0001 ORDER BY pi.PurchaseInvoiceID LIMIT 1")[0]
+    part_rows = dict(d.q("SELECT a.AccountNumber, SUM(g.Debit - g.Credit) FROM GLEntry g JOIN Account a USING (AccountID) WHERE "
+                         "g.SourceDocumentType = 'PurchaseInvoice' AND g.SourceDocumentID = ? AND g.SourceLineID = ? GROUP BY 1", part[0], part[2]))
+    part_grni, part_ppv = part_rows[2020], part_rows.get(5060, 0.0)
+    claim(part_grni < part[6] - 0.005, "an invoice line that bills part of a receipt line clears less goods received not invoiced than the whole receipt value")
+    claim(abs(part[5] - part_grni - part_ppv) < 0.005, "on that line the price variance is the line total less the amount of goods received not invoiced it clears")
+    claim(abs(part_grni - part[6] * part[3] / part[4]) < 1.0, "the amount cleared is about the receipt value of the quantity billed")
     claim(len(same) > 1, "the invoice's key alone also finds ledger rows of other document types")
     return dict(
         pid=pid, pi=dict(number=pi[0], date=pi[1], received=pi[8], order_id=pi[2], supplier_id=pi[3], subtotal=pi[4], total=pi[6], status=pi[7]),
@@ -452,6 +463,7 @@ def ex1(d, claim):
         gl_pi=gl_pi, gl_gr=gl_gr, gl_dp=gl_dp, variance=variance, variance_abs=abs(variance), variance_side="unfavorable" if variance > 0 else "favorable",
         paid_one=paid_one, paid=paid, accrual=accrual, pays=pays, single=dict(pays)[1], multi=sum(n for k, n in pays if k > 1), split=split, same=same, same_rows=sum(n for _, n in same), same_types=len(same),
         differ=len(differ), repeated=repeated, taxed=taxed,
+        part=dict(id=part[0], number=part[1], billed=part[3], received=part[4], total=part[5], receipt=part[6], grni=part_grni, ppv=part_ppv),
         rows=rows_of(d, ["PurchaseInvoice", "PurchaseInvoiceLine", "GoodsReceiptLine", "PurchaseOrderLine", "DisbursementPayment"]))
 
 
@@ -688,7 +700,7 @@ def ex4(d, claim):
         n_budget_accounts=b_accounts, n_line_accounts=line_accounts, line_cats=[dict(category=r[0], accounts=r[1], rows=r[2], no_cc=r[3], no_item=r[4]) for r in line_cats],
         n_unbudgeted=len(unbudgeted), unbudgeted_first=and_join(f"{n} {name}" for n, name in unbudgeted[:4]), gl_accounts=d.one("SELECT COUNT(DISTINCT AccountID) FROM GLEntry"), budget_rows=d.one("SELECT COUNT(*) FROM Budget"), line_rows=d.one("SELECT COUNT(*) FROM BudgetLine"),
         year=C, matched=[m for y, n, m in grain if y == C][0], budget_year=[n for y, n, m in grain if y == C][0], quiet=quiet, next_year=d.N, next_rows=next_year,
-        in_gl=in_gl, fan=fan, n_line_only=line_only[0])
+        in_gl=in_gl, fan=fan, n_line_only=line_only[0], n_closes=len(d.closes))
 
 
 # --- Exercise 3.5: a data extraction plan for three audit procedures -----------------------------------------------------
@@ -729,6 +741,28 @@ def ex5(d, claim):
     hours = d.q("SELECT (SELECT SUM(BillableHours) FROM ServiceTimeEntry), (SELECT SUM(BilledHours) FROM ServiceBillingLine)")[0]
     claim(abs(hours[0] - hours[1]) < 0.005, "the billable hours recorded on service time entries equal the hours billed")
     claim(d.one("SELECT COUNT(*) FROM Customer c WHERE c.CustomerID NOT IN (SELECT CustomerID FROM SalesOrder)") > 0, "some customers have no orders")
+    claim(d.one("SELECT COUNT(*) FROM (SELECT t.ServiceEngagementID, substr(t.WorkDate, 1, 7), SUM(t.BillableHours) b, (SELECT SUM(s.BilledHours) FROM "
+                "ServiceBillingLine s WHERE s.ServiceEngagementID = t.ServiceEngagementID AND substr(s.BillingPeriodStartDate, 1, 7) = substr(t.WorkDate, 1, 7)) l "
+                "FROM ServiceTimeEntry t GROUP BY 1, 2) WHERE ABS(b - COALESCE(l, 0)) > 0.001") == 0,
+          "billable and billed service hours also agree for each engagement and month")
+    comp = d.q("WITH r AS (SELECT g.SourceDocumentID id, "
+               "SUM(CASE WHEN a.AccountType = 'Revenue' AND CAST(a.AccountNumber AS TEXT) <> '4050' THEN g.Credit - g.Debit ELSE 0 END) rev, "
+               "SUM(CASE WHEN CAST(a.AccountNumber AS TEXT) = '4050' THEN g.Credit - g.Debit ELSE 0 END) fr, "
+               "SUM(CASE WHEN CAST(a.AccountNumber AS TEXT) = '2050' THEN g.Credit - g.Debit ELSE 0 END) tax, "
+               "SUM(CASE WHEN CAST(a.AccountNumber AS TEXT) = '1020' THEN g.Debit - g.Credit ELSE 0 END) ar "
+               "FROM GLEntry g JOIN Account a USING (AccountID) WHERE g.SourceDocumentType = 'SalesInvoice' GROUP BY 1) "
+               "SELECT SUM(ABS(r.rev - s.SubTotal) > 0.005), SUM(ABS(r.fr - s.FreightAmount) > 0.005), SUM(ABS(r.tax - s.TaxAmount) > 0.005), "
+               "SUM(ABS(r.ar - s.GrandTotal) > 0.005), SUM(s.FreightAmount > 0), SUM(s.FreightAmount) FROM SalesInvoice s JOIN r ON r.id = s.SalesInvoiceID")[0]
+    claim(comp[:4] == (0, 0, 0, 0), "on every invoice SubTotal equals the revenue credits other than freight revenue, and freight, tax and the receivable "
+          "agree with 4050, 2050 and 1020")
+    claim(comp[4] > 0, "some invoices carry freight, so their revenue credits in all exceed their SubTotal")
+    accts = {name: d.one("SELECT CAST(AccountNumber AS TEXT) FROM Account WHERE AccountName = ?", name)
+             for name in ("Freight Revenue", "Sales Tax Payable", "Accounts Receivable")}
+    claim(accts == {"Freight Revenue": "4050", "Sales Tax Payable": "2050", "Accounts Receivable": "1020"},
+          "the accounts the invoice control compares are 4050, 2050 and 1020")
+    no_invoice = d.q("SELECT Status, COUNT(*) FROM SalesOrder o WHERE NOT EXISTS (SELECT 1 FROM SalesInvoice i WHERE i.SalesOrderID = o.SalesOrderID) "
+                     "GROUP BY 1 ORDER BY 2 DESC")
+    claim(no_invoice and all(s in ("Backordered", "Open") for s, _ in no_invoice), "the orders with no invoice are all backordered or open")
     # (2) three-way match
     claim(d.one("SELECT COUNT(*) FROM GoodsReceiptLine r JOIN PurchaseOrderLine p USING (POLineID) WHERE ABS(r.ExtendedStandardCost - ROUND(r.QuantityReceived * p.UnitCost, 2)) > 0.011") == 0,
           "a receipt line's ExtendedStandardCost is its quantity times the order line's UnitCost, so the receipt records no price of its own")
@@ -757,13 +791,18 @@ def ex5(d, claim):
     claim(d.one("SELECT COUNT(*) FROM GLEntry g JOIN JournalEntry j ON j.JournalEntryID = g.SourceDocumentID WHERE g.SourceDocumentType = 'JournalEntry' "
                 "AND g.CreatedByEmployeeID <> j.CreatedByEmployeeID") == 0, "the ledger rows of a journal entry name the entry's creator")
     claim(d.one("SELECT COUNT(*) FROM JournalEntry WHERE ApprovedByEmployeeID IS NULL OR CreatedByEmployeeID IS NULL") == 0, "every journal entry names a creator and an approver")
+    created = d.q("SELECT COUNT(*), COUNT(DISTINCT j.JournalEntryID) FROM GLEntry g JOIN JournalEntry j ON j.JournalEntryID = g.SourceDocumentID "
+                  "WHERE g.SourceDocumentType = 'JournalEntry' AND g.CreatedDate <> j.CreatedDate")[0]
+    claim(created[0] > 0, "some ledger rows of journal entries carry a CreatedDate other than their entry's")
     t = trace_ids(d)
     return dict(
         invoices=invoices, lines=lines, shipped=shipped, uninvoiced=uninvoiced, n_uninvoiced=len(uninvoiced), last_ship=last_ship,
         unposted=unposted, service_lines=d.one("SELECT COUNT(*) FROM ServiceBillingLine"), hours=hours[0],
         po_lines=po_lines, unreceived=unreceived, parts=parts, split=split, unmatched=unmatched, price=price,
         entries=entries, je_rows=je_rows, gl_rows=d.one("SELECT COUNT(*) FROM GLEntry"), je_cols=len(have["JournalEntry"]), gl_cols=len(have["GLEntry"]),
-        invoice_id=t["id.trace.invoice_id"],
+        invoice_id=t["id.trace.invoice_id"], freight_invoices=comp[4], freight_total=comp[5], je_created_rows=created[0], je_created_entries=created[1],
+        no_invoice=[dict(status=s, n=n) for s, n in no_invoice], n_no_invoice=sum(n for _, n in no_invoice),
+        freight_acct=accts["Freight Revenue"], tax_acct=accts["Sales Tax Payable"], ar_acct=accts["Accounts Receivable"],
         rows=rows_of(d, ["SalesInvoice", "ShipmentLine", "PurchaseOrderLine", "GoodsReceiptLine", "PurchaseInvoiceLine", "JournalEntry"]))
 
 
@@ -779,7 +818,7 @@ EX6_TESTS = [
     ("SalesInvoiceLine", "ShipmentLineID", "ShipmentLine", "ShipmentLineID", "design services", "Order-to-Cash"),
     ("CashReceiptApplication", "SalesInvoiceID", "SalesInvoice", "SalesInvoiceID", "", "Order-to-Cash"),
     ("CashReceipt", "SalesInvoiceID", "SalesInvoice", "SalesInvoiceID", "the link is in the application table", "Order-to-Cash"),
-    ("GLEntry", "AccountID", "Account", "AccountID", "", "cross-group, into the Accounting Core"),
+    ("GLEntry", "AccountID", "Account", "AccountID", "", "Accounting Core"),
     ("GLEntry", "CostCenterID", "CostCenter", "CostCenterID", "balance sheet and other rows with no cost center", "cross-group, into Organizational Planning"),
     ("Account", "ParentAccountID", "Account", "AccountID", "top-level accounts", "Accounting Core, self-reference"),
 ]

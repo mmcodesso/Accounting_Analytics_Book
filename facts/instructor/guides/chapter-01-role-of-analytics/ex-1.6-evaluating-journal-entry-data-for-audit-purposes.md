@@ -11,8 +11,8 @@ solution: ''
 figures:
   - id: IF-01-6-A
     kind: excel-mock
-    purpose: What the CreatedDate and ReversesJournalEntryID columns look like in JournalEntry, the evidence for requirements 3 and 4.
-    shows: The JournalEntry worksheet filtered to the rows whose ReversesJournalEntryID is filled, with the columns JournalEntryID, EntryNumber, PostingDate, EntryType, TotalAmount, CreatedDate and ReversesJournalEntryID visible (Description and the creator and approver columns are hidden so that the text stays legible). The time part of CreatedDate reads the same on every row shown, and the CreatedDate and ReversesJournalEntryID cells are outlined. The EntryType of the rows shown is Accrual Adjustment.
+    purpose: What the CreatedDate and ReversesJournalEntryID columns hold in JournalEntry, the evidence for requirements 3 and 4.
+    shows: The JournalEntry worksheet filtered to the rows whose ReversesJournalEntryID is filled, with the columns JournalEntryID, EntryNumber, PostingDate, EntryType, TotalAmount, CreatedDate and ReversesJournalEntryID visible (Description and the creator and approver columns are hidden so that the text stays legible). CreatedDate is shown with the number format changed to yyyy-mm-dd hh:mm:ss, because the workbook formats it as a date and the grid shows no time until the format changes. The time part of CreatedDate reads the same on every row shown, and the CreatedDate and ReversesJournalEntryID cells are outlined. The EntryType of the rows shown is Accrual Adjustment.
     data: A few JournalEntry rows of the Accrual Adjustment type and their columns, taken from the current dataset.
 ---
 # Exercise 1.6: Evaluating Journal Entry Data for Audit Purposes
@@ -25,7 +25,7 @@ Before an auditor writes a query for management override of controls, the audito
 
 By the end, students can:
 
-- list the columns of JournalEntry and GLEntry and say where the entry's lines are (chapter outcome 6);
+- list the columns of JournalEntry and GLEntry and say where the entry's lines are (outcome 6);
 - choose the columns that bear on who posted an entry, when, how much and what kind;
 - judge, for each indicator, whether the data are sufficient, and name what is missing when they are not;
 - sketch how ReversesJournalEntryID could support a test for window dressing at period end, and say what the data actually show.
@@ -35,7 +35,7 @@ By the end, students can:
 ## Before you assign
 
 - Students need CharlesRiver.xlsx. Exercise 1.5 (the source columns) is a good lead-in but not required.
-- The exercise relies on these conditions, which you can see on the worksheets: JournalEntry has no lines, which are the GLEntry rows of type JournalEntry; JournalEntry.CreatedDate and ApprovedDate carry a time of day, and the times vary very little; amounts are in TotalAmount, and the approver's limit is not in JournalEntry but in Employee (MaxApprovalAmount); and ReversesJournalEntryID is filled for only one kind of entry.
+- The exercise relies on these conditions, which you can see on the worksheets: JournalEntry has no lines, which are the GLEntry rows of type JournalEntry; JournalEntry.CreatedDate and ApprovedDate carry a time of day, and the times vary very little (the worksheet formats both columns as dates, yyyy-mm-dd, so the time shows in the formula bar when a cell is selected, or in the grid after the column's number format is changed to yyyy-mm-dd hh:mm:ss in a copy that is closed without saving); amounts are in TotalAmount, and the approver's limit is not in JournalEntry but in Employee (MaxApprovalAmount); and ReversesJournalEntryID is filled for only one kind of entry.
 - Do requirement 3 yourself on the worksheets before class. If you scan the time part of CreatedDate, you will see why the first indicator is not simple.
 - Do not ask for queries or calculations. This exercise is a data assessment.
 
@@ -43,7 +43,7 @@ By the end, students can:
 
 Individual work, with a short class discussion of requirement 3, which has the widest range of answers. For about 50 minutes: 10 minutes listing columns (requirement 1), 10 choosing them (requirement 2), 20 for the assessment (requirement 3) and 10 for the paragraph (requirement 4).
 
-**Hints.** For requirement 3, if a student judges the after-hours indicator by whether CreatedDate exists, ask them to read the time of ten entries. For requirement 4, if the paragraph only defines reversals, ask what the auditor would select and compare.
+**Hints.** For requirement 3, if a student judges the after-hours indicator by whether CreatedDate exists, ask them to select ten CreatedDate cells and read the time in the formula bar, and then to say whether creation is posting. For requirement 4, if the paragraph only defines reversals, ask what the auditor would select and compare.
 
 **Collect** the written assessment and the paragraph.
 
@@ -65,21 +65,21 @@ b. Click the **GLEntry** worksheet tab. It has {{ gl_cols }} columns: GLEntryID,
 | Question | Columns | What to look at |
 |---|---|---|
 | Who? | CreatedByEmployeeID, ApprovedByEmployeeID (and Employee for roles and limits) | The same person creating and approving; an approver without the authority |
-| When? | CreatedDate, PostingDate, ApprovedDate | Weekend or after-hours creation; posting before or after creation |
+| When? | CreatedDate, PostingDate, ApprovedDate | Weekend or after-hours creation; a posting date before or after creation |
 | How much? | TotalAmount in JournalEntry; Debit and Credit in GLEntry | Round amounts; amounts just below a limit |
 | What? | EntryType, Description | The kind of entry, and an unusual or vague description |
 
-**Check:** each column named exists, and the answer explains how to use it. **Watch for:** GLEntry's own CreatedByEmployeeID and CreatedDate. For the rows of a journal entry they repeat the entry's creator, but for the rows of other types they are system values, so they say little about who prepared the posting.
+**Check:** each column named exists, and the answer explains how to use it. **Watch for:** GLEntry's own CreatedByEmployeeID and CreatedDate. For the rows of a journal entry CreatedByEmployeeID repeats the entry's creator, but CreatedDate is a system value that need not match the entry's, and for the rows of other types both are system values, so they say little about who prepared the posting or when.
 
 ### Requirement (3): Assess the three indicators
 
 **Step 3. Take the indicators one at a time.** A model assessment in three to five sentences covers these points.
 
-**Outside normal business hours.** CreatedDate carries a time of day, so the field exists. In this dataset the times barely vary: {% for t, n in times %}{{ n|count }} entries at {{ t }}{{ ', and ' if not loop.last else '' }}{% endfor %}. No entry is created before 08:00 or after 17:00, so a time-of-day test with those hours would flag {{ after_hours }}. ApprovedDate is no better, because every entry is approved exactly one hour after it is created, at {{ approved_times|join(' or ') }}. PostingDate has no time. The date part of CreatedDate still gives the day of the week, and {{ weekend|count }} entries were created on a weekend (Chapter 8 tests that). A real after-hours test would need the system's entry log with true timestamps, and a stated definition of business hours, time zone and holidays.
+**Outside normal business hours.** Posting time cannot be tested, because PostingDate holds a date and no time. CreatedDate records when an entry was created, not when it was posted, so it supports a separate creation-time screen. Its times barely vary: {% for t, n in times %}{{ n|count }} entries at {{ t }}{{ ', and ' if not loop.last else '' }}{% endfor %}. No entry is created before 08:00 or after 17:00, so a creation-time test with those hours would flag {{ after_hours }}. ApprovedDate is no better, because every entry is approved exactly one hour after it is created, at {{ approved_times|join(' or ') }}. The date part of CreatedDate still gives the day of the week, and {{ weekend|count }} entries were created on a weekend (Chapter 8 tests that). A test of posting hours needs the system's posting log with true timestamps, its time zone, and a stated definition of business hours, holidays and batch processing. Times that vary so little are also a question to ask about where the recorded times come from.
 
 **Round-dollar amounts.** TotalAmount, and Debit and Credit on the lines, are enough. How many entries are round depends on the definition: {{ whole|count }} entries have a whole-dollar amount, and {{ n_thousands }} are exact multiples of {{ round_unit|count }}.
 
-**Just below an approval threshold.** JournalEntry holds no threshold. The limit sits in Employee, by approver, so the test needs ApprovedByEmployeeID joined to MaxApprovalAmount. With that, {{ above }} entries are above their approver's limit and {{ near|length }} are within ten percent below it, and the near ones are ordinary rent entries. Adding Employee makes a screen possible, but MaxApprovalAmount is a field on the approver's record, not proof of the limit that governs journal entries or of when it applied, so the written authority policy is the missing item.
+**Just below an approval threshold.** JournalEntry holds no threshold. The limit sits in Employee, by approver, so the test needs ApprovedByEmployeeID joined to MaxApprovalAmount. With that, {{ above }} entries are above their approver's limit, and {{ near|length }} are above 90 percent of the limit without exceeding it (a screening rule for this illustration, not the policy). These near ones are ordinary rent entries. Adding Employee makes a screen possible, but MaxApprovalAmount is a field on the approver's record, not proof of the limit that governs journal entries or of when it applied, so the written authority policy is the missing item.
 
 {{ figure('IF-01-6-A') }}
 
@@ -95,7 +95,7 @@ The approvers and their limits:
 
 ### Requirement (4): Write the window dressing paragraph
 
-**Step 4. Explain how ReversesJournalEntryID could support the test.** A model paragraph: the column links an entry that reverses or corrects another entry to the original. Window dressing books an entry in the last days of a period that improves the reported result and reverses it just after the period closes. The test selects entries posted in the last days of a quarter or a year, uses ReversesJournalEntryID to find the entries that reverse them, and flags pairs that reverse within days after period end, especially when the amounts match or are large, and then reads the descriptions and the approvals.
+**Step 4. Explain how ReversesJournalEntryID could support the test.** A model paragraph: the column links an entry that reverses or corrects another entry to the original. Window dressing books an entry in the last days of a period that improves the reported result and reverses it just after the period closes. The test selects entries posted in the last days of a quarter or a year, uses ReversesJournalEntryID to find the entries that reverse them, and flags pairs that reverse within days after period end, especially when the amounts match or are large, and then reads the descriptions and the approvals. A linked pair is a candidate for investigation, not proof of window dressing.
 
 What the data show, which students need not find: the column is filled for only {{ n_reversing|count }} entries. Each is an Accrual Adjustment that settles or partly cleans up the residual of an earlier accrual, none equals its original in amount, the gap is {{ gap_min|num(0) }} to {{ gap_max|num(0) }} days, and {{ across_years }} fall in the year after the original. In this dataset the column marks routine accrual cleanup, so a test would find pairs that the descriptions explain. A good student paragraph does not need to say this, but a student who checks the data and says so has gone further than required.
 
@@ -112,7 +112,7 @@ What the data show, which students need not find: the column is filled for only 
 | Entries created on a weekend | {{ weekend|count }} | Step 3 |
 | Whole-dollar entries; exact multiples of {{ round_unit|count }} | {{ whole|count }}; {{ n_thousands }} | Step 3 |
 | Entries above their approver's limit | {{ above }} | Step 3 |
-| Entries within ten percent below the limit | {{ near|length }} | Step 3 |
+| Entries above 90 percent of the limit, not exceeding it | {{ near|length }} | Step 3 |
 | Entries that reverse another; gap in days | {{ n_reversing|count }}; {{ gap_min|num(0) }} to {{ gap_max|num(0) }} | Step 4 |
 
 The entries that are exact multiples of {{ round_unit|count }}:
@@ -125,20 +125,20 @@ The entries that are exact multiples of {{ round_unit|count }}:
 ## What a strong answer says
 
 - **Requirement (1).** Complete column lists, and the observation that the lines are in GLEntry.
-- **Requirement (2).** Columns grouped by who, when, how much and what, each with a use.
-- **Requirement (3).** A verdict for each indicator: after-hours has the field but little variation, round amounts are testable, and the threshold needs the approver's limit from Employee and the written policy behind it. Missing items are named.
+- **Requirement (2).** The useful columns, each with a use. Grouping them by who, when, how much and what is a plus.
+- **Requirement (3).** A verdict for each indicator: posting time is not recorded and creation time varies little, round amounts are testable, and the threshold needs the approver's limit from Employee and the written policy behind it. Missing items are named.
 - **Requirement (4).** A test design: what to select, what to compare, what to flag, and a limit.
 
 A weak answer says that the data are sufficient because the columns exist, never opens the time part of CreatedDate, or defines reversals without a test.
 
 ## Common mistakes and how to respond
 
-- **Judging a field by its name.** *Symptom:* "CreatedDate has time, so after-hours is testable". *Response:* ask them to read the times.
-- **PostingDate treated as the only date.** *Symptom:* "no time, so after-hours is impossible". *Response:* point to CreatedDate.
+- **Judging a field by its name.** *Symptom:* "CreatedDate has time, so after-hours is testable". *Response:* ask them to read the times, and whether creation is posting.
+- **Posting time and creation time merged.** *Symptom:* "PostingDate has no time, so the test is impossible". *Response:* this is a valid limit for posting time. Ask the student to treat creation time as a separate question, and not to use CreatedDate as the posting timestamp.
 - **No approval limit.** *Symptom:* "the threshold is not in the data". *Cause:* Employee is not opened. *Response:* ask where an approver's authority would be recorded.
 - **Round defined as no cents.** *Symptom:* a different count from a classmate. *Response:* discuss the definition, and ask which one the policy would use.
 - **Window dressing paragraph with no test.** *Symptom:* a definition of reversals. *Response:* ask what the auditor selects first.
-- **The wrong end of the link.** *Symptom:* the reversed entry is flagged instead of the reversing one. *Response:* ask which row holds the column.
+- **Only one end of the link.** *Symptom:* the test keeps the original entry or the adjusting entry, not both. *Response:* ReversesJournalEntryID sits on the later entry and points to the original. Keep both, the period-end effect and the later change, and compare their dates, accounts, amounts, descriptions and approvals.
 - **GLEntry's creator as the preparer.** *Response:* ask what it shows for a sales invoice.
 - **An assessment of eight sentences.** *Response:* ask for the three verdicts first.
 
@@ -147,7 +147,7 @@ A weak answer says that the data are sufficient because the columns exist, never
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
 | Requirement 1: the columns | 20 | Both lists, and the lines in GLEntry | A list with columns missing |
-| Requirement 2: the useful columns | 25 | Grouped by who, when, how much and what, each with a use | Names without uses |
+| Requirement 2: the useful columns | 25 | The useful columns, each with a use | Names without uses |
 | Requirement 3: the three verdicts | 35 | A verdict for each, with reasons and the missing item named | A blanket verdict, or one indicator missing |
 | Requirement 4: the paragraph | 20 | Select, compare, flag, and a limit | A definition only |
 

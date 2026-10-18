@@ -34,32 +34,37 @@ Individual or pairs, about 150 minutes: 50 for the queries and model, 30 for pro
 
 ## Step-by-step solution
 
-The project encodes the model and the structure of each page, and its Checks tab proves every value below. How a page looks is visible only in Desktop.
+The project encodes the model and the structure of each page, and its Checks tab proves every value below. How a page looks is visible only in Desktop. The M blocks of a Custom Column are the expression alone, which the dialog takes under the column's name and type. Power Query shows the same step in the formula bar and the Advanced Editor as a `Table.AddColumn` assignment, which is not pasted into the dialog.
 
 ### Part 1: The queries and the model
 
 **Step 1. Load the ledger star and flag the closes.**
 
-a. Save Charles River Cash Case.pbix and turn off the two loading options of Tutorial 13.1.
+a. Save Charles River Cash Case.pbix and turn off Auto date/time and Autodetect new relationships under Current File, as Tutorial 13.1 did.
 b. Choose **Home > Get data > Excel workbook**, select GLEntry, Account and JournalEntry, and choose **Transform Data**.
 c. In GLEntry, choose **Home > Choose Columns**, keep only what the model needs and filter no rows. Merge JournalEntry on VoucherNumber and EntryNumber with **Home > Merge Queries** and expand EntryType.
-d. Add `IsYearEndClose` with **Add Column > Custom Column** (Tutorial 14.3) and clear **Enable load** on JournalEntry.
+d. Name the column `IsYearEndClose`, choose **Add Column > Custom Column** (Tutorial 14.3), enter only the expression below, set the type to True/False, and clear **Enable load** on JournalEntry.
 
 ```m
-    #"Added Custom" = Table.AddColumn(#"Expanded JournalEntry", "IsYearEndClose", each [EntryType] <> null and Text.StartsWith([EntryType], "Year-End Close"))
+[EntryType] <> null and Text.StartsWith([EntryType], "Year-End Close")
 ```
 
 **Check:** GLEntry has all 815,921 rows and 134 are flagged: the six closes (JE-2024-000265 and -000266; JE-2025-000287 and -000288; JE-2026-000296 and -000297). **Watch for:** closes left unflagged. Net income nets to zero in every year, because each close moves a year's revenue and expenses to retained earnings.
 
 **Step 2. Carry the channel into Receipts.**
 
-a. In Requisitions, choose **Add Column > Custom Column** for the channel, from the justification, and again for the work order it names. Merge WorkOrder and Employee (requester and approver).
+a. In Requisitions, choose **Add Column > Custom Column**, name the column `Channel`, enter only the first expression below and set the type to Text. Add `WorkOrderID` from the second expression, as a Whole number. Merge WorkOrder and Employee (requester and approver).
 b. In Receipts, merge OrderLines on POLineID, then Requisitions on RequisitionID, and expand Channel.
 
 ```m
-    #"Added Custom" = Table.AddColumn(#"Changed Type1", "Channel", each if Text.StartsWith([Justification], "WO-COMPONENT-SHORTFALL") then "Work-order shortfall"
-        else if Text.StartsWith([Justification], "Supply plan") then "Supply plan" else "Other")
-    #"Added Custom2" = Table.AddColumn(#"Changed Type3", "WorkOrderID", each if [Channel] = "Work-order shortfall" then Number.From(Text.BetweenDelimiters([Justification], "WO=", " |")) else null)
+if Text.StartsWith([Justification], "WO-COMPONENT-SHORTFALL") then "Work-order shortfall"
+else if Text.StartsWith([Justification], "Supply plan") then "Supply plan"
+else "Other"
+```
+
+```m
+if [Channel] = "Work-order shortfall" then Number.From(Text.BetweenDelimiters([Justification], "WO=", " |"))
+else null
 ```
 
 **Check:** 21,437 work-order shortfall requisitions, 3,921 supply plan and six other. Receipts goes through the order line because the order header names no requisition on 4,408 orders. **Watch for:** a merge through the header. 12,001 of 29,597 receipt lines then have no channel, and the materials among them, 11,524 lines worth $11,113,837.49, drop out of Requirement 4's channel columns.
@@ -74,7 +79,7 @@ c. Choose **Modeling > New measure** for each measure and type its definition in
     #"Grouped Rows" = Table.Group(#"Changed Type1", {"ItemID"}, {{"TargetDaysSupply", each List.Max([TargetDaysSupply]), Int64.Type}, {"PolicyEnd", each List.Max([EffectiveEndDate]), type date}})
 ```
 
-**Check:** Item has 266 rows. **Watch for:** the policy merged before it is grouped. Item then has 505 rows, so ItemID is no longer unique and the relationship cannot be one to many.
+**Check:** Item has 266 rows. **Watch for:** the policy merged before it is grouped. The 239 items with a policy at both warehouses appear twice, so Item has 505 rows, ItemID is no longer unique and the relationship cannot be one to many. The Group By step is shown as the formula bar reads it.
 
 ### Part 2: Profiles and links
 
@@ -83,6 +88,7 @@ c. Choose **Modeling > New measure** for each measure and type its definition in
 a. In Power Query, choose **View > Column quality**, **Column distribution** and **Column profile**.
 b. Click **Column profiling based on top 1000 rows** in the status bar and choose **Column profiling based on entire data set**.
 c. Read Justification, Status and ApprovedByEmployeeID in Requisitions.
+d. Profile every other new Table the same way (Receipts, Issues, InventoryPolicy, the invoice, payment and credit Tables, DebtSchedule) and record its grain, row count, missing and duplicate keys, date range, errors and disposition. Check that each merge keeps its fact table's row count.
 
 **Check:** 25,364 requisitions, Justification never empty, 6 without an approver and 522 Approved. **Watch for:** the default profile. The first 1,000 rows are all converted to orders, so no Approved requisition shows, only 2 of the 6 blank approvers do, and the shortfall channel is 161 rows of the thousand when it is most of the data set.
 
@@ -154,7 +160,7 @@ ROW (
 | Materials received and issued, 2026 | $17,578,136.00; $10,161,204.64 | 6 |
 | Data Through; last posting; rows after | 2026-12-31; 2027-02-23; 526 | 8 |
 
-> **Instructor notes, Requirement 1:** GLEntry has 815,921 rows; the six year-end closes (JE-2024-000265 and -000266, JE-2025-000287 and -000288, JE-2026-000296 and -000297) post 134 rows. Channel: Text.StartsWith on Justification, "WO-COMPONENT-SHORTFALL \| WO=\<id\> \| ITEM=\<id\>" for a work-order shortfall (21,437 requisitions; the ITEM in the text always equals ItemID), "Supply plan \<id\> - ..." for the supply plan (3,921; all but 3 carry a SupplyPlanRecommendationID), and six capital requests ("Other"). Receipts: 29,597 lines, every one with its order line, and every order line (24,842) with exactly one requisition; the purchase order header's RequisitionID is blank on 4,408 orders, which is why the merge goes through the line. Issues: 70,126 lines on 19,234 issues, every issue with its work order; 6 issue headers have no lines (Chapter 12). Requisitions: 25,364; 6 with no approver (Exercise 2.5); 522 Approved and never ordered, all work-order shortfall requisitions of December 2026. Validation (fiscal 2024 / 2025 / 2026): net income 5,110,308.27 / 5,134,354.71 / 4,503,611.24; total assets 23,742,720.31 / 31,838,684.00 / 39,328,524.11; materials received (receipt lines of Raw Materials and Packaging items) 7,823,080.62 / 13,490,602.93 / 17,578,136.00 and issued 10,560,905.25 / 10,005,081.44 / 10,161,204.64, equal to the GoodsReceipt debits and MaterialIssue credits to 1045 (AccountNumber, not AccountID). Data Through: the minimum of the last PostingDate of SalesInvoice, CashReceiptApplication, PurchaseInvoice, DisbursementPayment, GoodsReceipt, MaterialIssue, and Shipment postings, inside MINX over a table constructor and with the report's filters removed: 2026-12-31 (the model answer returns a blank if any of the seven has no posting, which MINX would skip). It is a bound observed in the extract, not proof that no document before it is missing, which the reconciliations of Requirement 5 and the source systems' own counts would show. The ledger's last posting is 2027-02-23: 263 supplier payments of 2026 invoices, 526 rows, 271,327.17 (Dr 2010, Cr 1010); a balance taken at that date shows cash 8,170,928.63 and payables 5,966,139.49, and a bridge for 2027 shows a fall of 271,327.17 that only means the data stop. Payroll summaries and payments end 2026-12-18, because the last two pay periods are marked Open in the data and are scheduled to pay in 2027 (Part III case), and the remittances of payroll liabilities run to 2026-12-30. Including them would make Data Through 2026-12-18 and blank the last quarter, so the About page should say why payroll is reported apart. Engine-checked on a reference model in Desktop 2.158.
+> **Instructor notes, Requirement 1:** GLEntry has 815,921 rows; the six year-end closes (JE-2024-000265 and -000266, JE-2025-000287 and -000288, JE-2026-000296 and -000297) post 134 rows. Channel: Text.StartsWith on Justification, "WO-COMPONENT-SHORTFALL \| WO=\<id\> \| ITEM=\<id\>" for a work-order shortfall (21,437 requisitions; the ITEM in the text always equals ItemID), "Supply plan \<id\> - ..." for the supply plan (3,921; all but 3 carry a SupplyPlanRecommendationID), and six capital requests ("Other"). Receipts: 29,597 lines, every one with its order line, and every order line (24,842) with exactly one requisition; the purchase order header's RequisitionID is blank on 4,408 orders, which is why the merge goes through the line. Issues: 70,126 lines on 19,234 issues, every issue with its work order; 6 issue headers have no lines (Chapter 12). Requisitions: 25,364; 6 with no approver (Exercise 2.5); 522 Approved and never ordered, all work-order shortfall requisitions of December 2026. Validation (fiscal 2024 / 2025 / 2026): net income 5,110,308.27 / 5,134,354.71 / 4,503,611.24; total assets 23,742,720.31 / 31,838,684.00 / 39,328,524.11; materials received (receipt lines of Raw Materials and Packaging items) 7,823,080.62 / 13,490,602.93 / 17,578,136.00 and issued 10,560,905.25 / 10,005,081.44 / 10,161,204.64, equal to the GoodsReceipt debits and MaterialIssue credits to 1045 (AccountNumber, not AccountID). Data Through: the minimum of the last PostingDate of SalesInvoice, CashReceiptApplication, PurchaseInvoice, DisbursementPayment, GoodsReceipt, MaterialIssue, and Shipment postings, inside MINX over a table constructor and with the report's filters removed: 2026-12-31 (the model answer returns a blank if any of the seven has no posting, which MINX would skip). It is a bound observed in the extract, not proof that no document is missing. The ledger's last posting is 2027-02-23: 263 supplier payments of 2026 invoices, 526 rows, 271,327.17 (Dr 2010, Cr 1010); a balance taken at that date shows cash 8,170,928.63 and payables 5,966,139.49, and a bridge for 2027 shows a fall of 271,327.17 that only means the data stop. Payroll summaries and payments end 2026-12-18, because the last two pay periods are marked Open in the data and are scheduled to pay in 2027 (Part III case), and the remittances of payroll liabilities run to 2026-12-30.
 
 ## What a strong answer says
 
@@ -169,7 +175,7 @@ A weak submission says the totals "look right" and has no Tests tab.
 
 - **Closes left in.** *Symptom:* net income reads zero in every year. *Response:* ask what a close does to a year's revenue and expenses.
 - **Merge through the header.** *Symptom:* 12,001 receipt lines with no channel. *Response:* ask which table names the requisition for each line.
-- **Policy not grouped.** *Symptom:* 505 item rows. *Response:* ask how many policy rows an item has.
+- **Policy not grouped.** *Symptom:* 505 item rows. *Response:* ask how many policy rows an item has, and which items have two.
 - **Profile of the first rows.** *Symptom:* no Approved requisition in the profile. *Response:* ask which basis the status bar names.
 - **Last posting as Data Through.** *Symptom:* 2027-02-23 on the About page. *Response:* ask what posts after the year.
 

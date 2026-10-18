@@ -165,7 +165,7 @@ files:
     constants: ["3176", "7244"]              # the author's ISNI, in About the Author
   # ---- Part I -----------------------------------------------------------------------------------------
   chapters/01-role-of-analytics/chapter.qmd:
-    constants: ["50", "500,000", "1,446"]    # a generic audit-sampling illustration; the CIMA survey (Chapter 1's reference)
+    constants: ["50", "500,000", "1,446", "20"]    # a generic audit-sampling illustration; the CIMA survey (Chapter 1's reference); Spraakman et al.'s 20 organizations
     "FUR-DSK-0075": id.trace.item_code
   chapters/02-understanding-data/_multiple-choice.qmd:
     constants: ["$15,000", "$1,500"]         # a generic data-entry error
@@ -244,6 +244,7 @@ files:
   chapters/06-descriptive-analytics/_tutorial-02.qmd:
     constants: ["100 percent"]               # Services carries no standard cost
   chapters/06-descriptive-analytics/_tutorial-03.qmd:
+    constants: ["+0.1", "0.10"]             # the deliberate error that tests the bridge check
     "8": val.promo.furniture_id
     "9": val.promo.segment_id
     "7": val.promo.collection_id
@@ -356,12 +357,12 @@ files:
   chapters/12-sql-audit-analytics/_multiple-choice.qmd:
     constants: ["3 percent", "2 percent", "$1", "1.5"]
   chapters/12-sql-audit-analytics/_tutorial-02.qmd:
-    constants: ["0.03", "0.02", "3%"]
+    constants: ["0.03", "0.02", "3%", "100", "1.0", "100.0", "15.30", "15.00", "0.02000000000000005"]   # whole cents, the percent share; 15.30 against 15.00 is the example of a division that lands above two percent
   chapters/12-sql-audit-analytics/_tutorial-03.qmd:
     constants: ["1.5", "0.5", "1"]
     "64": val.plant.hourly_employees
   chapters/12-sql-audit-analytics/chapter.qmd:
-    constants: ["0.0001", "14", "1.0", "999999.99", "1.000000e+06"]   # 999999.99: printf's rounding at six decimals
+    constants: ["0.0001", "14", "1.0", "999999.99", "1.000000e+06", "(10.0)"]   # 999999.99: printf's rounding at six decimals; LOG10(10.0) is 1 where the math functions exist
   cases/part-3-case.qmd:
     constants: ["31"]   # the last day of December ("December 14 to 31"; the 14 is date.payroll.open_start in dates.yml)
     "64": val.plant.hourly_employees
@@ -472,7 +473,7 @@ files:
   slides/chapter-09/index.qmd:
     constants: ["1.0", "2.0", "3.5", "1234.567", "-2", "1235.0", "1200"]   # the chapter's examples of SQLite arithmetic and ROUND
   slides/chapter-12/index.qmd:
-    constants: ["1.0", "999,999.99", "1.000000e+06"]   # LOG10(1 + 1.0 / Digit); printf's rounding at six decimals
+    constants: ["1.0", "999,999.99", "1.000000e+06", "(10.0)"]   # LOG10(1 + 1.0 / Digit); printf's rounding at six decimals; the LOG10(10.0) probe
   slides/chapter-13/index.qmd:
     constants: ["4.5", "5%"]        # the WCAG contrast ratio for ordinary text, 4.5 to 1; Beattie and Jones
   slides/chapter-19/index.qmd:
@@ -518,7 +519,7 @@ files:
   shared/calculations/sql_ch10.py:
     constants: ["$50,000", "50000"]
   shared/calculations/sql_ch12.py:
-    constants: ["3%", "0.03", "0.02", "1.5", "0.5"]
+    constants: ["3%", "0.03", "0.02", "1.5", "0.5", "100", "1.0", "100.0"]   # whole cents and the percent share of tests P2 and P6
 
   # ---- scripts/figures: assertions and strings that mirror what the figures and the text show --------------
   scripts/figures/appendix_b.py:
@@ -634,7 +635,7 @@ files:
   # ---- scripts/companion: the Excel, Power BI and SQL companion builders --------------------------------
   scripts/companion/xlbuild/analysis.py:
     "8": {context: 'PROMO = ', key: val.promo.furniture_id}
-    constants: ["100%", "0.5", "0.99", "0.9", "10", "15,000", "95%", "95.0%", "0.05", "$3", "15%", "5%"]
+    constants: ["100%", "0.5", "0.99", "0.9", "10", "15,000", "95%", "95.0%", "0.05", "$3", "15%", "5%", "$1,000"]
     "10%": val.promo.furniture_rate
     "30%": {key: val.promo.breakeven_lift, format: "floor5 .0%"}
     "35%": {key: val.promo.breakeven_lift, format: "ceil5 .0%"}
@@ -642,7 +643,7 @@ files:
       "1.6 million": "the bridge chart's axis minimum (Tutorial 6.3): check against the new quarters' margins"
   scripts/companion/xlbuild/audit.py:
     constants: ["0.012", "0.015", "1,000", "10,000", "50,000", "100,000", "$1,000", "$10,000", "$50,000", "$2,000", "100%",
-                "1899", "12", "30", "$10", "$250,000"]
+                "1899", "12", "30", "$10", "$250,000", "2", "5", "10"]
   scripts/companion/xlbuild/cap17.py:
     constants: ["5%", "2", "12.25", "843.86", "10,337.285", "10,337.28", "10,337.29", "8.1", "21%", "$14"]
     review:
@@ -734,7 +735,8 @@ files:
                 "4700", "50", "5250"]
   scripts/companion/sqlbuild/ex12.py:
     constants: ["1.0", "30", "1,000", "10,000", "50,000", "1000", "10000", "50000", "$50,000", "0.2", "0.3",
-                "999,999.99", "1.000000e+06"]
+                "999,999.99", "1.000000e+06", "0.301030", "0.176091", "0.124939", "0.096910", "0.079181", "0.066947",
+                "0.057992", "0.051153", "0.045757"]   # the nine Benford proportions of test B2, typed to six decimals
   scripts/companion/sqlbuild/script.py:
     constants: ["9.1"]
 

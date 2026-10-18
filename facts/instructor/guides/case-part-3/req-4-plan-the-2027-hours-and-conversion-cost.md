@@ -38,7 +38,7 @@ Students can:
 ## Before you assign
 
 - **Files.** Case.sql with the views from Requirements 1 and 3 (PlantEntries, PlantLedger), saved with **Write Changes**. It builds on Chapter 7's documented model (Tutorial 7.3) and Chapter 11's CTEs.
-- **Data conditions.** FixedAsset names the account each asset's depreciation is charged to; the WorkCenterCalendar covers only {{ g.in_calendar }} months of {{ d.N }}; the budget plans about {{ budget }} times the units the plant completed, and the plant's own budget lines are cost of goods sold only.
+- **Data conditions.** FixedAsset names the account each asset's depreciation is charged to; the WorkCenterCalendar covers only {{ g.in_calendar }} months of {{ d.N }}; and the plant's own budget lines are cost of goods sold only.
 - **Verify first.** The scenarios query returns {{ g.n.plan }} rows, and the schedule rebuilt from FixedAsset equals the ledger's depreciation of {{ d.C }} to the cent.
 
 ## How to run it
@@ -49,7 +49,7 @@ Pairs, about 150 minutes: 30 for the depreciation, 20 for the volume and standar
 
 ### Part 1: The assumptions
 
-**Step 1. Rebuild the depreciation of the plant's equipment from FixedAsset.** PlantAssets lists the assets whose depreciation is charged to 1090, with a first and last month counted as year times 12 plus month. Depreciation starts the month after the in-service date and ends the month before disposal. Count the months of {{ d.C }} from the calendar, and those of {{ d.N }} as the same months plus twelve.
+**Step 1. Rebuild the depreciation of the plant's equipment from FixedAsset.** PlantAssets lists the assets whose depreciation is charged to 1090, with a first and last month counted as year times 12 plus month. The case convention, not a universal policy: cost over the useful life with a zero residual value, charged by month from the month after the in-service date to the month before disposal and no longer than the life. Count the months of {{ d.C }} from the calendar, and those of {{ d.N }} as the same months plus twelve.
 
 ```sql
 SELECT pa.AssetCode, pa.InServiceDate, pa.DisposalDate, pa.Monthly,
@@ -64,7 +64,7 @@ SELECT pa.AssetCode, pa.InServiceDate, pa.DisposalDate, pa.Monthly,
 
 **Check:** the {{ d.C }} total is {{ dep_c|money }}, equal to the ledger; {{ d.N }} is {{ dep_n|money }}, {{ monthly_n|money }} a month, and {{ ending.code }} reaches the end of its life in {{ ending.month }} {{ d.N }}. The monthly charge is {{ jan|money }} in January, {{ changes[0].amount|money }} from {{ changes[0].month }} ({{ changes[0].code }}, in service {{ changes[0].date }}) and {{ changes[1].amount|money }} from {{ changes[1].month }}. The two newest assets trace to {{ new[0].po }} and {{ new[1].po }}, each above its approver's limit. **Watch for:** starting in the in-service month totals {{ g.total_early|money }}, {{ g.early_gap|money }} over the ledger, which fails the reproduction; taking {{ d.N }}'s months from the calendar finds only {{ g.in_calendar }} and a charge of {{ g.short_dep|money }}.
 
-**Step 2. Choose the volume.** The standard hours of {{ d.C }}'s completions are the base: {{ std|num }} hours at a standard conversion cost of {{ released|money }} released on the ledger, {{ conv_rate|num(2) }} an hour. The completion lines dated in the year carry {{ lines|money }}{% for x in stray %}, and {{ x.number }}, dated {{ x.dated }} and posted in {{ d.C }}, makes the difference{% endfor %}, so name both bases. The budget plans {{ g.volume[-1][1]|num(2) }} times the units completed and the demand forecast {{ g.volume[-1][2]|num(2) }} times the units ordered, and the Manufacturing cost center's budget lines are cost of goods sold only: no labor or overhead is budgeted. **Watch for:** the budget's volume needs {{ g.budget_hours|num }} hours at standard and {{ g.budget_over|num }} more than the regular capacity, and reads as a plan that needs heavy overtime.
+**Step 2. Choose the volume.** The standard hours of {{ d.C }}'s completions are the base: {{ std|num }} hours at a standard conversion cost of {{ released|money }} released on the ledger, {{ conv_rate|num(2) }} an hour. The completion lines dated in the year carry {{ lines|money }}{% for x in stray %}, and {{ x.number }}, dated {{ x.dated }} and posted in {{ d.C }}, makes the difference{% endfor %}, so name both bases. The budget plans {{ g.volume[-1][1]|num(2) }} times the units completed and the demand forecast {{ g.volume[-1][2]|num(2) }} times the units ordered, and the Manufacturing cost center's budget lines are cost of goods sold only: no labor or overhead is budgeted. The two ratios have different denominators, units completed and units ordered. **Watch for:** weighting each item's budget units by its standard labor hours gives {{ g.budget_hours|num }} standard hours, {{ g.budget_over|num }} more than the regular capacity, so the budget reads as a plan that needs heavy overtime. The figure is an annual screen and does not show a feasible work-center schedule.
 
 **Step 3. Document the assumptions in one Params CTE, and check capacity.** Each assumption has a comment with its value, source and effect, and a scalar subquery.
 
@@ -121,7 +121,7 @@ Scenarios AS (
         - StandardLabor, 0) AS LaborExcess,
 ```
 
-**Check:** the labor rate with burden is {{ g.final[5]|num(2) }} against the standard {{ g.final[6]|num(2) }}, about {{ g.final[7]|num }}; overhead of {{ g.final[8]|num }} (salaried staff, Factory Overhead, depreciation) is set against {{ g.final[9]|num }} applied at {{ oh_rate|num(2) }} an hour, about {{ g.final[10]|num }}. The applied overhead is {{ variable|num }} variable and {{ fixed|num }} fixed, and the output is {{ g.final[11]|pct(0) }} of the regular employee-hours, which are not the normal capacity of the inventory standard, so the overhead residual is not all idle capacity. Decision: keep the direct-hour standards, which the records give no reason to revise. Direct time stayed below them ({{ direct|num }} against {{ std_cut|num }}, and {{ direct_common|num }} against {{ std_common|num }} counted on both sides to {{ ind_end }}), a comparison of period totals that does not validate them. Review the rates, and do not raise the fixed overhead rate to absorb idle capacity (Requirement 5).
+**Check:** the labor rate with burden is {{ g.final[5]|num(2) }} against the standard {{ g.final[6]|num(2) }}, about {{ g.final[7]|num }}; overhead of {{ g.final[8]|num }} (salaried staff, Factory Overhead, depreciation) is set against {{ g.final[9]|num }} applied at {{ oh_rate|num(2) }} an hour, about {{ g.final[10]|num }}. The applied overhead is {{ variable|num }} variable and {{ fixed|num }} fixed, and the output is {{ g.final[11]|pct(0) }} of the regular employee-hours, which are not the normal capacity of the inventory standard, so the overhead residual is not all idle capacity. Decision: keep the direct-hour standards provisionally, since the records give no reason to revise them. Direct time stayed below them ({{ direct|num }} against {{ std_cut|num }}, and {{ direct_common|num }} against {{ std_common|num }} counted on both sides to {{ ind_end }}), a comparison of period totals that neither validates them nor shows they are right. Review the rates on a defensible normal-capacity basis, and do not raise the fixed overhead rate simply to absorb idle capacity (Requirement 5).
 
 ## Expected results
 
@@ -137,10 +137,10 @@ Scenarios AS (
 
 ## What a strong answer says
 
-- **Volume.** The output of {{ d.C }}, with the reason for rejecting the budget and the forecast, which run well above what the plant made.
+- **Volume.** The output of {{ d.C }} as the stated baseline, with the reasons for rejecting the budget's units ({{ g.volume[-1][1]|num(2) }} times those completed) and the forecast's ({{ g.volume[-1][2]|num(2) }} times those ordered), which have different denominators.
 - **Documentation.** Each assumption stated once with its value, source and effect, so a reader can change one and rerun.
 - **Capacity.** The plan fits regular capacity on the year's total; routine overtime is not needed, and any overtime would be a decision against a dated plan, not a default.
-- **Variance and standards.** A variance remains even at standard hours, from the rate with burden and from fixed overhead over few hours; the direct-hour standards stand for now, the rates are reviewed, and idle capacity is not absorbed into the rate.
+- **Variance and standards.** A variance remains even at standard hours. The labor-rate difference is separated from the overhead residual, which is analyzed into fixed and variable and normal and abnormal cost before it is called idle capacity. The direct-hour standards stay provisionally, and the fixed rate is not raised simply to absorb idle capacity.
 
 ## Common mistakes and how to respond
 
@@ -165,4 +165,3 @@ Scenarios AS (
 - Add a fourth scenario at the {{ d.P }} level of hours per standard hour and say where it falls.
 - Find the volume, in standard hours, above which the first-year level needs overtime: the capacity divided by its ratio, {{ (capacity / levels[1])|num }}.
 - Discuss: the plan allows no overtime, yet the plant used a great deal. What control would keep the plan?
-- Discuss: why is hours per standard hour the assumption worth testing, and who owns it?

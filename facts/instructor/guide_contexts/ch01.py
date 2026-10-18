@@ -340,9 +340,17 @@ def ex3(d, claim):
     line_blank = d.one("SELECT COUNT(*) FROM BudgetLine WHERE CostCenterID IS NULL")
     claim(line_blank > 0, "some BudgetLine rows have no cost center")
     claim(d.one("SELECT MAX(FiscalYear) FROM Budget") == d.N, "the budget runs one year past the last year of actuals")
-    expense = d.one("SELECT COUNT(*) FROM GLEntry g JOIN Account a USING (AccountID) WHERE a.AccountType = 'Expense'")
-    blank = d.one("SELECT COUNT(*) FROM GLEntry g JOIN Account a USING (AccountID) WHERE a.AccountType = 'Expense' AND g.CostCenterID IS NULL")
-    claim(0 < blank / expense < 0.02, "a small share of the expense postings has no cost center")
+    claim([r[0] for r in d.q(f"SELECT DISTINCT SourceDocumentType FROM GLEntry WHERE FiscalYear = {d.N}")] == ["DisbursementPayment"],
+          "the ledger's rows of the year after the last full year are supplier payments only")
+    # expense postings outside the year-end closes, by rows and by amount (debits less credits)
+    expense, blank, amount, blank_amount, blank_opex = d.q(
+        "SELECT COUNT(*), SUM(g.CostCenterID IS NULL), SUM(g.Debit - g.Credit), "
+        "SUM(CASE WHEN g.CostCenterID IS NULL THEN g.Debit - g.Credit ELSE 0 END), "
+        "SUM(CASE WHEN g.CostCenterID IS NULL AND a.AccountSubType = 'Operating Expense' THEN g.Debit - g.Credit ELSE 0 END) "
+        f"FROM GLEntry g JOIN Account a USING (AccountID) WHERE a.AccountType = 'Expense' AND g.{d.no_closes()}")[0]
+    claim(0 < blank / expense < 0.02, "outside the closes, a small share of the expense postings has no cost center")
+    claim(blank_amount / amount > 4 * blank / expense, "the postings with no cost center carry a far larger share of the expense amount than of its rows")
+    claim(blank_opex > 0.9 * blank_amount, "nearly all of the expense amount with no cost center is operating expense")
     claim(d.one("SELECT COUNT(*) FROM Budget b JOIN Account a USING (AccountID) WHERE a.AccountType NOT IN ('Expense', 'Revenue')") == 0,
           "Budget holds revenue and expense accounts only")
     claim(d.one("SELECT COUNT(*) FROM BudgetLine b JOIN Account a USING (AccountID) WHERE a.AccountType IN ('Asset', 'Liability', 'Equity')") > 0,
@@ -353,7 +361,7 @@ def ex3(d, claim):
     return dict(rows=rows_of(d, ["WorkOrder", "BillOfMaterial", "MaterialIssue", "ProductionCompletion", "WorkOrderClose", "CostCenter",
                                  "Budget", "BudgetLine", "LaborTimeEntry", "PayrollRegister", "GLEntry"]),
                 n_centers=len(centers), centers=and_join(centers), line_blank=line_blank, expense=expense, blank=blank,
-                blank_share=blank / expense, budget_first=d.one("SELECT MIN(FiscalYear) FROM Budget"),
+                blank_share=blank / expense, blank_amount_share=blank_amount / amount, budget_first=d.one("SELECT MIN(FiscalYear) FROM Budget"),
                 budget_last=d.one("SELECT MAX(FiscalYear) FROM Budget"))
 
 
@@ -464,8 +472,16 @@ def ex5(d, claim):
     claim(d.one("SELECT COUNT(*) FROM CashReceipt r WHERE r.SalesInvoiceID IS NOT NULL AND (SELECT COUNT(*) FROM CashReceiptApplication a "
                 "WHERE a.CashReceiptID = r.CashReceiptID) <> 1") == 0,
           "a receipt with a SalesInvoiceID is one that has a single application")
+    # the converse does not hold: a blank link can be a receipt that pays one invoice or several
+    paid = dict(d.q("SELECT n, COUNT(*) FROM (SELECT (SELECT COUNT(DISTINCT a.SalesInvoiceID) FROM CashReceiptApplication a "
+                    "WHERE a.CashReceiptID = r.CashReceiptID) AS n FROM CashReceipt r WHERE r.SalesInvoiceID IS NULL) "
+                    "GROUP BY CASE WHEN n > 1 THEN 2 ELSE n END"))
+    blank_single = paid.get(1, 0)
+    blank_multi = sum(v for k, v in paid.items() if k > 1)
+    claim(0 not in paid, "every receipt with a blank SalesInvoiceID has at least one application")
+    claim(blank_single > 0 and blank_multi > 0, "receipts with a blank SalesInvoiceID include some that pay one invoice and some that pay several")
     return dict(n_source_types=len(types), je_rows=je_rows, entries=entries, gl_rows=d.one("SELECT COUNT(*) FROM GLEntry"),
-                payments=d.one("SELECT COUNT(*) FROM DisbursementPayment"), receipts=receipts, direct=direct, purchase_invoices=d.one("SELECT COUNT(*) FROM PurchaseInvoice"),
+                payments=d.one("SELECT COUNT(*) FROM DisbursementPayment"), receipts=receipts, direct=direct, blank_single=blank_single, blank_multi=blank_multi, purchase_invoices=d.one("SELECT COUNT(*) FROM PurchaseInvoice"),
                 statuses=and_join(statuses), open_n=len(open_ids), asof=f"{d.C}-12-31", ar_ledger=d.balance(["1020"], f"{d.C}-12-31"),
                 creator=d.q("SELECT e.JobTitle FROM Employee e WHERE e.EmployeeID = (SELECT CreatedByEmployeeID FROM GLEntry WHERE "
                             "SourceDocumentType = 'SalesInvoice' LIMIT 1)")[0][0].lower())

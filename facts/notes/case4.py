@@ -225,10 +225,12 @@ def quarters(d) -> tuple[dict, ...]:
             purchases = cr - dr
             dso, dso_x, dio = ar / bill * 365, ar_x / bill * 365, inv / cogs * 365
             dpo, dpo_x = ap / purchases * 365, ap_x / purchases * 365
+            raw = dict(dso=dso, dso_x=dso_x, dio=dio, mat=mat / issues * 365, fg=fg / ships * 365, dpo=dpo, dpo_x=dpo_x,
+                       ccc=dso + dio - dpo, ccc_x=dso_x + dio - dpo_x)       # unrounded: a movement is the difference of these
             out.append(dict(end=end, label=f"{y}-Q{m // 3}", dso=xr(dso, 1), dso_x=xr(dso_x, 1), dio=xr(dio, 1),
                             mat=xr(mat / issues * 365, 1), fg=xr(fg / ships * 365, 1), dpo=xr(dpo, 1), dpo_x=xr(dpo_x, 1),
                             ccc=xr(dso + dio - dpo, 1), ccc_x=xr(dso_x + dio - dpo_x, 1), purchases=purchases,
-                            inv=inv, mat_balance=mat, fg_balance=fg, issues=issues))
+                            inv=inv, mat_balance=mat, fg_balance=fg, issues=issues, raw=raw))
     return tuple(out)
 
 
@@ -982,6 +984,10 @@ def r5(d, claim):
                      "WHERE g.SourceDocumentType = 'SalesInvoice' AND g.AccountID = ? AND g.FiscalYear = ?)", d.account("2050"), y)
         claim(abs(gl - docs) < 0.01, f"the {y} sales tax credits equal the invoices' TaxAmount")
         tax.append(xr(gl))
+    by_date = [d.one("SELECT SUM(TaxAmount) FROM SalesInvoice WHERE substr(InvoiceDate, 1, 4) = ?", str(y)) for y in d.years]
+    tax_date_diff = [xr(a - b) for a, b in zip(by_date, tax)]
+    claim(abs(sum(tax_date_diff)) < 0.01 and all(abs(x) > 0 for x in tax_date_diff),
+          "by invoice date the tax differs from the ledger's credits every year, and the differences net to zero across the window (each is a cutoff invoice posted in the next year)")
     thru = data_through(d)
     after_rows, after_amount = d.q("SELECT COUNT(*), SUM(Debit) FROM GLEntry WHERE PostingDate > ?", thru)[0]
     claim(all(abs(sum(bridge(d, y)[k] for k in STEPS) - bridge(d, y)["cash"]) < 0.01 for y in (d.P, d.C)),
@@ -997,10 +1003,45 @@ def r5(d, claim):
                 billing=[dict(year=y, diff=b, groups=described[y]) for y, b in zip(d.years, billing)],
                 shipped=shipped_in_year[0]["number"] if shipped_in_year else "?",
                 shipped_year=shipped_in_year[0]["shipped"][:4] if shipped_in_year else "?",
-                waiting=dict(n=len(waiting), amount=sum(m[3] - m[4] for m in waiting)), tax=tax, opening_ar=opening_ar,
+                waiting=dict(n=len(waiting), amount=sum(m[3] - m[4] for m in waiting)), tax=tax, tax_date_diff=tax_date_diff, opening_ar=opening_ar,
                 tax_balance=xr(-balance(d, ["2050"], asof)), current_portion=xr(d.one(
                     "SELECT SUM(PrincipalAmount) FROM DebtScheduleLine WHERE substr(PaymentDate, 1, 4) = ?", str(d.N))),
-                after_amount=xr(after_amount), after_rows=after_rows, accrual=processed(d)["accrual"])
+                after_amount=xr(after_amount), after_rows=after_rows, accrual=processed(d)["accrual"],
+                accrual_parts=dict(gross=processed(d)["gross"], tax=processed(d)["tax"], benefits=processed(d)["ben"],
+                                   accounts=payroll_accrual_accounts(d)))
+
+
+def payroll_accrual_accounts(d) -> list[str]:
+    """The accounts the Part III case's accrual entry credits, read from where the ledger posts payroll: gross pay (2030, accrued payroll),
+    employer payroll taxes (2032) and employee benefits and other deductions (2033). Each must exist and each must receive PayrollSummary credits."""
+    out = []
+    for number in ("2030", "2032", "2033"):
+        credits = d.one("SELECT SUM(g.Credit) FROM GLEntry g WHERE g.SourceDocumentType = 'PayrollSummary' AND g.AccountID = ?", d.account(number))
+        assert credits and credits > 0, f"the payroll postings credit {number}"
+        out.append(number)
+    return out
+
+
+def findings_rows(c: dict, d) -> list[list]:
+    """The rows of the Findings table (Enter data): account, finding, amount, disposition and the difference it reconciles. The model answer
+    types them and the guide of Requirement 5 prints them. Amounts are the effect on the ledger less the subledger where a row reconciles a
+    difference; the payroll accrual is carried as an unposted proposal, a separate finding that reconciles neither receivables nor payables."""
+    cap = c["capital"]
+    parts = c["accrual_parts"]
+    return [
+        ["1020", f"Opening receivables with no invoice ({c['entry']})", c["opening_ar"], "Follow up", "Receivables"],
+        ["2010", f"Opening payables with no invoice ({c['entry']})", c["opening_ap"], "Follow up", "Payables"],
+        ["2010", "Invoices moved to notes payable still open in the subledger (PI " +
+         " and ".join(str(x["id"]) for x in cap) + "); close them against the notes", -c["notes_total"], "Expected", "Payables"],
+        ["1045", f"Opening materials with no item or cost detail ({c['entry']})", c["opening_materials"], "Follow up", ""],
+        ["1040", f"Opening finished goods with no item or cost detail ({c['entry']})", c["opening_fg"], "Follow up", ""],
+        ["2050", "No remittance of the sales tax recorded", c["tax_balance"], "Follow up", ""],
+        ["2110", f"Current portion of the notes classified as long-term (due {d.N})", c["current_portion"], "Misstatement", ""],
+        ["1010 and 2010", "Supplier payments posted after Data Through", c["after_amount"], "Expected", ""],
+        [", ".join(parts["accounts"][:-1]) + " and " + parts["accounts"][-1],
+         f"Year-end payroll accrual that the Part III case proposed and did not post (gross payroll ${parts['gross']:,.2f}, employer payroll "
+         f"taxes ${parts['tax']:,.2f}, benefits and other payroll liabilities ${parts['benefits']:,.2f})",
+         c["accrual"], "Misstatement", ""]]
 
 
 # --- Requirement 6 -------------------------------------------------------------------------------

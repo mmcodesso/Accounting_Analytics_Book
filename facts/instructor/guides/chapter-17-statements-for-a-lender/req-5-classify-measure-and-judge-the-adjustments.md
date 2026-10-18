@@ -62,13 +62,13 @@ Individual or pairs, about 180 minutes: 60 for the schedule and entries, 25 for 
 
 **Check:** the effect of each adjustment on opening retained earnings, {{ d.P }} income and {{ d.C }} income is in the instructor note below; in total {{ sm(total.re) }}, {{ sm(total.P) }} and {{ sm(total.C) }}. A1 alone is {{ sm(a.A1.re) }}, {{ sm(a.A1.P) }} and {{ sm(a.A1.C) }}. **Watch for:** two errors. Taking each year-end's amount as the year's effect gives {{ sm(g.no_reversal) }} for {{ d.C }}, the equity effect, where the income effect is {{ sm(total.C) }}. Booking the whole payroll accrual in {{ d.C }} gives -${{ g.whole_a1|money }}, where only {{ sm(a.A1.C) }} is new.
 
-**Step 2. Classify and assign a period.** A1, A2 and A4 correct errors: the facts existed at each year-end. A3 corrects errors only on its case assumption that the facts at each original preparation supported the release, and is otherwise a change in estimate of the year they became known. The errors are material to the {{ d.P }} statements the shareholders received, on the balance sheet at least, so present {{ d.P }} as restated, with the Topic 250 disclosures: opening retained earnings fall by ${{ (total.re|abs)|money }} and {{ d.P }} income by ${{ (total.P|abs)|money }} (a reasoned "revised" presentation is acceptable).
+**Step 2. Classify and assign a period.** A1, A2 and A4 correct errors: the facts existed at each year-end. A3 corrects errors only on its case assumption that the facts at each original preparation supported the release, and is otherwise a change in estimate of the year they became known. The errors are material to the {{ d.P }} statements the shareholders received, on the balance sheet at least, so present {{ d.P }} as restated, with the Topic 250 disclosures: opening retained earnings fall by ${{ (total.re|abs)|money }} and {{ d.P }} income by ${{ (total.P|abs)|money }}.
 
 **Check:** adjusted income before income taxes is ${{ adj_ni_p|money }} for {{ d.P }} and ${{ adj_ni_c|money }} for {{ d.C }}.
 
 ### Part 2: Reclassifications and passed items
 
-**Step 3. Record R1 and R2.** R1 moves the principal due within a year out of the long-term notes: the script's R1 query sums the principal of each note's payments dated within a year after the year-end, for the notes originated by then.
+**Step 3. Record R1 and R2.** R1 moves the principal due within a year out of the long-term notes, for the notes originated by the year-end.
 
 **Check:** ${{ cur_p|money }} at the end of {{ d.P }} (the first note only) and ${{ cur_c|money }} at the end of {{ d.C }}. **Watch for:** the next year's scheduled payments, which include interest: ${{ g.with_interest|money }}, not the principal. R2 nets the credit balance of `1090`, ${{ (-c1090_c)|money }} at the last year-end, into work in process (${{ wip_c|money }} before), because `1090` clears conversion cost into it; no income changes.
 
@@ -92,9 +92,9 @@ GROUP BY AsOfDate
 ORDER BY AsOfDate;
 ```
 
-**Check:** P1 is {{ sm(p1) }} at the last year-end and {{ sm(p1_prior) }} a year earlier, so {{ sm(p1_income) }} on {{ d.C }} income. P2, the returns expected after the year-end, is estimated from the {{ p2.n }} returns made in {{ d.C }} on {{ d.P }}'s deliveries (${{ p2.rev|money }} of revenue less ${{ p2.cost|money }} of cost): {{ sm(p2.effect) }}. P3, the full cost of the damaged returns restocked, is {{ sm(p3.effect) }}. In aggregate {{ sm(aggregate) }}, {{ agg_share|pct(0) }} of materiality. **Watch for:** two errors. Letting the aging take in the opening receivable adds ${{ (g.with_opening - g.allowance)|money }} at the top rate, ${{ g.with_opening|money }} in all, for a balance that is a question for evidence, not an aging bucket. And selecting by InvoiceDate takes in {{ late_posted|join(', ') }}, posted in {{ d.C }}, so the {{ d.P }} aging no longer equals `1020` less its opening line.
+**Check:** P1 is {{ sm(p1) }} at the last year-end and {{ sm(p1_prior) }} a year earlier, so {{ sm(p1_income) }} on {{ d.C }} income. P2, the returns expected after the year-end, is estimated from the {{ p2.n }} returns made in {{ d.C }} on {{ d.P }}'s deliveries (${{ p2.rev|money }} of revenue less ${{ p2.cost|money }} of cost): {{ sm(p2.effect) }}. P1 and P2 are estimates, {{ sm(g.p12) }} together. P3, the full cost of the damaged returns restocked, {{ sm(p3.effect) }}, is an exposure, not a measured loss, until a count and a net realizable value review measure it. Together, {{ sm(aggregate) }} ({{ agg_share|pct(0) }} of materiality) is a screen, not a measured misstatement. **Watch for:** two errors. Letting the aging take in the opening receivable adds ${{ (g.with_opening - g.allowance)|money }} at the top rate, ${{ g.with_opening|money }} in all. And selecting by InvoiceDate takes in {{ late_posted|join(', ') }}, posted in {{ d.C }}, so the {{ d.P }} aging no longer equals `1020` less its opening line.
 
-**For the instructor.** The rates are the case's assumptions, not GAAP's. ASU 2025-05, effective for fiscal {{ d.C }}, lets any entity assume that year-end conditions persist and lets an entity that is not a public business entity also elect to consider later collections, which the extract cannot show.
+**For the instructor.** The rates are the case's assumptions, not GAAP's. ASU 2025-05 (prospective, {{ g.asu.effective }}) lets any entity assume, for current receivables and contract assets from Topic 606, that year-end conditions persist, and lets a private company also count later collections, disclosing the date used. Neither election removes the opening receivable from the assessment.
 
 ### Part 3: Materiality and the judgment
 
@@ -102,7 +102,7 @@ ORDER BY AsOfDate;
 
 **Check:** ${{ mat_p|money }} for {{ d.P }} and ${{ mat_c|money }} for {{ d.C }}, and ${{ g.trivial|money }} as clearly trivial. **Watch for:** adjusted income as the base, which gives ${{ g.adjusted_mat|money }} and a circular rule.
 
-**Step 6. Judge individually and in aggregate.** The effect on {{ d.C }} income, {{ sm(total.C) }}, is {{ share|pct(0) }} of materiality, but other grounds say record: the payroll liability alone, ${{ pay_c.total|money }}, exceeds materiality; current liabilities rise by ${{ rise|money }} before the reclassification and working capital falls by ${{ wc_fall|money }} after it; at the end of {{ d.P }} they were understated by ${{ under_p|money }}, above that year's materiality; and the error recurs every year. List P1 to P3 for approval as candidates to pass, each passed once its support holds. List the freight residual, ${{ residual|money }}, as clearly trivial.
+**Step 6. Judge individually and in aggregate.** The effect on {{ d.C }} income, {{ sm(total.C) }}, is {{ share|pct(0) }} of materiality, but other grounds say record: the payroll liability alone, ${{ pay_c.total|money }}, exceeds materiality; current liabilities rise by ${{ rise|money }} before the reclassification and working capital falls by ${{ wc_fall|money }} after it; at the end of {{ d.P }} they were understated by ${{ under_p|money }}, above that year's materiality; and the error recurs every year. List P1 to P3 for approval as candidates to pass. List the freight residual, ${{ residual|money }}, as clearly trivial.
 
 **Step 7. Show the adjusted trial balances balance and that no adjustment touches cash.** Add two columns to Working TB, the adjustment for each account and the adjusted balance:
 
@@ -111,7 +111,7 @@ ORDER BY AsOfDate;
 {{ g.f.adjusted }}
 ```
 
-**Check:** the largest imbalance of any entry is zero, no line has account `1010`, and the adjusted statements follow in Requirement 6. Holding A3 for evidence instead lowers income before income taxes by ${{ a.A3.P|money }} in {{ d.P }} and ${{ a.A3.C|money }} in {{ d.C }}.
+**Check:** the largest imbalance of any entry is zero, no line has account `1010`, and the adjusted statements follow in Requirement 6.
 
 ## Expected results
 
@@ -121,7 +121,7 @@ ORDER BY AsOfDate;
 | Equity effect at the year-ends, {{ d.P }}; {{ d.C }} | {{ sm(equity_p) }}; {{ sm(equity_c) }} | 1 |
 | Adjusted income before income taxes, {{ d.P }}; {{ d.C }} | ${{ adj_ni_p|money }}; ${{ adj_ni_c|money }} | 2 |
 | Current portion of the notes, {{ d.P }}; {{ d.C }} | ${{ cur_p|money }}; ${{ cur_c|money }} | 3 |
-| P1, P2, P3 and the aggregate | {{ sm(p1) }}; {{ sm(p2.effect) }}; {{ sm(p3.effect) }}; {{ sm(aggregate) }} | 4 |
+| P1, P2, P3 and their combined screen | {{ sm(p1) }}; {{ sm(p2.effect) }}; {{ sm(p3.effect) }}; {{ sm(aggregate) }} | 4 |
 | Materiality, {{ d.P }}; {{ d.C }} | ${{ mat_p|money }}; ${{ mat_c|money }} | 5 |
 
 {{ expected() }}
@@ -130,7 +130,7 @@ ORDER BY AsOfDate;
 
 - **Classification.** Each entry typed by what the facts were at the year-end, and the assumption of A3 stated.
 - **Periods.** Each year-end's amount reversing the one before, {{ d.P }} restated because the errors are material to the statements the shareholders received.
-- **Judgment.** Materiality by size and other grounds, the recurring error noted, the passed items listed in aggregate.
+- **Judgment.** Materiality by size and other grounds, the recurring error noted, the estimates and the exposure listed apart.
 
 A weak answer records or passes everything on the size of one year's income effect.
 
@@ -146,7 +146,7 @@ A weak answer records or passes everything on the size of one year's income effe
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
 | Schedule and entries | 30 | A1 to A4 numbered, entries for both year-ends, effects by year, in a Table | One year-end |
-| Classification and periods | 20 | Type and period for each; {{ d.P }} restated | Types without periods |
+| Classification and periods | 20 | A reasoned type and period for each, {{ d.P }} restated or, with reasons, revised | Types without periods |
 | Reclassifications and passed items | 20 | R1, R2 and P1 to P3 measured | Not described |
 | Materiality and judgment | 20 | Both years; size and other grounds; aggregate | Size alone |
 | Checks | 10 | Entries balance; no cash line | Not shown |
@@ -154,5 +154,4 @@ A weak answer records or passes everything on the size of one year's income effe
 ## Extensions and discussion questions
 
 - Rebuild the schedule for the retained-liability answer to A3 and compare the two presentations of {{ d.P }}.
-- Show that the adjustments change lines of the cash flow reconciliation but not its totals (Requirement 6).
 - Discuss: why does a recurring error of modest size deserve attention?

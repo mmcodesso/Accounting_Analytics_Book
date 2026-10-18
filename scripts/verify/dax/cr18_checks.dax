@@ -1,4 +1,4 @@
--- @@ totals by view, finished goods, 2026 (expect revenue 28,543,076.08; margins 12,739,803.20 / 10,661,488.03 / 11,731,216.94)
+-- @@ totals by view, finished goods, 2026 (expect revenue 28,543,076.08; margins 12,739,803.20 / 10,661,488.02 / 11,731,216.94; CR18 item costs are rounded to six decimals)
 DEFINE
     MEASURE SalesInvoiceLine[Revenue] = SUM ( SalesInvoiceLine[LineTotal] )
     MEASURE SalesInvoiceLine[Standard Cost] = SUMX ( SalesInvoiceLine, SalesInvoiceLine[Quantity] * RELATED ( ItemCosts[StandardCost] ) )

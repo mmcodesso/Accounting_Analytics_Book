@@ -30,7 +30,7 @@ Students can:
 - estimate an accrual by working day, by cost center, with the accounts to debit and credit (Steps 1 and 2);
 - measure the prior year's unrecorded work and separate the effect on income from the effect on the balance sheet (Steps 3 and 4);
 - decide what to do with an old balance that no payroll cleared (Step 5);
-- apply the inventory standard to idle capacity (Step 7), and judge materiality (Step 8).
+- apply the inventory standard to idle capacity (Step 6), rerun the cutoff tests (Step 7), and judge materiality (Step 8).
 
 **Competencies practiced.** CPA Evolution Core S1 M1 to M3 (financial statements, accounts and transactions); IMA Reporting and Control (financial recordkeeping and statement preparation); IFAC IES 2 (a); AACSB A5 part 5.1.
 
@@ -72,9 +72,11 @@ WITH Periods AS (
 - Without the `Status` filter the last eight periods include the Open ones, no day is left after the last, and the accrual is {{ g.no_status[6]|money }}.
 - Counting calendar rows instead of dates, on one side only, scales the accrual by the {{ g.work_centers }} work centers: {{ g.period_rows[6]|money }} or {{ g.left_rows[6]|money }}.
 
+The estimate applies one working-day rate and the recent payroll mix to every cost center, so true it up to the payroll actually posted. Another defensible allocation is a sensitivity, not an error in the stipulated method.
+
 **Step 2. Write the adjusting entries.** Query the debits of {{ d.C }}'s payroll postings (`SourceDocumentType = 'PayrollSummary'`) by cost center and account, joining Account on `AccountID`.
 
-**Check:** Manufacturing is debited to account {{ g.accounts.Manufacturing|join(', ') }} alone, for its whole cost ({{ mfg_all_in|money }}, with {{ mfg_employer|money }} of employer costs); each of the other {{ p.centers|length - 1 }} cost centers goes to one salary account for gross pay ({% for cc, nums in g.accounts.items() %}{% if cc != 'Manufacturing' %}{{ cc }} {{ nums|reject('equalto', 6060)|first }}{{ ", " if not loop.last else "" }}{% endif %}{% endfor %}), {{ other_gross|money }} in all, and to {{ g.names[3][0] }} {{ g.names[3][1] }} for its employer costs only, {{ other_employer|money }}. A student who debits {{ g.names[3][0] }} for every employer cost counts Manufacturing's twice. The credits are {{ g.names[0][0] }} {{ g.names[0][1] }} for gross pay, {{ g.names[1][0] }} for employer taxes and {{ g.names[2][0] }} for benefits. The Manufacturing part stays in {{ g.accounts.Manufacturing|join(', ') }} until it is cleared, because no completion releases standard cost against it. On the case's reading that it is a cost of the period, a second entry moves it to account {{ g.variance_account }} (debit {{ g.variance_account }}, credit {{ g.accounts.Manufacturing|join(', ') }}), once the accountant has judged how much is normal cost.
+**Check:** Manufacturing is debited to account {{ g.accounts.Manufacturing|join(', ') }} alone, for its whole cost ({{ mfg_all_in|money }}, with {{ mfg_employer|money }} of employer costs); each of the other {{ p.centers|length - 1 }} cost centers goes to its own salary account for gross pay, {{ other_gross|money }} in all, and to {{ g.names[3][0] }} {{ g.names[3][1] }} for its employer costs only, {{ other_employer|money }}. A student who debits {{ g.names[3][0] }} for every employer cost counts Manufacturing's twice. The Manufacturing part stays in {{ g.accounts.Manufacturing|join(', ') }} until it is cleared. Completions continue to the year-end and have already released standard conversion cost ({{ in_window.n }} completions dated December {{ left_day }} to 31 released {{ in_window.cost|money }}), so the accrual creates no further release. For the income figures, treat the Manufacturing part of the accrual and of the prior year's work as costs of the period, a second entry moving each to account {{ g.variance_account }} (debit {{ g.variance_account }}, credit {{ g.accounts.Manufacturing|join(', ') }}). That is a teaching assumption, not a split of normal and abnormal cost, which needs Requirement 4's overhead analysis and changes the income and equity figures.
 
 {{ figure('IF-C3-5-A') }}
 
@@ -100,7 +102,7 @@ SELECT NetIncome,
         + RevenueToAdd - RevenueToRemove, 2) AS AdjustedNetIncome,
 ```
 
-**Check:** {{ d.C }} expense rises by only {{ change|money }} ({{ p.accrual|money }} less {{ prior.total|money }}), while the liability rises by {{ p.accrual|money }} and opening retained earnings fall by {{ prior.total|money }}: the errors counterbalance in income and not on the balance sheet. **Watch for:** with the closes left in, net income is zero and the adjusted figure {{ g.closes_in[3]|money }}; recording only the {{ d.C }} accrual gives {{ g.only_new|money }}.
+**Check:** {{ d.C }} expense rises by only {{ change|money }} ({{ p.accrual|money }} less {{ prior.total|money }}), while the liability rises by {{ p.accrual|money }} and opening retained earnings fall by {{ prior.total|money }}: the errors counterbalance in income and not on the balance sheet, with the Manufacturing parts taken as period costs (Step 2). **Watch for:** with the closes left in, net income is zero and the adjusted figure {{ g.closes_in[3]|money }}; recording only the {{ d.C }} accrual gives {{ g.only_new|money }}.
 
 **Step 5. Decide on account 2030's old balance.** Group the account by source document type (test L8).
 
@@ -113,38 +115,46 @@ WHERE a.AccountNumber = 2030 AND gl.PostingDate <= '2026-12-31'
 GROUP BY gl.SourceDocumentType;
 ```
 
-**Check:** {{ opening|money }} remains from {{ entry }} alone, and the payroll postings net to zero. It is not the year-end accrual. Investigate it with the other unsupported opening balances of Chapter 8, and reverse it against opening retained earnings only if the investigation shows it is not owed, never against the new accrual.
+**Check:** {{ opening|money }} remains from {{ entry }} alone, and the payroll postings net to zero. Investigate it with the other unsupported opening balances of Chapter 8, and reverse it against opening retained earnings only if the investigation shows it is not owed, never against the new accrual.
 
 ### Part 3: Inventory and cutoff
 
 **Step 6. Apply the inventory standard.** Compare the year's actual conversion cost per standard hour with the standard, and read the finished goods balance (account `1040` to the year-end, summed on `AccountNumber`).
 
-**Check:** actual {{ actual_rate|num(2) }} against the standard {{ std_rate|num(2) }} per standard hour; finished goods {{ fg|money }}. The actual figure is a pay-year ledger cost over the year's output. Raising the standards to absorb it would carry idle capacity and unsupported hours into inventory, and defer them to later years. The part that comes from idle capacity or hours beyond the work is abnormal and belongs in {{ d.C }}'s cost of goods sold, and measuring it needs Requirement 4's overhead analysis, because nominal employee-hours are not normal capacity. **Watch for:** `FiscalYear = 2026` returns the year's movement, {{ g.fg_year|money }}, not the balance.
+**Check:** actual {{ actual_rate|num(2) }} against the standard {{ std_rate|num(2) }} per standard hour; finished goods {{ fg|money }}. The actual figure is a pay-year ledger cost over the year's output. Raising the standards to absorb it would carry any idle capacity and unsupported hours into inventory, and defer them to later years. Identified abnormal costs, such as idle capacity, are expensed in {{ d.C }}'s cost of goods sold, and normal conversion cost needs a separate allocation on normal capacity. Unsupported hours are not automatically hours not worked or an abnormal cost of the same amount, so measuring the abnormal part needs Requirement 4's overhead analysis. The authority is ASC 330-10-30 (paragraphs 3, 6, 7 and 12: normal capacity, abnormally low production, abnormal amounts, standard costs). Read the Codification text before quoting it. **Watch for:** `FiscalYear = 2026` returns the year's movement, {{ g.fg_year|money }}, not the balance.
 
 **Step 7. Rerun the revenue cutoff tests.** Test L5 finds the invoices posted in another year than their delivery, test L6 the shipments never invoiced.
 
-**Check:** {{ delivered|money }} of {{ d.P }} deliveries is in {{ d.C }}'s revenue, and {{ n_uninv }} shipment lines were never invoiced, {{ uninv|money }} at order price with {{ uninv_std|money }} of standard cost already in cost of goods sold: net {{ net_rev|money }} more {{ d.C }} revenue, receivables {{ uninv|money }} higher, opening retained earnings {{ delivered|money }} higher. **Watch for:** the {{ g.before_ship[2] }} invoices dated before their shipment ({{ g.before_ship[3]|money }}) were posted in the year of delivery; they are no cutoff error.
+**Check:** {{ delivered|money }} of {{ d.P }} deliveries is in {{ d.C }}'s revenue, and {{ n_uninv }} shipment lines were never invoiced, {{ uninv|money }} at order price with {{ uninv_std|money }} of standard cost already in cost of goods sold: net {{ net_rev|money }} more {{ d.C }} revenue. **Watch for:** the {{ g.before_ship[2] }} invoices dated before their shipment ({{ g.before_ship[3]|money }}) were posted in the year of delivery; they are no cutoff error.
 
-**Step 8. Summarize the adjustments and judge materiality.** {{ ni|money }} less {{ change|money }} plus {{ net_rev|money }} is {{ adj_ni|money }}, a net change of {{ share|pct(2) }}, which does not make the errors immaterial. Judge the liability left out ({{ liab_ni|pct(1) }} of net income), the prior-year error and the recurring deficiency each on its own. The supplier invoice {{ asv[0].number }} ({{ asv[0].total|money }}, received {{ asv[0].received }}) is not a payables cutoff item: {{ asv[0].je }} carried its liability.
+**Step 8. Summarize the adjustments in a balanced schedule, and judge materiality.** {{ ni|money }} less {{ change|money }} plus {{ net_rev|money }} is {{ adj_ni|money }}, a net change of {{ share|pct(2) }}, on the Step 2 assumption that the Manufacturing parts are period costs and not an independently determined split, which does not make the errors immaterial. Judge the liability left out ({{ liab_ni|pct(1) }} of net income), the prior-year error and the recurring deficiency each on its own. The supplier invoice {{ asv[0].number }} ({{ asv[0].total|money }}, received {{ asv[0].received }}) is not a payables cutoff item: {{ asv[0].je }} carried its liability.
+
+| Entry | Debit | Credit |
+|---|---|---|
+| 1. Accrual | {{ g.accounts.Manufacturing|join(', ') }} {{ mfg_all_in|money }}; the other cost centers' salary accounts {{ other_gross|money }}; {{ g.names[3][0] }} {{ other_employer|money }} | {{ g.names[0][0] }} {{ p.gross|money }}; {{ g.names[1][0] }} {{ p.tax|money }}; {{ g.names[2][0] }} {{ p.ben|money }} |
+| 2. Manufacturing part to the period | {{ g.variance_account }} {{ mfg_all_in|money }} | {{ g.accounts.Manufacturing|join(', ') }} {{ mfg_all_in|money }} |
+| 3. {{ d.P }} work paid in {{ d.C }} | Opening retained earnings {{ prior.total|money }} | {{ g.variance_account }} {{ split.mfg|money }}; the salary accounts {{ split.other_gross|money }}; {{ g.names[3][0] }} {{ split.other_employer|money }} |
+| 4. {{ d.P }} revenue recognized in {{ d.C }} | Revenue accounts {{ delivered|money }} | Opening retained earnings {{ delivered|money }} |
+| 5. {{ d.C }} deliveries not invoiced | Receivables, account {{ g.receivable_account }} {{ uninv|money }} | Revenue accounts {{ uninv|money }} |
+
+Compute from unrounded amounts, round each line to cents, and put any cent left over on a named line, never in a query total. The cost centers' amounts add to {{ centers_sum|money }} against the accrual's {{ p.accrual|money }}, and entry 3's {{ split.residual|money }} goes to {{ g.names[3][0] }}. Entry 5 adds no cost of goods sold, because {{ uninv_std|money }} of standard cost is already recorded. The effects reconcile: receivables +{{ uninv|money }}, liabilities +{{ p.accrual|money }}, opening equity {{ open_equity|money }}, income {{ effect|money }}, ending equity {{ end_equity|money }}, and the {{ opening|num }} in {{ g.names[0][0] }} is neither released nor netted. The prior-year omissions are prior-period corrections here, and their presentation in practice depends on the periods shown, the evidence and materiality. The schedule changes nothing in the database.
 
 ## Expected results
 
 | Quantity | Value | Step |
 |---|---|---|
 | Accrual: cost a day; amount | {{ p.daily|money }}; {{ p.accrual|money }} | 1 |
-| Prior-year work paid in {{ d.C }} | {{ prior.total|money }} | 3 |
 | Effect on {{ d.C }} income; liability | {{ change|money }}; {{ p.accrual|money }} | 4 |
 | Adjusted net income | {{ adj_ni|money }} | 8 |
-| Actual against standard conversion per hour | {{ actual_rate|num(2) }}; {{ std_rate|num(2) }} | 6 |
 
 {{ expected() }}
 
 ## What a strong answer says
 
-- **The accrual.** By working day and cost center, with Manufacturing's whole cost in {{ g.accounts.Manufacturing|join(', ') }}, cleared by a second entry.
+- **The accrual.** By working day and cost center, with Manufacturing's whole cost in {{ g.accounts.Manufacturing|join(', ') }}, cleared by a second entry on a stated assumption. A balanced schedule with rounded lines is a plus.
 - **Income against balance sheet.** Two accruals that almost cancel in income and not on the balance sheet.
 - **Account 2030.** An unsupported opening balance to investigate, not an accrual to net.
-- **Inventory and materiality.** No standard raised to absorb abnormal cost, and each error judged on its own.
+- **Inventory and materiality.** No standard raised to absorb abnormal cost, abnormal costs expensed and normal ones allocated on their own analysis, and each error judged on its own.
 
 ## Common mistakes and how to respond
 

@@ -25,7 +25,7 @@ authors:
   affiliation: Northeastern University
 version: '2027.1'
 date-released: '2027-01-18'
-doi: 10.5281/zenodo.23425592
+doi: 10.5281/zenodo.23425591
 license: CC-BY-SA-4.0
 url: https://aa.accountinganalyticshub.com
 repository-code: https://github.com/mmcodesso/Accounting_Analytics_Book
@@ -62,7 +62,7 @@ preferred-citation:
     name: Accounting Analytics Hub
   year: 2027
   isbn: 978-65-978221-9-5
-  doi: 10.5281/zenodo.23425592
+  doi: 10.5281/zenodo.23425591
   url: https://aa.accountinganalyticshub.com
   license: CC-BY-SA-4.0
   languages:

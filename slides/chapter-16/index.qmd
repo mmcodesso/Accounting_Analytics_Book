@@ -378,7 +378,7 @@ Chapter 8 kept its dispositions on a worksheet of pasted values for the same rea
 ## Order the review by score and novelty
 
 - A monthly system can raise more exceptions than reviewers can examine
-- A document that fails several tests comes before one that fails one
+- All else equal, start with documents that fail more tests, and weigh amount, age and urgency
 - An exception new this month comes before one already explained
 - Scores can learn from what past investigations found
 
@@ -517,7 +517,7 @@ The first review records three dispositions. The year-end closes are expected in
 Most open exceptions belong to the registers approved by the employee they pay, a single design finding the memo reports once. The year-end closes have left the AboveLimit row, which now holds only the entries that still need a look.
 :::
 
-## Documents that fail two tests or more come first
+## Documents failing two or more tests for review
 
 {{< book-figure fig-16-07 crop="0.4797,0.0215,0.4681,0.6172" >}}
 
@@ -541,7 +541,7 @@ The variables hold the order numbers, taken from the last six characters of each
 The order numbers are all different and run from one to the number of orders, so none is missing between them; whether any was numbered after the last is a question for the purchasing system's count. The three registers without a payment record are the ones Chapter 12 found with payment postings in the ledger and no payment record behind them, a break in the trail to resolve with payroll's and the bank's records, not proof that the pay was never received. Two already appear as pay after termination; the third, the chief executive's first register, is a finding for the memo.
 :::
 
-## Data Through states how far the tests have run
+## Data Through summarizes observed event dates
 
 ```
 Data Through =
@@ -555,7 +555,7 @@ MINX (
 )
 ```
 
-- The earliest of the three last dates, here the last payday
+- Earliest maximum event date: December 18, 2026, the scheduled PayDate of a loaded register
 
 ::: {.notes}
 The braces build a one-column table of the three last dates, whose column DAX names Value, and MINX returns the earliest. The card shows a date in mid-December, the last pay date of a payroll register. No pay period has a later pay date in December, and the rest of the month's work is in the open periods, so the card is a bound observed in the extract, not proof that payroll is complete or that the refresh ran. Step 7c keeps a click on a cell or an approver from changing it, and MINX skips a blank, so an empty population is caught by the counts of Tests 1 and 4, not by the card.

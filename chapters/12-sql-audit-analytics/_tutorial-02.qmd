@@ -56,29 +56,40 @@ The result, shown in @fig-12-05, has no exception rows. No line was invoiced abo
 
 ![The Three-Way Match of Every Purchase Order Line.](/visuals/svg/fig-12-05-three-way-match-status.svg){#fig-12-05 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Audit.sql, is scrolled past the three CTEs that sum received and invoiced quantities for each purchase order line, to the CASE expression that classifies each line. The result has four rows: Matched, with the great majority of lines; Received, not fully invoiced; Not yet received; and Partly received. No exception status appears, and the result is outlined."}
 
-**Step 2. Test prices against two tolerances.** An invoice price that differs from the order price by more than the tolerance is an exception, and counting at two tolerances shows how much the choice matters.
+**Step 2. Test prices against two tolerances.** An invoice price that differs from the order price by more than the tolerance is an exception, and counting at two tolerances shows how much the choice matters. The prices are recorded to the cent, so the Prices CTE turns each one into whole cents, and the test compares the differences with cross-multiplied whole numbers. A division of two decimal prices can land a hair above the tolerance for a line that is exactly on it, as 15.30 against 15.00 divides to 0.02000000000000005 and would be flagged at two percent, while whole numbers compare exactly. A line with no usable order price would be counted apart as not testable, not passed.
 
 a. Type and run the test below.
 
    ```sql
    -- Tutorial 12.2, test P2: invoice prices against order prices
    -- Population: invoice lines with a PO line; expected: none above 3%
+   WITH Prices AS (
+       SELECT
+           CAST(ROUND(pil.UnitCost * 100) AS INTEGER) AS InvoiceCents,
+           CAST(ROUND(pol.UnitCost * 100) AS INTEGER) AS OrderCents
+       FROM PurchaseInvoiceLine AS pil
+           INNER JOIN PurchaseOrderLine AS pol
+               ON pol.POLineID = pil.POLineID
+   )
    SELECT COUNT(*) AS InvoiceLines,
-       SUM(CASE WHEN ABS(pil.UnitCost - pol.UnitCost) / pol.UnitCost
-           > 0.03 THEN 1 ELSE 0 END) AS AboveThreePercent,
-       SUM(CASE WHEN ABS(pil.UnitCost - pol.UnitCost) / pol.UnitCost
-           > 0.02 THEN 1 ELSE 0 END) AS AboveTwoPercent,
-       ROUND(MAX((pil.UnitCost - pol.UnitCost) / pol.UnitCost), 4)
+       SUM(CASE WHEN OrderCents > 0
+           AND ABS(InvoiceCents - OrderCents) * 100 > 3 * OrderCents
+           THEN 1 ELSE 0 END) AS AboveThreePercent,
+       SUM(CASE WHEN OrderCents > 0
+           AND ABS(InvoiceCents - OrderCents) * 100 > 2 * OrderCents
+           THEN 1 ELSE 0 END) AS AboveTwoPercent,
+       ROUND(MAX((InvoiceCents - OrderCents) * 1.0 / OrderCents), 4)
            AS LargestIncrease,
-       ROUND(MIN((pil.UnitCost - pol.UnitCost) / pol.UnitCost), 4)
-           AS LargestDecrease
-   FROM PurchaseInvoiceLine AS pil
-       INNER JOIN PurchaseOrderLine AS pol ON pol.POLineID = pil.POLineID;
+       ROUND(MIN((InvoiceCents - OrderCents) * 1.0 / OrderCents), 4)
+           AS LargestDecrease,
+       SUM(CASE WHEN InvoiceCents IS NULL OR OrderCents IS NULL
+           OR OrderCents <= 0 THEN 1 ELSE 0 END) AS NotTestable
+   FROM Prices;
    ```
 
-b. Compare AboveThreePercent with AboveTwoPercent.
+b. Compare AboveThreePercent with AboveTwoPercent, and read NotTestable.
 
-At a tolerance of three percent, no invoice line is an exception: the largest increase over the order price is a little over two and a half percent, and the largest decrease is under two. At two percent, several thousand lines would be flagged, all of them billed above the order price, the differences that Exercise 10.4 traced to the purchase price variance. The choice of tolerance decides how many items an auditor must follow up, so it should be set before the test is run, based on what the purchasing policy allows, and documented with the test.
+At a tolerance of three percent, no invoice line is an exception: the largest increase over the order price is a little over two and a half percent, the largest decrease is under two, and every line has a usable order price. At two percent, several thousand lines would be flagged, all of them billed above the order price, the differences that Exercise 10.4 traced to the purchase price variance. Every price in this database has two decimals, so whole cents are exact, and a source with more decimals needs a finer scale. The choice of tolerance decides how many items an auditor must follow up, so it should be set before the test is run, based on what the purchasing policy allows, and documented with the test.
 
 **Step 3. Reconcile the goods received but not invoiced.** Receipts that suppliers have not yet billed are a liability, which the ledger records in account 2020 Goods Received Not Invoiced. Despite its name, the ExtendedStandardCost of a receipt line holds the quantity received at the order price, the value at which account 2020 records it.
 
@@ -193,23 +204,25 @@ c. Read the job titles, the approval limit, and the tests of each order.
 
 Fourteen orders are flagged, and most fail two tests. The two largest are the capital-equipment orders whose note-financed invoices you met in Exercise 8.2, created and approved by the Purchasing Manager, above that manager's limit and above even the chief financial officer's. Three orders name as their approver an Account Executive, a sales employee with no approval authority, and are dated after that employee's termination: the employee of Tutorial 12.1. Whether they were approved after the termination, and by whom, only the approval records can show. Several small orders were approved by buyers and analysts whose approval limit is zero. Each is an exception in the operation of the approval control, and each needs a disposition.
 
-**Step 6. Measure the concentration of approvals.** An approval control also depends on how many people share it. The test groups by the approver's key, not by the job title, which several employees share.
+**Step 6. Measure the concentration of approvals.** An approval control also depends on how many people share it. The test groups by the approver's key, not by the job title, which several employees share, and the window function SUM(COUNT(*)) OVER () of Chapter 11 divides each count by the total of the counts.
 
 a. Type and run the test below.
 
    ```sql
    -- Tutorial 12.2, test P6: who approves the purchase orders
    -- Population: all purchase orders; expected: approval shared
-   SELECT e.EmployeeID, e.JobTitle, COUNT(*) AS OrdersApproved
+   SELECT e.EmployeeID, e.JobTitle, COUNT(*) AS OrdersApproved,
+       ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2)
+           AS SharePercent
    FROM PurchaseOrder AS po
        INNER JOIN Employee AS e ON e.EmployeeID = po.ApprovedByEmployeeID
    GROUP BY e.EmployeeID, e.JobTitle
    ORDER BY OrdersApproved DESC;
    ```
 
-b. Read the share of orders approved by the first employee.
+b. Read SharePercent for the first employee.
 
-The chief financial officer approved nearly every purchase order in the three years, and the other approvers only a few each. With one approver, the purchasing control depends heavily on one person's review, and it would be hard for one person to review so many orders with care. That concentration can indicate a weakness in the design of the control, rather than an exception in any one order, depending on whether other controls, such as budget reviews or reconciliations, would detect an error the approver missed.
+The chief financial officer approved nearly every purchase order in the three years, and the other approvers only a few each. SharePercent is calculated over the orders in this query, which are those whose approver is found in Employee, so compare the total of OrdersApproved with the count of all purchase orders, and count apart any order with no approver or an unmatched one before you interpret the concentration. With one approver, the purchasing control depends heavily on one person's review, and it would be hard for one person to review so many orders with care. That concentration can indicate a weakness in the design of the control, rather than an exception in any one order, depending on whether other controls, such as budget reviews or reconciliations, would detect an error the approver missed.
 
 **Checkpoint.** Check that:
 

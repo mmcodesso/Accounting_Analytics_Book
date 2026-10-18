@@ -15,9 +15,9 @@ The exercise separates two kinds of cost analysis that students tend to blur. Pr
 
 By the end, students can:
 
-- list the Manufacturing tables and the columns that carry standard cost, material usage, completions and variances (chapter outcome 4);
+- list the Manufacturing tables and the columns that carry standard cost, material usage, completions and variances (outcome 4);
 - name the Organizational Planning tables and columns for a departmental budget, and the GLEntry columns that supply the actual spending for the same cost center, account and period;
-- explain which group suits product-level cost analysis and which suits departmental budget analysis, with the limit of each (chapter outcome 6);
+- explain which group suits product-level cost analysis and which suits departmental budget analysis, with the limit of each (outcome 6);
 - propose a question that needs Manufacturing together with Payroll and Time.
 
 **Competencies practiced.** CPA Evolution BAR M5 (cost accounting and variance analysis) and ISC M4 (use and management of data); IMA Data Literacy and Cost Accounting; IFAC IES 2 (b), management accounting, and IES 3 (a), evaluating data from several sources; AACSB A5 part 5.2.
@@ -71,19 +71,19 @@ b. Read one row of each and say what it represents.
 | Budget | FiscalYear, Month, CostCenterID, AccountID, BudgetAmount | The plan for one cost center, one account and one month |
 | BudgetLine | FiscalYear, Month, AccountID, CostCenterID, ItemID, WarehouseID, Quantity, UnitAmount, BudgetAmount, BudgetCategory, DriverType | A planned amount with its drivers: an item, a quantity and a unit amount |
 
-**Check:** Budget covers fiscal years 2024 through 2027, so it also holds the plan for the year after the last year of actuals (2027). **Watch for:** students who say Budget holds the actual amounts. It has BudgetAmount only.
+**Check:** Budget covers fiscal years 2024 through 2027, so it also holds the plan for 2027, the year after 2026, the last full year of operations. The ledger runs a little into 2027, but only with supplier payments that settle invoices of 2026, so a comparison states its period rather than assuming every ledger row ends in 2026. **Watch for:** students who say Budget holds the actual amounts. It has BudgetAmount only.
 
-**Step 3. Name the GLEntry columns that give the actuals.** Open **GLEntry**. The actual spending for a budget row is the sum of debits less credits of the rows with the same CostCenterID and AccountID in the same fiscal year and period. The columns are CostCenterID, AccountID, FiscalYear, FiscalPeriod (or PostingDate), Debit and Credit.
+**Step 3. Name the GLEntry columns that give the actuals.** Open **GLEntry**. The actual spending for a budget row is the sum of debits less credits of the rows with the same CostCenterID and AccountID in the same fiscal year and period. The columns are CostCenterID, AccountID, FiscalYear, FiscalPeriod (or PostingDate), Debit and Credit. Four fields match: Budget.FiscalYear to FiscalYear, Budget.Month to FiscalPeriod, CostCenterID and AccountID, for three dimensions (the period needs both year and month).
 
 ![How a budget row lines up with the ledger rows that give its actual spending.](../figures/chapter-01-role-of-analytics/IF-01-3-A.pdf)
 
-**Check:** the three join columns are named, and the amount is debits less credits. **Watch for:** blank cost centers. 1,005 of the 142,869 expense rows in GLEntry, 0.7%, have no CostCenterID, and 1,625 rows of BudgetLine have none, so a comparison by department leaves a small remainder. Mention it, but do not let it derail the exercise.
+**Check:** the four matching fields are named, and the amount is debits less credits. **Watch for:** blank cost centers. Outside the year-end closes, 903 of the 142,767 expense rows in GLEntry, 0.6%, have no CostCenterID, but they carry 8.3% of the expense amount, nearly all of it operating expense, and 1,625 rows of BudgetLine have none. A share of rows says nothing about the share of dollars, so a comparison by department separates the closes, shows the unassigned amount, and reconciles the departments to the same ledger total. Mention it, but students need not calculate it.
 
 ### Requirement (3): Decide which group suits which analysis
 
 **Step 4. Write the comparison in three to five sentences.** A model outline:
 
-1. *Product cost.* Manufacturing is better suited: it holds the standard cost of each item and of each work order's output, the materials issued, and the variance when the work order closes.
+1. *Product cost.* Manufacturing is better suited: it holds the standard cost recorded on each work order's output, the materials issued, and the variance when the work order closes, with each item's standard from Item in Master Data.
 2. *Its limit.* It does not hold the hours and pay of the people who did the work. Time and pay are in Payroll and Time, so actual conversion cost needs both groups.
 3. *Departmental budget.* Organizational Planning is better suited for the plan, with the cost center as the organizing key.
 4. *Its limit.* The planning tables hold only the plan, so actual spending has to come from GLEntry by cost center, account and period.
@@ -95,8 +95,8 @@ b. Read one row of each and say what it represents.
 
 **Step 5. Propose a question and the tables.** Accept either of these, or a similar one:
 
-- *Did direct labor hours on work orders stay within the standard hours of the units completed?* Manufacturing: ProductionCompletionLine (QuantityCompleted), Item (StandardLaborHoursPerUnit), WorkOrder. Payroll and Time: LaborTimeEntry (WorkOrderID, WorkOrderOperationID, LaborType, RegularHours, OvertimeHours, ExtendedLaborCost).
-- *Did overtime pay rise in the months when output rose?* Manufacturing: ProductionCompletion (CompletionDate), ProductionCompletionLine. Payroll and Time: PayrollRegister (PayrollPeriodID, CostCenterID, GrossPay) and LaborTimeEntry.
+- *Did direct labor hours on work orders stay within the standard hours of the units completed?* Manufacturing: ProductionCompletionLine (QuantityCompleted) and WorkOrder. Payroll and Time: LaborTimeEntry (WorkOrderID, WorkOrderOperationID, LaborType, RegularHours, OvertimeHours, ExtendedLaborCost). The standard hours per unit come from Item (StandardLaborHoursPerUnit) in Master Data, a third group that supplies reference data.
+- *Did overtime hours rise in the months when output rose?* Manufacturing: ProductionCompletion (CompletionDate) and ProductionCompletionLine. Payroll and Time: LaborTimeEntry (WorkDate, OvertimeHours). A question about overtime pay instead needs the overtime earnings lines of PayrollRegisterLine, because GrossPay alone does not separate overtime.
 
 **Check:** the tables come from both groups, and the answer says what each contributes: the standard or the output from Manufacturing, the hours or the pay from Payroll and Time.
 
@@ -109,13 +109,13 @@ b. Read one row of each and say what it represents.
 | Cost centers | 10 | Step 2 |
 | Rows in Budget, BudgetLine | 1,385; 31,426 | Step 2 |
 | Rows in LaborTimeEntry, PayrollRegister | 68,859; 8,197 | Step 5 |
-| Expense rows of GLEntry; those with no cost center | 142,869; 1,005 (0.7%) | Step 3 |
+| Expense rows of GLEntry outside the closes; those with no cost center | 142,767; 903 (0.6% of the rows, 8.3% of the amount) | Step 3 |
 | Budget rows with no cost center | 0 | Step 2 |
 
 ## What a strong answer says
 
-- **Requirement (1).** The answer groups the cost columns by purpose (standard, planned, variance) and puts the variance in WorkOrderClose.
-- **Requirement (2).** It says that Budget and BudgetLine are plan tables, and it names the GLEntry columns for the actuals.
+- **Requirement (1).** The answer names the cost columns and puts the variance in WorkOrderClose. Grouping them by purpose (standard, planned, variance) is a plus.
+- **Requirement (2).** It says that Budget and BudgetLine are plan tables, and it names the GLEntry columns for the actuals. Saying what one row of each represents is a plus.
 - **Requirement (3).** It gives each group a reason and a limit, and it does not claim that either group is complete.
 - **Requirement (4).** It names a question that really needs both groups, with the role of each.
 
@@ -125,7 +125,7 @@ A weak answer lists every table, says the budget tables hold actual spending, or
 
 - **The budget as actuals.** *Symptom:* "compare Budget with BudgetAmount". *Response:* ask where the actual amount is stored.
 - **Standard cost taken as actual cost.** *Symptom:* Item.StandardCost alone for product cost. *Response:* ask where the difference between standard and actual is.
-- **No join columns for the actuals.** *Symptom:* "GLEntry has the actuals" with no columns. *Response:* ask which three columns would match a budget row.
+- **No join columns for the actuals.** *Symptom:* "GLEntry has the actuals" with no columns. *Response:* ask which four fields would match a budget row.
 - **A cost center taken from the wrong table.** *Symptom:* Employee cited as the source of the department. *Response:* point to CostCenterID on GLEntry.
 - **A verdict with no reason.** *Response:* ask what data the other group lacks.
 - **A question needing one group only.** *Symptom:* "How many work orders closed last month?" *Response:* ask what the second group would add.
@@ -135,8 +135,8 @@ A weak answer lists every table, says the budget tables hold actual spending, or
 
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
-| Requirement 1: Manufacturing tables and cost columns | 25 | Tables and columns grouped as standard, planned and variance | Tables without columns, or all columns |
-| Requirement 2: planning tables and the GLEntry columns | 25 | The grain of each plan table, and the join columns for actuals | Plan tables only, or no ledger columns |
+| Requirement 1: Manufacturing tables and cost columns | 25 | The tables and the columns that carry cost | Tables without columns, or all columns |
+| Requirement 2: planning tables and the GLEntry columns | 25 | The plan tables and their columns, and the GLEntry columns for the actuals | Plan tables only, or no ledger columns |
 | Requirement 3: the comparison | 30 | A match for each analysis, with a reason and a limit | A verdict without reasons |
 | Requirement 4: the cross-group question | 20 | A question that needs both groups, with the role of each | A question for one group, or no roles |
 

@@ -204,6 +204,12 @@ class Facts:
                                          "ORDER BY EmployeeID")]
             self.payments = {r[0]: (r[1], r[2]) for r in q("SELECT SupplierID, COUNT(*), SUM(Amount) "
                                                              "FROM DisbursementPayment GROUP BY SupplierID")}
+            # Exercise 5.5 (4): the dates each supplier's payments cover, and those dated after the fiscal year-end
+            self.payment_dates = {r[0]: dict(first=r[1][:10], last=r[2][:10], late=r[3], late_amount=r[4] or 0.0)
+                                  for r in q("SELECT SupplierID, MIN(PaymentDate), MAX(PaymentDate), "
+                                             "SUM(PaymentDate > ?), SUM(CASE WHEN PaymentDate > ? THEN Amount END) "
+                                             "FROM DisbursementPayment GROUP BY SupplierID",
+                                             f"{year}-12-31", f"{year}-12-31")}
             self.purchase_orders = dict(q("SELECT SupplierID, COUNT(*) FROM PurchaseOrder GROUP BY SupplierID"))
         finally:
             con.close()
@@ -308,7 +314,9 @@ class Facts:
         for p in self.promotions:
             mine = [l for l in self.lines if l["promo"] == p["id"]]
             after = sum(1 for l in mine if self.invoices[l["inv"]]["date"] > p["end"])
-            promos.append(dict(p, lines=len(mine), after=after))
+            ordered = [self.orders[self.invoices[l["inv"]]["order"]]["date"] for l in mine]
+            promos.append(dict(p, lines=len(mine), after=after, order_first=min(ordered) if ordered else None,
+                               order_last=max(ordered) if ordered else None))
         return dict(count=len(all_lags), mean=statistics.mean(all_lags), median=statistics.median(all_lags),
                     p90=percentile_inc(all_lags, 0.9), negative=sum(1 for x in all_lags if x < 0), quarters=quarters,
                     promotions=promos)
@@ -329,7 +337,10 @@ class Facts:
                 n, total = self.payments.get(s["id"], (0, 0.0))
                 matches.append(dict(id=s["id"], name=s["name"], employees=len(found), emp=found[0]["id"],
                                     emp_name=found[0]["name"], title=found[0]["title"], payments=n, paid=total))
+        dates = [self.payment_dates[m["id"]] for m in matches if m["id"] in self.payment_dates]
         return dict(matches=matches, raw=sum(1 for s in self.suppliers if raw(s) in raw_keys),
+                    pay_first=min(x["first"] for x in dates), pay_last=max(x["last"] for x in dates),
+                    late=sum(x["late"] for x in dates), late_amount=sum(x["late_amount"] for x in dates),
                     address_only=sum(1 for s in self.suppliers
                                      if any(excel_trim(e["address"]).upper() == excel_trim(s["address"]).upper()
                                             for e in self.employees)))
@@ -402,8 +413,8 @@ def ex5_1(b: ExerciseBuild) -> None:
     wb, f, y, e = b.wb, facts(b).ex1, b.year, "5.1"
     ws = new_sheet(b, "Ex 5.1")
     heading(ws, e)
-    values(ws, {"A2": "Fiscal year", "B2": y})
-    ws.Range("B2").Font.Color = xl.BLUE
+    # a fixed year, not an input: the EarlierYearInvoice flag reads it, but the period labels of row 4 are typed
+    values(ws, {"A2": "Fiscal year (fixed)", "B2": y})
     yref = "'Ex 5.1'!$B$2"
 
     # (1) the credit memos and their lines, with CreditMemoDate set to the Date type (Replace current)
@@ -500,7 +511,10 @@ def ex5_1(b: ExerciseBuild) -> None:
         "Assigning credits to the original invoice's quarter answers a different question, the net result of each "
         "quarter's sales, and belongs in a separate schedule, labeled as such and reconciled to this one. Neither "
         "schedule changes the ledger, and an adjustment to an earlier period would need the return, posting, and "
-        f"accounting evidence. Here the choice moves only {moved:,.2f} out of {q1}. The credits are small (at most {share:.1%} of the Furniture revenue billed in "
+        f"accounting evidence. Rows 17 and 18 move only the credits for invoices of earlier years out of the year: {q1} "
+        f"net revenue rises by {moved:,.2f}, and the other quarters do not change. A schedule by the original "
+        f"invoice's quarter would also move credits between the quarters of {y}, so a comparison must be labeled for "
+        f"the credits it moves. The credits are small (at most {share:.1%} of the Furniture revenue billed in "
         f"any quarter) and do not explain the change between {q3} and {q4}: net revenue falls by "
         f"{net[q3] - net[q4]:,.2f}, against {gross[q3] - gross[q4]:,.2f} billed.")
     model_answer(ws, top + n + 2, "Model answer, requirement (4)", answer, last="F")
@@ -774,9 +788,10 @@ def ex5_4(b: ExerciseBuild) -> None:
     fmt = lambda x: f"{x:g}"
     answer2 = (
         f"The median lag is {fmt(f['median'])} days and the average {f['mean']:.1f}. The average is higher because the "
-        "distribution is skewed to the right: most orders are invoiced within a few weeks, but a minority take much "
-        f"longer (the 90th percentile is {fmt(f['p90'])} days), and those long lags pull the average up while the median "
-        f"is unaffected. The lag is fairly stable. In fiscal {y} the quarterly averages, which count each invoice once, "
+        "distribution is skewed to the right: most invoices are dated within a few weeks of their order, but a minority "
+        f"come much later (the 90th percentile is {fmt(f['p90'])} days), and those long lags pull the average up, while "
+        "the median is less sensitive to them. These are measures per invoice, so an order with several invoices "
+        f"counts once for each. The lag is fairly stable. In fiscal {y} the quarterly averages, which count each invoice once, "
         f"run from {min(means):.1f} to "
         f"{max(means):.1f} days and the medians from {fmt(min(medians))} to {fmt(max(medians))}. "
         f"{word(f['negative']).capitalize()} invoices have a negative lag: they are dated before their order "
@@ -786,6 +801,9 @@ def ex5_4(b: ExerciseBuild) -> None:
     backwards = sum(1 for p in every if p["end"] < p["start"])
     top = max(f["promotions"], key=lambda p: p["lines"])
     one_day_text = "a one-day promotion" if one_day == 1 else f"{word(one_day)} one-day promotions"
+    span = "; ".join(f"{p['code']} is recorded for {long_date(p['start'])}, but its orders are dated "
+                     f"{long_date(p['order_first'], False)} to {long_date(p['order_last'])}" for p in every
+                     if p["end"] == p["start"])
     memo = (
         "Assign promotional revenue by invoice date. The ledger records revenue on the invoice, so for this analysis of "
         "recorded revenue the invoice date assigns the quarter and ties the analysis to the ledger (whether that is "
@@ -799,7 +817,11 @@ def ex5_4(b: ExerciseBuild) -> None:
         "promotion's own order and invoice dates. "
         f"Promotions {series(p['code'][-3:] for p in every)} have every line invoiced after the end date because "
         f"their recorded dates do not span their sales ({one_day_text} and {word(backwards)} whose end date precedes "
-        "the start date), a master-data question left for the audit analytics chapter (Chapter 8).")
+        "the start date). " + (f"{span}. " if span else "") +
+        "Under the order-date pricing convention, the discounts on those orders need an explanation: they are "
+        "questions for the data owner about each promotion's eligibility rule and approved dates, not billing lag, "
+        "and a single day or a line invoiced after the end date does not by itself show an unauthorized discount. "
+        "Chapter 8 returns to them.")
     r = model_answer(ws, 21 + n, "Model answer, requirement (2)", answer2, last="G")
     model_answer(ws, r, "Model answer, requirement (4)", memo, last="G")
 
@@ -856,16 +878,27 @@ def ex5_5(b: ExerciseBuild) -> None:
                    "asks, because Exercise 5.6 uses the same Table; the Employee query keeps the five columns the "
                    "requirement names, including JobTitle, which requirement (3) brings onto the Supplier Table.")
 
+    y = b.year
+    matched = ('COUNTIFS(Supplier[SupplierID],DisbursementPayment[SupplierID],Supplier[EmployeeMatches],">0")>0')
     values(ws, {"A3": "Suppliers whose match key appears in the Employee Table",
                 "A4": "Matches on Address and City as recorded (without TRIM and UPPER)",
                 "A5": "Payments to the matched suppliers (count)",
-                "A6": "Payments to the matched suppliers (amount)"})
+                "A6": "Payments to the matched suppliers (amount)",
+                "A7": "First payment date in the totals",
+                "A8": "Last payment date in the totals",
+                "A9": f"Of the amount, payments dated after the fiscal year-end ({y}-12-31)"})
     formulas(ws, {"B3": '=COUNTIF(Supplier[EmployeeMatches],">0")',
                   "B4": "=SUMPRODUCT(--(COUNTIFS(Employee[Address],Supplier[Address],Employee[City],Supplier[City])>0))",
-                  "B5": "=SUM(Supplier[PaymentCount])", "B6": "=SUM(Supplier[PaymentTotal])"})
+                  "B5": "=SUM(Supplier[PaymentCount])", "B6": "=SUM(Supplier[PaymentTotal])",
+                  "B7": f"=MIN(FILTER(DisbursementPayment[PaymentDate],{matched}))",
+                  "B8": f"=MAX(FILTER(DisbursementPayment[PaymentDate],{matched}))",
+                  "B9": (f"=SUM(FILTER(DisbursementPayment[Amount],({matched})*"
+                         f"(DisbursementPayment[PaymentDate]>DATE({y},12,31)),0))")})
     ws.Range("B3:B5").NumberFormat = COUNT
     ws.Range("B6").NumberFormat = MONEY
-    top = 8
+    ws.Range("B7:B8").NumberFormat = DATE
+    ws.Range("B9").NumberFormat = MONEY
+    top = 11
     header_row(ws, top, ["SupplierID", "SupplierName", "EmployeeID", "EmployeeName", "JobTitle", "Payments",
                          "Amount paid"])
     ws.Range(f"A{top + 1}").Formula2 = (
@@ -899,7 +932,9 @@ def ex5_5(b: ExerciseBuild) -> None:
         "To: Audit senior. Re: Suppliers that share an address with an employee.\n"
         f"I matched every supplier's address and city with the employee master file, after standardizing both with TRIM "
         f"and UPPER. {word(len(m)).capitalize()} suppliers share an exact address and city with an employee: {lines}. "
-        f"Together they received {total_n:,} payments totaling {total_paid:,.2f}. A shared address does not prove a "
+        f"Together they received {total_n:,} payments totaling {total_paid:,.2f}, dated {long_date(f['pay_first'])} to "
+        f"{long_date(f['pay_last'])}, the whole extract, and {f['late']:,} of them ({f['late_amount']:,.2f}) are dated after "
+        f"{long_date(f'{y}-12-31')}, which a test of fiscal {y} alone would leave out. A shared address does not prove a "
         "related party or a fictitious vendor, but it is a recognized red flag; the employees involved are "
         f"{titles}, none of them in purchasing, so each relationship needs explaining.\n"
         "Next procedures: confirm the ownership of each supplier (business registrations, the tax identification "
@@ -922,6 +957,9 @@ def ex5_5(b: ExerciseBuild) -> None:
         b.check(e, f"supplier {sid}: payments", x["payments"], get("PaymentCount"), 0, COUNT)
         b.check(e, f"supplier {sid}: amount paid", round(x["paid"], 2), get("PaymentTotal"))
     b.check(e, "payments to the matched suppliers (Ex 5.5!B6)", round(total_paid, 2), "='Ex 5.5'!B6")
+    b.check(e, "first payment date in the totals (Ex 5.5!B7)", serial(f["pay_first"]), "='Ex 5.5'!B7", 0, DATE)
+    b.check(e, "last payment date in the totals (Ex 5.5!B8)", serial(f["pay_last"]), "='Ex 5.5'!B8", 0, DATE)
+    b.check(e, f"payments dated after {y}-12-31 (Ex 5.5!B9)", round(f["late_amount"], 2), "='Ex 5.5'!B9")
 
 
 # --- Exercise 5.6 ------------------------------------------------------------------------------------------------------

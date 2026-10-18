@@ -146,18 +146,21 @@ def facts() -> dict:
         first_late=one("SELECT MIN(ShipmentDate) FROM Shipment WHERE Status = 'In Transit' AND DeliveryDate < ?", review))
 
     # Exercise 4.6: price override approvals
-    req = [dict(id=r[0], line=r[1], by=r[2], appr=r[3], status=r[4], ref=r[5], price=r[6]) for r in q(
+    req = [dict(id=r[0], line=r[1], by=r[2], appr=r[3], status=r[4], ref=r[5], price=r[6], requested=r[7]) for r in q(
         "SELECT PriceOverrideApprovalID, SalesOrderLineID, RequestedByEmployeeID, ApprovedByEmployeeID, Status, "
-        "ReferenceUnitPrice, ApprovedUnitPrice FROM PriceOverrideApproval ORDER BY PriceOverrideApprovalID")]
+        "ReferenceUnitPrice, ApprovedUnitPrice, RequestedUnitPrice FROM PriceOverrideApproval "
+        "ORDER BY PriceOverrideApprovalID")]
     for r in req:
         r["disc"] = 1 - r["price"] / r["ref"]
     names = {e: (n_, t_) for e, n_, t_ in q("SELECT EmployeeID, EmployeeName, JobTitle FROM Employee")}
     requesters = sorted({r["by"] for r in req})
     pending = [r for r in req if r["status"] == "Pending"]
     for r in pending:
-        billed = q("SELECT UnitPrice, PricingMethod FROM SalesInvoiceLine WHERE SalesOrderLineID = ?", r["line"])
-        r.update(invoiced=len(billed), at_price=sum(1 for u, _ in billed if abs(u - r["price"]) < 0.005),
-                 method=billed[0][1] if billed else None, methods={m for _, m in billed})
+        billed = q("SELECT UnitPrice, PricingMethod, PriceOverrideApprovalID FROM SalesInvoiceLine "
+                   "WHERE SalesOrderLineID = ?", r["line"])
+        r.update(invoiced=len(billed), at_price=sum(1 for u, *_ in billed if abs(u - r["price"]) < 0.005),
+                 method=billed[0][1] if billed else None, methods={m for _, m, _ in billed},
+                 linked=sum(1 for *_, a in billed if a is not None))
     by_disc = sorted(req, key=lambda r: -r["disc"])
     out["ex6"] = dict(
         n=len(req), status={s: sum(1 for r in req if r["status"] == s) for s in sorted({r["status"] for r in req})},
@@ -836,10 +839,11 @@ def ex4_3(b: ExerciseBuild) -> None:
         "which says nothing about their profitability: included in the comparison, they would sit at the top of "
         "every ranking and pull up the averages, so the comparison is limited to the finished goods, whose "
         "StandardCost measures what an item costs to make or buy."])
-    first_sentence = (f"{most} earns the most per unit (an average UnitMargin of {money(g[most]['margin'])}) "
-                      + (f"but has the lowest average percentage ({pct(g[most]['pct'])})" if most == lo_pct else
+    first_sentence = (f"Of the four product groups, {most} has the highest average list-price margin per unit "
+                      f"(an average UnitMargin of {money(g[most]['margin'])}) "
+                      + (f"but the lowest average margin percentage ({pct(g[most]['pct'])})" if most == lo_pct else
                          f"at an average of {pct(g[most]['pct'])}")
-                      + f", while {least} earns the least per unit ({money(g[least]['margin'])})"
+                      + f", while {least} has the lowest per unit ({money(g[least]['margin'])})"
                       + (f" at the highest percentage ({pct(g[least]['pct'])})." if least == hi_pct else
                          f" at {pct(g[least]['pct'])}."))
     answer(ws, nxt, "Model answer (6)", [
@@ -847,10 +851,11 @@ def ex4_3(b: ExerciseBuild) -> None:
         f"percent, but {fx['below']} items are below the 0.45 target: "
         + and_join(f"{k} {v}" for k, v in below)
         + (f", and no {and_join(none_below)} item." if none_below else ".")
-        + " A margin at list price is not what Charles River earns: most sales are billed at price-list prices "
-        "below list, some lines carry promotional discounts on top, and StandardCost is a standard, not the actual "
-        "cost, so realized margins are lower and differ by customer and period. These group averages also give "
-        "each finished good the same weight, whatever it sold, so they are not the groups' margins on sales."])
+        + " These group averages give each finished good the same weight, whatever it sold, so they are not the "
+        "groups' margins on sales. A margin at list price is not what Charles River earns either. Most sales are "
+        "billed at price-list prices below list and some lines carry promotional discounts on top, which lower the "
+        "realized margin, while StandardCost is a standard, not the actual cost, which can differ from it in either "
+        "direction. Realized results depend on the prices billed, the discounts, the sales mix and the actual costs."])
 
     settle(b)
     e = "4.3"
@@ -1178,19 +1183,21 @@ def ex4_5(b: ExerciseBuild) -> None:
               else f"{long_date(review2)} to {long_date(d1.isoformat())}")
     not_due = fx["due_on_or_after"]
     gap = ("" if not not_due else
-           f"The In Transit count is {not_due:,} more than the {fx['late']:,} shipments past their DeliveryDate, because "
-           "a slicer on Status cannot test the date: "
+           f"The In Transit count is {not_due:,} more than the {fx['late']:,} shipments with a recorded DeliveryDate "
+           "before the review date, because a slicer on Status cannot test the date: "
            + ("one In Transit shipment is" if not_due == 1 else f"{not_due:,} In Transit shipments are")
-           + " due on or after the review date, so the slicer confirms the late count only together with a filter on "
+           + " due on or after the review date, so the slicer confirms that count only together with a filter on "
            "DeliveryDate. ")
     nxt = answer(an, r3 + 4, "Model answer (5)", [
         f"With the slicer on In Transit, SUBTOTAL shows {fx['status']['In Transit']:,} shipments, "
         f"{fx['blank_by'].get('In Transit', 0)} of them without a tracking number; on Delivered it shows "
         f"{fx['status']['Delivered']:,}, {fx['blank_by'].get('Delivered', 0)} without one, the same counts COUNTIFS "
-        f"gives. {gap}With ReviewDate on {long_date(review2)}, the In Transit shipments past their DeliveryDate fall from "
-        f"{fx['late']:,} to {fx['late2']:,}: the {drop} shipments due from {window} are not yet late on the earlier "
-        "date. The second category depends on the review date, "
-        "which is why it is a validated parameter rather than TODAY()."])
+        f"gives. {gap}With ReviewDate on {long_date(review2)}, the In Transit shipments with a recorded DeliveryDate "
+        f"before the review date fall from {fx['late']:,} to {fx['late2']:,}, because the {drop} shipments with a "
+        f"DeliveryDate from {window} drop out. This is a sensitivity of the count to the review date on the same "
+        "extract. The Status column is the extract's, so it does not show which shipments were In Transit on "
+        f"{long_date(review2)}, which would need the status history or an earlier extract. The second category "
+        "depends on the review date, which is why it is a validated parameter rather than TODAY()."])
     by_year = and_join(f"{y}: {fx['transit_by_year'][y]:,}" for y in years)
     answer(an, nxt, "Model answer (6): memo", [
         f"To: Audit senior. Subject: Shipment exceptions at {long_date(review)} ({fx['n']:,} shipments).",
@@ -1200,14 +1207,17 @@ def ex4_5(b: ExerciseBuild) -> None:
         "system does not require). Without it, the extract gives no way to trace these shipments to the carrier's "
         "records. Evidence: the carrier's bills of lading or invoices and proof of delivery for a sample, and the "
         "shipping procedure for recording tracking numbers.",
-        f"2. In Transit after the DeliveryDate: {fx['late']:,} of the {fx['status']['In Transit']:,} In Transit shipments "
-        f"have a DeliveryDate before the review date, and they come from every year of the data ({by_year}). If "
-        "DeliveryDate records the actual delivery, the two fields conflict, a consistency and timeliness problem "
-        "(Chapter 2), and the status was not updated when the goods arrived. If it is a planned date, the shipments "
-        "are overdue and may still be unresolved. Likely cause: no process or interface updates the status on delivery. "
+        f"2. In Transit with a recorded DeliveryDate before the review date: {fx['late']:,} of the "
+        f"{fx['status']['In Transit']:,} shipments marked In Transit, from every year of the data ({by_year}). The "
+        "first question is whether DeliveryDate records the actual delivery or a planned one. If it records the "
+        "delivery, the two fields conflict, a consistency and timeliness problem (Chapter 2), and either the status "
+        "or the date is wrong. If it is a planned date, the records show the shipments past it, and they need "
+        "follow-up. Likely cause: no process or interface updates the status on delivery. "
         "Evidence: proof of delivery or carrier tracking for a sample, the customers' receipt of the goods, the "
-        "history of status changes, and the process that is meant to close a shipment.",
-        f"3. Both: all {fx['both']} In Transit shipments without a tracking number are past their DeliveryDate, so "
+        "history of status changes, and the process that is meant to close a shipment, before concluding that a "
+        "delivery occurred, was late or was recorded incorrectly.",
+        f"3. Both: all {fx['both']} In Transit shipments without a tracking number also have a recorded DeliveryDate "
+        "before the review date, so "
         "the records hold neither a carrier reference nor a delivered status for them. They are the first items to "
         "confirm with customers, because the revenue and receivables recorded for them rest on deliveries that the "
         "extract alone cannot confirm.",
@@ -1416,12 +1426,15 @@ def ex4_6(b: ExerciseBuild) -> None:
     own = next(r for r in fx["grid"] if r["id"] == approver)
     assert own["open"] == len(pend), "the memo says the approver requested every pending request"
     assert top["status"] == "Approved", "the largest discount is on a Pending request: model answer (5) names it"
+    assert all(abs(p["requested"] - p["price"]) >= 0.005 for p in pend), \
+        "a Pending request's ApprovedUnitPrice equals its RequestedUnitPrice: model answer (6) says they differ"
+    assert all(p["linked"] == 0 for p in pend), "a pending request's invoice line carries a PriceOverrideApprovalID"
     inside = all(fx["low"] <= p["disc"] <= fx["high"] for p in pend)
     nxt = answer(ws, p0 + 3 + len(pend), "Model answer (5)", [
         f"Sorted from the largest, the approved prices run from {pct(fx['high'])} below the reference price "
-        f"(request {top['id']}) down to {pct(fx['low'])}: every approved override is a modest reduction of about "
-        f"{round(100 * fx['low'])} to {round(100 * fx['high'])} percent, none of them extreme, so the risk lies in "
-        "who approved them rather than in their size. "
+        f"(request {top['id']}) down to {pct(fx['low'])}. Their significance depends on the pricing policy, the "
+        "amounts of the transactions and their context, and the approval pattern calls for follow-up whatever the "
+        "size of the percentage. "
         + ("The Pending requests' prices fall inside that range, but they have not been approved, so they are not "
            "part of it." if inside else "The Pending requests' prices have not been approved, so they are left out "
                                         "of the range.")])
@@ -1435,15 +1448,19 @@ def ex4_6(b: ExerciseBuild) -> None:
         "and no independent review of the manager's own overrides, so the first question is whether the policy "
         "requires one, or whether another review compensates.",
         f"Exception 2, requests without an approval: requests {ids} are Pending, with no approver and no approval "
-        f"date, and all {len(pend)} were requested by the {a_title}. A pending request should never reach an "
-        "invoice, so the design question is whether the system blocks a price until it is approved.",
-        "Follow-up procedures: (a) obtain the pricing policy and authority matrix, and ask who may approve "
-        f"overrides and whether self-approval is allowed; (b) for the pending requests, filter SalesInvoiceLine on "
-        f"their SalesOrderLineIDs ({lines}) and compare the billed UnitPrice with the ApprovedUnitPrice: this "
-        f"workbook finds {n_inv} invoice lines billed at the pending prices under "
-        f"{and_join(methods)} pricing methods, so the pending prices were billed without a recorded approval, and "
-        "the invoice lines name a price list rather than an override (an exception to follow up, not yet evidence "
-        "of a misstatement); (c) for a sample of the self-approved overrides, inspect the documented reason and the customer "
+        f"date, and all {len(pend)} were requested by the {a_title}. Each still carries an amount in "
+        "ApprovedUnitPrice that differs from its RequestedUnitPrice, so ask the data owner what that amount "
+        "represents. A pending request should never reach an invoice, so the design question is whether the system "
+        "blocks a price until it is approved.",
+        "Follow-up procedures: (a) obtain the pricing policy, the authority matrix, the price-list history in effect "
+        "and the approval evidence before concluding whether a billed price was unauthorized or a preventive control "
+        "failed, and ask who may approve overrides and whether self-approval is allowed; (b) for the pending "
+        f"requests, filter SalesInvoiceLine on their SalesOrderLineIDs ({lines}) and compare the billed UnitPrice "
+        f"with the ApprovedUnitPrice: this workbook finds {n_inv} invoice lines whose UnitPrice equals the amount "
+        f"recorded in ApprovedUnitPrice, under {and_join(methods)} pricing methods and with no "
+        "PriceOverrideApprovalID. Price equality alone does not show that the pending record was applied, so this is "
+        "an exception to follow up, not yet evidence of a misstatement; (c) for a sample of the self-approved "
+        "overrides, inspect the documented reason and the customer "
         "agreement; (d) recommend an independent approver, such as the controller, for the manager's own requests "
         "and a system block on unapproved prices."])
 

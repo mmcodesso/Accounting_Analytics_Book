@@ -554,14 +554,15 @@ def t14_1(b: Build) -> None:
     invoice, lines = b.query("SalesInvoice"), m.tables["SalesInvoiceLine"]
     lines.query.merge(invoice, "SalesInvoiceID", "SalesInvoiceID", ["InvoiceNumber", "InvoiceDate", "CustomerID"])
     sync(lines)
-    # Steps 2 and 3: the Date table as the text prints it, Date typed as a date, MonthName sorted, marked
+    # Steps 2 and 3: the Date table as the text prints it, Date typed as a date, MonthName sorted, Year and
+    # MonthNumber set to Don't summarize (Step 3c), marked
     ((name, expr),) = definitions(dax_blocks(path, "table")[0])
     assert name == "Date"
     m.add(Table("Date", [
         Column("Date", "dateTime", "[Date]", DATE_FORMAT, extra=("isKey",)),
-        Column("Year", "int64", "[Year]", summarize="sum"), Column("Quarter", "string", "[Quarter]"),
+        Column("Year", "int64", "[Year]", summarize="none"), Column("Quarter", "string", "[Quarter]"),
         Column("YearQuarter", "string", "[YearQuarter]"), Column("YearMonth", "string", "[YearMonth]"),
-        Column("MonthNumber", "int64", "[MonthNumber]", summarize="sum"),
+        Column("MonthNumber", "int64", "[MonthNumber]", summarize="none"),
         Column("MonthName", "string", "[MonthName]", sort_by="MonthNumber")], dax=expr, props=("dataCategory: Time",)))
     # Step 4: the star
     unrelate(m, "SalesInvoiceLine.SalesInvoiceID", "SalesInvoice.SalesInvoiceID")
@@ -620,8 +621,8 @@ DESCRIPTIONS = {
     "Invoice Lines": "The number of invoice lines.",
     "Invoices": "The number of distinct invoices among the invoice lines in the filter context.",
     "Standard Cost": "Quantity times the item's standard cost, line by line.",
-    "Gross Margin": "Revenue less standard cost.",
-    "Margin %": "Gross margin as a share of revenue, calculated from the totals.",
+    "Gross Margin": "Revenue less standard cost: the margin at standard cost, not the ledger's gross profit.",
+    "Margin %": "Gross margin at standard cost as a share of revenue, calculated from the totals.",
     "Price Before Discount": "Quantity times unit price, line by line: the dollars the discounts were taken from.",
     "Discount Rate": "Discounts divided by the price before discount.",
     "Furniture Revenue": "Revenue of the Furniture item group, whatever item group is selected.",
@@ -1017,7 +1018,8 @@ def t15_2(b: Build) -> None:
         col("Date", "YearMonth"), M("Variance to Flexed"),
         {"NativeVisualCalculation": {"Language": "dax", "Expression": ytd_expr, "Name": ytd_name}}]},
         filters=[keep("varianceByMonthYear", col("Date", "Year"), [y]), keep("varianceByMonthOpex", opex,
-                                                                           ["Operating Expense"])]))
+                                                                           ["Operating Expense"])],
+        sort=[(col("Date", "YearMonth"), "Ascending")]))          # a running sum reads the rows in the order shown
     centers = {c["name"]: c for c in ctx["centers"]}
     page.expect = ["Variance to Flexed", "Gray up arrow", "Gray down arrow", "Yellow circle", ytd_name,
                    money(ctx["opex"])] + [money(ctx["ytd"][i]) for i in (0, 5, 6, 11)]
@@ -1128,8 +1130,10 @@ def t15_3(b: Build) -> None:
     year = col("Date", "Year")
     # Steps 7 to 11: the Plant page (the comparison table of Steps 8 and 9 is deleted in Step 10)
     page = b.report.add(Page("plant", "Plant"))
+    # Step 10d: the card's title, read from the text, says at the point of use that the latest month is provisional
+    card_title = re.search(r"give the card the title `([^`]+)`", path.read_text(encoding="utf-8")).group(1)
     page.add(card("plantCards", 20, TOP, 600, 110, [M("Hours per Standard Hour TTM"), M("Hours per Standard Hour 2024")],
-                  filters=[keep("plantCardsYears", year, years)]))
+                  title=card_title, filters=[keep("plantCardsYears", year, years)]))
     page.add(Visual("ttmLine", "lineChart", 20, 176, 600, 250, {"Category": [col("Date", "YearMonth")],
                                                               "Y": [M("Hours per Standard Hour TTM")]},
                     filters=[keep("ttmLineYears", year, years)]))
@@ -1144,8 +1148,9 @@ def t15_3(b: Build) -> None:
     # the card or the trailing line (Edit interactions, None)
     page.extra = {"visualInteractions": [{"source": s, "target": t_, "type": "NoFilter"}
                                          for s in ("directByCenter", "overtimeShare") for t_ in ("plantCards", "ttmLine")]}
+    relayout(page, {"plantCards": 150, "directByCenter": 410})      # a card under its own title needs about 150 px
     page.expect = ["Hours per Standard Hour TTM", f"{ctx['card']:.2f}", f"{ctx['first']:.2f}",
-                   center_name(ctx["centers"][0][0]), titles[0]]
+                   center_name(ctx["centers"][0][0]), titles[0], card_title]
     # Step 12: the About page with a page navigator, first; the detail pages hidden; a navigator on every visible page
     about = b.report.add(Page("about", "About"), before="salesDiscounts")
     for ms_ in m.tables[MEASURES_TABLE].measures:                     # Step 12c: every measure described

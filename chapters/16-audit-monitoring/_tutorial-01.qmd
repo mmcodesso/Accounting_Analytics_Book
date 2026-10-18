@@ -2,16 +2,20 @@
 
 **Context and objective.** In this tutorial, you will start internal audit's monitoring report, a new file of its own. You will rebuild Chapter 8's five journal entry tests as flag columns in Power Query, add up each entry's risk score, and look at the entries with the highest scores together with the ledger lines behind them. Then you will turn the flags into a table of exceptions, the first part of the exception register, and reconcile the population of entries to the ledger before relying on any test.
 
-**Prerequisites.** You need Power BI Desktop and CharlesRiver.xlsx. Tutorial 14.1 created the Date table and Tutorial 14.2 the Key Measures table; this tutorial repeats both briefly in a new file.
+**Prerequisites.** You need Power BI Desktop and CharlesRiver.xlsx. Tutorial 14.1 created the Date table and Tutorial 14.2 the Key Measures table, and this tutorial repeats both briefly in a new file. The two settings that Tutorial 13.1 turned off belong to that report, so Step 1 turns them off again in this one.
 
 **Step-by-step instructions.**
 
 **Step 1. Start the monitoring file.**
 
 a. Start a new report in Power BI Desktop, and save it as `Audit Monitoring.pbix`.
-b. Choose **Home > Get data > Excel workbook**, and select CharlesRiver.xlsx.
-c. In the **Navigator**, select **T2_JournalEntry** and **T74_Employee**, and click **Transform Data**.
-d. Rename the queries `JournalEntry` and `Employee`.
+b. Choose **File > Options and settings > Options**, and under **Current File**, select **Data Load**.
+c. Clear **Auto date/time** and **Autodetect new relationships after data is loaded**, and click **OK**.
+d. Choose **Home > Get data > Excel workbook**, and select CharlesRiver.xlsx.
+e. In the **Navigator**, select **T2_JournalEntry** and **T74_Employee**, and click **Transform Data**.
+f. Rename the queries `JournalEntry` and `Employee`.
+
+The two options apply to this file only, as they did to the report of Tutorial 13.1. The second matters here, because Power BI would otherwise relate Employee to any table with a column of the same name, such as the payee's EmployeeID on a payroll register, and Tutorial 16.2 and Exercise 16.6 depend on Employee reaching the journal entries and not the orders or the registers. You create every relationship yourself, and Model view shows each one.
 
 **Step 2. Keep the columns the tests need.**
 

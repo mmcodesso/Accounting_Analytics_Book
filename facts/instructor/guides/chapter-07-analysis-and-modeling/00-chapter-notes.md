@@ -56,6 +56,8 @@ The chapter depends on these conditions of the data:
 5. Evaluate a decision with Scenario Manager, a data table and Goal Seek, and describe what Solver adds. Practiced in Tutorial 7.3 (Steps 4 to 8), Exercises 7.3 (requirement 5) and 7.4, and questions 12 to 15.
 6. Test someone else's expectation or forecast as an auditor: its precision, its consistency with experience and the control over its adjustments. Practiced in Exercises 7.5 and 7.6.
 
+The six outcomes follow the chapter's learning objectives in order.
+
 ## Preparing to teach
 **Before the first class**
 
@@ -101,7 +103,7 @@ The chapter depends on these conditions of the data:
 | 10 | Debrief: the start-up month, the regression output, the backtest | 8 to 18 |
 | 20 | Debrief of Tutorial 7.2, done at home: the BudgetReport worksheet | 23 to 36 |
 | 10 | Contribution margin and the four what-if tools | 37 to 43 |
-| 55 | Tutorial 7.3 in pairs, from the Tutorial 7.2 start file | 44 to 49 |
+| 55 | Tutorial 7.3 in pairs, from the Start of Tutorial 7.3 file, the workbook at the end of Tutorial 7.2. Check first that GLOpex, InvoiceLines and SalesInvoiceLine are loaded as worksheet Tables | 44 to 49 |
 | 15 | Debrief: the lift, the data table, the recommendation | 46 to 48 |
 | 10 | Assign the exercises | 52 to 57 |
 | 180 | Total | |
@@ -135,6 +137,7 @@ Plan A is the safest. Plan B gives students ownership of the models and needs a 
 | 4 | Trend36: R Square, slope per month, P-value | {{ t1.r36.r2|num(3) }}; ${{ t1.r36.slope|money }}; {{ t1.r36.p|num(3) }} |
 | 5 | Trend35: the same three | {{ t1.r35.r2|num(3) }}; ${{ t1.r35.slope|money }}; {{ t1.r35.p|num(3) }} |
 | 6, 7 | The fourth quarter's actual revenue, then each forecast's error of the quarter and monthly error | ${{ t1.q_actual|money }}; trend {{ t1.err_trend[0]|spct(2) }}, {{ t1.err_trend[1]|pct(2) }}; mean {{ t1.err_mean[0]|spct(2) }}, {{ t1.err_mean[1]|pct(2) }}; same quarter {{ t1.err_same[0]|spct(2) }}, {{ t1.err_same[1]|pct(2) }} |
+| 6 | The TREND cross-check in I41:I43 | The same three values as the trend row, B42:D42 |
 | 8 | The forecast of {{ n }} Q1 with its range | ${{ t1.forecast|money }}; low ${{ t1.low|money }}; high ${{ t1.high|money }} |
 
 **Stumbles to expect**
@@ -143,6 +146,7 @@ Plan A is the safest. Plan B gives students ownership of the models and needs a 
 - Step 3: **Labels in first row** left checked on the second run, which has no headings.
 - Steps 4 and 5: **Labels** wrong, which shifts every range by one row.
 - Step 6: forecasts built on the wrong rows. The mean must use rows 3 to 34 only.
+- Step 6: the TREND cross-check returning #SPILL!, because a cell in I41:I43 is not empty.
 
 **The checkpoint to look for.** The five bullets. A strong student says the trend is significant only with the first month (about {{ t1.slope_share|pct(0) }} of the slope comes from that month) and that the range is the backtest error, not a confidence interval.
 
@@ -154,8 +158,8 @@ Plan A is the safest. Plan B gives students ownership of the models and needs a 
 
 | Step | Look for | Value |
 |---|---|---|
-| 3 | Lines with no planned price | {{ t2.fb.no_price|count }}, seasonal items in their launch month |
-| 4, 5 | The Total column: static, flexible and actual margin | ${{ t2.fb.total.static_margin|money }}; ${{ t2.fb.total.flex_margin|money }}; ${{ t2.fb.total.margin|money }}; row 6 plus the two variances equals row 12 in every column |
+| 3 | Lines with no planned price | {{ t2.fb.no_price|count }}, seasonal items in their launch month; the merge adds no rows, so the row control in B22 reads zero |
+| 4, 5 | The Total column: static, flexible and actual margin | ${{ t2.fb.total.static_margin|money }}; ${{ t2.fb.total.flex_margin|money }}; ${{ t2.fb.total.margin|money }}; the margin bridge difference in B21:F21 reads zero in every column |
 | 5 | The two variances | Sales-volume -${{ (t2.fb.total.svv|abs)|money }}; flexible-budget -${{ (t2.fb.total.fbv|abs)|money }}; budgeted units {{ t2.fb.total.unit_ratio|num(1) }} times actual |
 | 6 | Price gap before discounts, as a share of flexible revenue | {{ (t2.fb.groups|map(attribute='gap_pct')|max|abs)|pct(1) }} to {{ (t2.fb.groups|map(attribute='gap_pct')|min|abs)|pct(1) }} in the four lines; discounts ${{ t2.fb.total.discounts|money }}, almost all Furniture |
 | 7 | Furniture price after promotions, September and October, against the planned price | {{ t2.prices.sep.after|pct(1) }} and {{ t2.prices.oct.after|pct(1) }} against {{ t2.prices.sep.planned|pct(1) }}; still {{ t2.prices.dec.after|pct(1) }} in December against {{ t2.prices.dec.before|pct(1) }} before promotions |
@@ -225,7 +229,7 @@ Plan A is the safest. Plan B gives students ownership of the models and needs a 
 4. **The Furniture promotion needs a lift of {{ t3.lift|pct(0) }}. How would you find out whether it would come?** It reaches the orders as description and not cause, a test or a smaller promotion, and the lower bar of a smaller discount.
 5. **Solver says only Assembly binds. What do you do on Monday?** It reaches the shadow price as the most you would pay for an extra hour, and the range over which it holds.
 6. **A forecast runs {{ ch07_ex6.years[2].ratio|num(1) }} times the orders. Is it an estimate or a bias?** The same direction in every group and year, a systematic cause, and what a reserve or a plan built on it would do.
-7. **Who approved the forecast changes?** The three unapproved adjustments, a buyer who also places orders, and a recorded approval that shows a step and not a review.
+7. **Who approved the forecast changes?** The three unapproved adjustments, a planner whose buying role raises a possible segregation-of-duties question to confirm against policy, and a recorded approval that shows a step and not a review.
 
 ## Using the exercises
 
@@ -246,7 +250,7 @@ All six exercises are Excel builds with a model answer in the workbook of Chapte
 - *One exercise a session.* Take them in the order 7.2, 7.6, 7.1, 7.3, 7.5, 7.4, from the lightest to the longest.
 - *A light load.* Exercises 7.2 and 7.3 take about two and a half hours and cover outcomes 3 to 5. Add Exercise 7.6 for the audit view.
 
-**Grading and discussion.** Each exercise guide holds a rubric. Exercises 7.2, 7.3 and 7.4 suit grading from the workbook, because their numbers have one answer. Exercises 7.1, 7.5 and 7.6 end in a judgment and suit class discussion. Collect the workbook, not a screenshot: the formulas show the work.
+**Grading and discussion.** Each exercise guide holds a rubric. Exercises 7.2, 7.3 and 7.4 suit grading from the workbook, because their numbers have one answer. Exercises 7.1, 7.5 and 7.6 end in a judgment and suit class discussion. Collect the workbook, not a screenshot: the formulas show the work. Full credit requires only what each requirement asks. Control totals, the effect of a gap, a second break-even estimate and the limits of a recommendation are what a strong answer adds, and they count as a plus.
 
 ## Multiple-choice questions
 

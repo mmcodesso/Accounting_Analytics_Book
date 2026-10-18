@@ -23,7 +23,7 @@ figures:
 
 ## Purpose and learning outcomes
 
-"Overhead at a third of its cost" is a claim about cost behavior, and behavior is tested, not assumed. SQL extracts what flowed into account `1090` and what the standards released from it, because the extract must tie to the ledger; the regressions go in the workbook, as in Chapter 7, where the reasoning shows. The analytics type is diagnostic.
+"Overhead at a third of its cost" compares totals and leaves cost behavior open, and behavior is tested, not assumed. SQL extracts what flowed into account `1090` and what the standards released from it, because the extract must tie to the ledger; the regressions go in the workbook, as in Chapter 7, where the reasoning shows. The analytics type is diagnostic.
 
 Students can:
 
@@ -31,7 +31,7 @@ Students can:
 - build monthly series that can be tested and say what the start-up month and the three-pay-date months do to a test (Part 2);
 - classify each input as varying with output, committed, or neither, with evidence, and say what the evidence does not prove (Part 3).
 
-**Competencies practiced.** CPA Evolution BAR M5 (cost accounting and variance analysis); IMA Reporting and Control (cost accounting) and Strategic Cost Management; IFAC IES 2 (b); AACSB A5 part 5.1 (SQL).
+**Competencies practiced.** CPA Evolution BAR M5 (cost accounting and variance analysis); IMA Reporting and Control (cost accounting) and Strategic Cost Management; IFAC IES 2 (b); AACSB A5 part 5.1 (SQL and Excel).
 
 ## Before you assign
 
@@ -80,11 +80,11 @@ ORDER BY CASE prl.LineType
 
 **Step 2. Extract the debits to 1090 by source.** Q11 groups them by the journal entry's type (or the source document's type) and leaves out the closes. **Check:** three rows, payroll ${{ payroll|money }}, Factory Overhead ${{ foh|money }} and depreciation ${{ dep|money }}, ${{ inputs|money }} in all. **Watch for:** leaving the favorable closes' debits in: the total grows by ${{ g.closes_extra|money }}.
 
-**Step 3. Set the inputs against what completions released, per standard hour.** Q12 returns the standard hours completed, the standard cost released by part and the credits to `1090`. Paste it into the workbook with Q10 and Q11 and divide by the hours (`=C20/StdHours`). **Check:** {{ stdh|num(2) }} standard hours; released ${{ conv_rate|num(2) }} an hour (labor ${{ labor_rate|num(2) }}, overhead ${{ oh_rate|num(2) }}); actual inputs ${{ actual_rate|num(2) }}; actual overhead (the inputs less the direct earnings) ${{ actual_oh_rate|num(2) }}, {{ times|num(2) }} times the overhead applied, so the applied overhead is {{ third|pct(0) }} of it: the CFO's "a third", a comparison of totals that says nothing yet about behavior. The credits exceed the completion lines by ${{ off.amount|money }}: completion {{ off.number }} is dated {{ off.date }} and posted {{ off.posted }}. Name it as a date exception; it is not rounding.
+**Step 3. Set the inputs against what completions released, per standard hour.** Q12 returns the standard hours completed, the standard cost released by part and the credits to `1090`. Paste Q10, Q11 and Q12 into the workbook as the Tables PayrollLines, Debits1090 and Released, name the cell that holds Released's StandardHours `StdHours` (`=Released[StandardHours]`), and divide each input by it (`=C20/StdHours`). **Check:** {{ stdh|num(2) }} standard hours; released ${{ conv_rate|num(2) }} an hour (labor ${{ labor_rate|num(2) }}, overhead ${{ oh_rate|num(2) }}); actual inputs ${{ actual_rate|num(2) }}; actual overhead (the inputs less the direct earnings) ${{ actual_oh_rate|num(2) }}, {{ times|num(2) }} times the overhead applied, so the applied overhead is {{ third|pct(0) }} of it: the CFO's "a third", a comparison of totals that says nothing yet about behavior. The credits exceed the completion lines by ${{ off.amount|money }}: completion {{ off.number }} is dated {{ off.date }} and posted {{ off.posted }}. Name it as a date exception; it is not rounding.
 
 ### Part 2: The monthly extract and the tests
 
-**Step 4. Extract each input by month.** The ledger posts payroll on the pay date, so the payroll lines are grouped by the month of the pay date, and the parts then add up to the posted payroll in every month. Q14 builds `Made` (standard hours by completion month), `Posted` (the 1090 debits by posting month, with the pay dates counted) and `Paid`, whose first part is shown; its other six sums repeat the CASE for the other lines.
+**Step 4. Extract each input by month.** The ledger posts payroll on the pay date, so the payroll lines are grouped by the month of the pay date, and the parts then add up to the posted payroll in every month. Q14 builds `Made` (standard hours by completion month), `Posted` (the 1090 debits by posting month, with the pay dates counted) and `Paid`. The block is a fragment, the first part of `Paid`, and its other six sums repeat the CASE for the other lines; run the complete Q14 from the script.
 
 ```sql
 Paid AS (
@@ -96,7 +96,7 @@ Paid AS (
 
 **Check:** {{ g.n_q14|count }} rows from the start-up month; {{ three|length|count }} months show three pay dates ({{ g.three|join(', ') }}). **Watch for:** grouping by the month of the period's end. The direct regular earnings then correlate {{ g.r_dreg_alt|num(2) }} with output, which reads as "direct labor is variable", and the parts no longer tie to the ledger (largest monthly gap ${{ g.gap_alt|money }}).
 
-**Step 5. Test which inputs move with output, from the second month on.** Paste Q14 as a Table named Monthly and put the first month of the test in one cell (TestFrom, the second month). Regress each series on StandardHours over the months from TestFrom, with SLOPE, INTERCEPT, CORREL and RSQ (the Data Analysis ToolPak's regression is equally acceptable):
+**Step 5. Test which inputs move with output, from the second month on.** Paste Q14 as a Table named Monthly, whose Month column is YYYY-MM text, and put the first month of the test in one cell named TestFrom, the second month, read from the Table itself (`=INDEX(Monthly[Month],2)`), so that both are text and the comparison with `Monthly[Month]` selects the months. A date typed in TestFrom is a different type and selects none. Regress each series on StandardHours over the months from TestFrom, with SLOPE, INTERCEPT, CORREL and RSQ (the Data Analysis ToolPak's regression is equally acceptable):
 
 ```jinja
 {{ g.f.slope }}
@@ -139,6 +139,8 @@ Paid AS (
 | Depreciation | Committed | The asset schedule, three levels |
 
 The conclusion: the overhead the standards apply already covers the overhead that varies. The gap between inputs and standards is the crew and supervision, which do not move with output, plus depreciation, spread over a plant that runs well below its capacity (Requirement 3). Committed is conditional: while the crew is kept. Whether any of its pay would stop is a staffing decision that no correlation shows.
+
+Three distinctions to hold. The ratio of applied to actual overhead shows an allocation shortfall and does not by itself explain it, so test behavior before explaining the shortfall or using it in a decision. A correlation describes how two series moved together and is not a cash saving. And Neither for direct overtime describes its observed relation to output, while the crew-kept case still assumes that the existing hourly crew's pay stays, so the future overtime and staffing plan must be validated before any pay is called avoidable.
 
 ## Common mistakes and how to respond
 

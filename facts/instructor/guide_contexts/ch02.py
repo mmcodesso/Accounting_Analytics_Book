@@ -300,6 +300,8 @@ def t2(d, claim):
     claim(d.one("SELECT COUNT(*) FROM MaterialIssue WHERE MaterialIssueID NOT IN (SELECT SourceDocumentID FROM GLEntry WHERE "
                 "SourceDocumentType = 'MaterialIssue') AND MaterialIssueID IN (SELECT MaterialIssueID FROM MaterialIssueLine)") == 0,
           "the material issue headers with no ledger rows have no lines either")
+    claim({r[0] for r in d.q("SELECT Status FROM MaterialIssue WHERE MaterialIssueID NOT IN (SELECT MaterialIssueID FROM MaterialIssueLine)")}
+          == {"Issued"}, "the material issue headers with no lines all carry the status Issued, not a cancelled status")
     invoices = d.one("SELECT COUNT(*) FROM SalesInvoice")
     claim(d.one("SELECT COUNT(*) FROM SalesInvoice s LEFT JOIN (SELECT SourceDocumentID id, ROUND(SUM(Debit), 2) x FROM GLEntry "
                 "WHERE SourceDocumentType = 'SalesInvoice' AND AccountID = (SELECT AccountID FROM Account WHERE AccountNumber = 1020) "
@@ -403,6 +405,24 @@ def ex1(d, claim):
     claim(0 < len(prefix) <= 10, "a few invoice numbers carry the prefix of a year other than the invoice date's")
     claim(all(int(n[3:7]) == int(p[:4]) for n, _, p in prefix), "the prefix of those invoice numbers is the year in which the ledger posted them")
     claim(all(int(n[3:7]) == int(i[:4]) + 1 for n, i, _ in prefix), "each of those invoices is dated in the year before its number's prefix")
+    # SalesOrderLine, which requirement (1) names: the same tests, all clean
+    sol = d.q("SELECT COUNT(*), SUM(SalesOrderID IS NULL OR ItemID IS NULL OR Quantity IS NULL OR UnitPrice IS NULL OR Discount IS NULL "
+              "OR LineTotal IS NULL), SUM(SalesOrderID NOT IN (SELECT SalesOrderID FROM SalesOrder)), SUM(ItemID NOT IN (SELECT ItemID FROM Item)), "
+              "SUM(ABS(LineTotal - Quantity * UnitPrice * (1 - Discount)) > 0.01) FROM SalesOrderLine")[0]
+    claim(sol[1:] == (0, 0, 0, 0), "every SalesOrderLine row has its order, item, quantity, price, discount and line total, its order and item "
+          "exist, and its LineTotal agrees with its parts within a cent")
+    # the scenario's year: revenue by invoice date against the ledger's posting year
+    C = d.C
+    c_invoices, c_subtotal = d.q("SELECT COUNT(*), SUM(SubTotal) FROM SalesInvoice WHERE InvoiceDate BETWEEN ? AND ?",
+                                 f"{C}-01-01", f"{C}-12-31")[0]
+    c_posted = d.one("SELECT SUM(g.Credit - g.Debit) FROM GLEntry g JOIN Account a USING (AccountID) WHERE g.SourceDocumentType = 'SalesInvoice' "
+                     "AND g.FiscalYear = ? AND a.AccountType = 'Revenue' AND CAST(a.AccountNumber AS TEXT) <> '4050'", C)
+    into_c = [p for p in prefix if p[2][:4] == str(C)]
+    claim(into_c and all(p[2] == f"{C}-01-01" for p in into_c), "the invoices dated in the year before and posted in the latest year post on January 1")
+    into_c_total = sum(d.one("SELECT SubTotal FROM SalesInvoice WHERE InvoiceNumber = ?", n) for n, _, _ in into_c)
+    claim(abs(c_posted - c_subtotal - into_c_total) < 0.005,
+          "the latest year's revenue postings, freight aside, exceed its invoices by invoice date by exactly the invoices dated in the year "
+          "before and posted in it")
     return dict(
         orders=orders, required=required, notes_blank=notes_blank, lines=lines, no_shipment_lines=line_blank[1],
         promo_blank=line_blank[2], override_blank=line_blank[3], paid_blank=paid_blank, submitted=submitted,
@@ -410,6 +430,7 @@ def ex1(d, claim):
         max_diff=max_diff, over_cent=over_cent, rates=rates, methods=methods, override=dict(n=override[0], total=override[1]),
         orphans=orphans, unused=len(unused), before_order=[dict(number=n, date=a, order=b) for n, a, b in before_order],
         prefix=[dict(number=n, date=a, posted=p) for n, a, p in prefix],
+        sol_rows=sol[0], c_invoices=c_invoices, c_subtotal=c_subtotal, c_posted=c_posted, n_into_c=len(into_c), into_c_total=into_c_total,
         rows=rows_of(d, ["SalesOrder", "SalesOrderLine", "SalesInvoice", "SalesInvoiceLine", "Customer", "Item"]))
 
 
@@ -591,7 +612,8 @@ def ex4(d, claim):
         close_blank=close_blank, year=C, year_rows=year_total, year_blank=year_blank, year_blank_amount=year_blank_amount,
         year_amount=year_amount, row_share=year_blank / year_total, money_share=year_blank_amount / year_amount,
         n_actual_accounts=len(actual_accounts), other=dict(number=other, name=other_name, center=other_cc[0][0], budget=other_cc[0][1], actual=other_actual),
-        like=year_blank_amount - other_actual, cc=dict(id=cc[0], name=cc[1], rows=cc_rows, accounts=cc_accounts))
+        like=year_blank_amount - other_actual, cc=dict(id=cc[0], name=cc[1], rows=cc_rows, accounts=cc_accounts),
+        year_closes=d.closes_of(C), all_closes=d.closes)
 
 
 # --- Exercise 2.5: audit planning ------------------------------------------------------------------------------------------

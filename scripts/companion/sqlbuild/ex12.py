@@ -447,17 +447,25 @@ Supplier invoices are posted on the date received, and the one invoice that cros
 supplier-invoice cutoff test finds no exception. It is not a search for liabilities recorded nowhere, which takes the
 invoices and supplier statements received after the year-end.
 
-Payroll. Wages are recorded only when paid, and account 2030 holds the opening {money(v['opening'])} at every
-year-end, so no year-end accrues the wages earned in late December. The work of late December cost about
-{v['full'][0]:,} in {d.F} and {v['full'][1]:,} in {d.P} (hourly labor by work date of
-{money(v['hourly'][0]['total'])} and {money(v['hourly'][1]['total'])}, plus salaries by working day and employer
-taxes and benefits), and the {v['days']} working days of December 14-31, {d.C}, are estimated at {money(estimate)}
-(the cost of periods {v['first']}-{v['last']}, {money(v['avg'])} a period on average, per working day; spreading
-salaries over weekdays instead gives about {v['high']:,}). Each year-end's liability is understated by these amounts, and each year's expense by the change
-between them.
+Payroll. Wages are recorded only when paid, and no additional year-end payroll accrual is recorded: account 2030
+holds the opening {money(v['opening'])} at every year-end, and the payroll summaries and payments net to zero in it.
+The estimated payroll cost of late December that each close omits is about {v['full'][0]:,} for {d.F} and
+{v['full'][1]:,} for {d.P} (hourly labor by work date of {money(v['hourly'][0]['total'])} and
+{money(v['hourly'][1]['total'])}, plus salaries by working day and employer taxes and benefits), and
+{money(estimate)} for the {v['days']} working days of December 14-31, {d.C} (the cost of periods
+{v['first']}-{v['last']}, {money(v['avg'])} a period on average, per working day). The estimate depends on the
+allocation method, which should be stated: hourly earnings over the {v['days']} plant working days of the
+{v['base_days']} in those periods, and salaries over the {v['week_days']} weekdays of the {v['base_weekdays']}, then
+the employer-charge rate, gives {money(v['split_total'])}, of it {money(v['split_mfg'])} manufacturing. The opening
+credit of {money(v['opening'])} in account 2030 is a separate matter to investigate before the net liability
+adjustment is decided: if it proves unsupported and is reversed, each net increase is that much smaller. The omitted
+cost belongs among the payroll liabilities and the payroll cost accounts (manufacturing wages pass through account
+1090), and the amounts of {d.F} and {d.P} are year-end estimates, not each year's expense effect, which would need the
+accrual carried in from the year before.
 
 Recommendation: before the fiscal {d.C} statements are final, record revenue for the December deliveries billed in
-January and for the unbilled lines, and accrue the late-December payroll of about {round(liab[d.C], -3):,.0f}; then make both
+January and for the unbilled lines, and, once the opening credit of account 2030 is resolved and the allocation method
+chosen, accrue the late-December payroll of about {round(liab[d.C], -3):,.0f}; then make both
 part of every close, with a cutoff report of deliveries not yet invoiced and a payroll accrual from the open pay
 periods.""")
     s.answer("Dispositions", f"""\
@@ -467,9 +475,10 @@ invoices): reported to billing as invoices dated before shipment; {len(before)} 
 {' and '.join(both)} {'is' if len(both) == 1 else 'are'} adjusted with C1. C3 and C4: the unbilled lines
 ({money(value)}) are referred for billing and accrued revenue at {d.C}-12-31; no exception in the cost postings. C5:
 no exception. C6 ({crossing['number']}): no exception, accrued by {accrual}. C7 and C8: late-December payroll recorded in the
-next fiscal year, an accrual deficiency in every year. C9: the {d.C} accrual of about {money(estimate)} is proposed.
+next fiscal year, an accrual deficiency in every year. C9: the omitted late-December cost of about {money(estimate)} is
+estimated for {d.C}, to be allocated among the payroll liabilities and cost accounts once the method is stated.
 C10: account 2030 carries only the opening balance; the missing accrual is reported as a control deficiency of the
-close.""")
+close, and the unresolved opening credit is investigated separately.""")
 
 
 # --- Exercise 12.2 ---------------------------------------------------------------------------------------------------
@@ -651,6 +660,53 @@ FROM Negative AS n;""",
              Check("paid in full by the as-of date (not necessarily before the credit)", v["paid_in_full"],
                    lambda r: r.value("PaidInFull")),
              Check("credits refunded by the as-of date", v["refunded"], lambda r: r.value("Refunded"))])
+    s.query("Exercise 12.2, test A4b: the credit memos of those invoices by ledger account, and the refunds",
+            "Population: the credit memos of the invoices of test A4; expected: the excess in 2060, some also in 1020",
+            f"""\
+{OPEN},
+Negative AS (
+    SELECT SalesInvoiceID
+    FROM Balances
+    WHERE OpenBalance < 0
+),
+MemoPostings AS (
+    SELECT cm.CreditMemoID,
+        SUM(CASE WHEN a.AccountNumber = 2060 THEN gl.Credit ELSE 0 END)
+            AS To2060,
+        SUM(CASE WHEN a.AccountNumber = 1020 THEN gl.Credit ELSE 0 END)
+            AS To1020
+    FROM CreditMemo AS cm
+        INNER JOIN Negative AS n
+            ON n.SalesInvoiceID = cm.OriginalSalesInvoiceID
+        INNER JOIN GLEntry AS gl
+            ON gl.SourceDocumentType = 'CreditMemo'
+                AND gl.SourceDocumentID = cm.CreditMemoID
+        INNER JOIN Account AS a ON a.AccountID = gl.AccountID
+    WHERE cm.CreditMemoDate <= (SELECT AsOfDate FROM Params)
+    GROUP BY cm.CreditMemoID
+),
+Refunds AS (
+    SELECT CreditMemoID, SUM(Amount) AS Refunded
+    FROM CustomerRefund
+    WHERE RefundDate <= (SELECT AsOfDate FROM Params)
+    GROUP BY CreditMemoID
+)
+SELECT COUNT(*) AS CreditMemos,
+    ROUND(SUM(mp.To2060), 2) AS CreditedTo2060,
+    SUM(CASE WHEN mp.To1020 > 0 THEN 1 ELSE 0 END) AS AlsoCreditedTo1020,
+    ROUND(SUM(mp.To1020), 2) AS To1020,
+    ROUND(SUM(COALESCE(r.Refunded, 0)), 2) AS Refunded,
+    ROUND(SUM(mp.To2060) - SUM(COALESCE(r.Refunded, 0)), 2) AS NotYetRefunded
+FROM MemoPostings AS mp
+    LEFT JOIN Refunds AS r ON r.CreditMemoID = mp.CreditMemoID;""",
+            [Check("credit memos (one for each invoice)", v["n_negative"], lambda r: r.value("CreditMemos")),
+             Check("credited to account 2060 (equal to the negative balances)", round(v["credited_2060"], 2),
+                   lambda r: r.value("CreditedTo2060")),
+             Check("memos that also credit account 1020", v["n_to_1020"], lambda r: r.value("AlsoCreditedTo1020")),
+             Check("their credit to account 1020", round(v["to_1020"], 2), lambda r: r.value("To1020")),
+             Check("refunded by the as-of date", round(v["refund_total"], 2), lambda r: r.value("Refunded")),
+             Check("not yet refunded (the balance of account 2060)", round(v["unrefunded"], 2),
+                   lambda r: r.value("NotYetRefunded"))])
     s.query("Exercise 12.2, test A5: customers stratified by open balance",
             f"Population: customers with a positive balance; expected: {v['customers']} customers",
             f"""\
@@ -765,9 +821,12 @@ difference of {money(opening)} is exactly the receivables line of the opening en
 supports (the finding of Chapter 8). The {v['n_negative']} invoices with a negative balance ({money(v['negative'])})
 are invoices whose receipts and credits together exceed their total: {v['paid_in_full']} were paid in full by the
 as-of date, but only {v['full_before']} of them in full before their first credit, so the dates do not show that each
-credit came after the payment. The credit memo posts to account 2060, not to receivables, and the credit is refunded
-({v['refunded']} of the {v['n_negative']} by the as-of date), so they are amounts owed to customers, not negative
-receivables, and are left out of the aging.""")
+credit came after the payment. The excess, {money(v['credited_2060'])}, was credited to account 2060, although for
+{v['n_to_1020']} of the invoices the credit memo also reduced account 1020, by {money(v['to_1020'])} (test A4b), so a
+credit memo does not always post only to 2060. Refunds had settled {v['refunded']} of the {v['n_negative']} by the
+as-of date ({money(v['refund_total'])}), leaving {money(v['unrefunded'])} in account 2060. The invoice formula leaves
+out the refunds, so its negative balances are neither negative receivables nor the outstanding refund liability, and
+they are left out of the aging.""")
     s.answer("Requirement (5), memo to the controller", f"""\
 To: the controller. Subject: the open balances at {v['asof']}.
 
@@ -786,9 +845,10 @@ Most are December receipts, which are normal; {old_lines} lines received in {v['
 disputed or lost invoices, or receipts recorded against the wrong order.""")
     s.answer("Dispositions", f"""\
 A1-A2: no exception; the aging is the basis for the allowance and the confirmations. A3 ({money(opening)}): the
-unsupported opening line, reported as a finding. A4 ({v['n_negative']} invoices): credits on invoices that receipts also
-paid, refunded through account 2060; no exception for receivables, and the {v['n_negative'] - v['refunded']} not yet refunded are
-liabilities to customers. A5-A6: the {strata['50,000 and over']['n']} key items are selected for confirmation. A7-A8:
+unsupported opening line, reported as a finding. A4 and A4b ({v['n_negative']} invoices): credits on invoices that receipts also
+paid, credited to account 2060 (and for {v['n_to_1020']} of them partly to 1020) and refunded; the
+{v['n_negative'] - v['refunded']} items not yet refunded, {money(v['unrefunded'])}, are liabilities to customers; no
+exception in the aging of receivables. A5-A6: the {strata['50,000 and over']['n']} key items are selected for confirmation. A7-A8:
 agrees with account 2020 within {money(v['rounding'])}, the rounding of the clearing amounts; the total of A8 adds the
 unrounded values and rounds once, while the A7 lines, each rounded to the cent, add to {money(v['grni_shown'])}, which is
 display rounding; no exception. A9-A10: the {old_lines} lines older than
@@ -925,7 +985,7 @@ SELECT EndYear, WorkCenterName,
         ORDER BY RecordedHours / PlannedHours DESC) AS AllHoursRank,
     OpenPerPlanned,
     RANK() OVER (PARTITION BY EndYear
-        ORDER BY OpenPerPlanned DESC) AS WhileOpenRank
+        ORDER BY OpenHours / PlannedHours DESC) AS WhileOpenRank
 {CENTERS}
 ORDER BY EndYear, WhileOpenRank;""",
             [Check(f"{d.C} order on all hours", [centers[i] for i in rank_all],
@@ -1025,7 +1085,7 @@ none of which is dated before its operation's ActualStartDate.""")
     s.answer("Requirement (3)", f"""\
 On all direct hours, {d.C} ranks {', '.join(short[i] for i in rank_all)} ({', '.join(f'{v["now_all"][i]:.2f}' for i
 in rank_all)}): Packing and Quality Assurance record about four times their planned hours. Counting only the time
-recorded while each operation was open (on or before its ActualEndDate; test T1 finds no time dated before an
+dated while each operation was open (on or before its ActualEndDate; test T1 finds no time dated before an
 operation's start), the order becomes {', '.join(short[i] for i in rank_open)}
 ({', '.join(f'{v["now"][i]:.2f}' for i in rank_open)}): every work center is below plan in {d.C}, and Packing falls
 from first to last. Most of the Packing excess was time dated after the operation had ended; Packing is the last
@@ -1033,7 +1093,9 @@ operation of every routing, so time recorded late lands there. Quality Assurance
 planned hours are the smallest of any work center, so a few hours move its ratio.
 In {d.F} the in-window ratios were {', '.join(f'{short[i]} {v["then"][i]:.2f}' for i in range(len(short)))}, and on
 that time {above}, so the reading below plan holds for {d.C} only. A ratio below plan on the dated time does not show
-efficiency by itself: the hours left out may still be work that needs reassigning or redating.""")
+efficiency by itself: the hours left out may still be work that needs reassigning or redating, and the comparison is a
+sensitivity analysis of how the hours were assigned, not independent confirmation that they were worked or assigned
+correctly.""")
     s.answer("Requirement (4)", f"""\
 From {v['build_from']} to {v['build_to']} {d.F} the plant completed far more units than it shipped (test T4), about
 {v['surplus']:,} units of stock in all. The build is consistent with the little indirect time recorded from
@@ -1048,7 +1110,7 @@ through {v['before']} {v['before_year']} and first passed a quarter in {v['first
     s.answer("Requirement (5), memo to the plant manager", f"""\
 To: the plant manager. Subject: what the operation-level time can support.
 
-Much of the direct time is recorded after the operation it is charged to has ended: {by_year[d.C][1] / by_year[d.C][0]:.0%}
+Much of the direct time has a work date after the end of the operation it is charged to: {by_year[d.C][1] / by_year[d.C][0]:.0%}
 of the direct hours of {d.C}, against {by_year[d.F][1] / by_year[d.F][0]:.0%} in {d.F}. Counted only while the
 operations were open, every work center used less time than planned in {d.C}, and the apparent excess at Packing
 and Quality Assurance disappears. The comparison of work centers against plan therefore cannot be relied on: it
@@ -1058,11 +1120,13 @@ against the standard hours of output) does not depend on which operation the tim
 and the standards still need corroboration. The {v['no_op']} direct entries with no operation need repair from the
 original records.
 
-What should change: time should be recorded against an operation only while it is open, with the system rejecting
-entries after the ActualEndDate; time with no open operation should be recorded as indirect time with a reason, and
-supervisors should review late entries weekly. Until then, efficiency should be reported at the plant level only.""")
+What should change: flag a work date outside the operation's authorized start and end dates, and require a documented
+review, correction or reopening of the operation, while allowing a legitimate delayed entry when the work date is
+valid; record time with no open operation as indirect time with a reason; and have supervisors review the flagged
+entries weekly. Corroborate the operation dates, the hours and their assignment before relying on the restricted
+ratios. Until then, efficiency should be reported at the plant level only.""")
     s.answer("Dispositions", f"""\
-T1 and T5: direct time recorded after the operation ended ({by_year[d.C][1] / by_year[d.C][0]:.1%} of {d.C}'s hours),
+T1 and T5: direct time dated after the operation ended ({by_year[d.C][1] / by_year[d.C][0]:.1%} of {d.C}'s hours),
 reported to the plant manager for reassignment or redating, not as hours shown to be unworked; the {v['no_op']} entries
 with no operation are linkage exceptions to repair. T2 and T3: in {d.C} no work center exceeds plan on the time
 recorded while open, so the ranking depends on how time is dated; operation-level efficiency conclusions wait for
@@ -1419,6 +1483,36 @@ WITH Numbers AS (
 )"""
 
 
+FIRST_DIGITS = """\
+WITH Payments AS (
+    SELECT dp.Amount, pi.GrandTotal,
+        CAST(SUBSTR(printf('%.15e', dp.Amount), 1, 1) AS INTEGER) AS Digit
+    FROM DisbursementPayment AS dp
+        INNER JOIN PurchaseInvoice AS pi
+            ON pi.PurchaseInvoiceID = dp.PurchaseInvoiceID
+    WHERE dp.PaymentDate <= '2026-12-31'
+),
+Groups AS (
+    SELECT 'All payments' AS PaymentGroup, Digit
+    FROM Payments
+    UNION ALL
+    SELECT 'Full payments', Digit
+    FROM Payments
+    WHERE Amount = GrandTotal
+    UNION ALL
+    SELECT 'Partial payments', Digit
+    FROM Payments
+    WHERE Amount < GrandTotal
+),
+Observed AS (
+    SELECT PaymentGroup, Digit, COUNT(*) AS Payments,
+        COUNT(*) * 1.0 / SUM(COUNT(*)) OVER (PARTITION BY PaymentGroup)
+            AS Actual
+    FROM Groups
+    GROUP BY PaymentGroup, Digit
+)"""
+
+
 def ex6(b):
     v = context(b, "ex6")
     d = b.data
@@ -1571,34 +1665,8 @@ ORDER BY Series;""",
                    - 3 - len(d.years), lambda r: r.total("StepsTested"))])
     s.query("Exercise 12.6, test B1: first-digit mean absolute deviation of the supplier payments",
             "Population: supplier payments dated through 2026-12-31; expected: close conformity",
-            """\
-WITH Payments AS (
-    SELECT dp.Amount, pi.GrandTotal,
-        CAST(SUBSTR(printf('%.15e', dp.Amount), 1, 1) AS INTEGER) AS Digit
-    FROM DisbursementPayment AS dp
-        INNER JOIN PurchaseInvoice AS pi
-            ON pi.PurchaseInvoiceID = dp.PurchaseInvoiceID
-    WHERE dp.PaymentDate <= '2026-12-31'
-),
-Groups AS (
-    SELECT 'All payments' AS PaymentGroup, Digit
-    FROM Payments
-    UNION ALL
-    SELECT 'Full payments', Digit
-    FROM Payments
-    WHERE Amount = GrandTotal
-    UNION ALL
-    SELECT 'Partial payments', Digit
-    FROM Payments
-    WHERE Amount < GrandTotal
-),
-Observed AS (
-    SELECT PaymentGroup, Digit, COUNT(*) AS Payments,
-        COUNT(*) * 1.0 / SUM(COUNT(*)) OVER (PARTITION BY PaymentGroup)
-            AS Actual
-    FROM Groups
-    GROUP BY PaymentGroup, Digit
-)
+            f"""\
+{FIRST_DIGITS}
 SELECT PaymentGroup, SUM(Payments) AS Payments, COUNT(*) AS Digits,
     ROUND(AVG(ABS(Actual - LOG10(1 + 1.0 / Digit))), 5) AS MAD
 FROM Observed
@@ -1610,6 +1678,23 @@ ORDER BY PaymentGroup;""",
                 Check(f"{g} payments", counts[g], lambda r, g=g: r.where(PaymentGroup=g)["Payments"]),
                 Check(f"{g} MAD (Tutorial 8.1)", round(mad, 5), lambda r, g=g: r.where(PaymentGroup=g)["MAD"],
                       tolerance=0.000005))])
+    s.query("Exercise 12.6, test B2: the same deviation with the nine expected proportions typed in",
+            "Population: supplier payments dated through 2026-12-31; expected: the MAD of test B1 (the fallback without LOG10)",
+            f"""\
+{FIRST_DIGITS}
+SELECT PaymentGroup, SUM(Payments) AS Payments, COUNT(*) AS Digits,
+    ROUND(AVG(ABS(Actual - CASE Digit
+        WHEN 1 THEN 0.301030 WHEN 2 THEN 0.176091 WHEN 3 THEN 0.124939
+        WHEN 4 THEN 0.096910 WHEN 5 THEN 0.079181 WHEN 6 THEN 0.066947
+        WHEN 7 THEN 0.057992 WHEN 8 THEN 0.051153 WHEN 9 THEN 0.045757
+        END)), 5) AS MAD
+FROM Observed
+GROUP BY PaymentGroup
+ORDER BY PaymentGroup;""",
+            [Check("groups", list(first_digits), lambda r: r.col("PaymentGroup")),
+             Check("all nine digits in every group", [9, 9, 9], lambda r: r.col("Digits"))] +
+            [Check(f"{g} MAD equals test B1's", round(mad, 5), lambda r, g=g: r.where(PaymentGroup=g)["MAD"],
+                   tolerance=0.000005) for g, mad in first_digits.items()])
     js = series["Journal entry"]
     partial_min = d.one("SELECT MIN(pi.GrandTotal) FROM DisbursementPayment p JOIN PurchaseInvoice pi ON "
                         "pi.PurchaseInvoiceID = p.PurchaseInvoiceID WHERE p.PaymentDate <= ? AND p.Amount < pi.GrandTotal",
@@ -1621,12 +1706,13 @@ different amounts and each recorded invoice was paid once (Exercise 2.6). Dispos
 pair from the suppliers to confirm they are distinct bills; one payment per record does not exclude two records of one
 bill.
 
-D2, standardized numbers: the same {v['n_dupes']} pairs and no others; the numbers are entered consistently.
-Disposition: no exception.
+D2, standardized numbers: the same {v['n_dupes']} supplier-and-invoice-number groups as D1 and no additional group.
+Disposition: keep the {v['n_dupes']} groups for investigation with D1; standardizing the numbers finds no further
+duplicate.
 
 D3, repeated check numbers: {v['n_checks'].lower()} check numbers, {', '.join(v['checks'])}, each used twice for
-supplier {v['check_supplier']} (the AnomalyLog lists {v['n_logged']} duplicate references, but only
-{v['n_with_check']} carry check numbers). Disposition: trace both payments of each check to the bank statement.
+supplier {v['check_supplier']}. ACH and wire payments carry no check number, so they need a separate
+payment-reference test. Disposition: trace both payments of each check to the bank statement.
 
 D4 and D5, near-duplicate payments: {v['pairs']} pairs share supplier and amount on different dates, {v['within30']}
 within 30 days ({v['within14']} within 14, the chapter's example), and none of them refers to the same recorded
@@ -1651,9 +1737,10 @@ other payments of the same supplier, which takes the table joined to itself. A L
 continues across years would also miss a gap between the last number of one year and the first of the next, which is
 why the continuing series are ordered without a partition.
 
-What SQL gains over a workbook: the tests run on the whole population in the database, every quarter, without copying
-data into a workbook or refreshing formulas; each test is a saved, readable definition that a reviewer can rerun and
-get the same result; and printf('%.15e') writes every positive amount in scientific notation with fifteen decimals
+What SQL gains over a workbook: saved SQL avoids rebuilding the manual workbook analysis, and each test is a readable
+definition that a reviewer can rerun and get the same result. Each recurring run still needs a refreshed, reconciled
+database snapshot, an explicit as-of date and retained results, because the query does not fetch new transactions by
+itself. The tests run on the whole population, and printf('%.15e') writes every positive amount in scientific notation with fifteen decimals
 (688.42 as 6.884200000000000e+02, the smallest payment {v['smallest']} as {v['smallest_e']}), so the first character
 is the first significant digit, without the text tricks the workbook needed. The decimals matter: printf rounds, and
 with its default of six an amount just below a power of ten, such as 999,999.99, would read 1.000000e+06.""")

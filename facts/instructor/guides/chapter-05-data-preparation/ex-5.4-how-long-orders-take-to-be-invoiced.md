@@ -37,7 +37,7 @@ By the end, students can:
 ## Before you assign
 
 - **Files and software.** The analysis workbook after Tutorial 5.3, with the SalesOrder Table (Tutorial 5.2) and the Period column on SalesInvoice (Tutorial 5.1). The quarter in the model answer is the quarter of the InvoiceDate, which is what the Period column holds.
-- **Exercise 5.2.** Requirement (1) says to reuse the OrderDate column from Exercise 5.2 if it exists. Students who did not do it add the same lookup. The new column is OrderToInvoiceDays in column {{ g.letters.OrderToInvoiceDays }}.
+- **Exercise 5.2.** Requirement (1) says to reuse the OrderDate column from Exercise 5.2 if it exists. Students who did not do it add the same lookup. The new column, OrderToInvoiceDays, goes in the first empty column of the Table, after every existing column, BeforeOrder included: column {{ g.letters.OrderToInvoiceDays }} in the model answer, which holds Exercise 5.2's columns too, and column {{ g.direct_letters.OrderToInvoiceDays }} for a student who comes straight from the tutorials (OrderDate then in {{ g.direct_letters.OrderDate }}).
 - **Data conditions.** Every invoice has an order. Three invoices are dated a day before their order, so the lag has a minimum of minus one. {{ g.n_promos|count }} promotions: promotions {{ g.flagged_ids }} have every line invoiced after the end date, because their recorded dates do not span their sales. The others have between about a quarter and a half of their lines invoiced after the end date.
 
 ## How to run it
@@ -48,13 +48,13 @@ Individual or pairs, about 75 minutes: 10 on the lag column (requirement 1), 20 
 
 ### Requirement (1): The lag
 
-**Step 1. Measure the days from order to invoice.** If the SalesInvoice Table has no OrderDate yet, add it with `=XLOOKUP([@SalesOrderID],SalesOrder[SalesOrderID],SalesOrder[OrderDate],"No match")` and format it as a date. In the next column type `OrderToInvoiceDays` and enter the formula below. Format the column as a number with no decimals.
+**Step 1. Measure the days from order to invoice.** If the SalesInvoice Table has no OrderDate yet, add it in the first empty cell right of the last header with `=XLOOKUP([@SalesOrderID],SalesOrder[SalesOrderID],SalesOrder[OrderDate],"No match")` and format it as a date. Then, again in the first empty cell right of the last header, type `OrderToInvoiceDays` and enter the formula below. Format the column as a number with no decimals.
 
 ```
 =[@InvoiceDate]-[@OrderDate]
 ```
 
-**Check:** the lag is a whole number of days, and the smallest is minus one. **Watch for:** a column that Excel formats as a date. A lag of 30 days reads as the date `1900-01-30`. Tutorial 5.1, Step 4b, has the same fix.
+**Check:** the lag is a whole number of days, and the smallest is minus one. **Watch for:** a lag typed over an existing column. After Exercise 5.2 the cell to the right of OrderDate holds BeforeOrder, so "the next column" would overwrite it. **Watch for:** a column that Excel formats as a date. A lag of 30 days reads as the date `1900-01-30`. Tutorial 5.1, Step 4b, has the same fix.
 
 ### Requirement (2): The summary
 
@@ -67,7 +67,7 @@ Individual or pairs, about 75 minutes: 10 on the lag column (requirement 1), 20 
 =PERCENTILE.INC(SalesInvoice[OrderToInvoiceDays],0.9)
 ```
 
-**Step 3. Summarize by quarter.** Type the four period labels as text in A12 to A15 and enter, in B12 and C12, the two formulas below. Fill down. The model answer adds a median with `=MEDIAN(FILTER(SalesInvoice[OrderToInvoiceDays],SalesInvoice[Period]=$A12))`, which needs Microsoft 365.
+**Step 3. Summarize by quarter.** Type the four period labels as text in A12 to A15 and enter, in B12 and C12, the two formulas below. Fill down. The model answer adds a median with `=MEDIAN(FILTER(SalesInvoice[OrderToInvoiceDays],SalesInvoice[Period]=$A12))`. FILTER is in every Excel version that has XLOOKUP, though the complete model answer also uses HSTACK, TAKE and CHOOSECOLS, which need a newer version, as the chapter note says.
 
 ```
 =COUNTIFS(SalesInvoice[Period],$A12)
@@ -76,11 +76,11 @@ Individual or pairs, about 75 minutes: 10 on the lag column (requirement 1), 20 
 
 **Check:** the Expected results. **Watch for:** a quarter taken from the order date. The model answer uses the invoice's period, as the memo recommends for recorded revenue, and a student who uses the order date should say so.
 
-**Step 4. Interpret.** The average, {{ mean|num(1) }} days, is above the median, {{ median }}. A minority of orders take much longer, so a long right tail pulls the average up and leaves the median alone; the 90th percentile is {{ p90 }} days. Across the four quarters of the year the averages, which count each invoice once, run from {{ g.lowest|num(1) }} to {{ g.highest|num(1) }} days, a spread of {{ g.spread|num(1) }}, so the lag is fairly stable.
+**Step 4. Interpret.** Across all {{ g.n_invoices|count }} invoices in the extract, the average, {{ mean|num(1) }} days, is above the median, {{ median }}. A minority of invoices come much later than their orders, so a long right tail pulls the average up, while the median is less sensitive to it; the 90th percentile is {{ p90 }} days. The measures are per invoice: the {{ g.n_invoices|count }} invoices come from {{ g.n_orders|count }} orders, so an order with several invoices counts once for each. Across the four quarters of the year, by the quarter of the InvoiceDate, the averages run from {{ g.lowest|num(1) }} to {{ g.highest|num(1) }} days, a spread of {{ g.spread|num(1) }}, so the lag is fairly stable.
 
 ### Requirement (3): The promotions
 
-**Step 5. Read the dates first, then count.** On `Ex 5.4` spill the promotions with `=PromotionProgram[PromotionID]` and the same for code, start and end. Beside them enter the count and the late count, and the share:
+**Step 5. Read the dates first, then count.** On `Ex 5.4` type the headings PromotionID, PromotionCode, EffectiveStartDate, EffectiveEndDate, Invoice lines, Invoiced after end date and Share after end date in A19 to G19. In A20 spill the promotions with `=PromotionProgram[PromotionID]`, and in B20, C20 and D20 the same for code, start and end. In E20, F20 and G20 enter the count, the late count and the share, and keep the cells below row 20 empty, or the spills return #SPILL!:
 
 ```
 =COUNTIFS(SalesInvoiceLine[PromotionID],A20#)
@@ -88,9 +88,9 @@ Individual or pairs, about 75 minutes: 10 on the lag column (requirement 1), 20 
 =F20#/E20#
 ```
 
-A student without dynamic arrays fills the same three formulas down with a row reference instead of the spill.
+A student without dynamic arrays types or copies the promotions into rows 20 to {{ g.last_promo_row }} and fills the same three formulas down, with `A20` and `D20` in place of `A20#` and `D20#`.
 
-**Check:** the nine rows of the Expected results. Promotions {{ g.flagged_ids }} read 100 percent. **Watch for:** reading a hundred percent as billing lag. Promotion {{ g.one_day_ids }} is effective for a single day, and promotions {{ g.backwards_ids }} end before they start, so every line of the three falls after its recorded end date, because those dates do not span the sales. The memo should name them as master-data questions.
+**Check:** the nine rows of the Expected results. Promotions {{ g.flagged_ids }} read 100 percent. **Watch for:** reading a hundred percent as billing lag. Promotion {{ g.one_day.id }} is recorded for a single day, {{ g.one_day.start_long }}, while its lines come from orders dated {{ g.one_day.order_span }}, and promotions {{ g.backwards_ids }} end before they start. In all three the recorded dates do not span the orders, so every line falls after the end date and the share says nothing about billing. Under the chapter's convention that the order date sets the price, the discounts on those orders need an explanation. The memo names them as questions for the data owner, about each promotion's eligibility rule and approved dates. A single day or a line invoiced after the end date does not by itself show an unauthorized discount.
 
 ### Requirement (4): The recommendation
 
@@ -120,8 +120,8 @@ A student without dynamic arrays fills the same three formulas down with a row r
 
 ## What a strong answer says
 
-- **Requirement (2).** A skewed distribution, with the average above the median and the long tail named. Stability is a claim about the quarterly averages, with the range.
-- **Requirement (3).** Before the counts, the dates. Three promotions fail a simple test of their own dates, so their late lines say nothing about billing. The other six have between a quarter and a half of their lines invoiced after the end date, which is consistent with the usual lag for orders placed in the last weeks of a promotion.
+- **Requirement (2).** A skewed distribution of invoices, with the average above the median and the long tail named. Stability is a claim about the quarterly averages, with the range.
+- **Requirement (3).** Before the counts, the dates. Three promotions have recorded dates that do not span their orders, one a single day and two that end before they start, so their late lines say nothing about billing and their dates are a question for the data owner. The other six have between a quarter and a half of their lines invoiced after the end date, which is consistent with the usual lag for orders placed in the last weeks of a promotion.
 - **Requirement (4).** A split recommendation, with the reason for each date and the limit of the invoice date.
 
 A weak answer calls the three promotions "billed late", or recommends the order date for revenue because the price follows it.

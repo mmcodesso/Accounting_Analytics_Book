@@ -12,7 +12,7 @@ This is a case, not a chapter of tutorials. The deck opens with a kickoff (the e
 {{< book-objectives 1-3 >}}
 
 ::: {.notes}
-The first three objectives cover planning an integrated audit from the records, assessing the cycle's risks including fraud, and deciding when a query of the whole population replaces a sample.
+The first three objectives cover planning an integrated audit from the records, assessing the cycle's risks including fraud, and deciding when a query of the whole population replaces a sample and when outside evidence needs document examination.
 :::
 
 ## Learning objectives (continued)
@@ -279,7 +279,7 @@ These are the reasons the requirements themselves give. A query repeats exactly 
 {{< book-milestones 1-1 >}}
 
 ::: {.notes}
-Phase 1 establishes what the cycle is, as its records show it, that its populations are complete, and where its risks lie, before any test relies on them.
+Phase 1 establishes what the cycle is, as its records show it, that its recorded populations agree with the ledger, and where its risks lie, before any test relies on them.
 :::
 
 ## Map the cycle from its records
@@ -318,7 +318,7 @@ Reconcile the credits' subtotal, freight, tax and totals to their accounts; the 
 - **Check:** each risk names its control point, test, tool and evidence
 
 ::: {.notes}
-Compute overall materiality under the chief audit executive's condition, with performance materiality and a clearly trivial threshold as the chapter's shares of it. Build an expectation of the latest year's returns from the prior year's return rate, compare it with the ledger, and explain why the first year's rate would make a poorer expectation. Brainstorm the fraud risks with the table of schemes and AS 2401's three conditions, mapped to the people and documents of the cycle.
+Compute overall materiality under the chief audit executive's condition, with performance materiality and a clearly trivial threshold as the chapter's shares of it. Build an expectation of the latest year's returns from the prior year's return rate, compare it with the ledger, say what size of difference would lead you to investigate and why, and explain why the first year's rate would make a poorer expectation. Brainstorm the fraud risks with the table of schemes and AS 2401's three conditions, mapped to the people and documents of the cycle.
 :::
 
 ## Check your understanding {.check}
@@ -378,7 +378,7 @@ Phase 2 is the heart of the audit: it tests every document's controls, explains 
 - **Check:** each test states its definition, and the list combines them
 
 ::: {.notes}
-Test authority for credits and refunds against the approver's recorded limit, and the approvers' employment dates. Test separation of duties three ways, and try to test the preparer against the approver: explain why the records cannot answer. Test whether each refund was paid before the customer's payments had arrived, choosing and stating whether a payment counts from its receipt or its application to the invoice: the records hold dates, not times, and no bank clearance. Then test whether a past-due balance could have been offset. Compare refund and receipt methods, test the clawbacks and one refund per credit, combine the exceptions with UNION ALL, and export RefundFlags.csv.
+Test authority for credits and refunds against the approver's recorded limit, and the approvers' employment dates. Test separation of duties three ways, and try to test the preparer against the approver: explain why the records cannot answer. Test whether each refund was paid before the customer's payments had arrived, choosing and stating whether a payment counts from its receipt or its application to the invoice: the records hold dates, not times, and nothing that shows when a payment cleared the bank. Then test whether a past-due balance could have been offset. Compare refund and receipt methods, test the clawbacks and one refund per credit, combine the exceptions with UNION ALL, and export RefundFlags.csv.
 :::
 
 ## Explain the returns and rank the refunds
@@ -420,10 +420,10 @@ The sizes come from the binomial distribution, and the number in parentheses is 
 - **Produce:** a sampling plan, a frozen selection, and the evaluation rule
 - **Tool:** the workbook, with Chapter 8's RANDARRAY and SORTBY
 - **Revisit:** Chapter 8's key items and random selection
-- **Check:** the rule is written before the test, and no result is invented
+- **Check:** the rule is written before the sample is drawn, and no result is invented
 
 ::: {.notes}
-Define three attributes that need outside evidence: a written request from the customer, a payee checked independently, and an inspection record for refunds of goods returned damaged. The inspection applies only to those refunds, so size it on their own population, or examine them all: another refund is not a passed inspection. Choose the parameters, take the size from the table, take the key items in full under the chapter's thresholds and evaluate them apart, select the rest, and record the date and parameters. Write the rule for zero to three deviations, or up to one more than the plan allows. Apply the same sample to one attribute the data can test, the refund dated before the payment as Requirement 4 defined it, and compare its conclusion with the result for the same remaining refunds. A sample over three years does not show by itself how the controls operated at the latest year-end.
+Define three attributes that need outside evidence: a written request from the customer, a payee checked independently, and an inspection record for refunds of goods returned damaged. The inspection applies only to those refunds, so size it on their own population, or examine them all: another refund is not a passed inspection. Choose the parameters, take the size from the table, and write the rule for zero to three deviations, or up to one more than the plan allows, before anything is selected. Then take the key items in full under the chapter's thresholds and evaluate them apart, select the rest, freeze the selection, and record the IDs, the date, the parameters and the method. Apply the same sample to one attribute the data can test, the refund dated before the payment as Requirement 4 defined it, and compare its conclusion with the result for the same remaining refunds. A sample over three years does not show by itself how the controls operated at the latest year-end.
 :::
 
 ## Check your understanding {.check}
@@ -460,14 +460,14 @@ A query of the whole population replaces a sample wherever the records hold the 
 - **Check:** the timeline names each step's role and the evidence needed
 
 ::: {.notes}
-Recompute each credit line from its return, shipment and invoice lines, the tax at the invoice's rate, and the clawbacks. Compare the freight with the invoice's, recompute a share only under a stated freight policy, and report the limit of the test without one. List the open items in the hub account at the latest year-end. Measure what returned goods were put back into inventory at, by reason. Test for lapping, and explain with Chapter 8's criteria why a first-digit test does not suit these populations. Build the largest refund's timeline from the shipment to the last receipt on its invoice, and record a disposition.
+Recompute each credit line from its return, shipment and invoice lines, the tax at the invoice's rate, and the clawbacks. Compare the freight with the invoice's, recompute a share only under a stated freight policy, and report the limit of the test without one. List the open items in the hub account at the latest year-end. Measure what returned goods were put back into inventory at, by reason. Test for lapping, and explain with Chapter 8's criteria why a first-digit test is not established as suitable for these populations. Build the largest refund's timeline from the shipment to the last receipt on its invoice, and record a disposition.
 :::
 
 ## Milestone 2: before you hand it in
 
 - Every control test states its population, definition and result
 - The analytics allow for timing and for periods the data do not complete
-- The sample is frozen, with its rule written before any testing
+- The sample is frozen, with its rule written before it was drawn
 - The largest refund has a timeline, a disposition and the evidence needed
 
 ::: {.notes}
@@ -497,12 +497,20 @@ Phase 3 turns the results into judgments the committee can act on, and the tests
 A deficiency exists when a control does not allow timely prevention or detection of misstatements in the normal course of work. Its severity depends on whether a misstatement is reasonably possible and how large it could be, not on whether one actually occurred, as AS 2201 sets out. Internal auditors then rate their findings and agree on action plans with management under the IIA's Global Internal Audit Standards.
 :::
 
-## Three classifications, and who hears of each
+## Three classifications, and what each means
 
-{{< book-table tbl-19-04 widths="17,37,27,19" >}}
+{{< book-table tbl-19-04 columns="Classification,Abridged definition" widths="22,78" >}}
 
 ::: {.notes}
-The definitions are abridged. A material weakness turns on a reasonable possibility of a material misstatement with no compensating control precise enough; a significant deficiency is less severe but merits the attention of those who oversee financial reporting. Management hears of every deficiency in writing, and the audit committee is told so; the significant deficiencies and material weaknesses go to both in writing. For a public company, a material weakness also leads to an adverse opinion on internal control.
+The definitions are abridged. A material weakness turns on a reasonable possibility of a material misstatement with no compensating control precise enough; a significant deficiency is less severe but merits the attention of those who oversee financial reporting; a deficiency is a control whose design or operation does not allow timely prevention or detection. The PCAOB classifications give this case a framework for comparison, and the engagement does not issue an external auditor's opinion on internal control over financial reporting.
+:::
+
+## What tips each classification, and who hears of it
+
+{{< book-table tbl-19-04 columns="Classification,What tips the severity,Who hears about it" widths="20,45,35" >}}
+
+::: {.notes}
+Management hears of every deficiency in writing, and the audit committee is told so; the significant deficiencies and material weaknesses go to both in writing. For a public company, a material weakness also leads to an adverse opinion on internal control, which this internal-audit engagement does not issue.
 :::
 
 ## Four judgments lead to a classification
@@ -554,13 +562,13 @@ The chapter's criteria ask for deficiencies classified by likelihood, magnitude 
 
 {{< book-requirement 9 >}}
 
-- A report of at most three pages, with an appendix of exhibits
+- A report of at most three pages, with an appendix of selected, condensed exhibits
 - An executive summary, a conclusion, the scope and the reconciliations
 - Each finding: condition, criteria, cause, effect, rating, recommendation
 - Action plans with owners by role and dates, and the responses expected
 
 ::: {.notes}
-The conclusion says what the tests covered and what they could not reach, such as the documents outside the database. Report the clean results too, and say where you expect an owner to disagree. The audit partners Cohen and colleagues interviewed describe managers who resist a finding of a weakness when no error has been detected, so prepare the evidence for each compensating control they may point to.
+The conclusion says what the tests covered and what they could not reach, such as the documents outside the database and independent bank evidence. Report the clean results too, and say where you expect an owner to disagree. The audit partners Cohen and colleagues interviewed describe managers who resist a finding of a weakness when no error has been detected, so prepare the evidence for each compensating control they may point to.
 :::
 
 ## Keep the tests running
@@ -573,7 +581,7 @@ The conclusion says what the tests covered and what they could not reach, such a
 - **Check:** past exceptions link to a finding and do not flood review
 
 ::: {.notes}
-The four rule tests are credits above authority, credits approved by someone who applied cash to the invoice, refunds above authority, and refunds dated before the customer's payment as Requirement 4 defined it; the processes are Credit memos and Refunds. Keep the refund method and the missing offset as anomaly tests, outside the register of rules. Link the historical exceptions that share a supported cause to one finding, as Chapter 16 treated the payroll registers' self-approval, and keep each exception in the register. Say whether the finding concerns design or operation, and keep its covered period, the date the fix is due, the date it is made, and the retest apart. Keep reviewing the exceptions that arrive after the covered period, and close the finding only when the retest shows the fix works. Recheck the date through which the data run, and record the change.
+The four rule tests are credits above authority, credits approved by someone who applied cash to the invoice, refunds above authority, and refunds dated before the customer's payment as Requirement 4 defined it; the processes are Credit memos and Refunds. Keep the refund method and the missing offset as anomaly tests, outside the register of rules. Link the historical exceptions that share a supported cause to one finding, as Chapter 16 treated the payroll registers' self-approval, and keep each exception in the register. Say whether the finding concerns design or operation, and keep its covered period, the date the fix is due, the date it is made, and the retest apart. Keep reviewing the exceptions that arrive after the covered period, and close the finding only when the fix is made, a retest after it passes and the closure is approved. Recheck the date through which the data run, and record the change.
 :::
 
 ## Milestone 3: before you hand it in

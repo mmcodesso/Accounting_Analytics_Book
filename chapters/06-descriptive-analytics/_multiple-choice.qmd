@@ -85,7 +85,7 @@ D.  GETPIVOTDATA rounds the value to the number format shown in the PivotTable.
 
 **10.** An analyst adds a custom column to the InvoiceLines query and loads the query, but the new field does not appear in a PivotTable built from InvoiceLines. What is the most likely explanation?
 
-A.  A PivotTable reads a copy of the data that only a refresh updates.
+A.  A PivotTable reads a copy of the data that a refresh must update.
 B.  The new custom column must first be converted to values in the Table.
 C.  PivotTables cannot use any of the columns that Power Query adds.
 D.  The PivotTable must be deleted and built again from the Table.
@@ -122,5 +122,5 @@ D.  The two margins are calculated inconsistently, so no conclusion is possible.
 
 A.  Ask management for the expected amount and accept it if it is close to the recorded one.
 B.  Develop the expectation and decide in advance how large a difference is acceptable.
-C.  Replace the expectation with the recorded amount of the previous year.
+C.  Copy the previous year's revenue without considering known changes or the reliability of the data.
 D.  Select a random sample of transactions, because analytical procedures use no expectations.

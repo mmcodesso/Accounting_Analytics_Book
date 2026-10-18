@@ -54,9 +54,9 @@ def ex1(b: Build) -> None:
         "(2) The role's script, as TMDL view's Apply leaves it, is the TMDL view tab Ex B.1: the role's tablePermission "
         "rules are kept, and LaborTimeEntry gets columnPermission ExtendedLaborCost with metadataPermission: none. A "
         "role written from scratch with createOrReplace would replace the role and lose its row filters.",
-        f"(3) As the Production Manager (View as, Other user employee004@charlesriver.example, role {ROLE}), the table on "
-        "this page fails: Labor Cost reads a column the role cannot see, and the engine answers that column "
-        "'ExtendedLaborCost' in table 'LaborTimeEntry' cannot be found or may not be used in this expression, so the "
+        f"(3) As the Production Manager (View as, Other user employee004@charlesriver.example, role {ROLE}), the table and the card "
+        "on this page fail: Labor Cost reads a column the role cannot see, and the engine answers that column "
+        "'ExtendedLaborCost' in table 'LaborTimeEntry' cannot be found or may not be used in this expression, so each "
         "visual shows an error, while the Plant page's hours visuals still work, since no measure on it reads the cost. With "
         f"the Finance role the page shows every job title's cost ({money(total)} in fiscal {y}).",
         "(4) Performance analyzer durations vary by machine and from run to run. The role's filters can lengthen "
@@ -153,8 +153,10 @@ def ex2(b: Build) -> None:
         "(4) One row per user: every user name matches the Email of an active employee (" + ", ".join(f"{i} {t}" for i, t in ctx["matches"]) +
         "), each in the cost center the table gives them, so no user is flagged.",
         f"(5) Viewed as the Sales Manager, the page lists every row of AccessEmployees, all {ctx['n_employees']} "
-        "employees with their e-mail addresses and termination dates, because no rule filters an unrelated table (the same "
-        "reason the Customer table lists every customer for a user missing from the security table).",
+        "employees with their job titles, employment status and termination dates, because no rule filters an unrelated "
+        "table (the same reason the Customer table lists every customer for a user missing from the security table). "
+        "Email is also in the unprotected table, although this visual does not display it, and leaving a column off a "
+        "visual is not protection.",
         f"(6) The review found the unmapped {ctx['center']} and nothing else. Internal audit should run it whenever the "
         "security table changes and at least quarterly, with the controller's approval recorded. Before the file is "
         f"published, keep the table out of the published file, or give it a rule of FALSE () in {ROLE}, which empties it "

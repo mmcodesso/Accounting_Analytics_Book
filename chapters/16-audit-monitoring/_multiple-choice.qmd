@@ -44,7 +44,7 @@ B.  Power BI requires every unpivoted table to stay loaded
 C.  The rates divide each test's exceptions by its population
 D.  The drill-through page reads documents only from those tables
 
-**7.** On the monitoring page, most tests show exceptions only in January, while one test shows exceptions in every month of every year. Which reading is most appropriate?
+**7.** On the monitoring page, many exceptions cluster in January, while one test shows exceptions in every month of every year. Which reading is most appropriate?
 
 A.  The Date table assigns the recurring test's dates incorrectly
 B.  A possible design flaw in the recurring test's control

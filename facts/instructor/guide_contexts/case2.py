@@ -399,7 +399,20 @@ def g4(d, claim):
     claim(len(whole) == 12 and whole[3] < whole[1] and abs(whole[3] - whole[1]) < 0.01,
           "the whole budget's ratio in the collection months is only a few thousandths below January's")
     year_ratio = {y: (lambda ab: ab[0] / ab[1])(n2.budget_ratio(d, "b.FiscalYear = ?", y)) for y in d.years}
+    claim(max(plan_months) - min(plan_months) < 0.001 and max(plan_months) - min(plan_months) > 0,
+          "the plan year's monthly ratio is nearly flat, within a thousandth of list, but not exactly flat")
+    two_prices = d.q("SELECT i.ItemCode, i.ItemGroup FROM BudgetLine b JOIN Item i ON i.ItemID = b.ItemID "
+                     "WHERE b.BudgetCategory = 'Revenue' AND b.FiscalYear = ? GROUP BY b.ItemID "
+                     "HAVING COUNT(DISTINCT b.UnitAmount) > 1", d.N)
+    claim(len(two_prices) > 0 and all(g == "Furniture" for _, g in two_prices),
+          "a few Furniture items, and no other group's, carry two planned unit prices in the plan year")
     _, quarters, total = n2.proposal_quarters(d)
+    rate = n2.commission(d)[2]
+    typed = 0.01903                                   # Tutorial 7.3's rate typed to three decimals of a percent
+    claim(abs(typed - rate) < 5e-6, "the commission rate typed as a rounded percentage differs from the ratio in its fifth decimal")
+    contrib_quarters = [(q, v * (1 - rate)) for q, v in quarters]
+    claim(abs(round(total, -2) - total) * (1 - rate) > 1,
+          "rounding the annual discount to hundreds before the commission changes the contribution by more than a dollar")
     fall = prop["ItemGroup"]
     months = ",".join(str(m) for m in fall["months"])
     budget_units = d.one(f"SELECT SUM(b.Quantity) {n2.BUDGET} AND b.FiscalYear = ? AND i.ItemGroup = ? AND b.Month IN ({months})",
@@ -417,6 +430,9 @@ def g4(d, claim):
         plan_dev=max(abs(r - plan_all) for r in plan_months), plan_all=plan_all,
         year_ratios=[dict(year=y, ratio=r) for y, r in year_ratio.items()],
         quarters=[(q, v) for q, v in quarters], total=total, rows=r4_rows(len(nine)), cfo_name=cfo_name,
+        contrib_quarters=contrib_quarters, contrib_rounded_first=round(total, -2) * (1 - rate),
+        contrib_typed=total * (1 - typed), typed_rate=typed, plan_low=min(plan_months), plan_high=max(plan_months),
+        n_two_prices=n2.word(len(two_prices)),
         budget_units=budget_units, ordered=ordered, budget_over=budget_units / ordered,
         year=d.C, plan_year=d.N, first_year=d.F)
 
@@ -489,11 +505,23 @@ def g5(d, claim):
     blank = [dict(code=r[0], word=r[1].split()[0], lines=r[3]) for r in items]
     pending = d.q("SELECT PriceOverrideApprovalID FROM PriceOverrideApproval WHERE Status = 'Pending' ORDER BY 1")
     mgr = d.one("SELECT DISTINCT ApprovedByEmployeeID FROM PromotionProgram")
+    others = [t for t in tests if not t["fails"]]
+    claim(len(others) > 0 and all(t["recorded_in_scope"] > 0 and t["missing"] == 0 for t in others),
+          "the promotions whose recorded dates hold their lines have eligible lines in their recorded windows, none missing the promotion")
+    billed = d.q("SELECT l.SalesInvoiceLineID, l.UnitPrice, a.ApprovedUnitPrice, a.ApprovedByEmployeeID, l.PriceOverrideApprovalID "
+                 "FROM PriceOverrideApproval a JOIN SalesInvoiceLine l ON l.SalesOrderLineID = a.SalesOrderLineID "
+                 "WHERE a.Status = 'Pending' ORDER BY l.SalesInvoiceLineID")
+    claim(len(billed) > len(pending), "a Pending request can have more than one billed line (two shipments)")
+    claim(all(r[3] is None and r[4] is None for r in billed),
+          "the Pending requests' billed lines carry no override link, and the requests record no approver")
+    claim(all(abs(r[1] - r[2]) < 0.005 for r in billed),
+          "each billed unit price equals the Pending request's stored ApprovedUnitPrice, a field filled although the status is Pending")
     return dict(tests=tests, evidence=evidence, collection_lines=collection_lines, non_promo=non_promo,
                 unguarded=non_promo + sum(t["out_dates"] for t in tests), blank=blank, n_blank=len(blank),
                 total_lines=sum(t["lines"] for t in tests), n_failing=len(failing), failing_ids=n2.series(t["id"] for t in failing),
                 same_day_ids=n2.series(same_day), n_same_day=len(same_day), reversed_ids=n2.series(reversed_),
-                n_reversed=len(reversed_), provisional=provisional,
+                n_reversed=len(reversed_), provisional=provisional, n_other=n2.word(len(others)),
+                pending_lines=[r[0] for r in billed], n_pending_lines=n2.word(len(billed)),
                 overrides=d.one("SELECT COUNT(*) FROM PriceOverrideApproval"),                 approver_id=mgr, n_pending=len(pending), plan_year=d.N,
                 other_kinds=sum(t["lines"] for t in tests if t["kind"] != "item group"))
 

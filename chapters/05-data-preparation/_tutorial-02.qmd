@@ -86,7 +86,7 @@ e. In B47, enter this formula, which counts the same lines without the filters:
    =COUNTIFS(SalesInvoiceLine[PromotionID],8,SalesInvoiceLine[InvoiceDate],">"&DATE(2026,10,31))
    ```
 
-f. Clear the filters.
+f. Clear both the InvoiceDate filter and the PromotionID slicer.
 
 More than a hundred promotion lines were invoiced in November and December, after the promotion ended, and every one of them comes from an order placed while the promotion was running. The promotional price was set when the order was placed, but the revenue was recorded when the order was invoiced. @fig-05-05 shows some of these lines.
 

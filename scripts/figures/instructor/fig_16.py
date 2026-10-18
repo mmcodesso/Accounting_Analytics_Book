@@ -510,8 +510,9 @@ def if_16_0_c() -> Diagram:
         "darkest, or that the number stays in every cell<br><i>Tutorial 16.2, Step 11</i>",
         "<b>The drill-through click</b> The right-click that opens Entry Lines or Exception Detail, and the filters the click passes: the page's rows "
         "come from the cell, not from a measure<br><i>Tutorial 16.1, Step 10; Tutorial 16.2, Step 13</i>",
-        "<b>The edited interactions as a reader meets them</b> The project saves a click on an approver or on the heat map as None for the rates table "
-        "and the Data Through card, and Exercise 16.5's slicer as None for its table. Only a click shows that they hold<br><i>Tutorial 16.2, Step 12c; "
+        "<b>The edited interactions as a reader meets them</b> On Monitoring the project disables approvers to rates, approvers to Data Through and "
+        "heat map to Data Through, and keeps heat map to rates available for the selected context. On Exercise 16.5 it disables the PaymentKind slicer to "
+        "the deviation table. Verify each source and target pair in Desktop<br><i>Tutorial 16.2, Step 12c; "
         "Tutorial 16.3, Step 7c; Exercise 16.5, Step 4d</i>",
         f"<b>The Data Through card under a slicer</b> The Checks tab tests the date with each year selected ({years}), but not that the card on the "
         "page follows the Year slicer and ignores a click<br><i>Tutorial 16.3, Step 7</i>",
@@ -575,7 +576,7 @@ def if_16_0_d() -> Diagram:
          f"The {len(closes)} year-end closing entries, two a year, that exceed every approver's limit (JE AboveLimit): disposition Expected", "gray"),
         ("Does it recur because of the way a control is designed?", "<b>Set aside.</b> Report one finding, change the control, and the exceptions should stop",
          f"The {len(selfs)} registers approved by the employee they pay (PR SelfApproved), one or more in every month", "gray"),
-        ("Does one document fail several tests?", "<b>Review first.</b> The most tests first",
+        ("Does one document fail several tests?", "<b>Use the score as a first cue.</b> Materiality, age and urgency can override it",
          f"{_nowrap(top)}, the opening entry: {len(multi[top])} tests. {len(multi) - 1} other documents fail {two_each}", "blue"),
         ("Is it new this month?", "<b>Review next.</b> It arrives with no disposition",
          f"None in {month_name}: its {len(newest)} exceptions are {sum(1 for e in newest if e['disposition'] == 'Expected')} closes and "
@@ -609,7 +610,8 @@ def if_16_0_d() -> Diagram:
         d.text("no", x_q + qw / 2 + 6, ya + ha + 5, 30, 18, size=SMALL, bold=True)
     bottom = y - 30
     _note(d, "A sketch of the order the chapter gives: the expected and the recurring exceptions are dealt with once, as groups; what remains is reviewed by the "
-             "number of tests failed, then by novelty, then by amount and age. A question answered yes sends the exception to its action box; no sends it down. "
+             "number of tests failed, then by novelty, then by amount and age. This is a teaching order, not Li and colleagues' adaptive suspicion score, and a "
+             "serious single exception may need priority. A question answered yes sends the exception to its action box; no sends it down. "
              "The examples, counts and amounts are read from the register.", bottom + 10)
     return d
 
@@ -783,7 +785,7 @@ def if_16_1_a() -> Diagram:
     cy = pad + 96 + 86 + 14
     cy = kit.callout(d, f"<b>The difference is one line.</b> Unreconciled Difference, {_money(e['difference'])}, is the JournalEntry row of the table on the left: "
                         f"a line of {esc(e['entry'])} that no invoice supports. The other sources net to the open balance.", cx0, cy, cw, "teal") + 12
-    kit.callout(d, f"<b>The credit balances stand apart.</b> {e['n_negative']} invoices were paid and then credited, and their {_money(e['negative'])} is outside "
+    kit.callout(d, f"<b>The credit balances stand apart.</b> {e['n_negative']} invoices have applications and credit memos above their total, and their {_money(e['negative'])}, recorded as customer credits, is outside "
                    f"the open balance. Netted in, they would add a second difference, {_money(g['net_difference'])}, which is no new finding.", cx0, cy, cw, "gray")
     _tabs(page, d, canvas_h + 4)
     _note(d, f"Report view, page {_page_name(page)}, with the as-of date {e['asof']} typed in every query. Outlined: the JournalEntry row of the ledger table. The "
@@ -1292,8 +1294,9 @@ def if_16_6_a() -> Diagram:
     pbi.canvas(d, 0, 0, 860, canvas_h)
     _cards_visual(d, pad, pad, 340, card_h, [("Pairs", f"{len(pairs):,}"), ("Pairs Within<br>30 Days", f"{e['within30']:,}"), ("Pairs on the<br>Same Invoice", "0")])
     zero = 16 + 340 + 12
-    kit.callout(d, f"<b>None of the {len(pairs)} pairs pays one invoice.</b> The card reads 0 and not blank, because the measure adds 0. Two payments of one supplier and "
-                   f"one amount on different invoices are an anomaly to look at, not a duplicate payment.", zero, pad, 860 - pad - zero, "teal")
+    kit.callout(d, f"<b>None of the {len(pairs)} pairs repeats the same recorded invoice ID.</b> The card reads 0 and not blank, because the measure adds 0. The pairs are "
+                   f"screening candidates, not proven duplicate payments. Different invoice IDs can still represent the same underlying bill, so inspect the supplier "
+                   f"invoice numbers and the supporting records.", zero, pad, 860 - pad - zero, "teal")
     # the chart: one column for each number of days apart, to scale
     cy = pad + card_h + 10
     ix, iy, iw, ih = _frame(d, pad, cy, 860 - 2 * pad, chart_h, t_days, lines=1)

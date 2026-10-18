@@ -13,7 +13,7 @@ figures:
   - id: IF-17-1-A
     kind: sql-mock
     purpose: The trial-balance query for the last year-end with its result, the check students make before they map anything.
-    shows: "The tab LenderPackage.sql at the first query of Requirement 1: the two comment lines, the Params and Closes CTEs, the SELECT and the WHERE clause with its NOT (...) test. The result grid shows AccountNumber, AccountName, AccountType, AccountSubType, Balance, DebitBalance, CreditBalance and Postings for the first accounts, the cash row outlined; the message pane reports one row for each account with postings."
+    shows: "The compact Execute SQL editor scrolled to the first query of Requirement 1, from the Params and Closes CTEs through the SELECT and the WHERE clause with its NOT (...) test, without the window chrome so the SQL prints at a readable size. The result grid shows AccountNumber, AccountName, AccountType, AccountSubType, Balance, DebitBalance, CreditBalance and Postings for the first three accounts, the cash row outlined; the message pane reports one row for each account with postings."
     data: The trial-balance query for the last year-end, run read-only.
 ---
 {% set g = ch17_g1 %}

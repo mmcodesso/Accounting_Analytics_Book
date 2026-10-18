@@ -45,7 +45,7 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 (4) Append them to a copy of the register named `Exceptions 16.2`, and add the two tests to a copy of the Tests table named `Tests 16.2`. Relate Exceptions 16.2 to Tests 16.2 on TestID and to the Date table on EventDate, add a measure that counts the rows of Exceptions 16.2, and show the new tests by month.
 
-(5) Chapter 12 counted the invoices for December deliveries by the date they were posted in the ledger, and found one more in January 2026 than your test finds. Find that invoice in the ledger and explain the difference.
+(5) Chapter 12 counted the invoices for December deliveries by the date they were posted in the ledger, and found one more in January 2026 than your test finds. Find that invoice in the ledger and explain the difference. Use the ARLedger query of Exercise 16.1. If you work on this exercise alone, import T3_GLEntry as `ARLedger` with GLEntryID, PostingDate, AccountID, Debit, Credit, VoucherNumber, and SourceDocumentType, merge AccountNumber from Account, and keep account 1020 through 2026-12-31. Leave the query unfiltered by invoice, and look for the invoice in a report table or a DAX query.
 
 **Deliverable.** The two exception queries, the page, and a short note answering requirement (5).
 
@@ -142,7 +142,7 @@ Work on every exercise in a copy of Audit Monitoring.pbix, saved with **File > S
 
 (2) Add the number of days between the two payments, and show the pairs by that number. Count the pairs within 30 days, and check whether any pair pays the same invoice.
 
-(3) Write three measures, `Entries Approved`, `Orders Approved`, and `Registers Approved`, that count the documents each employee approved. JournalEntry is related to Employee through its approver; PurchaseOrder and PayrollRegister are not, so apply the employees in the filter context to their ApprovedByEmployeeID with TREATAS, which Test 2 of Tutorial 14.2 used to apply a list of values as a filter.
+(3) Write three measures, `Entries Approved`, `Orders Approved`, and `Registers Approved`, that count the documents each employee approved. JournalEntry is related to Employee through its approver; PurchaseOrder and PayrollRegister are not, and Model view should show no line from either to Employee, so apply the employees in the filter context to their ApprovedByEmployeeID with TREATAS, which Test 2 of Tutorial 14.2 used to apply a list of values as a filter.
 
 (4) Add a measure for each count's share of its process's documents, and show a table by EmployeeName and JobTitle with the three counts and shares. Compare it with the bar chart of exceptions by approver on the Monitoring page.
 

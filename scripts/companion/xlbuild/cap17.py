@@ -589,7 +589,11 @@ def documentation(b: ExerciseBuild) -> None:
              ("Refresh order", f"Data > Refresh All rereads CharlesRiver.xlsx but not the results pasted from "
                                f"{SQL_FILE}. On a new dataset release, rerun the script on the new working copy, paste "
                                "its results again on SQL Results, then refresh, check the Solution Notes, and save "
-                               "before refreshing Charles River Lender Review, which reads this workbook.")]
+                               "before refreshing Charles River Lender Review, which reads this workbook."),
+             ("Model answers", "The model-answer paragraphs here and the answer text boxes of Charles River Lender "
+                               "Review are snapshots of the published case. A refresh recalculates the numbers but does "
+                               "not rewrite that text, so after a change to the data, an assumption, or the A3 decision, "
+                               "update every affected label, note, and memo amount before export.")]
     for i, (a, t) in enumerate(rows, start=12):
         ws.Cells(i, 1).Value = a
         ws.Cells(i, 2).Value = t
@@ -747,6 +751,8 @@ def statement_block(ws, top: int, columns: list[tuple[str, str, int | None]]) ->
     total("Income before income taxes", lambda c: f"{c}{rows['Operating income']}-{c}{rows['Interest expense']}+"
                                                   f"{c}{rows['Loss on disposal of equipment']}+{c}{rows['Other income']}")
     write("Income taxes", ["=0" for _ in columns])
+    # the label printed on the statement says the tax is not determined; the row keeps its key (U24, item 2)
+    ws.Cells(rows["Income taxes"], 1).Value = "Income taxes (not determined, shown as zero)"
     note(ws, f"A{rows['Income taxes']}", "None recorded: the chart has no income tax account, and the tax status is "
                                           "a matter for the CFO (Memo, matter 1). Net income equals income before "
                                           "income taxes only if the current and deferred tax expense is determined to "
@@ -2333,9 +2339,12 @@ IS_KEYS = {"opr": "Operating revenue", "ret": "Sales returns and allowances", "n
 def r6(b: ExerciseBuild) -> None:
     F, P, C = years()
     ws = analysis_sheet(b, "Statements")
-    title(ws, "Charles River: financial statements (adjusted)",
-          f"Requirement 6. From the adjusted trial balances (WorkingTB) and the reclassifications; {P} restated. "
-          f"The third column is the restated balance sheet at {ye(F)}, the opening balances of {P}.")
+    title(ws, "Charles River: draft financial statements (adjusted), income taxes not determined",
+          f"Requirement 6. Draft for the CFO. From the adjusted trial balances (WorkingTB) and the reclassifications; "
+          f"{P} restated. Income taxes have not been determined: net income equals income before income taxes only if "
+          f"the current and deferred tax expense is determined to be zero, so net income, equity and the cash flows are "
+          f"provisional, and A3 rests on its stated assumptions. The third column is the restated balance sheet at "
+          f"{ye(F)}, the opening balances of {P}.")
     rows = statement_block(ws, 4, [(ye(C), f"Recorded{C}", C), (f"{ye(P)} (restated)", f"Recorded{P}", P),
                                    (f"{ye(F)} (restated)", f"Recorded{F}", F)])
     b.found["statement_rows"] = rows
@@ -2753,7 +2762,8 @@ def r7(b: ExerciseBuild) -> None:
 
     # revenue
     r += 12
-    put(ws, {f"A{r}": "Revenue, adjusted (year of delivery)", f"B{r}": f"{C}", f"C{r}": f"{P}", f"D{r}": "Account"})
+    put(ws, {f"A{r}": "Operating revenue, adjusted (year of delivery), before sales returns and allowances",
+             f"B{r}": f"{C}", f"C{r}": f"{P}", f"D{r}": "Account"})
     bold(ws, f"A{r}:D{r}")
     rev = lambda acct, y: f"-SUMIFS(WorkingTB[Adjusted{y}],WorkingTB[AccountNumber],{acct})"
     accounts = ch17().revenue_accounts(data())
@@ -2765,8 +2775,10 @@ def r7(b: ExerciseBuild) -> None:
         put(ws, {f"A{r + k}": label, f"B{r + k}": f"={rev(acct, C)}", f"C{r + k}": f"={rev(acct, P)}", f"D{r + k}": int(acct)})
         b.found["revenue_rows"][label] = r + k
     tr4 = r + len(lines) + 1
-    put(ws, {f"A{tr4}": "Operating revenue", f"B{tr4}": f"=SUM(B{r + 1}:B{tr4 - 1})", f"C{tr4}": f"=SUM(C{r + 1}:C{tr4 - 1})",
-             f"A{tr4 + 1}": "Less the income statement", f"B{tr4 + 1}": f"=ROUND(B{tr4}-I_opr_{C},2)",
+    opr_row = tr4
+    put(ws, {f"A{tr4}": "Operating revenue (before returns)", f"B{tr4}": f"=SUM(B{r + 1}:B{tr4 - 1})",
+             f"C{tr4}": f"=SUM(C{r + 1}:C{tr4 - 1})",
+             f"A{tr4 + 1}": "Less the income statement's operating revenue", f"B{tr4 + 1}": f"=ROUND(B{tr4}-I_opr_{C},2)",
              f"C{tr4 + 1}": f"=ROUND(C{tr4}-I_opr_{P},2)",
              f"A{tr4 + 2}": "Product revenue (the four product lines)",
              f"B{tr4 + 2}": f"=SUM(B{r + 1}:B{r + 4})", f"C{tr4 + 2}": f"=SUM(C{r + 1}:C{r + 4})",
@@ -2813,6 +2825,7 @@ def r7(b: ExerciseBuild) -> None:
         put(ws, {f"A{r + k}": s, **cells})
         b.found["segment_note_rows"][s] = r + k
     tr5 = r + len(segs) + 1
+    seg_first, seg_last = r + 1, tr5 - 1
     put(ws, {f"A{tr5}": "Total less product and design-services revenue",
              f"B{tr5}": f"=ROUND(SUM(B{r + 1}:B{tr5 - 1})-Product_{C}-OverTime_{C},2)",
              f"C{tr5}": f"=ROUND(SUM(C{r + 1}:C{tr5 - 1})-Product_{P}-OverTime_{P},2)"})
@@ -2843,7 +2856,8 @@ def r7(b: ExerciseBuild) -> None:
     name(b, "IssuedCount", ws, f"C{r + 6}")
     name(b, "IssuedTotal", ws, f"D{r + 6}")
     r += 8
-    put(ws, {f"A{r}": "Design services: billable hours worked and billed",
+    put(ws, {f"A{r}": "Design services: billable hours worked and billed over the whole extract (LenderPackage.sql tests "
+                      "each year-end)",
              f"A{r + 1}": "Billable hours worked (ServiceTimeEntry)", f"B{r + 1}": "=SUM(ServiceEngagements[BillableHours])",
              f"A{r + 2}": "Hours billed (ServiceBillingLine)", f"B{r + 2}": "=SUM(ServiceEngagements[BilledHours])",
              f"A{r + 3}": "Worked less billed", f"B{r + 3}": f"=ROUND(B{r + 1}-B{r + 2},2)",
@@ -2910,7 +2924,57 @@ def r7(b: ExerciseBuild) -> None:
         ws.Range(f"A{row}").WrapText = True
         ws.Range(f"A{row}:C{row}").VerticalAlignment = -4160                        # top
         ws.Rows(row).AutoFit()
+    # the revenue schedule is operating revenue, before returns: its bridge to net revenue, and the customer segments
+    # reconciled to operating revenue with the freight billed (U24, item 3)
     r += 8
+    fr_row = b.found["revenue_rows"]["Freight billed"]
+    put(ws, {f"A{r}": "Revenue: operating revenue to net revenue, and the segments reconciled", f"B{r}": f"{C}",
+             f"C{r}": f"{P}",
+             f"A{r + 1}": "Operating revenue, before sales returns and allowances (the schedule above)",
+             f"B{r + 1}": f"=B{opr_row}", f"C{r + 1}": f"=C{opr_row}",
+             f"A{r + 2}": "Less sales returns and allowances (4060)", f"B{r + 2}": f"=-I_ret_{C}", f"C{r + 2}": f"=-I_ret_{P}",
+             f"A{r + 3}": "Net revenue", f"B{r + 3}": f"=B{r + 1}+B{r + 2}", f"C{r + 3}": f"=C{r + 1}+C{r + 2}",
+             f"A{r + 4}": "Net revenue less the income statement's net revenue",
+             f"B{r + 4}": f"=ROUND(B{r + 3}-I_net_rev_{C},2)", f"C{r + 4}": f"=ROUND(C{r + 3}-I_net_rev_{P},2)",
+             f"A{r + 5}": "Customer segments, products and services (the schedule above)",
+             f"B{r + 5}": f"=SUM(B{seg_first}:B{seg_last})", f"C{r + 5}": f"=SUM(C{seg_first}:C{seg_last})",
+             f"A{r + 6}": "Plus freight billed", f"B{r + 6}": f"=B{fr_row}", f"C{r + 6}": f"=C{fr_row}",
+             f"A{r + 7}": "Segments and freight less operating revenue",
+             f"B{r + 7}": f"=ROUND(B{r + 5}+B{r + 6}-B{r + 1},2)", f"C{r + 7}": f"=ROUND(C{r + 5}+C{r + 6}-C{r + 1},2)"})
+    bold(ws, f"A{r}:C{r}")
+    bold(ws, f"A{r + 3}:C{r + 3}")
+    ws.Range(f"B{r + 1}:C{r + 7}").NumberFormat = STMT
+    for nm, row in (("NetRevenue", r + 3), ("NetRevCheck", r + 4), ("SegFreightCheck", r + 7)):
+        name(b, f"{nm}_{C}", ws, f"B{row}")
+        name(b, f"{nm}_{P}", ws, f"C{row}")
+    # the note on the correction of the comparative year: every line of its statements as previously reported (the
+    # Recorded worksheet), the adjustment, and as restated and reclassified (the Statements worksheet); the two blocks
+    # share their layout, and the comparative year is column C of both (U24, item 12)
+    r += 10
+    srows, rrows = b.found["statement_rows"], b.found["recorded_rows"]
+    assert all(srows.get(k) == v for k, v in rrows.items()), "the Recorded and Statements worksheets lay their statements out alike"
+    put(ws, {f"A{r}": f"Correction of the {P} statements: each line as previously reported, the adjustment, and as "
+                      "restated (with the reclassifications)",
+             f"A{r + 1}": "Line", f"B{r + 1}": "As previously reported", f"C{r + 1}": "Adjustment",
+             f"D{r + 1}": "As restated"})
+    bold(ws, f"A{r}:D{r + 1}")
+    totals = {"Total current assets", "Total assets", "Total current liabilities", "Total liabilities", TSE, TLSE,
+              "Net revenue", "Gross margin", "Operating income", "Income before income taxes", "Net income"}
+    corr = {}
+    k = r + 2
+    for label, row in sorted(rrows.items(), key=lambda kv: kv[1]):
+        if label == "Assets less liabilities and equity":
+            continue
+        put(ws, {f"A{k}": label, f"B{k}": f"=Recorded!C{rrows[label]}", f"C{k}": f"=ROUND(D{k}-B{k},2)",
+                 f"D{k}": f"=Statements!C{row}"})
+        if label in totals:
+            bold(ws, f"A{k}:D{k}")
+        corr[label] = k
+        k += 1
+    ws.Range(f"B{r + 2}:D{k - 1}").NumberFormat = STMT
+    for nm, label in (("CorrNI", "Net income"), ("CorrTA", "Total assets"), ("CorrRE", "Retained earnings")):
+        name(b, f"{nm}_{P}", ws, f"C{corr[label]}")
+    r = k + 1
     r = model_answer(ws, r, MA + ": the text of the required notes", note_texts(), last_col=8)
     documentation(b)
 
@@ -2948,12 +3012,15 @@ def note_texts() -> list[str]:
         "link each note to the asset it financed; they do not show a security interest, so the note claims none.",
         f"Revenue. Revenue from goods and freight is recognized at a point in time, when control passes to the "
         f"customer on delivery; "
-        f"design services are recognized over time, as the hours are worked and billed monthly, on the assumption, "
-        f"to be confirmed from the contracts, that they give an enforceable right to payment for the work completed "
-        f"to date. Revenue by product "
+        f"design services are recognized over time, as the hours are worked and billed monthly, on the assumptions, "
+        f"to be confirmed from the contracts, that the design work creates no asset with an alternative use to "
+        f"Charles River and that the contracts give an enforceable right to payment for the work completed to date. "
+        f"Revenue by product "
         f"line, {C} ({P}): {lines}; design services {money(f7['svc_c'])} ({money(f7['svc_p'])}); freight "
         f"{money(f7['fr_c'])} ({money(f7['fr_p'])}). By customer segment: {segs}. At a point in time "
         f"{money(f7['point_c'])} ({money(f7['point_p'])}); over time {money(f7['svc_c'])} ({money(f7['svc_p'])}). "
+        f"Sales returns and allowances of {money(f6['i_c']['ret'])} ({money(f6['i_p']['ret'])}) reduce this operating "
+        f"revenue to net revenue of {money(f6['i_c']['net_rev'])} ({money(f6['i_p']['net_rev'])}). "
         f"Receivables were {money(f7['recv_f'])} at January 1, {P}, {money(f7['recv_p'])}, and {money(f7['recv_c'])}. "
         "No contract asset or contract liability is recorded. Customer credits awaiting refund were "
         f"{money(f7['credits'][0])}, {money(f7['credits'][1])}, and {money(f7['credits'][2])}. The records show no "
@@ -2969,7 +3036,8 @@ def note_texts() -> list[str]:
         f"Correction of the {P} statements. The {P} statements given to the shareholders were prepared from the ledger "
         "without year-end adjustments. They have been restated to accrue the payroll owed for the last days of each "
         "year, to recognize revenue in the year of delivery, to reverse accruals open longer than the invoicing window "
-        "(on the assumption, still to be supported by the suppliers' evidence, that they were not owed), "
+        "(on the assumptions, still to be supported by the suppliers' evidence, that they were not owed and that the "
+        "facts available when each year's statements were prepared supported the release), "
         "and to accrue interest on the notes payable. The correction reduced retained earnings at January 1, "
         f"{P}, by {money(-f5['total']['re'])} (from {money(f6['reported'])} to {money(f6['restated'])}) and {P} income "
         f"before income taxes by {money(-f5['total']['P'])}, to {money(f5['adj_ni_p'])}. It increased {C} income before "
@@ -2977,7 +3045,9 @@ def note_texts() -> list[str]:
         f"{money(f5['total']['C'])}, to {money(f5['adj_ni_c'])}. Current liabilities at {ye(P)} increased by "
         f"{money(f5['under_p'])} before the current portion of the notes was reclassified. None of these adjustments "
         "affected "
-        "cash or the totals of the statements of cash flows."]
+        "cash or the totals of the statements of cash flows. The schedule above this note shows each line of the "
+        f"{P} statements as previously reported, the adjustment, and as restated. The tax effect of the correction "
+        "is not determined, because the company's tax status is not settled."]
 
 
 def checks_r7(b: ExerciseBuild) -> None:
@@ -3042,6 +3112,15 @@ def checks_r7(b: ExerciseBuild) -> None:
         b.check(e, f"revenue by segment less product and services, {y}", 0, f"=SegmentCheck_{y}")
         b.check(e, f"product revenue less ship-date revenue and unbilled lines, {y}", 0, f"=ShipCheck_{y}")
     b.check(e, f"product revenue {P}", f["product_p"], f"=Product_{P}")
+    f1, f5, f6 = facts("r1"), facts("r5"), facts("r6")
+    for y, i in ((C, f6["i_c"]), (P, f6["i_p"])):
+        b.check(e, f"net revenue {y} (operating revenue less returns)", i["net_rev"], f"=NetRevenue_{y}")
+        b.check(e, f"net revenue less the income statement, {y}", 0, f"=NetRevCheck_{y}")
+        b.check(e, f"segments and freight less operating revenue, {y}", 0, f"=SegFreightCheck_{y}")
+    b.check(e, f"correction of {P}: income before income taxes, adjustment", f5["total"]["P"], f"=CorrNI_{P}")
+    b.check(e, f"correction of {P}: total assets, adjustment", round(f6["s_p"]["ta"] - f1["rec"][1]["ta"], 2),
+            f"=CorrTA_{P}")
+    b.check(e, f"correction of {P}: retained earnings at the year-end, adjustment", f5["equity_p"], f"=CorrRE_{P}")
     for s in f["segments"]:
         row = b.found["segment_note_rows"][s["name"]]
         b.check(e, f"revenue {C}, segment {s['name']}", s["c"], f"=Notes!B{row}")
@@ -3331,8 +3410,8 @@ def r9(b: ExerciseBuild) -> None:
         f"suppliers' statements and the contracts must support), and interest accrued on the notes (A4); the current portion of the notes (R1) and the credit "
         f"balance of 1090 netted into work in process (R2). Income before income taxes becomes "
         f"{money(f5['adj_ni_c'])} in {C} and {money(f5['adj_ni_p'])} in {P} ({money(f5['keep'][C])} and "
-        f"{money(f5['keep'][P])} if the old accruals are kept), and it equals net income only once the tax expense "
-        f"is determined. The {P} statements are presented as restated, and retained earnings at January 1, {P}, fall by "
+        f"{money(f5['keep'][P])} if the old accruals are kept), and it equals net income only if the current and "
+        f"deferred tax expense is determined to be zero. The {P} statements are presented as restated, and retained earnings at January 1, {P}, fall by "
         f"{money(-f5['total']['re'])}. None of these adjustments moves cash or changes how a cash flow is classified, "
         "so cash and the totals of the statements of cash flows do not change.",
         f"1. Tax status. The chart has no income tax account and no tax has been recorded in {f9['years']} years; "
@@ -3373,7 +3452,9 @@ def r9(b: ExerciseBuild) -> None:
         f"8. Passed adjustments for your approval: P1 an allowance for credit losses on the invoice aging "
         f"({money(f5['p1'])}), P2 expected returns ({money(f5['p2']['effect'])}), and P3 the full cost of damaged "
         f"returns restocked ({money(f5['p3']['effect'])}), the exposure until a count and a review of their "
-        f"condition measure it; in aggregate {money(f5['aggregate'])}, {pct(f5['agg_share'], 0)} of materiality. "
+        f"condition measure it. Together they make a screen of {money(f5['aggregate'])}, {pct(f5['agg_share'], 0)} of "
+        f"materiality, not a measured misstatement, since P1 and P2 are estimates "
+        f"({money(f5['p1'] + f5['p2']['effect'])} together) and P3 is an exposure. "
         "Each is a candidate to pass once its support holds; an amount still unresolved stays open.",
         "Changes to the year-end close: accrue payroll for the days worked and not yet paid; review open accruals "
         "monthly and confirm with the supplier any past the invoicing window, reversing only what is not owed; cut "

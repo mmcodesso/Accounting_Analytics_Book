@@ -48,7 +48,7 @@ Students can:
 
 ## How to run it
 
-Individually, about 75 minutes: 10 for Requirement (1), 20 for (2), 15 for (3), 10 for (4), 15 for (5), 5 spare. The exercise points students to the syntax on Microsoft's object-level security page. Show your own copy of the lines only after students have opened the script and seen `createOrReplace`. Collect the .pbix, the script, the comparison and the note.
+Individually, about 75 minutes: 10 for Requirement (1), 20 for (2), 15 for (3), 10 for (4), 15 for (5), 5 spare. The exercise points students to the syntax on Microsoft's object-level security page. Show your own copy of the lines only after students have opened the script and seen `createOrReplace`. Collect the .pbix, the script, the test log with the comparison, and the note.
 
 ## Step-by-step solution
 
@@ -68,10 +68,11 @@ b. Enter the formula below.
 a. Add a page named `Ex B.1` and a **Table** visual.
 b. Put JobTitle, Manufacturing Hours and Labor Cost in it, sorted by Labor Cost.
 c. Under **Filters on this visual**, filter Year to {{ x.y }}, and title the visual "{{ x.t_table }}".
+d. Below it, add a **Card** of Labor Cost with the same year filter.
 
 {{ figure('IF-AB-1-A') }}
 
-**Check:** {{ x.w_titles }} rows. The first three are {% for t in x.manuf %}{{ t.title }} (${{ t.cost|money }}, {{ t.hours|num(0) }} hours){{ ", " if not loop.last else "" }}{% endfor %}; then {{ x.w_other }} non-manufacturing titles with cost and blank hours, ${{ x.total|money }} in all. **Watch for:** the year filter. Without it the table adds all three fiscal years, ${{ x.all_years|money }}. Blank hours are correct: Manufacturing Hours leaves out the NonManufacturing labor type, with KEEPFILTERS.
+**Check:** {{ x.w_titles }} rows and a card equal to their total. The first three are {% for t in x.manuf %}{{ t.title }} (${{ t.cost|money }}, {{ t.hours|num(0) }} hours){{ ", " if not loop.last else "" }}{% endfor %}; then {{ x.w_other }} non-manufacturing titles with cost and blank hours, ${{ x.total|money }} in all. **Watch for:** the year filter. Without it the table adds all three fiscal years, ${{ x.all_years|money }}. Blank hours are correct: Manufacturing Hours leaves out the NonManufacturing labor type, with KEEPFILTERS.
 
 ### Requirement (2): The column permission
 
@@ -85,7 +86,7 @@ c. Choose **Preview**, read the change, and choose **Apply**.
 {{ x.tmdl }}
 ```
 
-**Check:** **Manage roles** still shows the rules on CostCenter, Employee, Item and Security. In DAX query view, this instructor check returns {{ x.n_ols }} for the permission and {{ x.total|round(2) }} for the cost (the grid ignores the format string), because DAX query view runs as the author, whom no role limits.
+**Check:** **Manage roles** still shows the rules on CostCenter, Employee, Item and Security, also after the file is saved and reopened. In DAX query view, this instructor check returns {{ x.n_ols }} for the permission and {{ x.total|round(2) }} for the cost (the grid ignores the format string), because DAX query view runs as the author, whom no role limits.
 
 ```dax jinja
 EVALUATE ROW ( "Labor Cost", {{ x.dax_cost }}, "Columns set to none", {{ x.dax_ols }} )
@@ -133,7 +134,7 @@ c. Compare the durations of the matrix, the tables and the card by name.
 {% endfor %}
 | Labor Cost of the cost-only titles | ${{ x.other_cost|money }} | 2 |
 | Labor Cost, fiscal {{ x.y }}; with no year filter | ${{ x.total|money }}; ${{ x.all_years|money }} | 2 |
-| Column permissions set to none | {{ x.n_ols }} | 3 |
+| Column permissions set to none: role Cost Center Managers, table LaborTimeEntry, column ExtendedLaborCost; row rules kept | {{ x.n_ols }}; {{ x.w_rules }} | 3 |
 | Production Manager without the permission: cost, share of the total | ${{ x.pm_cost|money }}; {{ x.pm_share|pct(1) }} | 3 |
 | The same, by person: lowest and highest of {{ x.n_people }} | ${{ x.person_low|money }}; ${{ x.person_high|money }} | 3 |
 | Production Manager, Labor Cost table and card | an error | 4 |
@@ -143,7 +144,7 @@ c. Compare the durations of the matrix, the tables and the card by name.
 ## What a strong answer says
 
 - **(2)** The script keeps the {{ x.w_rules }} row rules and adds one column permission, and it was applied.
-- **(3)** The table and card fail for the manager; the hours and the Plant page work; finance sees all of it. The student names the cause: a visual that reads a hidden column cannot be built for the role.
+- **(3)** The test log names the role, user and result of each view. The table and card fail for the manager; the hours and the Plant page work; finance sees all of it. The student names the cause: a visual that reads a hidden column cannot be built for the role.
 - **(4)** A comparison of the same visuals over repeated recordings, with the difference observed and a reason (the role's filters travel with every query, and the fewer rows it leaves can make a query faster).
 - **(5)** Row-level security removes rows, and the manager needs the plant's rows. Pay is a column, so object-level security is the tool, and it hides the column from the role as if it did not exist. The failures are not a bug: the controller keeps cost measures off the pages managers read, or puts them in a finance report on the same semantic model, and tests each role with **View as** before release. Neither security layer limits the people who can edit the model, so the list of editors is part of the control.
 
@@ -163,11 +164,13 @@ A strong answer ends with a recommendation. A weak one proposes a rule on Employ
 
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
-| Requirement 1 | 15 | Measure, page, year filter and all {{ x.n_titles }} titles | A table of three titles, or all years |
-| Requirement 2 | 25 | Script keeps the rules, adds the permission, applied | Permission added to a role that lost its rules, or not applied |
-| Requirement 3 | 20 | Both views recorded, with the cause of the failure | One view, or the failure without a cause |
-| Requirement 4 | 10 | The same visuals compared over repeated recordings, the observed difference stated | One recording |
+| Requirement 1 | 15 | Measure, page with the table and the card, year filter and all {{ x.n_titles }} titles | A table of three titles, no card, or all years |
+| Requirement 2 | 25 | Script names the role, table and column, keeps the {{ x.w_rules }} row rules, and was applied | Permission added to a role that lost its rules, or not applied |
+| Requirement 3 | 20 | The table, the card and the Plant page recorded for both roles and compared | One role, or the Plant page left out |
+| Requirement 4 | 10 | The Budget page's visuals recorded without and with a role, and the durations compared | One recording |
 | Requirement 5 | 30 | Rows against columns, the cost of the failure, a recommendation | One of the three |
+
+The cause of the failure in (3) and repeated recordings in (4) are a plus.
 
 ## Extensions and discussion questions
 

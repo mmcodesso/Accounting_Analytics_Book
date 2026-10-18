@@ -23,10 +23,10 @@ A slicer on a number column starts with the style **Between**, a range with two 
 
 **Step 3. Bring back the card visual, if it is missing.** The list of visuals in the service can lack the card, which Tutorial 13.2 uses for its four totals.
 
-a. Look for **Card** among the visual types of the **Visualizations** pane, between **Gauge** and **KPI**.
+a. Look for **Card** by name among the visual types of the **Visualizations** pane. When this appendix was tested, it sat between **Gauge** and **KPI**.
 b. If it is not there, click the **…** below the visual types, choose **Restore default visuals**, and click **OK**.
 
-Restoring the default visuals adds the card to the list, and also an older card and a multi-row card further down. Use the one between **Gauge** and **KPI**, the card of Tutorial 13.2, whose wells are **Value**, **Categories**, and **Tooltips**.
+Restoring the default visuals adds the card to the list, and also an older card and a multi-row card further down. Use the card whose wells are **Value**, **Categories**, and **Tooltips**, the card of Tutorial 13.2. In the test it was the one between **Gauge** and **KPI**, but choose it by its name and its wells, because the order of the icons can change.
 
 **Step 4. Add the cards.**
 

@@ -185,7 +185,7 @@ FROM Account
 WHERE AccountNumber = 5080;
 ```
 
-@tbl-09-03 lists the comparison and logical operators you will use most. Numbers are written without quotes. Text values are written in single quotes, and with SQLite's default comparison they must match the data exactly, including capitals: the condition `SourceDocumentType = 'WorkOrderClose'` finds the variance postings, but `SourceDocumentType = 'workorderclose'` finds nothing. When the capitals or spacing of stored text cannot be trusted, compare standardized values instead, as in `UPPER(TRIM(CustomerName)) = 'BROWN LLC'`.
+@tbl-09-03 lists the comparison and logical operators you will use most. Numbers are written without quotes. Text values are written in single quotes, and with SQLite's default comparison they must match the data exactly, including capitals: the condition `SourceDocumentType = 'WorkOrderClose'` finds the postings of the work order closes, but `SourceDocumentType = 'workorderclose'` finds nothing. When the capitals or spacing of stored text cannot be trusted, compare standardized values instead, as in `UPPER(TRIM(CustomerName)) = 'BROWN LLC'`.
 
 | Operator | Meaning | Example |
 |---|---|---|

@@ -41,7 +41,7 @@ Only journal entries have a VoucherNumber equal to an EntryNumber, so every othe
 a. In **Model view**, drag AccountID from **GLEntry** onto AccountID in **Account**.
 b. Drag CostCenterID from **GLEntry** onto CostCenterID in **CostCenter**.
 c. Drag PostingDate from **GLEntry** onto Date in the **Date** table.
-d. Hide the three keys of GLEntry, as in Tutorial 14.1.
+d. Select GLEntryID, AccountID, and CostCenterID in GLEntry, and in the **Properties** pane turn on **Is hidden** and set **Summarize by** to **None**, as in Tutorial 14.1.
 
 The Date table now filters two fact tables, the invoice lines and the ledger, as in @fig-14-08.
 
@@ -138,7 +138,7 @@ c. Record the months whose deviation exceeds 20%.
 
 @fig-14-11 shows the line chart. Apart from February 2024, whose expectation rests on the start-up month alone, the months well above their expectation are the six with three pay dates, from March 2024 on, which Chapter 11 traced to payroll recorded when paid rather than accrued. March 2024 stands out most, because its expectation averages only the two months before it, the start-up month among them.
 
-![Monthly Operating Expense Against the Average of the Three Months Before.](/visuals/svg/fig-14-11-expense-expectation.svg){#fig-14-11 fig-alt="A mock of a Power BI line chart of operating expense by month from January 2024 to December 2026, with a second line for the expected operating expense, the average of the three months before each month, or of fewer at the start of 2024. The actual line runs close to the expectation except in seven months, marked, where it is more than a fifth above it. They are February 2024, whose expectation is the start-up month alone, and the six months with three pay dates, the first of which, March 2024, has an expectation of only two months."}
+![Monthly Operating Expense Against the Average of the Three Months Before.](/visuals/svg/fig-14-11-expense-expectation.svg){#fig-14-11 fig-alt="A mock of a Power BI line chart of operating expense by month from January 2024 to December 2026, with a second, dashed line for the expected operating expense, the average of the three months before each month, or of fewer at the start of 2024. The actual line runs close to the expectation except in seven months, marked, where it is more than a fifth above it. They are February 2024, whose expectation is the start-up month alone, and the six months with three pay dates, the first of which, March 2024, has an expectation of only two months."}
 
 **Step 9. Add the trial-balance test.**
 

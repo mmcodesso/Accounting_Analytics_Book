@@ -121,7 +121,7 @@ isbn:
 # page and homepage) ends with https://doi.org/... in place of the website's address (APA 7), and it reaches Google
 # Scholar's tags on the homepage, the structured data, the EPUB's identifiers and the PDF's XMP metadata. After
 # changing it, run python scripts/citation_cff.py (tests/test_metadata.py fails until CITATION.cff agrees).
-doi: "10.5281/zenodo.23425592"
+doi: "10.5281/zenodo.23425591"
 
 # What catalogs, stores and search engines read about the book besides its title, author and ISBNs. Unknown to
 # Quarto, so its own templates never show it: filters/book-metadata.lua and the anchors below put it where it goes.

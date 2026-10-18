@@ -50,12 +50,12 @@ figures:
 | Tools | Power BI Desktop {{ version }} on Windows, reading CharlesRiver.xlsx: Report view, Model view, Power Query, DAX query view |
 | Components | {{ unit.tutorials|length }} guided tutorials ({{ steps[1] }}, {{ steps[2] }} and {{ steps[3] }} steps) that extend Charles River Reports.pbix, {{ n_exercises }} exercises ({{ per_perspective }} for each perspective), {{ n_questions }} multiple-choice questions and a deck of {{ slides }} slides |
 | Files students need | CharlesRiver.xlsx. Chapter15-companion.zip holds Charles River Reports, a Power BI project, at the start of Tutorials 15.1, 15.2 and 15.3 and at the end of the chapter. Chapter15-exercises-pbi.zip holds the model answer |
-| Time | Class: about 360 minutes. Students: about 100 minutes of reading, 60 to 120 for each tutorial and 60 to 100 for each exercise (assign two or three). The times are estimates: time them yourself |
+| Time | Class: about 360 minutes. Students: about 100 minutes of reading, 60 to 120 for each tutorial and 60 to 100 for each exercise (assign two or three). The times are estimates: time them yourself. The 360 minutes is scheduled class time. Reading, all three tutorials and all six exercises together come to about 13 or 14 hours of activity on these estimates, some of which can happen in class, so assign two or three exercises and mark which steps students finish outside the scheduled demonstrations |
 
 The chapter depends on these conditions of the data:
 
 - {{ t1.promotions }} promotions, three a year. The largest of fiscal {{ y }}, {{ t1.top.label }}, gave ${{ t1.top.discounts|money }} on {{ t1.top.lines|count }} lines, and {{ t1.odd.label }} ends ({{ t1.odd.end }}) before it starts ({{ t1.odd.start }}).
-- The budget plans {{ static_ratio|num(1) }} times the product revenue actually billed, so only the operating expense lines are comparable. Depreciation is budgeted in {{ t2.frm.name }} and recorded partly in {{ t2.to.name }}, ${{ t2.dep.cls|money }} each way.
+- The budget plans {{ static_ratio|num(1) }} times the product revenue actually billed, so a static sales or cost-of-sales comparison is dominated by the gap in activity volume, and operating expense also needs the commission flex and the classification reconciliation. Depreciation is budgeted in {{ t2.frm.name }} and recorded partly in {{ t2.to.name }}, ${{ t2.dep.cls|money }} each way.
 - Payroll is recorded on the pay date, so the two months with three pay dates, {{ t2.above|join(" and ") }}, run above the flexed budget and every other month below it.
 - The time records end {{ t3.last }}, before the year does, and the Date table runs to the end of {{ n }}. A trailing figure without a year filter is blank for that reason.
 - Indirect time ends earlier, {{ t3.indirect_end }}, so the plant ratio is an observed-records diagnostic whose last month is provisional. Counted to that day on both sides, hours and output alike, the year's ratio reads {{ t3.common.ratio|num(2) }} against the published {{ t3.tests[-1].ratio|num(2) }}, a labeled sensitivity, not a correction.
@@ -69,6 +69,8 @@ The chapter depends on these conditions of the data:
 5. Assemble a package with navigation, an About page and tests, and test a chart's claim against a second record. Practiced in Tutorial 15.3 (Steps 12 and 13), Exercise 15.6, and question 13.
 6. Use what-if parameters and the forecast, and judge them against what is already known. Practiced in Exercises 15.3 (2), 15.4 and 15.5, and questions 14 and 15.
 
+These outcomes are this guide's own, and they follow the chapter's six learning objectives one for one, in the same order.
+
 No exercise rebuilds the budget model or the package, so outcomes 3 and 5 rest mostly on the tutorials: grade Tutorial 15.2's reconciliation and Tutorial 15.3's About page and Test 5 with the exercises.
 
 ## Preparing to teach
@@ -80,14 +82,14 @@ No exercise rebuilds the budget model or the package, so outcomes 3 and 5 rest m
 - A student who lacks the Chapter 14 report, or falls behind, takes Charles River Reports from Chapter15-companion.zip, from the folder of the tutorial they start. Its README gives the steps: open the .pbip, point the queries at CharlesRiver.xlsx (**Home > Transform data > Data source settings > Change Source**), choose **Home > Refresh**, and **File > Save as** a .pbix.
 - Tell students to save a copy after Tutorial 15.3, such as `Ch15 Exercises.pbix`, for the exercises: one page or query tab and one display folder of measures for each.
 - Open the model answer once. Its visible pages are About through Income Statement (the earlier chapters), then Promotions, Budget and Plant. It also holds the hidden pages Promotion Detail, Promotion Tooltip, Cost Center Detail and Ledger Detail, the visible pages Ex 15.2 to Ex 15.6 and Notes, and the DAX query tabs Tests, Ex 15.1 and Checks. After **Home > Refresh**, **Run** on the Checks tab tests {{ n_checks_mine }} values of the chapter's tutorials and exercises ({{ n_checks }} in all).
-- The Checks tab cannot read what a visual computes: the visual calculations and the forecast. Compare those by eye on the pages.
+- The Checks tab cannot read what a visual computes: the visual calculations and the forecast. Compare those by eye on the pages. The tab proves the model, not the interactive behavior. Record the Desktop build and the checks you made on the pages (drill-through, tooltips, navigation, the forecast and an export) separately from the Checks tab's results.
 - Separate Build and Format panes in place of Visualizations mean the on-object interaction preview is on. The tutorials describe the default panes.
 
 **Pitfalls that cost class time**
 
 - **The drill-through field.** It must also be a field of the visual the reader right-clicks, or the option does not appear (Tutorial 15.1, Step 7).
 - **Ctrl.** In Desktop a button responds only with Ctrl held: the back button of a drill-through page and every navigator button.
-- **No operating expense filter.** The budget matrix then includes revenue and cost of goods sold, whose static budget (${{ t2.rev|money }} and ${{ t2.cogs|money }}) says nothing about the year.
+- **No operating expense filter.** The budget matrix then includes revenue and cost of goods sold, whose static budgets (${{ t2.rev|money }} and ${{ t2.cogs|money }}) show a large gap between planned and actual activity but do not isolate spending performance.
 - **Edit interactions.** Forgotten in Tutorial 15.3 Step 11, a click on {{ t3.top_center }} shows {{ t3.wrong|num(2) }} on the card in place of {{ t3.card|num(2) }}.
 - **KEEPFILTERS.** Without it Direct Hours reads {{ manufacturing_hours|num(0) }} for fiscal {{ y }} in place of {{ direct_hours|num(0) }}.
 - **The forecast.** Desktop computes it, so a new release can move it. Do not hand students a number to match.
@@ -111,7 +113,7 @@ No exercise rebuilds the budget model or the package, so outcomes 3 and 5 rest m
 | 3 | 55 | Tutorial 15.3: Steps 5, 8, 9 and 11 live | 53 to 60 |
 | 3 | 20 | What-if parameters and forecasts | 61 to 64 |
 | 4 | 10 | Looking ahead and the summary | 65 to 70 |
-| 4 | 50 | Exercises 15.1 and 15.4 in pairs | |
+| 4 | 50 | Exercises 15.1 and 15.4 in pairs: start and discuss selected requirements, finish afterward | |
 | 4 | 15 | Quiz on questions 4, 7, 9, 10, 12 and 15 | |
 | 4 | 15 | Discussion prompts 1, 2 and 5 | |
 | | 360 | Total | |
@@ -139,12 +141,12 @@ No exercise rebuilds the budget model or the package, so outcomes 3 and 5 rest m
 | 15 | Quiz on questions 3, 5, 7, 9, 10, 12, 13 and 15 | |
 | 30 | Review clinic: partners compare Test 4, Test 5 and the Validation page | 47, 60 |
 | 30 | Break it: the static budget, a visual calculation on a filtered axis, a click on a work center | 29, 36, 56, 57 |
-| 50 | Exercises 15.1 and 15.2, or 15.5, in pairs | |
+| 50 | Exercises 15.1 and 15.2, or 15.5, in pairs: start and discuss selected requirements, finish afterward | |
 | 15 | Discussion prompts 3 and 6; assign | |
 | 10 | Looking ahead to Chapter 16 | 65, 66 |
 | 150 | Total | |
 
-Plan A is the safest: the stumbles are in reading a variance and a filter, and a demonstration shows how. Plan B lets students meet the traps themselves and needs a lab. Plan C leaves no time to demonstrate, and fails for students who arrive without a finished package.
+Plan A is the safest: the stumbles are in reading a variance and a filter, and a demonstration shows how. Plan B lets students meet the traps themselves and needs a lab. Plan C leaves no time to demonstrate, and fails for students who arrive without a finished package. The 75 and 80 minutes that Plan B gives Tutorials 15.2 and 15.3 are shorter than the 90 minutes or more that each of them takes, so students finish those steps outside the session, and you should tell them which steps are due.
 
 {{ figure('IF-15-0-A') }}
 
@@ -193,7 +195,7 @@ Plan A is the safest: the stumbles are in reading a variance and a filter, and a
 - Step 4: no filter on Operating Expense, so revenue and cost of goods sold enter.
 - Step 5: the thresholds typed as whole percents. Rules take decimals, entered with **Number**.
 - Step 6: the formula typed on one line, or KEEPFILTERS missing.
-- Step 10: the visual calculation tried on an unselected visual, or the table not filtered to the year.
+- Step 10: the visual calculation tried on an unselected visual, or the table not filtered to the year, or sorted by an amount in place of YearMonth, so the running sum adds the months in the wrong order.
 - The sign: a positive expense variance is spending above the budget, and students read it as good.
 
 **The checkpoint to look for.** The three bullets. A strong student says the classification effect totals zero and names what remains.
@@ -208,7 +210,7 @@ Plan A is the safest: the stumbles are in reading a variance and a filter, and a
 | 5, 6 | Hours, output, ratio, by year | {% for t in t3.tests %}{{ t.year }}: {{ t.hours|num(0) }} hours, {{ t.standard|num(0) }} standard hours, {{ t.ratio|num(2) }}{{ "; " if not loop.last else "" }}{% endfor %} |
 | 7 | The trailing measure | {{ t3.ttm[0][0] }} {{ t3.ttm[0][1]|num(2) }} to {{ t3.ttm[-1][0] }} {{ t3.ttm[-1][1]|num(2) }}; blank before twelve months |
 | 8, 9 | The visual calculation | on an axis from January of the prior year it reads {{ t3.visual[0]|num(3) }}, the measure {{ t3.ttm[1][1]|num(3) }}; equal from December |
-| 10 | The card | {{ t3.card|num(2) }} beside the first year's {{ t3.first|num(2) }}; blank with no year filter |
+| 10 | The card | {{ t3.card|num(2) }} beside the first year's {{ t3.first|num(2) }}; blank with no year filter; its title says that the latest month is provisional |
 | 11 | Work centers, job titles | {{ t3.top_center }} first with {{ t3.centers[0][1]|num(1) }} direct hours |
 | 12, 13 | About page; Test 5 | Test 5 returns the three yearly ratios; saved on About |
 
@@ -218,7 +220,9 @@ Plan A is the safest: the stumbles are in reading a variance and a filter, and a
 - Step 3d: the Item query's **Choose Columns** reopened from the wrong step.
 - Step 5: KEEPFILTERS missing. Direct Hours reads every manufacturing hour.
 - Step 6: Standard Hours without the cut-off, which overstates the last year's output.
+- Step 8: the table sorted by an amount in place of YearMonth, so the moving average reads the months in the wrong order.
 - Step 9: the table's year filter not changed, so the two columns agree and the lesson is lost.
+- Step 10: the card left without its provisional title, so the latest month reads as final.
 - Step 11c: Edit interactions skipped, so a click on {{ t3.top_center }} shows {{ t3.wrong|num(2) }}.
 - Step 12: a measure without a description, or the navigator tested without Ctrl.
 
@@ -275,7 +279,7 @@ All six exercises are Power BI work with a model answer in Chapter15-exercises-p
 - *One exercise a session.* Take the basic one first: 15.1, 15.2, 15.3, 15.4, 15.5, 15.6.
 - *A light load.* Exercises 15.1 and 15.4 take about two hours and fifteen minutes and cover outcomes 1, 2 and 6.
 
-**Grading and discussion.** Exercises 15.1 to 15.4 suit grading from the saved report, and Exercise 15.6 from its queries, with the Checks tab to compare a number. Exercise 15.5 is graded on its audit note: Desktop computes the forecast, so a student's value need not match. Exercises 15.4 and 15.5 suit class discussion. Collect the .pbix, not screenshots: the measures, the display folders and the query text are the evidence.
+**Grading and discussion.** Exercises 15.1 to 15.4 suit grading from the saved report, and Exercise 15.6 from its queries, with the Checks tab to compare a number. Exercise 15.5 is graded on its audit note: Desktop computes the forecast, so a student's value need not match. Exercises 15.4 and 15.5 suit class discussion. Collect the .pbix, not screenshots: the measures, the display folders and the query text are the evidence. Grade what each requirement asks. The model answers go further in places, such as the work-center shares of Exercise 15.6 or the assumptions behind Exercise 15.4's break-even lift, and those count as a plus, not as conditions for full credit.
 
 {{ figure('IF-15-0-C') }}
 

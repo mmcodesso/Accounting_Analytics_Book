@@ -664,6 +664,47 @@ class PowerPointTests(unittest.TestCase):
         self.assertLess(342900, int(coded.find('.//a:pPr', NS).get("marL")))   # a code-font number is wider
         self.assertLess(342900, int(long.find('.//a:pPr', NS).get("marL")))    # and so are 10 and 11
 
+    def test_pictures_take_their_figure_alt_text(self) -> None:
+        def picture(path: str) -> str:
+            return (f'<p:pic><p:nvPicPr><p:cNvPr descr="{path}" id="0" name="Picture 1"/><p:cNvPicPr/><p:nvPr/>'
+                    '</p:nvPicPr></p:pic>')
+        xml = ET.fromstring(
+            f'<p:sld xmlns:p="{NS["p"]}" xmlns:a="{NS["a"]}"><p:cSld><p:spTree>'
+            + picture('../_shared/visuals/fig-01-04-architecture.png')
+            + picture('../_shared/visuals/fig-03-07-keys.crop-0-0-1-0p559.png')
+            + picture('../_shared/visuals/not-a-figure.png')
+            + '</p:spTree></p:cSld></p:sld>')
+        alts = {"fig-01-04-architecture": "The table groups around GLEntry.", "fig-03-07-keys": "Keys of the sale."}
+        pptx_finish.describe_pictures(xml, alts)
+        described = [node.get("descr") for node in xml.iter(f'{{{NS["p"]}}}cNvPr')]
+        self.assertEqual(["The table groups around GLEntry.", "Detail of: Keys of the sale.",
+                          "../_shared/visuals/not-a-figure.png"], described)
+
+    def test_a_detail_takes_the_alt_text_its_deck_writes(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            index, deck = Path(temp) / "book.json", Path(temp) / "index.qmd"
+            index.write_text(json.dumps({"figures": {"fig-03-07": {"src": "/visuals/svg/fig-03-07-keys.svg",
+                                                                  "alt": "Keys of the sale."}}}), encoding="utf-8")
+            deck.write_text('{{< book-figure fig-03-07 crop="0,0,1,0.559" alt="Detail of the order keys." >}}\n'
+                            '{{< book-figure fig-03-07 crop="0,0.5,1,0.5" >}}\n', encoding="utf-8")
+            alts = {**pptx_finish.figure_alts(index), **pptx_finish.deck_alts(deck, index)}
+        self.assertEqual("Detail of the order keys.", alts["fig-03-07-keys.crop-0-0-1-0p559"])
+        xml = ET.fromstring(
+            f'<p:sld xmlns:p="{NS["p"]}" xmlns:a="{NS["a"]}"><p:cSld><p:spTree>'
+            + ''.join(f'<p:pic><p:nvPicPr><p:cNvPr descr="../_shared/visuals/{name}" id="0" name="Picture 1"/>'
+                      '<p:cNvPicPr/><p:nvPr/></p:nvPicPr></p:pic>'
+                      for name in ("fig-03-07-keys.crop-0-0-1-0p559.png", "fig-03-07-keys.crop-0-0p5-1-0p5.png"))
+            + '</p:spTree></p:cSld></p:sld>')
+        pptx_finish.describe_pictures(xml, alts)
+        self.assertEqual(["Detail of the order keys.", "Detail of: Keys of the sale."],
+                         [node.get("descr") for node in xml.iter(f'{{{NS["p"]}}}cNvPr')])
+
+    def test_every_book_figure_has_alt_text_for_the_decks(self) -> None:
+        alts = pptx_finish.figure_alts(ROOT / "slides/_shared/book.json")
+        if not alts:
+            self.skipTest("slides/_shared/book.json is not staged")
+        self.assertTrue(all(alt.strip() and not alt.endswith((".png", ".svg")) for alt in alts.values()))
+
     def test_code_blocks_take_the_evidence_size(self) -> None:
         code = '<a:r><a:rPr><a:latin typeface="Consolas"/></a:rPr><a:t>{}</a:t></a:r>'
         xml = ET.fromstring(

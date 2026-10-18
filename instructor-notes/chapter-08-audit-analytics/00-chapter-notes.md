@@ -24,7 +24,7 @@ The chapter depends on these conditions of the data:
 - Charles River pays only larger invoices in parts (the smallest is $1,000.24), which is why the partial payments fail a first-digit test that the full payments pass.
 - Account 1020 exceeds the open invoices by exactly one journal entry line of $380,000.00, and accounts 1030 and 6170 have no postings. The same entry credits payables with $2,096,371.12.
 - Of 851 journal entries, 33 have at least one flag. Many flags have a likely ordinary explanation (weekend depreciation, the size of the year-end closes) that still needs its evidence, and one entry carries four.
-- The purchasing and pricing exercises rest on planted conditions: self-approved orders, orders approved under the ID of an employee whose recorded termination precedes the order, requisitions clustered just under an approval limit, promotions with impossible dates, and expired price lists still cited.
+- The purchasing and pricing exercises rest on planted conditions: self-approved orders, orders approved under the ID of an employee whose recorded termination precedes the order, requisitions clustered just under an approval limit, promotions with reversed or one-day date windows, and expired price lists still cited.
 - Two tests are clean on purpose: no purchase order number repeats or goes missing, and no near-duplicate pair pays the same invoice.
 
 ## What students should be able to do afterward
@@ -35,6 +35,8 @@ The chapter depends on these conditions of the data:
 4. Test journal entries, orders and invoices for management override with flags and a risk score. Practiced in Tutorial 8.3, Exercise 8.5 (requirements 1 to 3) and questions 11 to 13.
 5. Design duplicate, gap, threshold and pricing tests. Practiced in Exercises 8.5 (requirements 4 to 6) and 8.6 and question 15.
 6. Document a test in a workpaper and give every exception a disposition, separating weaknesses in a control's design from failures in its operation. Practiced in the last step of each tutorial, in every exercise's memo and most in Exercises 8.5 and 8.6.
+
+Outcome 1 covers the chapter's learning objectives 1 and 2, outcomes 2 to 4 follow objectives 3 to 5, and outcomes 5 and 6 divide objective 6.
 
 ## Preparing to teach
 **Before the first class**
@@ -72,16 +74,16 @@ The chapter depends on these conditions of the data:
 | 3 | 10 | The findings, the summary; assign the exercises | 60 to 65 |
 | | 240 | Total | |
 
-**Plan B: lab first (one session of 180 minutes, with the exercises as homework).** Students build before they hear the vocabulary, so each finding arrives as a result they produced. It fits a computer lab; pairs take the next start file when they fall behind.
+**Plan B: lab first (one session of 180 minutes, with the exercises as homework).** Students build before they hear the vocabulary, so each finding arrives as a result they produced. It fits a computer lab; pairs take the next start file when they fall behind. Each 45-minute block covers selected steps (those the Demonstrate paragraphs below name), and students finish the rest outside class. The full tutorials are estimated at 75 to 90 minutes for Tutorials 8.1 and 8.2 and 60 to 75 for 8.3, before refresh delays.
 
 | Minutes | Activity | Slides |
 |---:|---|---|
 | 5 | Pose the audit committee's request | 5 |
-| 45 | Tutorial 8.1 in pairs, to the checkpoint | 21 to 27 |
+| 45 | Tutorial 8.1 in pairs, selected steps | 21 to 27 |
 | 10 | Debrief: the strata, the MAD and the partial payments | 13 to 18 |
-| 45 | Tutorial 8.2 in pairs, from the Tutorial 8.2 start file | 34 to 38 |
+| 45 | Tutorial 8.2 in pairs, selected steps, from its start file | 34 to 38 |
 | 10 | Debrief: the difference of a round amount | 30, 36 |
-| 45 | Tutorial 8.3 in pairs, to Step 6 | 46 to 50 |
+| 45 | Tutorial 8.3 in pairs, selected steps, from its start file | 46 to 50 |
 | 15 | Debrief: three tests, one entry; dispositions | 43, 49 to 51 |
 | 5 | Assign the exercises | 64 |
 | 180 | Total | |
@@ -132,7 +134,7 @@ Plan A is the safest. Plan B gives students ownership of the findings and needs 
 
 | Step | Look for | Value |
 |---|---|---|
-| 2 | Rows of OpenInvoices, with no balance of zero or less | 1,079 invoices; the 225 paid and then credited are removed |
+| 2 | Rows of OpenInvoices, with no balance of zero or less | 1,079 invoices; the 225 whose receipts and credit memos together exceed the invoice are removed (197 paid in full, 28 in part, only 76 paid in full before their first credit memo) |
 | 4 | The aging total, and the share of it that is current | $4,418,804.32; 83% current, 17% at 1 to 30 days; the three older buckets hold 41 invoices |
 | 5 | Account 1020 against the open invoices (Aging!C12 and C13) | $4,798,804.32; a difference of $380,000.00, a round amount |
 | 6 | The PivotTable by source document, and the Show Details sheet | four source types; one JournalEntry row, JE-2024-000001; no rows for accounts 1030 and 6170 |
@@ -143,9 +145,9 @@ Plan A is the safest. Plan B gives students ownership of the findings and needs 
 - Step 2: the null left in AppliedTotal or CreditedTotal. Of the open invoices, 866 have neither a receipt nor a credit memo, so nearly all of them disappear at the filter.
 - Step 3: the last argument of XLOOKUP left out, which returns #N/A for every invoice that is not exactly on a bucket boundary.
 - Step 5: **And** chosen in the AccountID filter instead of **Or**, which returns no rows.
-- Step 7: the sample not pasted as values, so it changes on every recalculation and no longer matches the workpaper. Two customers named Brown LLC are kept apart only because the grouping includes CustomerID.
+- Step 7: the sample not pasted as values, so it changes on every recalculation and no longer matches the workpaper. Two customers named Brown LLC are kept apart only because the grouping includes CustomerID. A student's names need not match the model's. Look for 20 distinct CustomerIDs from the 180 customers below the threshold, none among the 23 key items, saved as values.
 
-**The checkpoint to look for.** The five bullets. A strong student says that most of the balance is not yet due, that the aging shows what is owed and not how promptly customers paid, and that the difference traces to one line that no invoice supports.
+**The checkpoint to look for.** The five bullets. A strong student says that most of the balance is not yet due, that the aging shows what is owed and not how promptly customers paid, and that the difference traces to one line that no invoice supports. Pasting values freezes the sample but does not make a new RANDARRAY draw repeat, so a reviewer needs the frozen records and the documented method.
 
 ### Guided Tutorial 8.3: Testing Journal Entries for Management Override
 
@@ -160,7 +162,7 @@ Plan A is the safest. Plan B gives students ownership of the findings and needs 
 | 3 | Entries scoring 0 to 4 | 818, 25, 7, 0, 1; the one that scores four is JE-2024-000001 |
 | 4 | Who creates entries; why flags come in groups | the accounting manager creates 772; the controller the depreciation and the closes; the chief financial officer one |
 | 5 | Dispositions for every flagged entry | 33 entries: 19 expected, 14 to follow up |
-| 6 | JE Summary!B15 and B16, and the spilled lines | both $129,860,610.27; 18 lines, one of them the $380,000.00 debit to 1020 |
+| 6 | JE Summary!B15, B16 and B17, and the spilled lines | B15 and B16 both $129,860,610.27, and B17, the ledger credits, the same; 18 lines, one of them the $380,000.00 debit to 1020 |
 
 **Stumbles to expect**
 
@@ -169,12 +171,12 @@ Plan A is the safest. Plan B gives students ownership of the findings and needs 
 - Step 5: the filtered rows pasted without **Paste Special > Values**, or dispositions typed in the live Table, where a refresh moves them.
 - Step 6: **Load** instead of **Transform Data** for T3_GLEntry, and a drill-down with no empty cells below it.
 
-**The checkpoint to look for.** The four bullets. A strong student says that the weekend depreciation entries are expected, with their schedules still to examine, that the size of the year-end closes explains their flag while the authority to approve them is still to be requested, that the approval exceptions go to follow-up, and that one entry is the first item for the audit committee.
+**The checkpoint to look for.** The four bullets. A strong student says that the weekend depreciation entries are expected, with their schedules still to examine, that the size of the year-end closes explains their flag while the authority to approve them is still to be requested, that the approval exceptions go to follow-up, and that one entry is the first item for the audit committee. B17 agrees with B16. A stronger control compares each entry's lines with its header (headers without lines, lines without headers, approvers missing from Employee), and all pass here.
 
 ![One journal entry reached by three different tests, for the discussion at the end of Tutorial 8.3.](../figures/chapter-08-audit-analytics/IF-08-0-A.pdf)
 
 ## Difficult ideas and misconceptions
-**Agreeing totals is not completeness.** Question 1 and Tutorial 8.1 Step 2. Students write "complete" after a zero difference. Ask: what two errors would leave the totals equal, and what could the ledger itself have missed?
+**Agreeing totals is not completeness.** Question 1 and Tutorial 8.1 Step 2. Students write "complete" after a zero difference. Ask: what two errors would leave the totals equal, and what could the ledger itself have missed? A quick demonstration: payments of 100 and 200 and of 150 and 150 share a count and total, and document numbers 1, 2, 2, 4 have the right count and range yet repeat 2 and miss 3. A key check or distinct count exposes the defect.
 
 **A nonconforming digit test is not a finding.** Questions 5 and 6, and the partial payments. Students say "fraud" when the MAD is high, or "fine" when it is marginal, and read a significant chi-square as proof. Ask: which subset drives it, what in the business explains it, and why does the book use the MAD?
 
@@ -188,7 +190,7 @@ Plan A is the safest. Plan B gives students ownership of the findings and needs 
 
 **Exceptions are not errors.** Tutorial 8.3 and Exercises 8.5 and 8.6. Students list every flag as a problem or clear it with a guess. Ask: what evidence turns an exception into an expected one?
 
-**Design or operation.** Exercises 8.5 and 8.6. A control that the data cannot stop is a design weakness; one that was bypassed is a failure of operation. Ask: what would you need to see to decide, and what do you say until you have it?
+**Design or operation.** Exercises 8.5 and 8.6. A design deficiency exists when a needed control is missing or, even if performed as intended, would not meet its objective. An operating deficiency exists when a suitably designed control is not performed as intended, or not by someone with the authority and competence to do so. An extract shows the exception only. The policy, the configuration, the approval limits then in force and the evidence of execution decide which explanation applies. Ask: what would you need to see to decide, and what do you say until you have it?
 
 **Clean results count.** Exercise 8.5 (5) and (6). Students leave out a test that flags nothing. Ask: what does the clean result exclude, and what does it leave open?
 
@@ -217,10 +219,10 @@ All six exercises are Excel builds with a model answer in the solution workbook 
 **Assignment bundles**
 
 - *Three tracks.* Financial students do Exercises 8.1 and 8.2, managerial students 8.3 and 8.4, auditing students 8.5 and 8.6. A swap of memos lets each track hear the others; the opening balance appears in 8.1 and 8.2, and the capital orders of 8.2 return in 8.5.
-- *One exercise a session.* Take them in the order 8.3, 8.4, 8.1, 8.2, 8.5, 8.6, from the lightest to the longest.
+- *One exercise a session.* Take them in the order 8.3, 8.4, 8.1, 8.2, 8.5, 8.6, from the lightest to the longest. The six together take about ten hours, so assign a financial or working-capital exercise before an advanced controls exercise, and stage Exercises 8.5 and 8.6 over two sessions each. The times are estimates until measured on your students' computers.
 - *A light load.* Exercises 8.1 and 8.5 take about four hours and cover outcomes 3 to 6.
 
-**Grading and discussion.** Each exercise guide holds a rubric. Exercises 8.3 and 8.4 suit grading from the workbook, because their numbers have one answer. Exercises 8.1, 8.2, 8.5 and 8.6 end in a judgment and suit class discussion, with the workbook still graded for its numbers. Collect the workbook, not a screenshot: the formulas show the work.
+**Grading and discussion.** Each exercise guide holds a rubric. Exercises 8.3 and 8.4 suit grading from the workbook, because their numbers have one answer. Exercises 8.1, 8.2, 8.5 and 8.6 end in a judgment and suit class discussion, with the workbook still graded for its numbers. A rubric's full credit asks only for what the requirements ask, and extras such as a stated conclusion or a request for records are a plus. Collect the workbook, not a screenshot: the formulas show the work.
 
 ![Choosing a test by the kind of records, for the discussion of the exercises.](../figures/chapter-08-audit-analytics/IF-08-0-B.pdf)
 
@@ -255,11 +257,11 @@ Key: 1 C, 2 A, 3 D, 4 B, 5 D, 6 B, 7 C, 8 A, 9 D, 10 C, 11 B, 12 A, 13 C, 14 D, 
 - **Question 9.** Option C calls the difference the allowance. Accounts 1030 and 6170 have no postings.
 - **Question 14.** Option A invents a rule against formulas. Pasting the selection as values is what preserves it.
 
-Use the questions as a ten-minute quiz, as clickers, or as a review. Questions 1 and 2 make a quiz of populations, 3 to 7 of digit tests, 8 to 10 and 14 of receivables, and 11 to 13 and 15 of journal entries, gaps and scores.
+Use the questions as a ten-minute quiz, as clickers or as a review. Questions 1 and 2 cover populations, 3 to 7 digit tests, 8 to 10 and 14 receivables, and 11 to 13 and 15 journal entries, gaps and scores.
 
 ## Connections
 **Builds on.** Exercises 2.5 and 2.6 found the requisitions without an approver and the reused references that this chapter tests again. Chapter 4 taught Power Query, Tables, the control total and the documentation sheet, Tutorial 4.1 Step 10 showed why agreeing totals proves little, and Chapter 5 set the as-of date and tested invoice numbers and the supplier and item masters. Chapters 6 and 7 supplied the ledger to statements, the analytical procedures and the year-end closes that the Watch out explains.
 
 **Later chapters.** The Part II case follows. Part III repeats the tests in SQL (Chapter 12's audit library and Exercise 12.6 reproduce the first-digit, duplicate and gap tests), Chapter 16 rebuilds the journal entry, order and payroll tests as a monitoring report in Power BI, and Chapter 19 audits the credits cycle with the same exception and disposition vocabulary.
 
-**Appendices.** The quick reference lists every Excel and Power Query function the chapter uses. **Appendix D** maps each exercise to the CPA Evolution model curriculum, the IMA framework, the IFAC education standards and the AACSB standard; each exercise guide names the competencies it practices.
+**Appendices.** The quick reference lists the Excel and Power Query functions the chapter uses, and **Appendix D** maps each exercise to the professional competency frameworks that its guide names.

@@ -11,12 +11,12 @@
 
 ## Purpose and learning outcomes
 
-The exercise asks a planning question before any test is run: for three common audit tests, does the data exist, in which tables, and in which columns? An auditor who can answer that can write a data request, scope a procedure and say what a test cannot show. It also gives students the first use of the source columns of GLEntry, to separate postings made by documents from journal entries. The three tests are descriptive procedures (a stratification, a search for repeats, and a screen of entries), and the exercise is practice in judging whether the data can support them (chapter outcome 6).
+The exercise asks a planning question before any test is run: for three common audit tests, does the data exist, in which tables, and in which columns? An auditor who can answer that can write a data request, scope a procedure and say what a test cannot show. It also gives students the first use of the source columns of GLEntry, to separate postings made by documents from journal entries. The three tests are descriptive procedures (a stratification, a search for repeats, and a screen of entries), and the exercise is practice in judging whether the data can support them (outcome 6).
 
 By the end, students can:
 
-- name the table group, the tables and the columns that support an aging of receivables, a duplicate payment test and a journal entry test (chapter outcome 4);
-- use SourceDocumentType to separate journal entries from postings that documents generate (chapter outcome 5);
+- name the table group, the tables and the columns that support an aging of receivables, a duplicate payment test and a journal entry test (outcome 4);
+- use SourceDocumentType to separate journal entries from postings that documents generate (outcome 5);
 - identify a test that needs the Order-to-Cash group and the Accounting Core together, and say why neither is enough;
 - document the data for each test in a one-page planning memo.
 
@@ -52,7 +52,7 @@ e. For the check, use GLEntry (PostingDate, AccountID, Debit, Credit) and Accoun
 **Check:** the plan names the applications and the credit memos, and the date columns that decide what counts. **Watch for:** two traps.
 
 - *Status and PaymentDate.* SalesInvoice has Status (Settled, Submitted, and Partially Settled) and PaymentDate. They describe each invoice at the end of the data. At the last date, 2026-12-31, the invoices that are Submitted or Partially Settled are exactly the 1,079 that have an open balance, but for an earlier reporting date the columns would age the wrong invoices.
-- *CashReceipt.SalesInvoiceID.* It is filled for 531 of the 7,409 receipts, the ones that pay a single invoice. The other receipts pay several invoices, and only the applications record that.
+- *CashReceipt.SalesInvoiceID.* It is filled for 531 of the 7,409 receipts, and each of them pays a single invoice. A blank does not tell a single-invoice receipt from a multiple-invoice one: 1,133 receipts with a blank link pay one invoice and 5,745 pay several. Only CashReceiptApplication records which invoices a receipt paid and how much went to each.
 
 **Step 2. Plan the duplicate payment test.**
 
@@ -60,7 +60,7 @@ a. Open **DisbursementPayment**, **PurchaseInvoice** and **Supplier** (the Procu
 b. Note DisbursementPayment (PaymentNumber, PaymentDate, SupplierID, PurchaseInvoiceID, Amount, PaymentMethod, CheckNumber) and PurchaseInvoice (InvoiceNumber, InvoiceDate, SupplierID, GrandTotal).
 c. List the repeat patterns the columns allow: the same supplier and invoice number on two invoices; one invoice with two payments; the same supplier and amount within a few days; a check number used twice for one supplier; a payment above the invoice total.
 
-**Check:** at least three patterns, each with its columns. The data has 40,127 payments against 40,204 supplier invoices, so the test needs a population method, not a visual scan. Exercise 2.6 finds six supplier invoice numbers that appear twice for one supplier and two check numbers that repeat, a result that students meet in Chapter 2.
+**Check:** the plan names the columns a duplicate test would compare. Several patterns, each with its columns, are a plus. The data has 40,127 payments against 40,204 supplier invoices, so the test needs a population method, not a visual scan. Exercise 2.6 finds six supplier invoice numbers that appear twice for one supplier and two check numbers that repeat, a result that students meet in Chapter 2.
 
 **Step 3. Plan the journal entry test.**
 
@@ -107,7 +107,7 @@ For the aging, a model reason: the invoice detail shows who owes what and how ol
 
 ## What a strong answer says
 
-- **Requirement (1).** For each test, tables with columns, the dates that decide what counts, and a note on what the table cannot do (Status for a past date, a receipt that pays several invoices).
+- **Requirement (1).** For each test, tables with columns, and for the aging the dates that decide what counts and the ledger check. A note on what a column cannot do (Status for a past date, a blank CashReceipt.SalesInvoiceID) is a plus.
 - **Requirement (2).** SourceDocumentType, the JournalEntry value against the others, and a caveat that JournalEntry is not the same as unusual.
 - **Requirement (3).** A test with tables from both groups and a reason about the comparison.
 - **Requirement (4).** A planning memo specific enough to be a data request.
@@ -129,10 +129,10 @@ A weak answer names groups without tables, or tables without columns, or plans a
 
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
-| Requirement 1: three tests with tables, columns and dates | 35 | Tables, columns and date logic for all three, with the traps noted | One test missing, or no date logic |
+| Requirement 1: three tests with tables, columns and dates | 35 | Tables and columns for all three, with the aging's date columns and ledger check | One test missing, or no date logic for the aging |
 | Requirement 2: SourceDocumentType | 20 | The JournalEntry value against the others, with the caveat | The column without the explanation |
 | Requirement 3: a cross-group test | 20 | Tables from both groups and a reason about the comparison | One group, or no reason |
-| Requirement 4: the planning memo | 25 | One page, specific, with limits and gaps | A list with no limits |
+| Requirement 4: the planning memo | 25 | One page, specific enough about tables and columns to serve as a data request | A list of table names with no columns |
 
 ## Extensions and discussion questions
 

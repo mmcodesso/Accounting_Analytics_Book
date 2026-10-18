@@ -228,7 +228,34 @@ def tutorial_82(d, claim) -> dict:
     neither = sum(1 for i in inv if i["id"] not in received and i["id"] not in credited)
     claim(neither > len(inv) / 2, "most open invoices have neither a receipt application nor a credit memo, so a null breaks their subtraction")
     neg = [b for b in balances(d) if b["balance"] < 0]
-    claim(all(b["credits"] > 0 for b in neg), "every invoice with a negative balance has a credit memo (it was paid, then credited)")
+    claim(all(b["credits"] > 0 for b in neg), "every invoice with a negative balance has a credit memo")
+    # The order of payment and credit is not the same for all of them (the review of 2026-10-16): the applications and the
+    # credit memos together exceed the invoice, but only some were paid in full before the first credit memo.
+    ids = ",".join(str(b["id"]) for b in neg)
+    totals = {r[0]: (r[1], r[2]) for r in d.q(
+        f"SELECT si.SalesInvoiceID, si.GrandTotal, COALESCE((SELECT SUM(a.AppliedAmount) FROM CashReceiptApplication a "
+        f"WHERE a.SalesInvoiceID = si.SalesInvoiceID AND a.ApplicationDate <= ?), 0) FROM SalesInvoice si "
+        f"WHERE si.SalesInvoiceID IN ({ids})", end)}
+    neg_full = sum(1 for t, a in totals.values() if abs(a - t) < 0.005)
+    neg_part = sum(1 for t, a in totals.values() if a < t - 0.005)
+    neg_after = d.one(
+        f"SELECT COUNT(DISTINCT ap.SalesInvoiceID) FROM CashReceiptApplication ap WHERE ap.SalesInvoiceID IN ({ids}) "
+        "AND ap.ApplicationDate > (SELECT MIN(cm.CreditMemoDate) FROM CreditMemo cm WHERE cm.OriginalSalesInvoiceID = ap.SalesInvoiceID)")
+    neg_first = d.one(
+        f"SELECT COUNT(*) FROM SalesInvoice si WHERE si.SalesInvoiceID IN ({ids}) AND (SELECT COALESCE(SUM(ap.AppliedAmount), 0) "
+        "FROM CashReceiptApplication ap WHERE ap.SalesInvoiceID = si.SalesInvoiceID AND ap.ApplicationDate < "
+        "(SELECT MIN(cm.CreditMemoDate) FROM CreditMemo cm WHERE cm.OriginalSalesInvoiceID = si.SalesInvoiceID)) >= si.GrandTotal - 0.005")
+    neg_refunded = d.one(
+        f"SELECT COUNT(DISTINCT cm.OriginalSalesInvoiceID) FROM CustomerRefund cr JOIN CreditMemo cm ON cm.CreditMemoID = cr.CreditMemoID "
+        f"WHERE cm.OriginalSalesInvoiceID IN ({ids})")
+    claim(neg_full + neg_part == len(neg) and neg_full > neg_part > 0,
+          "most invoices with a negative balance were paid in full by the as-of date, and some were only partly paid")
+    claim(0 < neg_after < len(neg) and 0 < neg_first < len(neg),
+          "some, not all, of the invoices with a negative balance were paid in full before their first credit memo, so "
+          "'paid and then credited' does not describe them all")
+    claim(neg_first < neg_after and neg_first < neg_full,
+          "fewer of them were paid in full before the first credit memo than were paid in full by the as-of date")
+    claim(neg_refunded > 0.95 * len(neg), "nearly every credit memo on these invoices was refunded")
     ar = d.account("1020")
     gl = d.balance(["1020"], end)
     entry = opening_entry(d)
@@ -250,7 +277,8 @@ def tutorial_82(d, claim) -> dict:
     claim(0.35 < sum(key.values()) / total < 0.5 and len(cust) - len(key) > SAMPLE,
           "the key items hold about two-fifths of the balance, and more than the sample size of customers remain")
     return dict(n=len(inv), total=total, buckets=buckets, gl=gl, diff=xr(gl - total), entry=entry, opening=opening,
-                neg_n=len(neg), customers=len(cust), key_n=len(key), key_share=sum(key.values()) / total,
+                neg_n=len(neg), neg_full=neg_full, neg_part=neg_part, neg_after=neg_after, neg_first=neg_first,
+                neg_refunded=neg_refunded, customers=len(cust), key_n=len(key), key_share=sum(key.values()) / total,
                 others_n=len(cust) - len(key), sample=SAMPLE, neither=neither, shared=shared[0], ar_id=ar,
                 allowance_id=d.account("1030"), bad_debt_id=d.account("6170"), ar_sources=sorted(sources),
                 ar_rows=sum(sources.values()))
@@ -305,6 +333,17 @@ def journal(d, claim) -> dict:
     entry_total = sum(r["total"] for r in rows)
     lines, debits = d.q("SELECT COUNT(*), SUM(Debit) FROM GLEntry WHERE SourceDocumentType = 'JournalEntry'")[0]
     claim(abs(entry_total - debits) < 0.005 and lines > len(rows), "the entries' totals equal the debits of their ledger lines")
+    # the stronger control the chapter note names: each entry's lines against its own header (all pass on this data)
+    claim(d.one("SELECT COUNT(*) FROM JournalEntry j WHERE NOT EXISTS (SELECT 1 FROM GLEntry g WHERE g.SourceDocumentType = 'JournalEntry' "
+                "AND g.VoucherNumber = j.EntryNumber)") == 0, "every journal entry header has ledger lines")
+    claim(d.one("SELECT COUNT(*) FROM GLEntry g WHERE g.SourceDocumentType = 'JournalEntry' AND g.VoucherNumber NOT IN "
+                "(SELECT EntryNumber FROM JournalEntry)") == 0, "every journal entry ledger line has a header")
+    claim(d.one("SELECT COUNT(*) FROM JournalEntry j WHERE j.ApprovedByEmployeeID NOT IN (SELECT EmployeeID FROM Employee)") == 0,
+          "every journal entry approver is an Employee row")
+    claim(d.one("SELECT COUNT(*) FROM (SELECT j.EntryNumber FROM JournalEntry j JOIN GLEntry g ON g.SourceDocumentType = 'JournalEntry' "
+                "AND g.VoucherNumber = j.EntryNumber GROUP BY j.EntryNumber, j.TotalAmount HAVING ABS(SUM(g.Debit) - j.TotalAmount) > 0.005 "
+                "OR ABS(SUM(g.Credit) - j.TotalAmount) > 0.005)") == 0,
+          "every entry's debits and credits equal its header total, so B15, B16 and B17 agree and so does each entry")
     olines, odebit = d.q("SELECT COUNT(*), SUM(Debit) FROM GLEntry g JOIN Account a USING (AccountID) "
                          "WHERE g.SourceDocumentType = 'JournalEntry' AND g.VoucherNumber = ? AND a.AccountNumber = 1020", top["number"])[0]
     olines = d.one("SELECT COUNT(*) FROM GLEntry WHERE SourceDocumentType = 'JournalEntry' AND VoucherNumber = ?", top["number"])
@@ -381,13 +420,21 @@ def g1(d, claim):
     old_before = rows[3]["n"] + rows[4]["n"]
     old_after = old_before - len(old)
     claim(old_after > 0, "some invoices remain in the two oldest buckets after the small balances go")
+    claim(len(small) == 10 and len(old) == 9 and len(current) == 1,
+          "ten open invoices are under 10 dollars, nine of them old and one current, as the model answer's layout (A34:H40, A43:H49) assumes")
+    claim(0 < abs(after_all - after_old) < 1,
+          "the allowance left after all of the small balances differs only by cents from the one left after the old ones")
+    seq_after = xr(after_old + old_total)           # a write-off first, against a zero allowance, then the expense and the allowance
+    claim(abs(xr(loss - old_total) + xr(after_old - (loss - old_total)) - after_old) < 0.005,
+          "the allowance after the write-off and the top-up equals the estimate on the remaining invoices")
     return dict(rows=rows, loss=loss, total=total, share=loss / total, ar_id=ar, allowance_id=d.account("1030"),
                 bad_debt_id=d.account("6170"), opening=opening, opening_loss=opening_loss, current=current[0], n_small=len(small),
                 n_old=len(old), old_total=old_total, old_low=min(i["balance"] for i in old), old_high=max(i["balance"] for i in old),
                 small_total=xr(sum(i["balance"] for i in small)), after_all=after_all, after_old=after_old,
                 remaining=xr(loss - old_total), topup=xr(after_old - (loss - old_total)), old_before=old_before,
                 old_after=old_after, gl_rows=d.one("SELECT COUNT(*) FROM GLEntry WHERE AccountID IN (?, ?)", d.account("1030"), d.account("6170")),
-                sum_rates=sum(RATES))
+                sum_rates=sum(RATES), seq_after=seq_after, gross_after=xr(total - old_total), case_diff=xr(after_old - after_all),
+                n_current=len(current))
 
 
 # --- Exercise 8.2: accounts payable --------------------------------------------------------------------------------------
@@ -406,7 +453,16 @@ def g2(d, claim):
     raw = [t - paid[pid] for pid, t in d.q("SELECT PurchaseInvoiceID, GrandTotal FROM PurchaseInvoice WHERE InvoiceDate <= ?", end)]
     open_n = sum(1 for r in raw if xr(r) > 0)
     residue = sum(1 for r in raw if r > 0 and xr(r) <= 0)
-    claim(residue >= 100, "without the rounding step, hundreds of fully paid invoices keep a residue of a fraction of a cent")
+    claim(residue > 0, "without the rounding step, some fully paid invoices keep a residue of a fraction of a cent")
+    # the number of such rows depends on how the payments are added (a running sum, as here, or a compensated sum), so the
+    # guide states no count (the review of 2026-10-16)
+    exact = defaultdict(list)
+    for pid, amount in d.q("SELECT PurchaseInvoiceID, Amount FROM DisbursementPayment WHERE PaymentDate <= ? ORDER BY DisbursementID", end):
+        exact[pid].append(amount)
+    residue_exact = sum(1 for pid, t in d.q("SELECT PurchaseInvoiceID, GrandTotal FROM PurchaseInvoice WHERE InvoiceDate <= ?", end)
+                        if t - math.fsum(exact[pid]) > 0 and xr(t - math.fsum(exact[pid])) <= 0)
+    claim(residue_exact != residue,
+          "the number of fully paid invoices that keep a residue depends on how the payments are added, so no count is promised")
     sources = {r[0]: r[1] for r in d.q("SELECT SourceDocumentType, COUNT(*) FROM GLEntry WHERE AccountID = ? AND PostingDate <= ? GROUP BY 1", ap, end)}
     after_n, after_amount = d.q("SELECT COUNT(*), SUM(Credit) - SUM(Debit) FROM GLEntry WHERE AccountID = ? AND PostingDate > ?", ap, end)[0]
     claim(after_n > 0 and after_amount < 0, "account 2010 already holds debits for supplier payments dated after the as-of date")
@@ -548,6 +604,8 @@ def g5(d, claim):
     orders = d.q("SELECT PONumber, OrderDate, OrderTotal, CreatedByEmployeeID, ApprovedByEmployeeID FROM PurchaseOrder ORDER BY PurchaseOrderID")
     no_term = sum(1 for o in orders if emp[o[4]]["terminated"] is None)
     claim(no_term > 0.99 * len(orders), "almost every purchase order was approved by an employee with no termination date")
+    claim(all(o[4] in emp and emp[o[4]]["limit"] is not None for o in orders),
+          "every purchase order's approver is an Employee row with a recorded limit, so AboveLimit never compares with a missing limit")
     # the model answer's classification of the flagged orders
     capital = {c["po"] for c in capital_invoices(d)}
     kinds = Counter()
@@ -593,6 +651,8 @@ def g5(d, claim):
                                  for run in runs),
           "in each run of identical consecutive requisitions only the last has an approver, the chief financial officer, the day after the request")
     invoices = d.q("SELECT PurchaseInvoiceID, GrandTotal, ApprovedByEmployeeID FROM PurchaseInvoice")
+    claim(all(r[2] in emp and emp[r[2]]["limit"] is not None for r in invoices),
+          "every supplier invoice's approver is an Employee row with a recorded limit")
     other = [r for r in invoices if r[2] != cfo_id]
     pays = d.one("SELECT COUNT(*) FROM DisbursementPayment WHERE PaymentDate < ?", f"{d.N}-01-01")
     return dict(orders=len(orders), no_term=no_term, kinds=dict(kinds), bands=bands, n_reqs=len(reqs), n_band=len(band),
@@ -624,6 +684,18 @@ def g6(d, claim):
                                 below=(ref - price) * qty))
     claim(all(p["price"] == p["approved"] for p in pending), "every invoice line of a pending request is billed at its ApprovedUnitPrice")
     claim(all(p["price"] < p["reference"] for p in pending), "every such line is billed below the reference price")
+    # the total of the unrounded line differences, and what rounding each request's subtotal first would give
+    below_exact = sum(p["below"] for p in pending)
+    by_request = defaultdict(float)
+    for p in pending:
+        by_request[p["id"]] += p["below"]
+    below_by_request = sum(round(v, 2) for v in by_request.values())
+    claim(abs(round(below_exact, 2) - below_by_request) > 0.005,
+          "rounding each request's subtotal before adding gives a different cent from adding the unrounded line differences")
+    claim(len(pending) == 4 and len(by_request) == 3 and max(Counter(p["id"] for p in pending).values()) == 2,
+          "four invoice lines belong to three pending requests, one request with two shipments, as the model answer's layout assumes")
+    promos = d.q("SELECT PromotionID FROM PromotionProgram WHERE EffectiveEndDate <= EffectiveStartDate")
+    claim(len(promos) == 3, "three promotions end on or before their start date, so the pending schedule starts at A21 as in the model answer")
     lists = d.q("SELECT PriceListID, EffectiveStartDate, EffectiveEndDate FROM PriceList WHERE Status = 'Expired' OR EffectiveEndDate < EffectiveStartDate")
     backwards = [r[0] for r in lists if r[2] < r[1]]
     claim(len(backwards) == 1, "one price list ends before it starts")
@@ -632,6 +704,29 @@ def g6(d, claim):
                      "JOIN SalesOrder o ON o.SalesOrderID = si.SalesOrderID JOIN PromotionProgram p ON p.PromotionID = l.PromotionID "
                      "WHERE p.EffectiveEndDate > p.EffectiveStartDate AND (o.OrderDate = p.EffectiveStartDate OR o.OrderDate = p.EffectiveEndDate)")
     claim(boundary > 0, "some lines of the other promotions were ordered exactly on a start or end date, so a strict inequality would count them outside")
+    claim(len(lists) == 3, "three price lists are flagged, so the model answer's grid has its list rows in A11:A13 and its total in row 14")
+    # the lines of a customer with its own list: the cited list line and the customer's own list line, by their exact IDs
+    own_lines = [dict(line=r[0], date=r[1], cited_line=r[2], own_line=r[3], customer=r[4], own_list=r[5]) for r in d.q(
+        "SELECT l.SalesOrderLineID, o.OrderDate, l.PriceListLineID, x.PriceListLineID, o.CustomerID, mine.PriceListID "
+        "FROM SalesOrderLine l JOIN SalesOrder o ON o.SalesOrderID = l.SalesOrderID "
+        "JOIN PriceList mine ON mine.CustomerID = o.CustomerID AND mine.ScopeType = 'Customer' "
+        "JOIN PriceListLine x ON x.PriceListID = mine.PriceListID AND x.ItemID = l.ItemID "
+        "WHERE l.PricingMethod NOT IN ('Customer Price List', 'Approved Override') ORDER BY l.SalesOrderLineID")]
+    claim(len(own_lines) > 0 and len({(r["customer"], r["own_list"]) for r in own_lines}) == 1,
+          "the customer-list lines priced another way belong to one customer and one own list")
+    claim(d.one("SELECT COUNT(*) FROM (SELECT x.PriceListID, x.ItemID FROM PriceListLine x JOIN PriceList p ON p.PriceListID = x.PriceListID "
+                "WHERE p.ScopeType = 'Customer' GROUP BY 1, 2 HAVING COUNT(*) > 1)") == 0,
+          "no customer list holds an item twice, so the own-list lookup finds exactly one price row")
+    claim(d.one("SELECT COUNT(*) FROM (SELECT x.PriceListID, x.ItemID FROM PriceListLine x JOIN PriceList p ON p.PriceListID = x.PriceListID "
+                "WHERE p.ScopeType = 'Segment' GROUP BY 1, 2 HAVING COUNT(*) > 1)") > 0,
+          "some segment lists hold an item more than once, at quantity tiers, so a general lookup also needs the quantity rule")
+    claim(all(d.one("SELECT COUNT(*) FROM PriceOverrideApproval WHERE SalesOrderLineID = ?", r["line"]) == 0 for r in own_lines),
+          "no override request covers the customer-list lines, so their join needs no request ID")
+    claim(d.one("SELECT COUNT(*) FROM SalesOrderLine WHERE PriceListLineID IS NOT NULL AND PriceListLineID NOT IN "
+                "(SELECT PriceListLineID FROM PriceListLine)") == 0,
+          "every cited PriceListLineID exists, so the only order lines without a list are the ones with a blank key")
     return dict(no_list=no_list, pending=pending, n_pending=len({p["id"] for p in pending}), flagged_lists=[r[0] for r in lists],
+                below_exact=below_exact, below_by_request=below_by_request, own_lines=own_lines,
+                shipped_twice=[k for k, v in Counter(p["id"] for p in pending).items() if v > 1],
                 backwards=backwards, promo_lines=promo_lines, boundary=boundary, order_lines=d.one("SELECT COUNT(*) FROM SalesOrderLine"),
                 invoice_lines=d.one("SELECT COUNT(*) FROM SalesInvoiceLine"))

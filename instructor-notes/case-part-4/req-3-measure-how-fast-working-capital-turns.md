@@ -91,7 +91,8 @@ Materials Days = IF ( [Full Twelve Months], DIVIDE ( [Materials], [Issues TTM] )
 a. Choose **Modeling > New parameter > Fields**, name it `WC Measure`, and add the six measures in order; keep the slicer.
 b. Add a **Line chart** with YearQuarter on the **X-axis** and the parameter on the **Y-axis**, titled "The measure chosen, at each quarter-end (hover for the balances and flows)".
 c. Add a tooltip page: **Canvas settings** Type Tooltip, **Page information** **Tooltip** on, and a table of each balance beside its flow. In the line chart's **Format visual > General > Tooltips**, choose that page.
-d. Add a **Matrix** titled "The measures at each quarter-end (icons: days of supply against the largest item target)", with **Conditional formatting > Icons** (**Format style** **Rules**) on the days of supply: up from 1.25 times the target, down at 0.8 or below.
+d. Add a **Matrix** titled "The measures at each quarter-end (icons: days of supply against the largest item target)", with **Conditional formatting > Icons** (**Format style** **Rules**) on the days of supply, based on each one's ratio to its target: up at 1.25 or more, a circle above 0.8 and below 1.25, down at 0.8 or less. A quarter with no ratio should show no icon, which only Desktop shows. The icons are benchmark signals, not proof that any item meets its policy.
+e. Add a **Table** (Step 5) beside it and, in **Format > Edit interactions**, set the line chart and the matrix to **None** toward that table, so a quarter picked in either leaves the annual comparison annual.
 
 ```dax
 {
@@ -126,7 +127,7 @@ IF (
 )
 ```
 
-**Check:** without the opening line DSO runs 57.4 to 50.5 and DPO 66.2 to 65.7. The cycle moves 252.0 days as recorded and 233.4 without the opening line; DIO moves 239.9, DSO -7.3 and DPO -19.5. The average-balance materials days are 76.7 in 2024 and 288.9 in 2026.
+**Check:** without the opening line DSO runs 57.4 to 50.5 and DPO 66.2 to 65.7. The cycle moves 252.0 days as recorded and 233.4 without the opening line; DIO moves 239.9, DSO -7.3 and DPO -19.4, all from the unrounded measures (the displayed DPO endpoints would give -19.5), so DIO's rise is most of the cycle's, and DPO's fall adds 19.4 days because DPO is subtracted. The average-balance materials days are 76.7 in 2024 and 288.9 in 2026.
 
 ![Which component moved the cycle, so students see that receivables and payables are flat beside inventory.](../figures/case-part-4/IF-C4-3-B.pdf)
 

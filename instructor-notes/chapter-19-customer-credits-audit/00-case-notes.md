@@ -14,7 +14,7 @@
 | Part | Part V, Capstone Cases. The case is an independent final-project option: it asks for nothing from another capstone. Chapters 8, 12 and 16, whose internal auditor this is, are context, and the Part III and Part IV case files are only an optional head start |
 | Analytics types | Descriptive (Requirements 1 and 2), diagnostic (4, 5 and 7), a small predictive model (the expectation of returns, Requirement 3), statistical inference (the sample, Requirement 6) and prescriptive (the recommendations and action plans, Requirements 9 and 10) |
 | Tools | SQL in DB Browser for SQLite, Excel and Power BI Desktop. Where the choice is clear the requirement says why a tool fits; where it is not, students choose and explain |
-| Components | Ten requirements in three phases, with a milestone after each; no tutorials, exercises or questions. The deck has 68 slides. The model answer is four files: Credits.sql (40 queries), Credits Audit.xlsx (21 worksheets), the Power BI project Credits Analytics (8 pages, 215 checks) and Audit Monitoring updated |
+| Components | Ten requirements in three phases, with a milestone after each; no tutorials, exercises or questions. The deck has 69 slides. The model answer is four files: Credits.sql (40 queries), Credits Audit.xlsx (21 worksheets), the Power BI project Credits Analytics (8 pages, 215 checks) and Audit Monitoring updated |
 | Files students need | CharlesRiver.sqlite, copied as CharlesRiver_Capstone.sqlite; CharlesRiver.xlsx; the three files they build; Audit Monitoring.pbix from Chapter 16 if they built it. Solutions: Chapter19-capstone-sql.zip, Chapter19-capstone-excel.zip, Chapter19-capstone-pbi.zip and Chapter19-capstone-pbi-monitoring.zip |
 | Deliverables | The script; the workbook; the report and the register; a report to the audit committee of three pages with an appendix of three |
 | Time | Class: about 240 minutes in Plan A. Students: about 24 hours in all, from 90 minutes for Requirement 10 to 240 for Requirement 4 |
@@ -32,10 +32,12 @@ The case depends on these conditions of the data, all visible in the files stude
 
 1. Plan an integrated audit of a cycle: map it from its records, reconcile each population to the ledger, and set materiality. Practiced in Requirements 1, 2 and 3.
 2. Assess the cycle's risks, including fraud, and link each to a control point, a test and the evidence it needs. Practiced in Requirements 3 and 4.
-3. Tell a test of controls from a substantive test, and decide when a query of the whole population replaces a sample. Practiced in Requirements 4, 6 and 7.
+3. Tell a test of controls from a substantive test, and decide when a query of the whole population replaces a sample and when evidence outside the database requires document examination, by a sample or a census. Practiced in Requirements 4, 6 and 7.
 4. Size an attribute sample, select it at random with key items taken in full, and evaluate it with an upper deviation limit. Practiced in Requirement 6.
 5. Explain the growth of returns and rank refunds with descriptive and diagnostic analytics, allowing for timing and for periods the data do not complete. Practiced in Requirement 5.
 6. Classify deficiencies by likelihood, magnitude and compensating controls, and report them to a committee with action plans and the tests that keep watching. Practiced in Requirements 8, 9 and 10.
+
+These six outcomes are the chapter's six learning objectives, in the same order and in shorter words.
 
 ## Preparing to teach
 
@@ -45,7 +47,7 @@ The case depends on these conditions of the data, all visible in the files stude
 - Open the model answer as Opening a Companion File on the Downloads page describes. Credits Analytics reads CharlesRiver.xlsx and RefundFlags.csv from one folder: copy both there or use **Change Source**, and refresh once before class. Audit Monitoring is a separate project.
 - Run Credits.sql top to bottom on a copy of the database: every query returns in a fraction of a second. In **DAX query view**, run the Checks tab of Credits Analytics: all 215 rows agree.
 - In the workbook, the amber cells hold values pasted from Credits.sql. After a new run of the script, paste them again: **Data > Refresh All** does not rerun the script.
-- Open the deck. Slides 5 to 8 set out the question and the criteria, slides 13 to 19 the cycle and its risks, and slides 54 to 56 the classification of deficiencies.
+- Open the deck. Slides 5 to 8 set out the question and the criteria, slides 13 to 19 the cycle and its risks, and slides 54 to 57 the classification of deficiencies.
 
 **Pitfalls that cost class time**
 
@@ -55,7 +57,22 @@ The case depends on these conditions of the data, all visible in the files stude
 - The preparer (slide 24). The ledger's creator is the approver; students who read it as the preparer find a deficiency that is not in the records.
 - Query or sample (slides 45 to 46 and 47). A query replaces a sample only where the records hold the evidence. Requirement 6 has no results to report: students who invent results lose the point of the plan.
 - Wording (slide 26). A finding says what the records show, never what someone did.
-- Severity (slides 54 to 56). Classify by likelihood and magnitude, not by the number of exceptions.
+- Severity (slides 54 to 57). Classify by likelihood and magnitude, not by the number of exceptions.
+
+**Rebuilding the model workbook**
+
+A second instructor can rebuild the workbook without the finished file. Power Query reads CharlesRiver.xlsx: load T3_GLEntry with **Transform Data**, never Load, and filter it before the year after the last fiscal year first. Load each Table below to its own worksheet with **Close & Load To > Table > New worksheet**, and keep the helper queries (accounts, employees, receipts, applications, the invoice payments) as connection-only queries. The finished file is the complete reference: every query carries the editor's step names (**Data > Queries & Connections**), and each SQL excerpt in the guides names its query in Credits.sql.
+
+| Table | One row per | Built from | Flags and keys |
+|---|---|---|---|
+| Ledger | fiscal year, account, source document type and close flag | T3_GLEntry, Account, JournalEntry, grouped | IsYearEndClose |
+| Credits | credit memo | CreditMemo, Employee, the credit lines, the invoice's payments | AboveLimit, CashAndCredit, AppliedByCreditDate, HandledCash, OutsideEmployment |
+| Refunds | refund | CustomerRefund, Employee, Credits, the invoice's payments | BeforePayment, BeforeAnyPayment, MethodMismatch, AboveLimit, CreditAboveLimit |
+| ReturnLines | return line | SalesReturnLine, SalesReturn, Employee | ReasonCode, FiscalYear |
+| Clawbacks | clawback | SalesCommissionAdjustment, Credits, credit lines, accruals | BaseMatches, RateMatches, SameAsCredit |
+| RefundFlags | refund | the pasted values of Credits.sql test T10 (RefundFlags.csv) | the five flags and Score |
+
+Requirement 4's SQL output alone does not create the Credits, Refunds and ReturnLines Tables: build them with these queries, or open the model workbook. The order is the script, then the paste, then the refresh: run Credits.sql, paste its results (amber cells, each with a note naming the query), choose **Data > Refresh All**, and refresh Power BI last. Credits Analytics relates five dated facts to Date by their own dates, the credit lines and invoice lines also by ShipmentDate (inactive), all one to many with the single direction; Audit Monitoring starts from Chapter 16's file, and a student without it keeps a small register in Credits Analytics.
 
 ## Teaching approaches
 
@@ -76,17 +93,17 @@ The case depends on these conditions of the data, all visible in the files stude
 | 3. Milestone 2 | 15 | Sampling and the evidence outside the database | 45 to 46, 47 |
 | 3. Milestone 2 | 10 | The balances and the largest refund | 50 |
 | 3. Milestone 2 | 5 | Query or sample; self-check | 48 to 49, 51 |
-| 4. Milestone 3 | 15 | What makes a control deficient; the classifications | 54 to 56 |
-| 4. Milestone 3 | 10 | The evaluation of the deficiencies | 57 |
-| 4. Milestone 3 | 10 | The report and the expected pushback | 60 |
-| 4. Milestone 3 | 5 | Keeping the tests running | 61 |
-| 4. Milestone 3 | 5 | Severity check; self-check | 58 to 59, 62 |
-| 5. Debrief | 20 | Each group states its conclusion in two sentences and hears the owners | 60 |
-| 5. Debrief | 10 | What the case practiced; after the report | 65 to 67 |
-| 5. Debrief | 5 | The checklist | 63 to 64 |
+| 4. Milestone 3 | 15 | What makes a control deficient; the classifications | 54 to 57 |
+| 4. Milestone 3 | 10 | The evaluation of the deficiencies | 58 |
+| 4. Milestone 3 | 10 | The report and the expected pushback | 61 |
+| 4. Milestone 3 | 5 | Keeping the tests running | 62 |
+| 4. Milestone 3 | 5 | Severity check; self-check | 59 to 60, 63 |
+| 5. Debrief | 20 | Each group states its conclusion in two sentences and hears the owners | 61 |
+| 5. Debrief | 10 | What the case practiced; after the report | 66 to 68 |
+| 5. Debrief | 5 | The checklist | 64 to 65 |
 | | 240 | Total | |
 
-**Plan B: lab sessions (five sessions of 150 minutes, 750 minutes in all).** Students work in class on the data-heavy phases and you circulate. It fits a computer lab. Requirements 6 to 10 are done outside class; use touchpoints 3 to 5 of Plan A for them.
+**Plan B: lab sessions (five sessions of 150 minutes, 750 minutes in all).** Students work in class on the data-heavy phases and you circulate. It fits a computer lab. The five labs total 750 minutes. Students finish the last 60 minutes of Requirement 5 and Requirements 6 to 10 outside the labs, and you schedule touchpoints 3 to 5 of Plan A as 140 more minutes, for 890 contact minutes in all. If those touchpoints replace lab time, name the blocks they displace and revise the total.
 
 | Session | Minutes | Activity | Slides |
 |---|---:|---|---|
@@ -105,11 +122,11 @@ The case depends on these conditions of the data, all visible in the files stude
 
 | Minutes | Activity | Slides |
 |---:|---|---|
-| 10 | Retrieval: test or substantive, query or sample, what decides severity | 38 to 39, 48 to 49, 58 to 59 |
-| 20 | Each audit team states its bounded conclusion and its most serious finding: condition, criteria, cause, effect | 60 |
-| 30 | The owners answer from their compensating controls; the audit team replies with the evidence | 57, 60 |
-| 20 | Revise the ratings and the action plans in the light of the owners' evidence | 57 |
-| 10 | Looking ahead | 65 to 67 |
+| 10 | Retrieval: test or substantive, query or sample, what decides severity | 38 to 39, 48 to 49, 59 to 60 |
+| 20 | Each audit team states its bounded conclusion and its most serious finding: condition, criteria, cause, effect | 61 |
+| 30 | The owners answer from their compensating controls; the audit team replies with the evidence | 58, 61 |
+| 20 | Revise the ratings and the action plans in the light of the owners' evidence | 58 |
+| 10 | Looking ahead | 66 to 68 |
 | 90 | Total | |
 
 ## Milestone guide
@@ -160,7 +177,7 @@ Students hold the evaluation of the deficiencies, the report to the committee an
 
 ## Difficult ideas and misconceptions
 
-- **A tie is not a proof.** A reconciliation shows that the populations are complete against the ledger, not that the amounts are right. Ask which requirement recomputes them.
+- **A tie is not a proof.** A reconciliation shows that the recorded populations agree with the ledger, which supports completeness relative to those records and cannot detect an event omitted from both. It says nothing of the amounts. Ask which requirement recomputes them and what evidence outside the records would go further.
 - **A clean anti-join proves less than it seems.** It finds records that point at nothing, not the record that was never made. Ask what would show a missing document.
 - **As of the day.** A customer's past-due balance or a payment is read as of the refund date. On today's balances no refund finds a past-due invoice at all. Ask what the customer owed that day.
 - **Dates are not times.** "Before the payment" depends on the date used and on the same-day case, and no table shows when a payment cleared the bank. Ask which reading the student chose and why.
@@ -236,7 +253,7 @@ Four criteria run through every requirement.
 | Judgment | Severity by likelihood, magnitude and compensating controls; query or sample chosen for a reason; ratings provisional where the evidence is outside | Requirements 3, 6, 8 and 9 |
 | Communication | Findings worded as what the records show; a report the owners can act on | Requirements 9 and 10 |
 
-Each requirement guide has its own grading table out of 100; scale it by the weight above to place it in the case grade.
+Full credit for a requirement is what the requirement asks for. A supported alternative earns the model's credit, and a count that depends on a random draw or on a stated definition is graded for its definition, not its value. Each requirement guide has its own grading table out of 100; scale it by the weight above to place it in the case grade.
 
 ## Connections
 

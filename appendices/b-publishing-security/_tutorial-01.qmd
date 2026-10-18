@@ -29,7 +29,7 @@ The Plant page's labor time is related to Employee, so a rule on the employee's 
 a. Choose **Home > Enter data**, and in the **Create Table** dialog name two columns `UserPrincipalName` and `CostCenterID`.
 b. Type the nine rows of @tbl-b-02, leaving out its Cost center column, which is there for you to read.
 c. Type `Security` as the table's name, and click **Load**.
-d. In **Model view**, right-click **Security**, and choose **Hide in report view**.
+d. In **Model view**, check that no relationship line touches **Security**, deleting any that the file drew, and then right-click **Security** and choose **Hide in report view**.
 
 | UserPrincipalName | CostCenterID | Cost center |
 |--------------------------------------|------|----------------|

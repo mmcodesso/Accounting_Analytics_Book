@@ -25,13 +25,13 @@ By the end, students can:
 
 ## Before you assign
 
-- **From earlier work.** `OrderLines` from Requirement 1, with OrderYear, OrderMonth and ListAmount. From Chapter 7, the two expectations (the average of the other months, and the same period a year earlier) and Tutorial 7.3 Step 7, which looked at one promotion's orders in a PivotTable.
-- **Data conditions.** Each promotion's lines were ordered in one calendar year, in two months for collections and item groups and in one month for segments, and the recorded dates of promotions 1, 4, and 7 do not contain them (Requirement 5). The data begins in 2024, so promotions 1, 2, and 3 have no year earlier to compare with. Scope depends on the kind: Items.CollectionName for a collection, Items.ItemGroup for an item group, Customers.CustomerSegment for a segment.
-- **The customer test.** Of the customers, 211 ordered; the 9 that never did are inactive. The Customers table carries a CustomerSince that does not match the orders.
+- **From earlier work.** `OrderLines` from Requirement 1, with OrderYear, OrderMonth and ListAmount, and from Chapter 7 the two expectations (the average of the other months, and the same period a year earlier).
+- **Data conditions.** Each promotion's lines were ordered in one calendar year, in two months for collections and item groups and in one month for segments, and the recorded dates of promotions 1, 4, and 7 do not contain them (Requirement 5). The data begins in 2024, so promotions 1, 2, and 3 have no year earlier to compare with.
+- **The customer test.** Of the customers, 211 ordered; the 9 that never did are inactive. CustomerSince does not match the orders.
 
 ## How to run it
 
-Individual or pairs, about 90 minutes: 15 for the months and scope, 25 for the monthly grids, 25 for the comparison, 20 for the customers and 5 to write the conclusion. Ask "is that big?" about the largest difference before giving any hint about variation. If a student compares a two-month total's difference with one month's standard deviation, ask them to compare like with like, the promotion's average month with the other months or the total with the variation scaled to its months. **Collect** the comparison table, which is Exhibit 3 of the memo.
+Individual or pairs, about 90 minutes: 15 for the months and scope, 25 for the monthly grids, 25 for the comparison, 20 for the customers and 5 for the conclusion. Ask "is that big?" about the largest difference before any hint about variation. **Collect** the comparison table, which is Exhibit 3 of the memo.
 
 ![A mock of the comparison table of the volume test, one row for each promotion.](../figures/case-part-2/IF-C2-3-A.pdf)
 
@@ -39,7 +39,7 @@ Individual or pairs, about 90 minutes: 15 for the months and scope, 25 for the m
 
 ### Phase 1: When each promotion ran
 
-**Step 1. List the promotions with their months and scope.** On a worksheet named `R3 Volume`, list the PromotionIDs and look up each promotion's name, ScopeType, scope (the Promo column that is not blank), rate and recorded dates in `Promotions`. Beside them put the order dates of its lines and the months they cover:
+**Step 1. List the promotions with their months and scope.** The addresses are one reference layout. On `R3 Volume`, use rows 5 to 13 for the calendar: A PromotionID, B name, C scope type, D scope (the Promo column that is not blank), E rate, F and G the recorded dates, H the line count, I and J the first and last order dates, K the year, L and M the first and last month, N the number of months, O the lines inside the recorded dates, and P a check that the first and last orders share a year. Put the current year's monthly volume in rows 17 to 25, the year before in rows 29 to 37 and the comparisons in rows 41 to 49. In each grid, A to D hold the ID, kind, scope and year, E to P the months, with the numeric headers 1 to 12 in E16:P16 and E28:P28. Beside the calendar put the order dates of each promotion's lines and the months they cover:
 
 ```
 =MINIFS(OrderLines[OrderDate],OrderLines[PromotionID],A5)
@@ -73,7 +73,7 @@ Promotions 1, 4, and 7 have no line inside their recorded dates; their months co
 =SUMIFS(OrderLines[ListAmount],CHOOSE(MATCH($B17,{"Collection","ItemGroup","Segment"},0),OrderLines[CollectionName],OrderLines[ItemGroup],OrderLines[CustomerSegment]),$C17,OrderLines[OrderYear],$D17,OrderLines[OrderMonth],E$16)
 ```
 
-Columns B, C and D hold the kind, the scope and the year. CHOOSE and MATCH are not taught in Chapters 4 to 8; an IF on the kind that picks one of three SUMIFS does the same. A PivotTable on `OrderLines` gives the same numbers, with the scope field in **Filters**, OrderYear in **Rows**, OrderMonth in **Columns** and ListAmount in **Values**; the scope must be a PivotTable filter, because a PivotTable ignores the worksheet's own filters.
+CHOOSE and MATCH are not taught in Chapters 4 to 8; an IF on the kind that picks one of three SUMIFS does the same. A PivotTable on `OrderLines` gives the same numbers, with the scope field in **Filters**, OrderYear in **Rows**, OrderMonth in **Columns** and ListAmount in **Values**, because a PivotTable ignores the worksheet's own filters.
 
 **Step 3. Repeat for the year before.** Use the same formula with the year less one, wrapped as `=IF($D29<FirstYear,"",...)`, so that the first year's promotions show a blank.
 
@@ -92,9 +92,9 @@ Average month, in SDs:  =(D41-E41)/(C41*I41)
 In standard deviations: =(D41-E41)/(I41*SQRT(C41))
 ```
 
-The first of the last two compares the promotion's average month with the other months' mean, in monthly standard deviations, and needs only Chapter 6's STDEV.S. The model answer uses the second, which scales the monthly standard deviation by the square root of the number of months. That scaling assumes independent, comparable months and is not taught in Chapters 4 to 8, so accept either; here they give the same verdict.
+In the comparison rows, A to L hold the ID, scope, months, volume (D), expectation (E), difference (F), the year-earlier volume (G, the same SUMPRODUCT on the prior grid, blank for the first year) and its difference (H), the monthly standard deviation (I), its share of the other months' mean (J), the standardized difference (K) and the two-deviation screen (L). Enter `=MAX(F41:F49)` in F51 and name it `LargestLift`.
 
-The year-earlier column is the same SUMPRODUCT on the prior grid, divided into the volume. A student without FILTER can blank the promotion's months in a helper row (`=IF(AND(month>=first,month<=last),"",value)`), because AVERAGE and STDEV.S ignore the empty text.
+The first of the last two formulas needs only Chapter 6's STDEV.S. The model answer uses the second, which scales the monthly deviation by the square root of the months, an assumption of independent, comparable months that Chapters 4 to 8 do not teach, so accept either; here they give the same verdict. A student without FILTER can blank the promotion's months in a helper row (`=IF(AND(month>=first,month<=last),"",value)`), because AVERAGE and STDEV.S ignore empty text.
 
 **Check:**
 
@@ -112,7 +112,7 @@ The year-earlier column is the same SUMPRODUCT on the prior grid, divided into t
 
 The differences run from -20.7% to +11.9%. None is beyond two standard deviations either way. The largest, promotion 2 (Accessories), is about 1.2 for its average month and 1.6 standard deviations of a two-month total (the monthly sd times the square root of 2). Read this as an informal screen, not a test of significance, because seasonality, other promotions in the other months and the choice of the largest of several results all limit it. Every difference is far below its promotion's break-even increase (Requirement 4).
 
-**Watch for:** a two-month total's difference compared with one month's standard deviation, which puts promotion 2 beyond two. Comparing the average month, or scaling the deviation by the square root of the months, is the fix.
+**Watch for:** a two-month total's difference compared with one month's standard deviation, which puts promotion 2 beyond two. Comparing the average month, or scaling the deviation by the square root of the months, is the fix, and the question to ask is what a two-month total's variation is.
 
 ### Phase 4: New customers
 
@@ -124,11 +124,11 @@ The differences run from -20.7% to +11.9%. None is beyond two standard deviation
 =COUNTIFS(OrderLines[CustomerID],A5#,OrderLines[OrderDate],B5#,OrderLines[PromotionID],"<>")>0
 ```
 
-Look up CustomerSince and name, and summarize: customers who ordered, first orders that included a promotion line, first orders in the first four months of the data, first orders after June of the first year, and the last first order.
+Look up CustomerSince and name, and summarize the counts the Check lists.
 
-**Check:** 211 customers ordered, and zero first orders included a promotion line. Of the first orders, 195 fall in the first four months of the data (107 in the first month), only because the data begins then: customers who had bought before appear as new. Just seven came after June 2024, the last in July 2025. Of the 31 customers with a CustomerSince in 2024 or later, 27 placed their first order before that date, so CustomerSince cannot date a first purchase.
+**Check:** of 211 customers with observed orders, 195 first appear in the first four months of 2024, 107 of them in the first month, and zero first orders included a promotion line. That concentration is affected by the extract's start: a first-observed order need not be a customer's first-ever order, and the data cannot separate true acquisition from earlier customer history. Just seven came after June 2024, the last in July 2025. Of the 31 customers with a CustomerSince in 2024 or later, 27 placed their first order before that date, so CustomerSince cannot date a first purchase either.
 
-**Step 6. State the conclusion.** No difference is beyond the scope's normal variation or near its break-even increase, and no customer's first order came through a promotion. The comparisons describe the orders and cannot show what would have been ordered without a promotion, which a comparison group or a designed test would need. The data cannot show that promotions never attract customers either, because almost no new customers appear in it. The evidence gives the sales team's two arguments no support, which is not proof that the promotions had no effect.
+**Step 6. State the conclusion.** No difference is beyond the scope's normal variation or near its break-even increase, and no customer's first observed order included a promotion. The comparisons describe the orders and cannot show what would have been ordered without a promotion, which a comparison group or a designed test would need. The customer test gives the sales team's argument no positive evidence, which does not prove that promotions never attract customers, because a first order in this data need not be a customer's first. The evidence gives the team's two arguments no support, which is not proof that the promotions had no effect.
 
 ## Expected results
 
@@ -139,7 +139,7 @@ Look up CustomerSince and name, and summarize: customers who ordered, first orde
 | Customers who ordered; first orders with a promotion line | 211; 0 | 5 |
 | CustomerSince in the first year or later; first order earlier | 31; 27 | 5 |
 
-> **Instructor notes, Requirement 3:** every promotion's lines were ordered within two calendar months (collections March-April, item groups September-October) or one (segments, November). Promotions 1, 4, and 7 have recorded dates that cannot be right (see Requirement 5). The list amount holds price constant, so it moves only with quantity and mix; the net amount falls by the discount itself. Volume in the promotion's months against the average of the other months of the same year (against the same months a year earlier), with the other months' standard deviation (STDEV.S) as a percentage of their mean: 1 Alder -3.3% (sd 14.2%); 2 Accessories +11.9% (10.2%); 3 Strategic -20.7% (18.4%); 4 Brookside -15.4% (-9.8%; 19.2%); 5 Textiles -5.8% (-5.9%; 10.3%); 6 Wholesale +2.5% (+0.9%; 9.5%); 7 Harbor +0.4% (-21.1%; 14.3%); 8 Furniture +0.3% (+2.9%; 4.6%); 9 Design Trade +3.1% (-17.1%; 18.0%). No difference is unusual: the largest, promotion 2's +11.9%, is about 1.6 standard deviations of a two-month total (the monthly sd times the square root of 2), and promotion 3's fall is within the Strategic segment's normal swings. Every difference is far below the promotion's break-even increase (Requirement 4, which asks for the three proposed promotions and leaves the other six as corroboration). This is an informal screen, not a test of significance, because it assumes comparable, independent months, and the other months can carry seasonality or other promotions. Compared month for month (the promotion's average month against the other months' mean, in monthly standard deviations, which Chapter 6's STDEV.S supports), the largest is about 1.2, and either route is acceptable. The comparisons describe the orders and cannot show what would have been ordered without a promotion, so the answer is no evidence of an increase near the break-even, not proof of none, and a comparison group or a designed test would be needed to measure one. New customers: 211 customers ordered, and no customer's first order in the data included a promotion line. First orders cluster in January to April 2024 only because the data begins in January 2024, and just seven first orders came after June 2024 (the last in July 2025). Students should not rely on CustomerSince: for 27 of the 31 customers with a CustomerSince in 2024 or later, the first order came before that date.
+> **Instructor notes, Requirement 3:** every promotion's lines were ordered within two calendar months (collections March-April, item groups September-October) or one (segments, November). Promotions 1, 4, and 7 have recorded dates that cannot be right (see Requirement 5). The list amount holds price constant, so it moves only with quantity and mix; the net amount falls by the discount itself. Volume in the promotion's months against the average of the other months of the same year (and the same months a year earlier) runs from -20.7% (promotion 3) to +11.9% (promotion 2), with the other months' standard deviation (STDEV.S) as a percentage of their mean in the Check of the guide. No difference is unusual: the largest, promotion 2's +11.9%, is about 1.6 standard deviations of a two-month total (the monthly sd times the square root of 2), and promotion 3's fall is within the Strategic segment's normal swings. Every difference is far below the promotion's break-even increase (Requirement 4). This is an informal screen, not a test of significance, because it assumes comparable, independent months, and the other months can carry seasonality or other promotions. Compared month for month (the promotion's average month against the other months' mean, in monthly standard deviations), the largest is about 1.2, and either route is acceptable. The comparisons describe the orders and cannot show what would have been ordered without a promotion, so the answer is no evidence of an increase near the break-even, not proof of none, and a comparison group or a designed test would be needed to measure one. New customers: 211 customers had orders, and no customer's first observed order included a promotion line, which gives no positive evidence of acquisition and does not prove that promotions never attract customers. 195 of the first orders fall in January to April 2024 (107 in January) and just seven came after June 2024 (the last in July 2025). The extract's start affects that concentration, since a first observed order need not be a customer's first ever, and CustomerSince cannot settle it: for 27 of the 31 customers with a CustomerSince in 2024 or later, the first order came before that date.
 
 ## What a strong answer says
 
@@ -154,11 +154,9 @@ A weak answer calls the largest difference a success, or calls every difference 
 ## Common mistakes and how to respond
 
 - **Net amount as volume.** *Symptom:* nearly every promotion shows a fall, from -30.2% to +0.9%, with 1 above zero. *Response:* ask what the discount does to LineTotal in the promotion's months.
-- **Variation not scaled.** *Symptom:* promotion 2 flagged as unusual. *Response:* ask what a two-month total's variation is, against one month's.
 - **Recorded dates for the months.** *Symptom:* little or no volume in the months of promotions 1, 4, and 7. *Response:* ask which lines carry the promotion, and when they were ordered.
 - **No guard on the year before.** *Symptom:* a division error or a nonsense fall for promotions 1, 2, and 3. *Response:* ask what the data holds before 2024.
-- **CustomerSince as the first purchase.** *Symptom:* a count of new customers. *Response:* have them compare it with the first order date.
-- **Overclaiming.** *Symptom:* "promotions do not work". *Response:* ask what this data could and could not show.
+- **CustomerSince as the first purchase, or overclaiming.** *Symptom:* a count of new customers, or "promotions do not work". *Response:* have them compare CustomerSince with the first order date, and ask what this data could and could not show.
 
 ## Grading guide
 
@@ -174,4 +172,4 @@ A weak answer calls the largest difference a success, or calls every difference 
 
 - Repeat the comparison with the order count instead of the list amount, and say whether a promotion could change the mix without changing the total.
 - Discuss: an increase of about a tenth in the best month is inside the normal variation. What size of increase could this data detect?
-- Discuss: how would a control group (a similar scope with no promotion) make the next test stronger? This leads into the model of Requirement 4.
+- Discuss: how would a control group make the next test stronger?

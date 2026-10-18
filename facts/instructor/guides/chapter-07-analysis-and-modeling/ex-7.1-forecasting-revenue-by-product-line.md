@@ -36,7 +36,7 @@ By the end, students can:
 - choose a method for each series and justify it from the errors and from what they know about the data (outcome 2);
 - state a forecast as a range with its source, and compare it with a forecast made at another level (outcome 2).
 
-**Competencies practiced.** CPA Evolution BAR M8 (planning techniques, forecasting and decision models) and BAR M10 (advanced data analytics); IMA Data Analytics and Insights: Applied Forecasting, and Strategy, Planning, and Performance: Budgeting and Forecasting; IFAC IES 2 (b) and (i); AACSB A5 part 5.1.
+**Competencies practiced.** CPA Evolution BAR M8 (planning techniques, forecasting and decision models) and BAR M10 (advanced data analytics); IMA Data Analytics and Insights: Applied Forecasting, and Strategy, Planning, and Performance: Budgeting and Forecasting; IFAC IES 2 (b) and (i); AACSB A5 parts 5.1 and 5.2.
 
 ## Before you assign
 
@@ -62,25 +62,37 @@ c. In C4, enter this formula and fill it to G15, then enter `=SUM(C4:G4)` in H4 
 =SUMIFS(InvoiceLines[LineTotal],InvoiceLines[ItemGroup],C$3,InvoiceLines[Period],$B4)
 ```
 
-d. In A16 type `Control total`, and in H16 enter `=SUM(H4:H15)-SUM(InvoiceLines[LineTotal])`.
+d. In A16 type `Control total`, and in H16 enter this formula, which rounds to the cent so that a binary residue does not show:
 
-**Check:** H16 is zero. The company's revenue is ${{ totals[0]|money }} in the first quarter and ${{ totals[11]|money }} in the last. **Watch for:** a Period typed with a space or in another format. SUMIFS then returns zero for the row and H16 shows the missing revenue.
+```
+=ROUND(SUM(H4:H15)-SUM(InvoiceLines[LineTotal]),2)
+```
+
+**Check:** H16 is zero. The model answer has the control total, and the requirement does not ask for it. The company's revenue is ${{ totals[0]|money }} in the first quarter and ${{ totals[11]|money }} in the last. **Watch for:** a Period typed with a space or in another format. SUMIFS then returns zero for the row and H16 shows the missing revenue.
 
 ### Requirement (2): The backtest
 
-**Step 2. Forecast the four quarters of {{ d.C }} with three methods.** Fit each method to QuarterIndex 1 to 8 and forecast 9 to 12, in rows 20 to 31 (columns C to G, one block of four rows for each method).
+**Step 2. Forecast the four quarters of {{ d.C }} with three methods, and two more without the first quarter.** Fit each method to QuarterIndex 1 to 8 (rows 4 to 11) and forecast 9 to 12, in rows 20 to 39 (columns C to G, one block of four rows for each method).
 
-a. Trend, in rows 20 to 23: `=FORECAST.LINEAR($A20,C$4:C$11,$A$4:$A$11)`.
-b. Mean, in rows 24 to 27: `=AVERAGE(C$4:C$11)`.
-c. Same quarter last year, in rows 28 to 31: `=C8`, `=C9`, `=C10` and `=C11`.
-d. Repeat the trend and the mean in rows 32 to 39, fitted to rows 5 to 11, which leaves out the first quarter.
+a. In A19:B19 type `QuarterIndex` and `Method`, and in C19:G19 the five item groups in the order of C3:G3. In A20:A23 type 9, 10, 11 and 12, and repeat those four indexes in A24:A27, A28:A31, A32:A35 and A36:A39. Name each block in column B with its method and training window.
+b. Trend, in rows 20 to 23, filled down the four rows and across to G: `=FORECAST.LINEAR($A20,C$4:C$11,$A$4:$A$11)`.
+c. Mean, in rows 24 to 27: `=AVERAGE(C$4:C$11)`.
+d. Same quarter last year, in rows 28 to 31: `=C8`, `=C9`, `=C10` and `=C11`, copied across to G.
+e. Repeat the trend and the mean in rows 32 to 39, fitted to rows 5 to 11, which leaves out the first quarter: `=FORECAST.LINEAR($A32,C$5:C$11,$A$5:$A$11)` and `=AVERAGE(C$5:C$11)`.
 
-**Step 3. Measure the errors.** In row 43 and below, one row for each method, enter the mean absolute percentage error of the four quarters, then pick the lowest.
+**Step 3. Measure the errors.** In B42 type `Method` with the group headings in C42:G42, and in B43:B47 type `Trend`, `Mean`, `Same quarter last year`, `Trend without {{ d.F }} Q1` and `Mean without {{ d.F }} Q1`. Enter the five error formulas in C43:C47, the lowest of the first three in row 48 and the lowest of all five in row 49, and copy all seven formulas across to G. Label B48 `Lowest of the first three` and B49 `Lowest of all five`.
 
 ```
-=AVERAGE(ABS(C20:C23-C$12:C$15)/C$12:C$15)
-=INDEX($B$43:$B$45,MATCH(MIN(C43:C45),C43:C45,0))
+C43  =AVERAGE(ABS(C20:C23-C$12:C$15)/C$12:C$15)
+C44  =AVERAGE(ABS(C24:C27-C$12:C$15)/C$12:C$15)
+C45  =AVERAGE(ABS(C28:C31-C$12:C$15)/C$12:C$15)
+C46  =AVERAGE(ABS(C32:C35-C$12:C$15)/C$12:C$15)
+C47  =AVERAGE(ABS(C36:C39-C$12:C$15)/C$12:C$15)
+C48  =INDEX($B$43:$B$45,MATCH(MIN(C43:C45),C43:C45,0))
+C49  =INDEX($B$43:$B$47,MATCH(MIN(C43:C47),C43:C47,0))
 ```
+
+MATCH takes the first method in a tie, and that order is no evidence that one method is better. Rows 48 and 49 only rank the backtest.
 
 {{ figure('IF-07-1-A') }}
 
@@ -96,7 +108,7 @@ d. Repeat the trend and the mean in rows 32 to 39, fitted to rows 5 to 11, which
 - Accessories: the mean ({{ ac.errors['Mean']|pct(1) }}), narrowly ahead of the same quarter last year ({{ ac.errors['Same quarter last year']|pct(1) }}). The trend without the first quarter is lower ({{ ac.errors['Trend without the first quarter']|pct(1) }}), but the series rises and falls with no steady direction. A student who picks that trend and warns that four quarters are weak evidence has a defensible answer.
 - Services: the mean ({{ sv.errors['Mean']|pct(1) }}), though every method misses by {{ sv.span[0]|pct(0) }} to {{ sv.span[1]|pct(0) }}.
 
-The first quarter of {{ d.F }}: leave it out of the forecasts. It holds the start-up month. Leaving it out lowers {{ g.n_lowered }} of the {{ g.n_changes }} trend and mean errors and raises the others, the largest drop being the {{ g.best_drop.group }} {{ g.best_drop.method }} ({{ g.best_drop.before|pct(1) }} to {{ g.best_drop.after|pct(1) }}).
+The first quarter of {{ d.F }}: the model answer leaves it out of the forecasts, because it holds the start-up month. A student who keeps it needs a reason, and then adapts both the final fit and the backtest error that goes with it. Leaving it out lowers {{ g.n_lowered }} of the {{ g.n_changes }} trend and mean errors and raises the others, the largest drop being the {{ g.best_drop.group }} {{ g.best_drop.method }} ({{ g.best_drop.before|pct(1) }} to {{ g.best_drop.after|pct(1) }}).
 
 ### Requirement (4): The forecast of {{ d.N }} Q1
 
@@ -107,7 +119,7 @@ The first quarter of {{ d.F }}: leave it out of the forecasts. It holds the star
 =SWITCH(C53,"Trend",C46,"Mean",C47,"Same quarter last year",C45)
 ```
 
-Enter the first formula in row 54 and the second, the chosen method's backtest error, in row 55. Then enter `=C54*(1-C55)` in row 56 for the low end and `=C54*(1+C55)` in row 57 for the high end, and sum the groups in column H.
+Enter the first formula in row 54 and the second, the chosen method's backtest error, in row 55. Then enter `=C54*(1-C55)` in row 56 for the low end and `=C54*(1+C55)` in row 57 for the high end. Copy rows 54 to 57 across to G, and sum the point forecasts in H54. The formulas carry out the model answer's policy of leaving out the first quarter, since they fit rows 5 to 15 and read the error fitted without it. Row 53 holds only Trend, Mean or Same quarter last year.
 
 **Step 6. Compare with the company forecast.** Compare H54 with Forecast!B47, the forecast of Tutorial 7.1.
 
@@ -139,10 +151,11 @@ Enter the first formula in row 54 and the second, the chosen method's backtest e
 
 ## What a strong answer says
 
-- **Requirement (3).** A method for each group, with the error that supports it and the reason beyond the error: Lighting's growth, Accessories' lack of direction, Services' volatility. It says that four quarters are a small sample and that the first quarter of {{ d.F }} was left out, with the reason.
+- **Requirement (1), a plus.** A control total that agrees with InvoiceLines.
+- **Requirement (3).** A method for each group, with the error that supports it and the reason beyond the error: Lighting's growth, Accessories' lack of direction, Services' volatility. It says that four quarters are a small sample and whether the first quarter of {{ d.F }} was left out, with the reason.
 - **Requirement (4).** Forecasts labeled as billed revenue by invoice date, each with a range described as the backtest error and not a confidence interval, and a sentence on why the item groups need not add up to the company forecast: the methods differ.
 
-A weak answer picks the lowest number in each column without a reason, forecasts with a method fitted on all twelve quarters, or presents the ranges as bounds the revenue will stay within.
+A weak answer picks the lowest number in each column without a reason, backtests a method fitted to the quarters it is supposed to forecast, or presents the ranges as bounds the revenue will stay within. The forecast of {{ d.N }} Q1 itself may use all twelve quarters, with or without the first, when the choice is explained. What matters is a reason for the method and the training window, not the model answer's policy.
 
 ## Common mistakes and how to respond
 
@@ -157,7 +170,7 @@ A weak answer picks the lowest number in each column without a reason, forecasts
 
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
-| Requirement 1: the table | 15 | Five groups by twelve quarters, control total zero | No control total |
+| Requirement 1: the table | 15 | Five groups by twelve quarters, with the quarter index | A group or a quarter missing |
 | Requirement 2: the backtest | 30 | Three methods fitted to eight quarters, MAPE with ABS, errors correct | Fitted to all quarters, or signed errors |
 | Requirement 3: the choice | 25 | A method for each group with a reason, and a decision on the first quarter | A choice by the lowest number only |
 | Requirement 4: the forecast | 30 | Forecast and range for each group, the comparison and the labeling | No range, or no comparison |

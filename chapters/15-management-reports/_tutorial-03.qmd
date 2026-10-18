@@ -137,19 +137,20 @@ TTM (visual) = DIVIDE (
 )
 ```
 
-The ratio of two twelve-month averages over the same months equals the ratio of the twelve-month totals, so while the table starts in January 2024, the visual calculation agrees with the measure from December 2024 on.
+Keep the table sorted by YearMonth, oldest first, with one row for each month, because the moving average reads the rows in the order the visual shows them. The ratio of two twelve-month averages over the same months equals the ratio of the twelve-month totals, so while the table starts in January 2024, the visual calculation agrees with the measure from December 2024 on.
 
 **Step 9. Filter the table's axis.** Change the visual's year filter to 2025 and 2026 only, and compare the two trailing columns for 2025 again.
 
 Once the table starts in January 2025, the visual calculation has only the months on the table to work with: in January 2025 it averages a single month, in February two, and it agrees with the measure again only in December 2025, as @fig-15-10 shows. The measure is unaffected, because its window reaches into the model. The trailing figure the production manager will rely on is therefore the measure.
 
-![The Trailing Ratio as a Measure and as a Visual Calculation.](/visuals/svg/fig-15-10-measure-vs-visual-calc.svg){#fig-15-10 fig-alt="A mock of a Power BI line chart of the trailing twelve-month hours per standard hour for the months of 2025, with two lines. The measure, drawn as a solid line, rises gradually through the year. The visual calculation, on a chart filtered to start in January 2025, starts much higher, swings in the first months because its window holds only the months on the chart, and meets the measure in December 2025. The months where they differ are inside a dashed frame."}
+![The Trailing Ratio as a Measure and as a Visual Calculation.](/visuals/svg/fig-15-10-measure-vs-visual-calc.svg){#fig-15-10 fig-alt="A mock of a Power BI line chart of the trailing twelve-month hours per standard hour for the months of 2025, with two lines. The measure, drawn as a solid line, rises gradually through the year. The visual calculation, drawn dashed on a chart filtered to start in January 2025, starts much higher, swings in the first months because its window holds only the months on the chart, and meets the measure in December 2025. The months where they differ are inside a dashed frame."}
 
 **Step 10. Add the KPI card.**
 
 a. Delete the table of Steps 8 and 9, which served only for the comparison.
 b. Add a card visual with Hours per Standard Hour TTM and a second measure, written below, that holds the 2024 level for comparison.
 c. Filter the card to the years 2024 to 2026, like the line chart.
+d. In **Format visual > General > Title**, give the card the title `December 2026 is provisional`.
 
 
 ```
@@ -157,7 +158,7 @@ Hours per Standard Hour 2024 =
 CALCULATE ( [Hours per Standard Hour], REMOVEFILTERS ( 'Date' ), 'Date'[Year] = 2024 )
 ```
 
-The card sets the latest trailing figure beside the 2024 level, the KPI with its comparison. Without the year filter, the card is blank: its window would end in December 2027, the last month of the Date table, which has no time records.
+The card sets the latest trailing figure beside the 2024 level, the KPI with its comparison. Its title carries the warning of Step 6 to the place where the number is read, because direct time and output run to December 11, 2026, and indirect time to December 4, 2026, so the figure is an observed-records diagnostic, not a labor efficiency variance, even when the page is opened without the About page. Without the year filter, the card is blank: its window would end in December 2027, the last month of the Date table, which has no time records.
 
 **Step 11. Chart the work centers and the overtime share.**
 
@@ -170,9 +171,9 @@ c. Select the bar chart, choose **Format > Edit interactions**, and click the **
 Overtime Share = DIVIDE ( [Overtime Hours], [Manufacturing Hours] )
 ```
 
-@fig-15-11 shows the page. The bar chart shows that most direct hours of 2026 were recorded at Packing, the work center Chapter 11 found far above its planned load. The overtime share rose by about two-thirds or more from 2024 to 2026 for every manufacturing job title alike, the plant-wide pattern of the surge days that Chapter 12 found. Editing the interactions keeps the card and the line chart plant-wide. Without it, clicking Packing in the bar chart would divide Packing's direct hours by the whole plant's output, because the work center filters the labor time and not the completions: a ratio well below the plant's that describes neither Packing nor the plant. A ratio for one work center would first need its output measured there.
+@fig-15-11 shows the page. The bar chart shows that most direct hours of 2026 were recorded at Packing, the work center Chapter 11 found far above its planned load. The overtime share rose by about two-thirds or more from 2024 to 2026 for each of the three manufacturing job titles, the plant-wide pattern of the surge days that Chapter 12 found. Editing the interactions keeps the card and the line chart plant-wide. Without it, clicking Packing in the bar chart would divide Packing's direct hours by the whole plant's output, because the work center filters the labor time and not the completions: a ratio well below the plant's that describes neither Packing nor the plant. A ratio for one work center would first need its output measured there.
 
-![The Plant Page.](/visuals/svg/fig-15-11-plant-page.svg){#fig-15-11 fig-alt="A mock of a Power BI report page named Plant. At the top left, a card shows the trailing twelve-month hours per standard hour at December 2026 beside the 2024 level. A line chart shows the trailing ratio rising from December 2024 to December 2026. A bar chart of 2026 direct hours by work center shows Packing far longer than Assembly, Finishing and Test, Cutting, and Quality Assurance. A column chart shows the overtime share of each manufacturing job title in 2024, 2025, and 2026, rising for all three titles."}
+![The Plant Page.](/visuals/svg/fig-15-11-plant-page.svg){#fig-15-11 fig-alt="A mock of a Power BI report page named Plant. At the top left, a card titled to say that December 2026 is provisional shows the trailing twelve-month hours per standard hour at December 2026 beside the 2024 level. A line chart shows the trailing ratio rising from December 2024 to December 2026. A bar chart of 2026 direct hours by work center shows Packing far longer than Assembly, Finishing and Test, Cutting, and Quality Assurance. A column chart shows the overtime share of each manufacturing job title in 2024, 2025, and 2026, rising for all three titles."}
 
 **Step 12. Add the About page and the navigation.**
 
@@ -185,7 +186,7 @@ f. Copy the navigator to the top of each visible page, and test it by holding Ct
 
 @fig-15-12 shows the About page. The navigator lists the visible pages in order and updates itself as pages change, and the hidden detail pages are reached only from the pages they serve. Every measure now has the description the About page promises.
 
-![The About Page With Its Page Navigator.](/visuals/svg/fig-15-12-about-page.svg){#fig-15-12 fig-alt="A mock of a Power BI report page named About. A text box states the report's purpose, its three readers, its source, the period it covers, and where its measures are defined and tested. Below it, a page navigator shows one button for each visible page: About, Sales and Discounts, Validation, Review, Margins, Income Statement, Promotions, Budget, and Plant, with About selected. The page tabs below the canvas list the same pages; the three hidden detail pages are not among them."}
+![The About Page With Its Page Navigator.](/visuals/svg/fig-15-12-about-page.svg){#fig-15-12 fig-alt="A mock of a Power BI report page named About. A text box states the report's purpose, its three readers, its source, the period it covers, and where its measures are defined and tested. Below it, a page navigator shows one button for each visible page: About, Sales and Discounts, Validation, Review, Margins, Income Statement, Promotions, Budget, and Plant, with About selected. The visible tab strip shows About through Income Statement, and a note under the figure says it continues with Promotions, Budget, and Plant. The three hidden detail pages are absent."}
 
 **Step 13. Add the plant test.**
 

@@ -114,7 +114,7 @@ As in Chapter 4, work on these exercises in a fresh copy of your analysis workbo
 
 (3) Use XLOOKUP or COUNTIFS to find the suppliers whose match key appears in the Employee Table, and bring the matching employee's name and job title onto the Supplier Table.
 
-(4) Load the DisbursementPayment Table into the same workbook, and for each match, use SUMIFS on SupplierID to total the payments made to the supplier.
+(4) Load the DisbursementPayment Table into the same workbook, and for each match, use SUMIFS on SupplierID to total the payments made to the supplier. State the range of payment dates the totals cover, because the extract runs past the fiscal year-end.
 
 (5) Prepare a brief memo (one half page) that lists the matches, the payments involved, and the procedures you would perform next.
 

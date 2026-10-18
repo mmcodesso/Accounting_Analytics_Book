@@ -34,6 +34,7 @@ from pathlib import Path
 from guide_contexts import context
 from guide_contexts.ch01 import schema
 from guide_contexts.ch13 import _block
+from guide_contexts.ch16 import custom_expr
 from notes import case4 as n4
 
 REPO = Path(__file__).resolve().parents[3]
@@ -258,7 +259,7 @@ def chapter(d, claim):
             watch1=at(titles, "Watch out: rows"), watch2=at(titles, "Watch out: a ratio"),
             flow_check=at(titles, "Each balance has its flow") - 1, flow_answer=at(titles, "Each balance has its flow"),
             six=at(titles, "Six requirements"), r1=at(titles, "Build and validate"), r2=at(titles, "Explain where the cash went"),
-            cash_check=at(titles, "Only cash goes in the statement") - 1, cash_answer=at(titles, "Only cash goes in the statement"),
+            cash_check=at(titles, "Cash flows and separate noncash") - 1, cash_answer=at(titles, "Cash flows and separate noncash"),
             r3=at(titles, "Measure how fast"), r4=at(titles, "Trace the materials"), r5=at(titles, "Test the balances behind"),
             disp_check=at(titles, "Each exception has its disposition") - 1, disp_answer=at(titles, "Each exception has its disposition"),
             r6=at(titles, "Write the decision memo"), before=at(titles, "Before you submit"),
@@ -287,6 +288,10 @@ def g1(d, claim):
     items = d.one("SELECT COUNT(*) FROM Item")
     ungrouped = d.one("SELECT COUNT(*) FROM Item i LEFT JOIN InventoryPolicy p ON p.ItemID = i.ItemID")
     claim(ungrouped > items, "merging the policy rows without grouping them by item makes some items appear twice")
+    two_policy = d.one("SELECT COUNT(*) FROM (SELECT ItemID FROM InventoryPolicy GROUP BY ItemID HAVING COUNT(*) = 2)")
+    claim(d.one("SELECT COUNT(*) FROM (SELECT ItemID FROM InventoryPolicy GROUP BY ItemID HAVING COUNT(*) > 2)") == 0
+          and ungrouped == items + two_policy and 0 < two_policy < items,
+          "an item has at most two policy rows, and only some items have the two, so an ungrouped merge duplicates those items and not every item")
     claim(d.one("SELECT COUNT(*) FROM (SELECT ItemID FROM InventoryPolicy GROUP BY ItemID HAVING MIN(TargetDaysSupply) <> MAX(TargetDaysSupply))") == 0,
           "an item's policy rows (one for each warehouse) carry the same target, so grouping by item and taking the maximum loses nothing")
     # the receipt merged through the order header
@@ -317,6 +322,9 @@ def g1(d, claim):
     # the quoted project
     gl, req, rec, item, iss = table_m("GLEntry"), table_m("Requisitions"), table_m("Receipts"), table_m("Item"), table_m("Issues")
     m_close = step(claim, gl, "Added Custom")
+    e_close = custom_expr(claim, gl, "IsYearEndClose")
+    e_channel = custom_expr(claim, req, "Channel")
+    e_workorder = custom_expr(claim, req, "WorkOrderID")
     m_channel = step(claim, req, "Added Custom", "Added Custom2", split=True)
     m_receipts = step(claim, rec, "Merged Queries1", "Expanded OrderLines", "Merged Queries2", "Expanded Requisitions")
     m_policy = step(claim, expression_m("InventoryPolicy"), "Grouped Rows")
@@ -342,8 +350,8 @@ def g1(d, claim):
         y=y, f=d.F, p=d.P, n=d.N, top_n=1000, label_top="Column profiling based on top 1000 rows", top=top, allr=allr, top_no_app=top_no_app, all_no_app=all_no_app, top_approved=top_approved,
         all_approved=all_approved, n_items=items, ungrouped=ungrouped, hdr_lines=hdr[0], hdr_value=hdr[1], hdr_mat_lines=hdr_mat[0],
         hdr_mat_value=hdr_mat[1], receipt_lines=lines, by_year=by_year, through=through, last=last, pay_end=pay_end,
-        n_sources=len(thru_sources), sources=thru_sources, entry=t,
-        m_close=m_close, m_channel=m_channel, m_receipts=m_receipts, m_policy=m_policy, m_item=m_item, m_pair=m_pair,
+        n_sources=len(thru_sources), sources=thru_sources, entry=t, two_policy=two_policy,
+        e_close=e_close, e_channel=e_channel, e_workorder=e_workorder, m_close=m_close, m_channel=m_channel, m_receipts=m_receipts, m_policy=m_policy, m_item=m_item, m_pair=m_pair,
         d_through=d_through, d_received=d_received, d_close=d_close, d_balance=d_balance, dax_check=check,
         t_control=title(claim, "validation", "controlTotals"), t_links=title(claim, "validation", "linkCards"),
         t_data=title(claim, "about", "dataThrough"), test1=test_block(claim, 1), test2=test_block(claim, 2),
@@ -393,6 +401,9 @@ def g2(d, claim):
     acct = table_m("Account")
     m_step = step(claim, acct, "Added Custom", split=True)
     m_activity = step(claim, acct, "Added Custom1")
+    e_step = custom_expr(claim, acct, "Step")
+    e_activity = custom_expr(claim, acct, "Activity")
+    e_order = custom_expr(claim, acct, "StepOrder")
     claim("Step" in m_step and m_step.count("else if") >= 8, "the project's Step column is an if-then-else chain on account numbers and subtypes")
     dx = dax(claim, "Statement Balance")
     dax(claim, "Current Ratio", "Quick Ratio", "Disposal Write-off", "Disposal Loss", "Disposal Cost", "Disposal Proceeds", "Financed by Notes",
@@ -416,7 +427,7 @@ def g2(d, claim):
         y=y, f=F, p=P, n=N, diff_ni=diff["net_income"], diff_fin=diff["debt_equity"], kf_value=cur["cash"], after=after, inside=inside,
         beyond=beyond_n, beyond_lines=beyond_lines, fin_rec=cur["financing"], fin_res=rc["financing"], inv_rec=cur["investing"],
         inv_res=rc["investing"], op_rec=cur["operating"], op_res=rc["operating"], dep_entries=rc["depreciation"], dep_step=cur["depreciation"],
-        m_step=m_step, m_activity=m_activity, d_balance=dx, d_cash=d_cash, d_restated=d_restated, d_due=d_due,
+        m_step=m_step, m_activity=m_activity, e_step=e_step, e_activity=e_activity, e_order=e_order, d_balance=dx, d_cash=d_cash, d_restated=d_restated, d_due=d_due,
         d_opening=d_opening, dax_check=check, kf_check=kf, bd_check=bd,
         t_matrix=title(claim, "balanceSheet", "bsMatrix"), t_ratios=title(claim, "balanceSheet", "ratios"),
         t_waterfall=title(claim, "cashBridge", "waterfall"), t_bridge=title(claim, "cashBridge", "bridgeMatrix"),
@@ -470,8 +481,12 @@ def g3(d, claim):
         return n4.balance(d, ["1020"], e) / b * 365
     early, late = unguarded(f"{F}-03-31"), unguarded(f"{N}-03-31")
     claim(early > 4 * q0["dso"] and late > q1["dso"], "without the guard, the first quarter reads several times the real days and a quarter after Data Through reads a value")
-    dx = lambda k: round(q1[k] - q0[k], 1)                                                        # noqa: E731
+    dx = lambda k: round(q1["raw"][k] - q0["raw"][k], 1)      # a movement is the difference of the unrounded measures, rounded once   # noqa: E731
     claim(dx("dio") >= dx("ccc_x") > 0 and abs(dx("dso_x")) < 10 and abs(dx("dpo_x")) < 5, "the inventory days account for all of the cycle's growth")
+    shown = round(q1["dpo"] - q0["dpo"], 1)
+    claim(abs(shown - dx("dpo")) > 0.05, "subtracting the displayed endpoints misstates DPO's movement by a rounding step (it reads 0.1 day more)")
+    claim(dx("dpo") < 0 and 0.9 * dx("ccc") < dx("dio") < dx("ccc"), "DIO's rise is most of the cycle's, and DPO's fall adds to it because DPO is subtracted")
+    claim(abs(dx("ccc") - (dx("dso") + dx("dio") - dx("dpo"))) < 0.11, "the cycle's movement is DSO's plus DIO's less DPO's, from the unrounded measures")
     # the quoted project
     d_flows = dax(claim, "Full Twelve Months", "Billing TTM")
     dax(claim, "COGS TTM", "Issues TTM", "Shipments TTM", "Supplier Invoices TTM")
@@ -502,7 +517,7 @@ def g3(d, claim):
         early_label=f"{F}-Q1", late_label=f"{N}-Q1",
         d_dso=dx("dso"), d_dio=dx("dio"), d_dpo=dx("dpo"), d_ccc=dx("ccc"), d_dso_x=dx("dso_x"), d_dpo_x=dx("dpo_x"), d_ccc_x=dx("ccc_x"),
         d_mat=dx("mat"), d_fg=dx("fg"),
-        d_flows=d_flows, d_days=d_days, d_open=d_open, param=param, dax_check=check, icon_up=cuts[1], icon_down=cuts[0],
+        shown_dpo=shown, d_flows=d_flows, d_days=d_days, d_open=d_open, param=param, dax_check=check, icon_up=cuts[1], icon_down=cuts[0],
         t_line=title(claim, "workingCapital", "wcLine"), t_matrix=title(claim, "workingCapital", "wcMatrix"),
         t_average=title(claim, "workingCapital", "wcAverage"), t_slicer=title(claim, "workingCapital", "wcMeasure"),
         n_checks=check_sections()["Requirement 3"], test5=test_block(claim, 5))
@@ -561,6 +576,13 @@ def g4(d, claim):
     pairs_m = step(claim, table_m("ShortfallPairs"), "Filtered Rows", "Grouped Rows", "Merged Queries", "Expanded IssuedByPair")
     issued_m = step(claim, expression_m("IssuedByPair"), "Grouped Rows")
     key_m = step(claim, table_m("Issues"), "Added Custom")
+    e_pair = custom_expr(claim, table_m("Issues"), "PairKey")
+    grouped = [l for l in table_m("ShortfallPairs") if l.startswith('#"Grouped Rows" =')]
+    claim(len(grouped) == 1 and '{"Justification", "WorkOrderNumber", "ItemID"}' in grouped[0],
+          "the project's ShortfallPairs groups by Justification, WorkOrderNumber and ItemID, so it keeps the item for its relationship to Item")
+    claim(any(l.startswith("Source = Issues") for l in expression_m("IssuedByPair")) and "PairKey" in key_m,
+          "IssuedByPair is its own query over Issues, which keeps its PairKey column and one row for each issue line")
+    claim("fromColumn: ShortfallPairs.ItemID" in _model_text("relationships.tmdl"), "ShortfallPairs is related to Item on ItemID")
     d_build = dax(claim, "Materials Build", "Supply Plan Receipts", "Shortfall Receipts")
     dax(claim, "Shortfall Requisitions", "Self-requested")
     d_pairs = dax(claim, "Pairs", "Repeated Pairs", "Pairs with Issues", "Requisitioned Units", "Issued Units")
@@ -577,8 +599,8 @@ def g4(d, claim):
         y=y, n=N, pairs_all=len(pairs), pairs_matched=len(matched), units_all=units_all, units_inner=units_inner, main_inner=main_inner,
         wo_groups=by_wo_groups,
         wo_repeated=by_wo_repeated, wo_most=by_wo_most, inv=inv, mat=mat, all_inv_excess=all_inv_excess, allowed28=allowed28, low_days=first_day,
-        low_excess=mat - low, series=series, n_series=n_series, raw_target=targets["Raw Materials"][0], pack_target=targets["Packaging"][0],
-        pairs_m=pairs_m, issued_m=issued_m, key_m=key_m, d_build=d_build, d_pairs=d_pairs, d_target=d_target, d_out=d_out, dax_check=check,
+        low_excess=mat - low, series=series, n_series=n_series, s_min=rng[0], s_max=rng[1], s_step=rng[2], raw_target=targets["Raw Materials"][0], pack_target=targets["Packaging"][0],
+        pairs_m=pairs_m, issued_m=issued_m, key_m=key_m, e_pair=e_pair, d_build=d_build, d_pairs=d_pairs, d_target=d_target, d_out=d_out, dax_check=check,
         t_receipts=title(claim, "materialsBuild", "receiptsIssues"), t_build=title(claim, "materialsBuild", "buildMatrix"),
         t_approvals=title(claim, "materialsBuild", "approvals"), t_cards=title(claim, "materialsTarget", "pairCards"),
         t_pairs=title(claim, "materialsTarget", "topPairs"), t_slider=title(claim, "materialsTarget", "targetSlider"),
@@ -617,8 +639,16 @@ def g5(d, claim):
     claim(len(crossing) == 1 and crossing[0]["year"] == P, "one supplier invoice crosses a year-end, at the end of the prior year")
     at_cur = d.one("SELECT COUNT(*) FROM PurchaseInvoice WHERE InvoiceDate <= ? AND ReceivedDate > ?", asof, asof)
     claim(at_cur == 0, "at the end of the current year no supplier invoice is dated before it and received after it")
-    # decode the Findings table the project types
-    found = findings_table()
+    # the Findings rows the model answer types (the notes module's function builds the project's table; until the project is
+    # rebuilt its payroll row is the earlier one, which the claim below allows)
+    found = [[r[0], r[1], f"{r[2]:.2f}", r[3], r[4]] for r in n4.findings_rows(r5, d)]
+    shipped = findings_table()
+    claim(len(shipped) == len(found) and all(a[1:] == b[1:] or a[:1] == b[:1] for a, b in zip(shipped[:-1], found[:-1])),
+          "the project's Findings table holds the rows of the notes module")
+    claim(abs(float(shipped[-1][2]) - float(found[-1][2])) < 0.01 and shipped[-1][3] == found[-1][3] == "Misstatement",
+          "the payroll accrual's row has the same amount and disposition in the project")
+    parts = r5["accrual_parts"]
+    claim(abs(parts["gross"] + parts["tax"] + parts["benefits"] - r5["accrual"]) < 0.015, "the accrual's three parts add up to the estimate, to the cent")
     claim(len(found) >= 7, "the project's Findings table holds the reconciling items and the other findings")
     disp = [r[3] for r in found]
     claim(set(disp) == {"Follow up", "Expected", "Misstatement"}, "the findings carry three dispositions: follow up, expected and misstatement")
@@ -627,6 +657,10 @@ def g5(d, claim):
     # the quoted project
     ar_m = step(claim, table_m("ARInvoices"), "Added Custom")
     ap_m = step(claim, table_m("APInvoices"), "Added Custom4")
+    ar_e = custom_expr(claim, table_m("ARInvoices"), "OpenBalance").replace("\nelse ", " else ").replace(" - (if", "\n    - (if")
+    ap_e = custom_expr(claim, table_m("APInvoices"), "OpenBalance")
+    ap_moved = custom_expr(claim, table_m("APInvoices"), "MovedToNotes")
+    ap_bucket = custom_expr(claim, table_m("APInvoices"), "Bucket")
     dax(claim, "Open Receivables", "Receivables Difference", "Open Payables", "Payables Difference")
     dax(claim, "Past Due Payables", "Past Due Share without Notes", "Billing Difference")
     d_find = dax(claim, "Payables Findings", "Unexplained Payables")
@@ -647,7 +681,8 @@ def g5(d, claim):
     return dict(
         y=y, p=P, wrong_n=len(wrong_open), wrong_sum=sum(wrong_open), no_credit=no_credit, rows=len(rows), neither=neither, right_find=right_find,
         wrong_find=wrong_find, wrong_gap=n4.xr(wrong_find - r5["ap_diff"]), gr_ni=gr_ni, step_diff=step_diff, crossing=crossing[0],
-        names=names, n_findings=len(found), findings=found, ar_m=ar_m, ap_m=ap_m, d_find=d_find, later_quarters=4,
+        names=names, n_findings=len(found), findings=found, ar_m=ar_m, ap_m=ap_m, ar_e=ar_e, ap_e=ap_e, ap_moved=ap_moved,
+        ap_bucket=ap_bucket, accrual_parts=parts, d_find=d_find, later_quarters=4,
         dax_check=check, test4=test_block(claim, 4), test5=test_block(claim, 5),
         t_roll=title(claim, "reconciliations", "rollForward"), t_cards=title(claim, "reconciliations", "reconCards"),
         t_billing=title(claim, "reconciliations", "billing"), t_aging=title(claim, "reconciliations", "aging"),
@@ -664,7 +699,7 @@ def g6(d, claim):
     exhibits = [e.format(P=d.P, C=d.C, N=d.N) for e in EXHIBITS]
     for e in exhibits:
         claim(e in text, f"the case's Deliverable lists the exhibit: {e}")
-    claim("no more than two pages" in text and "one-page appendix" in text, "the memo is at most two pages with a one-page appendix")
+    claim("no more than two pages" in text and "appendix of at most three pages" in text, "the memo is at most two pages with an appendix of at most three")
     words = 0
     for name in ("memoLeft", "memoRight"):
         v = json.loads((REPORT / "definition" / "pages" / "memo" / "visuals" / name / "visual.json").read_text(encoding="utf-8"))

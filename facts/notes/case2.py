@@ -349,7 +349,8 @@ def r3(d, claim):
                 n_falls=len(falls), promoted=len(promoted), n_promoted=word(len(promoted)),
                 promoted_ids=series(promoted_ids), customers=len(first), late=word(len(late)),
                 last=f"{MONTHS[int(last[5:7]) - 1]} {last[:4]}", since=len(since),
-                since_before=sum(1 for r in since if r[1] < r[3]))
+                since_before=sum(1 for r in since if r[1] < r[3]), early=early,
+                jan=sum(1 for r in first if r[1].startswith(f"{d.F}-01")))
 
 
 @note("case2.r4", CASE)
@@ -402,7 +403,8 @@ def r4(d, claim):
     flat = (lambda a, b: a / b)(*budget_ratio(d, "b.FiscalYear = ?", d.N))
     monthly = [r for _, r in d.q(f"SELECT b.Month, SUM(b.BudgetAmount) / SUM(b.Quantity * i.ListPrice) {BUDGET} "
                                  f"AND b.FiscalYear = ? GROUP BY 1", d.N)]
-    claim(len(monthly) == 12 and all(abs(r - flat) < 0.0005 for r in monthly), f"the {d.N} budget is flat in every month")
+    claim(len(monthly) == 12 and all(abs(r - flat) < 0.0005 for r in monthly),
+          f"the {d.N} budget is approximately flat, every month within half a thousandth of the year's ratio")
 
     _, quarters, prop_total = proposal_quarters(d)
     fall = prop["ItemGroup"]
@@ -412,14 +414,15 @@ def r4(d, claim):
                          d.N, fall["label"])
     ordered = d.one(f"SELECT SUM(l.Quantity) {ORDERS} WHERE i.ItemGroup = ? AND o.OrderDate BETWEEN ? AND ?",
                     fall["label"], f"{d.C}-{fall['months'][0]:02d}-01", f"{d.C}-{fall['months'][-1]:02d}-31")
-    claim(3.5 <= budget_units / ordered < 4, "the budget's volume would overstate the cost almost fourfold")
+    claim(budget_units / ordered > 3, "the budget plans more than three times the units ordered in the fall promotion's months")
     claim(not any("Customer" in r[1] for r in d.q("PRAGMA table_info(BudgetLine)")), "BudgetLine has no customer dimension")
     return dict(coll=model["Collection"], grp=grp, seg=model["Segment"], rate=c, be_low=min(be.values()),
                 be_high=max(be.values()), promos=word(len(be)), best=best, discount=discount,
                 best_year=next(p["year"] for p in promotions(d) if p["id"] == best["id"]), cross=best["id"] != grp["id"],
                 own=own, own_discount=max(own_discount, 0.0),
                 unbilled=[u for u in unbilled if u["amount"] > 0.005], unbilled_total=sum(u["amount"] for u in unbilled),
-                promoted=promoted_ratio, cfo=cfo, approved=approved, flat=flat, cost=prop_total,
+                promoted=promoted_ratio, cfo=cfo, approved=approved, flat=flat, plan_low=min(monthly), plan_high=max(monthly),
+                cost=prop_total,
                 contribution=prop_total * (1 - c), quarters=[(qn, round(amount, -2)) for qn, amount in quarters],
                 budget_units=budget_units, ordered=ordered)
 

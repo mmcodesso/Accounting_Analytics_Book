@@ -57,18 +57,20 @@ Individual, about 100 minutes, best in two sittings: 10 on PROPER (requirement 1
 
 ### Requirement (3): The lists
 
-**Step 3. List the unapproved and the High-risk suppliers.** Filter the Supplier Table on IsApproved 0 and on SupplierRiskRating High, or spill them with FILTER.
+**Step 3. List the unapproved and the High-risk suppliers.** Clear every filter on the Supplier Table first, including an EmployeeMatches filter left from Exercise 5.5. Filter IsApproved to 0 and record the suppliers, clear that filter, then filter SupplierRiskRating to High and record those, and clear the filter again. Filters left on together combine, so the second list would show only the suppliers on both. Or spill each list with FILTER, as the model answer does.
 
 **Check:** Seven unapproved suppliers, IDs 104 to 110, and seven High-risk suppliers, IDs 11, 24, 40, 55, 57, 80, and 104. Supplier 104 is on both lists.
 
 ### Requirement (4): Orders and payments
 
-**Step 4. Load PurchaseOrder and count.** Load PurchaseOrder to a worksheet as in Exercise 5.5. For each supplier on the lists enter:
+**Step 4. Load PurchaseOrder and count.** Load PurchaseOrder to a worksheet as in Exercise 5.5. Add `PurchaseOrderCount` and `DisbursementCount` to the Supplier Table before reading the lists (Exercise 5.5's PaymentCount counts only the matched suppliers), so that `[@SupplierID]` refers to the row's supplier:
 
 ```
 =COUNTIFS(PurchaseOrder[SupplierID],[@SupplierID])
 =COUNTIFS(DisbursementPayment[SupplierID],[@SupplierID])
 ```
+
+Beside a plain list copied out of the Table, refer to the SupplierID cell of the list's row instead, because `[@SupplierID]` has no row outside a Table. The model answer counts beside its spilled lists with `TAKE` on the list's first column.
 
 **Check:** every unapproved supplier has no purchase order and no payment. **Watch for:** a zero read as proof. Run the same two formulas on an approved supplier, for example the approved High-risk supplier 11, which has 60 orders and 116 payments. A control that returns a count shows the formula and the Table work. The finding is consistent with an approval control that keeps these suppliers from receiving business, and the extract alone cannot show how the control operates.
 
@@ -83,7 +85,7 @@ Individual, about 100 minutes, best in two sittings: 10 on PROPER (requirement 1
 
 Name them `InvoiceLineCount` and `LatestInvoiceDate`. On SalesInvoiceLine add `LaunchDate` with an XLOOKUP into ItemMaster, and `BeforeLaunch` with `=[@InvoiceDate]<[@LaunchDate]`. Then add `PrelaunchLines` to ItemMaster with COUNTIFS on ItemID and BeforeLaunch TRUE.
 
-**Step 6. List the three findings.** Filter ItemMaster for LifecycleStatus Discontinued with IsActive 1; for IsActive 0 with InvoiceLineCount above zero; and for PrelaunchLines above zero.
+**Step 6. List the three findings.** Clear every ItemMaster filter before each test. Filter LifecycleStatus to Discontinued and IsActive to 1, and record the items. Clear the filters, filter IsActive to 0 and InvoiceLineCount above zero, and record the items with their latest dates. Clear the filters, filter PrelaunchLines above zero, and record the items. Clear the filters before saving.
 
 **Check:** see the Expected results. **Watch for:** MAXIFS on an item with no lines. It returns 0, which Excel shows as a meaningless date, and 12 of the 15 inactive items were never invoiced; the IF guard prevents it. Compare dates as dates: the lookup returns the item's LaunchDate, and a blank would compare as zero.
 
@@ -124,9 +126,9 @@ The generator's anomaly log also lists item 228 as invoiced before launch, but n
 
 ## What a strong answer says
 
-- **Requirement (1).** The names are already consistently cased; PROPER lowers "and" and abbreviations; so the right step is to leave the field alone and record that it was checked.
+- **Requirement (1).** The names are already consistently cased. PROPER capitalizes the connecting word "and" to "And" and lowers abbreviations such as LLC to Llc, so the right step is to leave the field alone and record that the 62 names it would change were checked.
 - **Requirement (2).** A clean result with its limit: identifiers are unique, which does not rule out a duplicate entered under a different identifier.
-- **Requirement (4).** The zero is checked against a control, and the finding is stated as consistent with a control, not as proof of one.
+- **Requirement (4).** The counts for every unapproved supplier, and the finding stated as consistent with a control, not as proof of one. A plus: the zero checked against a supplier that has business, such as supplier 11.
 - **Requirement (6).** Each item finding is a conflict between fields, and the memo says the master holds only current values, so history is needed. The recommendation names where the purchasing tests should go.
 
 A weak answer applies PROPER anyway, reads the clean duplicate test as "no duplicates", or calls the item findings sales controls that failed.
@@ -135,7 +137,7 @@ A weak answer applies PROPER anyway, reads the clean duplicate test as "no dupli
 
 - **`<>` for EXACT.** *Symptom:* zero names changed. *Response:* ask whether `"And"<>"and"` is TRUE in Excel.
 - **COUNTIF on masked accounts.** *Symptom:* none here. *Response:* ask what an asterisk means to COUNTIF, and mark the method.
-- **A zero without a control.** *Response:* run the formula on a supplier that has orders.
+- **A zero without a control.** *Response:* run the formula on a supplier that has orders. A structured `[@SupplierID]` pasted beside a plain list is the usual cause of a wrong zero.
 - **MAXIFS dates in the year `1900`.** *Cause:* items with no invoice lines. *Response:* guard with the count.
 - **The filtered Item Table.** *Symptom:* none here. *Response:* the full master is the population; ask what the filter could have removed.
 - **A memo that names a control failure.** *Response:* ask what the extract shows and what it cannot.
@@ -147,7 +149,7 @@ A weak answer applies PROPER anyway, reads the clean duplicate test as "no dupli
 | Requirement 1: PROPER | 15 | EXACT, the count, the reason PROPER would damage the names | A count without the reason |
 | Requirement 2: duplicates | 15 | An exact comparison, a stated result and its limit | COUNTIF with no limit |
 | Requirement 3: lists | 5 | Both lists, the overlap noticed | One list |
-| Requirement 4: orders and payments | 15 | COUNTIFS on both Tables, a control run | No control |
+| Requirement 4: orders and payments | 15 | COUNTIFS on both Tables for each unapproved supplier | One Table only, or a row reference that does not reach the row's supplier |
 | Requirement 5: item master | 30 | The three tests with counts and the guarded MAXIFS | Two of three |
 | Requirement 6: memo | 20 | Both reviews, each finding with its limit, a focus recommendation | Findings without limits |
 

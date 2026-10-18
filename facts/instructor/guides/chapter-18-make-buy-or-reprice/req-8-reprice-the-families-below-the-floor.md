@@ -63,7 +63,7 @@ Below floor   {{ g.f.below }}
 
 a. Choose **Data > What-If Analysis > Goal Seek**.
 b. Enter H6 in **Set cell**, `0` in **To value** and G6 in **By changing cell**, and repeat for each family below the floor.
-c. Compare with column I, which computes the same price directly.
+c. Compare with column I, which computes the same price directly.{% if g.agrees %} The increase, the volume it can lose and the revenue read column I, so they follow the floor and the costs, and column O says whether the Goal Seek result still agrees.{% endif %}
 
 ```jinja
 Check      {{ g.f.check }}
@@ -86,7 +86,7 @@ Volume lost   {{ g.f.loss }}
 
 ### Part 2: What the records say about customers' response
 
-**Step 4. Screen the promotions for a volume response (Q24).** Routine: type the query at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Q24 sums the list-price order value of each promotion's scope by month of its year; the months of the promotion are the months in which promotion lines were ordered:
+**Step 4. Screen the promotions for a volume response (Q24).** Routine: type the query at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Q24 sums the list-price order value of each promotion's scope by month of its year, a list-price-weighted order-value proxy for volume; the months of the promotion are the months in which promotion lines were ordered. The block is a fragment, the `PromotionMonths` column, and the complete statement is Q24:
 
 ```sql
 (SELECT GROUP_CONCAT(M, ',')
@@ -104,9 +104,9 @@ Lift       {{ g.f.lift }}
 Z          {{ g.f.z }}
 ```
 
-**Check:** {{ g.n_q24|count }} rows, one for each promotion. No lift passes a z of 2 (the largest, {{ top.label }} {{ top.year }}, reads {{ top.z|num(2) }}); {{ n_up }} of the {{ n_promos }} are positive and {{ n_down }} negative, down to {{ lowest|pct(1) }}. **Watch for:** months taken from the effective dates: {{ g.n_before|count }} promotions end before they start and so have no months at all, and one ends on its start date, which gives one month although its orders ran for two.
+**Check:** {{ g.n_q24|count }} rows, one for each promotion. No lift passes the descriptive z of 2 screen (the largest, {{ top.label }} {{ top.year }}, reads {{ top.z|num(2) }}); {{ n_up }} of the {{ n_promos }} are positive and {{ n_down }} negative, down to {{ lowest|pct(1) }}. **Watch for:** months taken from the effective dates: {{ g.n_before|count }} promotions end before they start and so have no months at all, and one ends on its start date, which gives one month although its orders ran for two.
 
-**Step 5. Check the price lists and the overrides (Q25 and Q26).** Q25 returns each list with its dates, the range of its prices against list, and the count of order lines priced after its end date:
+**Step 5. Check the price lists and the overrides (Q25 and Q26).** Q25 returns each list with its dates, the range of its prices against list, and the count of order lines priced after its end date. The block is a fragment, the last column, and the complete statement is Q25:
 
 ```sql
 (SELECT COUNT(*)
@@ -155,7 +155,7 @@ Their revenue      {{ g.f.still_rev }}
 ## What a strong answer says
 
 - **Each increase beside its threshold.** The threshold is the volume the family can lose before it earns less contribution than now; it is not a forecast.
-- **The evidence and its limits.** No promotion shows a lift beyond chance, and most are small. That is a screen of past discounts, so it cannot measure the response to an increase; recommend staged increases and watch each family's volume against its threshold.
+- **The evidence and its limits.** None of the {{ n_promos }} promotion scopes passes the descriptive z of 2 screen: {{ n_up }} lifts are positive and {{ n_down }} negative. The comparison of list-price-weighted order value is a proxy for volume that mix, seasonality and targeting also move. It does not establish significance, that a promotion caused a lift, that a result arose by chance, or that customers will accept a permanent increase. Recommend staged increases, and monitor realized net price, units and contribution against each family's loss threshold.
 - **The lists.** Prices reach invoices only through the lists, and the records show expired lists still in use and one approver for every override: new, approved lists with end dates, and customer lists renegotiated.
 - **The families bought.** They clear the floor at the delivered price, so only {{ need|join(', ') }} need increases.
 

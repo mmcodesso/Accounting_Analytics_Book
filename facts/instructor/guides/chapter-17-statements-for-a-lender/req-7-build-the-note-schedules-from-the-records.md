@@ -19,7 +19,7 @@ figures: []
 
 ## Purpose and learning outcomes
 
-A note is a schedule that the records can produce and that must agree with a line of the statements. Rebuilding a register, a debt schedule or revenue by product line joins documents to the ledger, which suits SQL; the workbook formats each schedule beside its statement and holds the text. The case allows Chapter 14's sales model for the revenue note if it is reconciled to the ledger and the cutoff, so students choose and say why. The analytics type is descriptive.
+The notes this requirement asks for rest on schedules that the records can produce, and each schedule must agree with the statements. Notes on policies and uncertainties are text, judged on their evidence. Rebuilding a register, a debt schedule or revenue by product line joins documents to the ledger, which suits SQL; the workbook formats each schedule beside its statement and holds the text. The case allows Chapter 14's sales model for the revenue note if it is reconciled to the ledger and the cutoff, so students choose and say why. The analytics type is descriptive.
 
 Students can roll property and equipment forward and reconcile it (Part 1), state the notes' terms, maturities and current portion (Part 2), disaggregate revenue on the adjusted basis (Part 3), break accrued liabilities and inventories into components (Part 4), and write the notes (Part 5).
 
@@ -28,7 +28,7 @@ Students can roll property and equipment forward and reconcile it (Part 1), stat
 ## Before you assign
 
 - **Files.** `LenderPackage.sql`, the workbook with Requirements 1 to 6 done, and CharlesRiver.xlsx for the Fixed Assets Table.
-- **Data conditions.** FixedAsset holds no residual values; each note links to its asset through DebtAgreement.FixedAssetID, and no column records a security interest; design services and freight billed each have their own revenue account; `2070` is unused; every billable service hour is billed.
+- **Data conditions.** FixedAsset holds no residual values; each note links to its asset through DebtAgreement.FixedAssetID, and no column records a security interest; design services and freight billed each have their own revenue account; `2070` is unused.
 - **Verify first.** The register, at monthly amounts rounded to the cent, reproduces the ledger's depreciation.
 
 ## How to run it
@@ -59,54 +59,25 @@ Pairs, about 150 minutes: 35 for property and equipment, 20 for the notes payabl
 
 ### Part 3: Revenue
 
-**Step 4. Disaggregate revenue on the adjusted basis.** Adjusted revenue is the ledger's revenue by account plus Requirement 4's cutoff items by year of delivery. The model's query builds the items in a CTE:
+**Step 4. Disaggregate revenue on the adjusted basis.** Adjusted revenue is the ledger's revenue by account plus Requirement 4's cutoff items by year of delivery. The model's revenue query builds the items in a Cutoff CTE: each late invoice added to its delivery year and taken out of its posting year, and each shipment line never invoiced at order price less discount.
 
-```sql
-Cutoff AS (
-    SELECT ItemGroup, DeliveryYear AS FiscalYear, LineTotal AS Amount
-    FROM Late
-    UNION ALL
-    SELECT ItemGroup, PostingYear, -LineTotal
-    FROM Late
-    UNION ALL
-    SELECT i.ItemGroup,
-        CAST(strftime('%Y', s.DeliveryDate) AS INTEGER),
-        ROUND(sl.QuantityShipped * sol.UnitPrice
-            * (1 - sol.Discount), 2)
-    FROM ShipmentLine AS sl
-        INNER JOIN Shipment AS s ON s.ShipmentID = sl.ShipmentID
-        INNER JOIN SalesOrderLine AS sol
-            ON sol.SalesOrderLineID = sl.SalesOrderLineID
-        INNER JOIN Item AS i ON i.ItemID = sl.ItemID
-        INNER JOIN SalesOrder AS so ON so.SalesOrderID = s.SalesOrderID
-        INNER JOIN Customer AS c ON c.CustomerID = so.CustomerID
-        LEFT JOIN SalesInvoiceLine AS sil
-            ON sil.ShipmentLineID = sl.ShipmentLineID
-    WHERE sil.SalesInvoiceLineID IS NULL
-),
-```
+The workbook reads the adjusted trial balance by revenue account and adds the cutoff to the invoice lines for the segments.
 
-The workbook reads the adjusted trial balance by revenue account and, for the segments, adds the cutoff to the invoice lines by posting year:
+**Check:** by product line, design services, freight and the five segments, the amounts of the instructor note below; at a point in time ${{ point_c|money }} and over time ${{ svc_c|money }} in {{ d.C }}. {{ d.P }}'s product revenue, ${{ ship_p|money }}, equals Exercise 14.2's revenue by ship date. The schedule is operating revenue before returns, so tie it to that line and bridge it to net revenue through the returns. The segments plus freight add up to operating revenue. **Watch for:** the ledger's revenue without the cutoff: ${{ g.revenue_gap[d.C]|money }} below the adjusted income statement in {{ d.C }} and ${{ (g.revenue_gap[d.P]|abs)|money }} above it in {{ d.P }}.
 
-```jinja
-{{ g.f.revenue }}
-```
+**Step 5. Show the contract balances and test the services.** Receivables are ${{ recv_p|money }} and ${{ recv_c|money }}, each including the opening line that no document supports; no contract asset or liability is recorded; customer credits awaiting refund (`2060`) are ${{ credits[1]|money }} and ${{ credits[2]|money }}, {{ issued }} Issued credit memos at the last year-end. The services query tests each year-end, engagement by engagement, setting the hours worked through it against the hours billed on invoices posted by it, in hours and amount.
 
-**Check:** by product line, design services, freight and the five segments, the amounts of the instructor note below; at a point in time ${{ point_c|money }} and over time ${{ svc_c|money }} in {{ d.C }}. {{ d.P }}'s product revenue, ${{ ship_p|money }}, equals Exercise 14.2's revenue by ship date. **Watch for:** the ledger's revenue without the cutoff: ${{ g.revenue_gap[d.C]|money }} below the adjusted income statement in {{ d.C }} and ${{ (g.revenue_gap[d.P]|abs)|money }} above it in {{ d.P }}.
-
-**Step 5. Show the contract balances and test the services.** Receivables are ${{ recv_p|money }} and ${{ recv_c|money }}, each including the opening line that no document supports; no contract asset or liability is recorded; customer credits awaiting refund (`2060`) are ${{ credits[1]|money }} and ${{ credits[2]|money }}, {{ issued }} Issued credit memos at the last year-end. The services query compares hours worked with hours billed, engagement by engagement.
-
-**Check:** all {{ billable|num(2) }} billable hours were billed, so the records show no recorded service work left unbilled. They cannot show that every hour worked was recorded. **Watch for:** reading engagement {{ engs[0].id }}'s planned hours less its billed hours as unbilled work: {{ g.short_hours|num(2) }} hours that were never worked.
+**Check:** no difference at any year-end ({{ svc_ye[0].n }}, {{ svc_ye[1].n }} and {{ svc_ye[2].n }} engagements), so the records show no recorded service work left unbilled at a year-end, though they cannot show that every hour worked was recorded. **Watch for:** a test over the whole extract or by today's status, which cannot see December work billed in January. And engagement {{ engs[0].id }}'s planned hours less its billed hours, {{ g.short_hours|num(2) }}, are planned work not recorded as worked, not unbilled work.
 
 ### Part 4: Accrued liabilities and inventories
 
-**Step 6. Break each line into its components.** Accrued liabilities: payroll and related, commissions, accrued expenses after A3 and interest; inventories: finished goods as recorded (purchased goods at receipt cost, manufactured goods at standard), materials and packaging at purchase-order cost (price variances go to cost of goods sold) and work in process net of the `1090` credit. Each total must equal its balance sheet line.
+**Step 6. Break each line into its components.** Accrued liabilities by payroll, commissions, accrued expenses after A3 and interest, and inventories by finished goods as recorded, materials at purchase-order cost and work in process net of the `1090` credit. Each total must equal its balance sheet line.
 
 **Check:** accrued liabilities ${{ s_c.accrued|money }}, of which payroll ${{ s_c.payroll|money }}; inventories ${{ s_c.inv|money }}, of which materials ${{ s_c.mat|money }}. **Watch for:** showing only the wages owed, ${{ g.payroll_only|money }}. The total misses the balance sheet by the ${{ opening_2030|money }} opening line.
 
 ### Part 5: The text of the notes
 
-**Step 7. Write the notes.** Five notes, each tied to a statement line.
+**Step 7. Write the notes.** Five notes, each tied to the statements.
 
 | Note | It must say | Ties to |
 |---|---|---|
@@ -114,7 +85,7 @@ The workbook reads the adjusted trial balance by revenue account and, for the se
 | Notes payable | Terms, linked asset, maturities, current portion, interest paid | `2110` |
 | Revenue | Timing and its assumption; disaggregation; contract balances; no recorded service work unbilled | The income statement |
 | Accrued liabilities | Components, the opening line named | The balance sheet |
-| Correction of {{ d.P }} | What changed; effect on opening equity and income; none on cash | The equity statement |
+| Correction of {{ d.P }} | Each error, each affected {{ d.P }} line as reported, adjusted and restated, the effect on opening retained earnings, the tax effect still open, A3's assumption, and unchanged cash-flow totals | The equity statement and the {{ d.P }} column |
 
 Notes still to be written (policies, inventories, Requirement 9's matters) go on the memo's list.
 
@@ -124,15 +95,13 @@ Notes still to be written (policies, inventories, Requirement 9's matters) go on
 |---|---|---|
 | Cost at the three year-ends | ${{ cost_f|money }}; ${{ cost_p|money }}; ${{ cost_c|money }} | 2 |
 | Notes payable at the last year-end | ${{ notes_total|money }} | 3 |
-| Operating revenue as adjusted, {{ d.C }} | ${{ point_c|money }} at a point in time; ${{ svc_c|money }} over time | 4 |
-| Accrued liabilities; inventories, {{ d.C }} | ${{ s_c.accrued|money }}; ${{ s_c.inv|money }} | 6 |
 
 {{ expected() }}
 
 ## What a strong answer says
 
 - **Property and equipment and notes.** Method, lives, both disposals, the noncash acquisition; the asset each note financed, with no security interest claimed.
-- **Revenue.** The adjusted basis, with the assumptions stated that control of the goods passes on delivery and that the service contracts support recognition over time.
+- **Revenue.** The adjusted basis, both timing assumptions stated (delivery for the goods, the over-time criteria for the services), and the bridge to net revenue.
 - **Accrued liabilities and the correction.** The opening line named; no effect on cash.
 
 A weak answer lists balances without reconciling them to the statements.
@@ -157,6 +126,4 @@ A weak answer lists balances without reconciling them to the statements.
 
 ## Extensions and discussion questions
 
-- Produce the revenue disaggregation from Chapter 14's sales model and reconcile it to the ledger and the cutoff.
-- Disclose the interest the next five years will cost.
-- Discuss: why claim no security interest when the records link each note to an asset?
+- Discuss: why is the link to the financed asset not enough to describe a note as secured, and which executed agreement would establish the security terms?

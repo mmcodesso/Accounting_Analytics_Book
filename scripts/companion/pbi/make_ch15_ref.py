@@ -342,6 +342,7 @@ RETURN
     [Budget] - CommissionBudget
         + IF ( NOT ISBLANK ( CommissionBudget ), CommissionRate * ProductRevenue )
 """, MONEY),
+    measure("Variance to Flexed", "[Actual] - [Flexed Budget]", MONEY),
     measure("Volume Effect", "[Flexed Budget] - [Budget]", MONEY),
     measure("Classification Effect", """
 CALCULATE ( [Actual] - [Budget], KEEPFILTERS ( Account[AccountNumber] = 6130 ) )
@@ -415,6 +416,13 @@ RETURN
             CALCULATE ( [Standard Hours to Cut-off], Window )
         )
     )
+""", "0.00"),
+    measure("Hours per Standard Hour 2024", """
+CALCULATE (
+    [Hours per Standard Hour],
+    REMOVEFILTERS ( 'Date' ),
+    'Date'[Year] = 2024
+)
 """, "0.00"),
     measure("Overtime Share", "DIVIDE ( [Overtime Hours], [Manufacturing Hours] )", "0.0%"),
 ]

@@ -18,7 +18,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 (2) Use a CASE expression on AccountType and AccountSubType to assign each account to a statement line: operating revenue, contra revenue, cost of goods sold, operating expenses, other income and expense, current assets, fixed assets, contra fixed assets, current liabilities, long-term liabilities, and equity.
 
-(3) Total the lines, and calculate net revenue, gross margin, operating income, and net income. Show gross margin and operating income as percentages of net revenue. The totals can be columns of one row, built by conditional aggregation; to stack them below the lines instead, join the SELECT statements with UNION ALL, which keeps every row of each and which Chapter 12 explains.
+(3) Total the lines, and calculate net revenue, gross margin, operating income, and net income. Show gross margin and operating income as percentages of net revenue. The totals can be columns of one row, built by conditional aggregation; to stack them below the lines instead, join SELECT statements that return the same columns in the same order with UNION ALL, which keeps every row of each and which Chapter 12 explains.
 
 (4) Show that total assets equal total liabilities plus equity plus net income, and compare net income with the closing entry of fiscal 2026 that moves it to retained earnings.
 
@@ -70,7 +70,7 @@ Work on these exercises in CharlesRiver_Work.sqlite, and save the queries of eac
 
 (3) Keep the top three items of each item group, using a CTE and an outer filter.
 
-(4) For each item group, show the highest and lowest unit margins and the number of items, using window functions rather than GROUP BY, so that each item row keeps its detail.
+(4) For every item with a list price, not only the three kept in (3), show the highest and lowest unit margins of its item group and the number of items in the group, using window functions rather than GROUP BY, so that each item row keeps its detail.
 
 (5) Explain why the Services items show a margin equal to their price, and why this measure is a gross margin at list price rather than a contribution margin.
 

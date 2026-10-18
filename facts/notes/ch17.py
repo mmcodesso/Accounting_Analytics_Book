@@ -1143,6 +1143,31 @@ def disposal(d, year: int, claim) -> dict:
     return dict(code=assets[0]["code"], cost=e["cost"], written=e["written"], proceeds=e["proceeds"], loss=e["loss"])
 
 
+SERVICE_POSTED = ("SELECT SourceDocumentID AS SalesInvoiceID, MIN(PostingDate) AS PostingDate FROM GLEntry "
+                  "WHERE SourceDocumentType = 'SalesInvoice' GROUP BY SourceDocumentID")
+
+
+def services_at(d, asof: str) -> dict:
+    """The design services at one year-end (U24, item 9): for every engagement started by then, the billable hours worked
+    through the year-end against the hours billed on invoices first posted by it, and the same in amount (hours worked at
+    the engagement's rate against the billing lines' amounts)."""
+    rows = d.q(
+        f"WITH Posted AS ({SERVICE_POSTED}), "
+        "Worked AS (SELECT t.ServiceEngagementID, SUM(t.BillableHours) AS Hours, SUM(t.BillableHours * se.HourlyRate) AS Amount "
+        "FROM ServiceTimeEntry t JOIN ServiceEngagement se ON se.ServiceEngagementID = t.ServiceEngagementID "
+        "WHERE t.WorkDate <= ? GROUP BY t.ServiceEngagementID), "
+        "Billed AS (SELECT b.ServiceEngagementID, SUM(b.BilledHours) AS Hours, SUM(b.LineAmount) AS Amount "
+        "FROM ServiceBillingLine b JOIN SalesInvoiceLine sil ON sil.SalesInvoiceLineID = b.SalesInvoiceLineID "
+        "JOIN Posted p ON p.SalesInvoiceID = sil.SalesInvoiceID WHERE p.PostingDate <= ? GROUP BY b.ServiceEngagementID) "
+        "SELECT se.ServiceEngagementID, COALESCE(w.Hours, 0), COALESCE(b.Hours, 0), COALESCE(w.Amount, 0), COALESCE(b.Amount, 0) "
+        "FROM ServiceEngagement se LEFT JOIN Worked w ON w.ServiceEngagementID = se.ServiceEngagementID "
+        "LEFT JOIN Billed b ON b.ServiceEngagementID = se.ServiceEngagementID WHERE se.StartDate <= ?", asof, asof, asof)
+    return dict(asof=asof, n=len(rows), worked=round(sum(r[1] for r in rows), 2), billed=round(sum(r[2] for r in rows), 2),
+                worked_amount=xr(sum(r[3] for r in rows)), billed_amount=xr(sum(r[4] for r in rows)),
+                hour_diff=sum(1 for r in rows if abs(r[1] - r[2]) > 0.005),
+                amount_diff=sum(1 for r in rows if abs(r[3] - r[4]) > 0.005))
+
+
 @note("ch17.r7", CHAPTER)
 def r7(d, claim):
     F, P, C = d.F, d.P, d.C
@@ -1260,6 +1285,22 @@ def r7(d, claim):
                 "JOIN SalesInvoice si ON si.SalesInvoiceID = sil.SalesInvoiceID WHERE substr(b.BillingPeriodEndDate, 1, 7) = ? "
                 "AND si.InvoiceDate <> ?", f"{C}-12", ye(C)) == 0
           and d.one("SELECT MAX(WorkDate) FROM ServiceTimeEntry") <= ye(C), "December's work was billed on December 31")
+    # the services at each year-end (U24, item 9): an invoice posts up to a few weeks after its billing period ends, so a
+    # test over the whole extract, or of the engagements not Billed today, cannot see work billed after a year-end
+    svc_ye = [services_at(d, ye(y)) for y in d.years]
+    claim(all(s["hour_diff"] == 0 and s["amount_diff"] == 0 for s in svc_ye),
+          "at each year-end every engagement started by then billed, on invoices posted by then, the hours worked through it")
+    claim(svc_ye[0]["n"] < svc_ye[1]["n"] < svc_ye[2]["n"], "the engagements started by each year-end grow from year to year")
+    svc_lines, svc_lines_ok = d.q(
+        "SELECT COUNT(*), SUM(ABS(b.BilledHours - (SELECT COALESCE(SUM(t.BillableHours), 0) FROM ServiceTimeEntry t "
+        "WHERE t.ServiceEngagementID = b.ServiceEngagementID AND t.WorkDate BETWEEN b.BillingPeriodStartDate AND "
+        "b.BillingPeriodEndDate)) < 0.005 AND ABS(b.LineAmount - ROUND(b.BilledHours * b.HourlyRate, 2)) < 0.005) "
+        "FROM ServiceBillingLine b")[0]
+    claim(svc_lines == svc_lines_ok, "every billing line bills the hours of its period at its rate")
+    svc_lag = int(d.one(f"SELECT MAX(julianday(p.PostingDate) - julianday(b.BillingPeriodEndDate)) FROM ServiceBillingLine b "
+                        f"JOIN SalesInvoiceLine sil ON sil.SalesInvoiceLineID = b.SalesInvoiceLineID JOIN ({SERVICE_POSTED}) p "
+                        f"ON p.SalesInvoiceID = sil.SalesInvoiceID"))
+    claim(svc_lag > 0, "some invoices post after their billing period ends")
     # the engagements not Billed by status: each must have billed every hour worked, so there is no unbilled work
     engs = []
     for eid, status, end, planned in d.q("SELECT ServiceEngagementID, Status, EndDate, PlannedHours FROM ServiceEngagement "
@@ -1310,6 +1351,7 @@ def r7(d, claim):
                 mixed=sorted(mixed),
                 recv_f=statement(d, F)["recv"], recv_p=s_p["recv"], recv_c=s_c["recv"], opening_ar=opening_line(d, "1020"),
                 credits=credits, issued=word(issued[0]), issued_n=issued[0], billable=billable, engs=engs,
+                svc_ye=svc_ye, svc_lines=svc_lines, svc_lag=svc_lag,
                 s_c=s_c, s_p=s_p, opening_2030=opening_2030, w_c=withheld[C], w_p=withheld[P])
 
 

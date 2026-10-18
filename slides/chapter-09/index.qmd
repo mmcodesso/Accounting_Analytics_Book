@@ -26,7 +26,7 @@ The last three cover filtering, sorting and limiting, and saving, documenting an
 ## This one is a database question
 
 - The controller turns to cost of goods sold, and one line in it: manufacturing variance
-- It has grown every year, by about three-quarters, while sales grew less than a tenth
+- It rose each year, to about three-quarters above fiscal 2024, while sales grew less than a tenth
 - Is production less efficient, or do the standards no longer describe the plant?
 - The detail sits in tables the Part II workbook never imported
 
@@ -83,7 +83,7 @@ DB Browser can change a database as well as read it, which is why the tutorials 
 
 ## Database Structure lists every column and its type
 
-{{< book-figure fig-09-02 crop="0,0.3092,1,0.4819" >}}
+{{< book-figure fig-09-02 crop="0,0.3092,1,0.4819" alt="Detail of the Database Structure tab, with the GLEntry table expanded to its sixteen columns. The outlined name and type columns show INTEGER for the keys, the other identifiers and the fiscal year and period, REAL for Debit and Credit, and TEXT for the dates, the voucher type and number, the source document type and the description, with each column's schema line beside them." >}}
 
 ::: {.notes}
 Look here first when you plan a query: it gives the exact name of every table and column and the type each holds. As Chapter 3 explained, the Charles River database stores whole numbers as INTEGER, amounts as REAL, and dates as TEXT in year-month-day form.
@@ -214,7 +214,7 @@ Students make the working copy, read the ledger's structure, start Chapter09.sql
 
 ## Choose the columns you need
 
-{{< book-figure fig-09-03 crop="0,0.092,1,0.6163" >}}
+{{< book-figure fig-09-03 crop="0,0.092,1,0.6163" alt="Detail of the Execute SQL tab, with numbered labels on the editor tab Chapter09.sql, the Open SQL file(s) and Save SQL file buttons, the Execute all/selected SQL button, the selected query and the result grid. The selected query lists AccountID, AccountNumber, AccountName, AccountType and AccountSubType from the Account table, and the grid, scrolled to the rows around the manufacturing accounts, outlines account 1090 Manufacturing Cost Clearing with AccountID 92 and account 5080 Manufacturing Variance with AccountID 93." >}}
 
 ::: {.notes}
 The window's parts: the editor tab named after the saved script; Open SQL file(s) and Save SQL file, icons on the real toolbar; Execute all/selected SQL; the selected query; the result grid; and the message pane below it. The outlined rows show the clearing and variance accounts, whose AccountIDs differ from their account numbers.
@@ -230,7 +230,7 @@ The message names the column SQLite could not find and the line where the statem
 
 ## Every close adds up
 
-{{< book-figure fig-09-05 crop="0,0.1876,1,0.6118" >}}
+{{< book-figure fig-09-05 crop="0,0.1876,1,0.6118" alt="Detail of the Execute SQL tab with the query that selects each work order close's material, conversion and total variance under the aliases Material, Conversion and Total, and a CheckDifference column that rounds material plus conversion minus total to two decimals. The first rows of the result show a CheckDifference of zero in every row, and that column is outlined." >}}
 
 ::: {.notes}
 The query adds the material and conversion parts of each close and subtracts the recorded total. The CheckDifference column is zero in every row shown; Tutorial 9.2 tests every close at once.
@@ -321,15 +321,15 @@ How many work orders or ledger rows does each condition keep?
 Ask students which of the four would fail silently in a real analysis.
 :::
 
-## Three of four look fine and are wrong {.answer}
+## Two of the four silently return no rows {.answer}
 
 1. None: an ordinary comparison with NULL is never true
-2. Every work order not yet closed
-3. None: = is case-sensitive, and the data says WorkOrderClose
-4. Every variance posting: LIKE ignores case in SQLite
+2. Every work order with no ClosedDate
+3. None: = matches capitals exactly here, and the data says WorkOrderClose
+4. Every posting of a work order close, to any account: LIKE ignores case in SQLite
 
 ::: {.notes}
-Only the second and fourth answer the question, and the fourth only in SQLite, which is why the book writes text values exactly as the data spells them.
+The first and third fail silently, with no rows and no error. The fourth finds the work order closes' postings to work in process and the clearing account as well as the variance account, so the variance postings of a year still need the account and the fiscal year. Case rules differ between databases and their collations, which is why the book writes text values exactly as the data spells them.
 :::
 
 # Guided Tutorial 9.2: Filtering the Ledger to the Variance Postings
@@ -474,7 +474,7 @@ Students rank the year's closes by total variance, measure the share of overhead
 
 ## Overhead makes up most of each large variance
 
-{{< book-figure fig-09-09 crop="0,0.1704,1,0.671" >}}
+{{< book-figure fig-09-09 crop="0,0.1704,1,0.671" alt="Detail of the Execute SQL tab with the query that selects the work order closes of fiscal 2026 with their material, labor, overhead and total variance, sorts them by total variance in descending order and keeps ten rows. The grid shows the ten closes, with totals of a few thousand dollars each, and the outlined Overhead column holds most of each total." >}}
 
 ::: {.notes}
 The ten largest variances of the year are each a few thousand dollars, and overhead is most of each one. Sorted the other way, the ranking starts with favorable variances, and a review threshold finds several hundred closes, only a small share of them favorable.
@@ -482,7 +482,7 @@ The ten largest variances of the year are each a few thousand dollars, and overh
 
 ## The script documents itself
 
-{{< book-figure fig-09-10 crop="0,0.1979,1,0.4444" >}}
+{{< book-figure fig-09-10 crop="0,0.1979,1,0.4444" alt="Detail of the first lines of the saved script Chapter09.sql. A header comment records the purpose, the database file, the preparer and date, and the checks, and the first two queries of Tutorial 9.1 follow, each under a comment line, one selecting every column of the Account table and one selecting the columns that identify each account." >}}
 
 ::: {.notes}
 The header records the purpose, the database, the preparer and the checks, and a comment above each query says what it answers. Saved beside the working copy, the script can be reviewed and rerun.

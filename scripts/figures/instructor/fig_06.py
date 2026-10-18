@@ -184,8 +184,8 @@ def if_06_0_a() -> Diagram:
     steps = [
         (cutoff, f"The {_word(len(invoices))} cutoff invoices, {nowrap(numbers[0])} to {nowrap(numbers[-1])}, dated {y - 1} and posted "
                  f"{esc(ex1['posted'])}. The ledger has them in {y}; InvoiceLines does not. Only {nowrap(early['number'])} "
-                 f"(${early['amount']:,.2f}) shipped in {y - 1}."),
-        (freight, f"Freight revenue, account {g1['acct']['freight']}. It is billed on the invoice header, so no invoice line carries it."),
+                 f"(${early['amount']:,.2f}) was delivered in {y - 1}."),
+        (freight, f"Freight revenue, account {g1['acct']['freight']}, net of freight credits. It is billed on the invoice header, so no invoice line carries it."),
         (contra, f"Sales returns and allowances, account {g1['acct']['returns']}: the credit memos, in a contra revenue account."),
     ]
     for i, (amount, text) in enumerate(steps):
@@ -198,7 +198,8 @@ def if_06_0_a() -> Diagram:
               align="left", stroke_width=1.5)
     bottom = 3 * (bh + gap) + bh
     _note(d, "Gray: the invoice lines. Blue: balances of the trial balance of Exercise 6.1. Teal: the line of the income statement. "
-             "Each arrow carries one reconciling item, signed as it changes the amount above it.", bottom + 14)
+             "Each arrow carries one reconciling item, signed as it changes the amount above it. The ladder is as recorded, "
+             "before correction of the cutoff error.", bottom + 14)
     return d
 
 

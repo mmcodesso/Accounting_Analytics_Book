@@ -49,7 +49,7 @@ def monthly(db: sqlite3.Connection, field: str, year: int = 2026, **match) -> li
     for r in lines(db):
         if r["fy"] == year and all(r[k] == v for k, v in match.items()):
             by[r["month"]] += r[field]
-    return [by[m] for m in MONTHS_2026]
+    return [by[f"{year}-{m:02d}"] for m in range(1, 13)]
 
 def _profile(db: sqlite3.Connection, sample: int | None) -> dict:
     """Column quality and distribution of SalesInvoiceLine on the first rows or all of them."""

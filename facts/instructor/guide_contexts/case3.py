@@ -1,7 +1,7 @@
 """The Part III case's instructor guides: the values the guides state, and the claims their wording makes.
 
 The case (cases/part-3-case.qmd, "Planning the Plant's Hours for 2027") is worked in one SQL script, Case.sql, whose model
-answer is outputs/companion/solutions/PartIII-case-sql/Case.sql (71 queries, eight saved views).  The registered notes
+answer is outputs/companion/solutions/PartIII-case-sql/Case.sql (74 queries, eight saved views).  The registered notes
 case3.r1 to case3.r5 (facts/notes/case3.py) already supply the expected values of the requirements; these contexts add what
 the model paths need beyond them: the row count each quoted query reports, and the result of every wrong variant a guide
 names, run read-only on the model script's own text with one change, so the symptom a guide describes is the symptom of the
@@ -44,7 +44,7 @@ SCHEMA = {
     "EmployeeShiftRoster": ["EmployeeShiftRosterID", "EmployeeID", "RosterDate", "ScheduledStartTime", "ScheduledEndTime",
                             "ScheduledHours", "RosterStatus", "CreatedByEmployeeID", "CreatedDate"],
     "AttendanceException": ["AttendanceExceptionID", "EmployeeID", "WorkDate", "TimeClockEntryID", "ExceptionType", "Severity",
-                            "MinutesVariance", "Status", "ReviewedByEmployeeID"],
+                            "MinutesVariance", "Status", "ReviewedByEmployeeID", "ReviewedDate"],
     "WorkCenterCalendar": ["WorkCenterID", "CalendarDate", "IsWorkingDay", "AvailableHours", "ExceptionReason"],
     "RoughCutCapacityPlan": ["BucketWeekStartDate", "WorkCenterID", "PlannedLoadHours", "AvailableHours"],
     "EmployeeAbsence": ["EmployeeID", "AbsenceDate"],
@@ -217,7 +217,7 @@ def chapter(d, claim):
           "the Downloads page lists the Part III solution, PartIII-case-sql.zip, and the views script, Setup_Part3_Views.sql")
     queries = script()
     per_req = Counter(int(re.match(r"-- Requirement (\d+):", first).group(1)) for first, _ in queries)
-    claim(len(queries) == 71, "the model script holds 71 queries")
+    claim(len(queries) == 74, "the model script holds 74 queries")
     claim(len(view_texts()) == len(VIEWS), "the model script saves eight views and reads Tutorial 11.3's")
     hourly = d.one("SELECT COUNT(*) FROM Employee e JOIN CostCenter cc ON cc.CostCenterID = e.CostCenterID "
                    "WHERE cc.CostCenterName = 'Manufacturing' AND e.PayClass = 'Hourly' AND e.IsActive = 1")
@@ -391,14 +391,22 @@ def g2(d, claim):
                     "(julianday(pe.ClockOutTime) - julianday(r.RosterDate || ' ' || r.ScheduledEndTime)) * 1440 AS Departure")
         ge_o, raw_o = {r[0]: r for r in ge}["Ordinary"][3], {r[0]: r for r in raw}["Ordinary"][3]
         rule_o = {r[0]: r for r in rule}["Ordinary"][3]
-        ungrouped = k.alt(keys["rule"], "Flagged AS ( SELECT TimeClockEntryID FROM AttendanceException GROUP BY TimeClockEntryID )",
-                          "Flagged AS ( SELECT TimeClockEntryID FROM AttendanceException )")
+        ungrouped = k.alt(keys["rule"], "Flagged AS ( SELECT TimeClockEntryID, MAX(CASE WHEN ExceptionType = 'Off Shift Clocking' "
+                          "THEN 1 ELSE 0 END) AS OffShift FROM AttendanceException GROUP BY TimeClockEntryID )",
+                          "Flagged AS ( SELECT TimeClockEntryID, CASE WHEN ExceptionType = 'Off Shift Clocking' "
+                          "THEN 1 ELSE 0 END AS OffShift FROM AttendanceException )")
         claim(gt == rule, "no plant entry arrives exactly on the rule's minutes, so > and >= give the same arrivals")
         claim(ge_o > rule_o and raw_o != rule_o, "some ordinary entries leave exactly the rule's minutes late, so in whole minutes >= counts more "
               "than >, and the raw julianday minutes put some of those exact cases on the wrong side")
         claim(ungrouped == rule, "no plant entry carries two exceptions, so joining the exceptions without grouping them gives the same counts")
         claim(by_type["Surge"][2] == 0 and by_type["Surge"][3] == by_type["Surge"][1] and by_type["Surge"][4] == 0,
-              "no surge entry arrives late, every one leaves late by the rule's minutes, and none was flagged")
+              "no surge entry arrives late, every one leaves late by the rule's minutes, and none carries any attendance exception")
+        claim(by_type["Surge"][5] == 0 and by_type["Ordinary"][5] == 0 and by_type["Ordinary"][4] > 0,
+              "no plant entry carries an Off Shift Clocking exception, so the ordinary entries that carry an exception carry one of another type")
+        off_centers = d.q("SELECT DISTINCT cc.CostCenterName FROM AttendanceException ae JOIN TimeClockEntry tc ON tc.TimeClockEntryID = "
+                          "ae.TimeClockEntryID JOIN Employee e ON e.EmployeeID = tc.EmployeeID JOIN CostCenter cc ON cc.CostCenterID = "
+                          "e.CostCenterID WHERE ae.ExceptionType = 'Off Shift Clocking'")
+        claim(off_centers == [("Warehouse",)], "the Off Shift Clocking exceptions belong to Warehouse employees")
         off = rows["off_shift"]
         minutes_rule = off[0][1]
         claim(all(r[1] == minutes_rule == r[4] for r in off), "each Off Shift Clocking exception records the minutes its clock-in was after the scheduled start")
@@ -452,10 +460,16 @@ def g3(d, claim):
             limits="what limits the weekly comparison", capacity="regular capacity the ordinary days used",
             cost="the cost of the surge-day overtime at base rates", ledger="the ledger lines of 5080 by fiscal year",
             bridge="the bridge of 5080 from fiscal 2024", direct="the postings made directly to 5080",
-            measures="three measures of the payroll line")
+            measures="three measures of the payroll line", six="over six complete following weeks")
         rows = {name: k.run(key) for name, key in keys.items()}
         n = {name: len(r) for name, r in rows.items()}
         year = rows["year"]
+        six = {r[0]: r for r in rows["six"]}
+        six_open = {r[0]: r for r in k.alt(keys["six"], "AND date(WeekStart, '+42 days') < ( SELECT MAX(WeekStart) FROM PlantWeeks)", "")}
+        claim(set(six) == {"Surge", "Ordinary"} and six["Surge"][2] < six["Ordinary"][2],
+              "over six complete following weeks, the weeks after surge weeks completed less than the weeks after the others")
+        claim(six_open["Surge"][1] == six["Surge"][1] + 1 and six_open["Ordinary"][1] == six["Ordinary"][1],
+              "a frame of six weeks alone adds one surge week whose frame holds the partial last week, and no other week")
         no_cut = k.alt(keys["year"], "WHERE pc.CompletionDate <= (SELECT MAX(WorkDate) FROM TimeClockEntry)", "")
         claim(no_cut[-1][3] < year[-1][3] and no_cut[0] == year[0], "counting the output to the end of the last year lowers its ratio and leaves the first year unchanged")
         claim([round(r[3], 2) for r in year] == [round(r[3], 2) for r in rows["december"]],
@@ -513,7 +527,7 @@ def g3(d, claim):
         n=n, year=year, no_cut=no_cut[-1], december=rows["december"], groups=rows["groups"], versus=rows["versus"], err=err,
         cum_next=cum_next, own_next=own_next, limits=rows["limits"][0], capacity=cap, cost=rows["cost"], all_centers=all_centers,
         ledger=rows["ledger"], closes_in=closes_in, by_id=len(by_id), bridge=rows["bridge"][0], direct=rows["direct"], m=m, m_cut=m_cut,
-        m_cal=m_cal, pay_dates=two_dates, surge_no_cut=surge_nc, short=short,
+        m_cal=m_cal, pay_dates=two_dates, surge_no_cut=surge_nc, short=short, six=six, six_open=six_open,
         ind_end=d.one("SELECT MAX(WorkDate) FROM LaborTimeEntry WHERE LaborType = 'Indirect Manufacturing'"))
 
 
@@ -528,7 +542,7 @@ def g4(d, claim):
             purchases="the purchases behind the equipment", standard="the standard cost of 2026's output",
             salaried="the salaried manufacturing staff", volume="why the volume comes from output",
             budget="what the budget holds for Manufacturing", plan="the 2027 plan, hours against regular capacity",
-            variance="the variance left at standard hours")
+            variance="the variance left at standard hours", weighted="budget's volume weighted by standard labor hours")
         rows = {name: k.run(key) for name, key in keys.items()}
         n = {name: len(r) for name, r in rows.items()}
         assets = rows["assets"]
@@ -561,13 +575,19 @@ def g4(d, claim):
         claim(rows["volume"][-1][1] > 2.5 and rows["volume"][-1][2] > 2, "the budget plans about three times the units the plant completed and the forecast more than twice the units ordered")
         claim({r[1] for r in rows["budget"]} == {"COGS"}, "the Manufacturing cost center's budget lines are cost of goods sold only")
         claim(plan[0][4] == 0 and plan[-1][4] == 0, "no scenario needs overtime for capacity")
+        weighted = rows["weighted"][0]
+        claim(weighted[2] > weighted[3] > 0 and weighted[4] > 0 and weighted[3] == plan[0][3],
+              "the budget's volume, weighted item by item by standard labor hours, needs more than the regular capacity of the plan")
+        claim(abs(weighted[2] / (std_hours * last_ratio) - 1) < 0.02,
+              "weighting by item differs from the aggregate ratio by less than two percent, so the conclusion does not depend on the mix")
         final = rows["variance"][0]
         claim(all(r[4] > r[5] for r in rows["purchases"]), "each plant asset bought in the window was ordered above its approver's limit")
         titles = [r[0] for r in rows["salaried"]]
     return dict(
         n=n, assets=assets, ledger=ledger, total_early=total_early, early_gap=round(total_early - ledger, 2), in_calendar=in_calendar,
         short_dep=short_dep, plan=plan, emp_all=emp_all, short_days=short_days, volume=rows["volume"], last_ratio=last_ratio,
-        budget_hours=std_hours * last_ratio, budget_over=std_hours * last_ratio - plan[0][3], standard=rows["standard"][0],
+        budget_hours=weighted[2], budget_over=weighted[4], budget_units=weighted[1], aggregate_hours=std_hours * last_ratio,
+        standard=rows["standard"][0],
         salaried=rows["salaried"], budget=rows["budget"], final=final, titles=titles, purchases=rows["purchases"],
         months=rows["months"])
 
@@ -583,7 +603,8 @@ def g5(d, claim):
             accounts="the accounts each cost center's payroll is debited to", names="the accounts the adjusting entries credit",
             prior="the 2025 work in the registers paid in fiscal 2026", l8="test L8 of Audit.sql rerun", l5="test L5 of Audit.sql rerun",
             l6="test L6 of Audit.sql rerun", adjust="the proposed adjustments and their effect", asc="actual conversion cost per standard hour",
-            asv="supplier invoices dated in 2025 and received in 2026")
+            asv="supplier invoices dated in 2025 and received in 2026",
+            released="completions dated after the time records end released")
         rows = {name: k.run(key) for name, key in keys.items()}
         n = {name: len(r) for name, r in rows.items()}
         total = rows["total"][0]
@@ -625,16 +646,20 @@ def g5(d, claim):
         for cc, num, name, debit in rows["accounts"]:
             accounts.setdefault(cc, []).append(num)
         claim(accounts["Manufacturing"] == [1090], "the Manufacturing payroll is debited to account 1090 alone")
+        released = {r[0]: r for r in rows["released"]}
+        claim(all(r[2] > 0 and abs(r[3] - r[4]) < 0.005 for r in released.values()),
+              "the completions dated after the time records end, and after the last processed period, released their standard conversion cost to 1090 to the cent")
         claim(all(len(v) == 2 and 6060 in v for c, v in accounts.items() if c != "Manufacturing"), "every other cost center's payroll goes to a salary account and 6060")
         l8 = {r[0]: r for r in rows["l8"]}
         claim(abs(l8["PayrollSummary"][2] + l8["PayrollPayment"][2]) < 0.005 and l8["JournalEntry"][1] == 1, "account 2030's payroll postings net to zero and one journal entry line carries the balance")
     return dict(
         work_centers=d.one("SELECT COUNT(DISTINCT WorkCenterID) FROM WorkCenterCalendar"),
         variance_account=d.one("SELECT AccountNumber FROM Account WHERE AccountNumber = 5080"),
+        receivable_account=d.one("SELECT AccountNumber FROM Account WHERE AccountNumber = 1020"),
         n=n, total=total, no_status=no_status, period_rows=period_rows, left_rows=left_rows, cal_days=cal_days, cal_left=cal_left,
         calendar_accrual=calendar_accrual, by_end=by_end[0], prior=prior, adjust=adjust, closes_in=closes_in, asc=asc, fg_year=fg_year,
         before_ship=before_ship[0], another=another[0], l6=l6, only_new=only_new, accounts=accounts, centers=rows["centers"],
-        names=rows["names"], l8=rows["l8"], asv=rows["asv"], l5=l5)
+        names=rows["names"], l8=rows["l8"], asv=rows["asv"], l5=l5, released=released)
 
 
 # --- requirement 6: the memo ----------------------------------------------------------------------------------------------

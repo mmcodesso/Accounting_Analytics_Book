@@ -1,4 +1,13 @@
-"""SQL twins for Tutorial 15.2: opex budget against actual, flexed commission, reconciliation."""
+"""SQL twins for Tutorial 15.2: opex budget against actual, flexed commission, reconciliation.
+
+The flexed commission is the budget's commission rate times the ACTUAL PRODUCT REVENUE of the invoice lines without
+design services (the tutorial's ProductRevenue, [Revenue] with 'Item'[ItemGroup] <> "Services"), not the ledger's
+revenue to 4010-4040, which differs by the invoices' freight and credit postings and the three cutoff invoices
+(review of 2026-10-16: the ledger basis gave 621,879.86, 6,646,555.36 and -174,858.78 for the tutorial's 621,780.04,
+6,646,455.55 and -174,758.97). The reconciliation by cost center flexes with the annual rate times the annual invoice
+revenue, as the table visual evaluates the year as one context; the sum of the monthly flexes is kept apart for the
+running visual (Step 10), where it is within a cent or two of the year's.
+"""
 import sqlite3
 from collections import defaultdict
 
@@ -15,19 +24,25 @@ for r in c.execute("""SELECT BudgetCategory, DriverType, COUNT(*), ROUND(SUM(Bud
         SUM(CostCenterID IS NULL), SUM(ItemID IS NOT NULL) FROM BudgetLine WHERE FiscalYear=2026 GROUP BY 1,2"""):
     print("  ", r)
 
-print("Actual revenue 4010-4040 2026 by cost center:", c.execute(f"""SELECT g.CostCenterID, ROUND(SUM(g.Credit-g.Debit),2)
+print("Ledger revenue 4010-4040 2026 by cost center (not the flex basis):", c.execute(f"""SELECT g.CostCenterID, ROUND(SUM(g.Credit-g.Debit),2)
     FROM GLEntry g JOIN Account a ON a.AccountID=g.AccountID {NOCLOSE} AND g.FiscalYear=2026
     AND a.AccountNumber IN (4010,4020,4030,4040) GROUP BY 1""").fetchall())
+INVOICE_REVENUE = """SELECT CAST(substr(si.InvoiceDate,6,2) AS INT), SUM(l.LineTotal) FROM SalesInvoiceLine l
+        JOIN SalesInvoice si ON si.SalesInvoiceID=l.SalesInvoiceID JOIN Item i ON i.ItemID=l.ItemID
+        WHERE substr(si.InvoiceDate,1,4)='2026' AND i.ItemGroup <> 'Services' GROUP BY 1"""
+print("Invoice merchandise revenue 2026 (the flex basis):", round(sum(v for _, v in c.execute(INVOICE_REVENUE)), 2))
 
 # monthly flex
 bud = defaultdict(float); act = defaultdict(float)
 for m, an, amt in c.execute("""SELECT b.Month, a.AccountNumber, SUM(b.BudgetAmount) FROM BudgetLine b JOIN Account a ON a.AccountID=b.AccountID
         WHERE b.FiscalYear=2026 AND a.AccountNumber IN (4010,4020,4030,4040,6290) GROUP BY 1,2"""):
     bud[(m, 'rev' if an < 5000 else 'com')] += amt
+for m, amt in c.execute(INVOICE_REVENUE):
+    act[(m, 'rev')] += amt
 for m, an, amt in c.execute(f"""SELECT CAST(substr(g.PostingDate,6,2) AS INT), a.AccountNumber, SUM(g.Credit-g.Debit)
         FROM GLEntry g JOIN Account a ON a.AccountID=g.AccountID {NOCLOSE} AND g.FiscalYear=2026
-        AND a.AccountNumber IN (4010,4020,4030,4040,6290) GROUP BY 1,2"""):
-    act[(m, 'rev' if an < 5000 else 'com')] += amt
+        AND a.AccountNumber = 6290 GROUP BY 1,2"""):
+    act[(m, 'com')] += amt
 flex_total = 0
 print("month, rev budget, com budget, rate, rev actual, flexed com, com actual")
 for m in range(1, 13):
@@ -36,7 +51,8 @@ for m in range(1, 13):
     flex_total += flexed
     print(f"  {m:2} {bud[(m,'rev')]:14,.2f} {bud[(m,'com')]:12,.2f} {rate:.5f} {act[(m,'rev')]:14,.2f} {flexed:12,.2f} {-act[(m,'com')]:12,.2f}")
 annual_rate = sum(bud[(m, 'com')] for m in range(1, 13)) / sum(bud[(m, 'rev')] for m in range(1, 13))
-print("monthly flex total", round(flex_total, 2), "annual-rate flex", round(annual_rate * sum(act[(m, 'rev')] for m in range(1, 13)), 2), "annual rate", annual_rate)
+annual_flex = annual_rate * sum(act[(m, 'rev')] for m in range(1, 13))
+print("monthly flex total (the running visual)", round(flex_total, 2), "annual-rate flex (the year's context)", round(annual_flex, 2), "annual rate", annual_rate)
 
 # reconciliation by cost center (opex)
 B = defaultdict(float); A = defaultdict(float); BD = defaultdict(float); AD = defaultdict(float); BC = defaultdict(float)
@@ -54,7 +70,7 @@ for cc, an, amt in c.execute(f"""SELECT COALESCE(cc.CostCenterName,'(Blank)'), a
 print("cost center, budget, flexed, actual, variance, volume, classification, remaining, remaining % of flexed")
 tot = defaultdict(float)
 for cc in sorted(set(B) | set(A)):
-    flexed = B[cc] - BC[cc] + (flex_total if BC[cc] else 0)
+    flexed = B[cc] - BC[cc] + (annual_flex if BC[cc] else 0)
     var = A[cc] - B[cc]; vol = flexed - B[cc]; cls = AD[cc] - BD[cc]; rem = var - vol - cls
     for k, v in zip("b f a v vol cls rem".split(), (B[cc], flexed, A[cc], var, vol, cls, rem)):
         tot[k] += v

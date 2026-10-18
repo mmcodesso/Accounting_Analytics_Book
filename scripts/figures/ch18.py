@@ -38,7 +38,7 @@ def fig_18_01() -> Diagram:
         d.arrow(top, head, exit=(0.15 + 0.35 * i, 1), entry=TOP)
         d.text("<b>Charged to products</b>", x, 160, w, 20, size=SMALL, color=GRAY, align="left")
         d.box(products, x, 182, w, 74, fill=BLUE_TINT, stroke=BLUE)
-        d.text("<b>Left out of product cost</b>", x, 266, w, 20, size=SMALL, color=GRAY, align="left")
+        d.text(f"<b>{title} leaves out</b>", x, 266, w, 20, size=SMALL, color=GRAY, align="left")
         d.box(rest, x, 288, w, 74, fill=WHITE if empty else AMBER_TINT, stroke=GRAY if empty else AMBER,
               dashed=empty)
         d.box(f"<i>{note}</i>", x, 372, w, 44, fill=GRAY_TINT, stroke=RULE, size=SMALL)

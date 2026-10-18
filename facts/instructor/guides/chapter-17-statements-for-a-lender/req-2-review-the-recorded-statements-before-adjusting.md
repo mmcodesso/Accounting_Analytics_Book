@@ -54,8 +54,10 @@ Individual or pairs, about 150 minutes: 45 for the model, 30 for Balance and the
 
 a. Choose **Home > Get data > Excel workbook**, select the Tables for the ledger, the chart, the cost centers and the journal entries, and choose **Transform Data**.
 b. In GLEntry, merge JournalEntry on VoucherNumber and EntryNumber (**Home > Merge Queries**) and expand EntryType.
-c. Add IsYearEndClose with **Add Column > Custom Column**, then clear **Enable load** on JournalEntry.
+c. Add IsYearEndClose with **Add Column > Custom Column**, whose formula is `{{ g.close_expr }}`, then clear **Enable load** on JournalEntry.
 d. Add the Date table of Tutorial 14.1, choose **Close & Apply**, and relate the Tables in **Model view**, many to one, **Single** direction.
+
+In the **Advanced Editor** the three steps read as below, a fragment of the GLEntry query, whose complete text is in the solution project.
 
 ```jinja
 {{ g.m_gl }}
@@ -73,7 +75,7 @@ d. Add the Date table of Tutorial 14.1, choose **Close & Apply**, and relate the
 
 ### Part 2: Flag the large changes
 
-**Step 3. Bring in the statement lines.** Load the Working TB Table of the package workbook as a second source, filter out its totals row, and relate its account number to the chart's.
+**Step 3. Bring in the statement lines.** Load the Working TB Table of the package workbook as a second source, filter out its totals row, and relate its account number to the chart's. Its steps read as below, a fragment that leaves out the Changed Type step and the LineOrder column.
 
 ```jinja
 {{ g.m_wt }}
@@ -81,7 +83,7 @@ d. Add the Date table of Tutorial 14.1, choose **Close & Apply**, and relate the
 
 **Check:** the matrix can group accounts by statement line. **Watch for:** the totals row. Power Query reads a Table's totals row as data, so a blank account number sits on the one side of the relationship and Desktop rejects it.
 
-**Step 4. Measure the change and set the threshold.** Choose **Modeling > New parameter > Numeric range** for the threshold (the model's series is `{{ g.series }}`, with **Add slicer to this page**), and write the measures.
+**Step 4. Measure the change and set the threshold.** Choose **Modeling > New parameter > Numeric range** for the threshold (the model's series is `{{ g.series }}`, with **Add slicer to this page**), and write the measures. Materiality reads Tutorial 14.3's Net Income.
 
 ```dax jinja
 {{ g.d_change }}
@@ -91,7 +93,7 @@ d. Add the Date table of Tutorial 14.1, choose **Close & Apply**, and relate the
 {{ g.d_flag }}
 ```
 
-**Check:** the card titled "{{ g.t_card }}" shows materiality of ${{ mat_c|money }} for {{ d.C }} and ${{ mat_p|money }} for {{ d.P }}, and the threshold reads the {{ d.C }} figure until the slider moves.
+**Check:** the card titled "{{ g.t_card }}" shows materiality of ${{ mat_c|money }} for {{ d.C }} and ${{ mat_p|money }} for {{ d.P }}. With no value selected on the slicer, Threshold Value falls back to the exact materiality, a selected value overrides it, and clearing the selection restores it. The nearest step, ${{ g.near|money }}, is a sensitivity, not the benchmark.
 
 **Step 5. Build the matrix and the flagged list.** On the Review page add the slicer ("{{ g.t_threshold }}", set to **Single select**), the matrix ("{{ g.t_matrix }}") with the year-end balances, the change and Flag, and a table ("{{ g.t_above }}") filtered to the measure `Is Above Threshold` with its filter card, sorted by absolute change.
 

@@ -208,16 +208,24 @@ def line_chart(d: Diagram, x: float, y: float, w: float, h: float, title: str | 
                categories: list[str], series: list[tuple[str, list[float], str]], unit: str,
                ticks: list[float], every: int = 1, legend: bool = False,
                selected: bool = False, axis_title: str | None = None) -> dict:
-    """A line chart: series are (name, values, color); ticks set the value axis, whose first
-    tick is where the axis starts. A value of None is a blank, which Power BI leaves as a gap in
-    the line. axis_title, when given, is the value axis's title (Format visual > Y-axis > Title),
-    written upward beside the tick labels. Returns the plot geometry and the y mapping."""
+    """A line chart: series are (name, values, color), or (name, values, color, "dashed") for a
+    line drawn dashed, so that two series differ by more than their color; ticks set the value
+    axis, whose first tick is where the axis starts. A value of None is a blank, which Power BI
+    leaves as a gap in the line. axis_title, when given, is the value axis's title (Format visual >
+    Y-axis > Title), written upward beside the tick labels. Returns the plot geometry and the y
+    mapping."""
     ix, iy, iw, ih = frame(d, x, y, w, h, title, selected)
     title_w = 18 if axis_title else 0
+    dashed = [len(s) > 3 and s[3] == "dashed" for s in series]
     if legend:
         lx = ix
-        for name, _, color in series:
-            d.box("", lx, iy + 6, 14, 3, fill=color, stroke=color, rounded=False)
+        for (name, _, color, *_), dash in zip(series, dashed):
+            if dash:
+                d.edge(d.anchor(lx, iy + 7), d.anchor(lx + 22, iy + 7), color=color, width=2.5, dashed=True,
+                       meta="edgeStyle=none;")
+                lx += 8
+            else:
+                d.box("", lx, iy + 6, 14, 3, fill=color, stroke=color, rounded=False)
             d.text(esc(name), lx + 18, iy - 2, text_width(esc(name), SMALL, False) + 8, 20, size=SMALL)
             lx += text_width(esc(name), SMALL, False) + 34
         iy += 20
@@ -232,11 +240,12 @@ def line_chart(d: Diagram, x: float, y: float, w: float, h: float, title: str | 
     y_of = _value_axis(d, left, top, plot_h, ticks, unit, ix + title_w, grid_w=plot_w)
     step = plot_w / len(categories)
     xs = [left + step * (i + 0.5) for i in range(len(categories))]
-    for name, values, color in series:
+    for (name, values, color, *_), dash in zip(series, dashed):
         anchors = [d.anchor(cx, y_of(v)) if v is not None else None for cx, v in zip(xs, values)]
         for a, b in zip(anchors, anchors[1:]):
             if a and b:
-                d.edge(a, b, color=color, width=2.5, meta="edgeStyle=none;")
+                d.edge(a, b, color=color, width=2.5, dashed=dash,
+                       meta="edgeStyle=none;" + ("dashPattern=3 2;" if dash else ""))
         for cx, v in zip(xs, values):
             if v is not None:
                 d.vertex("", f"ellipse;html=1;fillColor={color};strokeColor={color};", cx - 3,

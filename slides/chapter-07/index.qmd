@@ -12,7 +12,7 @@ This chapter turns from explaining the past to estimating the future and evaluat
 {{< book-objectives >}}
 
 ::: {.notes}
-The objectives run from measuring relationships and forecasting, through budgets and variances, to models that evaluate a decision. Each pairs a tool with the test that makes it trustworthy.
+The objectives run from measuring relationships and forecasting, through budgets and variances, to models that evaluate a decision and the auditor's tests of an expectation or a forecast. Each pairs a tool with the test that makes it trustworthy.
 :::
 
 ## A forecast, a budget review and a decision
@@ -23,7 +23,7 @@ The objectives run from measuring relationships and forecasting, through budgets
 - And whether to repeat the Furniture Seasonal Promotion
 
 ::: {.notes}
-Each request asks what could happen rather than what did happen. The chapter teaches the Excel tools that answer such questions, and the discipline of testing a model before anyone relies on it.
+Together, the requests use what happened in 2026 to forecast and plan 2027. The chapter teaches the Excel tools that answer such questions, and the discipline of testing a model before anyone relies on it.
 :::
 
 # From Explaining to Predicting and Deciding
@@ -115,7 +115,7 @@ Hyndman and Athanasopoulos recommend comparing every method with the four benchm
 
 - Fit the method to an earlier part of the history, and hold back a later part
 - Forecast the held-back part and compare with what actually happened
-- Express each error as a percentage of the actual; average them for MAPE
+- Take each absolute error as a percentage of actual revenue; average those for MAPE
 - The most recent quarter with actual results is the natural holdout
 
 ::: {.notes}
@@ -138,9 +138,9 @@ Ask students what they would do next in each case, not only what it means.
 ## Each result calls for a next step {.answer}
 
 1. The line explains little of the variation
-2. A slope unlikely to be zero, unless one point drives it
-3. An influential point: investigate, and report with and without it
-4. The method to use, with its error as a range
+2. Evidence against a zero slope under the model's assumptions; check whether one point drives it
+3. An unusual residual: investigate it, and see whether dropping it changes the fit
+4. A candidate method for this holdout; report an illustrative error range with its limits
 
 ::: {.notes}
 The second and third belong together: Charles River's trend was significant only with the start-up month in the data.
@@ -451,7 +451,7 @@ Every term is defined at the end of the chapter. Backtest, flexible budget and b
 Next: {{< book-next >}}
 
 ::: {.notes}
-Assign one exercise from each perspective; Exercise 7.6 evaluates management's own demand forecast, the auditor's version of a backtest. Chapter 8 turns to audit analytics.
+Assign one exercise from each perspective; Exercise 7.6 compares management's own demand forecast with past orders, an auditor's test of consistency with experience. Chapter 8 turns to audit analytics.
 :::
 
 ## About these slides

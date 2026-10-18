@@ -10,12 +10,12 @@ figures:
   - id: IF-13-0-A
     kind: diagram
     purpose: The build sequence of the chapter and the pages of the model answer, so an instructor sees where each tutorial and exercise sits.
-    shows: "Left to right: the four Tables, the queries in Power Query, the model with three relationships, then the three report pages (Validation, Sales and Discounts, Review). Branches from the model lead to the six exercise pages, each labeled with the query it adds (InvoiceHeaders for 13.1, PromotionProgram for 13.3, four Profile queries that do not load for 13.5) and with the tutorial it extends."
+    shows: "Left to right: the four Tables, the queries in Power Query, the model with three relationships, then the three report pages (Validation, Sales and Discounts, Review). Branches from the model lead to the six exercise pages, each labeled with the query it adds (InvoiceHeaders for 13.1, PromotionProgram for 13.3, four Profile queries that do not load, with a typed table of their figures, for 13.5) and with the tutorial it extends."
     data: None; the boxes cite the tutorials, exercises and the model answer's queries and pages.
   - id: IF-13-0-B
     kind: pbi-mock
     purpose: The model answer in Model view, with the unrelated control table beside the related ones.
-    shows: "Model view with six tables. SalesInvoiceLine in the middle, related to SalesInvoice, Item and PromotionProgram, SalesInvoice related to Customer, each line with 1 and an asterisk and an arrow toward the lines. InvoiceHeaders stands apart with no relationship line. Key columns are listed in each table."
+    shows: "Model view of the model answer. SalesInvoiceLine in the middle, related to SalesInvoice, Item and PromotionProgram, SalesInvoice related to Customer, each line with 1 and an asterisk and an arrow toward the lines. InvoiceHeaders stands apart with no relationship line, as does the small table that holds the figures attached to the memo of Exercise 13.5. Key columns are listed in each table."
     data: None; the tables, columns and relationships of the model answer.
   - id: IF-13-0-C
     kind: pbi-mock
@@ -57,6 +57,8 @@ The chapter depends on these conditions of the data:
 4. Reconcile a report to control totals before anyone reads it, and tell revenue from the other amounts on an invoice. Practiced in Tutorial 13.1 (Step 10), Exercises 13.1 and 13.2.
 5. Choose the summary and the visual for the reader's task, build a page, and control how its visuals filter one another. Practiced in Tutorial 13.2, Exercises 13.2 and 13.4, and questions 1, 5, 7, 9 and 15.
 6. Review a page for misleading axes, scales, periods and hidden filters, and apply the chapter's accessibility practices. Practiced in Tutorial 13.3, Exercises 13.3 (5) and 13.6, and questions 8 and 10 to 14.
+
+These outcomes are this guide's own and are numbered differently from the chapter's six learning objectives. Outcomes 1 to 3 serve objective 2, outcome 3's filter direction and outcome 5 serve objective 3, outcome 4 serves objective 4, outcomes 5 and 6 serve objective 5, and outcome 6 serves objective 6. Objective 1, what a reporting tool adds and the vocabulary of Desktop, the service, reports and dashboards, is met by the reading and questions 1 and 2.
 
 ## Preparing to teach
 
@@ -125,7 +127,7 @@ The chapter depends on these conditions of the data:
 | 15 | Discussion prompts 1 and 2; assign | 66, 69 |
 | 120 | Total | |
 
-Plan A is the safest: the stumbles of this chapter are about reading what a visual summarizes, and a demonstration shows how. Plan B lets students meet the traps themselves and needs a lab. Plan C leaves no time to demonstrate, and fails for students who arrive without a finished report.
+Plan A is the safest: the stumbles of this chapter are about reading what a visual summarizes, and a demonstration shows how. Plan B lets students meet the traps themselves and needs a lab. Plan C leaves no time to demonstrate, and fails for students who arrive without a finished report. Tutorial 13.1 takes students 75 to 90 minutes, more than the 55 or 60 minutes that Plans A and B give it in class, so both plans assume that students set it up and start before class or finish it afterward. Tell them which steps are due at each point, and do not expect all six exercises to fit the class plan.
 
 {{ figure('IF-13-0-A') }}
 
@@ -247,7 +249,7 @@ All six exercises are Power BI pages with a model answer in Chapter13-exercises-
 - *One exercise a session.* Take the basic one first: 13.4, 13.1, 13.2, 13.3, 13.6, 13.5.
 - *A light load.* Exercises 13.1 and 13.6 take about two and a half hours and cover outcomes 1, 3, 4 and 6.
 
-**Grading and discussion.** The pages of Exercises 13.1 to 13.4 suit grading from the saved report, with the Checks tab to compare a number. The notes, memos and review notes suit class discussion, and Exercise 13.6's review notes suit peer review. Collect the .pbix, not screenshots: the Applied Steps and the Filters pane show choices a screenshot hides.
+**Grading and discussion.** The pages of Exercises 13.1 to 13.4 suit grading from the saved report, with the Checks tab to compare a number. The notes, memos and review notes suit class discussion, and Exercise 13.6's review notes suit peer review. Collect the .pbix, not screenshots: the Applied Steps and the Filters pane show choices a screenshot hides. Grade what each requirement asks. The model answers go further in places, such as the likely season of Exercise 13.3's odd promotion or Exercise 13.1's remark that annual totals can agree while single invoices differ, and those count as a plus, not as conditions for full credit.
 
 {{ figure('IF-13-0-C') }}
 

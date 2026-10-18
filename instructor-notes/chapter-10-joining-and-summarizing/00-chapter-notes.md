@@ -16,11 +16,11 @@
 | Tools | DB Browser for SQLite 3.13.1, reading the working copy. No query of the chapter writes to the database |
 | Components | 3 guided tutorials, 6 exercises (2 for each perspective), 15 multiple-choice questions and a deck of 72 slides |
 | Files students need | CharlesRiver_Work.sqlite, made in Tutorial 9.1. Chapter10.sql is built through the tutorials; Chapter10-companion.zip holds it at the start of Tutorials 10.2 and 10.3 and at the end. Chapter10-exercises-sql.zip holds Ex 10.1.sql to Ex 10.6.sql |
-| Time | Class: about 270 minutes. Students: about 90 minutes of reading, 60 to 90 for each tutorial and 60 to 90 for each exercise (assign two or three). The times are estimates: time them yourself |
+| Time | Class: 270 minutes in Plan A, 240 in Plan B and 120 in Plan C. Students: about 90 minutes of reading, 60 to 90 for each tutorial and 60 to 90 for each exercise (assign two or three). The plans do part of the tutorials in class, so the times overlap. They are estimates, so time them yourself |
 
 The chapter depends on these conditions of the data:
 
-- No foreign keys are declared, so a bad join raises no error; it returns more or fewer rows. Every key of Tutorial 10.1 matches: the joins return 12,998 rows, one for each close.
+- No foreign keys are declared, so the keys must be tested. A wrong join raises no error in any database, and its count can look right, so check keys and totals too. Every key of Tutorial 10.1 matches: the joins return 12,998 rows, one for each close.
 - The ledger reaches its documents through SourceDocumentType and SourceDocumentID, and the ID that numbers the traced sale also numbers ledger rows of 11 kinds of document.
 - PurchaseRequisition has NULL approvers, so NOT IN returns 0 employees where NOT EXISTS finds 117 of 120. Two different customers share the name Brown LLC.
 - The labor time records end before the year does, because the last pay periods are Open, while the completions run to the last day. Tutorial 10.3 depends on the cut-off. Indirect time ends earlier still (2026-12-04), so the tutorial calls its ratio an observed-records diagnostic.
@@ -35,6 +35,8 @@ The chapter depends on these conditions of the data:
 5. Write scalar, IN, correlated and derived-table subqueries. Practiced in Tutorials 10.2 (Steps 1 and 3) and 10.3 (Step 6), Exercises 10.1 (4), 10.4 (2) and 10.6 (2), and questions 9 and 14.
 6. Tie a summary to the ledger, rebuild the pre-closing trial balance, and compare recorded hours with standard hours. Practiced in Tutorials 10.2 and 10.3, Exercises 10.1 (3) and (4) and 10.4 (1) and (2), and questions 13 and 15. No exercise repeats the hours comparison; Chapter 11 extends it by month and work center.
 
+These outcomes follow the chapter's six learning objectives one for one.
+
 ## Preparing to teach
 
 **Before the first class**
@@ -43,13 +45,13 @@ The chapter depends on these conditions of the data:
 - Do the three tutorials yourself in order. Tutorial 10.3 depends on the pay-period lookup of Step 5 and the cut-off of Step 6.
 - Open the model scripts once: each query has two comment lines and a result comment, and the notes at the end repeat the requirements and the checks.
 - A late student takes Chapter10.sql from Chapter10-companion.zip, from the folder Start of Tutorial 10.2 or 10.3. Tutorial 10.1 needs only the working copy. Get the PowerPoint deck from the Downloads page; each tutorial has a checkpoint slide.
-- Every query of the chapter runs in a few seconds at most, so slowness means a mistake. The exception is a correlated NOT EXISTS against LaborTimeEntry, which has no index on the operation key.
+- The queries are modest on this data, but run time depends on the computer and the query plan. For a slow query, read its joins, result size and indexes rather than the delay itself. A correlated NOT EXISTS against LaborTimeEntry is slow because the operation key has no index.
 
 **Pitfalls that cost class time**
 
 - **Ambiguous column.** A column in both tables of a join needs its alias; the red message pane reads ambiguous column name.
 - **Nothing selected.** Running with no selection runs the whole script and shows only the last result.
-- **A join on the wrong keys.** It raises no error: a close matched to the wrong work order key returns 12,485 rows instead of 12,998. The row-count test is the only alarm.
+- **A join on the wrong keys.** It raises no error: a close matched to the wrong work order key returns 12,485 rows instead of 12,998. The count exposes this one, but another wrong join can keep the count, so check the key too.
 - **A condition in the wrong clause.** Moving the date test from ON to WHERE in Tutorial 10.1 Step 6 turns 88 rows into 83, with no sign in the message pane.
 - **Joining the raw tables in Tutorial 10.3.** Labor time joined to the completions before summarizing asks for 366,690,316 rows, and DB Browser seems to hang. Stop it and ask what level each table is at.
 - **A copy without its comment.** Tutorial 10.2 copies a query and edits it; the copy keeps its comment, or the script loses what each query tests.
@@ -71,7 +73,7 @@ The chapter depends on these conditions of the data:
 | 2 | 20 | Fan-out; check | 38 to 42 |
 | 2 | 15 | Subqueries and derived tables | 43 to 46 |
 | 3 | 10 | The order in which a query runs | 47 to 49 |
-| 3 | 30 | Tutorial 10.2: Steps 1, 2, 4 live; Steps 3, 5, 6 for students | 50 to 56 |
+| 3 | 30 | Tutorial 10.2: Steps 2, 3, 6 live; Steps 1, 4, 5 for students | 50 to 56 |
 | 3 | 15 | Measuring the plant against its standards | 57 to 60 |
 | 3 | 25 | Tutorial 10.3: Steps 4, 6, 7 live; Steps 1 to 3, 5 for students | 61 to 66 |
 | 3 | 10 | The questions again; assign the exercises | 67 to 72 |
@@ -133,7 +135,7 @@ Plan A is the safest, because this chapter's stumbles are about reading a result
 
 ### Guided Tutorial 10.2: Building the Trial Balance and Following the Conversion Cost
 
-**Purpose.** Students put two totals side by side with scalar subqueries, rebuild the pre-closing trial balance, check with a derived table that it nets to zero, follow account 1090 by year and source, split the conversion variance into labor and overhead, and identify the journal entries. **Time.** About 60 minutes. **Demonstrate, then hand over.** Demonstrate Step 2 (the two closes left out), Step 3 (the derived table) and Step 6 (the document type in ON). Leave Steps 1, 4 and 5 to students.
+**Purpose.** Students put two totals side by side with scalar subqueries, rebuild the pre-closing trial balance, check with a derived table that it nets to zero, follow account 1090 by year and source, split the conversion variance into labor and overhead, and identify the journal entries. **Time.** About 60 minutes. **Demonstrate, then hand over.** Demonstrate Step 2 (the two closes left out), Step 3 (the derived table) and Step 6 (the document type in ON). Leave Steps 1, 4 and 5 to students, after showing account 1090's flows (slide 53).
 
 | Step | Look for | Value |
 |---|---|---|
@@ -225,7 +227,7 @@ All six exercises are SQL scripts with a model answer in Chapter10-exercises-sql
 - *One exercise a session.* Take the basic one first: 10.3, 10.2, 10.5, 10.6, 10.1, 10.4.
 - *A light load.* Exercises 10.3 and 10.5 take about two and a half hours and cover outcomes 1 to 3.
 
-**Grading and discussion.** Exercises 10.1, 10.3 and 10.4 (1) to (4) suit grading from the script and the row counts, because their numbers have one answer. Exercises 10.2 (4), 10.4 (5), 10.5 (6) and 10.6 (5) end in a memo or a table of dispositions and suit class discussion. Collect the script, not a screenshot: its comment lines show the population and the expected result.
+**Grading and discussion.** Exercises 10.1, 10.3 and 10.4 (1) to (4) suit grading from the script and the row counts, because their numbers have one answer. Exercises 10.2 (4), 10.4 (5), 10.5 (6) and 10.6 (5) end in a memo or a table of dispositions and suit class discussion. Collect the script, not a screenshot: its comment lines show the population and the expected result. Grade what each requirement asks. The model answers' extra queries and points, such as the ownership test of 10.2 or the open invoices of 10.6, count as a plus, not toward full credit.
 
 ## Multiple-choice questions
 

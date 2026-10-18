@@ -8,7 +8,7 @@
 
 **Cutoff.** The recording of a transaction in the accounting period in which it occurred. A cutoff test compares the posting date that first records each transaction with the date of the event behind it, such as the delivery of the goods a sales invoice bills, when control passes on delivery, or the work a payroll pays, and flags the transactions recorded in a different period.
 
-**Existence and completeness tests.** Tests that trace in opposite directions between the ledger and its documents. An existence test starts from the ledger and asks whether each posting has a document record; a completeness test starts from the documents and asks whether each was posted. The second is an audit assertion about the ledger, not the data quality dimension of Chapter 2, which asks whether the expected records and values are present in a dataset.
+**Existence and completeness tests.** Tests that trace in opposite directions between the ledger and its documents. An existence test starts from the ledger and asks whether each posting has a document record, which contributes to testing the occurrence of the recorded transactions; a completeness test starts from the documents and asks whether each recorded document was posted. Neither independently proves that the underlying event occurred or finds a transaction omitted from both records. The second is an audit assertion about the ledger, not the data quality dimension of Chapter 2, which asks whether the expected records and values are present in a dataset.
 
 **Full-population testing.** An audit approach that applies a test to every item of a population rather than to a sample, so that it finds the actual exceptions instead of estimating an error rate.
 
@@ -18,7 +18,7 @@
 
 **Self-join.** A join of a table to itself, under two aliases, used to compare each row with other rows of the same table, such as payments to the same supplier for the same amount on different dates. A condition such as `b.ID > a.ID` keeps each pair once.
 
-**Substantive analytical procedure.** An analytical procedure that an auditor uses as evidence about whether an amount is misstated, by comparing the recorded amount with an expectation developed from plausible relationships and investigating differences above a threshold set in advance. In SQL, the expectation can be calculated for every record of a population, as when the hours of each earnings line times the employee's rate of pay predict the amount paid, although an expectation recalculated from rates the same system stores is weaker evidence than one built from independent data.
+**Substantive analytical procedure.** An analytical procedure that an auditor uses as evidence about whether an amount is misstated, by comparing the recorded amount with an expectation developed from plausible relationships and investigating differences above a threshold set in advance. In SQL, the expectation can be calculated for every record of a population, as Exercise 7.5 did in Excel for revenue and commissions. Recomputing the pay of each earnings line from its hours and the rate the same system stores, as test H5 does, is a recalculation of arithmetic, weaker evidence than an expectation built from independent data.
 
 **Three-way match.** A comparison of the purchase order, the goods receipt, and the supplier invoice for the same purchase, testing that the company is billed only for what it ordered and received, at the price it approved.
 

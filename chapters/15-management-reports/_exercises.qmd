@@ -66,11 +66,11 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 (2) Choose **Modeling > New parameter > Fields**, name the parameter `Plant Measure`, and add Hours per Standard Hour, Overtime Share, and Labor Cost per Standard Hour.
 
-(3) Add a clustered column chart with Year on the **X-axis** and the Plant Measure parameter on the **Y-axis**, filtered to 2024 to 2026, and the slicer that Power BI adds. Record the three measures for each year.
+(3) Add a clustered column chart with Year on the **X-axis** and the Plant Measure parameter on the **Y-axis**, filtered to 2024 to 2026, and the slicer that Power BI adds, set to **Single select** so that the chart shows one measure at a time. Record the three measures for each year.
 
 (4) Explain why the labor cost per standard hour rose faster than the hours per standard hour.
 
-(5) Try to use the field parameter as the field of a drill-through page, and explain what Power BI allows instead.
+(5) Try to use the field parameter as the field of a drill-through page. Explain what Power BI allows instead, and whether that alternative applies to a parameter that lists measures.
 
 **Deliverable.** The chart and its slicer, and a short note answering requirements (3) to (5).
 
@@ -112,13 +112,13 @@ Work on these exercises in a copy of Charles River Reports.pbix, saved with **Fi
 
 (1) Add a calculated column MonthStart to the Date table, `DATE ( YEAR ( 'Date'[Date] ), MONTH ( 'Date'[Date] ), 1 )`, formatted as a date. A forecast needs a continuous date axis, which the text column YearMonth cannot provide.
 
-(2) Add a line chart with MonthStart on the **X-axis** and Revenue on the **Y-axis**, filtered to the months from January 2024 to September 2026. In the **Analytics** pane, add a forecast of three months with a 95 percent confidence interval.
+(2) Add a line chart with MonthStart on the **X-axis** and Revenue on the **Y-axis**, filtered to the months from January 2024 to September 2026. In the **Analytics** pane, add a forecast of three months with a 95 percent confidence interval. Use MonthStart itself on a continuous axis, with Revenue as the only series, and note the Power BI Desktop version and the forecast settings, including seasonality, so that you can apply the same ones in requirement (5).
 
 (3) Record the forecast for October, November, and December 2026 and each month's interval, and add the three monthly forecasts to a quarter total. The monthly intervals cannot simply be added into an interval for the quarter.
 
-(4) Compare the forecast with the actual revenue of fiscal 2026's fourth quarter and with the three benchmarks of Chapter 7: the trend, the mean, and the same quarter of the previous year.
+(4) Compare the forecast with the actual revenue of fiscal 2026's fourth quarter and with the three benchmarks of Chapter 7: the trend, the mean, and the same quarter of the previous year. Use one definition of error for every method. The quarter's error is the forecast total over the actual total, less one, and the monthly error is the average, over the three months, of the absolute difference between the forecast and the actual divided by the actual.
 
-(5) Change the start of the chart to February 2024, leaving out the start-up month, and repeat requirement (3). Report how much the forecast changed.
+(5) Change the start of the chart to February 2024, leaving out the start-up month, and repeat requirement (3). Report how much the forecast changed. The February run fits the same months as Chapter 7's benchmarks, so it is the fairer comparison with them.
 
 (6) Write a short audit note on whether the forecast is fit for the 2027 plan and what the manager should disclose with it.
 

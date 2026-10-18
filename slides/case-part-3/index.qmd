@@ -244,7 +244,7 @@ The assumptions are the volume and why not the budget's, a target of hours per s
 - **Check:** the effect on income is kept apart from the balance sheet
 
 ::: {.notes}
-Estimate the cost of the work after the time records end from the cost per working day of the last eight processed pay periods, by cost center, and write the entries. Measure the prior year-end's work paid in the latest year by the same method, show why the effect on income differs from the effect on the liability, and decide what to do about the accrued payroll balance carried since the opening entry. Start from Chapter 6's net income, and judge materiality on each error and on the liability left out, not only on the net effect on income.
+Estimate the cost of the work after the time records end from the cost per working day of the last eight processed pay periods, by cost center, and write the entries. Measure the prior year-end's work paid in the latest year by the same method, show why the effect on income differs from the effect on the liability, and decide what to do about the accrued payroll balance carried since the opening entry. Say how you treat the manufacturing part in your income figures. Start from Chapter 6's net income, and judge materiality on each error and on the liability left out, not only on the net effect on income.
 :::
 
 ## Check your understanding {.check}
@@ -278,7 +278,7 @@ Fixed overhead goes to inventory only at normal capacity; abnormal amounts, such
 - At most two pages, in the order of the controller's questions
 - Auditing: the evidence, its independence, and the control
 - Managerial accounting: the hours' output and cost, and the plan
-- Financial reporting: the adjustments, and why inventory stays out
+- Financial reporting: the adjustments, and why abnormal costs stay out of inventory
 
 ::: {.notes}
 The auditing section also names the explanations that remain open and the evidence that would settle them. The managerial section includes the bridge of the variance and the overtime the plan allows. Close with your recommendation, and keep calling the hours unsupported.

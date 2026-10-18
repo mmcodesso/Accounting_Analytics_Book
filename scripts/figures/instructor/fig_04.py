@@ -251,7 +251,7 @@ def if_04_0_a() -> Diagram:
         ("2", "Filled one column to the right with the fill handle", "C16", f2, "C16 shows 0",
          "Each column name moved to the next column of the Table. No error appears, and the count is wrong.", CORAL),
         ("3", "Copied from B16 and pasted into C16", "C16", f3, f"C16 shows {pasted:,}",
-         f"The column names stayed; only $A16 and the rate cell moved, so C16 counts the {second_rate:.0%} lines.", TEAL),
+         f"The column names and $A16 stay as typed, and B$15 becomes C$15, so C16 counts the {second_rate:.0%} lines.", TEAL),
     ]
     y += 30
     for number, title, cell, formula, shows, reading, tone in panels:
@@ -721,7 +721,7 @@ def if_04_5_a() -> Diagram:
     assert blank_total == n["blank"] and sum(v for _, v in by_year) == n["transit"]
     head2 = lambda text: [dict(text=text, bold=True, fill=BLUE_TINT), dict(text="Shipments", bold=True, fill=BLUE_TINT, align="right")]
     rows = [dict(n="3", cells=["Shipments", f"{n['shipments']:,}"]),
-            dict(n="4", cells=["ReviewDate", dict(text=review, color=BLUE)]),
+            dict(n="4", cells=["ReviewDate", review]),                  # =ReviewDate, a formula, so black
             dict(n="5", cells=[]),
             dict(n="6", cells=head2("Exception category")),
             dict(n="7", cells=["Blank TrackingNumber (amber)", f"{n['blank']:,}"]),

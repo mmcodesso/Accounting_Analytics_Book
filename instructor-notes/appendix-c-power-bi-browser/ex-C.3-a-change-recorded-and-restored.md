@@ -12,7 +12,7 @@
 
 ## Purpose and learning outcomes
 
-Internal audit wants evidence that a model built in the browser can be returned to a known state after a mistake. The service saves every change as it is made, with no undo, so the only way back is a saved version or a formula typed again. The exercise makes one controlled change to the Revenue measure and shows what detects it. The test in Tests.dax changes, and the report's cards do not, because they read columns and not the measure. A change log then records what happened. The analytics type is diagnostic, with a control point at the end: version history compared with a project under version control.
+Internal audit wants evidence that a model built in the browser can be returned to a known state after a mistake. The service saves every change as it is made, with no undo, so the way back is a saved version, which the service may also have captured when the model was opened in Editing mode, or a formula typed again. The exercise makes one controlled change to the Revenue measure and shows what detects it. The test result changes, and the report's original cards do not, because they read columns and not the measure, while any query or visual that uses the measure changes with it. A change log then records what happened. The analytics type is diagnostic, with a control point at the end: version history compared with a project under version control.
 
 Students can:
 
@@ -25,11 +25,11 @@ Students can:
 
 ## Before you assign
 
-- **Files and software.** A browser and the student's model after Tutorial C.3, in Editing mode, with Tests.dax saved. A Pro license is needed for version history. Without one, students do Requirements (2), (3) and (5), and for (4) retype the formula and run the third test.
+- **Files and software.** A browser and the student's model after Tutorial C.3, in Editing mode, with Tests.dax saved. A Pro license is needed for version history, which also needs Write and Build permission on the model. Without a license, students take the manual route of the exercise: they record the formula, the model's name and its workspace before editing, retype the recorded formula for (4), run the third test, and label the method manual repair.
 - **Data conditions.** ListAmount, Quantity times BaseListPrice, exceeds LineTotal in every fiscal year, so the changed test is higher in all three rows.
 - **Verify first, in a live tenant.** The author's test read the two commands, **Save to version history** and **Version history**, on the **File** menu of a Pro account, but not their windows. Check that a description box exists, what the restore control is called, and what a free account's **File** menu shows.
 - **Order.** Do this exercise after C.1 and C.2: it changes the Revenue measure that C.1's query reads.
-- **One sitting, one editor.** Have students do (1) to (4) in one session, on a model only they edit. Microsoft supports restoring a version only up to 14 days old, and a restore brings back the model's data as it stood, as well as its measures.
+- **One sitting, one editor.** Have students do (1) to (4) in one session, on a model only they edit. Microsoft supports restoring a version only up to 14 days old, and a restore brings back the model's data as it stood, as well as its measures. The service keeps five versions and a sixth replaces the oldest, and it also captures one each time a model is opened in Editing mode, so students do not open and close the model repeatedly between (1) and (4).
 
 ## How to run it
 
@@ -45,7 +45,7 @@ a. In the model editor, choose **File > Save to version history**.
 b. If the window offers a description, type `Before Exercise C.3`.
 c. Choose **File > Version history** and confirm that a version is listed.
 
-**Check:** a version dated now. **Watch for:** a student who saves after the change, or not at all: the model then has no earlier state to return to, and the formula must be retyped.
+**Check:** a version dated now. **Watch for:** a student who saves after the change, or not at all. Before concluding that recovery is impossible, look at version history: the service also captures a version when the model is opened in Editing mode, so a suitable earlier version may exist. Identify it, verify that it predates the change, and prove the restore by the third run. If none is suitable, the student restores the recorded formula by hand and labels the method manual repair. The named baseline, saved immediately before the exercise, is still required.
 
 ### Requirement (2): The test before the change
 
@@ -82,7 +82,7 @@ c. Return to DAX query view and click **Run**.
 Revenue = SUM ( SalesInvoiceLine[ListAmount] )
 ```
 
-**Check:** every row now equals its list amount: fiscal 2026 reads $33,589,137.45, higher by $3,832,717.37, the price reductions and discounts. Open the Sales and Discounts page: its cards still read the old revenue, because they sum the columns. The test is the only place the change shows. **Watch for:** a result that has not moved, which usually means the formula was not committed with Enter; look at the formula bar.
+**Check:** every row now equals its list amount: fiscal 2026 reads $33,589,137.45, higher by $3,832,717.37, the price reductions and discounts. Open the Sales and Discounts page: its original cards still read the old revenue, because they sum the columns. Any query or visual that uses [Revenue], Exercise C.1's Revenue column included, reflects the changed measure, so the test is the check that detects it. **Watch for:** a result that has not moved, which usually means the formula was not committed with Enter; look at the formula bar.
 
 ![The three runs of the test, and what the pages did and did not show.](../figures/appendix-c-power-bi-browser/IF-AC-3-A.pdf)
 
@@ -106,7 +106,7 @@ Revenue = SUM ( SalesInvoiceLine[LineTotal] )
 
 **Step 5. Write the entry and the comparison.** The model entry has five rows: what changed (the Revenue measure, from LineTotal to ListAmount), when (the student's date and time), the results ($29,756,420.08, $33,589,137.45, $29,756,420.08), how it was restored, and by whom.
 
-**Check:** the comparison says that version history records the model and its data as they stood at each saved version, with the time of the last change, the person who made it, and a description if one was typed. It keeps only the last five, supports a restore up to 14 days back, and needs a Pro license. It does not record what changed, change by change, or why, unless someone wrote it in the description, and nothing reviews a change before it takes effect. A Power BI project under version control, Chapter 16's change control, records every change with its author and message and can be reviewed before it is merged.
+**Check:** the comparison says that version history records the model and its data as they stood at each saved version, with the time of the last change, the person who made it, and a description if one was typed. It keeps only the last five, supports a restore up to 14 days back, and needs a Pro license. It does not record what changed, change by change, or why, unless someone wrote it in the description, and nothing reviews a change before it takes effect. A Power BI project retained in version control, Chapter 16's change control, records committed changes with their author and message and can support review before merging. It does not automatically capture every service edit.
 
 ## Expected results
 
@@ -118,12 +118,12 @@ Revenue = SUM ( SalesInvoiceLine[LineTotal] )
 | Test after the restore | $29,756,420.08 | 4 |
 | Test after the change, each year | 2024: $30,596,029.91; 2025: $33,030,575.85; 2026: $33,589,137.45 | 3 |
 
-> **Instructor notes, Exercise C.3:** the test's fiscal 2026 revenue is 29,756,420.08 before the change, 33,589,137.45 with ListAmount (higher by 3,832,717.37, the price reductions and discounts), and 29,756,420.08 again after the restore. Version history records the model and its data at each saved version, with the time of the last change, the person who made it, and a description only if one was typed. It keeps up to five versions, supports a restore up to 14 days back, and needs a Pro license. It does not record what changed, change by change, and nothing reviews a change before it takes effect. A Power BI project under version control (Chapter 16) records every change with its author and message and can be reviewed before it is merged.
+> **Instructor notes, Exercise C.3:** the test's fiscal 2026 revenue is 29,756,420.08 before the change, 33,589,137.45 with ListAmount (higher by 3,832,717.37, the price reductions and discounts), and 29,756,420.08 again after the restore. Version history records the model and its data at each saved version, with the time of the last change, the person who made it, and a description only if one was typed. It keeps up to five versions, also captures one when the model is opened in Editing mode, supports a restore up to 14 days back, and needs a Pro license. It does not record what changed, change by change, and nothing reviews a change before it takes effect. A Power BI project retained in version control (Chapter 16) records committed changes with their author and message and can support review before merging. It does not automatically capture every service edit.
 
 ## What a strong answer says
 
 - **(1), (2)** A version before the change and a baseline result.
-- **(3)** The test moved in all three years and the pages did not, with the reason: the cards read columns. A strong answer adds that a report built on the measure would have changed on every page at once.
+- **(3)** The test moved in all three years and the original cards did not, with the reason: the cards read columns. A strong answer adds that any query or visual built on the measure, Exercise C.1's Revenue column among them, changes with it, and that a report built on the measure would have changed on every page at once.
 - **(4)** The restore proved by the third run, not by the version history window.
 - **(5)** A complete entry, and a comparison that names what version history leaves out: the change itself, a reason unless one was typed, review, and more than five versions.
 
@@ -137,9 +137,11 @@ Revenue = SUM ( SalesInvoiceLine[LineTotal] )
 
 ## Grading guide
 
+For the manual route, Requirement 1's points are earned by preserving the original formula, the model's identity and the baseline result before editing. Requirement 4's points need the formula restored and the third passing run recorded. The method is labeled manual repair, and the answer does not claim that this route demonstrated the service's version-restore feature. The total stays the same.
+
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
-| Requirement 1 | 10 | A version saved before the change | Saved after |
+| Requirement 1 | 10 | A version saved before the change, or on the manual route the formula, model identity and baseline result preserved before editing | Saved after |
 | Requirement 2 | 15 | Baseline result recorded | Result without the query |
 | Requirement 3 | 25 | Result, difference and why the pages did not change | Result only |
 | Requirement 4 | 20 | Restored and proved by a third run | Restored, not proved |

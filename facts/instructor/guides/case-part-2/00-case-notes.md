@@ -14,8 +14,8 @@ figures:
   - id: IF-C2-0-B
     kind: diagram
     purpose: The two dates of a promotion, the order date that sets its months and the invoice date that sets when the discount reaches revenue.
-    shows: "A twelve-month timeline of the report year. For each of the three proposed promotions solid cells mark the months in which its lines were ordered and lighter cells mark each month in which they were invoiced. Beneath the timeline four quarter bars show the discount billed in each quarter, the fourth the tallest. A dashed line marks the recorded end date of the collection promotion, which falls before its own start."
-    data: The proposed promotions' order months, invoice months and discount billed by quarter (Requirement 2 Step 6, Requirement 3 Step 1).
+    shows: "A twelve-month timeline of the report year. Each of the three proposed promotions has two tracks, Order months and Invoice months, and each month with lines shows its count of lines, so billing in the order months and after them stays visible. Beneath the timeline four quarter bars show the discount billed in each quarter, the fourth the tallest. A dashed line marks the recorded end date of the collection promotion, which falls before its own start."
+    data: The proposed promotions' order months and invoice months with their line counts, and the discount billed by quarter (Requirement 2 Step 6, Requirement 3 Step 1).
 ---
 {% set g = case2_chapter %}
 {% set s = g.slide %}
@@ -32,8 +32,8 @@ figures:
 | Tools | Excel only: Power Query, PivotTables and charts, SUMIFS and lookup formulas, a data table, Goal Seek and named cells |
 | Components | Six requirements, no tutorials, no milestones and no multiple-choice questions; the deck has {{ g.slides }} slides |
 | Files students need | CharlesRiver.xlsx, from the Downloads page; the workbook they build, `Charles River Promotion Case.xlsx`; their commission rate from Tutorial 7.3. The Downloads page lists no start file; its solution is PartII-case.zip (Excel) |
-| Deliverable | A memorandum of at most two pages to the controller, a one-page appendix of five exhibits, and the workbook with its Documentation sheet complete |
-| Time | Class: about 150 minutes in Plan A. Students: about eight hours, from 60 minutes for Requirement 6 to 100 for Requirement 4 |
+| Deliverable | A memorandum of at most two pages to the controller, a one-page appendix that summarizes five exhibits and names the worksheet behind each, and the workbook with its schedules and its Documentation sheet complete |
+| Time | Class: about 150 minutes in Plan A. Students: a planning estimate of about eight hours, adding the minutes of the six requirement guides (from 60 for Requirement 6 to 100 for Requirement 4), excluding software setup and troubleshooting and not measured student time |
 
 The case depends on these conditions of the data, all visible in the workbook:
 
@@ -41,7 +41,7 @@ The case depends on these conditions of the data, all visible in the workbook:
 - Revenue is recorded net of every price reduction. The discount account exists and has no postings, so the ledger cannot show what the promotions cost.
 - The recorded end dates of the collection promotions fall on or before their start dates, so none of their lines was ordered inside them.
 - Volume in each promotion's months is within the scope's normal month-to-month variation on an informal screen, and far below the increase the promotion would need to pay for itself.
-- The {{ g.plan_year }} budget prices every month alike, plans no promotion, and plans several times the volume actually ordered.
+- The {{ g.plan_year }} budget is approximately flat across the months, with no promotion-month price reductions, and plans several times the volume actually ordered.
 - One employee approved every promotion and every approved price override.
 
 ## What students should be able to do afterward
@@ -123,7 +123,7 @@ The case depends on these conditions of the data, all visible in the workbook:
 - **List amount measures volume; net amount measures revenue.** A student who measures volume at LineTotal sees nearly every promotion fall, from {{ case2_g3.net_low|spct }} to {{ case2_g3.net_high|spct }}. Ask what the discount does to the number in the promotion's own months.
 - **A difference is not an increase until it is compared with normal variation.** A two-month total's difference read against one month's standard deviation makes promotion {{ case2_g3.naive_flagged }} look unusual. The average month read against the monthly variation, or the total against the variation scaled to its months, does not. Either like-for-like comparison is fine, and both are an informal screen, not a test of significance. Ask how much a two-month total varies.
 - **A break-even is a threshold, not a forecast.** Students write that the promotion will lift volume by the break-even. Put the break-even beside the measured difference and ask which is evidence.
-- **No evidence of an effect is not evidence of no effect.** The volume comparisons describe the orders and cannot show what would have sold without a promotion. The first-order test finds no promotional first order, but the data begins in the first year and almost no new customers appear in it. Ask what each test could have shown.
+- **No evidence of an effect is not evidence of no effect.** The volume comparisons describe the orders and cannot show what would have sold without a promotion. The first-order test finds no promotional first order, but the data begins in the first year, so a first observed order need not be a customer's first ever. Ask what each test could have shown.
 - **An exception is a symptom.** The failing dates look like unauthorized discounts. The orders and the budgets suggest the promotion ran when it was meant to and its end date was entered wrongly, which the approved campaign calendar would confirm. Ask which other records speak to the question, and which would settle it.
 - **A vacuous test is not a clean result.** A completeness test on the recorded dates of the {{ case2_g5.n_failing }} failing promotions examines no lines and returns zero. Ask how many lines it looked at.
 - **The ledger cannot show what it does not record.** Students look for the discounts in the income statement. Revenue is net, so there is nothing to find; the cost lives in a schedule.

@@ -11,7 +11,7 @@ This is the comprehensive case that closes Part II, not a chapter. The deck open
 
 - The sales team proposes repeating last year's three promotions
 - The approved budget for the new year includes none
-- Chapter 7 found one promotion needed far more orders than came
+- Chapter 7 found one promotion needed far more volume than came
 - The controller wants your decision memo before the CFO sees it
 
 ::: {.notes}
@@ -62,7 +62,7 @@ The proposed promotions are the Harbor Collection Promotion on the items of the 
 - Both are claims the data can test
 
 ::: {.notes}
-Your analysis in Chapter 7 showed that the Furniture Seasonal Promotion would have needed about a third more orders to pay for itself, and that orders in its months rose only slightly, far short of that. The comparison could not show what would have sold without the promotion. The team's answer is that one promotion in one year is not the whole story. Requirement 3 tests both arguments across every promotion and every year in the data.
+Your analysis in Chapter 7 showed that the Furniture Seasonal Promotion would have needed about a third more volume, at the same mix, to pay for itself, and that the volume ordered in its months rose only slightly, far short of that. The comparison could not show what would have sold without the promotion. The team's answer is that one promotion in one year is not the whole story. Requirement 3 tests both arguments across every promotion and every year in the data.
 :::
 
 ## Four questions from the controller
@@ -126,7 +126,7 @@ The three columns are ItemGroup, CollectionName and CustomerSegment; rename them
 
 ## Check your understanding {.check}
 
-Order date or invoice date?
+Which date or dates?
 
 1. Whether a line falls within a promotion's dates
 2. The quarter in which a discount was billed
@@ -134,7 +134,7 @@ Order date or invoice date?
 4. Tying billed revenue to the ledger
 
 ::: {.notes}
-Ask students which query each question belongs in, OrderLines or BilledLines, and whether one date is enough.
+Ask students which query each question belongs in, OrderLines or BilledLines, and which date or dates it needs, since the ledger adds a posting date.
 :::
 
 ## Each question has its date {.answer}
@@ -253,7 +253,7 @@ A weakness in design, or a failure in operation?
 
 1. Nothing requires a second approval before a promotion starts
 2. A required approval is given after the promotion ended
-3. The order system accepts a discount typed with no promotion
+3. The system has no required promotion-tag validation before a discount is accepted
 4. A monthly exception report exists, but nobody reviews it
 
 ::: {.notes}

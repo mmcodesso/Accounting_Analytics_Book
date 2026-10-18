@@ -87,6 +87,7 @@
 % longtable resets LaTeX's room for text on the page (\@colroom) to the full page when a table starts and never sets
 % it back, so on a page whose top holds a figure the rows after it can run into the foot (the book patches this too).
 \usepackage{needspace}
+\usepackage{placeins}
 \makeatletter
 \apptocmd{\endlongtable}{\global\@colroom\vsize}{}{\PackageWarning{instructor}{Could not patch the end of longtable}}
 \makeatother

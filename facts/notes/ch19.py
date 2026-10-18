@@ -30,7 +30,7 @@ from __future__ import annotations
 import math
 import statistics as st
 from collections import Counter, defaultdict
-from datetime import date
+from datetime import date, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 from functools import lru_cache
 from pathlib import Path
@@ -49,6 +49,10 @@ WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
 # over the window exceed 10,000; the expected sampling parameters are 95% confidence, 5% tolerable, 0% expected, so
 # n = 59 (tbl-19-03).
 MATERIALITY, PERFORMANCE, TRIVIAL = 0.05, 0.75, 0.05
+# The analytical follow-up trigger of Requirement 3 is a case assumption of its own, the share of the expectation that a one-rate
+# expectation is assumed to support. Clearly trivial is a threshold for accumulating identified misstatements (AS 2810), not the
+# size of an unexplained difference that is investigated (AS 2305), so the two are separate cells that happen to differ.
+FOLLOW_UP = 0.05
 KEY_AMOUNT, KEY_CUSTOMER = 5000, 10000
 CONFIDENCE, TOLERABLE, SAMPLE = 0.95, 0.05, 59
 TAIL = 0.05                 # the plausible draws of Requirement 6: the tightest range with each tail below 5%
@@ -238,6 +242,16 @@ def last_receipt(c, inv: int) -> str | None:
     return max((c.rcpt[a[3]]["date"] for a in c.apps[inv]), default=None)
 
 
+def supported(c, r) -> float:
+    """The credit balance the cash received by the refund date supports: the invoice's receipts and credits dated by then,
+    less its total and the refunds paid on it earlier (the as-of test that the retrospective timing screen is not)."""
+    inv = c.cm[r["cm"]]["inv"]
+    paid = sum(a[1] for a in c.apps[inv] if c.rcpt[a[3]]["date"] <= r["date"])
+    credited = sum(x["gt"] for x in c.cm.values() if x["inv"] == inv and x["date"] <= r["date"])
+    earlier = sum(x["amt"] for x in c.rf.values() if c.cm[x["cm"]]["inv"] == inv and x["date"] < r["date"])
+    return max(0.0, paid + credited - c.inv[inv]["gt"] - earlier)
+
+
 def chance_mad(n: int) -> float:
     """The first-digit MAD a population of n amounts that followed Benford's Law exactly would show by chance
     (the normal approximation: the mean over the digits of sqrt(2 / pi) x sqrt(p(1 - p) / n))."""
@@ -362,7 +376,7 @@ def expectation(d) -> dict:
     exp = rates[-2] * rev[-1]
     exp_f = rates[0] * rev[-1]
     return dict(revenue=rev, rates=rates, actual=ret[-1], exp=exp, diff=ret[-1] - exp, diff_pct=ret[-1] / exp - 1,
-                exp_f=exp_f, f_pct=ret[-1] / exp_f - 1)
+                exp_f=exp_f, f_pct=ret[-1] / exp_f - 1, follow_up=FOLLOW_UP * exp)
 
 
 @lru_cache(maxsize=None)
@@ -471,6 +485,13 @@ def substantive(d) -> dict:
     tax_sub_flags = [m for m in c.cm.values() if abs(m["tax"] - round(m["sub"] * rate, 2)) > 0.011]
     with_freight = [m for m in c.cm.values() if m["freight"] > 0.005]
     freight_over = [m for m in c.cm.values() if m["freight"] > c.inv[m["inv"]]["freight"] + 0.005]
+    # the original invoices' own tax: the rate the credits are tested at is first corroborated on the invoices the credits
+    # reverse (SubTotal plus freight), with the credits' own effective rate as a diagnostic beside it
+    original = "SELECT OriginalSalesInvoiceID FROM CreditMemo"
+    inv_rate = d.one(f"SELECT ROUND(SUM(TaxAmount) / SUM(SubTotal + FreightAmount), 3) FROM SalesInvoice WHERE SalesInvoiceID IN ({original})")
+    inv_tax_off = d.one(f"SELECT COUNT(*) FROM SalesInvoice WHERE SalesInvoiceID IN ({original}) AND "
+                        f"ABS(TaxAmount - ROUND((SubTotal + FreightAmount) * ?, 2)) > 0.005", inv_rate)
+    inv_cent_ties = d.one("SELECT COUNT(*) FROM SalesInvoice WHERE ABS(TaxAmount - ROUND((SubTotal + FreightAmount) * ?, 2)) > 0.005", inv_rate)
     gt_ok = all(abs(m["gt"] - m["sub"] - m["freight"] - m["tax"]) < 0.005 for m in c.cm.values())
     clean = (len(traced) == n_lines == len(lines) and not over and not qty_off and not twice and not price_off and not total_off
              and distinct_inv == len(c.cm) and not above_invoice and sub_ok == len(c.cm) and len(tax_ok) == len(c.cm)
@@ -479,7 +500,7 @@ def substantive(d) -> dict:
                 total_off=total_off, half=half, half_up=half_up,
                 twice=twice, distinct_inv=distinct_inv, above_invoice=len(above_invoice), sub_ok=sub_ok, rate=rate,
                 tax_ok=len(tax_ok), tax_sub_flags=tax_sub_flags, with_freight=with_freight, freight_over=len(freight_over),
-                gt_ok=gt_ok, clean=clean)
+                gt_ok=gt_ok, clean=clean, inv_rate=inv_rate, inv_tax_off=inv_tax_off, inv_cent_ties=inv_cent_ties)
 
 
 @lru_cache(maxsize=None)
@@ -875,7 +896,9 @@ def r3(d, claim):
     m, e = materiality(d), expectation(d)
     claim(d.one("SELECT COUNT(*) FROM Account WHERE AccountName LIKE '%Income Tax%'") == 0,
           "the chart has no income tax account, so net income is income before income taxes")
-    claim(abs(e["diff"]) > m["trivial"], "the difference is above clearly trivial, so the expectation calls for investigation")
+    claim(abs(e["diff"]) > e["follow_up"], "the difference is above the follow-up trigger the case assumes, so the expectation calls for investigation")
+    claim(abs(e["diff"]) != m["trivial"] and e["follow_up"] != m["trivial"],
+          "the follow-up trigger is its own assumption: it does not equal the clearly trivial threshold")
     claim(e["rates"][0] < e["rates"][1] and e["exp_f"] < e["actual"], f"the {d.F} rate understates the expectation")
     claim(d.one("SELECT MIN(ShipmentDate) FROM Shipment") >= f"{d.F}-01-01"
           and d.one("SELECT MIN(PostingDate) FROM GLEntry WHERE SourceDocumentType = 'SalesInvoice'") >= f"{d.F}-01-01",
@@ -945,15 +968,7 @@ def r4(d, claim):
           "the refunds the two definitions part on were dated the day of the last receipt")
     same_lag = [(D(last_payment(c, c.cm[r["cm"]]["inv"])) - D(r["date"])).days for r in same]
 
-    def supported(r) -> float:
-        """The credit balance the cash received by the refund date supports: the invoice's receipts and credits dated by
-        then, less its total and the refunds paid on it earlier."""
-        inv = c.cm[r["cm"]]["inv"]
-        paid = sum(a[1] for a in c.apps[inv] if c.rcpt[a[3]]["date"] <= r["date"])
-        credited = sum(x["gt"] for x in c.cm.values() if x["inv"] == inv and x["date"] <= r["date"])
-        earlier = sum(x["amt"] for x in c.rf.values() if c.cm[x["cm"]]["inv"] == inv and x["date"] < r["date"])
-        return max(0.0, paid + credited - c.inv[inv]["gt"] - earlier)
-    excess = [(r, r["amt"] - supported(r)) for r in c.rf.values() if r["amt"] > supported(r) + 0.005]
+    excess = [(r, r["amt"] - supported(c, r)) for r in c.rf.values() if r["amt"] > supported(c, r) + 0.005]
     claim({r["id"] for r, _ in excess} == rcpt_ids, "the refunds above the balance the cash received supports are the "
           "refunds before the last receipt")
     # past due
@@ -1071,9 +1086,19 @@ def r5(d, claim):
     lag_d = [(D(l["return_date"]) - D(l["delivered"])).days for l in lines if l["delivered"]]
     # rates by shipment month
     ship_rev = defaultdict(float)
+    ship_day = defaultdict(float)
     for day, lt in d.q("SELECT s.ShipmentDate, sil.LineTotal FROM SalesInvoiceLine sil JOIN ShipmentLine sl ON "
                        "sl.ShipmentLineID = sil.ShipmentLineID JOIN Shipment s ON s.ShipmentID = sl.ShipmentID"):
         ship_rev[day[:7]] += lt
+        ship_day[day] += lt
+    # an explicit maturity rule: a shipment is compared only if the extract holds at least the longest lag seen after it
+    last_return = d.one("SELECT MAX(ReturnDate) FROM SalesReturn")
+    horizon = max(lag_s)
+    cutoff = (D(last_return) - timedelta(days=horizon)).isoformat()
+    late_ship = sum(v for day, v in ship_day.items() if day > cutoff)
+    immature = sorted({day[:7] for day in ship_day if day > cutoff})
+    mature = dict(last_return=last_return, horizon=horizon, cutoff=cutoff, after_share=late_ship / sum(ship_day.values()),
+                  after_amt=r2(late_ship), immature=immature)
     ret_ship = defaultdict(float)
     for l in lines:
         ret_ship[l["ship_date"][:7]] += l["total"]
@@ -1083,6 +1108,9 @@ def r5(d, claim):
     dec = months.get(f"{d.C}-12", 0.0)
     others = [v for k, v in months.items() if k != f"{d.C}-12"]
     claim(dec < min(others), f"December {d.C} shipments have the lowest return rate (censored)")
+    claim(f"{d.C}-12" in immature and len(immature) >= 2 and immature[0] >= f"{d.C}-10",
+          "more than December is immature: the last two or three months of shipments have had less follow-up than the longest "
+          "lag seen, so leaving out December alone would not make the comparison one of equal follow-up")
     cross = [l for l in lines if l["return_date"][:4] != l["ship_date"][:4]]
     claim(not any(l["ship_date"] < f"{d.F}-01-01" for l in lines)
           and d.one("SELECT COUNT(*) FROM Shipment WHERE ShipmentDate < ?", f"{d.F}-01-01") == 0,
@@ -1127,7 +1155,7 @@ def r5(d, claim):
                 top=top, families=families, top_segment=top_segment,
                 segment=[r2(seg_year[(top_segment, y)]) for y in yrs], car_lo=min(carriers.values()), car_hi=max(carriers.values()),
                 car_rlo=min(car_rates), car_rhi=max(car_rates), wh_rates=wh_rates, warehouses=wn, lag=dict(lo=min(lag_s), hi=max(lag_s), mean=st.mean(lag_s), dlo=min(lag_d), dhi=max(lag_d)),
-                by_ship_year=by_ship_year, dec=dec, mlo=min(others), mhi=max(others), cross=len(cross),
+                by_ship_year=by_ship_year, dec=dec, mlo=min(others), mhi=max(others), cross=len(cross), mature=mature,
                 cross_amt=r2(sum(l["total"] for l in cross)), overall=overall, focus=focus, seg=seg, terms=terms,
                 rate=rate, focus_cred=cred[focus], focus_sales=sales[focus], focus_n=len(focus_cm),
                 focus_gt=amount(focus_cm), top_two=sum(n for _, n in top_two), focus_rf=len(focus_rf),
@@ -1176,6 +1204,17 @@ def r7(d, claim):
     claim(sub["freight_over"] == 0, "no freight credit above the invoice's freight")
     claim(d.one("SELECT COUNT(*) FROM SalesInvoice WHERE ABS(TaxAmount - ROUND((SubTotal + FreightAmount) * ?, 2)) > 0.011",
                 sub["rate"]) == 0, "every sales invoice carries tax at the same rate on SubTotal plus freight")
+    claim(sub["inv_tax_off"] == 0 and sub["inv_rate"] == sub["rate"],
+          "the original invoices' tax is the rate on their SubTotal plus freight, within half a cent, the rate the credits are tested at "
+          "(the credits' own effective rate agrees, a diagnostic beside it)")
+    # credit lines whose stored total and SQLite's ROUND part by one cent at an exact half-cent product
+    half_info = []
+    for l in sub["half"]:
+        exact_v = Decimal(repr(l["qty"])) * Decimal(repr(l["price"])) * (1 - Decimal(repr(l["disc"])))
+        sqlite_v = d.one("SELECT ROUND(Quantity * UnitPrice * (1 - Discount), 2) FROM CreditMemoLine WHERE CreditMemoLineID = ?", l["id"])
+        half_info.append(dict(id=l["id"], exact=f"{exact_v:,.3f}", stored=money2(l["total"]), sqlite=money2(sqlite_v)))
+        claim(abs(abs(l["total"] - sqlite_v) - 0.01) < 1e-9 and abs(abs(Decimal(repr(l["total"])) - exact_v) - HALF_CENT) < Decimal("1e-9"),
+              "a line the stored total and SQLite's ROUND part on differs by one cent, and its exact product is a half-cent tie")
     # restocking: at standard cost, except the return lines of less than one unit (the whole shipment line), which are
     # costed at the quantity times the shipment line's extended cost
     rest = dict(d.q("SELECT sr.ReasonCode || '|' || substr(sr.ReturnDate, 1, 4), SUM(srl.ExtendedStandardCost) FROM SalesReturnLine srl "
@@ -1187,6 +1226,16 @@ def r7(d, claim):
     claim(all(q < 1 and abs(q - qs) < 1e-9 and abs(ext - r2(q * ship_ext)) < 0.011 for _, q, qs, ext, ship_ext, _ in frac),
           "the return lines restocked off standard are whole shipment lines of less than one unit, costed at the quantity "
           "times the shipment line's extended cost")
+    ex_line = d.q("SELECT srl.SalesReturnLineID, sr.ReturnNumber, srl.QuantityReturned, i.StandardCost, sl.ExtendedStandardCost, "
+                  "srl.ExtendedStandardCost FROM SalesReturnLine srl JOIN SalesReturn sr ON sr.SalesReturnID = srl.SalesReturnID "
+                  "JOIN ShipmentLine sl ON sl.ShipmentLineID = srl.ShipmentLineID JOIN Item i ON i.ItemID = srl.ItemID "
+                  "WHERE ABS(srl.ExtendedStandardCost - ROUND(srl.QuantityReturned * i.StandardCost, 2)) > 0.011 "
+                  "ORDER BY srl.QuantityReturned, srl.SalesReturnLineID LIMIT 1")[0]
+    frac_example = dict(line=ex_line[0], ret=ex_line[1], qty=ex_line[2], unit=money2(ex_line[3]), shipped=money2(ex_line[4]),
+                        recorded=money2(ex_line[5]), proportionate=money2(ex_line[2] * ex_line[3]))
+    claim(abs(ex_line[2] * ex_line[3] - ex_line[2] * ex_line[4]) > 0.011 and abs(ex_line[5] - r2(ex_line[2] * ex_line[4])) < 0.011,
+          "the example return line is recorded at the quantity times the shipment line's extended cost, a tenth of what proportionate "
+          "standard costing reverses")
     frac_gap = r2(sum(full - ext for _, _, _, ext, _, full in frac))
     frac_dq = r2(sum(full - ext for reason, _, _, ext, _, full in frac if reason in ("Damaged", "Quality Concern")))
     claim(sides(d, "SalesReturn") == {("Dr", "1040"), ("Cr", "5010"), ("Cr", "5020"), ("Cr", "5030"), ("Cr", "5040")},
@@ -1292,7 +1341,8 @@ def r7(d, claim):
         why.append(f"why before its {method_word(methods[0]) + 's' if paid_by_one else 'payments'} arrived")
     return dict(sub=sub, rate=sub["rate"], half=[x["id"] for x in sub["half"]],
                 with_freight=len(sub["with_freight"]), dmg=dmg, dmg_total=r2(sum(dmg)), both=both, both_c=both_c, lap=lap,
-                n_frac=len(frac), frac_gap=frac_gap, frac_dq=frac_dq, n_cm=len(c.cm), n_rf=len(c.rf),
+                n_frac=len(frac), frac_gap=frac_gap, frac_dq=frac_dq, frac_example=frac_example, half_info=half_info,
+                n_cm=len(c.cm), n_rf=len(c.rf),
                 half_up=[x["id"] for x in sub["half_up"]], chance_rf=chance_rf, chance_cm=chance_cm, mad_rf=mad_rf,
                 mad_cm=mad_cm, threshold=NONCONFORMITY,
                 timeline=timeline, payee=payee, why=", and ".join(why))
@@ -1396,7 +1446,24 @@ def r10(d, claim):
     cm_last = max(m["date"] for m in c.cm.values())
     rf_last = max(r["date"] for r in c.rf.values())
     claim(cm_last > through and rf_last > through, "the credits and refunds run past Data Through, so it stays")
-    return dict(tests=tests_, pop_c=pop_c, pop_r=pop_r, old=len(old), new=new, through=through, cm_last=cm_last,
+    # the timing rule is retrospective: it fires only once an application dated after the refund is recorded. In an event-date
+    # replay, the first such application comes 1-14 days after the refund and the last 1-19 days after it (two different lags)
+    first_lag, final_lag = [], []
+    for r in t.before:
+        later = sorted(a[0] for a in c.apps[c.cm[r["cm"]]["inv"]] if a[0] > r["date"])
+        first_lag.append((D(later[0]) - D(r["date"])).days)
+        final_lag.append((D(later[-1]) - D(r["date"])).days)
+    lags = dict(first=dict(lo=min(first_lag), hi=max(first_lag), mean=st.mean(first_lag)),
+                final=dict(lo=min(final_lag), hi=max(final_lag), mean=st.mean(final_lag)))
+    claim(lags["first"]["lo"] >= 1 and lags["first"]["hi"] < lags["final"]["hi"] and lags["first"]["mean"] < lags["final"]["mean"],
+          "the first later application comes sooner than the last one, so the screen's earliest trigger and the final payment are different quantities")
+    # no refund in the data has a balance the cash received by its date does not support while no later application follows
+    # it, so the retrospective flag finds every refund the as-of supported-balance test finds; an invoice never paid would not be found
+    unsupported = {r["id"] for r in c.rf.values() if r["amt"] > supported(c, r) + 0.005}
+    claim(unsupported <= {r["id"] for r in t.before},
+          "every refund above the balance the cash received supports is followed by a later application, so the data show no unfunded "
+          "refund the retrospective timing screen would miss (the never-paid case is hypothetical)")
+    return dict(tests=tests_, lags=lags, pop_c=pop_c, pop_r=pop_r, old=len(old), new=new, through=through, cm_last=cm_last,
                 rf_last=rf_last, rcpt_n=len(t.before_rcpt), rcpt_years=rcpt_years,
                 rcpt_rates=[1000 * k / p for k, p in zip(rcpt_years, pop_r)],
                 rcpt_new=new - len(t.before) + len(t.before_rcpt),

@@ -219,7 +219,7 @@ def _memo_sections() -> list[str]:
 
 def _exhibits() -> list[str]:
     text = CASE.read_text(encoding="utf-8")
-    m = re.search(r"appendix of exhibits: (.+?)\.", text)
+    m = re.search(r"summarizes five numbered exhibits: (.+?)\.", text)
     items = re.split(r", (?:and )?", m.group(1))
     return [re.sub(r"^(?:and )?the ", "", i).strip() for i in items]
 
@@ -303,7 +303,7 @@ def if_c2_0_a() -> Diagram:
 # -- IF-C2-0-B: the two dates of a promotion ---------------------------------------------------------------------------------------
 
 def if_c2_0_b() -> Diagram:
-    """The proposed promotions' order months and invoice months on a twelve-month strip, with the discount billed by quarter."""
+    """Each proposed promotion's order months and invoice months on two tracks of a twelve-month strip, with the discount billed by quarter."""
     data = ctx.data()
     g = ctx.values("case2.chapter")
     g2 = ctx.values("case2.g2")
@@ -311,19 +311,19 @@ def if_c2_0_b() -> Diagram:
     promos = {p["id"]: p for p in g["promos"]}
     prop = g["proposal"]
     assert len(prop) == 3
-    ordered, invoiced = {}, {}
+    ordered, invoiced = {}, {}                       # month -> number of lines, for each promotion, in the report year
     for p in prop:
-        ordered[p["id"]] = sorted({int(m) for (m,) in data.q(
-            "SELECT DISTINCT substr(o.OrderDate, 6, 2) FROM SalesOrderLine l JOIN SalesOrder o ON o.SalesOrderID = l.SalesOrderID "
-            "WHERE l.PromotionID = ? AND substr(o.OrderDate, 1, 4) = ?", p["id"], str(year))})
-        invoiced[p["id"]] = sorted({int(m) for (m,) in data.q(
-            "SELECT DISTINCT substr(i.InvoiceDate, 6, 2) FROM SalesInvoiceLine l JOIN SalesInvoice i ON i.SalesInvoiceID = l.SalesInvoiceID "
-            "WHERE l.PromotionID = ? AND substr(i.InvoiceDate, 1, 4) = ?", p["id"], str(year))})
+        ordered[p["id"]] = {int(m): n for m, n in data.q(
+            "SELECT substr(o.OrderDate, 6, 2), COUNT(*) FROM SalesOrderLine l JOIN SalesOrder o ON o.SalesOrderID = l.SalesOrderID "
+            "WHERE l.PromotionID = ? AND substr(o.OrderDate, 1, 4) = ? GROUP BY 1", p["id"], str(year))}
+        invoiced[p["id"]] = {int(m): n for m, n in data.q(
+            "SELECT substr(i.InvoiceDate, 6, 2), COUNT(*) FROM SalesInvoiceLine l JOIN SalesInvoice i ON i.SalesInvoiceID = l.SalesInvoiceID "
+            "WHERE l.PromotionID = ? AND substr(i.InvoiceDate, 1, 4) = ? GROUP BY 1", p["id"], str(year))}
         total_lines = data.one("SELECT COUNT(*) FROM SalesOrderLine WHERE PromotionID = ?", p["id"])
-        in_year = data.one("SELECT COUNT(*) FROM SalesOrderLine l JOIN SalesOrder o ON o.SalesOrderID = l.SalesOrderID "
-                           "WHERE l.PromotionID = ? AND substr(o.OrderDate, 1, 4) = ?", p["id"], str(year))
-        assert total_lines == in_year == promos[p["id"]]["lines"], "every line was ordered in the report year"
+        assert total_lines == sum(ordered[p["id"]].values()) == promos[p["id"]]["lines"], "every line was ordered in the report year"
         assert min(invoiced[p["id"]]) >= min(ordered[p["id"]]), "invoices follow the orders"
+        assert set(ordered[p["id"]]) & set(invoiced[p["id"]]), "orders and invoices share at least one month"
+        assert max(invoiced[p["id"]]) > max(ordered[p["id"]]), "invoicing continues after the order window"
     quarters = [sum(r["q"][k] for r in g2["quarter_rows"]) for k in range(4)]
     total = sum(quarters)
     assert quarters[3] == max(quarters), "the fourth quarter is the tallest"
@@ -332,34 +332,41 @@ def if_c2_0_b() -> Diagram:
     assert fp["end"] < fp["start"], "the collection promotion's recorded end date falls before its start"
 
     d = Diagram("The Two Dates of a Promotion")
-    x0, mw = 192.0, 55.5
-    right = x0 + 12 * mw
+    lx, lw, tw = 0.0, 106.0, 118.0                    # program label, track label
+    x0 = lx + lw + tw
+    mw = (858 - x0) / 12
     hy = 0.0
     for m in range(12):
         d.box(f"<b>{MONTHS[m]}</b>", x0 + m * mw, hy, mw, 24, fill=GRAY_TINT, stroke=RULE, size=SMALL, rounded=False)
-    d.text(f"<b>{year}</b>", 0, hy, 186, 24, size=SMALL, valign="middle")
-    ry0, rh, rgap = 30.0, 38.0, 8.0
-    rows_bottom = ry0 + 3 * (rh + rgap) - rgap
+    d.text(f"<b>{year}</b>", 0, hy, lw, 24, size=SMALL, valign="middle")
+    ry0, th, tgap, pgap = 30.0, 24.0, 4.0, 10.0
+    prog_h = 2 * th + tgap
+    rows_bottom = ry0 + 3 * prog_h + 2 * pgap
     chart_top, base_y, max_h = rows_bottom + 56, rows_bottom + 56 + 190, 150.0
     for m in range(13):                                                   # month lines, heavier at the quarters
         q = m % 3 == 0
         d.box("", x0 + m * mw - (0.75 if q else 0.5), ry0 - 4, 1.5 if q else 1, rows_bottom + 4 - (ry0 - 4), fill=GRAY if q else RULE,
               stroke=GRAY if q else RULE, rounded=False)
+    prog_y = {}
     for k, p in enumerate(prop):
         info = promos[p["id"]]
-        y = ry0 + k * (rh + rgap)
-        d.box(f"<b>{esc(info['label'])} {info['kind']}</b><br>{info['rate'] * 100:.0f}% off", 0, y, 186, rh, fill=WHITE, stroke=RULE,
+        y = ry0 + k * (prog_h + pgap)
+        prog_y[p["id"]] = y
+        d.box(f"<b>{esc(info['label'])} {info['kind']}</b><br>{info['rate'] * 100:.0f}% off", lx, y, lw, prog_h, fill=WHITE, stroke=RULE,
               size=SMALL, align="left", rounded=False)
-        for m in invoiced[p["id"]]:
-            d.box("", x0 + (m - 1) * mw + 2, y, mw - 4, rh, fill=BLUE_TINT, stroke=BLUE, stroke_width=1.5, rounded=False)
-        for m in ordered[p["id"]]:
-            d.box("", x0 + (m - 1) * mw + 2, y, mw - 4, rh, fill=BLUE, stroke=BLUE, rounded=False)
+        for j, (name, counts, fill, stroke, color) in enumerate((("Order months", ordered[p["id"]], BLUE, BLUE, WHITE),
+                                                                   ("Invoice months", invoiced[p["id"]], BLUE_TINT, BLUE, INK))):
+            ty = y + j * (th + tgap)
+            d.box(f"<b>{name}</b>", lx + lw, ty, tw, th, fill=WHITE, stroke=RULE, size=SMALL, align="left", rounded=False)
+            for m, n in sorted(counts.items()):
+                d.box(f"<b>{n}</b>", x0 + (m - 1) * mw + 2, ty, mw - 4, th, fill=fill, stroke=stroke, stroke_width=1.5, color=color,
+                      size=SMALL, rounded=False)
     # The recorded end date of the collection promotion, which falls before its own start.
-    fy_row = ry0 + [p["id"] for p in prop].index(failing["id"]) * (rh + rgap)
+    fy = prog_y[failing["id"]]
     ex = _day_x(fp["end"], x0, mw)
-    d.vertex("", DASHED_CORAL, ex - 1, 0, 2, fy_row + rh)
-    d.box(f"<b>Recorded end</b><br>{fp['end']}", ex - 106, fy_row + 2, 100, rh - 4, fill=WHITE, stroke=CORAL, stroke_width=1.5, size=SMALL,
-          rounded=False)
+    d.vertex("", DASHED_CORAL, ex - 1, 0, 2, fy + prog_h)
+    d.box(f"<b>Recorded end</b><br>{fp['end']}", max(ex - 98, x0 + 1), fy + 2, 94, th * 2 + tgap - 4, fill=WHITE, stroke=CORAL,
+          stroke_width=1.5, size=SMALL, rounded=False)
     # The discount billed in each quarter, aligned to the months above.
     d.text(f"<b>Discount billed in each quarter</b>, the three promotions together: ${total:,.2f} in all", 0, chart_top - 30, 860, 22,
            size=SMALL)
@@ -373,11 +380,10 @@ def if_c2_0_b() -> Diagram:
               rounded=False)
         d.text(f"<b>Q{k + 1}</b>", bx, base_y + 4, bw, 18, size=SMALL, align="center", color=GRAY)
     d.text(f"<b>By invoice date,</b> {quarters[3] / total:.0%} of the proposal's discount reaches Q4. "
-           f"<b>By order date</b> the same discount puts {g2['q4_ordered']:.0%} there.", 0, chart_top - 4, 186, 140, size=SMALL)
+           f"<b>By order date</b> the same discount puts {g2['q4_ordered']:.0%} there.", 0, chart_top - 4, x0 - 12, 140, size=SMALL)
     ly = base_y + 32
     cx = 0.0
-    for fill, stroke, label in ((BLUE, BLUE, "Months in which its lines were ordered"),
-                                (BLUE_TINT, BLUE, "Months in which they were invoiced")):
+    for fill, stroke, label in ((BLUE, BLUE, "Months with order lines"), (BLUE_TINT, BLUE, "Months with invoice lines")):
         _swatch(d, cx, ly + 3, fill, stroke)
         w = text_width(label, SMALL, False) + 8
         d.text(label, cx + 20, ly, w, 20, size=SMALL, valign="middle")
@@ -389,13 +395,12 @@ def if_c2_0_b() -> Diagram:
     mid = prop[1]
     mid_info = promos[mid["id"]]
     mid_q = next(r for r in g2["quarter_rows"] if r["id"] == mid["id"])["q"]
-    gaps = [(promos[p["id"]]["label"], [m for m in range(min(invoiced[p["id"]]), max(invoiced[p["id"]])) if m not in invoiced[p["id"]]])
-            for p in prop]
-    gap_text = " ".join(f"{label} has no invoices in {names(ms)}, so that month is left clear." for label, ms in gaps if ms)
-    _note(d, f"{fp['label']}'s recorded dates run from {fp['start']} to {fp['end']}, so the end falls {days} day{'s' if days != 1 else ''} before "
-             f"the start, yet its lines were ordered in {names(ordered[failing['id']])}. The discount is billed with the invoice: "
-             f"{mid_info['label']}'s orders of {names(ordered[mid['id']])} are invoiced through {MONTH_NAMES[invoiced[mid['id']][-1] - 1]}, "
-             f"which puts {mid_q[3] / sum(mid_q):.0%} of its discount in the fourth quarter. {gap_text}", ly + 28)
+    _note(d, f"The number in a month is its count of lines. {fp['label']}'s recorded dates run from {fp['start']} to {fp['end']}, so the end falls "
+             f"{days} day{'s' if days != 1 else ''} before the start, yet its lines were ordered in {names(sorted(ordered[failing['id']]))}. "
+             f"Orders and invoices can occur in the same month; "
+             f"invoice activity also continues after the order window. The discount is billed with the invoice: "
+             f"{mid_info['label']}'s orders of {names(sorted(ordered[mid['id']]))} are invoiced through {MONTH_NAMES[max(invoiced[mid['id']]) - 1]}, "
+             f"which puts {mid_q[3] / sum(mid_q):.0%} of its discount in the fourth quarter.", ly + 28)
     return d
 
 
@@ -632,8 +637,8 @@ def if_c2_2_b() -> Diagram:
         w = text_width(label, SMALL, False) + 8
         d.text(label, cx + 20, ly, w, 20, size=SMALL, valign="middle")
         cx += 20 + w + 22
-    _note(d, f"The bars are drawn to scale from zero, so the promotional discounts are a thin bar and the rounding a sliver; the amounts are labeled "
-             f"to the cent. List less reductions less promotions is ${r2['after']:,.2f}, and the rounding is what separates it from the net billed.",
+    _note(d, f"Major bars share the dollar scale. The ${rounding:,.2f} rounding marker is enlarged for visibility; read its label for the amount. "
+             f"List less reductions less promotions is ${r2['after']:,.2f}, and the rounding is what separates it from the net billed.",
           ly + 28)
     return d
 

@@ -433,7 +433,8 @@ def model(d: Data) -> dict:
         tops[k] = dict(share=sum(ms[:top_n]) / sum(ms), negative=sum(1 for m in ms if m < 0),
                        low=items[low]["code"], low_margin=item_m[low][k] / sold[low][1])
     unused_h = pract - used
-    explorer = dict(n_items=len(fg), rev=rev_fg, std_cost=view["std"], std=rev_fg - view["std"],
+    loss_any = sum(1 for v in item_m.values() if any(x < 0 for x in v.values()))      # each item once, whatever its views
+    explorer = dict(n_items=len(fg), loss_any=loss_any, rev=rev_fg, std_cost=view["std"], std=rev_fg - view["std"],
                     absorp=rev_fg - view["absorp"], td=rev_fg - view["td"],
                     td_unused=rev_fg - view["td"] - unused_h * td_rate, year=rev_fg - view["std"] - totals["total"],
                     top_n=top_n, tops=tops)
@@ -451,7 +452,12 @@ def model(d: Data) -> dict:
                            a_kept=(w["kept"] - dq) * u, a_reduced=(w["reduced"] - dq) * u,
                            be_kept=w["kept"] / (1 + FREIGHT), be_reduced=w["reduced"] / (1 + FREIGHT),
                            margin=1 - dq / w["price"], time=w["time"]))
+    for q in quoted:                  # one-time costs and the two years of a family bought on its own (columns X to Z)
+        q["once"] = q["tooling"] + q["time"] * q["units"] / pos_hours * severance
+        q["two_year"] = PRICE_YEARS * q["a_reduced"] - q["once"]
+        q["be_two_years"] = (q["reduced"] - q["once"] / (PRICE_YEARS * q["units"])) / (1 + FREIGHT)
     buy = [q for q in quoted if q["a_reduced"] > 0]
+    assert all(q["two_year"] > 0 for q in buy), "a family the annual test selects fails the workbook's two-year gate"
     lose = [q for q in quoted if q["a_reduced"] <= 0 and q["a_kept"] <= 0]
     gain = sum(q["a_reduced"] for q in buy)
     hours = sum(q["time"] * q["units"] for q in buy)
@@ -1394,9 +1400,14 @@ def documentation(b: ExerciseBuild) -> None:
                           "2. Data > Refresh All (ItemCosts and RoutingHours; "
                           "ItemSales and ItemCompletions keep the base year in their Filtered Rows step, so change it "
                           "there with BaseYear). 3. Rerun Goal Seek on Make or Buy and Prices and, for the optional test, "
-                          "Solver on each growth sheet; the Data Tables recalculate by themselves. 4. Save, then refresh "
-                          "Product Costs.pbix, whose Practical Share measure is typed at the case's 80% and must change "
-                          "with the Assumptions value."),
+                          "Solver on each growth sheet; the Data Tables recalculate by themselves. 4. Recalculate and save, then "
+                          "refresh Product Costs.pbix, whose Model Parameters query reads the practical share from the "
+                          "name PracticalUsed, so the report and the workbook use one value; the refresh stops if that "
+                          "cell holds anything but one number above 0 and at most 1."),
+        ("Model answers", "The decision table's actions and the paragraphs marked Model answer on each sheet describe the "
+                          "published base case: the quote as given, 80% practical capacity, and the 40% floor. A change "
+                          "in an assumption makes them a snapshot. Solve Goal Seek and Solver again and rewrite them "
+                          "before a memo goes out; cell A3 of the Memo sheet says whether the inputs still match."),
         ("Worksheets", "; ".join(sheets) + "."),
         ("Checks", "The Solution Notes worksheet checks every result the instructor notes state against values computed "
                    "independently from CharlesRiver.sqlite."),
@@ -2333,9 +2344,9 @@ def r4(b: ExerciseBuild) -> None:
         ("Share of margin the top fifth earns: standard", top_f.format(c="MarginStandard"), PCT1),
         ("  actual absorption", top_f.format(c="MarginAbsorption"), PCT1),
         ("  time-driven", top_f.format(c="MarginTimeDriven"), PCT1),
-        ("Items that lose money under any view",
-         '=COUNTIFS(ItemCosts[Units],">0",ItemCosts[MarginStandard],"<0")+COUNTIFS(ItemCosts[Units],">0",'
-         'ItemCosts[MarginAbsorption],"<0")+COUNTIFS(ItemCosts[Units],">0",ItemCosts[MarginTimeDriven],"<0")', COUNT),
+        ("Items that lose money under any view (each counted once)",
+         '=SUMPRODUCT(--(ItemCosts[Units]>0),--(((ItemCosts[MarginStandard]<0)+(ItemCosts[MarginAbsorption]<0)'
+         '+(ItemCosts[MarginTimeDriven]<0))>0))', COUNT),
         ("Lowest margin under actual absorption: item", low_f.format(c="MarginAbsorption", i=1), None),
         ("  its margin", low_f.format(c="MarginAbsorption", i=2), PCT1)])
     r += 10
@@ -2464,7 +2475,7 @@ def r4(b: ExerciseBuild) -> None:
     for i, k in enumerate(("std", "absorp", "td")):
         b.check(t, f"share of margin the top fifth earns, {('standard', 'absorption', 'time-driven')[i]}",
                 round(tops_m[k]["share"], 9), "=" + tops[list(tops)[2 + i]], 1e-9, PCT1)
-    b.check(t, "items that lose money under any view", sum(tops_m[k]["negative"] for k in tops_m),
+    b.check(t, "items that lose money under any view (each counted once)", e["loss_any"],
             "=" + tops[list(tops)[5]], 0, COUNT)
     b.check(t, "lowest margin under absorption: item", tops_m["absorp"]["low"], "=" + tops[list(tops)[6]], 0, "@")
     b.check(t, "lowest margin under absorption: margin", round(tops_m["absorp"]["low_margin"], 9),
@@ -2536,9 +2547,12 @@ MB_COLS = ["Family", "Description", "Units sold, base year", "Quoted annual volu
            "Quoted price", "Delivered quote (price plus freight)", "Actual absorption cost", "Relevant cost, crew kept",
            "Relevant cost, crew reduced", "Routing time per unit (hours)", "Effect of buying a year: absorption view",
            "Effect of buying a year: crew kept", "Effect of buying a year: crew reduced", "Decision",
-           "Buy (1) only with the crew reduced", "Break-even quote, crew kept", "Break-even quote, crew reduced",
+           "Buy (1): only with the crew reduced, and covering its one-time costs in the two years",
+           "Annual break-even quote, crew kept", "Annual break-even quote, crew reduced",
            "Delivered margin at the base-year price", "Routing hours freed (base-year sales)", "Positions",
-           "Effect at the sensitivity inputs", "Tooling and qualification"]
+           "Effect at the sensitivity inputs", "Tooling and qualification",
+           "One-time cost (tooling plus severance of its positions)", "Effect over the two years, crew reduced",
+           "Two-year break-even quote, crew reduced"]
 
 
 def mb(c: str, row: int | None = None, absolute: bool = True) -> str:
@@ -2581,21 +2595,32 @@ def r6(b: ExerciseBuild) -> None:
             f"L{rr}": f"=(H{rr}-G{rr})*C{rr}",
             f"M{rr}": f"=(I{rr}-G{rr})*C{rr}",
             f"N{rr}": f"=(J{rr}-G{rr})*C{rr}",
-            f"O{rr}": f'=IF(M{rr}>0,"Buy",IF(N{rr}>0,"Buy only with the crew reduced","Make"))',
-            f"P{rr}": f"=--(N{rr}>0)",
+            f"O{rr}": (f'=IF(M{rr}>0,"Buy",IF(N{rr}>0,IF(Y{rr}>0,"Buy only with the crew reduced",'
+                       f'"Make: the two years do not cover the one-time costs"),"Make"))'),
+            f"P{rr}": f"=--AND(N{rr}>0,Y{rr}>0)",
             f"Q{rr}": f"=I{rr}/(1+Freight)",
             f"R{rr}": f"=J{rr}/(1+Freight)",
             f"S{rr}": f"=1-G{rr}/XLOOKUP({fam},{famref('Family')},{famref('Price')})",
             f"T{rr}": f"=K{rr}*C{rr}",
             f"U{rr}": f"=T{rr}/PositionHours",
             f"V{rr}": f"=(I{rr}+CrewRemoved*CrewRate*K{rr}-F{rr}*(1+QuoteAdjustment)*(1+Freight))*C{rr}",
-            f"W{rr}": f"=XLOOKUP({fam},Quote[Family],Quote[Tooling])"})
+            f"W{rr}": f"=XLOOKUP({fam},Quote[Family],Quote[Tooling])",
+            f"X{rr}": f"=W{rr}+U{rr}*SeverancePerPosition",
+            f"Y{rr}": f"=PriceYears*N{rr}-X{rr}",
+            f"Z{rr}": f"=(J{rr}-X{rr}/(PriceYears*C{rr}))/(1+Freight)"})
     last = first + len(families) - 1
     for c, fmt in (("C", UNITS), ("D", COUNT), ("E", PCT1), ("F", MONEY), ("G", MONEY), ("H", MONEY), ("I", MONEY),
                    ("J", MONEY), ("K", "0.0000"), ("L", COUNT), ("M", COUNT), ("N", COUNT), ("Q", MONEY), ("R", MONEY),
-                   ("S", PCT1), ("T", COUNT), ("U", "0.00"), ("V", COUNT), ("W", COUNT)):
+                   ("S", PCT1), ("T", COUNT), ("U", "0.00"), ("V", COUNT), ("W", COUNT), ("X", COUNT), ("Y", COUNT),
+                   ("Z", MONEY)):
         ws.Range(f"{c}{first}:{c}{last}").NumberFormat = fmt
-    ws.Rows(first - 1).RowHeight = 60
+    ws.Rows(first - 1).RowHeight = 90
+    note(ws, f"P{first - 1}", "The flag requires both a positive annual effect with the crew reduced (column N) and a "
+                              "positive effect over the two years the prices are fixed (column Y), after the tooling and "
+                              "the severance of the family's own positions (column X). The annual break-even quotes "
+                              "(columns Q and R) are operating tests; the two-year quote (column Z) is the quote at which "
+                              "the family covers its one-time costs with the crew fully reduced. The supplier's terms "
+                              "(minimum volume, quality, lead time) are assessed apart.", height=170)
 
     # Goal Seek: the quote at which buying breaks even, under each crew case
     g = last + 3
@@ -2699,7 +2724,7 @@ def r6(b: ExerciseBuild) -> None:
         "slows its drawdown."]
     answer(ws, r, paras, last_col="O")
     ws.Columns("A").ColumnWidth = 34
-    ws.Columns("B:W").ColumnWidth = 14
+    ws.Columns("B:Z").ColumnWidth = 14
 
     t = "Requirement 6"
     for i, f in enumerate(families):
@@ -2717,8 +2742,14 @@ def r6(b: ExerciseBuild) -> None:
                 0.005)
         b.check(t, f"{f}: break-even quote, crew reduced (Goal Seek)", round(x["be_reduced"], 4),
                 f"='Make or Buy'!D{gs[f]}", 0.005)
-        decision = "Buy" if x["a_kept"] > 0 else ("Buy only with the crew reduced" if x["a_reduced"] > 0 else "Make")
+        decision = ("Buy" if x["a_kept"] > 0 else
+                    (("Buy only with the crew reduced" if x["two_year"] > 0
+                      else "Make: the two years do not cover the one-time costs") if x["a_reduced"] > 0 else "Make"))
         b.check(t, f"{f}: decision", decision, cell("O"), 0, "@")
+        b.check(t, f"{f}: one-time cost (tooling plus severance of its positions)", round(x["once"], 2), cell("X"), 0.01,
+                COUNT)
+        b.check(t, f"{f}: effect over the two years, crew reduced", round(x["two_year"], 2), cell("Y"), 0.01, COUNT)
+        b.check(t, f"{f}: two-year break-even quote, crew reduced", round(x["be_two_years"], 6), cell("Z"), 1e-6)
         b.check(t, f"{f}: delivered margin at the base-year price", round(x["margin"], 9), cell("S"), 1e-9, PCT1)
     b.check(t, "families to buy, only with the crew reduced", ", ".join(m["buy_names"]), "=BuyFamilies", 0, "@")
     b.check(t, "annual effect, crew reduced", round(m["gain"], 2), "=BuyGain", 0.01, COUNT)
@@ -2730,6 +2761,9 @@ def r6(b: ExerciseBuild) -> None:
     b.check(t, "tooling and qualification", m["tooling"], "=BuyTooling", 0, COUNT)
     b.check(t, "effect over the two years", round(PRICE_YEARS * m["gain"] - m["positions"] * m["severance"] - m["tooling"], 2),
             "=BuyTwoYears", 0.01, COUNT)
+    b.check(t, "the families' two-year effects add up to the effect over the two years",
+            round(PRICE_YEARS * m["gain"] - m["positions"] * m["severance"] - m["tooling"], 2),
+            f"=SUMPRODUCT({mb('P')},{mb('Y')})", 0.01, COUNT)
     b.check(t, "families the absorption view would buy", len(absorp_buy), "=" + tot[list(tot)[9]], 0, COUNT)
     b.check(t, "families to make under either crew case", ", ".join(x["name"] for x in lose), "=" + tot[list(tot)[10]], 0,
             "@")
@@ -3109,7 +3143,8 @@ def r8(b: ExerciseBuild) -> None:
             "Below the floor", "Target price (Goal Seek's changing cell)",
             "Margin above the floor at the target price, a year (Goal Seek sets it to 0)", "Target price (direct)",
             "Increase", "Relevant cost, crew kept", "Contribution per unit at today's price",
-            "Volume the increase can lose before contribution falls", "Revenue a year if volume holds"]
+            "Volume the increase can lose before contribution falls", "Revenue a year if volume holds",
+            "Goal Seek agrees with the direct price (a blank is a family at or above the floor)"]
     header(ws, 4, cols)
     ws.Rows(4).RowHeight = 90                      # six lines: the longest heading wraps to six in its column
     fams = sorted(m["fam"])
@@ -3122,10 +3157,11 @@ def r8(b: ExerciseBuild) -> None:
         formulas(ws, {f"B{rr}": look("Units"), f"C{rr}": look("Price"), f"D{rr}": look("TimeDriven"),
                       f"E{rr}": f"=1-D{rr}/C{rr}", f"F{rr}": f"=E{rr}<MarginFloor",
                       f"H{rr}": f'=IF(F{rr},B{rr}*(G{rr}*(1-MarginFloor)-D{rr}),"")',
-                      f"I{rr}": f'=IF(F{rr},D{rr}/(1-MarginFloor),"")', f"J{rr}": f'=IF(F{rr},G{rr}/C{rr}-1,"")',
+                      f"I{rr}": f'=IF(F{rr},D{rr}/(1-MarginFloor),"")', f"J{rr}": f'=IF(F{rr},I{rr}/C{rr}-1,"")',
                       f"K{rr}": look("Kept"), f"L{rr}": f"=C{rr}-K{rr}",
-                      f"M{rr}": f'=IF(F{rr},1-L{rr}/(L{rr}+G{rr}-C{rr}),"")',
-                      f"N{rr}": f'=IF(F{rr},(G{rr}-C{rr})*B{rr},"")'})
+                      f"M{rr}": f'=IF(F{rr},1-L{rr}/(L{rr}+I{rr}-C{rr}),"")',
+                      f"N{rr}": f'=IF(F{rr},(I{rr}-C{rr})*B{rr},"")',
+                      f"O{rr}": f'=IF(F{rr},IF(ISNUMBER(G{rr}),ABS(G{rr}-I{rr})<0.005,FALSE),"")'})
         rows[f] = rr
     last = 4 + len(fams)
     b.wb.Application.Calculate()
@@ -3142,8 +3178,10 @@ def r8(b: ExerciseBuild) -> None:
     settle(b)
     note(ws, "G4", "Goal Seek (Data > What-If Analysis > Goal Seek), run for each family below the floor when the solution "
                    "was built: Set cell H To value 0 By changing cell G. The results stay in the changing cells, as Goal "
-                   "Seek leaves them; column I computes the same price directly (time-driven cost / (1 - floor)).",
-         height=130)
+                   "Seek leaves them; column I computes the same price directly (time-driven cost / (1 - floor)). The "
+                   "increase, the volume it can lose and the revenue read column I, so they follow the floor and the "
+                   "costs; column O says whether the Goal Seek result still agrees, and a FALSE means the changing "
+                   "cell needs solving again.", height=190)
     for c, fmt in (("B", UNITS), ("C", MONEY), ("D", MONEY), ("E", PCT1), ("G", MONEY), ("H", MONEY), ("I", MONEY),
                    ("J", "0.00%"), ("K", MONEY), ("L", MONEY), ("M", PCT1), ("N", COUNT)):
         ws.Range(f"{c}5:{c}{last}").NumberFormat = fmt
@@ -3154,9 +3192,9 @@ def r8(b: ExerciseBuild) -> None:
         ("Revenue a year if volume holds", f"=SUM(N5:N{last})", COUNT, "RepriceRevenue"),
         ("If the families of Requirement 6 are bought, those still below the floor",
          f'=TEXTJOIN(", ",TRUE,FILTER(A5:A{last},F5:F{last}*ISNA(XMATCH(A5:A{last},'
-         f'FILTER({mb("A")},{mb("P")}=1))),"none"))', None, "StillToReprice"),
+         f'FILTER({mb("A")},{mb("P")}=1,""))),"none"))', None, "StillToReprice"),
         ("  their revenue a year if volume holds",
-         f'=SUMPRODUCT(--F5:F{last},ISNA(XMATCH(A5:A{last},FILTER({mb("A")},{mb("P")}=1)))*1,N5:N{last})', COUNT,
+         f'=SUMPRODUCT(--F5:F{last},ISNA(XMATCH(A5:A{last},FILTER({mb("A")},{mb("P")}=1,"")))*1,N5:N{last})', COUNT,
          "StillToRepriceRevenue")])
     r += 6
     heading(ws, r, "Delivered margins of the families bought (the quote against the base-year price)")
@@ -3246,6 +3284,7 @@ def r8(b: ExerciseBuild) -> None:
         b.check(t, f"{x['name']}: increase", round(x["increase"], 6), f"=Prices!J{rr}", 1e-5, "0.00%")
         b.check(t, f"{x['name']}: volume the increase can lose", round(x["loss"], 6), f"=Prices!M{rr}", 1e-5, PCT1)
         b.check(t, f"{x['name']}: revenue a year if volume holds", round(x["revenue"], 2), f"=Prices!N{rr}", 0.5, COUNT)
+        b.check(t, f"{x['name']}: the Goal Seek result agrees with the direct price", True, f"=Prices!O{rr}", 0, "General")
     b.check(t, "families below the floor", len(m["reprice"]), "=" + tot[list(tot)[0]], 0, COUNT)
     b.check(t, "  which", ", ".join(x["name"] for x in m["reprice"]), "=" + tot[list(tot)[1]], 0, "@")
     b.check(t, "revenue a year if volume holds", round(sum(x["revenue"] for x in m["reprice"]), 2), "=RepriceRevenue", 1,
@@ -3521,8 +3560,20 @@ def r10(b: ExerciseBuild) -> None:
     m, d = ms(b), data(b)
     ws = sheet(b, "Memo")
     title(ws, "Requirement 10: the decision table and the memo (model answer)",
-          "The memo itself is a separate document of no more than two pages; the decision table's figures are formulas "
-          "over the other sheets.")
+          "The memo itself is a separate document of no more than two pages. The decision table's figures are formulas "
+          "over the other sheets, but its actions and the paragraphs below (marked Model answer) describe the published "
+          "base case; a change in an assumption makes them a snapshot (see A3).")
+    quote_value = sum(v[1] * v[2] for v in QUOTE.values())
+    quote_tooling = sum(v[3] for v in QUOTE.values())
+    base_inputs = (f"AND(PracticalShare={PRACTICAL},MarginFloor={FLOOR},Freight={FREIGHT},QuoteAdjustment=0,"
+                   f"CrewRemoved=1,SUMPRODUCT(Quote[Price],Quote[QuotedVolume])={quote_value},"
+                   f"SUM(Quote[Tooling])={quote_tooling})")
+    base_text = ("Base case: the decision table and the paragraphs below describe the inputs now on the Assumptions "
+                 "sheet.")
+    ws.Range("A3").Formula = (f'=IF({base_inputs},"{base_text}","The inputs differ from the base case: the decision '
+                              'table and the paragraphs below are a snapshot. Solve Goal Seek and Solver again and '
+                              'rewrite them before a memo goes out.")')
+    ws.Range("A3").Font.Bold = True
     header(ws, 4, ["Family", "What to do", "Annual effect", "One-time cost", "What the decision depends on"])
     reprice = {x["name"]: x for x in m["reprice"]}
     order = [x["name"] for x in m["buy"]] + [x["name"] for x in m["lose"]] + \
@@ -3601,8 +3652,9 @@ def r10(b: ExerciseBuild) -> None:
         "a year if volume holds. Past promotions show no unusually large response in volume, but that cannot say how "
         "customers would answer an increase, so stage the increases and watch each family's volume against the loss it "
         "can afford.",
-        f"Standards: adopt {m['new_rate']:.2f} a standard hour on normal capacity for inventory, and time-driven costs "
-        "(capacity at its practical cost, idle capacity reported apart) for decisions. Applied to the stock of earlier "
+        f"Standards: adopt {m['new_rate']:.2f} a standard hour on normal capacity for inventory, relevant costs for make "
+        "or buy, and time-driven costs (capacity at its practical cost, idle capacity reported apart) for the pricing "
+        "floor and the capacity question. Applied to the stock of earlier "
         f"years, the proposed standard would raise inventories by about {sp['plan']:,.0f} at the end of {d.P} and "
         f"{sc['plan']:,.0f} at the end of {d.C}, above the 5% screen, but that is a sensitivity on next year's plan, not "
         "an established error. Before the shareholders are told anything, the CFO needs the evidence of whether the old "
@@ -3636,6 +3688,7 @@ def r10(b: ExerciseBuild) -> None:
     b.check(t, "total one-time cost", round(m["tooling"] + m["positions"] * m["severance"], 2), "=" + tot[list(tot)[1]],
             0.01, COUNT)
     b.check(t, "unused capacity exceeds the positions buying frees", True, "=UnusedPositions>BuyPositions", 0, "General")
+    b.check(t, "the snapshot indicator reads the base case", base_text, "=Memo!A3", 0, "@")
     documentation(b)
 
 

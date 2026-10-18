@@ -302,7 +302,7 @@ def if_c3_0_b() -> Diagram:
     for y in range(first_year, last_year + 1):
         a, b = x_of(f"{y}-01-01"), (x_of(f"{y + 1}-01-01") if y < last_year else x_of(last_work) - 6)
         strong = y in (first_year, last_year)
-        d.box(f"<b>{by_year[y]} pay dates</b>" if strong else f"{by_year[y]} pay dates", a + 4, ly + 6, b - a - 8, 22,
+        d.box(f"<b>{by_year[y]} payroll postings<br>to 1090</b>" if strong else f"{by_year[y]} payroll postings<br>to 1090", a + 4, ly + 2, b - a - 8, 31,
               fill=TEAL_TINT if strong else WHITE, stroke=TEAL if strong else WHITE, size=SMALL, rounded=False,
               stroke_width=1.5 if strong else 1)
     # lane 3: output, from the first completion to the year-end
@@ -326,8 +326,8 @@ def if_c3_0_b() -> Diagram:
     bottom = kit.callout(d, "<b>Compare hours with output on work dates</b>, counting output only up to the last day with time records. "
                             "<b>Measure cost on the ledger</b>, by pay date: never divide the cost of a pay year by the hours of a work year.",
                          x0, by + 14, 860 - x0, "amber")
-    _note(d, f"Time records end {gap_days} days before the year-end. The first year has {by_year[last_year] - by_year[first_year]} fewer pay dates "
-             f"charged to account 1090 than the last: {by_year[first_year]} against {by_year[last_year]}.", bottom, gap=6)
+    _note(d, f"Time records end {gap_days} days before the year-end. The first year has {by_year[last_year] - by_year[first_year]} fewer payroll postings "
+             f"charged to account 1090 than the last: {by_year[first_year]} against {by_year[last_year]}. The first payroll of the first year posted to 5080.", bottom, gap=6)
     return d
 
 
@@ -607,7 +607,8 @@ def if_c3_2_a() -> Diagram:
               fill=fill, stroke=stroke, color=INK, size=SMALL, rounded=False, align="left", stroke_width=1.5)
         d.box(esc(evidence), xs[5], y, widths[5], h, fill=WHITE, stroke=RULE, size=SMALL, rounded=False, align="left")
         y += h
-    _note(d, "Every record that agrees with the hours comes from the time clock. The three records outside it (the capacity plan, the calendar and the "
+    _note(d, f"Supports means agreement with one recorded feature, such as attendance or a timestamp, not that all {r2['clocked']:g} recorded hours were "
+             "worked. Every record that agrees with the hours comes from the time clock. The three records outside it (the capacity plan, the calendar and the "
              f"output) do not support the hours as recorded, and the records do not show who keeps them, so their independence from the {boss} "
              "is not established. Absences are silent. The hours are unsupported, not unworked. Output is from Requirement 3's weekly "
              "comparison.", y, gap=6)
@@ -765,7 +766,7 @@ def if_c3_5_a() -> Diagram:
     d.text(f"<b>{MINUS}{_money(net)}</b><br>from {cur} income", x4 + bw + 6, base - h4 - hn - 4, 860 - (x4 + bw + 6), 36, size=SMALL, color=AMBER)
     _note(d, f"One scale for both panels. Recording both accruals adds {_money(accrual)} of expense and removes {_money(prior)}, so {cur} income moves only "
              f"{_money(net)}. The liability at the year-end carries the whole {_money(accrual)}: {_money(prior)} of it falls on opening retained earnings and "
-             f"{_money(net)} on {cur} income.", base + 70)
+             f"{_money(net)} on {cur} income. Manufacturing's part of each amount is taken as a cost of the period.", base + 70)
     return d
 
 

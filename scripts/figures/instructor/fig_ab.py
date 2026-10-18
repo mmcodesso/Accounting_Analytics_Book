@@ -302,8 +302,8 @@ def if_ab_0_a() -> Diagram:
     _tag(d, "No", (q2x + centers[0]) / 2 - 17, fork - 10)
     _path(d, [(q2x, fork), (centers[1], fork), (centers[1], ly)])
     _tag(d, "Yes", (q2x + centers[1]) / 2 - 17, fork - 10)
-    _note(d, "The work, the needs and the class time are the rows of the Teaching approaches table below; Plan A, Plan B and Plan C are the plans "
-             "that follow it. Scope 3 asks for 45 to 60 minutes of student time outside the class as well.", ly + leaf_h + 10)
+    _note(d, "The work, the needs and the class time are the rows of the Teaching approaches table. Plan A, Plan B and Plan C are the plans "
+             "in the same section. Scope 3 asks for 45 to 60 minutes of student time outside the class as well.", ly + leaf_h + 10)
     return d
 
 

@@ -26,7 +26,7 @@ a. Type and run the query below.
 
 b. Compare the three years of UnitsCompleted and StandardHours.
 
-Output was nearly flat. The plant completed about the same number of units in fiscal 2024 and fiscal 2026, with a dip of about six percent in fiscal 2025, and the standard labor hours those units required moved with them.
+Output was nearly flat. The plant completed about the same number of units in fiscal 2024 and fiscal 2026, with a dip of about six percent in fiscal 2025, and the standard labor hours those units required moved with them. The item table keeps one standard for each item and no history of it, so the query applies the same standard to all three years. The completion lines of every year carry the item's current standard labor cost, so the standards appear to have held over the period.
 
 **Step 2. Measure the hours and pay of the manufacturing payroll.** The payroll register records each employee's pay for a period, and its lines record the hours of regular and overtime earnings.
 

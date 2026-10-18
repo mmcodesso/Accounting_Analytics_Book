@@ -26,7 +26,7 @@ Duplicate payments are a classic audit risk, and a first test in Excel is easy t
 
 By the end, students can:
 
-- count repeats with COUNTIFS on a pair of columns and read the result (chapter outcome 4);
+- count repeats with COUNTIFS on a pair of columns and read the result (outcome 4);
 - judge a pair of records and name the evidence that would settle it (outcome 5);
 - explain what a test that finds nothing does and does not prove (outcome 6);
 - write a short memo that states the matches, the conclusions and the limits.
@@ -35,7 +35,7 @@ By the end, students can:
 
 ## Before you assign
 
-- Students need CharlesRiver_Work.xlsx. PurchaseInvoice has {{ ch02_ex6g.invoices|count }} rows and DisbursementPayment {{ ch02_ex6g.payments|count }}, so a COUNTIFS over whole columns recalculates slowly. Tell students to wait, or to switch calculation to manual while they build the columns.
+- Students need CharlesRiver_Work.xlsx. PurchaseInvoice has {{ ch02_ex6g.invoices|count }} rows and DisbursementPayment {{ ch02_ex6g.payments|count }}, so a COUNTIFS over whole columns recalculates slowly. Tell students to wait. A student who switches calculation to manual must press F9 before filtering or recording a result, switch back to automatic, and check the first and last formulas.
 - The exercise relies on these conditions: a few supplier invoice numbers appear twice for the same supplier, a few check numbers appear twice for the same supplier, a payment carries a check number only when its method is Check, and no invoice is paid above its GrandTotal once both sides are rounded to the cent.
 - The generator's own log of planted anomalies lists more repeated payment references than the data holds. Do not quote that count to students: the data holds {{ checks }} repeated check numbers, and the note under Expected results says so.
 - Requirement (4) asks for rounding to the cent. Students who skip it get false matches.
@@ -90,9 +90,9 @@ a. On **DisbursementPayment**, in the first free column, enter and copy down:
    =IF(H2="","",COUNTIFS(D:D,D2,H:H,H2))
    ```
 
-b. Filter the column for 2.
+b. Filter the column for values above 1.
 
-**Check:** {{ checks }} check numbers repeat, both for supplier {{ check_suppliers }}, each on two payments. Payments by ACH or wire show a blank and are left out. **Watch for:** a COUNTIFS on the check number alone, which would count a check number reused by a different supplier as a match.
+**Check:** {{ checks }} check numbers repeat, both for supplier {{ check_suppliers }}, each on two payments. Payments by ACH or wire show a blank and are left out. **Watch for:** a COUNTIFS on the check number alone. It answers a different question, a check number used for two suppliers, which is not harmless either (a check register should not repeat a number from one bank account), but these columns do not say which account issued a check, so the requested test is within a supplier. No check number is shared by two suppliers here.
 
 ### Requirement (3): Judge each pair
 
@@ -110,7 +110,7 @@ b. Filter the column for 2.
 {% endfor %}
 {% endfor %}
 
-Each pair pays two different invoices of different amounts, which is consistent with one check number reused on two payments rather than one payment made twice, but does not settle it. The pairs stay open until the bank's record of the checks that cleared and the payables team's check register, with any void and reissue, settle them.
+Each pair pays two different invoices of different amounts on the same day, which is consistent with one check number reused on two payments, or with one check that paid both invoices and was recorded as two payments, rather than one payment made twice, but does not settle it. Compare each pair's combined amount with the cleared check. The pairs stay open until the bank's record of the checks that cleared and the payables team's check register, with any void and reissue, settle them.
 
 ### Requirement (4): Test each invoice for overpayment
 
@@ -130,9 +130,9 @@ A model answer on what a clean result shows: recorded payments never exceed an i
 
 ### Requirement (5): Judge the approach
 
-**Step 6. Name what the tests would miss.** A model list: the same invoice entered with a slightly different number; a repeat paid with a different amount; a payment by ACH or wire, which has no check number; and the same supplier and amount on two different invoices. Chapter 8 tests that last pattern and finds {{ ch08_ex5.pairs }} supplier-and-amount pairs on different dates, {{ ch08_ex5.within30 }} within 30 days, none paying the same invoice.
+**Step 6. Name what the tests would miss.** A model list: the same invoice entered with a slightly different number; a repeat paid with a different amount; a payment by ACH or wire, which the check-number test cannot see (the overpayment test includes every method); and the same supplier and amount on two different invoices. Chapter 8 tests that last pattern on the payments dated through {{ d.C }} and finds {{ ch08_ex5.pairs }} supplier-and-amount pairs on different dates, {{ ch08_ex5.within30 }} within 30 days, none paying the same invoice (the whole extract, with the payments of early {{ d.N }}, holds a few more).
 
-**Check:** the answer gives at least three misses and a reason SQL helps: it can group by several columns, join a table to itself and test near matches in one query over the whole table, without a helper column on tens of thousands of rows, and the query can be saved and rerun.
+**Check:** the answer gives at least three misses and a reason SQL helps: it can group by several columns, join a table to itself and test near matches in one query over the whole table, without a helper column on tens of thousands of rows, and the query can be saved and rerun. SQL helps with repeatability and scale, but it does not supply evidence the records lack.
 
 ### Requirement (6): Write the memo
 
@@ -149,7 +149,7 @@ A model answer on what a clean result shows: recorded payments never exceed an i
 | Payments with no check number | {{ ch02_ex6g.no_check|count }} | Step 1 |
 | Invoices paid above their total, after rounding | {{ ch02_ex6g.rounded }} | Step 5 |
 | Invoices paid in installments | {{ installments|count }} | Step 5 |
-| Supplier-and-amount pairs on different dates; within 30 days | {{ ch08_ex5.pairs }}; {{ ch08_ex5.within30 }} | Step 6 |
+| Supplier-and-amount pairs on different dates, payments through {{ d.C }}; within 30 days | {{ ch08_ex5.pairs }}; {{ ch08_ex5.within30 }} | Step 6 |
 
 {{ expected() }}
 
@@ -167,7 +167,7 @@ A weak answer calls the matches duplicate payments, or calls the clean overpayme
 
 - **A match called a duplicate payment.** *Symptom:* "the supplier was paid twice". *Response:* ask what the dates, amounts and invoices show.
 - **No rounding.** *Symptom:* many invoices flagged as overpaid. *Response:* ask how a sum of many cents compares with a total.
-- **Check numbers tested alone.** *Symptom:* a COUNTIFS on CheckNumber only. *Response:* ask whether two suppliers can use the same number.
+- **Check numbers tested alone.** *Symptom:* a COUNTIFS on CheckNumber only. *Response:* ask which question the exercise asks, and what a repeat across suppliers would need (the account that issued the check).
 - **ACH and wire counted.** *Symptom:* blanks treated as one big repeat. *Response:* ask what a blank check number means for those methods.
 - **A clean result called proof.** *Symptom:* "there are no duplicates". *Response:* ask what a duplicate entered under a different number would do to the test.
 - **Unpaid invoices misread.** *Symptom:* negative differences reported as errors. *Response:* ask what a negative difference means.

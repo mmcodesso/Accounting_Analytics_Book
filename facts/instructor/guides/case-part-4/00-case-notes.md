@@ -40,7 +40,7 @@ figures:
 | Tools | Power BI Desktop only: Power Query (merges, Group By, custom columns), a star model with DAX (CALCULATE, KEEPFILTERS, trailing windows), report pages (waterfall, matrices, field parameter, what-if, drill-through, tooltip) and DAX query view for tests |
 | Components | Six requirements, no tutorials, milestones or multiple-choice questions; the deck has {{ c.slides }} slides; the model answer has {{ c.n_pages }} pages ({{ c.n_hidden }} hidden), {{ c.n_measures }} measures and a Checks tab of {{ c.checks }} rows |
 | Files students need | CharlesRiver.xlsx and the file they build, Charles River Cash Case.pbix. Charles River Reports.pbix and Audit Monitoring.pbix stay as they are. The solution is PartIV-case.zip |
-| Deliverable | A memo of at most two pages to the controller, a one-page appendix of five exhibits, and the .pbix with its About page, Validation page, Tests tab and Data Through card |
+| Deliverable | A memo of at most two pages to the controller, an appendix of up to three pages of five exhibits, and the .pbix with its About page, Validation page, Tests tab and Data Through card |
 | Time | Class: about 150 minutes in Plan A. Students: about 15 hours, from 90 minutes for Requirement 6 to 180 for each of Requirements 2 and 3 |
 
 The case depends on these conditions of the data, all visible in the file students build:
@@ -107,6 +107,8 @@ The case depends on these conditions of the data, all visible in the file studen
 | 2 | 120 | Requirement 2: balance sheet, bridge, drill-through, restated sections | {{ s.r2 }} |
 | 3 | 120 | Requirement 3: the measures, the field parameter and the tooltip | {{ s.r3 }} |
 | | 360 | Total | |
+
+These sessions start and check Requirements 1 to 3. Budget about 45 minutes after Session 1 and 60 minutes after each of Sessions 2 and 3 to finish them, in addition to the work on Requirements 4 to 6. Require a validated model before Session 2 and a tied cash bridge before Session 3. The estimates assume the prerequisite exercises are done.
 
 **Plan C: memo workshop (90 minutes).** Students arrive with Requirements 1 to 5 done. It fits an upper-level or graduate class and moves the learning to the writing. Its risk is an early error found late, so collect the Tests tab and the findings the day before and mark them.
 

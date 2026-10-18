@@ -27,7 +27,7 @@ This is the chapter's first free-standing build. It uses the chapter's tools in 
 
 By the end, students can:
 
-- name a parameter cell and protect it with data validation (chapter outcome 5);
+- name a parameter cell and protect it with data validation (outcome 5);
 - total a Table by period with COUNTIFS and SUMIFS on named cells (outcomes 2 and 3);
 - fill a two-way grid from one formula and lock the Table column that must not move (outcome 3);
 - tie a schedule to its source and say what it leaves out (outcomes 1 and 6).
@@ -66,7 +66,7 @@ b. Enter {{ g.start }} in B4 and {{ g.end }} in B5, as dates. Fiscal {{ g.c }} i
 c. Select B4, click the **Name Box**, type `PeriodStart` and press Enter. Name B5 `PeriodEnd` in the same way.
 d. Set the font of both cells to blue, the input convention of Tutorial 4.2.
 
-**Check:** the **Name Box** shows PeriodStart when B4 is selected, and both dates are right-aligned. **Watch for:** a date typed as text. It sits left-aligned, and every SUMIFS below returns zero.
+**Check:** the **Name Box** shows PeriodStart when B4 is selected, and `=ISNUMBER(PeriodStart)` and `=ISNUMBER(PeriodEnd)` return TRUE. **Watch for:** a date typed as text. ISNUMBER returns FALSE, and every SUMIFS below returns zero. A text date usually sits left-aligned, but alignment is only a clue, because a cell can be aligned by hand.
 
 **Step 3. Validate both cells.**
 
@@ -76,7 +76,11 @@ c. On the **Input Message** tab, add a title and a message that states the allow
 d. Repeat for B5.
 e. Test B4 with a date before {{ g.first }}, then click **Cancel**.
 
-**Check:** Excel refuses the entry and the cell keeps its date. **Watch for:** the Warning style, which lets the user accept the bad date, and a Date rule with no range.
+**Check:** Excel refuses the entry and the cell keeps its date. **Watch for:** the Warning style, which lets the user accept the bad date, and a Date rule with no range. Validation tests each cell on its own, so a PeriodStart later than PeriodEnd passes both rules, and the period block then shows zeros while its parts check still reads 0, as if all were well. An optional status cell beside the parameters catches it. Test it with the dates reversed, then restore fiscal {{ g.c }}:
+
+```jinja
+=IF(AND(ISNUMBER(PeriodStart),ISNUMBER(PeriodEnd),PeriodStart>=DATE({{ g.first }},1,1),PeriodEnd<=DATE({{ g.c }},12,31),PeriodStart<=PeriodEnd),"Period valid","Check period dates")
+```
 
 ### Requirement (3): The period's billing
 
@@ -97,8 +101,10 @@ In B9 enter the same criteria in a SUMIFS, and repeat it in B10 to B12 with the 
 **Step 5. Confirm that the parts add up.** In B13 enter `=ROUND(B9+B10+B11-B12,2)`. For the whole Table, in B14 enter:
 
 ```
-=SUMPRODUCT(--(ABS(SalesInvoice[SubTotal]+SalesInvoice[FreightAmount]+SalesInvoice[TaxAmount]-SalesInvoice[GrandTotal])>0.005))
+=SUMPRODUCT(--(ABS(SalesInvoice[SubTotal] + SalesInvoice[FreightAmount] + SalesInvoice[TaxAmount] - SalesInvoice[GrandTotal]) > 0.005))
 ```
+
+The spaces around the operators are optional, and the solution file writes the formula without them.
 
 **Check:** both cells show 0. **Watch for:** a small nonzero B13. It usually means FreightAmount was rounded to whole dollars by Changed Type, so send the student back to Tutorial 4.1, Step 6c.
 
@@ -120,7 +126,7 @@ c. Optional: in G17 type `Invoices`, and count each year's invoices with the sam
 
 **Check:** click E18. Its sum column reads SalesInvoice[GrandTotal], and InvoiceDate has not moved. Row 20 equals the period block. **Watch for:** two silent failures. A pasted formula keeps SubTotal in every column, so each year shows ${{ g.year.sub|money }} four times in {{ g.c }}. A formula without the lock moves its date criterion to the next column of the Table, so the numbers drift or turn to zero without an error.
 
-**Step 8. Add the total row and the tie-out.** In row 21 enter `Total` and `=SUM(B18:B20)`, filled right. In row 22 enter `Entire SalesInvoice Table` and `=SUM(SalesInvoice[SubTotal])`, filled right (it shifts along the amounts, which is what the row needs). In row 23 enter `=ROUND(B21-B22,2)`.
+**Step 8. Add the total row and the tie-out.** In row 21 enter `Total` and `=SUM(B18:B20)`, filled right. In row 22 enter `Entire SalesInvoice Table` and `=SUM(SalesInvoice[SubTotal])`, filled right (it shifts along the amounts, which is what the row needs). In B23 enter `=ROUND(B21-B22,2)` and fill it right to E23.
 
 **Check:** row 23 is zero in all four columns, and the total row reads SubTotal ${{ g.total.sub|money }}, FreightAmount ${{ g.total.frt|money }}, TaxAmount ${{ g.total.tax|money }} and GrandTotal ${{ g.total.gt|money }}.
 
@@ -159,7 +165,7 @@ A weak answer calls GrandTotal revenue, lists only one limitation, or ties the t
 
 - **A grid that repeats SubTotal.** *Symptom:* the four columns of a year show one number. *Cause:* the formula was pasted, not filled. *Response:* ask the student to click E18 and read the formula bar.
 - **A date criterion that drifts.** *Symptom:* amounts that look right but differ from the period block. *Cause:* a fill across with InvoiceDate unlocked. *Response:* compare row 20 with B9 to B12 and read the formula.
-- **Dates typed as text.** *Symptom:* zeros. *Response:* check the alignment and the **Settings** tab of the validation.
+- **Dates typed as text.** *Symptom:* zeros. *Response:* test the cells with ISNUMBER and check the **Settings** tab of the validation.
 - **A nonzero tie-out.** *Cause:* FreightAmount rounded by Changed Type. *Response:* Tutorial 4.1, Step 6c.
 - **A total row that sums itself.** *Response:* ask what the Entire SalesInvoice Table row is compared with.
 - **GrandTotal named as revenue.** *Response:* ask which part of GrandTotal Charles River keeps.

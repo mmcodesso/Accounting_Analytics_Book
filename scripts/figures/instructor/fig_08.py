@@ -215,6 +215,9 @@ def if_08_0_a() -> Diagram:
     ar, ap, cash = lines[1020][0], lines[2010][1], lines[1010][0]
     assert abs(ar - t2["opening"]) < 0.005 and abs(t2["diff"] - ar) < 0.005, "the receivables difference is the entry's line"
     assert abs(ap - ex2["opening"]) < 0.005 and abs(cash - ap) < 0.005, "the payables line is balanced by cash"
+    # the payables difference is the opening credit less the two debt reclassifications (the review of 2026-10-16)
+    ap_diff, reclassed = ex2["gl"] - ex2["open_ap"], ex2["reclassed"]
+    assert abs(ap_diff - (ap - reclassed)) < 0.005 and reclassed > 0, "account 2010 less the open invoices is the opening credit less the reclasses"
     assert abs(total - t3["top_total"]) < 0.005 and t3["olines"] == data.one(
         "SELECT COUNT(*) FROM GLEntry WHERE SourceDocumentType = 'JournalEntry' AND VoucherNumber = ?", number)
     d = Diagram("One Journal Entry Reached by Three Tests")
@@ -225,7 +228,8 @@ def if_08_0_a() -> Diagram:
     left_label = (f"<b>Receivables reconciliation</b><br>Tutorial 8.2, Step 5<br>Account 1020 less the open invoices: "
                   f"<b>${ar:,.2f}</b>, the entry's debit line to 1020")
     right_label = (f"<b>Payables reconciliation</b><br>Exercise 8.2<br>Account 2010 less the open supplier invoices: "
-                   f"<b>${ap:,.2f}</b>, the entry's credit to 2010, balanced by a debit to cash of the same amount")
+                   f"<b>${ap_diff:,.2f}</b>. After the two debt reclassifications, ${reclassed:,.2f} in all, the unsupported "
+                   f"opening credit to 2010 is <b>${ap:,.2f}</b>. The same entry debits cash by ${cash:,.2f}")
     bottom_label = (f"<b>Journal entry tests</b><br>Tutorial 8.3, Steps 2 and 3<br>The only entry that scores four of five "
                     f"flags: {', '.join(esc(k) for k in on)}. Entry total <b>${total:,.2f}</b>")
     top = 20
@@ -247,9 +251,10 @@ def if_08_0_a() -> Diagram:
     d.text("<b>credit to<br>2010</b>", hub_x + hub_w, cy - 40, gap_r, 34, size=SMALL, align="center", valign="bottom")
     d.text("<b>score four</b>", 436, (cy + hub_h / 2 + bot_y) / 2 - 10, 120, 20, size=SMALL)
     y = bot_y + bot_h + 18
-    _note(d, f"Three routes to one entry. The two reconciliations meet it as an unexplained difference, the journal entry tests as the "
-             f"highest risk score. The amounts are the entry's own lines (the debit to 1020, the credit to 2010 and the matching debit "
-             f"to cash 1010) and its total. Amber: the entry; blue: the tests that reach it.", y)
+    _note(d, f"Three routes to one entry. The two reconciliations meet it as an unexplained difference, which for payables is smaller "
+             f"than the entry's credit by the two reclassifications, and the journal entry tests as the highest risk score. The other "
+             f"amounts are the entry's own lines (the debit to 1020, the credit to 2010 and the matching debit to cash 1010) and its "
+             f"total. Amber: the entry; blue: the tests that reach it.", y)
     return d
 
 

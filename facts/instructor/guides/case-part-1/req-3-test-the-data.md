@@ -31,7 +31,7 @@ By the end, students can:
 ## Before you assign
 
 - Students need their Tutorial 2.1 and 2.2 notes (or the tutorials to rerun) and the data quality checklist of Chapter 2. Exercises 2.1 and 2.2 are the closest practice.
-- The requirement relies on these conditions: the ledger's rows after {{ g.last_invoice }} are all of one source document type ({{ g.late_types }}); the ledger's monthly row counts in the last six periods are similar, so the fourth quarter is not partial; {{ g.n_nine }} invoices are dated before the first shipment of their order, and only {{ g.n_furniture }} of them hold Furniture lines; some customers share a name; and the blank list prices belong to items the company buys.
+- The requirement relies on these conditions: the ledger's rows after {{ g.last_invoice }} are all of one source document type ({{ g.late_types }}); the published operating window ends on {{ g.last_invoice }}, and the monthly counts and the documents' last dates support comparing the fourth and third quarters of {{ g.year }}, while the ledger's tail of {{ g.next_year }} holds only supplier payments (these observations do not prove that every expected document is present); {{ g.n_nine }} invoices are dated before the first shipment of their order, and only {{ g.n_furniture }} of them hold Furniture lines; some customers share a name; and the blank list prices belong to items the company buys.
 - Verify that students kept their working copy unchanged, since a helper column from Tutorial 2.1 (Min Date and Check in SalesInvoice) is reused here. If they did not keep it, the first step of Phase 2 rebuilds it in five minutes.
 
 ## How to run it
@@ -52,7 +52,7 @@ d. The periods of {{ g.year }} from 7 to 12 hold similar numbers of rows:
    - period {{ p[0] }}: {{ p[1]|count }}
 {% endfor %}
 
-**Check:** the sales documents stop on the last day of fiscal {{ g.year }}, so the fourth quarter is complete for sales and shipments; the ledger's later rows are payments of prior-year supplier invoices, with no sales and no shipments, so no margin can come from them. The latest complete quarter is {{ g.ql4 }}, compared with {{ g.ql3 }}. A student who also looked at the start finds {{ g.jan_invoices }} invoices in the first month of the extract against {{ g.feb_invoices }} in the second: a partial first month that does not touch these quarters, which is the other edge.
+**Check:** the sales documents stop on the last day of fiscal {{ g.year }}, so the fourth quarter is complete for sales and shipments; the ledger's later rows are payments of prior-year supplier invoices, with no sales and no shipments, so no margin can come from them. The latest complete quarter is {{ g.ql4 }}, compared with {{ g.ql3 }}. This supports the comparison window, but it does not establish that the extract is complete or that the cutoff is right. A student who also looked at the start finds {{ g.jan_invoices }} invoices in the first month of the extract against {{ g.feb_invoices }} in the second. That is a question about the opening coverage to investigate, not by itself a partial month, and it does not touch these quarters.
 
 **Watch for:** "the latest quarter is {{ g.next_year }} Q1" because those rows are the latest, and "the latest quarter is complete because it has ledger rows". Ask what kind of rows.
 
@@ -82,14 +82,14 @@ The filter lists {{ g.n_nine }} invoices. To see which hold Furniture lines, fil
 
 **Step 4. List prices that are blank by design.** Filter the Item worksheet's ListPrice column for blanks: {{ g.blank_items }} items, all in {{ g.blank_groups }}. **Check:** no Furniture item has a blank list price, and no invoice line is for an item with one, so the Furniture lines are untouched. The blanks are items the company buys, not products it sells.
 
-**Step 5. The other findings of Tutorial 2.1 (not named in the case).** A strong student also considers blank tracking numbers and "In Transit" shipments whose delivery date has passed. For the Furniture shipments of the two quarters:
+**Step 5. The other findings of Tutorial 2.1 (not named in the case).** A strong student also considers blank tracking numbers and "In Transit" shipments whose delivery date has passed. Use {{ g.last_invoice }} as the as-of date of this static case, not today's date: select the Furniture shipments by ShipmentDate in each quarter, keep Status In Transit, and test DeliveryDate earlier than {{ g.last_invoice }}. For the Furniture shipments of the two quarters:
 
 | Quarter | Furniture shipments | With a blank TrackingNumber | Lines | Standard cost | Still "In Transit" with a past delivery date |
 |---|---:|---:|---:|---:|---:|
 | {{ g.ql3 }} | {{ g.other.q3.shipments }} | {{ g.other.q3.blank }} | {{ g.other.q3.blank_lines }} | ${{ g.other.q3.blank_cost|money }} | {{ g.other.q3.stale }} |
 | {{ g.ql4 }} | {{ g.other.q4.shipments }} | {{ g.other.q4.blank }} | {{ g.other.q4.blank_lines }} | ${{ g.other.q4.blank_cost|money }} | {{ g.other.q4.stale }} |
 
-**Check:** a shipment's cost posts on its ShipmentDate whatever its tracking number or status says, so neither changes the margin arithmetic. They weaken the evidence that the goods left, which matters for the auditing view in Requirement 6.
+**Check:** a shipment's cost posts on its ShipmentDate whatever its tracking number or status says, so neither changes the margin arithmetic. They call for corroboration of dispatch and delivery, and an overdue In Transit status may also be stale status data, so establish what DeliveryDate records before reading the flag. The flag alone does not show that goods failed to leave or that revenue is misstated. This matters for the auditing view in Requirement 6.
 
 ## Expected results
 

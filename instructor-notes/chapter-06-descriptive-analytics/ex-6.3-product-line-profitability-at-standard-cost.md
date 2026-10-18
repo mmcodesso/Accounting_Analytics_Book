@@ -30,7 +30,7 @@ By the end, students can:
 
 ## How to run it
 
-Individual, about 60 minutes: 15 on requirement 1, 15 on requirement 2, 15 on requirement 3 and 15 on the explanation. Hold back the shares-without-Services idea until students have seen the Services row. Collect the workbook and the explanation.
+Individual, about 60 minutes: 15 on requirement 1, 15 on requirement 2, 15 on requirement 3 and 15 on the explanation. Before students compute the shares that requirement (2) asks for, ask them to predict what the Services row, at a margin of 100 percent, will do to the denominators. Collect the workbook and the explanation.
 
 ## Step-by-step solution
 
@@ -52,15 +52,15 @@ c. Drag LineTotal, Margin and MarginPct to **Values**, rename them `Revenue`, `M
 
 ### Requirement (3): Furniture product types
 
-**Step 3. Switch to product type.** Build a second PivotTable with ItemGroup in **Filters** set to Furniture, ProductType in **Rows** and the three value fields, and sort the types by Margin % from largest to smallest. Read the two highest and the two lowest, and name them with the codes of Chapter 5.
+**Step 3. Switch to product type.** Copy the fiscal 2026 PivotTable of Step 1. In the copy, move ItemGroup from **Rows** to **Filters** and select Furniture, keep FiscalYear set to 2026, and add ProductType to **Rows**. Sort the types by Margin % from largest to smallest, on the underlying values and not on the rounded display. Before ranking, check the Furniture totals: revenue $17,395,054.38 and margin $7,365,245.96. Read the two highest and the two lowest, and name them with the codes of Chapter 5.
 
-**Check:** the order is DSK (desk) 44.36%, CON (console table) 44.00%, SDB (sideboard) 43.08%, CTB (coffee table) 41.84%, NGT (nightstand) 41.84%, TBL (dining table) 41.46%, BKC (bookcase) 39.37%, BNH (bench) 39.04%. **Watch for:** the Furniture filter missing. TBL then mixes in the other lines that use the code, and its margin reads 43.31% instead of 41.46%.
+**Check:** the order is DSK (desk) 44.36%, CON (console table) 44.00%, SDB (sideboard) 43.08%, CTB (coffee table) 41.84%, NGT (nightstand) 41.84%, TBL (dining table) 41.46%, BKC (bookcase) 39.37%, BNH (bench) 39.04%. CTB and NGT both display 41.84 percent (41.8425% and 41.8352% unrounded), so rank the unrounded values. Neither is among the two highest or the two lowest. **Watch for:** the Furniture filter missing. TBL then mixes in the other lines that use the code, and its margin reads 43.31% instead of 41.46%.
 
 ### Requirement (4): The Services margin
 
-**Step 4. Explain it.** Three to five sentences. The model answer says that the PivotTable values every line at its item's standard cost, that the design-service items carry a standard cost of 0, and that the cost of a design service is the time of the design staff, recorded in the time records and in payroll. To measure the margin you need the cost of the hours behind the services billed. The model answer offers two measures: the time records' extended cost for the year ($220,317.28, a margin of about 82%) or the year's Design Services salaries expense ($471,214.88, about 61%). The gap shows that the margin depends on the cost definition, which a report must state.
+**Step 4. Explain it.** Three to five sentences. The model answer says that the PivotTable values every line at its item's standard cost, that the design-service items carry a standard cost of 0, and that the cost of a design service is the time of the design staff, recorded in the time records and in payroll. To measure the margin you need a cost source for the hours behind the services billed, and its scope. The model answer offers two illustrative scopes, not matched service margins. One is the time records' extended cost for the year ($220,317.28, a margin of about 82%), which covers every hour recorded on a work date of the year, nonbillable hours included. The other is the year's Design Services salaries expense ($471,214.88, about 61%), which covers the staff's whole pay whether or not the hours were billed. They differ in scope and in period, since hours worked are set against revenue billed. Neither is a margin until the work and billing periods agree and nonbillable capacity and overhead are treated on purpose, and a report must state the definition it uses.
 
-**Check:** the explanation names the missing standard cost and one cost source. **Watch for:** the 100 percent read as a finding. Neither of the two sources is loaded in the student workbook, so students describe the data they would ask for.
+**Check:** the explanation names the missing standard cost and one cost source with its scope. **Watch for:** the 100 percent read as a finding, and either ratio presented as the Services margin. Neither source is loaded in the student workbook, and the student text asks only for the data they would need, so students describe it. Computing a cost from tables outside the workbook is not required.
 
 ## Expected results
 
@@ -74,13 +74,15 @@ c. Drag LineTotal, Margin and MarginPct to **Values**, rename them `Revenue`, `M
 | Grand total margin percentage | 46.89% | 1 |
 | Highest and lowest Furniture type | DSK 44.36%; BNH 39.04% | 3 |
 
-> **Instructor notes, Exercise 6.3:** 2026 margin at standard cost: Accessories 50.96% (margin 954,080.96 on 1,872,273.66), Textiles 49.47% (1,621,892.16 on 3,278,211.11), Lighting 46.66% (2,798,584.12 on 5,997,536.93), Furniture 42.34% (7,365,245.96 on 17,395,054.38). Excluding Services, revenue shares are Furniture 60.9%, Lighting 21.0%, Textiles 11.5%, Accessories 6.6%, and margin shares 57.8%, 22.0%, 12.7%, 7.5%, so Lighting, Textiles, and Accessories contribute more margin than revenue. Furniture types: highest DSK (desk) 44.36% and CON (console table) 44.00%; lowest BNH (bench) 39.04% and BKC (bookcase) 39.37%. Services items carry StandardCost 0, so their margin shows 100%; their cost is design staff time. Possible measures: ServiceTimeEntry.ExtendedCost for 2026 work dates (220,317.28, a margin of about 82%) or the 2026 Design Services salaries expense in account 6280 (471,214.88, about 61%). The gap shows that the answer depends on the cost definition, which the report must state.
+> **Instructor notes, Exercise 6.3:** 2026 margin at standard cost: Accessories 50.96% (margin 954,080.96 on 1,872,273.66), Textiles 49.47% (1,621,892.16 on 3,278,211.11), Lighting 46.66% (2,798,584.12 on 5,997,536.93), Furniture 42.34% (7,365,245.96 on 17,395,054.38). Excluding Services, revenue shares are Furniture 60.9%, Lighting 21.0%, Textiles 11.5%, Accessories 6.6%, and margin shares 57.8%, 22.0%, 12.7%, 7.5%, so Lighting, Textiles, and Accessories contribute more margin than revenue. Furniture types: highest DSK (desk) 44.36% and CON (console table) 44.00%; lowest BNH (bench) 39.04% and BKC (bookcase) 39.37%. Services items carry StandardCost 0, so their margin shows 100%; their cost is design staff time. Illustrative scopes, not matched service margins: ServiceTimeEntry.ExtendedCost for 2026 work dates (220,317.28, a margin of about 82%), which includes nonbillable hours, or the 2026 Design Services salaries expense in account 6280 (471,214.88, about 61%), which is the staff's whole pay whether or not the hours were billed. The two differ in scope and in period, and nonbillable capacity and overhead are outside both, so the answer depends on the cost definition, which the report must state.
 
 ## What a strong answer says
 
 - **Requirement (2).** Lighting, Textiles, and Accessories contribute more margin than revenue, because their margins are above Furniture's. The shares exclude Services, whose margin percentage is an artifact.
 - **Requirement (3).** The two highest types are DSK (desk) and CON (console table) and the two lowest BNH (bench) and BKC (bookcase), with the margin spread across types small.
-- **Requirement (4).** The missing standard cost, the two cost definitions with their margins, and a statement that the report must say which one it uses.
+- **Requirement (4).** The missing standard cost, a defensible cost source and its scope, and a statement that the report must say which definition it uses.
+
+**A plus, not required.** The two scopes with their margins, the difference between them explained, and the work and billing periods, nonbillable capacity and overhead raised before either ratio is called a margin.
 
 A weak answer calls Services the most profitable line, or gives a cost number without a source.
 
@@ -99,7 +101,7 @@ A weak answer calls Services the most profitable line, or gives a cost number wi
 | Requirement 1: the PivotTable | 25 | Year filter, a calculated field for the dollar margin, correct percentages | Margins by group without the calculated field |
 | Requirement 2: the shares | 25 | Services excluded, lines with the larger margin share named | Shares with Services in the denominator |
 | Requirement 3: product types | 25 | Furniture filter, four types named with codes | Types without the filter |
-| Requirement 4: Services | 25 | Missing standard cost and a cost source, stated definition | The 100 percent explained without a source |
+| Requirement 4: Services | 25 | Missing standard cost and a cost source with its scope | The 100 percent explained without a source |
 
 ## Extensions and discussion questions
 

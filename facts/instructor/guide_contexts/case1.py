@@ -427,11 +427,15 @@ def g5(d, claim):
     un = not_invoiced(d, a4, b4)
     billed4 = margin(rev4 + un["at_order_price"], cogs4)
     claim(billed4 < margin(rev3, cogs3), "the margin of Q4 stays below Q3's even if the unbilled Furniture shipments were invoiced at their order prices")
+    # the invoice-line cost at standard against the posted shipment cost net of cost returns: two definitions, not an error
+    std3, std4 = qs[3]["std"], qs[4]["std"]
+    claim(abs(std3 - cogs3) > 1 and abs(std4 - cogs4) > 1, "the invoice lines at standard cost differ from the posted shipment cost net of returns")
     # the same trap at the earlier year-ends: each close is in the fourth quarter of its year
     claim(len(closes) == 2 * (d.C - d.F + 1) and all(c[2].startswith("Year-End Close") for c in closes), "each fiscal year has two year-end close entries")
     return dict(**labels(d), cols=cols, ledger=ledger, close_rows=[dict(desc=r[0], number=r[1], debit=r[2], credit=r[3]) for r in rows],
                 closes=[dict(number=e, posted=p, type=t) for e, p, t in closes], n_closes=len(closes), net3=net3, net4=net4, ret3=ret3, ret4=ret4,
-                billed4=billed4, unbilled=un, rev_change=(rev4 / rev3 - 1) * 100, cogs_change=(cogs4 / cogs3 - 1) * 100, drop=(r5["m3"] - r5["m4"]) * 100, year_rev=year_rev, year_cogs=year_cogs, rev3=rev3, cogs3=cogs3, rev_net3=rev3 - ret3, rev_net4=rev4 - ret4, cogs4=cogs4, std_drop=(r5["s3"] - r5["s4"]) * 100)
+                billed4=billed4, unbilled=un, rev_change=(rev4 / rev3 - 1) * 100, cogs_change=(cogs4 / cogs3 - 1) * 100, drop=(r5["m3"] - r5["m4"]) * 100, year_rev=year_rev, year_cogs=year_cogs, rev3=rev3, cogs3=cogs3, rev_net3=rev3 - ret3, rev_net4=rev4 - ret4, cogs4=cogs4, std_drop=(r5["s3"] - r5["s4"]) * 100,
+                std3=std3, std4=std4, std_gap3=std3 - cogs3, std_gap4=std4 - cogs4)
 
 
 # --- Requirement 6: the memo ------------------------------------------------------------------------------------------------

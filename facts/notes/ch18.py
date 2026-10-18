@@ -392,7 +392,8 @@ def model(d) -> dict:
                      "l.SalesInvoiceID JOIN Item i ON i.ItemID = l.ItemID WHERE si.InvoiceDate BETWEEN ? AND ? "
                      "AND i.ItemGroup = 'Services'", first, last)
     unused_h = pract - used
-    explorer = dict(n_items=len(fg), rev=rev_fg, std=rev_fg - view["std"], absorp=rev_fg - view["absorp"],
+    loss_any = sum(1 for v in item_m.values() if any(x < 0 for x in v.values()))      # each item once, whatever its views
+    explorer = dict(n_items=len(fg), loss_any=loss_any, rev=rev_fg, std=rev_fg - view["std"], absorp=rev_fg - view["absorp"],
                     td=rev_fg - view["td"], td_unused=rev_fg - view["td"] - unused_h * td_rate,
                     year=rev_fg - view_exact["std"] - totals["total"], top_n=top_n, tops=tops,
                     all_rev=all_rev, all_std=all_std, services=services, std_cost=view_exact["std"],
@@ -410,6 +411,10 @@ def model(d) -> dict:
                            reduced=w["reduced"], delivered=dq, absorp=(w["absorp"] - dq) * u, a_kept=(w["kept"] - dq) * u,
                            a_reduced=(w["reduced"] - dq) * u, be_kept=w["kept"] / (1 + FREIGHT),
                            be_reduced=w["reduced"] / (1 + FREIGHT), margin=1 - dq / w["price"], time=w["time"]))
+    for q in quoted:                  # the one-time costs and the two years of a family bought on its own (MOD18-04)
+        q["once"] = q["tooling"] + q["time"] * q["units"] / pos_hours * severance
+        q["two_year"] = PRICE_YEARS * q["a_reduced"] - q["once"]
+        q["be_two_years"] = (q["reduced"] - q["once"] / (PRICE_YEARS * q["units"])) / (1 + FREIGHT)
     buy = [q for q in quoted if q["a_reduced"] > 0]
     lose = [q for q in quoted if q["a_reduced"] <= 0 and q["a_kept"] <= 0]
     gain = sum(q["a_reduced"] for q in buy)
@@ -619,6 +624,9 @@ def make_buy_claims(m: dict, claim) -> None:
     claim(len(m["buy"]) + len(m["lose"]) == len(QUOTE),
           "every quoted family either gains only with the crew reduced or loses either way")
     claim(len(m["buy"]) > 0 and len(m["lose"]) > 0, "some quoted families are worth buying and some are not")
+    claim(all(q["two_year"] > 0 for q in m["buy"]),
+          "each family to buy covers its own tooling and severance within the two years the prices are fixed, so the "
+          "workbook's two-year gate keeps every family the annual test selects")
 
 
 # --- Milestones ------------------------------------------------------------------------------------
@@ -919,20 +927,29 @@ def r6(d, claim):
 # --- Requirement 7 -----------------------------------------------------------------------------------
 
 def overloaded_weeks(d) -> dict:
-    """The base year's rough-cut plan (RoughCutCapacityPlan, Monday buckets through the week of the last time record):
-    the weeks whose planned load is above the plant's available hours, the work-center weeks above their own, and the
-    highest of each. Spare hours over a year do not make every week spare."""
+    """The base year's rough-cut plan (RoughCutCapacityPlan, Monday buckets): the weeks whose planned load is above the
+    plant's available hours, the work-center weeks above their own, and the highest of each. The main window runs from
+    the first bucket of the year through the week of the last time record, the weeks the records can speak to (a
+    time-record-aligned subset of the plan); `all` counts every bucket that starts in the year, the last of which ends in
+    the next January (N18-02). Spare hours over a year do not make every week spare."""
     through = monday(last_work(d))
     centers = ("WITH C AS (SELECT BucketWeekStartDate AS W, WorkCenterID, SUM(PlannedLoadHours) AS L, "
                "MAX(AvailableHours) AS A FROM RoughCutCapacityPlan WHERE BucketWeekStartDate BETWEEN ? AND ? GROUP BY 1, 2) ")
-    args = (f"{d.C}-01-01", through)
-    weeks = d.one(centers + "SELECT COUNT(DISTINCT W) FROM C", *args)
-    plant = d.q(centers + "SELECT W, SUM(L) / SUM(A) FROM C GROUP BY W HAVING SUM(L) > SUM(A) ORDER BY 2 DESC", *args)
-    center = d.q(centers + "SELECT C.W, w.WorkCenterName, C.L / C.A FROM C JOIN WorkCenter w ON w.WorkCenterID = "
-                 "C.WorkCenterID WHERE C.L > C.A ORDER BY 3 DESC", *args)
-    return dict(weeks=weeks, plant=len(plant), centers=len(center), through=through,
-                peak=dict(week=plant[0][0], share=plant[0][1]) if plant else None,
-                center_peak=dict(week=center[0][0], name=wc_short(center[0][1]), share=center[0][2]) if center else None)
+
+    def window(last: str) -> dict:
+        args = (f"{d.C}-01-01", last)
+        weeks = d.one(centers + "SELECT COUNT(DISTINCT W) FROM C", *args)
+        first, final = d.q(centers + "SELECT MIN(W), MAX(W) FROM C", *args)[0]
+        plant = d.q(centers + "SELECT W, SUM(L) / SUM(A) FROM C GROUP BY W HAVING SUM(L) > SUM(A) ORDER BY 2 DESC", *args)
+        center = d.q(centers + "SELECT C.W, w.WorkCenterName, C.L / C.A FROM C JOIN WorkCenter w ON w.WorkCenterID = "
+                     "C.WorkCenterID WHERE C.L > C.A ORDER BY 3 DESC", *args)
+        ends = d.one("SELECT date(?, '+6 days')", final)
+        return dict(weeks=weeks, plant=len(plant), centers=len(center), first=first, last=final, ends=ends,
+                    peak=dict(week=plant[0][0], share=plant[0][1]) if plant else None,
+                    center_peak=dict(week=center[0][0], name=wc_short(center[0][1]), share=center[0][2]) if center else None)
+
+    main = window(through)
+    return dict(main, through=through, all=window(f"{d.C}-12-31"))
 
 
 @note("ch18.r7", CHAPTER)
@@ -957,6 +974,9 @@ def r7(d, claim):
     # two bases: the capacity table counts the year's completions, Requirement 6's positions the year's sales
     claim(abs(total - m["hours"]) > 1, "the hours freed on the year's completions differ from those on the year's sales")
     wk = overloaded_weeks(d)
+    claim(wk["weeks"] < wk["all"]["weeks"] and wk["plant"] <= wk["all"]["plant"] and wk["centers"] <= wk["all"]["centers"],
+          "the weeks through the last time record are a subset of the year's rough-cut plan, and the full year has at "
+          "least as many overloaded weeks")
     claim(m["used"] / m["pract"] < 0.8 and wk["plant"] > 0 and wk["centers"] > wk["plant"],
           "the plant runs well below its practical capacity over the year, yet some weeks, and more work-center weeks, "
           "were planned above the available hours")

@@ -23,7 +23,7 @@ figures:
 
 ## Purpose and learning outcomes
 
-Every later test assumes that the populations are complete, and Requirement 1's anti-joins cannot show that a document was never made. A reconciliation can: each document population is totaled by year from its own table and from the ledger, and the two sides must agree to the cent. Two-sided totals by year, without the closes, are a query. The analytics type is descriptive. The requirement also teaches the hub account: 2060 passes tens of millions a year and ends each year with a few thousand, so it must be reconciled flow by flow, and its balance named item by item.
+Every later test relies on the recorded populations, and a reconciliation identifies differences between the recorded document population and the ledger population: each is totaled by year from its own table and from the ledger, and the two sides must agree to the cent. Agreement supports completeness relative to those records, but cannot detect an event omitted from both. Use sequence checks, source documents and outside-system evidence before a broader completeness conclusion. Two-sided totals by year, without the closes, are a query. The analytics type is descriptive. The requirement also teaches the hub account: 2060 passes tens of millions a year and ends each year with a few thousand, so it must be reconciled flow by flow, and its balance named item by item.
 
 Students can reconcile credits, returns, refunds, clawbacks, receipts and applications to the accounts they post to (Part 1), roll the hub forward and name its items, reconcile commissions payable (Part 2), and state what was excluded and why (Part 3).
 
@@ -66,7 +66,7 @@ SUM(CASE WHEN a.AccountNumber = 4060 THEN gl.Debit ELSE 0 END)
 - A GrandTotal tied to `1020` alone: the difference is the part posted to `2060`, ${{ g.parts_total|money }} in all.
 - `4060` read by account alone, as debits less credits over every source: zero in every year, because the close credits it back.
 
-**Step 2. Reconcile the returns (G2).** The return lines at standard cost against the debits to `1040` and the credits to the four cost of goods sold accounts. **Check:** {{ g.g2 }} rows; the cost is ${{ std_total|money }} over the three years. **Watch for:** tying the cost to `5010` alone, which leaves ${{ g.cogs_gap|money }} in the last year.
+**Step 2. Reconcile the returns (G2).** The return lines at standard cost against the debits to `1040` and the credits to the four cost of goods sold accounts. **Check:** {{ g.g2 }} rows; the cost is ${{ std_total|money }} over the three years. **Watch for:** tying all returned cost to `5010` alone. In the last year that omits ${{ g.cogs_gap|money }} posted to `5020` to `5040`: the total returned cost is ${{ g.cogs_total|money }} and the `5010` portion ${{ g.cogs_5010|money }}.
 
 **Step 3. Reconcile the refunds and the clawbacks (G3, G4).** Refunds against the credits to cash (`1010`) and the debits to `2060`; clawbacks against the debits to `2034` and the credits to `6290`, with the year's accruals and payments beside them. **Check:** {{ g.g3 }} rows each; refunds total ${{ rf_amt[0]|money }}, ${{ rf_amt[1]|money }}, ${{ rf_amt[2]|money }} and clawbacks ${{ clawback[0]|money }}, ${{ clawback[1]|money }}, ${{ clawback[2]|money }}. **Watch for:** every credit to `6290`, whatever its source. It reads ${{ g.all_6290[0]|money }} in the first year, the year's accruals, because the close credits the expense account for its net cost.
 
@@ -118,7 +118,7 @@ GROUP BY a.AccountNumber, je.EntryNumber, je.PostingDate
 ORDER BY a.AccountNumber, je.PostingDate;
 ```
 
-**Check:** {{ g.g9 }} rows, one close a year on each account (`4060`: ${{ close_4060[1]|money }}; `6290`: ${{ close_6290[1]|money }}). The statement names the six closing entries, which move the year's result to equity, and the ledger rows after the last year-end, which hold supplier payments only.
+**Check:** {{ g.g9 }} rows, one close a year on each account (`4060`: ${{ close_4060[1]|money }}; `6290`: ${{ close_6290[1]|money }}). The statement names the {{ g.g9 }} account-level closing rows from the {{ g.close_entries }} year-end closing entries, which move the year's result to equity, and the ledger rows after the last year-end, which hold supplier payments only.
 
 **Step 9. Build the appendix version.** The Reconciliation sheet repeats each test as formulas on the Ledger Table: a total from the document Table, one from the ledger, and their difference.
 
@@ -146,7 +146,7 @@ ORDER BY a.AccountNumber, je.PostingDate;
 - **Every population ties to the cent, in every year, from both sides,** and the answer says which date each side uses.
 - **The hub is reconciled flow by flow,** and each year-end balance is named by credit.
 - **The exclusions are stated and justified:** the closes, and the rows after the last year-end.
-- **A tie is evidence of completeness, not of correctness:** the amounts are tested in Requirement 7.
+- **A tie is evidence that the recorded populations agree with the ledger,** not of completeness beyond the records or of correctness: the amounts are tested in Requirement 7.
 
 A weak answer reconciles totals over three years at once, ties the balance alone, or leaves the closes in.
 

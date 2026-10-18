@@ -29,7 +29,7 @@ RETURN
     )
 ```
 
-(2) Build a matrix with AccountType and AccountSubType from Account on **Rows** and Balance as **Values**, and a slicer with YearMonth set to single selection. Select 2026-12 and confirm three things: the total of the matrix is zero; the assets equal the liabilities, the equity, and the balance of the revenue and expense accounts, each with its sign reversed; and that last balance equals the net income of fiscal 2026 from Tutorial 14.3.
+(2) Build a matrix with AccountType and AccountSubType from Account on **Rows** and Balance as **Values**, and a slicer with YearMonth set to single selection. Select 2026-12 and confirm three things: the total of the matrix is zero; the assets equal the liabilities, the equity, and the balance of the revenue and expense accounts, each with its sign reversed; and that last balance, with its sign reversed, equals the net income of fiscal 2026 from Tutorial 14.3.
 
 (3) Select 2026-06, and then 2024-12. Confirm that the matrix still totals zero in both, and explain why the revenue and expense accounts at June 2026 hold only six months of postings, although the ledger begins in January 2024.
 
@@ -67,7 +67,7 @@ CALCULATE (
 )
 ```
 
-(5) Add a custom column named `CrossesYear` to ShippedLines, true when ShipmentDate is not null and its year differs from the year of InvoiceDate. List the lines for which it is true in a table visual with InvoiceNumber, InvoiceDate, ShipmentDate, and LineTotal. Sort them into two kinds, invoices issued after the year in which the goods shipped and invoices dated before their shipment, and compare each kind with Chapter 12's revenue cutoff findings.
+(5) Add a custom column named `CrossesYear` to ShippedLines, true when ShipmentDate is not null and its year differs from the year of InvoiceDate. List the lines for which it is true in a table visual with SalesInvoiceLineID, InvoiceNumber, InvoiceDate, ShipmentDate, and LineTotal, and set SalesInvoiceLineID to **Don't summarize** in the visual, so that each line has a row of its own. Sort them into two kinds, invoices issued after the year in which the goods shipped and invoices dated before their shipment, and compare each kind with Chapter 12's revenue cutoff findings.
 
 (6) Recommend which date the monthly sales report should use for revenue, and what the report should disclose about the other.
 
@@ -105,7 +105,7 @@ CALCULATE (
 
 **Table group:** Order-to-Cash, with the Item table from Master Data
 
-**Scenario.** Chapter 6's bridge explained the fall in Furniture's margin for one pair of quarters, on a worksheet. The controller wants the bridge in the model, so that it can be read for any quarter and any item group.
+**Scenario.** Chapter 6's bridge explained the fall in Furniture's margin for one pair of quarters, on a worksheet. The controller wants the bridge in the model, so that it can be read for other quarters and item groups, wherever the quarter before has sales.
 
 **Requirements.**
 
@@ -213,7 +213,7 @@ RETURN
 
 (2) Run the query. The revenue posted by sales invoices differs from the revenue of the invoice lines. Explain the difference, and add a test that the difference equals its documented cause.
 
-(3) In your exercise copy, change GL Amount so that it no longer leaves out the closing entries, run the tests again, and record which fail and which do not. Then undo the change and run them once more.
+(3) In your exercise copy, change GL Amount so that it no longer leaves out the closing entries, run the tests again, and record which fail and which do not. Then undo the change, run them once more, and record the result of that run too, with the restored Net Income card, so that your record has three results in all: before, with the change, and after the undo.
 
 (4) Write a conclusion of a few sentences: what the passing tests show about the model, what they cannot show, and when the library should be run.
 

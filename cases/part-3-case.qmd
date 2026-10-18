@@ -105,7 +105,7 @@ Roster times carry no date, while clock and punch times do, and a late-shift clo
 **Requirement 5: Close the fiscal 2026 statements (Chapters 11 and 12; financial reporting).**
 
 - Estimate the payroll cost of the work of December 14 to 31, 2026, by cost center. Take the cost per working day of the last eight processed pay periods, counting working days in WorkCenterCalendar, and multiply it by the working days left in the year. Write the adjusting entries, with the accounts that the payroll postings of each cost center use, and explain where the manufacturing part ends up.
-- The year-end before was not accrued either. With the same working-day method, measure the 2025 work paid in fiscal 2026 from the registers of the pay periods that cross the year-end. Show the effect of recording both accruals on fiscal 2026 income and on the liability at December 31, 2026, and explain why they differ. Decide what to do about the balance that account 2030 has carried since the opening entry.
+- The year-end before was not accrued either. With the same working-day method, measure the 2025 work paid in fiscal 2026 from the registers of the pay periods that cross the year-end. Show the effect of recording both accruals on fiscal 2026 income and on the liability at December 31, 2026, say how you treated the manufacturing part in those figures, and explain why they differ. Decide what to do about the balance that account 2030 has carried since the opening entry.
 - Explain where the cost of the hours beyond the work belongs. The inventory standard of U.S. GAAP (FASB Accounting Standards Codification Topic 330) allocates fixed production overhead to inventory on the normal capacity of the production facilities, and charges abnormal amounts, such as idle facility expense, to the period in which they are incurred. Consider what raising the standards to absorb 2026's actual conversion cost would do to the finished goods inventory.
 - Rerun tests L5 and L6 of Audit.sql for the revenue cutoff. Summarize the proposed adjustments and their effect on fiscal 2026 net income, starting from the net income of Chapter 6's income statement, and on the balance sheet, and judge whether they are material.
 
@@ -116,14 +116,14 @@ Roster times carry no date, while clock and punch times do, and a late-shift clo
 
 - **Auditing:** what the records outside the time clock show about the surge-day hours, how independent they are, which explanations remain open and what evidence would settle them, and what the attendance-exception control needs.
 - **Managerial accounting:** what the extra hours produced and what they cost, the bridge of the variance, and the 2027 plan with its assumptions and the overtime it allows.
-- **Financial reporting:** the proposed adjustments to the fiscal 2026 statements, their effect, and why the cost of the hours stays out of inventory.
+- **Financial reporting:** the proposed adjustments to the fiscal 2026 statements, their effect, why identified abnormal costs are expensed, and why normal conversion costs need a separate inventory-allocation analysis.
 
 Close the memo with your recommendation.
 
 
 
 
-**Deliverable.** A decision memorandum of no more than two pages, with a one-page appendix of exhibits: the corroboration matrix, output against hours, the bridge of the variance, the 2027 plan against the status quo, and the proposed adjustments. Submit Case.sql as well, with its header complete and a comment above every query.
+**Deliverable.** A decision memorandum of no more than two pages, with a one-page appendix of exhibits: the corroboration matrix, output against hours, the bridge of the variance, the 2027 plan against the status quo, and the proposed adjustments. Each exhibit shows only the results that carry the decision, and the full tables stay in Case.sql. Submit Case.sql as well, with its header complete and a comment above every query.
 
 
 ## What a Strong Submission Includes
@@ -132,7 +132,7 @@ Close the memo with your recommendation.
 - Evidence graded for independence as well as agreement, with honest limits on what the output comparison can show.
 - A bridge of the variance that sums to the ledger, and measures that explain its payroll line on stated calendars.
 - A plan with its assumptions in one place, a capacity check, and scenarios that show what each assumption is worth.
-- Adjusting entries that separate the effect on income from the effect on the balance sheet, and a clear reason why the cost of the hours stays out of inventory.
+- Adjusting entries that separate the effect on income from the effect on the balance sheet, and a clear reason why identified abnormal costs are expensed while normal conversion costs need a separate allocation analysis.
 - A memo written for the controller: concise, organized by perspective, careful with the word "unsupported", and ending with a recommendation she can act on.
 
 ::: {.callout-note .connecting-dots icon=false}

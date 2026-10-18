@@ -76,7 +76,7 @@ Time-driven rate       =CommittedCost/PracticalHours
 
 ### Part 2: The item costs
 
-**Step 3. Build the ItemCosts Table with Power Query.** Start from Item filtered to finished goods, add the family (the first seven characters of ItemCode), merge the routing's run and setup hours, the year's sales by item (**Transform > Group By**) and the year's completions by item (**Home > Merge Queries**), replace the nulls with zero (**Transform > Replace Values**) and load the result as a Table. **Check:** 219 rows, one for each finished good. **Watch for:** a missing year filter on the sales or the completions: revenue reads $82,927,040.29 and manufactured units 131,379.38 against 46,786.01, three years of sales against one year's costs.
+**Step 3. Build the ItemCosts Table with Power Query.** Start from Item filtered to finished goods, add the family (the first seven characters of ItemCode), merge the routing's run and setup hours, the year's sales by item (**Transform > Group By**) and the year's completions by item (**Home > Merge Queries**), replace an absent aggregate with zero (**Transform > Replace Values**) only where absence means no activity, as with an item that had no sales or no completions in the year, and load the result as a Table. A missing key, routing or assumption is flagged apart (a check column, or a row of the Tests), never turned into a zero. **Check:** 219 rows, one for each finished good. **Watch for:** a missing year filter on the sales or the completions: revenue reads $82,927,040.29 and manufactured units 131,379.38 against 46,786.01, three years of sales against one year's costs.
 
 **Step 4. Add the cost columns as Table formulas.** Material at the actual rate, the cost with the crew kept, and the three views:
 

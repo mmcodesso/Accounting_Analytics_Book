@@ -46,7 +46,7 @@ FROM SalesReturn
 
 **Check:** 12 rows; Records equals DistinctKeys in every row and Missing is zero. M2 (15 rows) lists the values of each status, reason and method column.
 
-**Step 2. Read the days between the steps (M3).** Credits are dated 0 to 3 days after the return (mean 1.4), every approval carries the credit's date, and refunds come 2 to 94 days after the credit, clearing 0 to 3 days later. **Check:** 4 rows. The lags say how long to wait before a period's returns are complete (Requirement 5), and the records hold dates, not times (Requirement 4).
+**Step 2. Read the days between the steps (M3).** Credits are dated 0 to 3 days after the return (mean 1.4), every approval carries the credit's date, and refunds come 2 to 94 days after the credit, clearing 0 to 3 days later. **Check:** 4 rows. The lags show how long the records took and inform the follow-up window (Requirement 5), though they do not prove that no later return can arrive, and the records hold dates, not times (Requirement 4).
 
 ### Part 2: Test every link (tests M4 to M6)
 
@@ -151,7 +151,7 @@ ORDER BY p.Document, Documents DESC
 | C4 | Who recorded and who applied each receipt | Cash handled outside the system |
 | C5 | A clawback for each line, with base, rate and amount | Whether representatives were told |
 | C6 | The refund's approver, title and limit | The delegation for refunds, the preparer |
-| C7 | The refund date against the payments applied | Bank clearance, the customer's request |
+| C7 | The refund date against the payments applied | Independent bank evidence (the refund's ClearedDate is recorded, not verified), the customer's request |
 | C8 | The refund's method against the receipts', open balances | The payee, the account, the request |
 | C9 | Receipt, deposit and application dates | Remittance advices, bank records |
 
@@ -178,7 +178,7 @@ ORDER BY p.Document, Documents DESC
 ## What a strong answer says
 
 - **The map comes from the records:** every link tested both ways, every document traced to the ledger and back, the numbering tested, each result reported with its population, clean or not.
-- **A clean result is bounded.** An anti-join finds a record that points at nothing, not the record never made; completeness rests on the numbering and on Requirement 2.
+- **A clean result is bounded.** An anti-join finds a record that points at nothing, not the record never made; numbering and Requirement 2's reconciliation support completeness relative to the records, and sequence checks, source documents and outside-system evidence go further.
 - **The limits are named by control point** and carried forward to the sample (Requirement 6) and the report (Requirement 9).
 - **The duties are seen:** customer service records receipts, applies cash and approves credits and clawbacks.
 

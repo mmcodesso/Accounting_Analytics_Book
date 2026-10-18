@@ -26,7 +26,7 @@ A cost analysis stands on three things: a standard cost for each item, a reliabl
 
 By the end, students can:
 
-- explain why a zero standard cost is legitimate for one kind of item and a problem for another (chapter outcome 5);
+- explain why a zero standard cost is legitimate for one kind of item and a problem for another (outcome 5);
 - decide whether items that share a name are duplicates or distinct, and say what grouping by name would do to a cost figure (outcomes 3 and 5);
 - count the child rows of a parent with COUNTIFS and name what a parent with none breaks (outcome 4);
 - write a short readiness assessment for product costing.
@@ -44,7 +44,7 @@ By the end, students can:
 
 Individual work with a pair comparison of requirement (2). For about 60 minutes: 15 on requirement 1, 15 on requirement 2, 15 on requirement 3 and 15 on the assessment.
 
-**Hints.** If a student wants to delete the zero-cost items, ask what Charles River sells them for. If nobody finds the work orders, give the COUNTIFS pattern of Tutorial 2.1 Step 6 and ask which table is the child.
+**Hints.** If a student wants to delete the zero-cost items, ask what Charles River sells them for. If nobody finds the work orders, give the COUNTIFS pattern of Tutorial 2.2 Step 5 and ask which table is the child.
 
 ## Step-by-step solution
 
@@ -62,7 +62,7 @@ Individual work with a pair comparison of requirement (2). For about 60 minutes:
 
 All are Services items sold by the hour, so the zero is by design: Charles River does not carry the consultants' time as an item cost. A margin at standard cost would be the whole price, which a cost analysis must not read as profit. Chapter 6 shows where the cost of the design staff appears.
 
-**Step 2. Compare the costs within their group and unit.** Sort StandardCost from largest to smallest and look at the group of each large value.
+**Step 2. Compare the costs within their group and unit.** Clear the filter of Step 1, filter StandardCost for values above 0, sort it from largest to smallest and look at the group of each large value. The table below counts the items with a positive cost, so the Services row leaves out the design services at 0.
 
 | ItemGroup | Items | Lowest cost | Highest cost |
 |---|---:|---:|---:|
@@ -76,7 +76,7 @@ All are Services items sold by the hour, so the zero is by design: Charles River
 
 **Step 3. Sort the blank list prices by group.** Filter **Item** for a blank ListPrice and read ItemGroup, as in Tutorial 2.1 Step 8.
 
-**Check:** {{ ch02_t1.sizes }}. The {{ ch02_t1.sellable|count }} remaining items are sold. The four design services have a price per hour, and the other items are bought: raw materials, packaging, equipment and operating services.
+**Check:** {{ ch02_t1.sizes }}. The {{ ch02_t1.sellable|count }} remaining items have a list price, the items Charles River offers for sale. The four design services have a price per hour, and the other items are bought: raw materials, packaging, equipment and operating services.
 
 **Step 4. Find the names shared by more than one item.**
 
@@ -84,7 +84,7 @@ a. In the first free column of **Item**, count the rows with the same name: `=CO
 b. Filter the column for values above 1, then sort by ItemName.
 c. Compare ItemCode, StandardCost and the lifecycle of the items that share each name.
 
-**Check:** the table holds {{ n_names }} shared names, on {{ n_shared_items }} items. Every pair or group has different codes and different standard costs, so these are distinct items, not duplicate records. For {{ lifecycle }} of the names the items also differ in lifecycle status, so one item may be the successor of another; ask the owner of the item master. For example, {{ widest.name }} appears on {{ widest.codes|length }} items with costs from ${{ widest.low|money }} to ${{ widest.high|money }}.
+**Check:** the table holds {{ n_names }} shared names, on {{ n_shared_items }} items. Every pair or group has different codes and different standard costs, which supports treating them as separate items in this analysis, though codes and costs alone do not prove distinct products: compare their specifications and lifecycle and ask the owner of the item master before merging or deleting a record. For {{ lifecycle }} of the names the items also differ in lifecycle status, so one item may be the successor of another; ask the owner of the item master. For example, {{ widest.name }} appears on {{ widest.codes|length }} items with costs from ${{ widest.low|money }} to ${{ widest.high|money }}.
 
 | ItemCode | StandardCost | Lifecycle |
 |---|---:|---|
@@ -119,7 +119,7 @@ All are Closed, and each is the first work order numbered in its year. The other
 
 ### Requirement (4): Write the assessment
 
-**Step 7. Outline half a page to a page.** A strong assessment has a conclusion up front (the data supports product costing for the items with a positive cost and a routing); a short list of problems with the table, column and count; the conditions it sets (treat the design services separately, key by ItemCode, resolve the three work orders before the variance work); and what is not known (whether a shared name is a successor).
+**Step 7. Outline half a page to a page.** A strong assessment has a conclusion up front (use the item costs that fit each item and purpose: purchased items need no routing, manufactured work orders are assessed against their operations, and a service's zero StandardCost does not mean its labor costs nothing); a short list of problems with the table, column and count; the conditions it sets (treat the design services separately, key by ItemCode, resolve the three work orders before the variance work); and what is not known (whether a shared name is a successor).
 
 **Check:** each problem has a count and a decision.
 
@@ -129,7 +129,7 @@ All are Closed, and each is the first work order numbered in its year. The other
 |---|---:|---|
 | Items with a blank StandardCost | 0 | Step 1 |
 | Items with a StandardCost of 0; their group | {{ n_zero }}; Services | Step 1 |
-| Items with a blank ListPrice; items sold | {{ ch02_t1.blank_items }}; {{ ch02_t1.sellable|count }} | Step 3 |
+| Items with a blank ListPrice; items with a list price | {{ ch02_t1.blank_items }}; {{ ch02_t1.sellable|count }} | Step 3 |
 | Names shared by more than one item; items involved | {{ n_names }}; {{ n_shared_items }} | Step 4 |
 | Shared names that appear on invoice lines; made on work orders | {{ sold }}; {{ made }} | Step 4 |
 | Work orders; with no operation | {{ work_orders|count }}; {{ n_none }} | Step 5 |

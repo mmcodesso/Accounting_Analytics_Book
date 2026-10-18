@@ -15,7 +15,7 @@ figures:
   - id: IF-01-0-B
     kind: diagram
     purpose: A decision aid for sorting a question into one of the four types of analytics.
-    shows: A vertical flow of four yes/no questions, asked from the most demanding type down so that a mixed question takes the highest type it asks for (does the answer recommend what to do under constraints, does it project what might happen, does it explain why it happened, does it summarize what happened). Each yes leads to a type label with one Charles River example question and the kind of evidence the answer needs (a recommendation with its constraints, an expectation or forecast, a decomposition or trace, a summary). A no on the last question leads to a box that says to reword the question. A side note says that most real questions combine two types.
+    shows: A vertical flow of four yes/no questions, asked from the most demanding type down so that a mixed question takes the highest type it asks for (does the answer recommend what to do under constraints, does it estimate an outcome not yet known, such as a forecast or an expectation, does it explain why it happened, does it summarize what happened). Each yes leads to a type label with one Charles River example question and the kind of evidence the answer needs (a recommendation with its constraints, an expectation or forecast, a decomposition or trace, a summary). A no on the last question leads to a box that says to reword the question. A side note says that most real questions combine two types.
     data: The example questions are the model questions of Exercise 1.4 (the quarters and fiscal years come from that guide's context); the evidence lines follow its Step 1 table.
 ---
 # Chapter 1: The Role of Analytics in Accounting
@@ -39,12 +39,14 @@ The chapter depends on these conditions of the data, all visible in the workbook
 - Every GLEntry row names the document that created it. The ledger has {{ n_source_types }} source types, and journal entries are a small share of its rows ({{ je_share|pct(1) }}).
 - The sale that Figure 1.6 traces, invoice {{ trace_invoice }}, exists as drawn. Exercise 1.2 gives its whole path.
 - The timestamps and the reversal column that Exercise 1.6 asks about behave in a particular way, which that guide describes.
-- The Manufacturing group holds completions, work order closes and labor time, but no table of actual scrap, defects or downtime (Exercise 1.4).
+- The Manufacturing group holds completions, work order closes and operations, and Payroll and Time holds the labor time. The dataset has no table of actual scrap, defects or downtime (Exercise 1.4).
 
 ## What students should be able to do afterward
 
+These outcomes are this guide's own and finer than the chapter's five learning objectives. Outcome 1 serves objective 2, outcome 2 objective 3, outcome 3 objective 4, and outcomes 4 to 6 objective 5. Objective 1, the changing profession, is met by the reading and discussion prompt 2.
+
 1. Classify a question as descriptive, diagnostic, predictive or prescriptive, and write one of each type. Practiced in Exercise 1.4 and questions 2, 3, 4 and 15.
-2. Place a task at its stage of the six-stage workflow and say why defining the question comes first. Practiced in Exercise 1.4 (requirement 4) and questions 5 and 12.
+2. Place a task at its stage of the six-stage workflow and say why defining the question comes first. Practiced in questions 5 and 12 and discussion prompt 5. Exercise 1.4 touches it, because writing the question is the first stage and the memo the last.
 3. Choose among Excel, SQL and Power BI for a task and give the reason. Practiced in questions 7 and 10 and the discussion prompts; no exercise asks for it directly.
 4. Map a financial reporting, cost or audit need to table groups, tables and columns of the dataset. Practiced in Exercises 1.1, 1.3 and 1.5.
 5. Describe how a revenue transaction moves from order to ledger, and use SourceDocumentType, SourceDocumentID and SourceLineID to trace a posting and to separate postings made by documents from journal entries. Practiced in Exercises 1.2 and 1.5 (requirement 2) and question 11.
@@ -134,7 +136,7 @@ The chapter depends on these conditions of the data, all visible in the workbook
 
 **Stumbles to expect**
 
-- Step 1: students scroll the tab strip for one table at a time. The tutorial says the worksheets are arranged by table group, so send them to Table 1.3 first.
+- Step 1: students scroll the tab strip for one table at a time. The tutorial says the worksheets follow the business cycles only roughly, with master data tables such as Item and Employee among them, so send them to Table 1.3 first.
 - Step 4: students ask why Services is among the items. The tutorial explains that it holds design services that Charles River sells and operating services that it buys.
 - Steps 5 and 6: students read AccountID as the account number. It is the key of Account, and the traced sale's revenue row carries AccountID {{ ch01_ex2.revenue.account_id }} for account {{ ch01_ex2.revenue.number }}.
 - Any step: a student sorts a Table or leaves a filter on. Show how to clear it, and remind them not to save.
@@ -143,7 +145,7 @@ The chapter depends on these conditions of the data, all visible in the workbook
 
 ## Difficult ideas and misconceptions
 
-**Descriptive is not "basic", and the types are not a ladder.** Students read Figure 1.1 as a ranking and treat prescriptive work as the goal. The chapter's Watch out says most accounting analytics is descriptive and that a poor summary can mislead as much as a model. Ask which type the controller's question is and what descriptive work has to come first.
+**Descriptive is not "basic", and the types are not a ladder.** Students read Figure 1.1 as a ranking and treat prescriptive work as the goal. The chapter's Watch out says much accounting analytics is descriptive and that a poor summary can mislead as much as a model. Ask which type the controller's question is and what descriptive work has to come first.
 
 **Telling the type by the tool or the first step.** Question 15 describes a PivotTable summary, then a breakdown and a trace of the largest changes. Students choose descriptive because the PivotTable came first, but the work ends by asking why. Question 2 reverses it: quarter-to-quarter percentage changes tempt students toward diagnostic, though nothing in it explains why.
 
@@ -174,7 +176,7 @@ The chapter depends on these conditions of the data, all visible in the workbook
 
 ## Using the exercises
 
-All six exercises are conceptual: students browse the workbook, write short answers, and write a memo in four of them. There is no solution workbook, so the model answers are in the guide for each exercise. The outcome column uses the numbers of the list at the top of this note.
+All six exercises are conceptual: students browse the workbook and write. Exercises 1.1, 1.4 and 1.5 end in a memo, and Exercises 1.2, 1.3 and 1.6 in a written description or assessment. There is no solution workbook, so the model answers are in the guide for each exercise. The outcome column uses the numbers of the list at the top of this note.
 
 | Exercise | Perspective | Tool | Time | Difficulty | Outcome |
 |---|---|---|---:|---|---|
@@ -193,7 +195,7 @@ All six exercises are conceptual: students browse the workbook, write short answ
 - *One exercise a session.* Take them in the order 1.2 (after the lecture), 1.1, 1.4, 1.3, 1.5, 1.6. The order rises in difficulty, and Exercise 1.2 prepares the source columns that 1.5 and 1.6 use.
 - *A light load.* Exercises 1.2 and 1.4 take about 95 minutes and cover outcomes 1, 2 and 5. Add Exercise 1.6 for an auditing course.
 
-**Grading and discussion.** Exercises 1.1, 1.3 and 1.5 end in a memo or written assessment and suit grading with the rubrics in their guides. Exercises 1.2 and 1.4 have short answers and suit pairs and an in-class review. Exercise 1.6 is the one most worth discussing, because its answers rest on judgment about what the data can show. Collect work in class or through your course system, since students cannot check themselves against a file.
+**Grading and discussion.** Exercises 1.1, 1.3 and 1.5 end in a memo or written assessment and suit grading with the rubrics in their guides. Exercise 1.2's short answers and Exercise 1.4's half-page memo suit pairs and an in-class review. Exercise 1.6 is the one most worth discussing, because its answers rest on judgment about what the data can show. Collect work in class or through your course system, since students cannot check themselves against a file. Grade what each requirement asks: the model answers go further in places (more key and date columns, a statement of each table's grain, a next step), and those count as a plus, not as conditions for full credit. Accept other relevant tables and supported choices, and do not ask for queries or calculations.
 
 ## Multiple-choice questions
 

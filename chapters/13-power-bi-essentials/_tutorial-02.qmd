@@ -84,4 +84,4 @@ The count taken from SalesInvoiceLine falls to the invoices that contain a Furni
 - The discount line rises sharply in September and October, and the bar chart shows Furniture far ahead of the other groups.
 - Selecting Furniture changes the invoice count taken from the invoice lines but not one taken from the SalesInvoice table.
 
-The page already answers part of the controller's question: the discounts were concentrated in Furniture in the autumn. What it cannot show is how much the discounts cost in margin, because margin is a ratio of totals and the report has no measure for it yet.
+The page already answers part of the controller's question: the discounts were concentrated in Furniture in the autumn. What it cannot show is what the discounts cost in gross margin percentage, which divides total gross margin by total revenue, because the report has no measure for a ratio of totals yet.

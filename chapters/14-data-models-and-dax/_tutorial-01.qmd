@@ -41,11 +41,12 @@ The Data pane now lists a table named Date with seven columns. CALENDAR supplies
 
 a. Select the Date column of the Date table in the **Data** pane, and on the **Column tools** tab set **Data type** to **Date**, so that the dates show without a time.
 b. Select the MonthName column, and on the **Column tools** tab choose **Sort by column > MonthNumber**.
-c. Right-click the **Date** table in the **Data** pane, and choose **Mark as date table**.
-d. Choose Date as the date column, and confirm.
-e. Select **Table view**, select the **Date** table, and read the number of rows in the status bar.
+c. Select the Year column, and on the **Column tools** tab set **Summarization** to **Don't summarize**. Do the same for MonthNumber.
+d. Right-click the **Date** table in the **Data** pane, and choose **Mark as date table**.
+e. Choose Date as the date column, and confirm.
+f. Select **Table view**, select the **Date** table, and read the number of rows in the status bar.
 
-The table has one row for each day from January 1, 2024, to December 31, 2027, four full years, as @fig-14-02 shows. Marking it lets the time intelligence functions of Tutorial 14.3 rely on it.
+The table has one row for each day from January 1, 2024, to December 31, 2027, four full years, as @fig-14-02 shows. Year and MonthNumber are whole numbers, which Power BI would otherwise sum, so they are set to act as categories, as FiscalYear was in Chapter 13. Marking the table lets the time intelligence functions of Tutorial 14.3 rely on it.
 
 ![The Date Table in Table View.](/visuals/svg/fig-14-02-date-table.svg){#fig-14-02 fig-alt="A mock of Power BI's Table view showing the first rows of the Date table: one row per day from January 1, 2024, with the columns Date, Year, Quarter, YearQuarter, YearMonth, MonthNumber, and MonthName. The status bar reports the table's name and number of rows, one for every day of four full years, and outlines it."}
 
@@ -57,7 +58,7 @@ c. Delete the line between Customer and SalesInvoice in the same way.
 d. Drag InvoiceDate from **SalesInvoiceLine** onto Date in the **Date** table.
 e. Drag CustomerID from **SalesInvoiceLine** onto CustomerID in **Customer**.
 
-If a relationship window opens for a drag, check that it reads many to one, with a single cross filter direction, and save it. The lines now sit at the center of three dimensions: Item, Customer, and Date. SalesInvoice is left unrelated, and its year slicer has stopped filtering anything, which the next step corrects.
+If a relationship window opens for a drag, check that it reads many to one, with a single cross filter direction, and save it. If none opens, read the new line in Model view instead. It should show 1 at the dimension, an asterisk at the lines, and one arrow pointing toward the lines. The lines now sit at the center of three dimensions: Item, Customer, and Date. SalesInvoice is left unrelated, and its year slicer has stopped filtering anything, which the next step corrects.
 
 **Step 5. Point the visuals at the date table.** @tbl-14-02 lists each field to replace. To replace a field, drag its replacement from the Data pane onto the field in the visual's well, or onto its filter in the Filters pane.
 

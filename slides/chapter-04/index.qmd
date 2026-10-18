@@ -73,7 +73,7 @@ Each Charles River Table is named with a number and the database table it holds,
 
 ## A plain range depends on cell addresses
 
-{{< book-figure fig-04-01 crop="0,0,1,0.462" >}}
+{{< book-figure fig-04-01 crop="0,0,1,0.462" alt="Detail of the plain-range view of four invoice lines, one of them shaded, in columns A, G, H, K and P, with ordinary text in row 1. Notes below the cells explain that the ListAmount formula was typed in the first row and copied down by hand, so each row holds its own copy, and that the total names fixed cells, so rows added below the data are left out without a warning." >}}
 
 ::: {.notes}
 The total names fixed cells, so rows added below the data are left out and nothing warns you: a number that looks reasonable, which is what makes a range error dangerous. The column formula was copied down by hand, so every row holds its own copy, and nothing ensures that new rows get one.
@@ -81,7 +81,7 @@ The total names fixed cells, so rows added below the data are left out and nothi
 
 ## A Table knows its extent and names its columns
 
-{{< book-figure fig-04-01 crop="0,0.462,1,0.538" >}}
+{{< book-figure fig-04-01 crop="0,0.462,1,0.538" alt="Detail of the same four invoice lines as the SalesInvoiceLine Excel Table, with its name, a header row with filter buttons, banded rows and ListAmount as a calculated column. Notes below the cells explain that one formula fills every row, including rows added later, and that the total refers to the LineTotal column by name, so it includes every row the Table holds. A last note says the shaded row is the Alder Desk line traced in Tutorial 3.2." >}}
 
 ::: {.notes}
 The same cells as a Table: one calculated-column formula fills every row by default, including rows added later, and the total refers to the column by name. The chapter's comparison table adds that slicers work only on Tables, and that charts and PivotTables follow a Table as it grows, although a PivotTable still needs a refresh.
@@ -124,7 +124,7 @@ A copy of the data leaves the source alone but goes stale, which Power Query als
 
 ## Check the types Power Query chose
 
-- Power Query types each column from its first 200 rows, in a step named Changed Type
+- By default, Power Query types each column from its first 200 rows, in a step named Changed Type
 - The first invoice lines carry no promotion, so Discount can arrive as a whole number
 - A whole-number Discount rounds every rate to zero
 - Fix it with Replace current, which corrects Changed Type before any rounding
@@ -259,7 +259,7 @@ The control totals from Tutorial 4.1 sit above the large-line measures and the g
 
 ## A promotion is a discount on top of a price
 
-{{< book-figure fig-04-06 crop="0,0.466,1,0.534" >}}
+{{< book-figure fig-04-06 crop="0,0.466,1,0.534" alt="Detail of the Analysis worksheet: the outlined grid that counts the invoice lines by pricing method and discount rate, with row and column totals, and below it the same counts as shares of all lines. Most lines are Segment Price List lines with no discount, and the Base List row has no discounted lines." >}}
 
 ::: {.notes}
 Most lines are billed at a segment price list with no discount. Discounts at the promotions' rates appear with every pricing method except Base List, which Charles River uses only for its hourly design services. So a promotion is not a way of pricing a line, and a slicer on PromotionID, in Tutorial 4.3, is the way to see which promotions were used.

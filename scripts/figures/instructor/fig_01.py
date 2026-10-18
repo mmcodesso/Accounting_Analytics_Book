@@ -179,7 +179,7 @@ def if_01_0_b() -> Diagram:
          "Given the hours each work center has next quarter, which items should the plant schedule to maximize "
          "contribution margin?",
          "a recommendation, with its objective and its constraints"),
-        ("Does it project what might happen in a later period?", "Predictive",
+        ("Does it estimate an outcome not yet known, such as a forecast or an expectation?", "Predictive",
          "How many units will the plant complete next quarter, and what total variance does that suggest, if recent "
          "trends continue?",
          "an expectation or forecast from historical patterns"),
@@ -239,8 +239,8 @@ def if_01_2_a() -> Diagram:
         ("CashReceipt", f"{n['receipt']}<br>{rec['date']}<br>{_money(rec['amount'])}"),
         ("CashReceiptApplication", f"{_money(rec['applied_here'])} to this invoice<br>{rec['applied_date']}"),
     ]
-    labels = [f"{order['shipments']}<br>shipments", f"{order['invoices']}<br>invoices", "paid<br>by",
-              f"{rec['applications']}<br>invoices"]
+    labels = [f"1 of {order['shipments']}<br>shipments", f"1 of {order['invoices']}<br>invoices", "paid<br>by",
+              f"1 of {rec['applications']}<br>invoices"]
     fills = ["blue", "blue", "blue", "teal", "teal"]
     widths = [108, 108, 108, 108, 150]          # 12 px text: the document numbers need 92 px, the longest table name 138
     gap = (860 - sum(widths)) / (len(widths) - 1)
@@ -268,9 +268,9 @@ def if_01_2_a() -> Diagram:
            "because no financial effect has happened yet.</i>", 0, height + 14, 164, 110, size=SMALL, color=GRAY)
     d.text("<b>Dashed amber:</b> a posting to the ledger. <b>Solid gray:</b> the next step of the sale.", 0, gl_y + 66,
            860, 20, size=SMALL)
-    d.text(f"<i>Arrow labels count what the order has ({order['shipments']} shipments, {order['invoices']} invoices) "
-           f"and what the receipt paid ({rec['applications']} invoices); each box shows the one that the traced sale "
-           f"passes through.</i>", 0, gl_y + 88, 860, 36, size=SMALL, color=GRAY)
+    d.text(f"<i>Arrow labels place the traced documents among the order's {order['shipments']} shipments and "
+           f"{order['invoices']} invoices and the {rec['applications']} invoices that the receipt paid. Each box shows "
+           f"the one that the traced sale passes through.</i>", 0, gl_y + 88, 860, 36, size=SMALL, color=GRAY)
     return d
 
 
@@ -496,9 +496,10 @@ def if_01_6_a() -> Diagram:
     time_of_day = rows[0][5][11:]
     d.text(f"<i>Filtered to the entries whose ReversesJournalEntryID is filled; the first {len(rows)} of {found} are shown, "
            f"all of type Accrual Adjustment. Columns E, G, I and J (Description, the creator and the approver) are "
-           f"hidden. Outlined: CreatedDate, which reads {time_of_day} on every row, and ReversesJournalEntryID, the "
-           f"JournalEntryID of the earlier accrual that the entry adjusts. Blue row numbers mark a filtered "
-           f"Table.</i>", 0, bottom + 66, 860, 52, size=SMALL, color=GRAY)
+           f"hidden. CreatedDate's number format is changed to yyyy-mm-dd hh:mm:ss (the workbook shows it as a date). "
+           f"Outlined: CreatedDate, whose time, {time_of_day} on every row, is when the entry was created, not when it "
+           f"was posted, and ReversesJournalEntryID, the JournalEntryID of the earlier accrual that the entry adjusts. "
+           f"Blue row numbers mark a filtered Table.</i>", 0, bottom + 66, 860, 70, size=SMALL, color=GRAY)
     return d
 
 

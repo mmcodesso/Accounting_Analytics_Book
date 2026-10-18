@@ -18,7 +18,7 @@ figures:
   - id: IF-18-10-B
     kind: diagram
     purpose: The page plan of the memo and its appendix, for the kickoff and for grading.
-    shows: "Two columns of boxes: a memo of two pages with seven short sections in order (the finding, the two views, the decisions, the whole paths, the prices, the standards and statements, the production manager's decision), and an appendix of three pages with three exhibits, each tagged with the sheet of the workbook it comes from."
+    shows: "Two columns of boxes: a memo of at most two pages with seven short sections in order (the finding, the two views, the decisions, the whole paths, the prices, the standards and statements, the production manager's decision), and an appendix of at most three pages with three exhibits, each tagged with the sheet of the workbook it comes from and a callout asking for legible summaries."
     data: none; the sections and exhibits come from the requirement and from the sheets of the model workbook.
 ---
 {% set g = ch18_g10 %}
@@ -29,13 +29,13 @@ figures:
 
 ## Purpose and learning outcomes
 
-The memo is where the case's analysis becomes a decision two people who disagree can act on. It goes to the CFO and the production manager, so it gives each the evidence they need and leaves the crew decision with the production manager. Students pull the figures from their own workbook, compare whole paths and not single decisions, and keep to the page limits. The analytics type is prescriptive. This guide gives an outline and a rubric, not a memo to copy.
+The memo is where the case's analysis becomes a decision two people who disagree can act on. It goes to the CFO and the production manager, so it gives each the evidence they need and leaves the crew decision with the production manager. Students pull the figures from their own workbook, compare whole paths and not single decisions, and keep within the page maximums. The analytics type is prescriptive. This guide gives an outline and a rubric, not a memo to copy.
 
 Students can:
 
 - build a decision table from the workbook for each quoted family and each family below the floor, with the action, the annual effect, the one-time cost and what each depends on (Step 1);
-- write a two-page memo that leads with the finding that changes the question, states each decision with its condition, and compares the whole paths (Steps 2 to 4);
-- close with the standards, the statements and the one decision only the production manager can make, and choose exhibits that fit three pages (Steps 5 and 6).
+- write a memo of at most two pages, including the decision table, that leads with the finding that changes the question, states each decision with its condition, and compares the whole paths (Steps 2 to 4);
+- close with the standards, the statements and the one decision only the production manager can make, and choose exhibits that fit at most three pages (Steps 5 and 6).
 
 **Competencies practiced.** CPA Evolution Core S1 M8 (visualization and communicating results); IMA Leadership (communication skills); IFAC IES 3 (b); AACSB A5 part 5.2 (technology judgment, interpretation and communication).
 
@@ -67,15 +67,15 @@ One-time cost {{ g.f.once }}
 
 {{ figure('IF-18-10-A') }}
 
-**Step 2. Lead with the finding that changes the question.** Evidence: Requirements 3, 4 and 7. On the routings, the plant supplies about {{ unused_positions|num(1) }} position-equivalents of practical hours more than its completions need (${{ unused_crew|num(0) }} of crew cost a year), more than buying would free on the same base ({{ freed_positions|num(1) }}). Fitting the crew to the work is the larger question, and the two reductions add up only if both can be made. The memo says that these are annual hours from standard times, not a staffing plan, since some weeks were planned above capacity.
+**Step 2. Lead with the finding that changes the question.** Evidence: Requirements 3, 4 and 7. On the routings, the plant supplies about {{ unused_positions|num(1) }} position-equivalents of practical hours more than its completions need (${{ unused_crew|num(0) }} of crew cost a year), more than buying would free on the same base ({{ freed_positions|num(1) }}). Fitting the crew to the work is the larger question, and the two reductions add up only if both can be made. The memo says that these are annual hours from standard times, not a staffing plan, since {{ weeks.plant }} of the {{ weeks.weeks }} weekly buckets of the rough-cut plan through {{ weeks.through }} were planned above the plant's available hours.
 
 **Step 3. State each decision with its condition.** Evidence: Requirements 6 and 8. Make {{ lose|map(attribute='short')|join(', ') }}: buying them loses money whatever happens to the crew. Buy {{ buy|map(attribute='short')|join(', ') }} only with a committed plan to reduce the crew in step, about {{ positions|num(1) }} positions; otherwise keep making them and raise their prices. Raise {{ need|join(', ') }} to the floor through new, approved price lists with end dates.
 
 **Step 4. Compare the whole paths.** Evidence: the Memo sheet and Requirement 8. If volume holds, making all six and raising the {{ n_below }} families below the floor gains ${{ paths.make|num(0) }} a year with no one-time cost; buying {{ buy|map(attribute='short')|join(', ') }} and raising the rest gains ${{ paths.buy|num(0) }} with ${{ paths.once|num(0) }} once. Buying is a cost advantage at today's prices, not the better path under every assumption: which wins depends on how much volume the increases on those families would cost and on the crew plan.
 
-**Step 5. Explain the disagreement, and close.** Both decision makers are right about part of the cost: the CFO that the products cost more than their standards say, the production manager that idle capacity is not the products' fault and belongs to the plant. Then the standards (a rate on normal capacity for inventory, time-driven costs for decisions), what the base year's statements need (the evidence that would show whether the old standards misstated them, before anything is restated), and the one decision only the production manager can make: whether, and how fast, to reduce the crew to the work the plant has.
+**Step 5. Explain the disagreement, and close.** Both decision makers are right about part of the cost: the CFO that the products cost more than their standards say, the production manager that idle capacity is not the products' fault and belongs to the plant. Then the standards (a rate on normal capacity for inventory, relevant costs for make or buy, and time-driven costs for the pricing floor and the capacity question, with demand, opportunity cost and implementation constraints still part of each decision), what the base year's statements need (the evidence that would show whether the old standards misstated them, before anything is restated), and the one decision only the production manager can make: whether, and how fast, to reduce the crew to the work the plant has.
 
-**Step 6. Choose the exhibits.** Three pages hold three exhibits: the family costs under the three views (Costs), the make-or-buy table with the break-even quotes and the two-way table (Make or Buy), and the capacity, price and standards results (Capacity, Prices, Standards). Each exhibit is cited in the memo by name and supports a number the memo states.
+**Step 6. Choose the exhibits.** At most three pages hold three exhibits: the family costs under the three views (Costs), the make-or-buy table with the break-even quotes and the two-way table (Make or Buy), and the capacity, price and standards results (Capacity, Prices, Standards). Each exhibit is cited in the memo by name, with its workbook sheet and the date of its assumptions, and supports a decision or a number the memo states. Use abbreviated, legible summaries, above all on the last page, which carries three sheets, and keep the detailed worksheets for traceability. Read the exported PDF at normal size.
 
 **Check:** read the decision table first, then trace one number in each row back to its sheet.
 
@@ -98,7 +98,7 @@ One-time cost {{ g.f.once }}
 - **The standards and the statements,** kept apart from the make-or-buy decision, with the evidence named and no restatement claimed.
 - **The production manager's decision left open,** with what it would save and cost.
 
-A strong memo reads in two pages; a weak one lists results in the order the work was done, buries the crew decision, or tells the CFO that the statements are wrong.
+A strong memo reads within two pages, and a concise one that is supported earns full credit; a weak one lists results in the order the work was done, buries the crew decision, or tells the CFO that the statements are wrong.
 
 ## Common mistakes and how to respond
 
@@ -117,7 +117,7 @@ A strong memo reads in two pages; a weak one lists results in the order the work
 | Recommendation and paths | 25 | A condition on each decision, whole paths compared | Single decisions only |
 | Standards and statements | 15 | Rate on normal capacity, evidence named, no restatement claimed | An error claimed without evidence |
 | The crew decision | 15 | Left to the production manager, with what it would cost and save | Taken, or missing |
-| Writing and limits | 15 | Two pages, appendix of three, finding first, both readers addressed | Over the limit, or results in the order of the work |
+| Writing and limits | 15 | At most two pages and at most three of exhibits, legible; finding first, both readers addressed | Over a maximum, or results in the order of the work |
 | Traceability | 5 | Every number matches the workbook | Figures that disagree with it |
 
 ## Extensions and discussion questions

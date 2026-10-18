@@ -1,5 +1,5 @@
 ---
-description: "A quick reference to the Excel, Power Query, SQL, and DAX functions and commands the book teaches, each with its chapter, and one calculation in three tools."
+description: "A quick reference to the functions and main commands the book teaches in Excel, Power Query, SQL, and DAX, each with its chapter, and common calculations compared across three tools."
 aliases:
   - /appendices/c-quick-reference/appendix.html
 ---
@@ -98,6 +98,7 @@ The Excel chapters of Part II teach these functions, and a few appear earlier, i
 |:----------------|:---------------------------|:-------------------------------------|:---------|
 | PivotTable | Insert > PivotTable | Summarizes a Table by the fields placed in its rows, columns, and values | 4, 6 |
 | Show Values As | The shortcut menu of a value in a PivotTable | Shows each value as a share of a total, a difference from a base item, or a running total | 6 |
+| Calculated Field | PivotTable Analyze > Fields, Items, & Sets > Calculated Field | Adds a field defined by a formula on the sums of other fields, so a ratio is right at every level; not available when the PivotTable is added to the Data Model | 6 |
 | Analysis ToolPak | Data > Data Analysis, after loading the add-in | Writes correlation matrices and regression output to a worksheet | 7 |
 | Goal Seek | Data > What-If Analysis > Goal Seek | Finds the value of one input that produces a target result | 7 |
 | Data Table | Data > What-If Analysis > Data Table | Shows a result across a range of values of one or two inputs | 7 |
@@ -195,7 +196,7 @@ Window functions are calculated after HAVING and before ORDER BY, which is why t
 | `date(d, modifier)` | A date moved by modifiers such as `'start of month'`, applied in order | 11 |
 | `julianday(d)` | The date as a number of days, for the difference between two dates | 11 |
 | `printf('%.15e', x)` | x as text in scientific notation, with the fifteen decimals that keep the first digit right | 12 |
-| `LOG10(x)` | The base-10 logarithm of x, one of the math functions that some builds of SQLite leave out | 12 |
+| `LOG10(x)` | The base-10 logarithm of x, one of the math functions that some builds of SQLite leave out, so run `SELECT LOG10(10.0)`, which returns 1 when they are present | 12 |
 | `sqlite_version()` | The version of SQLite in use; window functions need version 3.25 or later | 11 |
 
 : Functions and operators {#tbl-a-10}
@@ -247,7 +248,7 @@ Window functions are calculated after HAVING and before ORDER BY, which is why t
 
 ## DAX {.new-page}
 
-The Power BI chapters of Part IV write DAX in measures, calculated columns, calculated tables, and queries. The book puts a space inside each parenthesis and quotes the table names Date and Item, which are reserved words (Chapter 14). Microsoft's DAX function reference describes each function (Microsoft, 2023). The time intelligence functions appear in the classic form that Chapter 14 teaches, which takes the date column of the marked Date table. The functions of the last table belong to visual calculations, which work on the aggregated rows and columns of a single visual, its visual matrix, and move along its first axis, the rows in most visuals, unless another axis is named (Microsoft, 2026).
+The Power BI chapters of Part IV write DAX in measures, calculated columns, calculated tables, and queries. The book puts a space inside each parenthesis and quotes the table names Date and Item, which are reserved words (Chapter 14). Microsoft's DAX function reference describes each function (Microsoft, 2023). The time intelligence functions appear in the classic form that Chapter 14 teaches, which takes the date column of the marked Date table.
 
 | Function | What it does | Chapter |
 |:---------------------------------|:--------------------------------------------------------|:---------|
@@ -328,7 +329,7 @@ The Power BI chapters of Part IV write DAX in measures, calculated columns, calc
 | `FIRST ( [x] )` | The value of the first row | 15 |
 | `COLLAPSE ( [x], ROWS )` | x evaluated at the parent level of the rows, so a ratio is calculated again there rather than added up | 15 |
 
-: Visual calculation functions, which work on the rows of a single visual {#tbl-a-18}
+: Visual calculation functions, which work on the aggregated rows and columns of a single visual, its visual matrix, and move along its first axis, normally the rows, unless another axis is named (Microsoft, 2026) {#tbl-a-18}
 
 
 ## The Same Calculation in Three Tools {.new-page}
@@ -340,7 +341,7 @@ The chapters return to a handful of calculations in each tool. @tbl-a-19 sets th
 | Total under a condition | SUMIFS (4) | SUM with WHERE, or with GROUP BY (10); SUM of a CASE (11) | CALCULATE with a filter (14) |
 | Count distinct values | COUNTA of UNIQUE, on a column without blanks (7) | COUNT(DISTINCT), which skips NULL (10) | DISTINCTCOUNT, which counts a blank as a value (14) |
 | Bring in a value from another table | XLOOKUP, or a merge in Power Query (5) | A JOIN on the key (10) | A relationship, and RELATED row by row (14) |
-| Find rows with no match | A left anti merge, or COUNTIFS against the parent table (2, 5) | An anti-join or NOT EXISTS (10) | The (Blank) row in a visual, which shows that some keys have no match, though not which rows (13, 14) |
+| Find rows with no match | A left anti merge, or COUNTIFS against the parent table (2, 5) | An anti-join or NOT EXISTS (10) | A (Blank) group in a visual can signal keys with no match, though a blank in the grouping column also shows as (Blank), so check the child keys to find the rows (13, 14) |
 | Summarize by group | A PivotTable, or Group By in Power Query (4, 6) | GROUP BY (10) | A matrix visual, or SUMMARIZECOLUMNS in a query (13, 14) |
 | Share of a total | Show Values As % of Grand Total (6) | A value divided by its SUM over an empty window, OVER () (11) | DIVIDE with REMOVEFILTERS (14) |
 | Running total | Show Values As Running Total In (6) | SUM over a window ordered by date (11) | TOTALYTD, which starts again each January, or the RUNNINGSUM visual calculation, which runs down the rows the visual shows (14, 15) |

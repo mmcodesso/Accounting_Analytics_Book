@@ -377,7 +377,7 @@ def if_19_0_a() -> Diagram:
     reqs, tools, miles, files = _requirements(), _tools(), _milestones(), _tool_files()
     assert [m["reqs"] for m in miles] == ["1 to 3", "4 to 7", "8 to 10"], miles
     text = _case_text()
-    assert "no more than three pages" in text and "appendix of exhibits" in text, "the report's page limits are the case's"
+    assert "no more than three pages" in text and re.search(r"appendix of (selected, condensed )?exhibits", text), "the report's page limits are the case's"
     # the four model files: the Power BI row of the case's table names two
     sql_f, xl_f, pbi_f = files
     # the Power BI row names Credits Analytics.pbix plus the monitoring file updated, or a register in its place; the model
@@ -640,7 +640,7 @@ def if_19_1_a() -> Diagram:
     used = {p["style"] for p in points}
     for style, label in [x for x in (("full", "The records evidence it"),
                                      ("partial", "The records evidence part of it: the rest is written beside the badge"),
-                                     ("outside", "The evidence lies outside the database")) if x[0] in used]:
+                                     ("outside", "The evidence lies mostly outside the database")) if x[0] in used]:
         _badge(d, "C", cx, ly, style, 22)
         width = text_width(label, SMALL, False) + 12
         d.text(esc(label), cx + 28, ly, width, 22, size=SMALL, valign="middle")
@@ -738,14 +738,23 @@ def if_19_3_a() -> Diagram:
         _agree(ws, f"{col}15", ex["revenue"][k], tol=0.01)
         _agree(ws, f"{col}16", n.returns_4060(data)[k], tol=0.01)
         _agree(ws, f"{col}17", ex["rates"][k], tol=1e-9)
-    assert [ws[f"B{r}"].value for r in (23, 24)] == ["Above clearly trivial", "Below performance materiality"]
+    # the workbook built since the revision of 2026-10-17 holds the follow-up trigger in rows 11 and 12; an earlier one compared the
+    # difference with the clearly trivial threshold, which the revision replaced
+    trigger = ws["A12"].value == "Analytical follow-up trigger"
+    if trigger:
+        _agree(ws, "B11", n.FOLLOW_UP, tol=1e-9)
+        _agree(ws, "B12", ex["follow_up"], tol=0.01)
+        assert [ws[f"B{r}"].value for r in (23, 24)] == ["Above the follow-up trigger", "Below performance materiality"]
+    else:
+        assert [ws[f"B{r}"].value for r in (23, 24)] == ["Above clearly trivial", "Below performance materiality"]
     concl = ws["B25"].value
     assert concl.startswith("Investigate (Requirement 5)"), concl
     ok = lambda cond, msg: None                                                                      # noqa: E731
-    for name, ref in (("Materiality", "$B$6"), ("PerformanceMateriality", "$B$8"), ("ClearlyTrivial", "$B$10")):
+    named = [("Materiality", "$B$6"), ("PerformanceMateriality", "$B$8"), ("ClearlyTrivial", "$B$10")] + ([("AnalyticalFollowUp", "$B$12")] if trigger else [])
+    for name, ref in named:
         assert g.defined(ok, name) == f"Materiality!{ref}", name
     assert g.formula(ok, "Materiality", "B6") == "=B4*B5"
-    assert m1["trivial"] < ex["diff"] < m1["perf"], "the difference is above clearly trivial and below performance materiality"
+    assert ex["follow_up"] < ex["diff"] < m1["perf"] and ex["follow_up"] != m1["trivial"], "the difference is above the follow-up trigger and below performance materiality"
     # the columns: B to E as wide as the conclusion needs (it spills over C to E), column A cut where its neighbor begins
     need = text_width(f"<b>{esc(concl)}</b>", SMALL, True) + 24
     w = max(118, int(need / 4) + 1)
@@ -771,8 +780,9 @@ def if_19_3_a() -> Diagram:
             dict(n="8", cells=[lab(8, bold=True), val("B8", bold=True)]),
             dict(n="9", cells=[lab(9), val("B9"), dict(text=ws["C9"].value, span=3, clip=False, align="left")]),
             dict(n="10", cells=[lab(10, bold=True), val("B10", bold=True)]),
-            dict(n="11", cells=[dict(text=ws["A11"].value, span=5, clip=True)]),
-            dict(n="12", cells=[]),
+            (dict(n="11", cells=[lab(11), val("B11"), dict(text=ws["C11"].value, span=3, clip=False, align="left")]) if trigger
+             else dict(n="11", cells=[dict(text=ws["A11"].value, span=5, clip=True)])),
+            (dict(n="12", cells=[lab(12, bold=True), val("B12", bold=True)]) if trigger else dict(n="12", cells=[])),
             dict(n="13", cells=[dict(text=ws["A13"].value, bold=True, span=5, clip=False)]),
             dict(n="14", cells=[dict(text="Item", bold=True)] + [_num(str(y), bold=True) for y in years]),
             dict(n="15", cells=[lab(15)] + [val(f"{c}15") for c in "BCD"]),
@@ -789,7 +799,7 @@ def if_19_3_a() -> Diagram:
     geo = _ws(d, 0, sy + 22, letters, widths, rows, show_letters=False)
     idx = lambda r: r - 1                                                                        # noqa: E731
     # the three named cells outlined, each with its name beside it (the tags are labels, not cells)
-    for r, name in ((6, "Materiality"), (8, "PerformanceMateriality"), (10, "ClearlyTrivial")):
+    for r, name in ((6, "Materiality"), (8, "PerformanceMateriality"), (10, "ClearlyTrivial"), (12, "AnalyticalFollowUp"))[:len(named)]:
         _outline(d, geo, (idx(r), 1), (idx(r), 1), TEAL, inset=1.5)
         x0, y0, w0, h0 = geo[(idx(r), 2)]
         tw = text_width(f"<b>Name: {name}</b>", SMALL, True) + 28
@@ -798,10 +808,13 @@ def if_19_3_a() -> Diagram:
     _outline(d, geo, (idx(23), 0), (idx(25), 1), CORAL, inset=1.5)
     bottom = _gap(d, 0, geo["bottom"], sum(widths), f"Rows 26 to {ws.max_row}: the expectation at the {years[0]} rate and the model answer")
     bottom = _tabs(d, bottom + 8, "Materiality", ["Cycle Map", "Reconciliation", "Materiality", "Risks", "Tests"])
-    _note(d, f"Outlined in teal: the three threshold cells, each with its name written beside it as a label (in the workbook the name shows in the Name Box, here that of B6); "
+    why = ("because the difference is above the follow-up trigger, a case assumption of its own and not the clearly trivial threshold, and below performance materiality"
+           if trigger else "because the difference is above the clearly trivial threshold and below performance materiality")
+    cells = ("the three threshold cells and the follow-up trigger, each" if trigger else "the three threshold cells, each")
+    _note(d, f"Outlined in teal: {cells} with its name written beside it as a label (in the workbook the name shows in the Name Box, here that of B6); "
              f"every later formula reads the name, not the cell. In blue: the expectation at the {years[1]} rate, the recorded returns, the difference "
              f"({_money(ex['diff'])}, {ex['diff_pct'] * 100:.1f}% of the expectation) and its percentage. In coral: the two comparisons and the conclusion, which says to investigate "
-             f"because the difference is above the clearly trivial threshold and below performance materiality. Column A is narrower than the workbook's, so a long label is cut "
+             f"{why}. Column A is narrower than the workbook's, so a long label is cut "
              f"where its neighbor's value begins.", bottom + 4)
     return d
 
@@ -1524,7 +1537,7 @@ def if_19_6_a() -> Diagram:
         _agree(ws, f"A{44 + k}", k, tol=0.5)
         _agree(ws, f"B{44 + k}", s["udl"][k], tol=1e-9)
         _agree(ws, f"C{44 + k}", "Yes" if s["udl"][k] <= n.TOLERABLE else "No")
-    assert ws["A43"].value.startswith("Deviations found") and ws["A42"].value.startswith("Evaluation rule, written before testing")
+    assert ws["A43"].value.startswith("Deviations found") and ws["A42"].value.startswith("Evaluation rule, written before")
     assert [ws[f"C{44 + k}"].value for k in range(4)] == ["Yes", "No", "No", "No"] and ws["A48"].value.startswith("Rule: rely on the control only if")
     focus = max(key, key=lambda r: tot[r["cust"]])["cust"]
     assert focus == g["focus"] and sum(1 for r in key if r["cust"] == focus) == g["focus_n"] and round(tot[focus], 2) == g["focus_total"]
@@ -1639,7 +1652,7 @@ def if_19_6_b() -> Diagram:
     top = 0.16
     assert max(pmf) < top
     p_low, p_high = float(hg.cdf(lo - 1)), float(hg.sf(hi))
-    d = Diagram("Why Almost Any Draw Gives the Same Answer")
+    d = Diagram("Why Plausible Draws Point the Same Way")
     d.text(f"<b>Deviations in a draw of {size} from the {rest} remaining refunds, {dev} of which deviate</b>", 0, 0, 860, 22, size=14)
     PY, PH = 100.0, 330.0
     plot = kit.Plot(d, 0, PY, 860, PH, y_ticks=[0, 0.04, 0.08, 0.12, 0.16], categories=[str(k) for k in range(kmax + 1)],
@@ -1699,9 +1712,10 @@ def if_19_6_b() -> Diagram:
         d.text(esc(label), cx0 + 28, ky, wd, 20, size=SMALL, valign="middle")
         cx0 += 28 + wd + 18
     _note(d, f"The distribution of the deviations in a draw of {size} (the sample size) from the {rest} remaining refunds, {dev} of which are dated before the last application of the customer's "
-             f"payments, as the sheet computes it (a hypergeometric distribution; the shaded range is the tightest with each tail below 5%). Whatever the draw, the upper limit is "
-             f"{udl(lo) * 100:.0f}% to {udl(hi) * 100:.0f}%, far above the {n.TOLERABLE * 100:.0f}% tolerable rate, so every plausible draw reaches the conclusion the whole remainder reached: the control "
-             f"cannot be relied on. The bar at no deviation is a sliver, too thin to see.", ky + 28)
+             f"payments, as the sheet computes it (a hypergeometric distribution; the shaded range is the tightest with each tail below 5%). For draws in the highlighted {lo} to {hi} deviation range, about "
+             f"{s['inside'] * 100:.0f}% of draws, the upper limit is approximately {udl(lo) * 100:.0f}% to {udl(hi) * 100:.0f}%, far above the {n.TOLERABLE * 100:.0f}% tolerable rate. A draw with no deviation "
+             f"has a {udl(0) * 100:.2f}% upper limit but is extremely unlikely, and its bar is a sliver, too thin to see. The test of the whole remainder establishes its observed deviation rate "
+             f"without sampling uncertainty.", ky + 28)
     return d
 
 
@@ -2035,7 +2049,7 @@ def if_19_9_a() -> Diagram:
     and the appendix's six exhibits."""
     g, g8 = ctx.values("ch19.g9"), ctx.values("ch19.g8")
     text = _case_text()
-    assert "no more than three pages, with an appendix of exhibits" in text and "with an appendix of no more than three pages" in text, "the page limits are the case's"
+    assert re.search(r"no more than three pages, with an appendix of (selected, condensed )?exhibits", text) and "with an appendix of no more than three pages" in text, "the page limits are the case's"
     ws = _book("Report")
     exhibits = [("The map of the cycle", "Cycle Map"), ("The reconciliation by year", "Reconciliation"), ("The test results", "Tests"),
                 ("The sample plan", "Sample"), ("The evaluation of deficiencies", "Deficiencies"), ("The action plans", "Report")]
@@ -2163,8 +2177,15 @@ def if_19_10_a() -> Diagram:
     assert titles == dict(matrix=g10["titles"]["newTests"], table=g10["titles"]["findings"])
     assert _mon_projections(page, "newTests", "Rows") == ["TestID"] and _mon_projections(page, "newTests", "Columns") == ["Year"]
     assert _mon_projections(page, "newTests", "Values") == ["Exceptions", "Population", "Rate per 1,000"]
-    assert _mon_projections(page, "registerCards", "Data") == ["Exceptions", "Reviewed Exceptions", "Design Finding Exceptions", "Open Exceptions"]
-    assert _mon_projections(page, "findings", "Values") == ["TestID", "Finding", "CoversThrough", "FixBy", "Design Finding Exceptions", "Open Exceptions"]
+    # the project built since the revision of 2026-10-17 has a Findings table (one row for each supported cause) and a mapping of the
+    # exceptions to it; the earlier one had a Design Findings table with a row for each test
+    new = (MON_MODEL / "definition" / "tables" / "Findings.tmdl").is_file()
+    assert new == g10["new_findings"]
+    card_fields = ["Exceptions", "Reviewed Exceptions", "Design Finding Exceptions", "Open Exceptions"] + (["Open Findings"] if new else [])
+    assert _mon_projections(page, "registerCards", "Data") == card_fields
+    table_fields = (["FindingID", "Finding", "Assessment", "Owner", "CoversThrough", "TargetDate", "Finding Status", "Design Finding Exceptions"] if new
+                    else ["TestID", "Finding", "CoversThrough", "FixBy", "Design Finding Exceptions", "Open Exceptions"])
+    assert _mon_projections(page, "findings", "Values") == table_fields
     pop = {"CM": r10["pop_c"], "RF": r10["pop_r"]}
     assert _mon_expected("CreditMemo rows") == sum(pop["CM"]) and _mon_expected("CustomerRefund rows") == sum(pop["RF"])
     one = lambda v: f"{xl.xround(v, 1):.1f}"                                                           # noqa: E731
@@ -2187,22 +2208,42 @@ def if_19_10_a() -> Diagram:
     assert g10["reviewed"] == _mon_expected("Test 3: reviewed exceptions (every disposition found its exception)") and g10["open_old"] == _mon_expected("Test 3: open exceptions")
     assert r10["new"] == g10["reviewed"] + new_rows + g10["open_old"], "reviewed, covered and open add up to the register"
     cards = [("Exceptions", f"{r10['new']:,}"), ("Reviewed<br>Exceptions", f"{g10['reviewed']:,}"), ("Design Finding<br>Exceptions", f"{new_rows:,}"), ("Open<br>Exceptions", f"{g10['open_old']:,}")]
-    # the findings, read from the Design Findings table
-    findings = {f[0]: f for f in g10["finding_rows"]}
-    assert sorted(findings) == sorted(names)
-    for t in tests:
-        assert t["n"] == _mon_expected(f"{t['name']} exceptions covered by its design finding") and _mon_expected(f"{t['name']} open exceptions (none is dated after {n.year_end(data.C)})") == 0
-    trows = [[nm, _clip(findings[nm][1], 328, margin=34), _us_date(findings[nm][2]), _us_date(findings[nm][3]), f"{t['n']:,}", ""] for nm, t in zip(names, tests)]
+    if new:
+        # one row for each supported cause; no finding is fixed, retested or approved, so both are open
+        findings = {f[0]: f for f in g10["finding_rows"]}
+        assert sorted(findings) == ["F-CM", "F-RF"] and _mon_expected("Findings rows (one for each supported cause)") == 2
+        assert _mon_expected("open findings (nothing is fixed, retested or approved in the supplied case)") == 2 and _mon_expected("closed findings") == 0
+        for t in tests:
+            assert t["n"] == _mon_expected(f"{t['name']} exceptions mapped to its finding") and _mon_expected(f"{t['name']} open exceptions (none is dated after {n.year_end(data.C)})") == 0
+        mapped = {fid: _mon_expected(f"exceptions mapped to {fid}") for fid in findings}
+        assert sum(mapped.values()) == new_rows
+        cards.append(("Open<br>Findings", f"{len(findings):,}"))
+        trows = [[fid, _clip(f[1], 164, margin=34), _clip(f[2], 104, margin=28), _clip(f[3], 120, margin=28), _us_date(f[4]), _us_date(f[5]),
+                  "Open: fix not yet made", f"{int(mapped[fid]):,}"] for fid, f in findings.items()]
+        heads = ["Finding<br>ID", "Finding", "Assessment", "Owner", "Covers<br>Through", "Target<br>Date", "Finding Status", "Design<br>Finding<br>Exceptions"]
+        widths = [58, 164, 104, 120, 88, 78, 142, 74]
+        aligns = ["left", "left", "left", "left", "right", "right", "left", "right"]
+        card_w, c_cover, c_dates, c_status, head_n = [162.0] * 5, 7, (4, 5), 6, 3
+    else:
+        # the findings, read from the Design Findings table
+        findings = {f[0]: f for f in g10["finding_rows"]}
+        assert sorted(findings) == sorted(names)
+        for t in tests:
+            assert t["n"] == _mon_expected(f"{t['name']} exceptions covered by its design finding") and _mon_expected(f"{t['name']} open exceptions (none is dated after {n.year_end(data.C)})") == 0
+        trows = [[nm, _clip(findings[nm][1], 328, margin=34), _us_date(findings[nm][2]), _us_date(findings[nm][3]), f"{t['n']:,}", ""] for nm, t in zip(names, tests)]
+        heads = ["TestID", "Finding", "CoversThrough", "FixBy", "Design Finding<br>Exceptions", "Open<br>Exceptions"]
+        widths = [124, 328, 104, 80, 110, 82]
+        aligns = ["left", "left", "right", "right", "right", "right"]
+        card_w, c_cover, c_dates, c_status, head_n = [202, 203, 202, 203], 4, (2, 3), None, 2
     pad = 10.0
     block = [68, 66, 44]
 
     def draw(d: Diagram) -> dict:
         mx = _year_matrix(d, pad, pad, titles["matrix"], 116, block, years + ["Total"], ["Exceptions", "Population", "Rate<br>per<br>1,000"], names, cells, total, head2=50)
         cy = mx["bottom"] + 12
-        cd = _cards(d, pad, cy, 76, cards, [202, 203, 202, 203])
+        cd = _cards(d, pad, cy, 76, cards, card_w)
         ty = cd["bottom"] + 12
-        tb = _table_visual(d, pad, ty, titles["table"], ["TestID", "Finding", "CoversThrough", "FixBy", "Design Finding<br>Exceptions", "Open<br>Exceptions"],
-                           [124, 328, 104, 80, 110, 82], trows, aligns=["left", "left", "right", "right", "right", "right"], title_lines=1, head_lines=2)
+        tb = _table_visual(d, pad, ty, titles["table"], heads, widths, trows, aligns=aligns, title_lines=1, head_lines=head_n)
         return dict(matrix=mx, cards=cd, table=tb, bottom=tb["bottom"] + pad)
     canvas_h = draw(Diagram("probe"))["bottom"]
     d = Diagram("The Credits Cycle Page")
@@ -2215,20 +2256,31 @@ def if_19_10_a() -> Diagram:
     d.outline(gx0 - 2, gy0 - 1, gx1 + gw1 - gx0 + 4, gh0 + 2, CORAL, width=2.5, front=True)
     cx, cyy, cw, ch = cd["cards"][2]
     d.outline(cx - 1, cyy - 1, cw + 2, ch + 2, TEAL, width=2.5, front=True)
-    xs_, ys_, ws_, hs_ = tb["geometry"][(-1, 4)]
-    xe, ye, we, he = tb["geometry"][(len(trows) - 1, 4)]
+    xs_, ys_, ws_, hs_ = tb["geometry"][(-1, c_cover)]
+    xe, ye, we, he = tb["geometry"][(len(trows) - 1, c_cover)]
     d.outline(xs_ - 1, ys_ - 1, ws_ + 2, ye + he - ys_ + 2, TEAL, width=2.5, front=True)
-    xs_, ys_, ws_, hs_ = tb["geometry"][(-1, 2)]
-    xe, ye, we, he = tb["geometry"][(len(trows) - 1, 3)]
+    xs_, ys_, ws_, hs_ = tb["geometry"][(-1, c_dates[0])]
+    xe, ye, we, he = tb["geometry"][(len(trows) - 1, c_dates[1])]
     d.outline(xs_ - 1, ys_ - 1, xe + we - xs_ + 2, ye + he - ys_ + 2, AMBER, width=2.5, front=True)
+    if new:
+        xs_, ys_, ws_, hs_ = tb["geometry"][(-1, c_status)]
+        xe, ye, we, he = tb["geometry"][(len(trows) - 1, c_status)]
+        d.outline(xs_ - 1, ys_ - 1, ws_ + 2, ye + he - ys_ + 2, CORAL, width=2.5, front=True)
+        cx5, cy5, cw5, ch5 = cd["cards"][4]
+        d.outline(cx5 - 1, cy5 - 1, cw5 + 2, ch5 + 2, CORAL, width=2.5, front=True)
     _mon_page_tabs(page, d, canvas_h + 4)
-    through = findings[names[0]][2]
-    fix = findings[names[0]][3]
+    first = next(iter(findings.values()))
+    through, fix = (first[4], first[5]) if new else (first[2], first[3])
+    tail = (f"The cards count the register: {r10['new']:,} exceptions, of which {g10['reviewed']} are reviewed, {new_rows:,} mapped to a finding (outlined in teal, as in the table), "
+            f"{g10['open_old']} open, as before the four tests, and {len(findings)} findings open (in coral, with the status column that names the first step each has not met: no fix, "
+            f"retest or closure approval is recorded, and a target date reached would not close one). In amber, the date each finding covers through ({_us_date(through)}) and its target date "
+            f"({_us_date(fix)}): exceptions dated later, or not yet mapped, stay open for review." if new else
+            f"The cards count the register: {r10['new']:,} exceptions, of which {g10['reviewed']} are reviewed, {new_rows:,} covered by a design finding (outlined in "
+            f"teal, as in the table) and {g10['open_old']} open, as before the four tests; the table's Open Exceptions is blank because every exception of the new tests is covered. In amber, the date each "
+            f"finding covers through ({_us_date(through)}) and the date it is to be fixed ({_us_date(fix)}): exceptions dated later stay open for review.")
     _note(d, f"Report view, page Credits Cycle of Audit Monitoring (the text box with the written answer, below the table, is not drawn). The matrix gives, for each "
              f"new test, the exceptions, the population and the rate per 1,000 by year and over the three years; the Total row's population and rate are blank (outlined in coral) because the Population "
-             f"measure reads one process at a time. The cards count the register: {r10['new']:,} exceptions, of which {g10['reviewed']} are reviewed, {new_rows:,} covered by a design finding (outlined in "
-             f"teal, as in the table) and {g10['open_old']} open, as before the four tests; the table's Open Exceptions is blank because every exception of the new tests is covered. In amber, the date each "
-             f"finding covers through ({_us_date(through)}) and the date it is to be fixed ({_us_date(fix)}): exceptions dated later stay open for review.", canvas_h + 34)
+             f"measure reads one process at a time. {tail}", canvas_h + 34)
     return d
 
 
@@ -2243,7 +2295,8 @@ def if_19_10_b() -> Diagram:
     g = ctx.values("ch19.g10")
     expr = mt("expressions.tmdl")
     tables = {p.stem for p in (MON_MODEL / "definition" / "tables").glob("*.tmdl")}
-    loaded = {"CreditMemo", "CustomerRefund", "Exceptions", "Tests", "Design Findings", "Dispositions"}
+    new = (MON_MODEL / "definition" / "tables" / "Findings.tmdl").is_file()
+    loaded = {"CreditMemo", "CustomerRefund", "Exceptions", "Tests", "Dispositions"} | ({"Findings", "Finding Exceptions"} if new else {"Design Findings"})
     not_loaded = ["Appliers", "Last Payments", "CM Exceptions", "RF Exceptions", "Invoice Methods", "Past Due at Refund", "JE Exceptions", "PO Exceptions", "Payroll Exceptions"]
     assert loaded <= tables and not any(q in tables for q in not_loaded), "the queries drawn dashed do not load; the others are tables of the model"
     assert all(re.search(rf"(?m)^expression '?{re.escape(q)}'? =", expr) for q in not_loaded)
@@ -2257,8 +2310,10 @@ def if_19_10_b() -> Diagram:
     assert not re.search(r'Table.Unpivot\([^)]*(MethodMismatch|OffsetMissed)', expr), "the anomaly columns are not unpivoted"
     m_ex = " ".join(mt("tables/Exceptions.tmdl").split())
     assert "Table.Combine({#\"JE Exceptions\", #\"PO Exceptions\", #\"Payroll Exceptions\", #\"CM Exceptions\", #\"RF Exceptions\"})" in m_ex
-    assert 'Dispositions, {"TestID", "DocumentNumber"}' in m_ex and '#"Design Findings", {"TestID"}' in m_ex and '"Covered"' in m_ex
+    assert 'Dispositions, {"TestID", "DocumentNumber"}' in m_ex and '"Covered"' in m_ex
+    assert ('#"Finding Exceptions", {"TestID", "DocumentNumber"}' in m_ex) if new else ('#"Design Findings", {"TestID"}' in m_ex)
     assert re.search(r"fromColumn: Exceptions\.TestID\s+toColumn: Tests\.TestID", mt("relationships.tmdl"))
+    assert not new or re.search(r"fromColumn: Exceptions\.FindingID\s+toColumn: Findings\.FindingID", mt("relationships.tmdl"))
     pop = g["d_pop"]
     assert "SELECTEDVALUE ( Tests[Process] )" in pop and '"Credit memos", COUNTROWS ( CreditMemo )' in pop and '"Refunds", COUNTROWS ( CustomerRefund )' in pop
     tests = g["test_rows"]
@@ -2321,10 +2376,11 @@ def if_19_10_b() -> Diagram:
     d.box("", stop_x, anm[0] + 6, 7, anm[1] - 12, fill=CORAL, stroke=CORAL, rounded=False)
     d.text("<b>Stops at the refund table</b><br>a reason to look, not a rule failure: no unpivot, no row in the register", stop_x + 12, anm[0] - 2, x4 - stop_x - 24, 74, size=SMALL)
     # column 4: the register, with the dispositions and the design findings merged in from below
-    reg = (y0 - 74, 340.0)
-    dsp = (y0 + 292, 90.0)
+    reg = (y0 - 74, 360.0 if new else 340.0)
+    dsp = (y0 + (312 if new else 292), 90.0)
     n_reg = node(x4, reg[0], w4, reg[1], "Exceptions: the register", f"the new tests appended to Chapter 16's, {n_new:,} more rows; one row for each test and document", "table", align="center")
-    n_dsp = node(x4, dsp[0], w4, dsp[1], "Dispositions, Design Findings", "merged on TestID and document, then on TestID", "table")
+    n_dsp = node(x4, dsp[0], w4, dsp[1], *(("Dispositions, Finding Exceptions", "both merged on TestID and document", "table") if new
+                                          else ("Dispositions, Design Findings", "merged on TestID and document, then on TestID", "table")))
     link(n_c16, n_reg, c16[0] + c16[1] / 2, c16[0] + c16[1] / 2, c16, reg)
     link(n_cme, n_reg, cme[0] + cme[1] / 2, cme[0] + cme[1] / 2, cme, reg)
     link(n_rfe, n_reg, rfe[0] + rfe[1] / 2, rfe[0] + rfe[1] / 2, rfe, reg)
@@ -2338,6 +2394,11 @@ def if_19_10_b() -> Diagram:
     d.text("<b>TestID</b>", x4 + w4 + 2, tst[0] + tst[1] / 2 - 22, x5 - x4 - w4 - 4, 18, size=SMALL, align="center")
     d.arrow(n_tst, n_pop, exit=(0.5, 1), entry=(0.5, 0), meta=STRAIGHT_)
     d.text("<b>Process</b>", x5 + w5 / 2 - 70, tst[0] + tst[1] + 6, 62, 18, size=SMALL, align="right")
+    if new:
+        fnd = (y0 + 236, 76.0)
+        n_fnd = node(x5, fnd[0], w5, fnd[1], "Findings", "two rows: owner, dates, closure fields", "table")
+        d.arrow(n_reg, n_fnd, exit=(1, (fnd[0] + fnd[1] / 2 - reg[0]) / reg[1]), entry=(0, 0.5), meta=STRAIGHT_)
+        d.text("<b>FindingID</b>", x4 + w4 + 2, fnd[0] + fnd[1] / 2 - 22, x5 - x4 - w4 - 4, 18, size=SMALL, align="center")
     # the key
     ky = 28.0
     for i, (label, kind) in enumerate((("A table the model loads", "table"), ("A query with Enable load cleared", "query"), ("Anomaly columns, outside the register", "anomaly"))):
@@ -2347,7 +2408,8 @@ def if_19_10_b() -> Diagram:
     bottom = dsp[0] + dsp[1]
     _note(d, f"The model answer's queries, left to right (the Power Query editor's names). Applications grouped two ways, the credit memos and the refunds feed the two flag queries, which are "
              f"tables of the model (hidden); each flag pair is unpivoted into an exception query that does not load, and the register appends those with Chapter 16's three, then merges the "
-             f"dispositions and the design findings. Its TestID is related to the Tests table, whose Process (Credit memos or Refunds) the Population measure reads: a process spelled differently "
+             + ("dispositions and the mapping of each historical exception to its finding; its FindingID is related to the Findings table. " if new else "dispositions and the design findings. ") +
+             f"Its TestID is related to the Tests table, whose Process (Credit memos or Refunds) the Population measure reads: a process spelled differently "
              f"leaves the population and the rate blank while the exceptions still count. MethodMismatch and OffsetMissed are columns of the refund table only, read by their own measures "
              f"and page.", bottom + 12)
     return d

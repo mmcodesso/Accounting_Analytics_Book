@@ -6,10 +6,12 @@ book's table look into each cell instead: a blue header row with white bold text
 and thin horizontal rules. The tables stay native and editable. Figure captions, which Pandoc writes
 at the body size, get the smaller gray type of the Reveal captions; a caption too long for one line
 gets the room for its lines from the picture above it. Numbered lists get numbers in the body font
-and room for two digits.
+and room for two digits. Every picture gets its figure's alt text as its description, which Pandoc
+fills with the image's file path.
 """
 from __future__ import annotations
 
+import json
 import re
 import shutil
 import xml.etree.ElementTree as ET
@@ -17,8 +19,13 @@ import zipfile
 from pathlib import Path
 
 from .pptx_theme import NS, q
+from .verify import CROP as CROP_ARGUMENT, FIGURE_CITE, crop_key, parse_crop
 
 SLIDE = re.compile(r'ppt/slides/slide\d+\.xml')
+BOOK_INDEX = Path(__file__).resolve().parents[2] / 'slides/_shared/book.json'
+DECKS = Path(__file__).resolve().parents[2] / 'slides'   # slides/<deck>/index.qmd, the deck's source
+CROP = re.compile(r'\.crop-[\w-]+$')   # a detail of a figure, staged as <stem>.crop-<key> (slides/shortcodes/book.lua)
+ALT_ARGUMENT = re.compile(r'\balt\s*=\s*"([^"]*)"')   # book-figure's alt="...", the deck's own alt text
 RULE_WIDTH = '9525'  # 0.75 pt
 EMU_PER_POINT = 12700
 CHARACTER_WIDTH = 0.47  # the average width of Arial text, as a share of its size
@@ -119,6 +126,50 @@ def format_captions(slide: ET.Element, tokens: dict) -> None:
             make_room(pictures[0], shape, caption_lines(text, int(ext.get('cx')), size), size)
 
 
+def figure_alts(index: Path = BOOK_INDEX) -> dict[str, str]:
+    """The alt text of every book figure, by the file stem its slide picture is staged under."""
+    try:
+        figures = json.loads(index.read_text(encoding='utf-8'))['figures']
+    except (OSError, ValueError, KeyError):
+        return {}
+    return {Path(figure['src']).stem: figure['alt'] for figure in figures.values() if figure.get('alt')}
+
+
+def deck_alts(deck: Path, index: Path = BOOK_INDEX) -> dict[str, str]:
+    """The alt text a deck writes itself, {{< book-figure ID crop="..." alt="..." >}}, by the stem the picture is
+    staged under (<stem>.crop-<key> for a detail), so a detail is described by what it shows."""
+    try:
+        figures = json.loads(index.read_text(encoding='utf-8'))['figures']
+        text = deck.read_text(encoding='utf-8')
+    except (OSError, ValueError, KeyError):
+        return {}
+    found = {}
+    for identifier, arguments in FIGURE_CITE.findall(text):
+        alt, crop = ALT_ARGUMENT.search(arguments), CROP_ARGUMENT.search(arguments)
+        if alt and identifier in figures:
+            stem = Path(figures[identifier]['src']).stem
+            found[stem + (f'.crop-{crop_key(parse_crop(crop.group(1)))}' if crop else '')] = alt.group(1)
+    return found
+
+
+def describe_pictures(slide: ET.Element, alts: dict[str, str]) -> None:
+    """Pandoc writes a picture's file path as its description, which PowerPoint reads as the alt text; the
+    picture gets its figure's alt text instead, as the book and the Reveal deck give it ("Detail of: ..." for a
+    crop, as slides/shortcodes/book.lua words it, unless the deck writes the detail's own alt text)."""
+    for picture in slide.iter(q('p', 'pic')):
+        properties = picture.find('p:nvPicPr/p:cNvPr', NS)
+        if properties is None or not properties.get('descr'):
+            continue
+        stem = Path(properties.get('descr').replace('\\', '/')).stem
+        if stem in alts:   # a whole figure, or a detail with the deck's own alt text
+            properties.set('descr', alts[stem])
+            continue
+        base = CROP.sub('', stem)
+        alt = alts.get(base)
+        if alt:
+            properties.set('descr', alt if base == stem else 'Detail of: ' + alt)
+
+
 def format_lists(slide: ET.Element, tokens: dict) -> None:
     """Pandoc's hanging indent leaves a list number no room for two digits, and PowerPoint draws the
     number of an item that opens with code in the wider code font (it ignores the bullet font for
@@ -209,9 +260,10 @@ def format_roadmap(slide: ET.Element, tokens: dict) -> None:
             run.set('sz', str(tokens['sizes']['evidence'] * 100))
 
 
-def finish(path: Path, tokens: dict) -> None:
+def finish(path: Path, tokens: dict, alts: dict[str, str] | None = None) -> None:
     """Rewrite the deck in place; only slides with a table, a figure, a numbered list or the roadmap change."""
     colors = tokens['colors']
+    alts = {**figure_alts(), **deck_alts(DECKS / path.stem / 'index.qmd')} if alts is None else alts
     temporary = path.with_name(f'.{path.name}.tmp')
     with zipfile.ZipFile(path) as source, zipfile.ZipFile(temporary, 'w', zipfile.ZIP_DEFLATED) as target:
         for item in source.infolist():
@@ -225,6 +277,7 @@ def finish(path: Path, tokens: dict) -> None:
                 for table in xml.iter(q('a', 'tbl')):
                     format_table(table, colors)
                 format_captions(xml, tokens)
+                describe_pictures(xml, alts)
                 format_lists(xml, tokens)
                 format_roadmap(xml, tokens)
                 format_code(xml, tokens)

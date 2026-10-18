@@ -59,7 +59,7 @@ RETURN
     DIVIDE ( Rev - [Standard Cost], Rev )
 ```
 
-In the formula bar, Shift+Enter starts a new line within a measure, and Enter commits it. Margin % is a ratio of totals, calculated anew for every cell, which no implicit measure could do.
+In the formula bar, Shift+Enter starts a new line within a measure, and Enter commits it. Margin % is a ratio of totals. Like any measure, it is calculated for each cell, and it divides one total by another, which an implicit measure, the summary of a single column, cannot do.
 
 **Step 4. Write the discount rate.** The rate is discount dollars divided by the dollars before discount, the ratio that Average of Discount misstated in Chapter 13.
 
@@ -149,6 +149,7 @@ SUMMARIZECOLUMNS (
     "Gross Margin", ROUND ( [Gross Margin], 2 ),
     "Margin %", ROUND ( [Margin %], 4 )
 )
+ORDER BY 'Date'[YearQuarter]
 ```
 
 TREATAS applies a list of values as a filter on a column, here Furniture and fiscal 2026. The result should show the Furniture margin of the third and fourth quarters that Chapter 6's bridge started from and ended at. A test that fails is a finding about the model, not about the business: look for a missing relationship, a filter that reached the wrong table, or a measure that summed what it should have iterated.

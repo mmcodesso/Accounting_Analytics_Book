@@ -39,7 +39,7 @@ Pairs, about 90 minutes: 30 for the family results, 15 for the margins, 20 for t
 
 **Step 1. Find the dates the records run to.** Run Q1 and copy the four dates above to the Documentation sheet; the time records end first.
 
-**Step 2. Build the family results, one CTE for each fact.** Sales, closes and completions are aggregated to the family separately and joined last, so no fact repeats another. The model saves the whole query as the view FamilyResults (Q2) and keeps it with **Write Changes** (Ctrl+S); the `Closes` CTE shows the pattern, and `Sold`, `Made` and the final SELECT, which left joins them and a second copy of `Sold` for the purchased products, follow it.
+**Step 2. Build the family results, one CTE for each fact.** Sales, closes and completions are aggregated to the family separately and joined last, so no fact repeats another. The model saves the whole query as the view FamilyResults (Q2) and keeps it with **Write Changes** (Ctrl+S); the block below is a fragment, the `Closes` CTE, of the complete Q2 in MakeBuy.sql, where `Sold`, `Made` and the final SELECT, which left joins them and a second copy of `Sold` for the purchased products, follow it.
 
 ```sql
 Closes AS (
@@ -87,7 +87,7 @@ ORDER BY Family;
 
 **Check:** Furniture, the group of the CFO's comparison: 42.33% at standard, 32.56% after the variance per unit completed and 31.64% with the year's variance, 10.7 points below standard. **Watch for:** dividing by the units sold. The variance per unit times the units sold is the whole variance, so the second and third margins coincide for every family. The units completed are the base because the variance is the cost of making them; 88 of the year's closes belong to work orders that completed nothing in it, so say which base you use.
 
-**Step 4. Set the purchased products beside them and move the result to Excel.** Only TXT-PIL beats its purchased benchmark on both measures; a family with no purchased products shows `none`. Copy the results with **Copy with Headers** (Ctrl+Shift+C) into the Families sheet as a Table named FamilyResults, and add the margins as Table columns:
+**Step 4. Set the purchased products beside them and move the result to Excel.** Only TXT-PIL beats its purchased benchmark on both measures; a family with no purchased products shows `none`. Run Q3, which returns the family results unrounded, and copy its raw output with **Copy with Headers** (Ctrl+Shift+C), not Q4's rounded margins, into the Families sheet as a Table named FamilyResults. Add the margins as Table columns:
 
 ```
 VariancePerUnit   =[@TotalVariance]/[@UnitsCompleted]
@@ -100,7 +100,7 @@ MarginYear        =1-([@StandardCost]+[@TotalVariance])/[@Revenue]
 
 ### Part 3: The premises
 
-**Step 5. Test the second premise.** Q9 counts the invoice lines whose list price differs from the item's and the shipment lines whose standard cost differs from quantity times the item's (shown), then the largest completion difference and the items sold in every year, which follow the same pattern. Q8 (what Charles River paid for purchased products) calibrates the quote.
+**Step 5. Test the second premise.** Q9 counts the invoice lines whose list price differs from the item's and the shipment lines whose standard cost differs from quantity times the item's (the block is a fragment of Q9, so run the complete query), then the largest completion difference and the items sold in every year. Q8 (what Charles River paid for purchased products) calibrates the quote.
 
 ```sql
 (SELECT COUNT(*)

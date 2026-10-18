@@ -88,7 +88,8 @@ The Checks tab proves every value; the icons, the tooltip and the parameter slic
 a. Choose **Modeling > New parameter > Fields**, name it `WC Measure`, and add the six measures in order; keep the slicer.
 b. Add a **Line chart** with YearQuarter on the **X-axis** and the parameter on the **Y-axis**, titled "{{ g.t_line }}".
 c. Add a tooltip page: **Canvas settings** Type Tooltip, **Page information** **Tooltip** on, and a table of each balance beside its flow. In the line chart's **Format visual > General > Tooltips**, choose that page.
-d. Add a **Matrix** titled "{{ g.t_matrix }}", with **Conditional formatting > Icons** (**Format style** **Rules**) on the days of supply: up from {{ g.icon_up|num(2) }} times the target, down at {{ g.icon_down|num(1) }} or below.
+d. Add a **Matrix** titled "{{ g.t_matrix }}", with **Conditional formatting > Icons** (**Format style** **Rules**) on the days of supply, based on each one's ratio to its target: up at {{ g.icon_up|num(2) }} or more, a circle above {{ g.icon_down|num(1) }} and below {{ g.icon_up|num(2) }}, down at {{ g.icon_down|num(1) }} or less. A quarter with no ratio should show no icon, which only Desktop shows. The icons are benchmark signals, not proof that any item meets its policy.
+e. Add a **Table** (Step 5) beside it and, in **Format > Edit interactions**, set the line chart and the matrix to **None** toward that table, so a quarter picked in either leaves the annual comparison annual.
 
 ```dax jinja
 {{ g.param }}
@@ -106,7 +107,7 @@ d. Add a **Matrix** titled "{{ g.t_matrix }}", with **Conditional formatting > I
 {{ g.d_open }}
 ```
 
-**Check:** without the opening line DSO runs {{ q0.dso_x|num(1) }} to {{ q1.dso_x|num(1) }} and DPO {{ q0.dpo_x|num(1) }} to {{ q1.dpo_x|num(1) }}. The cycle moves {{ g.d_ccc|num(1) }} days as recorded and {{ g.d_ccc_x|num(1) }} without the opening line; DIO moves {{ g.d_dio|num(1) }}, DSO {{ g.d_dso|num(1) }} and DPO {{ g.d_dpo|num(1) }}. The average-balance materials days are {{ avg[0].mat|num(1) }} in {{ d.F }} and {{ avg[-1].mat|num(1) }} in {{ d.C }}.
+**Check:** without the opening line DSO runs {{ q0.dso_x|num(1) }} to {{ q1.dso_x|num(1) }} and DPO {{ q0.dpo_x|num(1) }} to {{ q1.dpo_x|num(1) }}. The cycle moves {{ g.d_ccc|num(1) }} days as recorded and {{ g.d_ccc_x|num(1) }} without the opening line; DIO moves {{ g.d_dio|num(1) }}, DSO {{ g.d_dso|num(1) }} and DPO {{ g.d_dpo|num(1) }}, all from the unrounded measures (the displayed DPO endpoints would give {{ g.shown_dpo|num(1) }}), so DIO's rise is most of the cycle's, and DPO's fall adds {{ -g.d_dpo|num(1) }} days because DPO is subtracted. The average-balance materials days are {{ avg[0].mat|num(1) }} in {{ d.F }} and {{ avg[-1].mat|num(1) }} in {{ d.C }}.
 
 {{ figure('IF-C4-3-B') }}
 

@@ -36,13 +36,13 @@ By the end, students can:
 
 ## Before you assign
 
-- **From earlier work.** `OrderLines` from Requirement 1, with OrderYear, OrderMonth and ListAmount. From Chapter 7, the two expectations (the average of the other months, and the same period a year earlier) and Tutorial 7.3 Step 7, which looked at one promotion's orders in a PivotTable.
-- **Data conditions.** Each promotion's lines were ordered in one calendar year, in two months for collections and item groups and in one month for segments, and the recorded dates of promotions {{ bad }} do not contain them (Requirement 5). The data begins in {{ x.first_year }}, so promotions {{ x.no_py }} have no year earlier to compare with. Scope depends on the kind: Items.CollectionName for a collection, Items.ItemGroup for an item group, Customers.CustomerSegment for a segment.
-- **The customer test.** Of the customers, {{ customers }} ordered; the {{ x.never }} that never did are inactive. The Customers table carries a CustomerSince that does not match the orders.
+- **From earlier work.** `OrderLines` from Requirement 1, with OrderYear, OrderMonth and ListAmount, and from Chapter 7 the two expectations (the average of the other months, and the same period a year earlier).
+- **Data conditions.** Each promotion's lines were ordered in one calendar year, in two months for collections and item groups and in one month for segments, and the recorded dates of promotions {{ bad }} do not contain them (Requirement 5). The data begins in {{ x.first_year }}, so promotions {{ x.no_py }} have no year earlier to compare with.
+- **The customer test.** Of the customers, {{ customers }} ordered; the {{ x.never }} that never did are inactive. CustomerSince does not match the orders.
 
 ## How to run it
 
-Individual or pairs, about 90 minutes: 15 for the months and scope, 25 for the monthly grids, 25 for the comparison, 20 for the customers and 5 to write the conclusion. Ask "is that big?" about the largest difference before giving any hint about variation. If a student compares a two-month total's difference with one month's standard deviation, ask them to compare like with like, the promotion's average month with the other months or the total with the variation scaled to its months. **Collect** the comparison table, which is Exhibit 3 of the memo.
+Individual or pairs, about 90 minutes: 15 for the months and scope, 25 for the monthly grids, 25 for the comparison, 20 for the customers and 5 for the conclusion. Ask "is that big?" about the largest difference before any hint about variation. **Collect** the comparison table, which is Exhibit 3 of the memo.
 
 {{ figure('IF-C2-3-A') }}
 
@@ -50,7 +50,7 @@ Individual or pairs, about 90 minutes: 15 for the months and scope, 25 for the m
 
 ### Phase 1: When each promotion ran
 
-**Step 1. List the promotions with their months and scope.** On a worksheet named `R3 Volume`, list the PromotionIDs and look up each promotion's name, ScopeType, scope (the Promo column that is not blank), rate and recorded dates in `Promotions`. Beside them put the order dates of its lines and the months they cover:
+**Step 1. List the promotions with their months and scope.** The addresses are one reference layout. On `R3 Volume`, use rows {{ x.cmp.cal }} to {{ x.cmp.cal + x.n_rows - 1 }} for the calendar: A PromotionID, B name, C scope type, D scope (the Promo column that is not blank), E rate, F and G the recorded dates, H the line count, I and J the first and last order dates, K the year, L and M the first and last month, N the number of months, O the lines inside the recorded dates, and P a check that the first and last orders share a year. Put the current year's monthly volume in rows {{ x.cmp.grid }} to {{ x.cmp.grid + x.n_rows - 1 }}, the year before in rows {{ x.cmp.prior }} to {{ x.cmp.prior + x.n_rows - 1 }} and the comparisons in rows {{ x.cmp.cmp }} to {{ x.cmp.cmp + x.n_rows - 1 }}. In each grid, A to D hold the ID, kind, scope and year, E to P the months, with the numeric headers 1 to 12 in E{{ x.cmp.grid_head }}:P{{ x.cmp.grid_head }} and E{{ x.cmp.prior_head }}:P{{ x.cmp.prior_head }}. Beside the calendar put the order dates of each promotion's lines and the months they cover:
 
 ```
 =MINIFS(OrderLines[OrderDate],OrderLines[PromotionID],A5)
@@ -78,7 +78,7 @@ Promotions {{ bad }} have no line inside their recorded dates; their months come
 =SUMIFS(OrderLines[ListAmount],CHOOSE(MATCH($B{{ x.cmp.grid }},{"Collection","ItemGroup","Segment"},0),OrderLines[CollectionName],OrderLines[ItemGroup],OrderLines[CustomerSegment]),$C{{ x.cmp.grid }},OrderLines[OrderYear],$D{{ x.cmp.grid }},OrderLines[OrderMonth],E${{ x.cmp.grid_head }})
 ```
 
-Columns B, C and D hold the kind, the scope and the year. CHOOSE and MATCH are not taught in Chapters 4 to 8; an IF on the kind that picks one of three SUMIFS does the same. A PivotTable on `OrderLines` gives the same numbers, with the scope field in **Filters**, OrderYear in **Rows**, OrderMonth in **Columns** and ListAmount in **Values**; the scope must be a PivotTable filter, because a PivotTable ignores the worksheet's own filters.
+CHOOSE and MATCH are not taught in Chapters 4 to 8; an IF on the kind that picks one of three SUMIFS does the same. A PivotTable on `OrderLines` gives the same numbers, with the scope field in **Filters**, OrderYear in **Rows**, OrderMonth in **Columns** and ListAmount in **Values**, because a PivotTable ignores the worksheet's own filters.
 
 **Step 3. Repeat for the year before.** Use the same formula with the year less one, wrapped as `=IF($D{{ x.cmp.prior }}<FirstYear,"",...)`, so that the first year's promotions show a blank.
 
@@ -97,9 +97,9 @@ Average month, in SDs:  =(D{{ x.cmp.cmp }}-E{{ x.cmp.cmp }})/(C{{ x.cmp.cmp }}*I
 In standard deviations: =(D{{ x.cmp.cmp }}-E{{ x.cmp.cmp }})/(I{{ x.cmp.cmp }}*SQRT(C{{ x.cmp.cmp }}))
 ```
 
-The first of the last two compares the promotion's average month with the other months' mean, in monthly standard deviations, and needs only Chapter 6's STDEV.S. The model answer uses the second, which scales the monthly standard deviation by the square root of the number of months. That scaling assumes independent, comparable months and is not taught in Chapters 4 to 8, so accept either; here they give the same verdict.
+In the comparison rows, A to L hold the ID, scope, months, volume (D), expectation (E), difference (F), the year-earlier volume (G, the same SUMPRODUCT on the prior grid, blank for the first year) and its difference (H), the monthly standard deviation (I), its share of the other months' mean (J), the standardized difference (K) and the two-deviation screen (L). Enter `=MAX(F{{ x.cmp.cmp }}:F{{ x.cmp.cmp + x.n_rows - 1 }})` in F{{ x.cmp.cmp + x.n_rows + 1 }} and name it `LargestLift`.
 
-The year-earlier column is the same SUMPRODUCT on the prior grid, divided into the volume. A student without FILTER can blank the promotion's months in a helper row (`=IF(AND(month>=first,month<=last),"",value)`), because AVERAGE and STDEV.S ignore the empty text.
+The first of the last two formulas needs only Chapter 6's STDEV.S. The model answer uses the second, which scales the monthly deviation by the square root of the months, an assumption of independent, comparable months that Chapters 4 to 8 do not teach, so accept either; here they give the same verdict. A student without FILTER can blank the promotion's months in a helper row (`=IF(AND(month>=first,month<=last),"",value)`), because AVERAGE and STDEV.S ignore empty text.
 
 **Check:**
 
@@ -111,7 +111,7 @@ The year-earlier column is the same SUMPRODUCT on the prior grid, divided into t
 
 The differences run from {{ x.lift_low|spct }} to {{ x.lift_high|spct }}. None is beyond two standard deviations either way. The largest, promotion {{ top.id }} ({{ top.label }}), is about {{ x.top_month_z|num(1) }} for its average month and {{ top.z|num(1) }} standard deviations of a {{ sd_total }}. Read this as an informal screen, not a test of significance, because seasonality, other promotions in the other months and the choice of the largest of several results all limit it. Every difference is far below its promotion's break-even increase (Requirement 4).
 
-**Watch for:** a two-month total's difference compared with one month's standard deviation, which puts promotion {{ x.naive_flagged }} beyond two. Comparing the average month, or scaling the deviation by the square root of the months, is the fix.
+**Watch for:** a two-month total's difference compared with one month's standard deviation, which puts promotion {{ x.naive_flagged }} beyond two. Comparing the average month, or scaling the deviation by the square root of the months, is the fix, and the question to ask is what a two-month total's variation is.
 
 ### Phase 4: New customers
 
@@ -123,11 +123,11 @@ The differences run from {{ x.lift_low|spct }} to {{ x.lift_high|spct }}. None i
 =COUNTIFS(OrderLines[CustomerID],A5#,OrderLines[OrderDate],B5#,OrderLines[PromotionID],"<>")>0
 ```
 
-Look up CustomerSince and name, and summarize: customers who ordered, first orders that included a promotion line, first orders in the first four months of the data, first orders after June of the first year, and the last first order.
+Look up CustomerSince and name, and summarize the counts the Check lists.
 
-**Check:** {{ customers }} customers ordered, and {{ n_promoted }} first orders included a promotion line. Of the first orders, {{ x.early }} fall in the first four months of the data ({{ x.jan }} in the first month), only because the data begins then: customers who had bought before appear as new. Just {{ late }} came after June {{ x.first_year }}, the last in {{ last }}. Of the {{ since }} customers with a CustomerSince in {{ x.first_year }} or later, {{ since_before }} placed their first order before that date, so CustomerSince cannot date a first purchase.
+**Check:** of {{ customers }} customers with observed orders, {{ x.early }} first appear in the first four months of {{ x.first_year }}, {{ x.jan }} of them in the first month, and {{ n_promoted }} first orders included a promotion line. That concentration is affected by the extract's start: a first-observed order need not be a customer's first-ever order, and the data cannot separate true acquisition from earlier customer history. Just {{ late }} came after June {{ x.first_year }}, the last in {{ last }}. Of the {{ since }} customers with a CustomerSince in {{ x.first_year }} or later, {{ since_before }} placed their first order before that date, so CustomerSince cannot date a first purchase either.
 
-**Step 6. State the conclusion.** No difference is beyond the scope's normal variation or near its break-even increase, and no customer's first order came through a promotion. The comparisons describe the orders and cannot show what would have been ordered without a promotion, which a comparison group or a designed test would need. The data cannot show that promotions never attract customers either, because almost no new customers appear in it. The evidence gives the sales team's two arguments no support, which is not proof that the promotions had no effect.
+**Step 6. State the conclusion.** No difference is beyond the scope's normal variation or near its break-even increase, and no customer's first observed order included a promotion. The comparisons describe the orders and cannot show what would have been ordered without a promotion, which a comparison group or a designed test would need. The customer test gives the sales team's argument no positive evidence, which does not prove that promotions never attract customers, because a first order in this data need not be a customer's first. The evidence gives the team's two arguments no support, which is not proof that the promotions had no effect.
 
 ## Expected results
 
@@ -153,11 +153,9 @@ A weak answer calls the largest difference a success, or calls every difference 
 ## Common mistakes and how to respond
 
 - **Net amount as volume.** *Symptom:* nearly every promotion shows a fall, from {{ x.net_low|spct }} to {{ x.net_high|spct }}, with {{ x.n_net_up }} above zero. *Response:* ask what the discount does to LineTotal in the promotion's months.
-- **Variation not scaled.** *Symptom:* promotion {{ x.naive_flagged }} flagged as unusual. *Response:* ask what a two-month total's variation is, against one month's.
 - **Recorded dates for the months.** *Symptom:* little or no volume in the months of promotions {{ bad }}. *Response:* ask which lines carry the promotion, and when they were ordered.
 - **No guard on the year before.** *Symptom:* a division error or a nonsense fall for promotions {{ x.no_py }}. *Response:* ask what the data holds before {{ x.first_year }}.
-- **CustomerSince as the first purchase.** *Symptom:* a count of new customers. *Response:* have them compare it with the first order date.
-- **Overclaiming.** *Symptom:* "promotions do not work". *Response:* ask what this data could and could not show.
+- **CustomerSince as the first purchase, or overclaiming.** *Symptom:* a count of new customers, or "promotions do not work". *Response:* have them compare CustomerSince with the first order date, and ask what this data could and could not show.
 
 ## Grading guide
 
@@ -173,4 +171,4 @@ A weak answer calls the largest difference a success, or calls every difference 
 
 - Repeat the comparison with the order count instead of the list amount, and say whether a promotion could change the mix without changing the total.
 - Discuss: an increase of about a tenth in the best month is inside the normal variation. What size of increase could this data detect?
-- Discuss: how would a control group (a similar scope with no promotion) make the next test stronger? This leads into the model of Requirement 4.
+- Discuss: how would a control group make the next test stronger?

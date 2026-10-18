@@ -23,7 +23,7 @@ figures:
 
 ## Purpose and learning outcomes
 
-An auditor who tests an accounting estimate asks whether its assumptions are consistent with the company's experience. Here the assumption is the demand forecast, and the experience is the orders. Students compare the two by year and item group, set the budget beside them, and then look inside the forecast for the planner adjustments that no one approved. It is the auditor's version of a backtest, and it practices Power Query, SUMIFS by year, a ratio test and a control test. The analytics type is diagnostic.
+An auditor who tests an accounting estimate asks whether its assumptions are consistent with the company's experience. Here the assumption is the demand forecast, and the experience is the orders. Students compare the two by year and item group, set the budget beside them, and then look inside the forecast for the planner adjustments that no one approved. It is a retrospective consistency comparison of the stored, current forecast with historical orders. Before it counts as a backtest of an ex ante forecast, the auditor would need frozen forecasts or a version history that shows what was available before each forecast period, because IsCurrent and an approval date alone do not show that the stored quantities were unchanged afterward. The exercise practices Power Query, SUMIFS by year, a ratio test and a control test. The analytics type is diagnostic.
 
 By the end, students can:
 
@@ -75,7 +75,11 @@ Row 10 sums the four product groups (rows 5 to 8) without Services.
 
 ### Requirement (4): The budget
 
-**Step 6. Compare {{ d.C }}.** In B31 to H36 put, for each product group, the budget's quantity (`SUMIFS(BudgetLine[Quantity],BudgetLine[ItemGroup],$A32,BudgetLine[BudgetCategory],"Revenue")`), the forecast, the orders and the invoiced units, and the three ratios.
+**Step 6. Compare {{ d.C }}.** In B31 to H36 put, for each product group, the budget's quantity, the forecast, the orders and the invoiced units, and the three ratios. The budget's quantity is:
+
+```
+=SUMIFS(BudgetLine[Quantity],BudgetLine[ItemGroup],$A32,BudgetLine[BudgetCategory],"Revenue")
+```
 
 **Check:** the budget plans {{ budget|num(0) }} units, more than the forecast ({{ years[2].forecast|num(0) }}), and {{ (budget / years[2].orders)|num(1) }} times the {{ years[2].orders|num(0) }} units ordered ({{ invoiced|num(0) }} invoiced).
 
@@ -92,10 +96,17 @@ b. List the forecasts whose ratio differs from 1 by more than 0.5, and look up t
 ```
 
 c. Look up the planners in Employee. For the approver, replace a looked-up 0 with a blank and then with `(none)`: a blank ApprovedByEmployeeID comes back from the lookup as 0.
+d. Count the blank approvals independently of the size filter, and list those rows. The model answer keeps the count in B40:
 
-**Check:** {{ adjusted|length }} forecasts:{% for r in adjusted %} DemandForecastID {{ r.id }} ({{ r.date }}, {{ r.forecast|num(2) }} against {{ r.baseline|num(2) }}){% if not loop.last %};{% endif %}{% endfor %}. All are for {{ code }} ({{ name }}, {{ group }}) at warehouse {{ warehouse_id }}, {{ warehouse }}, {{ method }}, {{ multiple|num(1) }} times the baseline, by {{ planner }} (employee {{ planner_id }}), a {{ title }}, with no approver. Every other forecast is between {{ low|num(2) }} and {{ high|num(2) }} times its baseline. **Watch for:** an approver column that shows employee 0 or "(not found)". It means the lookup read a blank as 0.
+   ```
+   =COUNTBLANK(DemandForecast[ApprovedByEmployeeID])
+   ```
 
-The control tested is the approval of planners' adjustments. The three are the only unapproved forecasts in the Table, so every other adjustment has an approver recorded. That shows the step was taken, not how well it was done.
+   Expect {{ g.unapproved }}, the same forecasts as the size filter. A smaller unapproved adjustment in a later release would still be an approval exception even if it failed the size filter, so the filter alone is not the test of the control. A zero or missing baseline would make the ratio an error and is a separate exception.
+
+**Check:** {{ adjusted|length }} forecasts:{% for r in adjusted %} DemandForecastID {{ r.id }} ({{ r.date }}, {{ r.forecast|num(2) }} against {{ r.baseline|num(2) }}){% if not loop.last %};{% endif %}{% endfor %}. All are for {{ code }} ({{ name }}, {{ group }}) at warehouse {{ warehouse_id }}, {{ method }}, {{ multiple|num(1) }} times the baseline, by {{ planner }} (employee {{ planner_id }}), a {{ title }}, with no approver. The warehouse's name, {{ warehouse }}, needs a lookup in Warehouse, which the exercise does not import. Every other forecast is between {{ low|num(2) }} and {{ high|num(2) }} times its baseline. **Watch for:** an approver column that shows employee 0 or "(not found)". It means the lookup read a blank as 0.
+
+The control tested is the approval of planners' adjustments. Because the independent count finds only these three, every other adjustment has an approver recorded. That shows the step was taken, not how well it was done. The {{ pos|count }} purchase orders that {{ planner }} created come from PurchaseOrder (CreatedByEmployeeID), which the exercise does not supply, so they are instructor evidence. To have students substantiate them, supply or import PurchaseOrder and count the orders.
 
 ### Requirement (6): The memo
 
@@ -114,14 +125,14 @@ The control tested is the approval of planners' adjustments. The three are the o
 |---|---:|---|
 | {{ d.C }} units: budget; forecast; orders; invoiced (four product groups) | {{ budget|num(0) }}; {{ years[2].forecast|num(0) }}; {{ years[2].orders|num(0) }}; {{ invoiced|num(0) }} | 6 |
 | Forecasts adjusted by more than half; forecasts with no approver | {{ adjusted|length }}; {{ g.unapproved }} | 7 |
-| Planner; job title; purchase orders created | {{ planner }}; {{ title }}; {{ pos|count }} | 7 |
+| Planner; job title; purchase orders created (instructor evidence from PurchaseOrder) | {{ planner }}; {{ title }}; {{ pos|count }} | 7 |
 
 {{ expected() }}
 
 ## What a strong answer says
 
 - **Requirement (3).** Not consistent: more than twice the orders in every product group and year, and the bias grows. Services runs the other way and needs its own explanation.
-- **Requirement (5).** The list tests the approval of planner adjustments. The three are small in quantity but are an unapproved override by a buyer who plans most forecasts ({{ g.planner_adjusted|count }} Planner Adjusted rows in all) and also creates purchase orders. It is an authorization exception, and the buyer's two roles make an independent review more important.
+- **Requirement (5).** The list tests the approval of planner adjustments. The three missing approvals are documented approval-record exceptions, small in quantity, on forecasts entered by a buyer who plans most of the Planner Adjusted rows ({{ g.planner_adjusted|count }} in all). The planner's buying role creates a potential segregation-of-duties risk, to confirm against the required approvals, delegated authority and compensating reviews before concluding that the role combination breaches company policy. A populated approval field records a step, not the quality of its review. A plus: the planner's purchase orders ({{ pos|count }}, from PurchaseOrder) and the independent count of blank approvals.
 - **Requirement (6).** Consequences whose direction depends on the estimate: plans that buy and build too much, a reserve understated if it relies on the forecast, and a budget that shows the gap from the plan but is a poor measure of performance. Services is assessed separately. The evidence to request: the method and its inputs, the comparisons management made, the reasons for the three overrides, how the forecast feeds the plans, and inventory levels and aging.
 
 A weak answer says the forecast is "high" without the ratios, or treats a recorded approval as proof of a review.
@@ -149,6 +160,6 @@ A weak answer says the forecast is "high" without the ratios, or treats a record
 ## Extensions and discussion questions
 
 - Compute the ratio for each item, not each group. Is the bias spread evenly, or do a few items carry it?
-- Value the units forecast above orders at standard cost. How large is the exposure for a reserve?
+- Value the excess forecast product units at standard cost as a planning exposure indicator, and do not call that amount an inventory reserve. A reserve assessment needs the inventory on hand, its aging, expected sales and realizable values, the relevant costs and the applicable accounting policy.
 - Discuss: Exercise 7.1 backtests your own forecast and this exercise tests management's. What is the same, and what must the auditor add?
 - Discuss: the budget's volume is higher than the forecast. Whose assumption is it, and what does Tutorial 7.2 say it is worth?

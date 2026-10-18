@@ -30,7 +30,7 @@ figures:
 
 The committee will want to see where returns grow, which refunds deserve a second look, and the documents behind each. That is a report, not a workbook: a model with explicit relationships, a Date table that the facts read by their own dates and, through inactive relationships, by the shipment date (Chapter 14), measures that switch, a drill-through page (Chapter 15), and a Validation page and Tests tab that tie it out. The query of Requirement 4 decides which refunds are flagged; the report lets the committee see and drill into the decision. The analytics type is descriptive and diagnostic.
 
-Students can load the cycle's tables and the flags and relate each fact to Date twice (Part 1), write rate and score measures (Part 2), and build the pages, the drill-through and the tie-out (Part 3).
+Students can load the cycle's tables and the flags and relate the facts to Date (Part 1), write rate and score measures (Part 2), and build the pages, the drill-through and the tie-out (Part 3).
 
 **Competencies practiced.** CPA Evolution Core S1 M8 (data mining and analysis of financial data; visualization and communicating results); IMA Data Analytics and Insights (data analysis, data visualization); IFAC IES 2 (f) and (i); AACSB A5 part 5.1 (Power BI).
 
@@ -63,7 +63,7 @@ GLEntry is filtered first, so only the three posting types the Tests tab needs a
 
 **Check:** {{ g.n_lines|count }} credit lines, {{ g.n_cm }} credits, {{ g.n_rf }} refunds, {{ g.n_il|count }} invoice lines and {{ g.n_gl|count }} ledger rows. **Watch for:** the CSV merged into a workbook query, which combines two data sources and risks a privacy-level error; relate it instead.
 
-**Step 2. Relate the tables.** In **Model view**, relate each fact to Date by its own date ({{ g.rel_active }} active relationships) and the credit lines and invoice lines also by ShipmentDate ({{ g.rel_inactive }} inactive, with **Make this relationship active** cleared); relate the facts to Item and Customer, the refunds to RefundFlags on RefundNumber, and GLEntry to Account. The receipt applications stay unrelated and are read by TREATAS in Step 7. **Check:** the Date table carries the active and inactive relationships above.
+**Step 2. Relate the tables.** In **Model view**, relate the {{ g.rel_active }} dated fact tables ({{ g.rel_active_tables|join(', ') }}) to Date by their own dates, and add inactive ShipmentDate relationships only for {{ g.rel_inactive_tables|join(' and ') }} (**Make this relationship active** cleared); every relationship is many to one in a single direction. Relate the facts to Item and Customer, the refunds to RefundFlags on RefundNumber, and GLEntry to Account. The receipt applications stay unrelated and are read by TREATAS in Step 7. **Check:** the Date table carries the active and inactive relationships above.
 
 ### Part 2: The measures
 
@@ -98,7 +98,7 @@ GLEntry is filtered first, so only the three posting types the Tests tab needs a
 
 {{ figure('IF-19-5-A') }}
 
-**Check:** the last month by shipment month reads {{ dec|pct(2) }} against {{ mlo|pct(2) }} to {{ mhi|pct(2) }} for the other months of that year; the first month by credit month reads {{ g.first_rate|pct(2) }}. **Watch for:** reading either as good news. The last shipments' returns arrive after the data end, and the first year had nothing earlier to return; compare over complete windows.
+**Check:** the last month by shipment month reads {{ dec|pct(2) }} against {{ mlo|pct(2) }} to {{ mhi|pct(2) }} for the other months of that year; the first month by credit month reads {{ g.first_rate|pct(2) }}. **Watch for:** reading either as good news. The first year had nothing earlier to return, and the last shipments' returns arrive after the data end. Compare cohorts with equal follow-up under a stated rule: the last return is dated {{ mature.last_return }} and the longest lag is {{ mature.horizon }} days, so shipments after {{ mature.cutoff }} ({{ mature.after_share|pct(1) }} of shipped revenue, the months from {{ mature.immature[0] }} on) are immature and disclosed as excluded. Omitting December alone, or an unspecified month or two, does not establish maturity, and past lags do not prove that no later return can arrive.
 
 **Step 6. Build Concentration.** Credit lines by carrier and reason, by warehouse, and a customer table "{{ g.t.concentration }}" sorted by return rate with a visual filter on credits above zero. **Check:** customer {{ focus }} ({{ seg }}, {{ terms }}) has ${{ focus_cred|money }} of credits on sales of ${{ focus_sales|money }}, {{ rate|pct(2) }} against {{ overall|pct(3) }} for all customers; it is first by dollars and number {{ g.rank_rate }} by rate, with customers {{ higher[0][0] }}, {{ higher[1][0] }} and {{ higher[2][0] }} above it, {{ n_small }} on sales under a tenth of its. Carrier and warehouse counts compare only when volumes match; as shares of shipped revenue the carriers run {{ car_rlo|pct(2) }} to {{ car_rhi|pct(2) }}.
 
@@ -139,7 +139,7 @@ ROW (
 
 ## What a strong answer says
 
-- **Each fact is read by its own date and by the shipment date,** and the report says which basis each rate uses.
+- **Each fact is read by its own date, the credit and invoice lines also by the shipment date,** and the report says which basis each rate uses.
 - **Timing is allowed for:** the last months and the first year are explained, not presented as trends.
 - **Concentration is a share of each customer's sales,** and the customer to follow up is found by both dollars and rate.
 - **The ranking is traceable:** a reviewer drills from the score to the refund, its credit and its invoice, and Validation ties the report to the ledger and the export.
@@ -159,13 +159,13 @@ A weak answer shows counts without rates, ranks customers by dollars, or leaves 
 
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
-| Model and relationships | 25 | All tables and flags, each fact related twice, the CSV related not merged | Relationships without the shipment dates |
+| Model and relationships | 25 | All tables and flags, the dated facts related to Date by their own dates and two also by ShipmentDate (inactive), the CSV related not merged | Relationships without the shipment dates |
 | Measures | 25 | Rates by both dates, the score and the flag measures | One basis only |
 | Pages and drill-through | 30 | Returns, Timing, Concentration, Ranking and a working drill-through | Pages without the timing explanation |
 | Validation and Tests | 20 | Ties to the ledger and the export | Validation without a test |
 
 ## Extensions and discussion questions
 
-- Add a by-ship-month table of the last year that leaves out the censored month, and say what it shows.
+- Add a by-ship-month table of the last year under an explicit cutoff rule (shipments dated by the cutoff, the later ones disclosed as excluded), and say what it shows.
 - Discuss: should the committee see the score or the five flags?
 - Discuss: which page would you open the meeting with, and what would you say it cannot show?

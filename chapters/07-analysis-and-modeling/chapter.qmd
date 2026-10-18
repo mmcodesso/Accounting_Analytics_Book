@@ -14,6 +14,7 @@ After completing this chapter, you will be able to:
 3. Compare actual results with a static and a flexible budget, and explain sales-volume and flexible-budget variances.
 4. Build a contribution margin model with documented assumptions, and calculate break-even points.
 5. Evaluate a decision with Scenario Manager, data tables, and Goal Seek, and describe how Solver finds the best plan under constraints.
+6. Evaluate how precise a regression-based expectation is and how consistent a forecast is with experience, and identify the evidence needed to follow up unusual results and unapproved changes.
 :::
 
 
@@ -22,7 +23,7 @@ After completing this chapter, you will be able to:
 
 ## Opening Scenario {.unnumbered}
 
-The controller has read your analysis of the Furniture margin, and she is now preparing for the planning meeting for fiscal 2027. She has three requests. First, she needs a revenue forecast for the coming quarter that she can defend when the sales team pushes for a more optimistic number. Second, she wants to know how 2026 compared with the budget, because the budget will be the starting point for next year's plan and she suspects that some of its assumptions were wrong. Third, the sales team has proposed repeating the Furniture Seasonal Promotion, and she wants a recommendation based on what the promotion actually cost and what it would need to achieve to pay for itself. Each request asks what could happen rather than what did happen. This chapter teaches the Excel tools that answer such questions, and the discipline of testing a model before anyone relies on it.
+The controller has read your analysis of the Furniture margin, and she is now preparing for the planning meeting for fiscal 2027. She has three requests. First, she needs a revenue forecast for the coming quarter that she can defend when the sales team pushes for a more optimistic number. Second, she wants to know how 2026 compared with the budget, because the budget will be the starting point for next year's plan and she suspects that some of its assumptions were wrong. Third, the sales team has proposed repeating the Furniture Seasonal Promotion, and she wants a recommendation based on what the promotion actually cost and what it would need to achieve to pay for itself. Together, the requests use what happened in 2026 to forecast and plan 2027. This chapter teaches the Excel tools that answer such questions, and the discipline of testing a model before anyone relies on it.
 
 
 
@@ -58,7 +59,7 @@ A p-value below 0.05 is the conventional threshold for calling a relationship st
 
 ![Regression Output from the Data Analysis ToolPak.](/visuals/svg/fig-07-02-regression-output.svg){#fig-07-02 fig-alt="A mock of the ToolPak's summary output for a regression of monthly revenue on a month index. It shows the regression statistics, including a low R Square; the ANOVA table with its Significance F; and the coefficients table for the intercept and the month index, with standard errors, t statistics, p-values, and 95 percent confidence limits. Four numbered markers outline the R Square, the Significance F, the slope, and the slope's p-value, and a legend explains each."}
 
-Two further checks belong with every regression. The first is the residuals, the differences between the actual values and the line. A residual plot, which the Regression tool draws when you check Residual Plots, should look like a patternless band around zero, which is what the p-values assume. A single point far from the rest, or a curve in the residuals, means that the line describes the data poorly. The second check is the influence of individual points. As @fig-07-01 shows, the line fitted to all thirty-six months of Charles River's revenue slopes upward, and its slope is statistically significant, but the start-up month accounts for almost half of that slope. Fitted without January 2024, the line rises about half as steeply, and its slope is no longer significant.
+Two further checks belong with every regression. The first is the residuals, the differences between the actual values and the line. A residual plot, which the Regression tool draws when you check Residual Plots, should show no systematic pattern and a roughly even spread around zero. The usual p-values assume, among other things, a linear relationship and errors that are independent, of similar size, and roughly bell-shaped, so for a monthly series also look at the residuals in time order. A patternless plot is a useful check, not proof that every assumption holds. A single point far from the rest, or a curve in the residuals, means that the line describes the data poorly. The second check is the influence of individual points. As @fig-07-01 shows, the line fitted to all thirty-six months of Charles River's revenue slopes upward, and its slope is statistically significant, but the start-up month accounts for almost half of that slope. Fitted without January 2024, the line rises about half as steeply, and its slope is no longer significant.
 
 ::: {.callout-warning .watch-out icon=false}
 ## Watch out
@@ -82,13 +83,13 @@ A forecasting method is worth using only if it does better than the simplest alt
 |---|---|---|---|
 | Mean | The average of the historical values | `=AVERAGE(C3:C34)` | The series fluctuates around a stable level |
 | Naive | The last observed value | `=C34` | The series wanders without a stable level |
-| Seasonal naive | The value of the same season a year earlier | `=C23` for the same month or quarter a year earlier | There is a strong seasonal pattern |
+| Seasonal naive | The value of the same season a year earlier | `=C23` for the next month, `=C31` for the next quarter | There is a strong seasonal pattern |
 | Drift | The last value plus, for each period ahead, the average change from the first value to the last | `=C34+(C34-C3)/31` for the next period | The series grows or shrinks at a steady average rate |
 | Linear trend, a regression | The least-squares line fitted to all the values, extended | `FORECAST.LINEAR` or `TREND`, as in Tutorial 7.1 | The values lie close to a straight line |
 
 : Benchmark forecasting methods and the linear trend {#tbl-07-01}
 
-In the drift formula, `(C34-C3)/31` is the average change: the difference between the first and the last of the 32 values in C3:C34, divided by the 31 steps between them. Drift and the linear trend both extend a slope, but they draw it differently: drift's line passes through the first and the last values only, while the trend's line is fitted to all of them.
+In the seasonal naive formulas, C34 is the last value of the series, so the next period is in row 35 and the same season a year earlier is twelve rows above it for monthly values (row 23) and four rows above it for quarterly values (row 31). In the drift formula, `(C34-C3)/31` is the average change: the difference between the first and the last of the 32 values in C3:C34, divided by the 31 steps between them. Drift and the linear trend both extend a slope, but they draw it differently: drift's line passes through the first and the last values only, while the trend's line is fitted to all of them.
 
 ### Backtesting
 

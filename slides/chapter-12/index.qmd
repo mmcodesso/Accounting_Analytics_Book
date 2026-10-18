@@ -75,7 +75,9 @@ Chapter 8's workflow began every test by defining and reconciling its population
 
 ## Trace both ways between the ledger and documents
 
-{{< book-figure fig-12-01 crop="0,0,1,0.7337" >}}
+{{< book-figure fig-12-01 crop="0,0,1,0.7337" alt="Detail of the diagram of the two traces, without the cutoff box. The GLEntry table, with its SourceDocumentType and SourceDocumentID columns, is on the left, and four source document tables, SalesInvoice, PurchaseInvoice, DisbursementPayment and PayrollPayment, are on the right. A dashed amber arrow runs from the ledger through a box on existence to the documents, and a second runs from the documents through a box on completeness back to the ledger. The existence box finds postings whose document key is NULL, and the completeness box finds documents with no GLEntryID." >}}
+
+Restrict the ledger rows to the document type, then match the document ID.
 
 ::: {.notes}
 An anti-join from the ledger to a document table finds postings that point to nothing, which tests existence, or occurrence for transactions, as far as a document record can support it. An anti-join from the documents to the ledger finds documents never posted, which tests completeness. The completeness test finds only documents that were recorded but not posted: a transaction with no document at all escapes it. The figure's third test, cutoff, follows on its own slide.
@@ -156,7 +158,7 @@ Students start Audit.sql with a header comment. Each test goes at the end of the
 
 ## Six postings point to no payment
 
-{{< book-figure fig-12-02 crop="0,0.6003,0.9224,0.2219" >}}
+{{< book-figure fig-12-02 crop="0,0.6003,0.9224,0.2219" alt="Detail of the result grid of the combined trace test, six rows with the columns Test, RecordID, DocumentID, RecordDate and Amount. Every row reads Posting with no payroll payment, in the outlined Test column. The rows come in three pairs of equal amounts, dated in January 2024, January 2025 and January 2026, and the two rows of each pair share a DocumentID." >}}
 
 ::: {.notes}
 The four traces, two from the ledger to the payments and two from the invoices to the ledger, return six rows, all from the first test: three pairs, each a debit to accrued payroll and a credit to cash, in January of each year. Every supplier payment has its document, and every sales and supplier invoice was posted. The DocumentID column shows which missing payment each pair points to, and Step 4 matches the six to three approved registers with no payment: one pays the chief executive, and two pay an Account Executive who left in the first year, charged to the Executive cost center at the chief executive's gross pay. Only the bank records can confirm who received the cash.
@@ -164,7 +166,7 @@ The four traces, two from the ledger to the payments and two from the invoices t
 
 ## December deliveries were posted in January
 
-{{< book-figure fig-12-03 crop="0,0.619,0.8552,0.1977" >}}
+{{< book-figure fig-12-03 crop="0,0.619,0.8552,0.1977" alt="Detail of the result grid of the revenue cutoff test, five rows with the columns Finding, DeliveryYear, Invoices and SubTotal. Three rows are invoices dated before shipment, one for each year from 2024 to 2026. The two outlined rows are revenue posted in another year, for deliveries of 2024 and of 2025, the first with more invoices than the second." >}}
 
 ::: {.notes}
 More than twenty invoices for goods delivered in December were posted in January, so their revenue fell in the next fiscal year, while their cost was recorded when the goods shipped. Eight invoices are dated before their shipment but were posted in the year of delivery: errors in dating, not in posting. A ninth dated before its shipment was also posted in the next year, and the CASE counts only its first finding. The test covers only the invoices for goods; the design services ship nothing. Step 6 finds a handful of the latest December's shipment lines that were never invoiced.
@@ -190,7 +192,7 @@ Within the populations tested the ledger holds up, and its weakness is timing. R
 
 ## Sum each side to the purchase order line
 
-{{< book-figure fig-12-04 crop="0,0,1,0.5837" >}}
+{{< book-figure fig-12-04 crop="0,0,1,0.5837" alt="Detail of the diagram of the three-way match for one purchase order line, without the table of statuses below it. The line is at the top with its ordered quantity and unit cost. On the left, its two goods receipt lines are summed into the quantity received. On the right, its three supplier invoice lines, each with its price compared with the order price, are summed into the quantity invoiced. The three quantities are equal, so the line is matched, although one receipt line is billed on two invoice lines." >}}
 
 ::: {.notes}
 The line was received in two deliveries and invoiced on three invoices. Compared row by row, a receipt and an invoice line disagree wherever a delivery was split; summed to the purchase order line first, in CTEs, the three quantities agree, even though one receipt line was billed on two invoices. Summing before comparing is Chapter 10's cure for fan-out: joined directly, the two receipt lines and three invoice lines would make six rows.
@@ -198,7 +200,7 @@ The line was received in two deliveries and invoiced on three invoices. Compared
 
 ## Each line ends in one status
 
-{{< book-figure fig-12-04 crop="0,0.5997,1,0.4003" >}}
+{{< book-figure fig-12-04 crop="0,0.5997,1,0.4003" alt="Detail of the table of the statuses of a purchase order line, in the order the CASE tests them, with each condition and meaning. The first two rows, outlined, are the exceptions, invoiced above received and received above ordered. Below them come not yet received, received not fully invoiced, which is an accrual, partly received and matched. A note under the table says that compared row by row a receipt line matches neither of its invoice lines, but summed to the purchase order line the quantities agree." >}}
 
 ::: {.notes}
 The CASE gives each line the first status whose condition it meets, so the exceptions are tested first and none can hide under a normal status. A line received but not fully invoiced is not an exception: it is an accrual.
@@ -243,7 +245,7 @@ If that one review missed an error, nothing else would notice unless another con
 
 Exception, accrual or risk?
 
-1. A receipt line disagrees with an invoice line, but the order line matches
+1. A split receipt: ordered, received and invoiced quantities agree when summed at the order line
 2. Goods received at the year-end that the supplier has not yet billed
 3. A purchase order above its approver's limit
 4. One person approves nearly every purchase order
@@ -254,7 +256,7 @@ Ask students which of the four needs a disposition for a single document.
 
 ## Each finding has its meaning {.answer}
 
-1. None: a split delivery, so compare the sums at the order line
+1. No quantity exception: the summed quantities agree at the purchase order line
 2. An accrual: a liability to agree with the ledger
 3. An exception: an approval above authority
 4. A risk: a possible weakness in the control's design
@@ -275,7 +277,7 @@ Students match every purchase order line with its receipts and invoices, test pr
 
 ## No line was billed or received beyond its order
 
-{{< book-figure fig-12-05 crop="0,0.5696,0.635,0.2048" >}}
+{{< book-figure fig-12-05 crop="0,0.5696,0.635,0.2048" alt="Detail of the result grid of the three-way match, four rows with the columns MatchStatus and POLines. Matched holds the great majority of lines, followed by Received, not fully invoiced, Not yet received and Partly received. No exception status appears, and the whole grid is outlined." >}}
 
 ::: {.notes}
 Nearly every line is matched; the others are not yet received, partly received, or received but not fully invoiced, all normal at a year-end. COALESCE turns the NULL of a line with no receipts or invoices into zero. At three percent no invoice price is an exception, while at two percent several thousand lines would be. The unbilled receipts agree with the ledger to within a dollar, but a receipt never recorded would be missing from both, which is why auditors also search for unrecorded liabilities after the year-end.
@@ -283,7 +285,7 @@ Nearly every line is matched; the others are not yet received, partly received, 
 
 ## A handful of orders fail the approval tests
 
-{{< book-figure fig-12-06 crop="0,0.6781,0.7277,0.1367" >}}
+{{< book-figure fig-12-06 crop="0,0.6781,0.7277,0.1367" alt="Detail of the result grid of the approval tests on purchase orders, three rows with the columns Test, Orders and OrderValue. The tests are Above approver limit, Self-approved and Dated after approver left, with between three and thirteen orders each and their total values. The grid is outlined." >}}
 
 ::: {.notes}
 Step 5 lists fourteen orders, most failing two tests. The two largest are capital-equipment orders created and approved by the Purchasing Manager, above even the chief financial officer's limit. Three name the Account Executive of Tutorial 12.1 as approver and are dated after that employee had left, and several small ones by buyers and analysts with a limit of zero. Step 6 shows that the chief financial officer approved nearly every other order.
@@ -329,15 +331,15 @@ Records entered in bulk, rather than clocked by each employee, are one of the th
 A single register paid to a terminated employee is isolated; a large share of hours recorded after their operations ended is a pattern. A pattern does not necessarily mean that anyone was paid for time not worked. The auditor reports both kinds and distinguishes them.
 :::
 
-## An expectation tests what the drivers imply
+## A recalculation tests arithmetic, not hours
 
 - A substantive analytical procedure compares an amount with an expectation
-- The expectation comes from other data; the threshold is set in advance
-- For payroll: each line's hours times the employee's rate of pay
-- A reconciliation asks if records agree; an expectation, if amounts fit
+- The expectation comes from a plausible relationship; the threshold is set in advance
+- For payroll, each line's hours times the employee's rate recompute the pay
+- That is a recalculation: it tests the arithmetic, not whether the hours were worked
 
 ::: {.notes}
-Chapter 6 defined the procedure, which the PCAOB's standards describe, and Exercise 7.5 built expectations with regression; among the four types of analytics, it adds a predictive element. A payroll expectation from rates the payroll system itself stores is a recalculation; data from outside the system make a stronger expectation. Payroll is a common area for population testing because its typical frauds leave traces: employees paid after they left, hours paid but never clocked, overtime without approval, and time entered in bulk. Such tests often run every pay period, so that an exception can still be corrected.
+Chapter 6 defined the procedure, which the PCAOB's standards describe, and Exercise 7.5 built expectations for revenue and commissions with regression. A reconciliation asks whether two records agree, a recalculation whether an amount follows from its inputs, and an expectation whether an amount is what its drivers imply. Test H5 uses rates the payroll system itself stores, so it is a recalculation; evidence from an independent source can strengthen an expectation, but its relevance and reliability must still be evaluated. Payroll is a common area for population testing because its typical frauds leave traces: employees paid after they left, hours paid but never clocked, overtime without approval, and time entered in bulk. Such tests often run every pay period, so that an exception can still be corrected.
 :::
 
 ## Check your understanding {.check}
@@ -371,7 +373,7 @@ Which kind an exception is depends on its cause, which the auditor must find. Th
 {{< book-steps 12.3 1-5 >}}
 
 ::: {.notes}
-The profile fixes the dates over which the totals are measured, although indirect time ends a week before the last day. The hours clocked, recorded and paid agree in every pay period the records share, and the four quiet months are recorded like any others. The plant was building stock then, completing thousands of units more than it shipped, which is consistent with most hours staying on work orders, a plausible explanation still to confirm. Every earnings line agrees with its hours times the paid employee's rate on file to within a cent.
+The profile fixes the dates over which the totals are measured, although indirect time ends a week before the last day. The hours clocked, recorded and paid agree in every pay period the records share, and the four quiet months are recorded like any others. The plant was building stock then, completing thousands of units more than it shipped, which is consistent with most hours staying on work orders, a plausible explanation still to confirm. Every earnings line agrees with its recalculation from its hours and the paid employee's rate on file to within a cent.
 :::
 
 ## Steps 6 to 10: overtime, surge days and late time
@@ -384,7 +386,7 @@ No overtime of half an hour or less has an approval, and nearly every longer ent
 
 ## Surge days carried more and more of the overtime
 
-{{< book-figure fig-12-08 crop="0,0.6941,0.832,0.1298" >}}
+{{< book-figure fig-12-08 crop="0,0.6941,0.832,0.1298" alt="Detail of the result grid of the surge day test, one row for each of 2024, 2025 and 2026, with the columns WorkYear, SurgeDays, EmployeesPerDay, SurgeOvertime and SurgeShare. The outlined SurgeDays column rises each year, EmployeesPerDay is the same 64 in every row, and the outlined SurgeShare column rises from about a third to more than two-thirds." >}}
 
 ::: {.notes}
 The number of surge days grew each year, and by the latest year their overtime was more than two-thirds of the plant's, while overtime on other days stayed about the same. This is the most important finding of the audit. The query counts the employees who clocked in, and a separate count against the Employee table shows they are the plant's whole hourly staff, one entry each. Identical times for a whole plant look like time entered in bulk, or a schedule recorded in place of the clock; they do not prove that the hours were not worked, but the records cannot show that they were.
@@ -392,7 +394,7 @@ The number of surge days grew each year, and by the latest year their overtime w
 
 ## On an ordinary day, times and hours differ
 
-{{< book-figure fig-12-09 crop="0,0,1,0.4275" >}}
+{{< book-figure fig-12-09 crop="0,0,1,0.4275" alt="Detail of the time clock entries of six Assemblers on a day in March 2024, before the first surge day, with the columns Employee, Clock in, Clock out, Regular, Overtime and Overtime approved by. The clock times and the regular hours differ from one employee to the next, and only some of the six recorded overtime, approved by the Production Manager on the work date. A line below summarizes the day for all 64 hourly employees, with many different clock-in times and numbers of hours." >}}
 
 ::: {.notes}
 Six Assemblers on a day before the first surge day: their clock-in and clock-out times differ by minutes and hours, their regular hours vary, and only some of them recorded overtime. The line under the table summarizes the day for every hourly manufacturing employee: many different clock-in times and numbers of hours.
@@ -400,7 +402,7 @@ Six Assemblers on a day before the first surge day: their clock-in and clock-out
 
 ## On a surge day, everyone clocks the same minutes
 
-{{< book-figure fig-12-09 crop="0,0.4504,1,0.4275" >}}
+{{< book-figure fig-12-09 crop="0,0.4504,1,0.4275" alt="Detail of the time clock entries of the same six Assemblers on a surge day in June 2026. The outlined clock-in, clock-out, regular and overtime cells are identical from row to row, with one employee on the second shift, and all the overtime is approved by the Production Manager on the work date. A line below says that all 64 hourly employees clocked in at one of two times, recorded the same hours, and recorded overtime." >}}
 
 ::: {.notes}
 The same six on a surge day clock in and out at the same minutes on one of two shifts, with eight regular hours and four and a half of overtime, all approved by the Production Manager on the work date; a clock-out after midnight falls on the next day. Every hourly manufacturing employee clocked in at one of two times and recorded the same hours.
@@ -408,7 +410,7 @@ The same six on a surge day clock in and out at the same minutes on one of two s
 
 ## Late direct time grew, mostly on surge days
 
-{{< book-figure fig-12-10 crop="0,0.6293,0.8204,0.1573" >}}
+{{< book-figure fig-12-10 crop="0,0.6293,0.8204,0.1573" alt="Detail of the result grid of the late direct time test, one row for each of 2024, 2025 and 2026, with the columns WorkYear, DirectHours, AfterEnd, ShareAfterEnd and AfterEndOnSurgeDays. The outlined ShareAfterEnd column rises from about a fifth to about half and then about two-thirds, and the outlined AfterEndOnSurgeDays column holds most of the AfterEnd hours in every year." >}}
 
 ::: {.notes}
 The share of the direct hours recorded against an operation that came after the operation had ended rose from about a fifth to half and then to about two-thirds, and most of it fell on surge days. Step 9 finds it at Packing, where nearly all of the latest year's direct time came after the operation ended, and at Quality Assurance: much of the time above plan there in Tutorial 11.2 was charged to finished work.
@@ -451,7 +453,7 @@ GROUP BY does what COUNTIFS and SUMIFS did in Chapter 8, and the as-of date in a
 - `LOG10(1 + 1.0 / Digit)` gives Benford's expectation for each digit
 
 ::: {.notes}
-A series that continues from one year to the next, such as the sales invoice numbers, is ordered without a partition, so a gap at the year boundary is not missed. Leave zero and negative amounts out of the first-digit test. Fifteen decimals keep printf's rounding from carrying an amount such as 999,999.99 to 1.000000e+06, which would read as a 1. LOG10 is one of SQLite's math functions, which the Windows release of DB Browser for SQLite includes; DB Browser for SQLCipher lacks them and answers "no such function: LOG10", and a CASE that lists the nine expected proportions can take its place. Grouped and compared, the digits give the same mean absolute deviation as the workbook of Tutorial 8.1, and Exercise 12.6 builds the other tests.
+A series that continues from one year to the next, such as the sales invoice numbers, is ordered without a partition, so a gap at the year boundary is not missed. Leave zero and negative amounts out of the first-digit test. Fifteen decimals keep printf's rounding from carrying an amount such as 999,999.99 to 1.000000e+06, which would read as a 1. LOG10 is one of SQLite's math functions, and SELECT LOG10(10.0) returns 1 where they are present; the Windows release of DB Browser for SQLite includes them, while DB Browser for SQLCipher lacks them and answers "no such function: LOG10", and a CASE that lists the nine expected proportions can take its place. Grouped and compared, the digits give the same mean absolute deviation as the workbook of Tutorial 8.1, and Exercise 12.6 builds the other tests.
 :::
 
 ## Watch out: a self-join pairs every row twice {.watch-out}
@@ -485,7 +487,7 @@ An expected result is not always "no rows": the purchasing tests expect the unbi
 
 ## Each test opens with what it tests
 
-{{< book-figure fig-12-11 crop="0,0,1,0.8658" >}}
+{{< book-figure fig-12-11 crop="0,0,1,0.8658" alt="Detail of the editor holding Audit.sql, without the note under it. A header comment names the purpose of the script, the database, the preparer and reviewer, and the checks. Below it, the first test begins with a two-line comment that gives its tutorial and test number, its objective, its population and its expected result, followed by the query that reconciles the journal entries to the ledger with four scalar subqueries." >}}
 
 ::: {.notes}
 The header names the script's purpose, the database, the preparer and reviewer, and the checks the tests passed. Each test begins with a two-line comment that gives its tutorial and test number, its objective, its population and its expected result.
@@ -495,7 +497,7 @@ The header names the script's purpose, the database, the preparer and reviewer, 
 
 - Save each test as a view; count the rows of those that list exceptions
 - Review and record every change to a test
-- Keep each run's results as a workpaper: the date, the data and the reviewer
+- Keep each run's results as a workpaper: the date, the data, the reviewer and each item's key
 - A library that anyone can change without a record undermines its evidence
 
 ::: {.notes}
@@ -517,13 +519,13 @@ Revenue and payroll are recorded when invoiced and paid, so each year-end is mis
 
 ## Do the standards still fit?
 
-- The records give no reason to revise them: direct time stayed within them
+- These tests give no reason to revise them, though they do not show they are right
 - What grew is the time paid beyond the work: indirect time and overtime
 - In the records, the hours grew around the work, not in it
 - Part of the growth is the calendar: the first year charged two payrolls fewer
 
 ::: {.notes}
-This answers the question the controller asked at the start of Chapter 9. The plant-level totals of Chapters 10 and 11 reproduce within the populations tested, although records that agree cannot show how much work the output required. The operation-level comparison does not hold until time is recorded against open operations, and neither does the surge-day overtime until it is corroborated. How much of the extra time was avoidable, the records cannot measure. Management decides what to do once the hours are corroborated: hours that bring nothing can be cut, and a standard is revised when the work or the conditions it assumes have changed, not to absorb inefficiency. The Part III case asks what the plant should plan for and what the latest statements need before they are final.
+Direct time stayed within the standards, and a review against corroborated work and current operating conditions would be needed to show they are right. This answers the question the controller asked at the start of Chapter 9. The plant-level totals of Chapters 10 and 11 reproduce within the populations tested, although records that agree cannot show how much work the output required. The operation-level comparison does not hold until time is recorded against open operations, and neither does the surge-day overtime until it is corroborated. How much of the extra time was avoidable, the records cannot measure. Management decides what to do once the hours are corroborated: hours that bring nothing can be cut, and a standard is revised when the work or the conditions it assumes have changed, not to absorb inefficiency. The Part III case asks what the plant should plan for and what the latest statements need before they are final.
 :::
 
 ## Summary
@@ -532,10 +534,10 @@ This answers the question the controller asked at the start of Chapter 9. The pl
 - Anti-joins trace both ways, UNION ALL lists the exceptions, dates test cutoff
 - The three-way match compares sums at the order line, within tolerances
 - Approval tests check each approver's authority and concentration
-- The chain behind a cost is tested link by link and by an expectation
+- The chain behind a cost is tested link by link, with the pay recalculated
 
 ::: {.notes}
-Most of the tests were diagnostic, the pay expectation was predictive, and the recommendations that close each finding are prescriptive. Part IV turns from finding answers to communicating them, with reports and dashboards.
+Most of the tests were diagnostic, the estimate of the unrecorded late-December payroll in Exercise 12.1 was predictive, and the recommendations that close each finding are prescriptive. Part IV turns from finding answers to communicating them, with reports and dashboards.
 :::
 
 ## Key terms

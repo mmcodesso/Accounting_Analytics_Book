@@ -26,7 +26,7 @@ An update to the credit loss standard, effective for Charles River's fiscal 2026
 
 (2) The unsupported opening balance of account 1020 is not part of the aging. Calculate the allowance again with that balance treated as more than 90 days past due, and explain why its age, and whether it should be in the aging at all, cannot be known from the data.
 
-(3) List the open invoices whose balance is less than $10, total them, and show how the aging would change if they were written off.
+(3) List the open invoices whose balance is less than $10 and total them. First show how the aging would change if all of them were written off. Then distinguish the old residual balances from any invoice that is not yet due, say which balances, if any, an approved small-balance policy would write off, and show the aging for that case separately.
 
 (4) Draft the adjusting journal entry that would record your recommended allowance, using accounts 6170 Bad Debt Expense and 1030 Allowance for Doubtful Accounts. Explain how the requirement of the credit loss standard of the Financial Accounting Standards Board (FASB) to reflect current conditions and reasonable and supportable forecasts would affect the proposed rates (FASB, 2016).
 

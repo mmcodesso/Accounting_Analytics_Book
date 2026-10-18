@@ -81,7 +81,7 @@ Before calculating with a numeric column, ask whether its values are quantities 
 
 - A **primary key** identifies each row: unique and never blank; every Charles River table uses one integer surrogate key
 - Unique indexes protect document numbers, but not the number on a supplier's own invoice, which is how Chapter 2's duplicates got in
-- A **foreign key** refers to the primary key of another table
+- A **foreign key** refers to the primary key of another table, or of the same table
 - Charles River's foreign keys are logical, not declared, so referential integrity is tested, and Power BI relationships are defined and checked rather than imported
 
 ::: {.notes}
@@ -106,7 +106,7 @@ What is each SalesOrderLine column?
 4. Quantity
 
 ::: {.notes}
-Students can answer from the column names alone. Ask them which column crosses into another table group.
+Use the diagram to verify each column's role, because the names are only clues. Ask them which column crosses into another table group.
 :::
 
 ## Keys and attributes in SalesOrderLine {.answer}
@@ -133,7 +133,7 @@ One-to-many is the most common in accounting data, such as one customer and many
 ## The many side multiplies rows in a join
 
 - **Optionality**: must a row take part? Every order has a customer, but some customers have no orders
-- A join that allows no match can silently drop the customers who never ordered
+- A join that keeps only matching rows can omit the customers who never ordered
 - Joining customers to orders to lines repeats a customer once per line
 - Summing order-line amounts by line is right; counting customers by line overstates them
 
@@ -330,7 +330,7 @@ Every dashed line is the same pair of columns, SourceDocumentType and SourceDocu
 
 - A foreign key refers to one table; SourceDocumentID refers to a different table on each row
 - So the link has to be tested rather than trusted
-- At Charles River, a few PayrollPayment rows point to payments that do not exist
+- At Charles River, a few ledger rows typed PayrollPayment point to payments that do not exist
 
 ::: {.notes}
 That handful of orphaned rows is exactly the kind of exception a trace test reveals. The SQL chapters of Part III write those tests for every source document type.

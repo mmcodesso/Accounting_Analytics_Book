@@ -213,6 +213,17 @@ def cell(sheet: str, address: str):
     return values()[sheet][address].value
 
 
+def maybe_formula(sheet: str, address: str) -> str:
+    """The cell's formula as the formula bar reads it, or '' when the cell holds a constant (a model workbook built before the
+    case's last revision)."""
+    value = workbook()[sheet][address].value
+    return clean(value) if (isinstance(value, str) and value.startswith("=")) or hasattr(value, "text") else ""
+
+
+def has_name(name: str) -> bool:
+    return name in workbook().defined_names
+
+
 def defined(claim, name: str) -> str:
     wb = workbook()
     ok = name in wb.defined_names
@@ -353,7 +364,7 @@ def dates_of(d) -> dict:
 def g0(d, claim):
     need(d, claim)
     t = deck_titles()
-    claim(len(t) == 68, "the case's deck has 68 slides")
+    claim(len(t) == 69, "the case's deck has 69 slides")
     text = CHAPTER.read_text(encoding="utf-8")
     n_req = len(re.findall(r"^\*\*Requirement \d+", text, re.M))
     claim(n_req == 10, "the case has ten requirements")
@@ -529,8 +540,12 @@ def g2(d, claim):
                    "WHERE a.AccountNumber = 4060 AND g.FiscalYear BETWEEN 2024 AND 2026 GROUP BY 1 ORDER BY 1")
     claim(len(net_4060) == 3 and all(abs(x[1]) < 0.005 for x in net_4060), "the net balance of 4060 over every source is zero in each year, because the close credits it back")
     # wrong version: the returns tied to 5010 alone
-    cogs_5010_gap = round(g2_[-1][1] - g2_[-1][3], 2)
-    claim(cogs_5010_gap > 0.005, "the returns' standard cost is spread over four cost of goods sold accounts, so 5010 alone leaves a difference")
+    cogs_total, cogs_5010 = g2_[-1][1], g2_[-1][4]       # the year's returned cost, and its part credited to 5010
+    cogs_5010_gap = round(cogs_total - cogs_5010, 2)
+    claim(cogs_5010_gap > 0.005 and cogs_5010 > 0, "the returns' standard cost is spread over four cost of goods sold accounts, so 5010 alone leaves a difference")
+    claim(abs(cogs_5010_gap - sum(g2_[-1][k] for k in (7, 10, 13))) < 0.005, "the difference is what the other three accounts, 5020 to 5040, received")
+    close_entries = len({r[1] for r in g9_})
+    claim(close_entries == 3 and len(g9_) == 6, "the six account rows of the closes belong to three year-end closing journal entries")
     # wrong version: every credit to 6290, whatever its source
     all_6290 = d.q("SELECT g.FiscalYear, ROUND(SUM(g.Credit), 2) FROM GLEntry g JOIN Account a ON a.AccountID = g.AccountID "
                    "WHERE a.AccountNumber = 6290 AND g.FiscalYear BETWEEN 2024 AND 2026 GROUP BY 1 ORDER BY 1")
@@ -552,7 +567,7 @@ def g2(d, claim):
     return dict(
         g1=len(g1_), g2=len(g2_), g3=len(g3_), g4=len(g4_), g5=len(g5_), g6=len(g6_), g7=len(g7_), g8=len(g8_), g9=len(g9_),
         parts_2060=parts_2060, parts_total=round(sum(parts_2060), 2), net_4060=[x[1] for x in net_4060],
-        cogs_gap=cogs_5010_gap, all_6290=[x[1] for x in all_6290], issued=issued, last_items=len(last_year_items),
+        cogs_gap=cogs_5010_gap, cogs_total=cogs_total, cogs_5010=cogs_5010, close_entries=close_entries, all_6290=[x[1] for x in all_6290], issued=issued, last_items=len(last_year_items),
         claw_total=claw_total, resid=f"{max(resid):.1e}", not_netted=g8_[0][4], opening=opening,
         f_sub=formula(claim, "Reconciliation", "C7"), f_4060=formula(claim, "Reconciliation", "C8"),
         f_diff=formula(claim, "Reconciliation", "C9"), f_credit=formula(claim, "Reconciliation", "C19"),
@@ -561,6 +576,32 @@ def g2(d, claim):
 
 
 # --- Requirement 3: materiality and the expectation ---------------------------------------------------------------------------
+
+# The formulas and texts the Excel builder writes since the revision of 2026-10-17. A model workbook built before it holds the older
+# ones, so the guides quote these until the workbook is rebuilt; a claim checks them against the workbook once it holds the change.
+NEW_CONCLUSION = ('=IF(ABS(B21)>AnalyticalFollowUp,"Investigate (Requirement 5): an unexplained difference above the follow-up trigger"'
+                  '&IF(ABS(B21)>PerformanceMateriality,", above performance materiality",", below performance materiality"),'
+                  '"Below the quantitative trigger; consider qualitative risk and expectation precision")')
+NEW_RECON = ('=LET(mask,LEFT(Reconciliation!A5:A{last},10)="Difference",d,FILTER(Reconciliation!C5:E{last},mask),'
+             'ok,FILTER(ISNUMBER(Reconciliation!C5:E{last}),mask),IF(AND(ok),SUM(ABS(d)),'
+             '"Not evaluable: missing or erroneous difference"))')
+NEW_RECON_CONCLUSION = '=IF(ISNUMBER(C32),IF(C32<0.005,"Reconciles to the cent","Investigate differences"),C32)'
+# the builder's new wording of the report's findings and of the owners' answers (the earlier workbook holds the older)
+FRESH = {
+    "Refunds approved without recorded authority and dated before": "Refunds approved above the recorded general limits (effective delegation and enforcement unverified) and dated before",
+    "Credits approved above recorded authority, in the department": "Credits approved above the recorded general limits, in the department",
+    "The receipt shows that goods came back, not that the credit's amount or the customer's cash was right; show the credits whose approver applied the invoice's cash.":
+        "The receiving record documents a return; it needs authenticating, with inspection evidence, before it shows that the goods arrived, in the stated condition, or justified the credit, and it says nothing of who handled the customer's cash; show the credits whose approver applied the invoice's cash.",
+}
+
+
+def fresh(text):
+    """A workbook text with the builder's newer wording where the workbook is older."""
+    out = str(text or "")
+    for old, new in FRESH.items():
+        out = out.replace(old, new)
+    return out
+
 
 def builder_text(claim, needle: str) -> str:
     """A line of the Excel builder that the guide quotes (the Power Query step the workbook's Ledger Table uses)."""
@@ -586,7 +627,12 @@ def g3(d, claim):
     claim(all(abs(x[1]) < 0.005 for x in with_closes), "with the year-end closes left in, the revenue and expense accounts net to zero in every year")
     # wrong version: the difference measured against materiality
     claim(ex["diff"] < m["mat"], "the difference between the recorded and the expected returns is below overall materiality")
-    claim(m["trivial"] < ex["diff"] < m["perf"], "the difference is above clearly trivial and below performance materiality")
+    claim(ex["follow_up"] < ex["diff"] < m["perf"], "the difference is above the follow-up trigger the case assumes and below performance materiality")
+    claim(ex["follow_up"] != m["trivial"], "the follow-up trigger is its own assumption, not the clearly trivial threshold")
+    # the model workbook's trigger cell, once the workbook holds it (the builder's rows 11 and 12 of the Materiality sheet)
+    if has_name("AnalyticalFollowUp"):
+        claim(abs(cell("Materiality", "B12") - ex["follow_up"]) < 0.005 and abs(cell("Materiality", "B11") - n19.FOLLOW_UP) < 1e-9,
+              "the Materiality sheet holds the follow-up trigger at its rate of the expectation")
     claim(ex["exp_f"] < ex["actual"] and ex["f_pct"] > ex["diff_pct"] * 2, "the first year's rate understates the expectation by far more than the prior year's")
     # the SQL cross-check
     p1, p2 = test(d, "P1"), test(d, "P2")
@@ -600,15 +646,23 @@ def g3(d, claim):
     claim(covered == 9, "the risk-and-control matrix covers all nine control points")
     brainstorm = [cell("Risks", f"A{r}") for r in range(22, 27)]
     claim(len(brainstorm) == 5 and all(brainstorm), "the fraud brainstorm names the five schemes of the chapter's table")
+    # the conclusion the sheet's formula gives (the workbook built since the revision of 2026-10-17); an earlier workbook's text is the
+    # clearly-trivial wording the revision replaced, so the expected text is computed from the rule instead
+    f_concl = formula(claim, "Materiality", "B25")
+    if has_name("AnalyticalFollowUp"):
+        claim(f_concl == NEW_CONCLUSION, "the Materiality sheet's conclusion is the builder's formula against the follow-up trigger")
+    concl = (cell("Materiality", "B25") if has_name("AnalyticalFollowUp") else
+             "Investigate (Requirement 5): an unexplained difference above the follow-up trigger, "
+             + ("above" if ex["diff"] > m["perf"] else "below") + " performance materiality")
     ledger_rows = workbook()["Ledger"].max_row - 1
     iyec = builder_text(claim, '\'[EntryType] <> null and Text.StartsWith([EntryType], "Year-End Close")\'').strip("'")
     claw_share = facts[1]
     return dict(
         income_closes=[x[1] for x in with_closes], ratings=ratings, matrix_rows=len(grid), covered=covered, brainstorm=brainstorm,
         facts=facts, ledger_rows=ledger_rows, iyec=iyec, p1=len(p1), p2=len(p2), claw_share=claw_share,
-        mat_ratio=ex["diff"] / m["mat"],
+        mat_ratio=ex["diff"] / m["mat"], follow_up=ex["follow_up"], follow_rate=n19.FOLLOW_UP, concl=concl,
         f_income=formula(claim, "Materiality", "B4"), f_mat=formula(claim, "Materiality", "B6"), f_rate=formula(claim, "Materiality", "B17"),
-        f_ret=formula(claim, "Materiality", "B16"), f_exp=formula(claim, "Materiality", "B19"), f_concl=formula(claim, "Materiality", "B25"),
+        f_ret=formula(claim, "Materiality", "B16"), f_exp=formula(claim, "Materiality", "B19"), f_concl=f_concl if has_name("AnalyticalFollowUp") else NEW_CONCLUSION,
         f_cover=formula(claim, "Risks", "B41"), f_rev=formula(claim, "Materiality", "B15"))
 
 
@@ -731,6 +785,10 @@ def g5(d, claim):
     rel_active = sum(1 for r in rel if not r[2])
     rel_inactive = sum(1 for r in rel if r[2])
     claim(rel_active == 5 and rel_inactive == 2, "the model relates five facts to Date by their own date and two by the shipment date, inactive")
+    rel_active_tables = [r[0] for r in rel if not r[2]]
+    rel_inactive_tables = [r[0] for r in rel if r[2]]
+    claim(set(rel_inactive_tables) == {"CreditMemoLine", "SalesInvoiceLine"} and set(rel_inactive_tables) < set(rel_active_tables),
+          "only the credit lines and the invoice lines are also related to Date by the shipment date")
     fact_titles = {p: title(claim, p, v) for p, v in (("returns", "byYear"), ("timing", "rateByMonth"), ("concentration", "customers"),
                                                        ("ranking", "refunds"), ("refundDetail", "invoice"), ("validation", "tieOut"))}
     has_visual(claim, "returns", "byYear", "byGroup", "byReason", "families", "damaged", "bySegment")
@@ -744,7 +802,7 @@ def g5(d, claim):
     ids = dax(claim, "Return Rate", "Credits by Ship Date", "Revenue by Ship Date", "Return Rate by Ship Date", "Flagged Refunds", "High-Score Refunds",
               "Applied to the Invoice")
     return dict(
-        t=fact_titles, n_rf=n_rf, n_il=n_il, n_gl=n_gl, n_noship=n_noship, rate_year=rate_year, rel_active=rel_active,
+        t=fact_titles, rel_active_tables=rel_active_tables, rel_inactive_tables=rel_inactive_tables, n_rf=n_rf, n_il=n_il, n_gl=n_gl, n_noship=n_noship, rate_year=rate_year, rel_active=rel_active,
         rel_inactive=rel_inactive, c_scores=check_expr(claim, "scores different from the export (Test 3)"),
         c_exports=check_expr(claim, "refunds whose date or amount differs from the export (Test 3)"), n_lines=lines_n, n_cm=cm_n, tot_diff=tot[0], first_month=first_month, first_rate=first_rate, rate_ship=c_all / r_ship,
         rate_all=c_all / r_all, any_hi=any_hi, n_checks=sections["Requirement 5"], n_flags=sections["Requirement 5 (the flags of Requirement 4)"],
@@ -897,17 +955,33 @@ def g6(d, claim):
     udl_tol10 = float(beta.ppf(conf, 1, size_tol10))
     udl_conf90 = float(beta.ppf(conf, 1, size_conf90))
     claim(udl_tol10 > tol and udl_conf90 > tol, "a sample from the 10% column or the 90% column cannot support reliance at 5% even with no deviation")
+    size_exp1 = int(cell("Sample", "E16"))                  # the table's size at a 1% expected rate, the plan a changed input would give
+    udl1_exp1 = float(beta.ppf(conf, 2, size_exp1 - 1))     # one deviation, with the planned size where the tested count belongs
+    claim(float(beta.ppf(conf, 2, size - 1)) > tol > udl1_exp1 or udl1_exp1 < float(beta.ppf(conf, 2, size - 1)),
+          "one deviation gives a different bound at the planned size of another plan than at the tested count, a change that can cross the tolerable rate")
     size_2pct = int(cell("Sample", "E17"))
     claim(size_2pct / len(s["rest"]) > 0.8, "at 2% expected deviations the table's size is most of the remainder")
     dmg = s["dmg"]
     claim(dmg["mean"] > 10 and dmg["rest"] < size, "a draw of 59 holds about 13 refunds of Damaged returns, and the remainder holds only 48")
     claim(cell("Sample", f"H{first}") == cell("Sample", f"I{first}") == "Not tested: no document in the database",
           "the attribute columns of the frozen draw say Not tested: no document in the database")
+    # the frozen plan and the guard (columns M and N of the Sample sheet, in a workbook built since the revision of 2026-10-17)
+    ws_s = values()["Sample"]
+    guard_row = {ws_s.cell(r, 13).value: r for r in range(1, ws_s.max_row + 1) if isinstance(ws_s.cell(r, 13).value, str)}
+    guard = {label: ws_s.cell(r, 14).value for label, r in guard_row.items()}
+    if guard:
+        claim(guard.get("Plan changed since the freeze?") == "No" and guard.get("All intended items accounted for?") == "Yes",
+              "the frozen plan agrees with the live plan, and every intended item is accounted for")
+        claim(guard.get("Tested (valid, distinct, eligible, with an outcome)") == size,
+              "the tested count of the frozen selection is the planned size")
+    tested_row, changed_row = guard_row.get("Tested (valid, distinct, eligible, with an outcome)"), guard_row.get("Plan changed since the freeze?")
     return dict(
+        guard=guard, f_tested=maybe_formula("Sample", f"N{tested_row}") if tested_row else "",
+        f_changed=maybe_formula("Sample", f"N{changed_row}") if changed_row else "",
         size=size, conf=conf, tol=tol, nk=nk, key_rows=key_rows, focus=focus, focus_n=focus_n, focus_total=focus_total, by_amount=by_amount,
         key_if_5000=key_if_5000, exp_key=exp_key, p_no_key=p_no_key, n_rest=len(s["rest"]), n_all=len(c.rf), rule=rule,
         k_drawn=k_drawn, udl_drawn=udl_drawn, dmg_drawn=dmg_drawn, udl_dmg=udl_dmg, size_tol10=size_tol10, udl_tol10=udl_tol10,
-        size_conf90=size_conf90, udl_conf90=udl_conf90, size_2pct=size_2pct, share_2pct=size_2pct / len(s["rest"]),
+        size_conf90=size_conf90, udl_conf90=udl_conf90, size_exp1=size_exp1, udl1_exp1=udl1_exp1, size_2pct=size_2pct, share_2pct=size_2pct / len(s["rest"]),
         pop_rate=len(s["dev"]) / len(s["rest"]), p_zero=f"{s['zero_draw']:.1e}", draw_rate=k_drawn / size,
         dmg_all_pass=float(beta.ppf(conf, 1, dmg["rest"])), dmg_k=dmg["k"],
         f_size=formula(claim, "Sample", "B15"), f_key=formula(claim, "Sample", f"A{r0 + 1}"), f_draw=draw,
@@ -930,9 +1004,11 @@ def g7(d, claim):
     unrounded = d.one("SELECT COUNT(*) FROM CreditMemoLine WHERE ABS(LineTotal - Quantity * UnitPrice * (1 - Discount)) > 0.004")
     half_cent = d.one("SELECT COUNT(*) FROM CreditMemoLine WHERE ABS(LineTotal - Quantity * UnitPrice * (1 - Discount)) > 0.0051")
     claim(unrounded > 50 and half_cent == 0, "against the unrounded product with a tolerance of less than half a cent, many lines differ; with half a cent, none does")
-    credits, invoices, rate, above_inv, sub_off, tax_off, tax_alone, with_freight, freight_over, parts_off = s2[0]
+    credits, invoices, rate, credit_rate, inv_tax_off, above_inv, sub_off, tax_off, tax_alone, with_freight, freight_over, parts_off = s2[0]
     claim(credits == invoices and above_inv == sub_off == tax_off == freight_over == parts_off == 0 and tax_alone == with_freight > 0,
           "S2 finds every credit recomputed, and a tax test on SubTotal alone flags the credits with freight")
+    claim(inv_tax_off == 0 and abs(rate - credit_rate) < 1e-9,
+          "S2 corroborates the tax of every original invoice at the rate on SubTotal plus freight, the rate the credits' own totals give")
     open_items = [(r[0], r[5]) for r in s3]
     claim(abs(sum(x[1] for x in open_items) - n19.balance_2060(d, d.C)) < 0.005, "the open items of 2060 add up to its balance at the last year-end")
     claim([x[0] for x in open_items] == [x["number"] for x in n19.open_2060(d, d.C)], "S3 lists the note's open items")
@@ -1037,6 +1113,12 @@ def g8(d, claim):
     clean = [[ws.cell(r, 2).value, ws.cell(r, 3).value, ws.cell(r, 5).value] for r in range(ca + 1, ca + 9)]
     claim(all(x[0] for x in clean) and ws.cell(ca + 9, 2).value is None, "the clean results of the matrix are eight rows")
     tot = n19.amount(n19.in_year(c.cm.values(), d.C))
+    old_recon = formula(claim, "Deficiencies", "C32")
+    last_row = re.search(r"A5:A(\d+)", old_recon).group(1)
+    recon_formula = old_recon if maybe_formula("Deficiencies", "E32") else NEW_RECON.format(last=last_row)
+    if maybe_formula("Deficiencies", "E32"):
+        claim(old_recon == NEW_RECON.format(last=last_row) and maybe_formula("Deficiencies", "E32") == NEW_RECON_CONCLUSION,
+              "the Deficiencies sheet's reconciliation summary is the builder's formula that blocks an invalid difference")
     resid = f"{clean[0][1]:.1e}"
     claim(float(clean[0][1]) < 0.005, "the reconciliation differences add up to far less than a cent")
     return dict(resid=resid,
@@ -1045,12 +1127,17 @@ def g8(d, claim):
         self_all=len(c.cm) + len(c.rf), n_clean=len(clean), clean=clean, potential_credits=tot, n_sig=cell("Deficiencies", "D26"),
         n_mw=cell("Deficiencies", "D27"), overall=cell("Deficiencies", "D28"), d7_registers=d.one("SELECT COUNT(*) FROM PayrollRegister"),
         f_band=formula(claim, "Deficiencies", "I8"), f_union=formula(claim, "Deficiencies", "D20"),
-        f_potential=formula(claim, "Deficiencies", "E20"), f_clean=formula(claim, "Deficiencies", "C32"),
+        f_potential=formula(claim, "Deficiencies", "E20"), f_clean=recon_formula,
         f_overall=formula(claim, "Deficiencies", "D28"), f_exposure=formula(claim, "Deficiencies", "H8"),
+        f_clean_concl=maybe_formula("Deficiencies", "E32") or NEW_RECON_CONCLUSION,
         names_ok=all(defined(claim, n) for n in ("Materiality", "PerformanceMateriality", "ClearlyTrivial")))
 
 
 # --- Requirement 9: the report ------------------------------------------------------------------------------------------------
+
+# the three action plans whose owners are expected to push back (the refund plan's text changed in the revision of 2026-10-17)
+PUSHBACK = ("Have credits approved by someone", "Pay refunds to the original", "Verify the customer terms", "Review the concentration")
+
 
 @context("ch19.g9")
 def g9(d, claim):
@@ -1064,7 +1151,7 @@ def g9(d, claim):
     claim(keys[0][1] == len(t.cm_above) and keys[1][1] == len(t.cash_credit) and keys[2][1] == len(t.rf_above)
           and keys[3][1] == len(t.before), "the Report sheet's key figures are the counts of Requirement 4")
     h = row_of("Report", "Finding")
-    findings = [dict(id=ws.cell(r, 1).value.split(".")[0], title=ws.cell(r, 1).value, rating=ws.cell(r, 6).value)
+    findings = [dict(id=ws.cell(r, 1).value.split(".")[0], title=fresh(ws.cell(r, 1).value), rating=ws.cell(r, 6).value)
                 for r in range(h + 1, h + 7)]
     claim([f["id"] for f in findings] == [f"F{i}" for i in range(1, 7)], "the Report sheet lists six findings, F1 to F6")
     claim([f["rating"] for f in findings] == ["Significant deficiency (provisional)", "Significant deficiency (provisional)",
@@ -1091,8 +1178,7 @@ def g9(d, claim):
     claim(all(any(k in p["action"].lower() for p in plans) for k in ("delegation of authority", "unpaid invoices", "concentration of duties",
                                                                      "original instrument", "damaged items", "largest refund")),
           "every finding of the report has an action plan")
-    claim(sum(1 for p in plans if p["action"].startswith(("Have credits approved by someone", "Pay refunds to the original",
-                                                           "Review the concentration"))) == 3,
+    claim(sum(1 for p in plans if p["action"].startswith(PUSHBACK)) == 3,
           "the three plans whose owners are expected to push back are in the model's table")
     claim(r8["u12"][1] < m["mat"] < n19.amount(n19.in_year(n19.cycle(d).cm.values(), d.C)),
           "a report that sets the year's credits against materiality, not the credits that failed, overstates the case")
@@ -1102,8 +1188,7 @@ def g9(d, claim):
         mat=m["mat"], d1_3y=n19.amount(t.cm_above), d1_26=r8["d1"], before_def=(len(t.before), len(t.before_rcpt)),
         f_key=formula(claim, "Report", "D5"), f_sig=formula(claim, "Report", "D9"), f_overall=formula(claim, "Report", "D10"),
         f_count=formula_at(claim, "Report", "Action plans with an owner and a date", col="D"),
-        pushback=[(p["owner"], p["response"], p["pushback"]) for p in plans
-                  if p["action"].startswith(("Have credits approved by someone", "Pay refunds to the original", "Review the concentration"))],
+        pushback=[(p["owner"], p["response"], fresh(p["pushback"])) for p in plans if p["action"].startswith(PUSHBACK)],
         am_registers=r8["am_largest"])
 
 
@@ -1121,8 +1206,24 @@ def g10(d, claim):
     tests_rows = mon_entered("Tests")
     claim(len(tests_rows) == 15 and [r[0] for r in tests_rows[-4:]] == ["CM AboveLimit", "CM CashAndCredit", "RF AboveLimit", "RF BeforePayment"]
           and {r[2] for r in tests_rows[-4:]} == {"Credit memos", "Refunds"}, "the Tests table holds Chapter 16's eleven tests and the four new ones")
-    findings = mon_entered("Design Findings")
-    claim(len(findings) == 4 and all(f[2] == n19.year_end(d.C) for f in findings), "the Design Findings table covers each new test through the last year-end")
+    # one row for each supported cause, with its owner, dates and closure fields, and the document-level mapping (a project built
+    # since the revision of 2026-10-17); the earlier project held one Design Findings row for each test
+    new_findings = (MONITOR / "definition" / "tables" / "Findings.tmdl").is_file()
+    if new_findings:
+        findings = mon_entered("Findings")
+        mapping = mon_entered("Finding Exceptions")
+        claim(len(findings) == 2 and all(f[4] == n19.year_end(d.C) for f in findings),
+              "the Findings table holds the two supported causes, each covering the exceptions through the last year-end")
+        claim(all(f[6] is None and f[7] is None and f[8] is None and f[9] is None for f in findings),
+              "no finding has an implementation date, a retest or a closure, so every finding is open")
+        claim(len(mapping) == r10["new"] - r10["old"] and len({(m_[0], m_[1]) for m_ in mapping}) == len(mapping),
+              "the mapping holds one row for each historical exception of the new tests")
+        fix_by = findings[0][5]
+    else:
+        findings = mon_entered("Design Findings")
+        mapping = []
+        claim(len(findings) == 4 and all(f[2] == n19.year_end(d.C) for f in findings), "the Design Findings table covers each new test through the last year-end")
+        fix_by = findings[0][3]
     log = mon_entered("Change Log")
     claim(len(log) == 5, "the Change Log holds five rows")
     pop = mon_dax(claim, "Population")
@@ -1161,7 +1262,7 @@ def g10(d, claim):
         any_app=any_app, n_credits=len(c.cm), same_day=same_day, max_through=max_through, last=last, titles=titles,
         n_tests=len(tests_rows), n_findings=len(findings), n_log=len(log), checks=sum(sections.values()), per_section=sections,
         n_r10_checks=sections["Requirement 10"] + sections["Requirement 10 (Chapter 16's checks, on the larger register)"],
-        fix_by=findings[0][3], mism=r4["mism"]["n"], pd2=r4["pd2"]["n"],
+        fix_by=fix_by, new_findings=new_findings, n_mapped=len(mapping), mism=r4["mism"]["n"], pd2=r4["pd2"]["n"],
         m_last="\n".join("    " + l.rstrip(",") for l in mon_expression_m("Last Payments")[2:3]),
         m_appliers="\n".join("    " + l.rstrip(",") for l in mon_expression_m("Appliers")[2:3]),
         m_cm=step(claim, m_cm, "Merged Queries1", "Added Custom1"),
@@ -1170,5 +1271,7 @@ def g10(d, claim):
         m_cov=step(claim, m_ex, "Added Custom"),
         m_anom=step(claim, m_rf, "Added Custom2", "Added Custom3"),
         d_pop=pop, d_open=mon_dax(claim, "Open Exceptions"), d_cov=mon_dax(claim, "Design Finding Exceptions"), d_through=through_dax,
+        d_status=mon_dax(claim, "Finding Status") if new_findings else "",
+        d_open_findings=mon_dax(claim, "Open Findings") if new_findings else "",
         d_rate=mon_dax(claim, "Rate per 1,000"), test6=mon_test_block(claim, 6),
         test_rows=[r for r in tests_rows[-4:]], finding_rows=findings)

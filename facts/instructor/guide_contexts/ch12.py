@@ -204,7 +204,18 @@ def tutorial_121(d, claim) -> dict:
     claim(sum(r[2] for r in other_re) == sum(r[2] for r in other) - 1,
           "putting the dating branch first moves one invoice, the ninth, from the posting finding to the dating finding")
     other_fan = [r for r in l5_fan if r[0] == "Revenue posted in another year"]
-    claim(sum(r[2] for r in other_fan) > sum(r[2] for r in other), "without the grouping, an invoice with two shipments is counted twice")
+    claim(sum(r[2] for r in other_fan) > sum(r[2] for r in other),
+          "without the grouping to one row for each invoice, an invoice that bills two lines of one shipment is counted twice")
+    late_inv = d.q("""WITH Shipped AS (SELECT sil.SalesInvoiceID, MAX(s.DeliveryDate) AS DeliveryDate, COUNT(*) AS Lines,
+        COUNT(DISTINCT s.ShipmentID) AS Shipments FROM SalesInvoiceLine sil JOIN ShipmentLine sl ON sl.ShipmentLineID = sil.ShipmentLineID
+        JOIN Shipment s ON s.ShipmentID = sl.ShipmentID GROUP BY sil.SalesInvoiceID),
+        Posted AS (SELECT SourceDocumentID AS SalesInvoiceID, MIN(PostingDate) AS PostingDate FROM GLEntry
+        WHERE SourceDocumentType = 'SalesInvoice' GROUP BY SourceDocumentID)
+        SELECT si.InvoiceNumber, sh.Lines, sh.Shipments, si.SubTotal FROM SalesInvoice si JOIN Shipped sh ON sh.SalesInvoiceID = si.SalesInvoiceID
+        JOIN Posted p ON p.SalesInvoiceID = si.SalesInvoiceID WHERE strftime('%Y', p.PostingDate) <> strftime('%Y', sh.DeliveryDate)""")
+    repeated = [r for r in late_inv if r[1] > 1]
+    claim(len(repeated) == 1 and repeated[0][1] == 2 and repeated[0][2] == 1,
+          "one invoice of the revenue cutoff finding bills two lines, both of one shipment, and so repeats when the shipment lines are not grouped")
     l6_sql = tutorial_sql("L6")
     l6 = run(d, l6_sql)
     l6_inner = run(d, sub(l6_sql, "LEFT JOIN SalesInvoiceLine AS sil", "INNER JOIN SalesInvoiceLine AS sil"))
@@ -226,7 +237,7 @@ def tutorial_121(d, claim) -> dict:
         re_other_2025=[r for r in other_re if r[1] == str(d.P)][0][2], re_before_2025=[r for r in l5_reorder if r[0] == "Invoice dated before shipment" and r[1] == str(d.P)][0][2],
         n_other=sum(r[2] for r in other), n_before=sum(r[2] for r in before), fan_other=sum(r[2] for r in other_fan),
         n_l6=len(l6), l6_inner=len(l6_inner), n_l7=len(l7), l7_inner=len(l7_inner), open_status=len(open_periods),
-        l8=l8, opening=jes[0][2])
+        l8=l8, opening=jes[0][2], fan_invoice=repeated[0][0], fan_sub=repeated[0][3])
 
 
 def tutorial_122(d, claim) -> dict:
@@ -234,10 +245,20 @@ def tutorial_122(d, claim) -> dict:
     p1 = run(d, p1_sql)
     names = {r[0]: r[1] for r in p1}
     claim(not any(n.startswith("Exception") for n in names), "test P1: no line is invoiced above received or received above ordered")
-    p2 = first_row(d, tutorial_sql("P2"))
+    p2_sql = tutorial_sql("P2")
+    p2 = first_row(d, p2_sql)
     claim(p2[1] == 0 and p2[2] > 0 and p2[3] > 0 > p2[4], "test P2: none above three percent, many above two, all increases above two")
-    p2_nopos = first_row(d, sub(tutorial_sql("P2"), "ABS(pil.UnitCost - pol.UnitCost) / pol.UnitCost > 0.02", "(pil.UnitCost - pol.UnitCost) / pol.UnitCost > 0.02"))
+    claim(p2[5] == 0, "test P2: every invoice line has a usable order price")
+    p2_nopos = first_row(d, sub(p2_sql, "AND ABS(InvoiceCents - OrderCents) * 100 > 2 * OrderCents", "AND (InvoiceCents - OrderCents) * 100 > 2 * OrderCents"))
     claim(p2_nopos[2] == p2[2], "a price test without ABS finds the same lines above two percent, because every one of them is an increase")
+    claim(d.one("SELECT COUNT(*) FROM PurchaseInvoiceLine pil JOIN PurchaseOrderLine pol ON pol.POLineID = pil.POLineID "
+                "WHERE ABS(pil.UnitCost * 100 - ROUND(pil.UnitCost * 100)) > 0.000001 OR ABS(pol.UnitCost * 100 - ROUND(pol.UnitCost * 100)) > 0.000001") == 0,
+          "every invoice and order price has at most two decimals, so whole cents are exact")
+    p2_div = d.one("SELECT SUM(CASE WHEN ABS(pil.UnitCost - pol.UnitCost) / pol.UnitCost > 0.02 THEN 1 ELSE 0 END) FROM PurchaseInvoiceLine pil "
+                   "JOIN PurchaseOrderLine pol ON pol.POLineID = pil.POLineID")
+    p2_exact = d.one("SELECT COUNT(*) FROM (SELECT CAST(ROUND(pil.UnitCost * 100) AS INTEGER) AS i, CAST(ROUND(pol.UnitCost * 100) AS INTEGER) AS o "
+                     "FROM PurchaseInvoiceLine pil JOIN PurchaseOrderLine pol ON pol.POLineID = pil.POLineID) WHERE ABS(i - o) * 100 = 2 * o")
+    claim(0 < p2_div - p2[2] <= p2_exact, "dividing the two decimal prices flags lines that sit exactly on two percent, which whole cents leave out")
     p3 = first_row(d, tutorial_sql("P3"))
     p3_full = first_row(d, sub(tutorial_sql("P3"), "SUM(grl.ExtendedStandardCost * (1 - COALESCE(ibr.QtyInvoiced, 0) / grl.QuantityReceived))",
                                "SUM(grl.ExtendedStandardCost)"))
@@ -253,11 +274,13 @@ def tutorial_122(d, claim) -> dict:
     claim(by_title < len(p6), "grouping the approvers by job title merges employees who share a title")
     total_orders = d.one("SELECT COUNT(*) FROM PurchaseOrder")
     claim(p6[0][2] / total_orders > 0.99, "one approver signs more than 99 percent of the purchase orders")
+    claim(sum(r[2] for r in p6) == total_orders and abs(sum(r[3] for r in p6) - 100) < 0.05,
+          "every purchase order has an approver found in Employee, so the shares of test P6 add to 100 percent")
     # the row-by-row comparison of one receipt line with one invoice line (the question 6 distractor's symptom)
     direct = d.q("SELECT COUNT(*), SUM(CASE WHEN ABS(grl.QuantityReceived - pil.Quantity) > 0.0001 THEN 1 ELSE 0 END) "
                  "FROM GoodsReceiptLine AS grl INNER JOIN PurchaseInvoiceLine AS pil ON pil.GoodsReceiptLineID = grl.GoodsReceiptLineID")[0]
     claim(direct[1] > 1000, "compared row by row, thousands of receipt and invoice lines disagree")
-    return dict(p1=p1, statuses=len(p1), p2=p2, p3=p3, p3_full=p3_full[0], p4=p4, p5_orders=len(p5), p5_rows=sum(r[1] for r in p4),
+    return dict(p1=p1, statuses=len(p1), p2=p2, p2_div=p2_div, p2_boundary=p2_div - p2[2], p2_exact=p2_exact, p3=p3, p3_full=p3_full[0], p4=p4, p5_orders=len(p5), p5_rows=sum(r[1] for r in p4),
                 p6=p6, p6_by_title=by_title, approvers=len(p6), top_share=p6[0][2] / total_orders, direct_rows=direct[0], direct_off=direct[1])
 
 
@@ -276,6 +299,9 @@ def tutorial_123(d, claim) -> dict:
     h4 = run(d, tutorial_sql("H4"))
     other = [r for r in h4 if r[0] == "Time paid to another employee"]
     unapproved = [r for r in h4 if r[0] != "Time paid to another employee"]
+    h4_lines = len({r[1] for r in h4})
+    claim(len(h4) - h4_lines == len({r[1] for r in other} & {r[1] for r in unapproved}) > 0,
+          "test H4: some earnings lines fail both tests, so the rows outnumber the earnings lines by the lines that appear under both labels")
     h5_sql = tutorial_sql("H5")
     h5 = run(d, h5_sql)
     claim(all(r[4] == 0 for r in h5), "test H5: no earnings line differs from its expectation by more than a cent")
@@ -308,7 +334,7 @@ def tutorial_123(d, claim) -> dict:
     claim(h10[0][0].startswith("Packing") and h10[0][2] > 0.9, "test H10: nearly all of Packing's direct time of the last year was recorded after the operation ended")
     return dict(
         h1=h1, h2=h2, h2_exact=h2_exact[1], n_h3=len(h3), h3_low=len(h3_low), quiet_n=len(quiet), quiet_max=max(r[4] for r in quiet), quiet_min_direct=min(r[3] for r in quiet),
-        first_indirect=h3[0][4], first_direct=h3[0][3], n_h4=len(h4), n_other=len(other), n_unapproved=len(unapproved),
+        first_indirect=h3[0][4], first_direct=h3[0][3], n_h4=len(h4), h4_lines=h4_lines, n_other=len(other), n_unapproved=len(unapproved),
         h5=h5, h5_no=[r[4] for r in h5_no], h6=h6, h6_lt=long_lt[2], n_h7=len(h7), h8=h8,
         h8_days=sum(r[1] for r in h8), h8_reg_days=sum(r[1] for r in h8_reg), h9=h9, h9_inner=h9_inner, h10=h10)
 
@@ -352,6 +378,10 @@ def g1(d, claim):
                   "GROUP BY sil.SalesInvoiceID ), Posted", "), Posted")
     fan = run(d, fan_sql)
     claim(len(fan) > len(c1) and sum(r[5] for r in fan) > sum(r[5] for r in c1), "joining the lines without grouping repeats an invoice and overstates the total")
+    repeated = sorted({r[0] for r in fan if sum(1 for x in fan if x[0] == r[0]) > 1})
+    claim(len(repeated) == 1 and len(fan) - len(c1) == 1, "one invoice repeats in the ungrouped version, once")
+    only_group_by = run(d, sub(c1_sql, "GROUP BY sil.SalesInvoiceID ), Posted", "), Posted"))
+    claim(only_group_by == [], "deleting only the GROUP BY leaves MIN and MAX as global aggregates and the test returns no row")
     c3_sql = script_sql(f, "C3")
     c3 = run(d, c3_sql)
     claim([r[0] for r in c3] == d.years, "test C3 has one row for each fiscal year")
@@ -384,6 +414,7 @@ def g1(d, claim):
     return dict(**window(d), n_services=n_invoices - n_goods, n_goods=n_goods, 
         c1_rows=len(c1), by_year=[[y, len(v), r2(sum(x[5] for x in v))] for y, v in sorted(by_year.items())], c1_total=r2(sum(r[5] for r in c1)),
         c2_rows=len(c2), both=both[0], inv_rows=len(inv_date), inv_true=len(in_both), fan_rows=len(fan), fan_total=r2(sum(r[5] for r in fan)),
+        fan_invoice=repeated[0], fan_only_gb=len(only_group_by),
         c3=c3, c3_rows=len(c3), no_unbilled=no_unbilled[-1][4], std_effect=std_cost[-1][4],
         off_date=c4[0], n_unbilled=c4[1], unbilled_cost=c4[2], unbilled_value=c4[3],
         c5=c5, c5_full=c5_full[3], c6=c6[0], c7_rows=len(c7), c7=c7, crossing=crossing, c8=c8, c9=c9, two_periods=two_periods, chg25=r2(c8[1][4] - c8[0][4]), chg26=r2(c9[5] - c8[1][4]), c10_rows=len(c10),
@@ -437,7 +468,9 @@ def g2(d, claim):
                                "grl.ExtendedStandardCost AS ValueNotInvoiced"))
     claim(a8_full[0] > a8[0], "valuing the open lines in full overstates what is not yet invoiced")
     a7_tol = rows(d, sub(a7_sql, "AND COALESCE(ibr.QtyInvoiced, 0) < grl.QuantityReceived - 0.0001", "AND COALESCE(ibr.QtyInvoiced, 0) < grl.QuantityReceived"))
-    claim(a7_tol > len(a7), "testing for exact equality adds the lines that differ by rounding noise")
+    claim(a7_tol > len(a7), "removing the tolerance from the less-than comparison adds the lines that differ by rounding noise")
+    a7_ne = rows(d, sub(a7_sql, "AND COALESCE(ibr.QtyInvoiced, 0) < grl.QuantityReceived - 0.0001", "AND COALESCE(ibr.QtyInvoiced, 0) <> grl.QuantityReceived"))
+    claim(a7_ne > a7_tol, "a literal not-equal test adds the tiny over-invoiced residuals to the strict less-than lines")
     a9_sql = script_sql(f, "A9")
     a9 = run(d, a9_sql)
     a9_raw = run(d, sub(a9_sql, "ROUND(SUM(ValueNotInvoiced), 2) AS Value", "SUM(ValueNotInvoiced) AS Value"))
@@ -452,7 +485,7 @@ def g2(d, claim):
         n_a1=len(a1), no_coalesce=nc, a2=a2, nz_rows=sum(r[1] for r in nonzero), nz_total=r2(sum(r[2] for r in nonzero)), nz_over90=over90_nz,
         inv_over90=[r for r in by_invoice_date if r[0] == "Over 90 days"][0][1], a3=a3, a4=a4, a5=a5, n_customers=sum(r[1] for r in a5),
         by_name=sum(r[1] for r in a5_name), by_name_mid=a5_name[1][1], mid=a5[1][1], a6_rows=len(a6), a7_rows=len(a7), a8=a8, direct_rows=a7_direct,
-        direct_value=a8_direct[0], full_value=a8_full[0], tol_rows=a7_tol, a9=a9, a10=a10,
+        direct_value=a8_direct[0], full_value=a8_full[0], tol_rows=a7_tol, ne_rows=a7_ne, a9=a9, a10=a10,
         old_lines=sum(r[1] for r in old), old_value=round(sum(r[2] for r in old), 2), old_months=len(old),
         prior={k: (v[2], v[3]) for k, v in prior.items()})
 
@@ -551,12 +584,21 @@ def g4(d, claim):
         GROUP BY tc.WorkDate HAVING COUNT(DISTINCT tc.RegularHours) = 1 AND COUNT(DISTINCT tc.EmployeeID) > 1)""")
     claim(reg_days > o4[0][2] and any(r[1] == "No approval" for r in o4_reg),
           "counting regular hours alone adds days, and entries with no approval appear on them")
+    ot = d.q("""SELECT COUNT(*), SUM(CASE WHEN tc.OvertimeApprovalID IS NULL THEN 1 ELSE 0 END),
+        SUM(CASE WHEN tc.OvertimeApprovalID IS NOT NULL AND oa.OvertimeApprovalID IS NULL THEN 1 ELSE 0 END),
+        SUM(CASE WHEN oa.OvertimeApprovalID IS NOT NULL AND (oa.EmployeeID <> tc.EmployeeID OR oa.WorkDate <> tc.WorkDate) THEN 1 ELSE 0 END),
+        SUM(CASE WHEN oa.OvertimeApprovalID IS NOT NULL AND oa.Status <> 'Approved' THEN 1 ELSE 0 END),
+        SUM(CASE WHEN oa.OvertimeApprovalID IS NOT NULL AND oa.ApprovedHours < tc.OvertimeHours - 0.0001 THEN 1 ELSE 0 END)
+        FROM TimeClockEntry tc LEFT JOIN OvertimeApproval oa ON oa.OvertimeApprovalID = tc.OvertimeApprovalID WHERE tc.OvertimeHours > 0.5""")[0]
+    claim(ot[1] > 0 and ot[2:] == (0, 0, 0, 0),
+          "every linked entry of overtime above half an hour has an approval of the same employee and day, in Approved status, for at least the hours worked, and only the missing links fail")
     o5_sql = script_sql(f, "O5")
     o5 = run(d, o5_sql)
     o5_inner = run(d, sub(o5_sql, "LEFT JOIN SurgeDays AS sd", "INNER JOIN SurgeDays AS sd"))
     claim(all(r[2] == 0 for r in o5_inner), "an inner join to the surge days drops every other day, so other-day overtime reads zero")
     claim(o5[-1][1] - o5[0][1] > 5 * abs(o5[-1][2] - o5[0][2]), "the growth in overtime is on the surge days")
     return dict(**window(d), o1_rows=len(o1), o1_int=sorted({r[3] for r in o1_int}), o2_rows=len(o2), by_title=by_title, o3=o3, o3_le=o3_le[3],
+                ot_long=ot[0], ot_nolink=ot[1], ot_linked=ot[0] - ot[1],
                 o4=o4[0], o4_reg_days=reg_days, o4_reg_noapp=[r for r in o4_reg if r[1] == "No approval"][0],
                 o5=o5, o5_inner=o5_inner, growth_surge=o5[-1][1] - o5[0][1], growth_other=o5[-1][2] - o5[0][2])
 
@@ -584,14 +626,19 @@ def g5(d, claim):
     r3_inner = first_row(d, sub(r3_sql, "FROM PayrollRegister AS pr INNER JOIN PayrollPeriod AS pp",
                                 "FROM PayrollRegister AS pr INNER JOIN PayrollPayment AS pay ON pay.PayrollRegisterID = pr.PayrollRegisterID INNER JOIN PayrollPeriod AS pp"))
     claim(r3_inner[2] == r3[0][2] - 3, "counting the approvals through an inner join to the payments drops the three registers with no payment")
-    r4 = first_row(d, script_sql(f, "R4"))
+    r4_rows = run(d, script_sql(f, "R4"))
+    r4 = r4_rows[0]
+    standalone = d.q("SELECT COUNT(*), ROUND(SUM(NetPay), 2) FROM PayrollRegister WHERE ApprovedByEmployeeID = EmployeeID")[0]
+    claim(len(r4_rows) == 1 and (r4[2], r4[3]) == standalone,
+          "test R4 returns one row for the approver, whose Registers and net pay equal the standalone count of self-approved registers")
+    claim(len(run(d, script_sql(f, "R2"))) == 1 and len(run(d, script_sql(f, "R3"))) == 1, "tests R2 and R3 return one summary row each")
     r5_sql = script_sql(f, "R5")
     r5 = run(d, r5_sql)
     r5_le = rows(d, sub(r5_sql, "pay.PaymentDate < pr.ApprovedDate", "pay.PaymentDate <= pr.ApprovedDate"))
     claim(len(r5) == 3 and r5_le > 1000, "a payment made on the approval day is not before it, and a <= test flags nearly every payment")
     ceo_title = r2_row and d.one("SELECT JobTitle FROM Employee WHERE EmployeeID = 1")
     return dict(**window(d), r1_rows=len(r1), start_rows=len(start), start_ids=[r[0] for r in start], missing_id=r1[0][0], avg_all=avg_all[0][10], usual=r1[0][10],
-                r2=r2_row, no_ceo=r2_row[0] - r2_row[1], r3=r3[0], r3_inner=r3_inner[2], r4=r4, r5_rows=len(r5), r5_le=r5_le, ceo_title=ceo_title)
+                r2=r2_row, no_ceo=r2_row[0] - r2_row[1], r3=r3[0], r3_inner=r3_inner[2], r4=r4, r4_rows=len(r4_rows), r5_rows=len(r5), r5_le=r5_le, ceo_title=ceo_title)
 
 
 # --- Exercise 12.6: Chapter 8's tests in SQL ------------------------------------------------------------------------------------
@@ -653,6 +700,10 @@ def g6(d, claim):
     claim(found == 1 and missed == 0, "a gap planted at a year boundary is found by the unpartitioned test and missed by the partitioned one")
     b1_sql = script_sql(f, "B1")
     b1 = run(d, b1_sql)
+    claim(d.one("SELECT LOG10(10.0)") == 1.0, "SELECT LOG10(10.0) returns 1 where the math functions are present")
+    b2 = run(d, script_sql(f, "B2"))
+    claim([r[:3] for r in b2] == [r[:3] for r in b1] and all(abs(a[3] - b[3]) < 0.000006 for a, b in zip(b1, b2)),
+          "test B2, with the nine expected proportions typed in a CASE, gives the MAD of test B1 in every group")
     claim([r[0] for r in b1] == ["All payments", "Full payments", "Partial payments"], "test B1 has the three payment groups")
     no_part = run(d, sub(b1_sql, "1.0 / SUM(COUNT(*)) OVER (PARTITION BY PaymentGroup)", "1.0 / SUM(COUNT(*)) OVER ()"))
     claim(all(a[3] > 2 * b[3] for a, b in zip(no_part, b1)), "without the partition each group's shares are divided by all three groups, and every deviation more than doubles")

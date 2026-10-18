@@ -360,8 +360,11 @@ def if_05_1_a() -> Diagram:
     total_gross, total_credit = round(sum(gross), 2), round(sum(c["amount"] for c in credits), 2)
     assert abs(total_credit - n["credit_total"]) < 0.005 and abs(sum(net) - (total_gross - total_credit)) < 0.01
     by_invoice = g["by_invoice"]                        # credits of the year by their invoice's quarter; [0] earlier years
-    moved = [round(gross[k] - by_invoice[k + 1], 2) for k in range(4)]
-    assert moved[2] == g["alt3"] and moved[3] == g["alt4"] and g["early_lines"] == n["earlier"]
+    moved = [round(gross[k] - by_invoice[k + 1], 2) for k in range(4)]       # the full original-quarter view
+    assert moved[2] == g["alt3"] and moved[3] == g["alt4"] and moved == g["alt"] and g["early_lines"] == n["earlier"]
+    # the workbook's rows 17 and 18: only the credits for earlier years' invoices leave the year
+    prior = [round(net[k] + g["early_by_q"][k], 2) for k in range(4)]
+    assert all(abs(a - b) < 0.006 for a, b in zip(prior, g["prior_only"])) and abs(sum(g["early_by_q"]) - g["early_furn"]) < 0.005
     assert abs(sum(by_invoice) - total_credit) < 0.01
     d = Diagram("The Ex 5.1 Worksheet: Net Furniture Revenue by Quarter")
     widths = [28, 340, 96, 96, 96, 96, 108]
@@ -376,7 +379,7 @@ def if_05_1_a() -> Diagram:
 
     rows = [
         dict(n="1", cells=[dict(text="Exercise 5.1: Net Furniture Revenue by Quarter", bold=True, span=6, clip=False)]),
-        dict(n="2", cells=["Fiscal year", dict(text=year, color=BLUE)]),
+        dict(n="2", cells=["Fiscal year (fixed)", dict(text=year)]),
         dict(n="3", cells=[]),
         dict(n="4", cells=[_head("Measure")] + [dict(text=p, bold=True, fill=BLUE_TINT, color=BLUE, align="right") for p in periods]
              + [_head("Total", "right")]),
@@ -393,8 +396,8 @@ def if_05_1_a() -> Diagram:
         dict(n="13", cells=[dict(text="Credit memos for invoices of earlier years", bold=True, span=6, clip=False)]),
         dict(n="14", cells=[f"Credit memos of {year} for invoices of earlier years", dict(text=f"{g['early_memos']:,}")]),
         dict(n="15", cells=["Furniture credits they carry", dict(text=money(g["early_furn"]))]),
-        dict(n="16", cells=row("Net revenue, credits moved to their invoice's quarter", [money(v) for v in moved],
-                               money(round(sum(moved), 2)))),
+        dict(n="16", cells=row("Net revenue, those credits moved to their invoice's year", [money(v) for v in prior],
+                               money(round(sum(prior), 2)))),
     ]
     geo = _sheet(d, 0, 40, letters, widths, rows)
     xl.select(d, *geo[(4, 1)])
@@ -403,9 +406,10 @@ def if_05_1_a() -> Diagram:
     bottom = geo["bottom"] + 8
     xl.sheet_tabs(d, 0, bottom, ["InvoiceLines", "Ex 5.1", "Ex 5.1 CreditMemo", "Ex 5.1 CreditMemoLine"], "Ex 5.1")
     d.text(f"<i>Selected: B5, whose formula shows in the bar; B6 uses the same SUMIFS on CreditMemoLine. Outlined: the count of "
-           f"lookups not matched, zero. Net revenue is billed less credits, in bold. The last row moves each of the {year} "
-           f"credits to the quarter of its invoice and leaves out the {g['early_memos']} credit memos for invoices of earlier "
-           f"years, all dated in January ({money(g['early_furn'])} of Furniture credits).</i>", 0, bottom + 34, 860, 52,
+           f"lookups not matched, zero. Net revenue is billed less credits, in bold. The last row moves only the credits of the "
+           f"{g['early_memos']} credit memos for invoices of earlier years, all dated in January ({money(g['early_furn'])} of "
+           f"Furniture credits), out of {year}: the first quarter rises and the others do not change. A full view by the "
+           f"invoice's quarter would also move credits between the quarters of {year}.</i>", 0, bottom + 34, 860, 70,
            size=SMALL, color=GRAY)
     return d
 
@@ -590,8 +594,9 @@ def if_05_4_a() -> Diagram:
     ay = geo["bottom"] + 8
     xl.sheet_tabs(d, 0, ay, ["SalesInvoice", "SalesOrder", "Ex 5.3", "Ex 5.4"], "Ex 5.4")
     notes = "; ".join(f"promotion {p['id']} {p['kind']}" for p in flagged)
-    d.text(f"<i>Rows 1 and 2 are scrolled out of view. The average lag is above the median: a minority of orders take much longer. "
-           f"Outlined: the promotions whose dates cannot span their sales ({notes}); every line of them falls after the end date, "
+    d.text(f"<i>Rows 1 and 2 are scrolled out of view. The average lag, per invoice, is above the median: a minority of invoices come "
+           f"much later than their orders. Outlined: the promotions whose recorded dates do not span their orders ({notes}); every "
+           f"line of them falls after the end date, "
            f"so the 100 percent says nothing about billing. The other {len(others)} promotions have between "
            f"{min(p['share'] for p in others):.0%} and {max(p['share'] for p in others):.0%} of their lines invoiced after the end date.</i>",
            0, ay + 34, 860, 64, size=SMALL, color=GRAY)

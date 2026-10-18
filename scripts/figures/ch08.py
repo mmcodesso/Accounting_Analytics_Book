@@ -402,7 +402,8 @@ def fig_08_09() -> Diagram:
     entries = [
         ("Objective", "Identify journal entries with characteristics of management override (AS 2401) "
                       "for follow-up."),
-        ("Source", f"T2_JournalEntry and T74_Employee in CharlesRiver.xlsx; all {n:,} entries posted in "
+        ("Source", "CharlesRiver.xlsx: Tables T2_JournalEntry, T74_Employee, and T1_Account (queries JournalEntries, "
+                   f"Employees, and Accounts) and T3_GLEntry (query JournalLines); all {n:,} entries posted in "
                    "fiscal 2024 through 2026."),
         ("Population check", f"{n:,} entries; their TotalAmount agrees with the debits of the ledger's "
                              "JournalEntry lines."),

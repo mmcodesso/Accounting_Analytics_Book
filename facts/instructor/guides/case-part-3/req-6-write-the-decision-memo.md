@@ -41,8 +41,8 @@ Students can:
 ## Before you assign
 
 - **From earlier work.** Requirements 1 to 5 complete, with their tables and Case.sql, and the memos of the Part I and Part II cases as models. No new SQL: students write the memo and appendix in a word processor.
-- **Length.** At most two pages, with a one-page appendix of {{ x.n_exhibits }} exhibits. The model answer in Case.sql is an outline of about {{ x.model_words }} words, not a finished memo.
-- **The model's view.** The hours are unsupported, not fictitious; the plan allows no routine overtime; the {{ d.C }} statements get the payroll accrual and the cutoff; the cost of the hours stays out of inventory. Students may reach another recommendation from the same evidence. Grade the reasoning and the wording, not the verdict, if it follows from the exhibits and states its limits.
+- **Length.** At most two pages, with a one-page appendix of {{ x.n_exhibits }} exhibits. The model answer in Case.sql is an outline of about {{ x.model_words }} words, not a finished memo. Students choose the decision-critical results for each exhibit and keep full reconciliations and entries in the labeled output of Case.sql. A landscape exhibit page is fine, and you may allow a second exhibit page when a readable layout needs it, rather than shrinking the type.
+- **The model's view.** The hours are unsupported, not fictitious; the plan allows no routine overtime; the {{ d.C }} statements get the payroll accrual and the cutoff; identified abnormal costs are expensed and normal conversion cost needs a separate allocation analysis. Students may reach another recommendation from the same evidence. Grade the reasoning and the wording, not the verdict, if it follows from the exhibits and states its limits.
 
 ## How to run it
 
@@ -62,29 +62,35 @@ Individual, about 90 minutes in class or as a take-home: 15 to plan the evidence
 |---|---|---|---|
 | Auditing | What the records outside the time clock show, how independent they are, the open explanations and the evidence that would settle them, what the control needs | Requirement 2 | 1 |
 | Managerial accounting | What the hours produced and cost, the bridge, the plan with its assumptions and the overtime it allows | Requirements 3 and 4 | 2, 3, 4 |
-| Financial reporting | The adjustments and their effect, and why the cost of the hours stays out of inventory | Requirement 5 | 5 |
+| Financial reporting | The adjustments and their effect, why identified abnormal costs are expensed, and why normal conversion cost needs its own allocation analysis | Requirement 5 | 5 |
 
 ### Part 2: The sections and the close
 
 **Step 3. Auditing.** Say that the records outside the time clock do not support the surge-day hours as recorded: on {{ r2.s.days }} surge days the plant used {{ r2.s.clock_ins|num(1) }} different clock-in times a day against {{ r2.o.clock_ins|num(1) }} on ordinary days, rostered {{ r2.rostered }} hours and clocked {{ r2.clocked }}, and {{ r2.cite.Surge.ended|count }} approvals cite an operation that had ended. Say that the records that agree (attendance, punches) come from the time clock, the rosters and approvals from one manager, and that the calendar, the plan and the output are not shown to be independent of that manager. Name two explanations, the hours worked and entered as a block, or not worked as recorded, and the evidence outside the database that would separate them. Say what the control needs: its configuration, since the stored exceptions only point to a rule, a rule that compares overtime with a roster or plan, and a review of the {{ r2.exceptions }} open exceptions.
 
-**Step 4. Managerial accounting.** Output was flat ({{ r3.ys[0].std|num }}, {{ r3.ys[1].std|num }} and {{ r3.ys[2].std|num }} standard hours) while surge overtime rose from {{ r3.ys[0].surge.overtime|num }} to {{ r3.ys[2].surge.overtime|num }} hours; the last year's cost was {{ r3.ys[2].surge_premium|money }} as a premium or {{ r3.ys[2].surge_full|money }} in full before burden, two alternatives and not a sum. Account {{ x.variance_account }} grew {{ r3.bridge.delta|money }}, nearly all payroll charged to {{ x.clearing_account }} ({{ r3.bridge.payroll|money }}). The plan at {{ r4.levels[1]|num(2) }} hours per standard hour needs {{ r4.need[1]|num }} hours against {{ r4.capacity|count }} of regular capacity and expects a variance of {{ r4.variance[1]|num }}; it allows no routine overtime, and exceptions are approved against a dated plan, because the year's total does not show that every week fits. State the assumptions, and that the budget's volume was not used.
+**Step 4. Managerial accounting.** Output was flat ({{ r3.ys[0].std|num }}, {{ r3.ys[1].std|num }} and {{ r3.ys[2].std|num }} standard hours) while surge overtime rose from {{ r3.ys[0].surge.overtime|num }} to {{ r3.ys[2].surge.overtime|num }} hours; the last year's cost was {{ (r3.ys[2].surge_premium * (1 + r3.burden))|money }} as a premium or {{ (r3.ys[2].surge_full * (1 + r3.burden))|money }} in full, each with the employer's taxes and benefits as Requirement 3 asks, two alternatives and not a sum. Account {{ x.variance_account }} grew {{ r3.bridge.delta|money }}, nearly all payroll charged to {{ x.clearing_account }} ({{ r3.bridge.payroll|money }}). The plan at {{ r4.levels[1]|num(2) }} hours per standard hour needs {{ r4.need[1]|num }} hours against {{ r4.capacity|count }} of regular capacity and expects a variance of {{ r4.variance[1]|num }}; it allows no routine overtime, and exceptions are approved against a dated plan, because the year's total does not show that every week fits. State the assumptions, and that the budget's volume was not used.
 
-**Step 5. Financial reporting.** Record the payroll accrual of {{ r5.p.accrual|money }}; with the {{ d.P }} work paid in {{ d.C }} ({{ r5.prior.total|money }}), income falls only {{ r5.change|money }}, while the liability rises by the full accrual. With the cutoff (+{{ r5.net_rev|money }}), adjusted net income is {{ r5.adj_ni|money }}. The net change is small, but the liability left out is {{ r5.liab_ni|pct(1) }} of net income, so judge it and each error on their own, and call the missing accrual a recurring deficiency. Keep the cost of the hours out of inventory: actual conversion cost was {{ r5.actual_rate|num(2) }} per standard hour against the standard {{ r5.std_rate|num(2) }}, and the abnormal part, from idle capacity and hours beyond the work, is a cost of the period.
+**Step 5. Financial reporting.** Record the payroll accrual of {{ r5.p.accrual|money }}; with the {{ d.P }} work paid in {{ d.C }} ({{ r5.prior.total|money }}), income falls only {{ r5.change|money }}, while the liability rises by the full accrual. With the cutoff (+{{ r5.net_rev|money }}), adjusted net income is {{ r5.adj_ni|money }}, on the stated assumption that the manufacturing parts are period costs. The net change is small, but the liability left out is {{ r5.liab_ni|pct(1) }} of net income, so judge it and each error on their own, and call the missing accrual a recurring deficiency. Do not raise the standards to absorb the cost: actual conversion cost was {{ r5.actual_rate|num(2) }} per standard hour against the standard {{ r5.std_rate|num(2) }}. Identified abnormal costs, such as idle capacity, are expensed, and normal conversion cost needs a separate allocation analysis. Unsupported hours are not automatically an abnormal cost of the same amount.
 
-**Step 6. Recommend.** Stop routine surge days and require overtime to be approved in advance against a plan, by someone outside production; review the open attendance exceptions and add a rule that compares overtime with the roster; have internal audit corroborate a sample of surge days with access logs and interviews; adopt a {{ d.N }} plan at about the first year's hours per standard hour as a target to test, with no routine overtime and exceptions against a dated plan; keep the direct-hour standards, which the records give no reason to revise, and review the overhead rates on normal capacity; record the year-end payroll accrual now and at every year-end.
+**Step 6. Recommend.** Stop routine surge days and require overtime to be approved in advance against a plan, by someone outside production; review the open attendance exceptions and add a rule that compares overtime with the roster; have internal audit corroborate a sample of surge days with access logs and interviews; adopt a {{ d.N }} plan at about the first year's hours per standard hour as a target to test, with no routine overtime and exceptions against a dated plan; keep the direct-hour standards provisionally, since the records give no reason to revise them and the comparison does not show they are right, and review the overhead rates on normal capacity; record the year-end payroll accrual now and at every year-end.
 
-**Step 7. Build the appendix.** One page, {{ x.n_exhibits }} numbered exhibits, each cited in the memo: {{ x.exhibits|join(', ') }}.
+**Step 7. Build the appendix.** One page, {{ x.n_exhibits }} numbered exhibits, each cited in the memo: {{ x.exhibits|join(', ') }}. Each panel carries only the decisive results.
 
-**Check:** the memo answers the controller's questions in the order they were asked, every number appears in an exhibit or a query, the word fictitious appears nowhere, and the length holds.
+- Corroboration: three or four decisive tests, the independence of the time clock and of the manager judged apart, and what remains unknown.
+- Output: the three annual comparisons, one qualified weekly result, and the cutoff note.
+- Bridge: all six ledger lines and the total, with the payroll measures marked as non-additive diagnostics.
+- Plan: the three scenarios, the baseline assumptions and a work-center scheduling caveat.
+- Adjustments: the payroll, cutoff, opening-equity and liability effects with the manufacturing assumption beside them, referring to the full entries.
+
+**Check:** the memo answers the controller's questions in the order they were asked, every number appears in an exhibit or a query, no hours are called fictitious and no person blamed without evidence ("these records do not prove the hours were fictitious" is acceptable), and the length holds.
 
 ## Expected results
 
 | Memo section | Numbers a correct memo carries | Source |
 |---|---|---|
 | Auditing | {{ r2.s.days }} surge days; {{ r2.s.clock_ins|num(1) }} against {{ r2.o.clock_ins|num(1) }} clock-in times; {{ r2.rostered }} hours rostered, {{ r2.clocked }} clocked | R2 |
-| Managerial accounting | Premium {{ r3.ys[2].surge_premium|money }}, full {{ r3.ys[2].surge_full|money }}; {{ x.variance_account }} up {{ r3.bridge.delta|money }}; variance {{ r4.variance[1]|num }} | R3, R4 |
-| Financial reporting | Accrual {{ r5.p.accrual|money }}; adjusted net income {{ r5.adj_ni|money }} | R5 |
+| Managerial accounting | Premium {{ (r3.ys[2].surge_premium * (1 + r3.burden))|money }}, full {{ (r3.ys[2].surge_full * (1 + r3.burden))|money }}, with burden; {{ x.variance_account }} up {{ r3.bridge.delta|money }}; variance {{ r4.variance[1]|num }} | R3, R4 |
+| Financial reporting | Accrual {{ r5.p.accrual|money }}; adjusted net income {{ r5.adj_ni|money }}, on the manufacturing assumption | R5 |
 | Recommendation | No routine overtime; approval in advance; corroborate; accrue every year-end | R2 to R5 |
 
 {{ expected() }}
@@ -94,10 +100,10 @@ Individual, about 90 minutes in class or as a take-home: 15 to plan the evidence
 - **Opening.** The question and the answer in two sentences, before any detail.
 - **Auditing.** The records contradict or fail to support the hours; the agreeing records are not independent; two explanations remain, and the evidence that separates them lies outside the database.
 - **Managerial accounting.** Output flat, overtime up, the cost two ways, the bridge, and a plan with stated assumptions that needs no routine overtime.
-- **Financial reporting.** The accruals, the effect on income against the balance sheet, materiality, and why the cost of the hours stays out of inventory.
+- **Financial reporting.** The accruals, the effect on income against the balance sheet, materiality, and why identified abnormal costs are expensed while normal conversion cost needs its own allocation analysis.
 - **Recommendation.** Specific actions, owners, and a way to learn more.
 
-A strong memo makes choices: it leaves out findings that do not bear on the decision and states what the data cannot show. A weak memo reports every result in the order found, hedges the recommendation, or says fictitious.
+A strong memo makes choices: it leaves out findings that do not bear on the decision and states what the data cannot show. A weak memo reports every result in the order found, hedges the recommendation, or asserts fictitious hours without evidence.
 
 ## Common mistakes and how to respond
 
@@ -116,7 +122,7 @@ A strong memo makes choices: it leaves out findings that do not bear on the deci
 | Auditing | 25 | Evidence, independence, open explanations, outside evidence, control needs | Results without independence |
 | Managerial accounting | 25 | Output, cost, bridge, plan and assumptions, overtime allowed | Results listed without a conclusion |
 | Financial reporting | 20 | Accruals, effect on income and balance sheet, materiality, inventory | One accrual, or no reason for inventory |
-| Recommendation | 15 | Specific actions, owners, a way to learn more | A decision without actions |
+| Recommendation | 15 | Specific actions, owners, a way to learn more; another recommendation that follows from the exhibits and states its limits | A decision without actions |
 | Exhibits and traceability | 10 | {{ x.n_exhibits }} exhibits, cited, agreeing with the text | Missing or inconsistent |
 | Form and audience | 5 | Two pages, three sections, plain for the controller | Over length or unorganized |
 

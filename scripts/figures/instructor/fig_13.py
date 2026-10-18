@@ -25,6 +25,7 @@ FILE = "Chapter 13 Exercises - Solutions"
 PROJECT = ctx.REPO / "outputs" / "companion" / "solutions" / "Chapter13-exercises-pbi" / FILE
 MODEL = PROJECT / f"{FILE}.SemanticModel"
 REPORT = PROJECT / f"{FILE}.Report" / "definition"
+ATTACHED = "Ex 13.5 Profile Figures"   # the table of Exercise 13.5's memo (Enter data), in projects built since 2026-10-17
 MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
                "November", "December"]
 
@@ -304,7 +305,8 @@ def if_13_0_a() -> Diagram:
             "13.2": "Adds no query: two Top N tables, by name and by key",
             "13.3": "Adds the query PromotionProgram and a fourth relationship, on PromotionID",
             "13.4": "Adds no query: a slicer, a card, a bar chart and a matrix",
-            "13.5": "Adds four queries that do not load: " + ", ".join(profiles[:-1]) + " and " + profiles[-1],
+            "13.5": "Adds four queries that do not load: " + ", ".join(profiles[:-1]) + " and " + profiles[-1] +
+                    (", and a table of the profile figures typed with Enter data" if ATTACHED in loaded else ""),
             "13.6": "Adds no query: the pages " + pages_ex6()}
     ew = (860 - 5 * 10) / 6
     texts = [f"<b>Ex {n}</b><br>{esc(titles[n])}<br><br>{esc(adds[n])}<br><br><i>{esc(BUILDS_ON[n])}</i>" for n in titles]
@@ -354,7 +356,8 @@ def if_13_0_b() -> Diagram:
               (("SalesInvoiceLine", "ItemID"), ("Item", "ItemID")), (("SalesInvoice", "CustomerID"), ("Customer", "CustomerID")),
               (("SalesInvoiceLine", "PromotionID"), ("PromotionProgram", "PromotionID"))}
     assert set(rels) == wanted, "the project's four relationships"
-    assert _loaded_tables() == set(shown), "the six tables of the model answer"
+    attached = ATTACHED in _loaded_tables()
+    assert _loaded_tables() - {ATTACHED} == set(shown), "the six tables of the model answer, and Exercise 13.5's attached table"
     win = pbi.window(d, 536, view="Model", tab="Home", buttons=["Manage relationships", "New measure", "New column"], file=FILE)
     top = win.top
     pbi.canvas(d, win.canvas_x, top, 860 - win.canvas_x, win.bottom - top)
@@ -371,6 +374,11 @@ def if_13_0_b() -> Diagram:
                      [(560, si.rows["SalesInvoiceID"]), (560, sil.rows["SalesInvoiceID"])])
     pbi.relationship(d, cust.right("CustomerID"), si.right("CustomerID"),
                      [(824, cust.rows["CustomerID"]), (824, si.rows["CustomerID"])])
+    if attached:                       # Exercise 13.5's figures, typed with Enter data: a table with no relationship
+        columns = ["QueryName", "ColumnName", "Comment"]
+        assert set(columns) <= set(_model_columns(ATTACHED))
+        extra = pbi.model_table(d, ATTACHED, 600, cust.y + cust.h + 12, columns, w=190)
+        assert extra.y + extra.h <= win.bottom - 4, "the attached table fits the canvas"
     xl.emphasis(d, inv.x, inv.y, inv.w, inv.h)
     d.text("<i>InvoiceHeaders, the control table of Exercise 13.1: no relationship line touches it.</i>", 92, inv.y + 66, 210, 60,
            size=SMALL, color=GRAY)
@@ -378,7 +386,8 @@ def if_13_0_b() -> Diagram:
     d.text("<b>1</b> the table that holds the key &nbsp; <b>*</b> the table that refers to it &nbsp; <b>Arrow</b> the direction in "
            "which a filter flows", 0, y, 860, 22, size=SMALL)
     _note(d, "Each table lists its key columns and a few others; the model answer holds more. Outlined: InvoiceHeaders. "
-             "PromotionProgram is the table Exercise 13.3 adds; after the tutorials the model has the other three relationships.",
+             "PromotionProgram is the table Exercise 13.3 adds; after the tutorials the model has the other three relationships." +
+             (f" {ATTACHED} holds the figures attached to Exercise 13.5's memo and is related to nothing." if attached else ""),
           y + 26)
     return d
 
@@ -1065,10 +1074,10 @@ def if_13_6_a() -> Diagram:
     d = Diagram("The Ex 13.6 Draft Page")
     pbi.canvas(d, 0, 0, 860, canvas_h)
     _pie(d, page, page, 410, h1, "Sum of LineTotal by ItemGroup", order, [revenue[k] for k in order])
-    # the card: Average of Discount, unformatted
+    # the card: Average of Discount, with Discount formatted as a percentage (Column tools), as the draft presents it
     cx = page + 410 + 16
     ix, iy, iw, ih = _frame(d, cx, page, 402, 100, "Average discount")
-    d.text(f"<b>{e['avg']:.4f}</b>", ix, iy, iw, ih, size=20, align="center", valign="middle")
+    d.text(f"<b>{e['avg']:.2%}</b>", ix, iy, iw, ih, size=20, align="center", valign="middle")
     # the line chart on the default axis, and the combo chart on two axes
     low, high = min(monthly.values()), max(monthly.values())
     auto = pbi.nice_ticks(low, high, 4)

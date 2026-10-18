@@ -20,7 +20,7 @@ This is the first time students put a question to the whole workbook: for four r
 
 By the end, students can:
 
-- name the tables and columns that hold the data for revenue, accounts receivable, inventory and cost of goods sold, and general ledger reporting (chapter outcome 4);
+- name the tables and columns that hold the data for revenue, accounts receivable, inventory and cost of goods sold, and general ledger reporting (outcome 4);
 - explain that a header table, its line table, the master data that classifies them and the ledger that records them are different tables, often in different groups;
 - identify a reporting task that needs the Order-to-Cash group and the Accounting Core together, and say why neither is enough alone;
 - present the mapping in a one-page memo for a named reader (workflow stage 6).
@@ -71,7 +71,7 @@ c. Read the headers in row 1 of each, and ask which of the four reporting areas 
 |---|---|---|
 | Revenue | SalesInvoice: InvoiceDate, SubTotal, FreightAmount, TaxAmount, GrandTotal. SalesInvoiceLine: ItemID, Quantity, UnitPrice, Discount, LineTotal. Item: ItemGroup | Revenue is billed on invoices, and the lines let you group it by product. The invoice total splits across several ledger accounts (revenue, freight revenue and sales tax payable), so SubTotal and GrandTotal differ |
 | Receivables | SalesInvoice: InvoiceNumber, InvoiceDate, DueDate, CustomerID, GrandTotal. CashReceiptApplication: SalesInvoiceID, ApplicationDate, AppliedAmount. CreditMemo: OriginalSalesInvoiceID, CreditMemoDate, GrandTotal. Customer: CustomerName, CreditLimit, PaymentTerms | A balance is what was billed, less what was applied and credited, as of a date. The age comes from DueDate. The control account is {{ ar }} |
-| Inventory and cost of goods sold | Item: StandardCost, SupplyMode, InventoryAccountID, COGSAccountID. ShipmentLine: ItemID, QuantityShipped, ExtendedStandardCost. Shipment: ShipmentDate. Inflows: GoodsReceiptLine, MaterialIssueLine, ProductionCompletionLine (ExtendedStandardCost, ExtendedStandardTotalCost). WorkOrderClose: TotalVarianceAmount | Cost of goods sold is recorded when goods ship, at standard cost. Manufactured items add the Manufacturing tables, and the difference between actual and standard cost sits in WorkOrderClose and its own ledger account |
+| Inventory and cost of goods sold | Item: StandardCost, SupplyMode, InventoryAccountID, COGSAccountID. ShipmentLine: ItemID, QuantityShipped, ExtendedStandardCost. Shipment: ShipmentDate. Inventory movements: GoodsReceiptLine (purchases received into inventory), MaterialIssueLine (materials moved into production), ProductionCompletionLine (finished goods completed), with ExtendedStandardCost or ExtendedStandardTotalCost. WorkOrderClose: TotalVarianceAmount | Cost of goods sold is recorded when goods ship, at standard cost. Manufactured items add the Manufacturing tables, and the difference between actual and standard cost sits in WorkOrderClose and its own ledger account |
 | General ledger | Account: AccountNumber, AccountName, AccountType, AccountSubType, ParentAccountID, NormalBalance. GLEntry: PostingDate, AccountID, Debit, Credit, FiscalYear, FiscalPeriod, SourceDocumentType. JournalEntry: EntryType, TotalAmount | A statement is a sum of GLEntry by account and period. Account gives the names, classes and hierarchy. Adjustments, accruals, depreciation and closes arrive as journal entries |
 
 **Check:** a student explanation names a worksheet and at least two columns it actually has. **Watch for:** AccountID read as the account number. AccountID is the key of Account, and the statement number is AccountNumber.
@@ -88,7 +88,7 @@ c. Read the headers in row 1 of each, and ask which of the four reporting areas 
 
 ### Requirement (4): Write the memo
 
-**Step 5. Outline a one-page memo.** A strong memo has, in order: a header (to, from, date, subject); one sentence on purpose; the four-row table of area, tables and columns; the cross-group task with its tables; and one closing line on what would come next, such as testing the keys that join the tables. Students who copy Table 1.3 into the memo have not done the exercise.
+**Step 5. Outline a one-page memo.** A strong memo has, in order: a header (to, from, date, subject); one sentence on purpose; the four-row table of area, tables and columns; the cross-group task with its tables; and, as a plus the requirement does not ask for, one closing line on what would come next, such as testing the keys that join the tables. Students who copy Table 1.3 into the memo have not done the exercise.
 
 **Check:** the memo fits one page, names worksheets and columns, and is written for the supervisor, who is not looking at the workbook.
 
@@ -114,7 +114,7 @@ The ledger exceeds the invoice lines by a small amount because {{ cutoff_n }} in
 
 - **Requirements (1) and (2).** The answer names the line tables and the master data, not only the tables of Table 1.3. It puts revenue and receivables at the invoice, and cost of goods sold at the shipment, and says why they can fall in different periods. It names real columns and reads the account numbers through Account.
 - **Requirement (3).** The task has a reason for the second group: the ledger is the control total, or the documents are the detail behind it.
-- **Requirement (4).** The memo is organized for a reader, with a table and a short explanation, and it recommends a next step.
+- **Requirement (4).** The memo is organized for a reader, with a table and a short explanation. A recommended next step is a plus.
 
 A weak answer lists table names from memory, copies the "Primary Accounting Use" column of Table 1.3, or describes areas without worksheets.
 
@@ -135,7 +135,7 @@ A weak answer lists table names from memory, copies the "Primary Accounting Use"
 | Requirement 1: tables for each group and area | 25 | Tables from four groups, with line and master tables | Key tables only, or a group missing |
 | Requirement 2: tables, columns and explanation for four areas | 30 | Real columns and two or three sentences for each area | Columns not checked, or no explanation |
 | Requirement 3: a cross-group task | 20 | A task with tables from both groups and the reason | A task from one group, or no reason |
-| Requirement 4: memo | 25 | One page, organized for the supervisor, with a next step | Over a page, or a list with no reasoning |
+| Requirement 4: memo | 25 | One page, organized for the supervisor | Over a page, or a list with no reasoning |
 
 ## Extensions and discussion questions
 

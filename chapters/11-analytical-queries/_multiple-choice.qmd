@@ -44,14 +44,14 @@ B.  PostingDate is stored as a number, which strftime cannot read
 C.  strftime returns text, which does not equal the number 2026
 D.  The condition must be written in a HAVING clause
 
-**7.** What does `SUM(Gap) OVER (PARTITION BY FiscalYear ORDER BY FiscalPeriod)` return on each monthly row?
+**7.** With exactly one row for each fiscal year and fiscal period, what does `SUM(Gap) OVER (PARTITION BY FiscalYear ORDER BY FiscalPeriod)` return on each row?
 
 A.  The total of the year's gaps up to and including that month
 B.  The total gap of the whole fiscal year, repeated on every monthly row
 C.  The gap of the previous month in the same fiscal year
 D.  The total of all the gaps in the table, across every fiscal year
 
-**8.** Over rows ordered by fiscal year and period, with one row for every month, what does `LAG(Gap, 12)` return?
+**8.** Over rows ordered by fiscal year and period, with one row for every month, what does `LAG(Gap, 12)` return on a row that has at least twelve earlier rows?
 
 A.  The average gap of the last twelve months, including this one
 B.  The gap of the same month of the previous year
@@ -65,7 +65,7 @@ B.  RANK leaves them out of the result, and ROW_NUMBER keeps them
 C.  They give identical results whenever values are tied
 D.  RANK gives them the same number, and ROW_NUMBER gives them different numbers
 
-**10.** An analyst wants only the three largest months of each year from a query that ranks months with RANK() OVER (…). Why can the condition not go in that query's WHERE clause?
+**10.** An analyst wants only the months ranked first through third within each year, keeping any ties, from a query that ranks months with RANK() OVER (…). Why can the condition not go in that query's WHERE clause?
 
 A.  WHERE cannot compare the number a function returns with 3
 B.  WHERE runs before window functions, so no rank exists yet

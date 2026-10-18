@@ -118,9 +118,9 @@ c. Choose each group in turn and record the results in a small table. The model 
 
 ### Requirement (6): The interpretation
 
-**Step 9. Write three or four sentences.** A model answer: {{ g.most.name }} earns the most per unit and has the lowest average percentage, while {{ g.least.name }} earns the least per unit and has the highest. A margin at list price is not what Charles River earns, because most sales are billed at price-list prices below list, some lines carry promotions, and StandardCost is a standard. An average of item margins counts each item once, so it is not the margin on a group's sales.
+**Step 9. Write three or four sentences.** A model answer: of the four product groups, {{ g.most.name }} has the highest average list-price margin per unit (${{ g.most.margin|money }}) and the lowest average margin percentage ({{ g.most.pct|pct }}), while {{ g.least.name }} has the lowest per unit and the highest percentage. Each finished good counts once, whatever it sold, so these are not margins on the groups' sales. A margin at list price is not what Charles River earns. Most sales are billed at price-list prices below list and some lines carry promotions, which lower the realized margin, and StandardCost is a standard, so actual costs can differ from it in either direction. Realized results depend on the prices billed, the discounts, the sales mix and the actual costs.
 
-**Check:** the answer names both limits and does not call the averages group margins.
+**Check:** the answer names both limits, does not call the averages group margins, and does not say a group earns the most from an unweighted list-price average.
 
 ## Expected results
 

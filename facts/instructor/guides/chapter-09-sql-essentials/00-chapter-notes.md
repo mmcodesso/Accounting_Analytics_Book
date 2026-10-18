@@ -30,12 +30,12 @@ figures:
 | Tools | DB Browser for SQLite {{ version }} with SQLite, one table at a time. Excel only receives a result in Tutorial 9.3 |
 | Components | {{ unit.tutorials|length }} guided tutorials, {{ n_exercises }} exercises ({{ per_perspective }} for each perspective), {{ n_questions }} multiple-choice questions and a deck of {{ slides }} slides |
 | Files students need | CharlesRiver.sqlite, never edited, and CharlesRiver_Work.sqlite, the copy made in Tutorial 9.1. Chapter09.sql is built through the tutorials; Chapter09-companion.zip holds it at the start of Tutorials 9.2 and 9.3 and at the end of the chapter. Chapter09-exercises-sql.zip holds Ex 9.1.sql to Ex 9.6.sql |
-| Time | Class: about 240 minutes. Students: about one hour of reading, 60 to 75 minutes for each tutorial and 45 to 75 for each exercise (assign two or three). The times are estimates: time them yourself |
+| Time | Class: 240 minutes in Plan A, 180 in Plan B and 90 in Plan C. Students: about one hour of reading, 60 to 75 minutes for each of Tutorials 9.1 and 9.2, 45 to 60 for Tutorial 9.3 and 45 to 75 for each exercise (assign two or three). Plans A and B do part of the tutorials in class and Plan C does them at home, so class and student times overlap. The times are estimates, so time them yourself |
 
 The chapter depends on these conditions of the data:
 
 - The ledger holds {{ t1.gl_n|count }} rows, which is why the chapter queries a database. GLEntry.AccountID is the Account table's surrogate key, not the account number: the manufacturing variance, account {{ t1.no.variance }}, is AccountID {{ t1.variance_id }}.
-- The year's postings to that account are {{ t2.rows|count }} rows: {{ t2.wo_rows|count }} work order closes and one journal entry, the year-end close {{ t2.close }}, which makes the year net to zero. {{ t2.open_n }} work orders have no ClosedDate, and every one was released in {{ t2.year }}.
+- The year's postings to that account are {{ t2.rows|count }} ledger rows: {{ t2.wo_rows|count }} postings from the {{ t2.wo_docs|count }} work order closes of the year (a close usually posts a material and a conversion part) and one journal entry, the year-end close {{ t2.close }}, which makes the year net to zero. {{ t2.open_n }} work orders have no ClosedDate, and every one was released in {{ t2.year }}.
 - Blank values are NULL, not empty text (ClosedDate, TrackingNumber, ClockOutTime), and dates are text in year-month-day form.
 - The exercises rest on planted conditions (shipments with no tracking number or still In Transit after their delivery date, direct labor with no operation, clock entries with no clock-out) and on tests that are clean on purpose (the parts of every close and the components of every manufactured item add up).
 
@@ -47,6 +47,8 @@ The chapter depends on these conditions of the data:
 4. Test for missing values with IS NULL and COALESCE, and say what a missing value means in an audit test. Practiced in Tutorial 9.2 (Steps 6 to 8), Exercises 9.3 (3), 9.4, 9.5 and 9.6, and question 6.
 5. Sort and limit results to rank transactions. Practiced in Tutorial 9.3, Exercises 9.2 (4), 9.3 (5) and 9.4 (4), and questions 8 and 9.
 6. Save queries in a documented script, check each result against what it should be, and explain what it means. Practiced in Tutorial 9.3 (Step 6), the script and memo of every exercise, and questions 11, 14 and 15.
+
+These outcomes are this guide's own and are numbered differently from the chapter's six learning objectives. Outcome 1 serves objective 2, outcome 2 objective 3, outcomes 3 and 4 objective 4, outcome 5 objective 5 and outcome 6 objective 6. Objective 1, when a query serves an analysis better than a spreadsheet, is met by the reading and discussion prompts 4 and 5.
 
 ## Preparing to teach
 **Before the first class**
@@ -237,7 +239,7 @@ All six exercises are SQL scripts with a model answer in Chapter09-exercises-sql
 - *One exercise a session.* Take the basic exercises first: 9.5, 9.1, 9.3, 9.2, 9.6, 9.4.
 - *A light load.* Exercises 9.4 and 9.5 take about two hours and cover outcomes 2 to 6.
 
-**Grading and discussion.** Each exercise guide holds a rubric. Exercises 9.3 and 9.5 suit grading from the script and the row counts, because their numbers have one answer. Exercises 9.1, 9.4 and 9.6 end in a memo or findings and suit class discussion. Collect the script, not a screenshot: its comment lines show the population and the expected result, and the query shows exactly what was tested.
+**Grading and discussion.** Each exercise guide holds a rubric. Exercises 9.3 and 9.5 suit grading from the script and the row counts, because their numbers have one answer. Exercises 9.1, 9.4 and 9.6 end in a memo or findings and suit class discussion. Collect the script, not a screenshot: its comment lines show the population and the expected result, and the query shows exactly what was tested. Grade what each requirement asks. The model answers add queries no requirement names (the posting tests of Exercise 9.1, the tie-break of 9.2, the check for a missing component of 9.3, the counts by status of 9.5 and 9.6 and the reverse termination test of 9.6), and those count as a plus, not as conditions for full credit.
 
 ## Multiple-choice questions
 

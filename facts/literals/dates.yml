@@ -42,6 +42,8 @@ files:
     - {rx: 'Excel 2021 on {Y}', class: real, why: "Microsoft's support for Excel 2021 ended on October 13, 2026 (Microsoft Lifecycle)"}
   appendices/d-competencies/appendix.qmd:
     - {rx: 'effective from {Y}', class: real, why: "IES 2, 3 and 4 (2026) are effective from July 1, 2026"}
+  back-matter/closing.qmd:
+    - {rx: 'took effect on {Y}', class: real, why: "the Global Internal Audit Standards took effect on January 9, 2025 (IIA)"}
   chapters/02-understanding-data/_multiple-choice.qmd:
     - {rx: '(?:on|posted on) {Y}', class: constant, why: "a generic scenario (an ERP extract in March)"}
   chapters/02-understanding-data/_tutorial-01.qmd:

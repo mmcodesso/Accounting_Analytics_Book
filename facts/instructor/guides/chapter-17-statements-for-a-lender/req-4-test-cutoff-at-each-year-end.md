@@ -31,7 +31,7 @@ Students can:
 - measure the payroll owed at each year-end by one working-day method, split between manufacturing and the rest (Part 2);
 - accrue the interest each note owes, stating the day count (Part 3).
 
-**Competencies practiced.** CPA Evolution Core S2 M9 (audit procedures, analytical procedures, and audit data analytics); IMA Reporting and Control (financial recordkeeping); IFAC IES 2 (a) and 2 (f); AACSB A5 part 5.1 (technology integration: SQL).
+**Competencies practiced.** CPA Evolution Core S2 M9 (audit procedures, analytical procedures, and audit data analytics); IMA Reporting and Control (financial recordkeeping); IFAC IES 2 (a) and 2 (f); AACSB A5 part 5.1 (technology integration: SQL and Excel).
 
 ## Before you assign
 
@@ -69,6 +69,8 @@ Posted AS (
 )
 ```
 
+The block holds the query's two CTEs only, a fragment. The complete query, with its main SELECT, is in LenderPackage.sql under the heading `{{ g.h.l5 }}`.
+
 **Check:** {{ cf.n }} invoices for {{ d.F }} deliveries (${{ cf.total|money }}), {{ cp.n }} for {{ d.P }} (${{ cp.total|money }}) and {{ cc.n }} for {{ d.C }}; sales tax of ${{ cf.tax|money }} and ${{ cp.tax|money }} on them is not adjusted. **Watch for:** dating the test by the invoice date. It finds {{ g.n_date[d.P] }} invoices (${{ g.s_date[d.P]|money }}) for {{ d.P }} and {{ g.n_date[d.C] }} (${{ g.s_date[d.C]|money }}) for {{ d.C }}: the lists mix invoices dated before their shipment, which the ledger posted in the right year, with real errors, and miss the invoice dated in the year of delivery and posted in the next.
 
 **Step 2. Find the shipments never invoiced.** A shipment line with no invoice line, valued at its order price less discount.
@@ -105,7 +107,7 @@ ORDER BY sl.ShipmentLineID;
 
 **Step 4. Find the pay periods that cross each year-end and test account `2030`.** Test L7 lists the periods whose start and pay date fall in different years: {{ g.l7 }} rows, four with registers and two with none. Test L8 sums `2030` by source document: the opening line alone, the payroll postings netting to zero, so no year-end has accrued wages.
 
-**Step 5. Measure the earlier year-ends from the registers.** The period paid in the next year in full, plus the share of the crossing period that falls in the year, by working days from WorkCenterCalendar. The model's formulas give the working days within the year, the share, and the total:
+**Step 5. Measure the earlier year-ends from the registers.** The period paid in the next year in full, plus the share of the crossing period that falls in the year, by working days from WorkCenterCalendar. The model's formulas give the working days within the year, the share, and the total. They read the Tables the workbook loads (WorkingDays, PayrollCost, PayrollPeriods), the year-end names such as `YE_{{ d.F }}`, and the cells of the payroll block that the figure shows, so build that block first (**Formulas > Name Manager** lists the names):
 
 ```jinja
 {{ g.f.days_in }}
@@ -124,7 +126,7 @@ ORDER BY sl.ShipmentLineID;
 {{ g.f.d_owed }}
 ```
 
-**Check:** {{ pc.p.wd }} working days, ${{ pc.p.cost|money }}, ${{ pc.p.daily|num(2) }} a day, {{ pc.p.left }} days left: ${{ pc.total|money }}, of which gross pay ${{ pc.gross|money }}, employer taxes ${{ pc.tax|money }} and benefits ${{ pc.ben|money }}. Manufacturing, ${{ pc.mfg|money }}, would have gone to `1090`; with no completion to absorb it, it ends in `5080`. The rest goes to the cost centers' salary accounts and `6060`. **Watch for:** two errors. An accrual from the registers alone is zero, and the last year's effect becomes +${{ g.open_none|money }}, the reversal of the year before with nothing new. One period's cost per day gives ${{ g.single|money }}, ${{ g.single_over|money }} too high.
+**Check:** {{ pc.p.wd }} working days, ${{ pc.p.cost|money }}, ${{ pc.p.daily|num(2) }} a day, {{ pc.p.left }} days left: ${{ pc.total|money }}, of which gross pay ${{ pc.gross|money }}, employer taxes ${{ pc.tax|money }} and benefits ${{ pc.ben|money }}. Manufacturing, ${{ pc.mfg|money }}, would have gone to `1090`. Under the case's standard-cost close it ends in `5080` and cost of goods sold, because standard cost leaves `1090` only through completions. An answer that traces the December work to its work orders and assigns part of it to work in process or finished goods is acceptable. The rest goes to the cost centers' salary accounts and `6060`. **Watch for:** two errors. An accrual from the registers alone is zero, and the last year's effect becomes +${{ g.open_none|money }}, the reversal of the year before with nothing new. One period's cost per day gives ${{ g.single|money }}, ${{ g.single_over|money }} too high.
 
 ### Part 3: Interest
 

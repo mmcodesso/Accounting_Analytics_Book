@@ -147,6 +147,12 @@
     \dimen@ii\pagegoal \advance\dimen@ii-\pagetotal
     \ifdim\dimen@>\dimen@ii \break \fi
   \endgroup}
+% After a bold label line that is not a step label (an exercise's "Requirements."), the filter adds \aaNoBreakAfter:
+% no break between the label and what follows, and LaTeX's \@afterheading, as after a heading, so that a list right
+% after it does not add \@beginparpenalty, which invites a break there (it left Exercise 3.5's "Requirements." alone
+% at the foot of a page although \aaKeepLabel had found room for it and its first lines); the first paragraph or
+% list item after the label clears the flag again.
+\newcommand{\aaNoBreakAfter}{\par\nobreak\@afterheading}
 \makeatother
 
 % Long Excel formulas in code blocks wrap after commas and asterisks, with a continuation mark,

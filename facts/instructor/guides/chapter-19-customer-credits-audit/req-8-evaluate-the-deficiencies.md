@@ -66,7 +66,7 @@ c. Add the band as a formula that reads the exposure against the three threshold
 
 {{ figure('IF-19-8-A') }}
 
-**Check:** each control cited rests on a result of Requirements 4 to 7 (every credit traces to a return received in the warehouse, refunds are approved outside customer service, no lapping), and none is shown to operate, since the receiving records and the delegation of authority lie outside the database. **Watch for:** a compensating control assumed precise. A warehouse receipt shows that goods came back, not that the credit's amount or the customer's cash was right.
+**Check:** each control cited rests on a result of Requirements 4 to 7 (every credit traces to a return received in the warehouse, refunds are approved outside customer service, no lapping), and none is shown to operate, since the receiving records and the delegation of authority lie outside the database. **Watch for:** a compensating control assumed precise. The receiving record documents a return: authenticate it and obtain inspection evidence before concluding that the goods physically arrived, were in the stated condition, or justified the credit.
 
 ### Part 2: Combine, classify and say what could change the rating
 
@@ -92,9 +92,10 @@ c. Add the band as a formula that reads the exposure against the three threshold
 
 ```jinja
 {{ g.f_clean }}
+{% if g.f_clean_concl %}{{ g.f_clean_concl }}{% endif %}
 ```
 
-**Check:** {{ g.n_clean }} rows, each with its test, its count and its conclusion: the reconciliations, the clawbacks, the approvers' employment dates, the refund approver apart from the credit approver, returns received in the warehouse, one refund per credit, the recomputed credits and the lapping tests. The reconciliation cell reads {{ g.resid }}, a floating-point residue far below a cent, and the conclusion says zero to the cent. **Watch for:** a matrix of exceptions only, or a clean result with no test named.
+**Check:** {{ g.n_clean }} rows, each with its test, its count and its conclusion: the reconciliations, the clawbacks, the approvers' employment dates, the refund approver apart from the credit approver, returns received in the warehouse, one refund per credit, the recomputed credits and the lapping tests. The reconciliation cell sums the selected Difference rows and reads {{ g.resid }}, a floating-point residue far below a cent, so the conclusion says it reconciles to the cent. A clean result requires every selected difference to be numeric and error-free: a failed or missing difference must block the summary (the model reads "Not evaluable"), never be replaced with zero, and any nonzero difference is investigated, telling a valid rounding residue from an unavailable result. **Watch for:** a matrix of exceptions only, a clean result with no test named, or errors hidden by IFERROR.
 
 ## Expected results
 

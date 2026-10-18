@@ -244,20 +244,25 @@ def _results(d: Diagram, y: float, headers: list[str], widths: list[float], rows
     return geometry
 
 
-def _mock(d: Diagram, key: str, lines: slice | None = None, shown: slice | None = None, tight: bool = False) -> dict:
+def _mock(d: Diagram, key: str, lines: slice | None = None, shown: slice | None = None, tight: bool = False,
+          chrome: bool = True) -> dict:
     """The Execute SQL tab with the query of LenderPackage.sql whose first comment line starts with `-- key`, as a reader sees
     it after selecting the query and clicking Execute all/selected SQL.  The editor shows the comment lines and the query at
     their line numbers in the script, or only `lines` of them (an editor scrolled to part of a long query, the line numbers
     kept); `shown` draws only some rows of the result, as a grid scrolled to them (the rows keep their numbers); `tight` keeps
-    a smaller margin in each cell, for a result of many columns.  Returns the grid and editor geometry."""
+    a smaller margin in each cell, for a result of many columns; `chrome` False leaves out the title bar, main toolbar and
+    tabs (a compact mock, as Part III draws them), so that a long query keeps its text readable on the page.  Returns the
+    grid and editor geometry."""
     comment, sql, line = _solution(key)
     headers, rows = _run(sql)
     spacing, pad, number_w = (3, 10, 32) if tight else (6, CELL_PAD + 2, 40)
-    saved, db.PATH = db.PATH, "C:\\Users\\you\\Documents\\CharlesRiver_Capstone.sqlite"    # the case works in a copy of that name
-    try:
-        y = db.window(d)
-    finally:
-        db.PATH = saved
+    y = 0.0
+    if chrome:
+        saved, db.PATH = db.PATH, "C:\\Users\\you\\Documents\\CharlesRiver_Capstone.sqlite"    # the case works in a copy of that name
+        try:
+            y = db.window(d)
+        finally:
+            db.PATH = saved
     editor_top = y
     full = [_fit_comment(c) for c in comment] + sql.split("\n")
     n_comment = len(comment)
@@ -317,13 +322,15 @@ def _outline_column(d: Diagram, mock: dict, column: int, rows: int, color: str =
 # -- IF-17-1-A: the trial balance at the last year-end ------------------------------------------------------------------
 
 def if_17_1_a() -> Diagram:
-    """Requirement 1's query for the last year-end: the editor from the comment lines to the NOT test, and the first accounts of
-    its 71 rows with the cash row outlined."""
+    """Requirement 1's query for the last year-end: the compact editor from the Params CTE to the NOT test, and the first three
+    accounts of its 71 rows with the cash row outlined.  The window chrome, the comment lines and the closing GROUP BY and
+    ORDER BY are left out, so the figure stays short enough to print its SQL at the book's figure scale (the guide quotes the
+    whole query beside it; U24, item 25)."""
     r1 = ctx.values("ch17.r1")
     C = ctx.data().C
     d = Diagram("The Trial Balance at the Last Year-End")
     key = f"Requirement 1: the trial balance at {C}-12-31"
-    mock = _mock(d, key, lines=slice(0, 25), shown=slice(0, 5), tight=True)
+    mock = _mock(d, key, lines=slice(2, 25), shown=slice(0, 3), tight=True, chrome=False)
     rows = mock["rows"]
     rec = r1["rec"][2]
     assert len(rows) == rec["n"] and sum(1 for r in rows if r[4] == 0) == rec["zero"], "the row count and the accounts at zero are the guide's"
@@ -336,8 +343,8 @@ def if_17_1_a() -> Diagram:
     _outline_lines(d, mock, not_test, not_test + 1, TEAL)
     _note(d, f"Outlined in teal: the test that leaves out a close only when it is dated on the as-of date. Outlined in coral: the cash row. "
              f"The grid shows the first {len(mock['geometry']) // len(mock['headers']) - 1} of {len(rows)} rows; the debit balances add up to "
-             f"{_money(rec['debits'])}, equal to the credit balances. The query's GROUP BY and ORDER BY lines are below the part of the editor drawn; "
-             "the second comment line is cut at the editor's edge.", mock["bottom"] + 6)
+             f"{_money(rec['debits'])}, equal to the credit balances. The editor is scrolled to the query's CTEs and WHERE clause: its two "
+             "comment lines are above the part drawn, and its GROUP BY and ORDER BY lines below.", mock["bottom"] + 6)
     return d
 
 

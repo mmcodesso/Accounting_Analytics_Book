@@ -50,7 +50,6 @@ Below floor   =E6<MarginFloor
 a. Choose **Data > What-If Analysis > Goal Seek**.
 b. Enter H6 in **Set cell**, `0` in **To value** and G6 in **By changing cell**, and repeat for each family below the floor.
 c. Compare with column I, which computes the same price directly.
-
 ```
 Check      =IF(F6,B6*(G6*(1-MarginFloor)-D6),"")
 Direct     =IF(F6,D6/(1-MarginFloor),"")
@@ -72,7 +71,7 @@ Volume lost   =IF(F6,1-L6/(L6+G6-C6),"")
 
 ### Part 2: What the records say about customers' response
 
-**Step 4. Screen the promotions for a volume response (Q24).** Routine: type the query at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Q24 sums the list-price order value of each promotion's scope by month of its year; the months of the promotion are the months in which promotion lines were ordered:
+**Step 4. Screen the promotions for a volume response (Q24).** Routine: type the query at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Q24 sums the list-price order value of each promotion's scope by month of its year, a list-price-weighted order-value proxy for volume; the months of the promotion are the months in which promotion lines were ordered. The block is a fragment, the `PromotionMonths` column, and the complete statement is Q24:
 
 ```sql
 (SELECT GROUP_CONCAT(M, ',')
@@ -90,9 +89,9 @@ Lift       =[@PromotionValue]/[@Expected]-1
 Z          =([@PromotionValue]-[@Expected])/(STDEV.S(FILTER(PromotionVolume[[#This Row],[M01]:[M12]],NOT(ISNUMBER(SEARCH(","&SEQUENCE(1,12)&",",","&[@PromotionMonths]&",")))))*SQRT([@Months]))
 ```
 
-**Check:** 9 rows, one for each promotion. No lift passes a z of 2 (the largest, Accessories 2024, reads 1.65); five of the nine are positive and four negative, down to -20.7%. **Watch for:** months taken from the effective dates: 2 promotions end before they start and so have no months at all, and one ends on its start date, which gives one month although its orders ran for two.
+**Check:** 9 rows, one for each promotion. No lift passes the descriptive z of 2 screen (the largest, Accessories 2024, reads 1.65); five of the nine are positive and four negative, down to -20.7%. **Watch for:** months taken from the effective dates: 2 promotions end before they start and so have no months at all, and one ends on its start date, which gives one month although its orders ran for two.
 
-**Step 5. Check the price lists and the overrides (Q25 and Q26).** Q25 returns each list with its dates, the range of its prices against list, and the count of order lines priced after its end date:
+**Step 5. Check the price lists and the overrides (Q25 and Q26).** Q25 returns each list with its dates, the range of its prices against list, and the count of order lines priced after its end date. The block is a fragment, the last column, and the complete statement is Q25:
 
 ```sql
 (SELECT COUNT(*)
@@ -140,12 +139,12 @@ Their revenue      =SUMPRODUCT(--F5:F20,ISNA(XMATCH(A5:A20,FILTER('Make or Buy'!
 | TBL | 5.26% | 9.4% | $148,350 |
 | CHD | 4.94% | 9.2% | $33,558 |
 
-> **Instructor notes, Requirement 8:** families below the 40% floor on time-driven cost and the increase that reaches it (volume loss the increase absorbs, on the crew-kept contribution margin): FUR-BKC +6.97% (12.7%), FUR-BNH +9.21% (16.9%), FUR-CTB +3.32% (6.1%), FUR-NGT +5.13% (9.3%), FUR-SDB +2.44% (4.5%), FUR-TBL +5.26% (9.4%), LGT-CHD +4.94% (9.2%); +556,535 of revenue a year if volume holds. If BNH, NGT, and TBL are bought, their delivered margins are 45.0%, 43.2%, and 42.7%, so only BKC, CTB, SDB, and CHD need increases. Evidence: no promotion's lift passes a z of 2 (the Part II case's screen; the largest, Accessories 2024, is 1.65), while five of the nine lifts are positive (Accessories 2024 +11.9%, Wholesale 2025 +2.5%, Harbor 2026 +0.4%, Furniture 2026 +0.3%, Design Trade 2026 +3.1%) and four negative, down to -20.7%. It is a descriptive screen of list-price order value in the promotions' months, which seasonality, mix, and targeting also move, not an estimate of how customers would answer an increase: the loss each increase can absorb is a threshold, not a forecast, so the increases are tested, staged and watched against it. Active price lists run at 0.84 to 0.94 of list and every one ended 2026-12-31, and lists 1, 2, and 4 had expired yet were still used (Exercise 8.6); the Sales Manager approves overrides; so the increases need new, approved lists for 2028 with stated end dates, and customer-specific lists should be renegotiated, not inherited. The floor is a price realized after discounts and overrides, so the lists and the override rules together decide whether an increase reaches it.
+> **Instructor notes, Requirement 8:** families below the 40% floor on time-driven cost and the increase that reaches it (volume loss the increase absorbs, on the crew-kept contribution margin): FUR-BKC +6.97% (12.7%), FUR-BNH +9.21% (16.9%), FUR-CTB +3.32% (6.1%), FUR-NGT +5.13% (9.3%), FUR-SDB +2.44% (4.5%), FUR-TBL +5.26% (9.4%), LGT-CHD +4.94% (9.2%); +556,535 of revenue a year if volume holds. If BNH, NGT, and TBL are bought, their delivered margins are 45.0%, 43.2%, and 42.7%, so only BKC, CTB, SDB, and CHD need increases. Evidence: no promotion's lift passes a z of 2 (the Part II case's screen; the largest, Accessories 2024, is 1.65), while five of the nine lifts are positive (Accessories 2024 +11.9%, Wholesale 2025 +2.5%, Harbor 2026 +0.4%, Furniture 2026 +0.3%, Design Trade 2026 +3.1%) and four negative, down to -20.7%. It is a descriptive screen of list-price order value (a proxy for volume) in the promotions' months, which seasonality, mix, and targeting also move. A z of 2 on it is not a significance test, and it does not show that a lift was caused by a promotion, that a result arose by chance, or how customers would answer an increase: the loss each increase can absorb is a threshold, not a forecast, so the increases are tested, staged and watched against it. Active price lists run at 0.84 to 0.94 of list and every one ended 2026-12-31, and lists 1, 2, and 4 had expired yet were still used (Exercise 8.6); the Sales Manager approves overrides; so the increases need new, approved lists for 2028 with stated end dates, and customer-specific lists should be renegotiated, not inherited. The floor is a price realized after discounts and overrides, so the lists and the override rules together decide whether an increase reaches it.
 
 ## What a strong answer says
 
 - **Each increase beside its threshold.** The threshold is the volume the family can lose before it earns less contribution than now; it is not a forecast.
-- **The evidence and its limits.** No promotion shows a lift beyond chance, and most are small. That is a screen of past discounts, so it cannot measure the response to an increase; recommend staged increases and watch each family's volume against its threshold.
+- **The evidence and its limits.** None of the nine promotion scopes passes the descriptive z of 2 screen: five lifts are positive and four negative. The comparison of list-price-weighted order value is a proxy for volume that mix, seasonality and targeting also move. It does not establish significance, that a promotion caused a lift, that a result arose by chance, or that customers will accept a permanent increase. Recommend staged increases, and monitor realized net price, units and contribution against each family's loss threshold.
 - **The lists.** Prices reach invoices only through the lists, and the records show expired lists still in use and one approver for every override: new, approved lists with end dates, and customer lists renegotiated.
 - **The families bought.** They clear the floor at the delivered price, so only BKC, CTB, SDB, CHD need increases.
 

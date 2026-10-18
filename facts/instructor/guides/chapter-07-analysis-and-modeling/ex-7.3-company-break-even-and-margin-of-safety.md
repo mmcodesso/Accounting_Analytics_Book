@@ -36,7 +36,7 @@ By the end, students can:
 ## Before you assign
 
 - **Files and software.** The analysis workbook at the end of Chapter 7's tutorials, with InvoiceLines, BudgetLine and GLOpex (Tutorial 7.2). Students import the ledger again for requirement 4, with **Transform Data**, never **Load**.
-- **Data conditions.** Services lines carry no standard cost, so design staff sit in the fixed costs. The budget files interest expense under Operating Expense although the chart of accounts makes it {{ g.interest_subtype }}. Accounts for freight-out, the purchase price variance and the manufacturing variance have journal-entry rows that are only the year-end close, so excluding the JournalEntry source removes just the close. The manufacturing variance grows every year of the window.
+- **Data conditions.** Services lines carry no standard cost, so design staff sit in the fixed costs. The budget files interest expense under Operating Expense although the chart of accounts makes it {{ g.interest_subtype }}. In {{ d.C }}, the journal-entry rows on the accounts for freight-out, the purchase price variance and the manufacturing variance are only the year-end close, so excluding the JournalEntry source removes just the close. That exclusion is not a general rule. In {{ d.F }} a Factory Overhead entry ({{ g.je_first|money }}) also posts to the manufacturing variance account, so a year-by-year extension identifies the closing vouchers by their EntryType instead. The manufacturing variance grows every year of the window.
 - **Verify first.** Run requirement 4 once. GLCostVariances holds {{ g.n_rows|count }} rows.
 
 ## How to run it
@@ -47,7 +47,7 @@ Individual, about 90 minutes: 15 for the ratio (requirement 1), 10 for the fixed
 
 ### Requirement (1): The contribution margin ratio
 
-**Step 1. Set up the model.** On a worksheet named `Ex 7.3` enter the year in B3 in blue, then calculate in B5 to B9:
+**Step 1. Set up the model.** On a worksheet named `Ex 7.3` set B3 to {{ d.C }} and label A3 `Base year (fixed)`. B3 is not a year selector, because BudgetLine, GLOpex and GLCostVariances are filtered to {{ d.C }}, and a different year needs every input, query filter and closing-entry exclusion changed together. Then calculate in B5 to B9:
 
 ```
 =SUMIFS(InvoiceLines[LineTotal],InvoiceLines[FiscalYear],$B$3)
@@ -61,7 +61,14 @@ Individual, about 90 minutes: 15 for the ratio (requirement 1), 10 for the fixed
 
 ### Requirement (2): The fixed costs
 
-**Step 2. Take the operating-expense budget and remove two items.** B11 is the operating-expense budget, B12 the commission budget (commissions are already in the margin), B13 the interest budget, and B14 `=B11-B12-B13`.
+**Step 2. Take the operating-expense budget and remove two items.** B11 is the operating-expense budget, B12 the commission budget (commissions are already in the margin), B13 the interest budget, and B14 the fixed costs.
+
+```
+B11  =SUMIFS(BudgetLine[BudgetAmount],BudgetLine[BudgetCategory],"Operating Expense")
+B12  =SUMIFS(BudgetLine[BudgetAmount],BudgetLine[AccountNumber],6290)
+B13  =SUMIFS(BudgetLine[BudgetAmount],BudgetLine[AccountNumber],7030)
+B14  =B11-B12-B13
+```
 
 **Check:** ${{ opex|money }} less ${{ budget_commission|money }} and ${{ interest|money }} is ${{ fixed|money }}. **Watch for:** the commission budget left in, which counts commissions twice and raises break-even by about ${{ g.commission_effect|num(0) }}, or the interest left in, which models profit after interest and raises it by about ${{ interest_effect|money }}.
 
@@ -128,7 +135,8 @@ c. Enter B9 as the **Row input cell** and B23 as the **Column input cell**, and 
 ## What a strong answer says
 
 - **Requirement (2).** The budget is a reasonable source because the recurring expenses came close to budget. The commission is out because it varies with revenue and is already in the margin. Interest is out because it is a financing cost shown below operating income.
-- **Requirement (6).** A break-even figure for each set of fixed costs, with the second preferred. The assumption that matters most is the manufacturing variance treated as fixed: it grew from ${{ g.variance[0][1]|money }} to ${{ g.variance[1][1]|money }} to ${{ g.variance[2][1]|money }}, and returning to its first-year level would lower break-even revenue by about ${{ g.reduction|num(0) }}. The ratio matters too: each percentage point moves break-even revenue by about ${{ g.per_point|num(0) }}. Services' design staff treated as fixed and all of the products' standard cost as variable are further simplifications.
+- **Requirement (6).** A break-even estimate with the fixed costs behind it. The assumption that matters most is the manufacturing variance treated as fixed: it grew from ${{ g.variance[0][1]|money }} to ${{ g.variance[1][1]|money }} to ${{ g.variance[2][1]|money }}, and returning to its first-year level would lower break-even revenue by about ${{ g.reduction|num(0) }}. The ratio matters too. Near the current assumptions, a one-percentage-point change moves break-even revenue by about ${{ g.per_point|num(0) }}, a local effect that is not constant over the whole grid of the data table. Services' design staff treated as fixed and all of the products' standard cost as variable are further simplifications.
+- **A plus.** Both estimates side by side. The second includes costs the first leaves out, and the exercise treats freight-out and the two variances as fixed-equivalent costs for this scenario, which the totals do not establish. Both estimates also assume a constant sales mix, unchanged prices and unit costs, and a stated range of activity, and the strongest answers test an alternative cost-behavior assumption before recommending one economic estimate.
 
 A weak answer reports the first break-even without noticing what the standard costs omit, or names no assumption.
 
@@ -150,11 +158,11 @@ A weak answer reports the first break-even without noticing what the standard co
 | Requirement 3: break-even | 10 | Break-even and margin of safety, in dollars and percent | One missing |
 | Requirement 4: added items | 20 | Query filtered correctly, three items, second break-even | Closing entry left in |
 | Requirement 5: table and Goal Seek | 20 | Data table with the right inputs, Goal Seek result kept | Inputs swapped, or no Goal Seek |
-| Requirement 6: memo | 20 | Both estimates, the key assumption named | No key assumption |
+| Requirement 6: memo | 20 | A break-even estimate with its fixed costs, the key assumption named | No key assumption |
 
 ## Extensions and discussion questions
 
-- Treat half of the manufacturing variance as variable and recompute. How far does break-even move?
+- Treat half of the manufacturing variance as variable and recompute. Remove that half from the fixed costs and add its ratio to revenue to the variable costs, so that the total modeled cost at the base-year revenue stays the same. Break-even then falls by about ${{ g.half_move|num(0) }}, to ${{ g.half_be|num(0) }}. Taking the half out of the fixed costs alone, with the ratio unchanged, gives ${{ g.half_naive|num(0) }}, which changes the cost behavior and the baseline cost together.
 - Repeat requirement 3 with the budget of the first year of the window as the fixed costs. How stable is the margin of safety?
 - Discuss: a margin of safety of {{ safety2_pct|pct(0) }} instead of {{ safety_pct|pct(0) }}. Which would you tell a lender?
 - Discuss: Chapter 18 separates the variable and fixed parts of standard cost. What would change in this model?

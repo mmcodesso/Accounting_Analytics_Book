@@ -28,7 +28,7 @@ figures:
 
 ## Purpose and learning outcomes
 
-The CFO and the production manager will want to move between families and items and between the three views while they talk. That is a report, not a workbook, and Chapters 13 to 15 taught the patterns: a model with explicit relationships, a disconnected table that switches a measure (Tutorial 15.1's Steps table), a Validation page and a Tests tab. Power BI fits because the readers explore, and the item costs come from the workbook so the two files cannot disagree. The analytics type is descriptive, with prescriptive intent.
+The CFO and the production manager will want to move between families and items and between the three views while they talk. That is a report, not a workbook, and Chapters 13 to 15 taught the patterns: a model with explicit relationships, a disconnected table that switches a measure (Tutorial 15.1's Steps table), a Validation page and a Tests tab. Power BI fits because the readers explore. Item costs come from the saved workbook, and the report's capacity assumption must come from the same source or be reconciled explicitly{% if g.share_read %}: the Model Parameters table reads the practical share from the workbook's name PracticalUsed{% else %}: the practical share is typed in the report, so it is reconciled by hand{% endif %}. Recalculate and save Excel before refreshing Power BI. The analytics type is descriptive, with prescriptive intent.
 
 Students can:
 
@@ -40,7 +40,7 @@ Students can:
 
 ## Before you assign
 
-- **Files.** Power BI Desktop (Windows only), CharlesRiver.xlsx and Make Buy Reprice.xlsx with its ItemCosts Table from Requirement 4. The project reads `C:\CharlesRiver\` for both; students point the queries at their copies with **Change Source**.
+- **Files.** Power BI Desktop (Windows only), CharlesRiver.xlsx and Make Buy Reprice.xlsx with its ItemCosts Table from Requirement 4. The project reads `C:\CharlesRiver\` for both; students point the queries at their copies with **Change Source**. The solution ships as a .pbip project, and students save their own .pbix.
 - **Data conditions.** The design services have no row in ItemCosts: {{ g.blank_lines|count }} lines in all years, ${{ g.blank_rev|money }} of revenue in the year. ItemCosts holds the base year's costs only, so every visual needs the year.
 - **Verify first.** In DAX query view, run the Checks tab: all {{ g.n_checks|count }} rows of Requirement 5 and {{ g.n_milestone|count }} of Milestone 2 agree.
 
@@ -61,9 +61,9 @@ Individual work or pairs, about 150 minutes: 30 for the model, 20 for the measur
 {{ g.m_year_step }}
 ```
 
-The Capacity and Validation pages load the workbook's Activity, Calendar, FamilyResults, PayClass and Debits1090 Tables the same way. **Check:** {{ g.n_ic|count }} item rows, {{ g.n_lines|count }} invoice lines, {{ g.n_invoices|count }} invoices.
+The Capacity and Validation pages need six more Tables of the workbook, loaded the same way: Activity, Calendar, FamilyResults, PayClass, Debits1090 and Ledger5080{% if g.share_read %}, and the practical share, the one-cell name PracticalUsed, as Model Parameters (its query stops the refresh unless the cell holds one number above 0 and at most 1){% endif %}. Transform Activity into Routing Time: keep Family, ItemGroup and the ten Run and Setup columns, choose **Transform > Unpivot Columns > Unpivot Other Columns** on Family and ItemGroup, split the attribute into its work-center prefix and its kind (Run or Setup), and name the value Hours. Transform Calendar into Work Centers and add a short WorkCenter name (Cutting, Assembly, Finishing, Packing, QA) that matches the prefixes. **Check:** {{ g.n_ic|count }} item rows, {{ g.n_lines|count }} invoice lines, {{ g.n_invoices|count }} invoices.
 
-**Step 2. Relate the tables.** In Model view relate the lines to the item costs on ItemID, many to one with a single direction, and the lines to the invoices on SalesInvoiceID. The Costing View table of Step 4 stays unrelated.
+**Step 2. Relate the tables.** In Model view create three relationships, each many to one with a single direction: the lines to the item costs on ItemID, the lines to the invoices on SalesInvoiceID, and Routing Time to Work Centers on WorkCenter. The Costing View table of Step 4 and the control-total tables stay unrelated. Create the empty Key Measures table (**Home > Enter data**, no rows) before its measures.
 
 **Step 3. Decide the blank.** The lines with no item cost row are the design services. The model keeps them in the totals and out of the Families page: a page filter on Family, and a Validation row that shows them as (Blank). **Check:** the Checks tab's row for lines with no item cost returns {{ g.blank_lines|count }}. **Watch for:** leaving them in the margin. Services carry no standard cost, so the standard margin reads {{ g.margin_with|pct(2) }}, Chapter 14's figure, instead of {{ g.margin_year|pct(2) }}.
 
@@ -86,15 +86,15 @@ The Capacity and Validation pages load the workbook's Activity, Calendar, Family
 
 ### Part 3: The pages and the tests
 
-**Step 6. Build the Families page.** Page filters: the year, and Family is not blank (**Filters on this page**). Add the slicer "{{ g.t_slicer }}" with **Single select**, a matrix "{{ g.t_matrix }}" (item groups and families in rows, View in columns, Margin % and Cost per Unit as values, manufactured items only), a bar chart "{{ g.t_chart }}" and a table "{{ g.t_totals }}". **Check:** {{ example }} reads {{ ex_std|pct(1) }}, {{ ex_absorp|pct(1) }} and {{ ex_td|pct(1) }}, as in Requirement 4.
+**Step 6. Build the Families page.** Page filters: the year, and Family is not blank (**Filters on this page**). Add the slicer "{{ g.t_slicer }}" with **Single select**, a matrix "{{ g.t_matrix }}" (item groups and families in rows, View in columns, Margin % and Cost per Unit as values, manufactured items only), a bar chart "{{ g.t_chart }}" and a table "{{ g.t_totals }}". Select the slicer and choose **Format > Edit interactions**: choose None for the matrix and the totals table, so both keep all three views side by side, and keep Filter for the cards and the ranked-item chart. Turn off the matrix's column subtotals and the table's total row, because the views are alternatives and are never added. **Check:** {{ example }} reads {{ ex_std|pct(1) }}, {{ ex_absorp|pct(1) }} and {{ ex_td|pct(1) }}, as in Requirement 4. Choose Standard, Absorption and Time-driven in turn: the cards and the chart change, and the matrix and the table keep all three views.
 
-**Step 7. Build the Capacity page.** From the workbook's capacity data: a chart "{{ g.t_cap_chart }}", a table "{{ g.t_cap_table }}", a matrix "{{ g.t_family_hours }}" and cards for the practical capacity, the routing time used, the unused capacity, the committed cost and the rate. The practical share is a typed measure, so it changes with the Assumptions value by hand:
+**Step 7. Build the Capacity page.** From the workbook's capacity data: a chart "{{ g.t_cap_chart }}", a table "{{ g.t_cap_table }}", a matrix "{{ g.t_family_hours }}" and cards for the practical capacity, the routing time used, the unused capacity, the committed cost and the rate. {% if g.share_read %}The practical share is a measure over the one-row Model Parameters table, so it follows the workbook's saved value at each refresh:{% else %}The practical share is a typed measure, so it changes with the Assumptions value by hand:{% endif %}
 
 ```jinja
 {{ g.d_share }}
 ```
 
-**Step 8. Add About, Validation and Tests.** About holds a text box, the last invoice date and a page navigator. Validation shows "{{ g.t_by_year }}", "{{ g.t_by_group }}", "{{ g.t_inputs }}", and "{{ g.t_views_wb }}". The Tests tab (DAX query view) runs {{ g.n_tests|count }} tests; this instructor check returns the time-driven margin difference and the blank-line count:
+**Step 8. Add About, Validation and Tests.** About holds a text box, the last invoice date and a page navigator. Validation shows "{{ g.t_by_year }}", "{{ g.t_by_group }}", "{{ g.t_inputs }}", and "{{ g.t_views_wb }}". The Tests tab (DAX query view) runs {{ g.n_tests|count }} tests: Tests 1 to 5 are the core reconciliations, and Test 6 reads the rank table of the optional Concentration page. The Checks tab is the instructor's own regression, not an assignment. This instructor check returns the time-driven margin difference and the blank-line count:
 
 ```jinja
 EVALUATE
@@ -104,7 +104,7 @@ ROW (
 )
 ```
 
-**Check:** a difference of zero and {{ g.blank_lines|count }} lines. The Checks tab tests the values and each view's tie to the workbook. The layout, the slicer state and how (Blank) displays show only in Desktop.
+**Check:** a difference of zero and {{ g.blank_lines|count }} lines. The Checks tab tests the values and each view's tie to the workbook. The layout, the slicer state and how (Blank) displays show only in Desktop. To test that the two files agree, set the practical share on Assumptions to {{ g.at85.share|pct(0) }}, recalculate, save and refresh: practical capacity reads {{ g.at85.pract|num(1) }} hours, the rate ${{ g.at85.rate|num(2) }} and the unused capacity's cost ${{ g.at85.unused_cost|money }}; a report that still shows {{ g.base_pract|num(1) }} hours and ${{ g.base_unused_cost|money }} has drifted. Restore {{ g.base_share|pct(0) }}, recalculate, save and refresh, then rerun the Checks.
 
 {{ figure('IF-18-5-B') }}
 
@@ -122,10 +122,10 @@ ROW (
 
 ## What a strong answer says
 
-- **One measure, three views.** A disconnected table, SWITCH on SELECTEDVALUE, and Margin and Margin % built on it, so every visual changes with the slicer.
+- **One measure, three views.** A disconnected table, SWITCH on SELECTEDVALUE, and Margin and Margin % built on it, so the selected-view cards and the ranking change with the slicer. The matrix and the totals table keep all three views because their interaction with the slicer is set to None.
 - **The blank is a decision.** The design services are out of the cost views and in the Validation row, with the reason.
 - **The report ties out.** Validation reproduces the year's revenue and standard cost of Chapters 13 and 14, the inputs to `1090`, and each view's total against the workbook.
-- **The caveats are visible.** The practical share is typed and must follow the workbook; the default view is Standard.
+- **The caveats are visible.** {% if g.share_read %}The practical share is the workbook's saved value, so recalculate and save before refreshing{% else %}The practical share is typed and must follow the workbook's value{% endif %}; the default view is Standard.
 
 A weak answer builds the visuals without the year filter or the tie to the workbook.
 
@@ -134,7 +134,7 @@ A weak answer builds the visuals without the year filter or the tie to the workb
 - **No year filter.** *Symptom:* revenue of ${{ g.rev_all|money }}. *Response:* ask which year the item costs describe.
 - **Services in the margin.** *Symptom:* {{ g.margin_with|pct(2) }}. *Response:* ask what standard cost the design services carry.
 - **A silent default.** *Symptom:* two views selected, Standard shown. *Response:* ask what SELECTEDVALUE returns.
-- **A drifting practical share.** *Symptom:* the Capacity page and the costs disagree after the Assumptions change. *Response:* ask where each file holds the share.
+- **A drifting practical share.** *Symptom:* the Capacity page and the costs disagree after the Assumptions change. *Response:* ask where each file holds the share{% if g.share_read %}, and whether the workbook was recalculated and saved before the refresh{% endif %}.
 - **A broken source path.** *Symptom:* a refresh error on a new computer. *Response:* point the queries at the files with **Change Source**.
 
 ## Grading guide
@@ -150,6 +150,6 @@ A weak answer builds the visuals without the year filter or the tie to the workb
 ## Extensions and discussion questions
 
 - Add the cumulative-margin curve of the Concentration page: a rank table from GENERATESERIES and TOPN over the items.
-- Add a parameter for the practical share, and say why it cannot move the workbook's costs.
+- Replace the practical share with a what-if parameter, and say why it moves the Capacity page and not the workbook's costs, which is why the model reads the workbook's value.
 - Discuss: which view should the slicer open on, and who decides?
 - Discuss: the services are left out of the cost views. What would a reader miss without the Validation row?

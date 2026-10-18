@@ -4,7 +4,10 @@
 --    the same Draw.io export the book's PDF uses) becomes a float with that PDF and its alt text as an unnumbered caption;
 --  * inline code is wrapped in \aacode (defined in instructor.tex) so a long formula can break at the line's end;
 --  * every table gets column widths from its content, because pandoc leaves a pipe table whose lines are short
---    unwrapped, and gives equal widths to one whose lines are long.
+--    unwrapped, and gives equal widths to one whose lines are long;
+--  * a heading, a short bold label ("**What students should see.**") or a table asks for the room of its first lines
+--    (\Needspace), counting what follows the heading or label, so none of them ends a page alone; and a heading is
+--    preceded by \FloatBarrier, so a waiting figure is set before the next section starts instead of pages later.
 -- Metadata: figure-dir (the folder of <unit folder>/<id>.pdf).
 if not FORMAT:match('latex') then
   return {}
@@ -126,4 +129,93 @@ local main = {
   end,
 }
 
-return {read_meta, main}
+-- the printed lines a block needs at the top of its page: a table its head and first rows, a short list all of it
+-- (so the last discussion question never sits alone on a page), anything else a few lines
+local LIST_WHOLE = 14   -- a list of up to this many printed lines moves whole
+local function first_lines(block)
+  if block == nil then return 0 end
+  if block.t == 'Table' then
+    -- the head and the first two rows, each row as tall as its longest cell needs in its column (the widths are
+    -- set by the table filter above); a tall first row, as in a grading table, needs more than a fixed few lines
+    local total, counted = 2, 0
+    for _, body in ipairs(block.bodies) do
+      for _, row in ipairs(body.body) do
+        if counted >= 2 then break end
+        local lines = 1
+        for i, cell in ipairs(row.cells) do
+          local width = block.colspecs[i] and block.colspecs[i][2]
+          if type(width) ~= 'number' then width = 1 / #row.cells end
+          lines = math.max(lines, math.ceil(#pandoc.utils.stringify(cell.content or cell.contents) / math.max(width * 100, 8)))
+        end
+        total, counted = total + lines, counted + 1
+      end
+    end
+    return total + 2   -- a table's rules and cell padding take more than its text lines
+  end
+  if block.t == 'CodeBlock' then
+    -- a short block moves whole (its own \Needspace asks for six lines), so a label before it moves with it
+    local n = select(2, block.text:gsub('\n', '\n')) + 1
+    return (n <= LIST_WHOLE and n or 6) + 1
+  end
+  if block.t == 'BulletList' or block.t == 'OrderedList' then
+    local total = 0
+    for _, item in ipairs(block.content) do
+      total = total + math.ceil(#pandoc.utils.stringify(item) / 95) + 0.3
+    end
+    total = math.ceil(total)
+    if total <= LIST_WHOLE then return total end
+  end
+  return 3
+end
+
+-- a paragraph that is only a short bold label, such as "**Assignment bundles**" or "**Step 2. Plan the test.**"
+local function is_label(block)
+  return block ~= nil and block.t == 'Para' and #block.content >= 1 and block.content[1].t == 'Strong'
+    and #pandoc.utils.stringify(block) <= 90
+end
+
+local function needspace(lines)
+  return pandoc.RawBlock('latex', '\\Needspace{' .. lines .. '\\baselineskip}')
+end
+
+-- the next block that prints, past the raw LaTeX the filter above adds (the room a code block asks for)
+local function content_at(blocks, j)
+  while blocks[j] ~= nil and blocks[j].t == 'RawBlock' do j = j + 1 end
+  return blocks[j]
+end
+
+local keep = {
+  Blocks = function(blocks)
+    local result, held = {}, false
+    for i, block in ipairs(blocks) do
+      local following = content_at(blocks, i + 1)
+      if block.t == 'Header' and held then
+        -- a heading right under another heading or a label: the room was asked for before the first of them
+        held = 'heading'
+      elseif block.t == 'Header' then
+        table.insert(result, pandoc.RawBlock('latex', '\\FloatBarrier'))
+        -- the heading, any headings and labels right under it, and the first lines of what follows them
+        local wanted, j = 3, i + 1
+        while blocks[j] ~= nil and (blocks[j].t == 'Header' or is_label(blocks[j])) do
+          wanted, j = wanted + (blocks[j].t == 'Header' and 3 or 2), j + 1
+        end
+        table.insert(result, needspace(wanted + first_lines(content_at(blocks, j))))
+        held = 'heading'
+      elseif is_label(block) and following ~= nil and following.t ~= 'Header' then
+        -- a label right under a heading was counted with it; a label after another label (a short Check line, then
+        -- the next step's label) asks for its own room
+        if held ~= 'heading' then table.insert(result, needspace(2 + first_lines(following))) end
+        held = 'label'
+      elseif block.t == 'Table' then
+        if not held then table.insert(result, needspace(first_lines(block))) end
+        held = false
+      else
+        held = false
+      end
+      table.insert(result, block)
+    end
+    return result
+  end,
+}
+
+return {read_meta, main, keep}

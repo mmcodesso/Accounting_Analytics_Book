@@ -277,23 +277,28 @@ def t4_3(b: Build) -> None:
 
 def t5_1(b: Build) -> None:
     wb, e = b.wb, b.exp
-    item = xl.table(wb, "Item")
-    xl.add_column(item, "ProductType", "=MID([@ItemCode],5,3)")
-    xl.add_column(item, "CodeCheck", '=AND(LEN([@ItemCode])=12,MID([@ItemCode],4,1)="-",MID([@ItemCode],8,1)="-")')
-    inv = xl.table(wb, "SalesInvoice")
-    xl.add_column(inv, "FiscalYear", "=YEAR([@InvoiceDate])", "0")
-    xl.add_column(inv, "FiscalQuarter", "=ROUNDUP(MONTH([@InvoiceDate])/3,0)", "0")
-    xl.add_column(inv, "Period", '=[@FiscalYear]&"-Q"&[@FiscalQuarter]')
-    xl.add_column(inv, "DaysToDue", "=[@DueDate]-[@InvoiceDate]", "0")
-    xl.add_column(inv, "TermsGroup", '=IFS([@DaysToDue]<=30,"Up to 30 days",[@DaysToDue]<=60,"31 to 60 days",'
-                                     'TRUE,"Over 60 days")')
-    xl.add_column(inv, "StandardTerms", "=OR([@DaysToDue]=30,[@DaysToDue]=45,[@DaysToDue]=60,[@DaysToDue]=90)")
+    # Tutorial 5.1's columns: one list feeds both the Tables and the Documentation entry, which Step 7a asks to
+    # name each column with its formula
+    added = {"Item": [("ProductType", "=MID([@ItemCode],5,3)", None),
+                      ("CodeCheck", '=AND(LEN([@ItemCode])=12,MID([@ItemCode],4,1)="-",MID([@ItemCode],8,1)="-")', None)],
+             "SalesInvoice": [("FiscalYear", "=YEAR([@InvoiceDate])", "0"),
+                              ("FiscalQuarter", "=ROUNDUP(MONTH([@InvoiceDate])/3,0)", "0"),
+                              ("Period", '=[@FiscalYear]&"-Q"&[@FiscalQuarter]', None),
+                              ("DaysToDue", "=[@DueDate]-[@InvoiceDate]", "0"),
+                              ("TermsGroup", '=IFS([@DaysToDue]<=30,"Up to 30 days",[@DaysToDue]<=60,"31 to 60 days",'
+                                             'TRUE,"Over 60 days")', None),
+                              ("StandardTerms", "=OR([@DaysToDue]=30,[@DaysToDue]=45,[@DaysToDue]=60,[@DaysToDue]=90)",
+                               None)]}
+    for table, columns in added.items():
+        t = xl.table(wb, table)
+        for name, formula, fmt in columns:
+            xl.add_column(t, name, formula, fmt)
     a = ws_(b, "Analysis")
     values(a, {"A39": "Invoices with nonstandard terms", "A40": "Item codes failing the check"})
     formulas(a, {"B39": "=COUNTIF(SalesInvoice[StandardTerms],FALSE)", "B40": "=COUNTIF(Item[CodeCheck],FALSE)"})
-    b.doc["Calculated columns"] += (" Item: ProductType, MID([@ItemCode],5,3); CodeCheck, the item code's form. "
-                                    "SalesInvoice: FiscalYear, FiscalQuarter, Period, DaysToDue, TermsGroup (IFS), and "
-                                    "StandardTerms (OR).")
+    b.doc["Calculated columns"] += "".join(
+        f" {table}: " + "; ".join(f"{name}, {formula[1:]}" for name, formula, _ in columns) + "."
+        for table, columns in added.items())
     b.sheets["Analysis"] += "; checks in B39 (nonstandard terms) and B40 (item codes)"
     b.sheets["Item"] += " with ProductType and CodeCheck"
     b.sheets["SalesInvoice"] += " with fiscal period and payment-terms columns"
@@ -455,7 +460,7 @@ def t6_1(b: Build) -> None:
                       f"C{r}": f"=SUMIFS(InvoiceLines[LineTotal],InvoiceLines[ItemGroup],$A{r},{crit})",
                       f"D{r}": f"=C{r}/B{r}"})
     values(ws, {"A17": "Total of groups", "A18": "Difference from control total"})
-    formulas(ws, {"B17": "=SUM(B12:B16)", "C17": "=SUM(C12:C16)", "B18": "=B17-B2", "C18": "=C17-B3"})
+    formulas(ws, {"B17": "=SUM(B12:B16)", "C17": "=SUM(C12:C16)", "B18": "=B17-B2", "C18": "=ROUND(C17-B3,2)"})   # Step 6f: to the cent
     ws.Range("C12:D18").NumberFormat = MONEY
     values(ws, {"F1": "From", "G1": "Lines", "F18": "Total"})
     for i in range(16):
@@ -473,6 +478,9 @@ def t6_1(b: Build) -> None:
     chart.SetSourceData(ws.Range("G1:G17"))
     chart.SeriesCollection(1).XValues = ws.Range("F2:F17")
     chart.ChartGroups(1).GapWidth = 0
+    for axis, text in ((1, "Line total, lower bound of the $1,000 bin"), (2, "Lines")):      # Step 9d: the axis titles of Figure 6.2
+        chart.Axes(axis).HasTitle = True
+        chart.Axes(axis).AxisTitle.Text = text
     b.doc["Parameters"] += " ReportYear (Parameters!B5, an input)."
     b.sheets["Profile"] = "the profile of the report year's invoice lines, revenue by item group, and a histogram"
     write_documentation(b)
@@ -628,13 +636,15 @@ def t6_3(b: Build) -> None:
         br.Range(f"C{11 + i}").Formula = f.replace("B", "C")
     bridge_labels = [f"{q3} margin", "Volume", "Mix", "Price lists", "Promotions", "Cost", f"{q4} margin", "Check"]
     bridge = ["=B9", "=(C4-B4)*B11", "=C4*(C12-B12)", "=-C4*(C13-B13)", "=-C4*(C14-B14)", 0, "=C9",
-              "=B16+SUM(B17:B21)-B22"]
+              "=ROUND(B16+SUM(B17:B21)-B22,2)"]       # Step 5d: the check compares to the cent
     for i, (label, f) in enumerate(zip(bridge_labels, bridge)):
         br.Cells(16 + i, 1).Value = label
         br.Range(f"B{16 + i}").Formula = f
     br.Range("C21").Value = "Each item has one standard cost"
+    br.Range("C23").Formula = '=IF(B23=0,"PASS","INVESTIGATE")'
     br.Range("B4:C14").NumberFormat = MONEY
-    br.Range("B16:B23").NumberFormat = "#,##0"
+    br.Range("B16:B22").NumberFormat = "#,##0"          # Step 5e: whole dollars shown, full precision kept
+    br.Range("B23").NumberFormat = MONEY
     br.Columns("A").ColumnWidth = 30
     br.Columns("B:C").ColumnWidth = 16
     shape = br.Shapes.AddChart2(-1, xl.XL_WATERFALL, br.Range("E3").Left, br.Range("E3").Top, 480, 300)
@@ -679,6 +689,7 @@ def t6_3(b: Build) -> None:
 
     t = "6.3"
     b.check(t, "bridge check (Bridge!B23)", 0, "=Bridge!B23", 0.01)
+    b.check(t, "bridge check status (Bridge!C23)", "PASS", "=Bridge!C23", 0, "General")
     for addr, key, label in (("B16", "q3", f"{q3} margin"), ("B17", "volume", "volume effect"),
                              ("B18", "mix", "mix effect"), ("B19", "price", "price-list effect"),
                              ("B20", "promotions", "promotions effect"), ("B22", "q4", f"{q4} margin")):
@@ -776,7 +787,7 @@ def t7_1(b: Build) -> None:
             f"D{r}": (f"=COUNTA(UNIQUE(FILTER(InvoiceLines[CustomerID],(InvoiceLines[InvoiceDate]>=A{r})*"
                       f"(InvoiceLines[InvoiceDate]<EDATE(A{r},1)))))"),
             f"E{r}": f"=AVERAGEIFS(InvoiceLines[LineTotal],{month})"})
-    ws.Range("C38").Formula2 = "=SUM(C2:C37)-SUM(InvoiceLines[LineTotal])"
+    ws.Range("C38").Formula2 = "=ROUND(SUM(C2:C37)-SUM(InvoiceLines[LineTotal]),2)"      # to the cent: no binary residue
     ws.Range("A2:A37").NumberFormat = "mmm yyyy"
     ws.Range("C2:C38").NumberFormat = MONEY
     ws.Range("E2:E37").NumberFormat = MONEY
@@ -801,6 +812,10 @@ def t7_1(b: Build) -> None:
     for r in range(42, 45):
         formulas(ws, {f"F{r}": f"=E{r}/$E$41-1", f"G{r}": f"=AVERAGE(ABS(B{r}:D{r}-$B$41:$D$41)/$B$41:$D$41)"})
     formulas(ws, {"B47": "=3*AVERAGE(C3:C37)", "B48": "=B47*(1-G43)", "B49": "=B47*(1+G43)"})
+    # Step 6g: TREND spills the same three forecasts as FORECAST.LINEAR (I41:I43 stay clear for the spill)
+    values(ws, {"I40": "TREND check"})
+    ws.Range("I41").Formula2 = "=TREND($C$3:$C$34,$B$3:$B$34,$B$35:$B$37)"
+    ws.Range("I41:I43").NumberFormat = MONEY
     ws.Range("B41:E44").NumberFormat = MONEY
     ws.Range("F42:G44").NumberFormat = PCT
     ws.Range("B47:B49").NumberFormat = MONEY
@@ -845,6 +860,8 @@ def t7_1(b: Build) -> None:
         b.check(t, f"{key} forecast, monthly error (Forecast!G{r})", round(bt[key]["monthly"], 9), f"=Forecast!G{r}",
                 1e-9, PCT)
     b.check(t, f"forecast of {b.year + 1} Q1 (Forecast!B47)", round(fc["value"], 2), "=Forecast!B47", 0.01)
+    b.check(t, "TREND's three values less the FORECAST.LINEAR row (Forecast!I41:I43 less B42:D42)", 0,
+            "=ROUND(SUM(Forecast!I41:I43)-SUM(Forecast!B42:D42),2)", 0.005)
 
 
 def t7_2(b: Build) -> None:
@@ -910,9 +927,15 @@ def t7_2(b: Build) -> None:
             f"{col}18": f"=SUMIFS(FlexLines[Quantity],FlexLines[ItemGroup],{g})"})
     for r in list(range(4, 17)) + [17, 18]:
         rep.Range(f"F{r}").Formula = f"=SUM(B{r}:E{r})"
-    values(rep, {"A20": "Lines without a planned price"})
+    values(rep, {"A20": "Lines without a planned price", "A21": "Margin bridge difference", "A22": "Row control"})
     rep.Range("B20").Formula2 = "=COUNTBLANK(FlexLines[PlannedPrice])"
+    for col in "BCDEF":                                   # Step 5d: the bridge, to the cent
+        rep.Range(f"{col}21").Formula2 = f"=ROUND({col}6+{col}13+{col}14-{col}12,2)"
+    rep.Range("B22").Formula2 = ('=ROWS(FlexLines[LineTotal])-COUNTIFS(InvoiceLines[FiscalYear],' + str(y) +
+                                 ',InvoiceLines[ItemGroup],"<>Services")')          # Step 4k: the merge added no rows
     rep.Range("B4:F18").NumberFormat = MONEY
+    rep.Range("B21:F21").NumberFormat = MONEY
+    rep.Range("B22").NumberFormat = COUNT
     rep.Columns("A").ColumnWidth = 30
     rep.Columns("B:F").ColumnWidth = 16
 
@@ -1002,6 +1025,9 @@ def t7_2(b: Build) -> None:
                 f"=BudgetReport!{addr}", 0.01)
     b.check(t, "static margin plus the two variances less the actual margin, total (column F)", 0,
             "=BudgetReport!F6+BudgetReport!F13+BudgetReport!F14-BudgetReport!F12", 0.01)
+    b.check(t, "margin bridge difference, every column (BudgetReport!B21:F21)", 0,
+            "=SUMPRODUCT(ABS(BudgetReport!B21:F21))", 0.005)
+    b.check(t, "FlexLines rows less the product lines of InvoiceLines (BudgetReport!B22)", 0, "=BudgetReport!B22", 0, COUNT)
     b.check(t, "budgeted burden rate (OpexReport!H5)", round(op["burden_budget"], 9), "=OpexReport!H5", 1e-9, PCT)
     b.check(t, "actual burden rate (OpexReport!H6)", round(op["burden_actual"], 9), "=OpexReport!H6", 1e-9, PCT)
     b.check(t, "flexed commission budget (OpexReport!H8)", round(flexed, 2), "=OpexReport!H8", 0.01)

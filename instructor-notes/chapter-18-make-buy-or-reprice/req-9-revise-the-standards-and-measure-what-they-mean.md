@@ -25,8 +25,9 @@ Students can:
 ## Before you assign
 
 - **Files.** Make Buy Reprice.xlsx with Requirements 2 and 4, and MakeBuy.sql on CharlesRiver_Capstone.sqlite.
-- **Data conditions.** The finished goods on the opening entry have no item detail, so the stock is rebuilt from completions less shipments plus returns, which counts it as made since the opening only if shipments drew on new production first. The ledger records no income tax, and the year-end closes net revenue and expense to zero.
+- **Data conditions.** The finished goods on the opening entry have no item detail, so the stock is rebuilt from completions less shipments plus returns, which counts it as made since the opening only if shipments drew on new production first. The ledger records no income tax, and the closes net revenue and expense to zero.
 - **Verify first.** The plan figures typed on Assumptions must equal the records: the sheet's three checks (B19:B21) read TRUE.
+- **Authority.** Topic 330, Subtopic 10, section 30 (initial measurement), and Topic 250, Subtopic 10, sections 20, 45 and 50 (definitions, reporting of errors and changes in estimate, disclosures). Read the Codification itself before teaching a definitive conclusion. Charles River is not treated as an SEC registrant, so Staff Accounting Bulletins 99 and 108 only illustrate what else bears on materiality.
 
 ## How to run it
 
@@ -46,29 +47,22 @@ Depreciation    =PlanDepreciation/PlanVolume
 Rate            =SUM(B5:B9)
 ```
 
-**Check:** 30.38 + 18.99 + 5.47 + 4.36 + 4.26 = 63.46 an hour, on 68,912.79 standard hours at 1.18 hours per standard hour and a labor rate of 26.62 with 14.14% burden. **Watch for:** supervision without the burden, a rate of 62.92, and the base year's depreciation instead of the plan year's, 63.61. Q27 returns the plan year's depreciation of the assets charged to the clearing account, $293,499.96:
+**Check:** 30.38 + 18.99 + 5.47 + 4.36 + 4.26 = 63.46 an hour, on 68,912.79 standard hours at 1.18 hours per standard hour and a labor rate of 26.62 with 14.14% burden. **Watch for:** supervision without the burden, a rate of 62.92, and the base year's depreciation instead of the plan year's, 63.61. Q27 returns the plan year's depreciation of the assets charged to the clearing account, $293,499.96.
 
-```sql
-SELECT ROUND(SUM(Monthly * (ToMonth - FromMonth + 1)), 2)
-    AS PlanYearDepreciation
-FROM InPlanYear
-WHERE ToMonth >= FromMonth;
-```
-
-**Step 2. Compare it with the other rates.** The current rate is the conversion released per standard hour, the time-driven rate adds the unused capacity's cost back, and the actual rate is the year's inputs per standard hour.
+**Step 2. Compare it with the other rates.** Put the rates on one basis, the standard hours completed. The current rate is the standard conversion released. The time-driven rate is the Factory Overhead entries plus the committed cost of the routing time used, and leaves out the unused capacity. The actual rate is all the inputs to `1090`, so it adds the unused capacity's cost to the time-driven conversion. The committed cost per practical routing hour, $39.97, is a separate rate.
 
 ```
 Current   =ConversionReleased/StdHours
 Actual    =Inputs1090/StdHours
 ```
 
-**Check:** the proposed rate $63.46 against $47.40 today, $61.81 time-driven and $78.77 actual. A standard on actual cost would carry the idle capacity and the hours recorded above the routings into inventory, and Topic 330 charges abnormal costs of that kind to the period.
+**Check:** the proposed rate $63.46 against $47.40 today, $61.81 time-driven and $78.77 actual; the time-driven rate plus the unused capacity's $16.96 an hour is the actual rate. A standard on actual cost would carry the capacity left unused and the hours recorded above the routings into inventory. Topic 330 charges abnormal costs, such as idle facility expense, to the period, but hours above the routings count only if the routing standard, the normal support work and the actual conditions show them abnormal, which the records do not settle.
 
 ![A mock of the top of the Standards sheet, where the proposed rate is built and set beside the other rates.](../figures/chapter-18-make-buy-or-reprice/IF-18-9-A.pdf)
 
 ### Part 2: The stock and its revaluation
 
-**Step 3. Rebuild the stock at each year-end (Q28 and Q29).** Routine: type the query at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Q28 returns the units of each manufactured finished good at the three year-ends; Q29 totals them, leaving out the items with a negative balance. The core of Q29 sums the movements up to each year-end:
+**Step 3. Rebuild the stock at each year-end (Q28 and Q29).** Routine: type the query at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Q28 returns the units of each manufactured finished good at the three year-ends; Q29 totals them, leaving out the items with a negative balance. The block is a fragment of Q29 (run the complete query), the sum of the movements up to each year-end:
 
 ```sql
 OnHand AS (
@@ -79,7 +73,7 @@ OnHand AS (
 )
 ```
 
-**Check:** Q28 returns 83 rows, Q29 75, 79, 82 items at the three year-ends. FUR-SDB-0006 goes negative at the end of 2024; FUR-DSK-0044 goes negative at the end of 2026. The opening stock was drawn on, and item-level opening balances would say which layers remain. Only manufactured finished goods revalue, because purchased ones are carried at their receipt cost. Paste Q28 into the Table OnHand and add the standard hours, conversion and standard cost per unit by lookup.
+**Check:** Q28 returns 83 rows, Q29 75, 79, 82 items at the three year-ends. FUR-SDB-0006 goes negative at the end of 2024; FUR-DSK-0044 goes negative at the end of 2026. The opening stock was drawn on, and item-level opening balances would say which layers remain. Paste Q28 into the Table OnHand and add the standard hours, conversion and standard cost per unit by lookup.
 
 **Step 4. Revalue at the proposed rate.** The revaluation is the standard hours in stock at the new rate, less the conversion already in them.
 
@@ -92,16 +86,7 @@ Revaluation      =B36*NewRate-B37
 
 ### Part 3: The effect on the statements
 
-**Step 5. Measure it against the screen (Q30 and Q31).** Q30 returns income before income taxes for each year, leaving the closes out:
-
-```sql
-WHERE a.AccountType IN ('Revenue', 'Expense')
-    AND gl.FiscalYear BETWEEN 2024 AND 2026
-    AND gl.VoucherNumber NOT IN (
-        SELECT EntryNumber
-        FROM JournalEntry
-        WHERE EntryType LIKE 'Year-End Close%')
-```
+**Step 5. Measure it against the screen (Q30 and Q31).** Q30 returns income before income taxes for each year, leaving the closes out of revenue and expense.
 
 Q31 returns the opening entry's finished goods, $4,111,795.76, which has no item detail and is left out. The effects follow from the revaluations: retained earnings at the start of the prior year, each year's income, and each balance.
 
@@ -126,15 +111,15 @@ Q31 returns the opening entry's finished goods, $4,111,795.76, which has no item
 | Screens, prior year and current | $256,717.74; $225,180.56 | 5 |
 | Rate with no indirect hours; at the two normal capacities | $58.00; $64.42; $62.68 | 6 |
 
-> **Instructor notes, Requirement 9:** proposed rate per standard hour on the Part III plan (68,912.79 standard hours, a planning target of 1.18 hours per standard hour): direct labor 26.62 x 1.1414 = 30.38; overhead that varies 18.99; indirect labor at plan 0.18 x 30.38 = 5.47; supervision 263,191.24 x 1.1414 / 68,912.79 = 4.36; depreciation 293,499.96 / 68,912.79 = 4.26; total 63.46. Current 47.40; time-driven 61.81; 2026 actual 78.77, which includes idle capacity and the hours recorded above the routings (Part III), abnormal under Topic 330. Revised standard costs (time-driven beside): BNH 398.17 (399.01), NGT 306.99 (308.67), SDB 337.91 (338.07), TBL 358.19 (357.64), SCN 189.74 (188.24), PIL 180.97 (180.09). Manufactured finished goods made since the opening and on hand, as the movements can rebuild them (completions less shipments plus returns, by item, the items with a positive balance): that counts the stock as made since the opening only if shipments drew on new production first, and FUR-SDB-0006 at 2024 and FUR-DSK-0044 at 2026 go negative, so the opening stock was drawn on and item-level opening balances are needed to know which layers remain: 2024 11,880.3 units, 16,482.8 standard hours, conversion 788,641.14 (47.85 an hour); 2025 17,103.3, 23,116.1, 1,097,455.36; 2026 21,883.6, 29,522.4, 1,402,508.30 (5,627,028.26 at standard). Revaluation at 63.46: +257,435 / +369,596 / +471,117. What is treated as normal capacity, the volume over which supervision and depreciation (8.62 an hour at plan) are spread, moves it: at 90% and 110% of the plan volume the rate is 64.42 and 62.68, and the revaluation +273,219 / +391,731 / +499,387 and +244,521 / +351,485 / +447,987. The indirect hours the rate allows are a different question, of labor content: with none (1.0 hours, 58.00) the revaluation is +167,288 / +243,171 / +309,655, and the 2025 balance (243,171) falls below the 5% screen while 2026's (309,655) stays above. Time-driven +230,093 / +331,251 / +422,145; at 2026 actual +922,829 (capitalizing idle capacity). Effect on the fiscal 2025 and 2026 statements at 63.46: retained earnings at January 1, 2025, +257,435, 2025 income +112,161, 2026 income +101,521; balance sheet +369,596 (2025) and +471,117 (2026), both above the 5% screen of tbl-18-02 (256,717.74 and 225,180.56) at either end of the normal-capacity range, while the income effects are below it. The 5% is a first, quantitative screen: a strong answer also weighs the nature of the item, the aggregate with other misstatements, the line items and periods it touches, and the tax effect the ledger cannot supply. The rates are 2027's plan applied to 2024-2026 stock: a sensitivity, not an established error. Before calling the difference an error, a strong answer asks whether the standards in use, the normal capacity of those years, and the costs known when each set of statements was prepared would have given a materially different inventory under Topic 330, names that evidence (period costs and volumes, the variances' disposition, counts and item-level opening balances), and recommends accordingly: revised statements if a material prior-period error is established (inventories, retained earnings, and income corrected, with the correction disclosed), the new standard prospectively if the difference is a change in estimate, and, for an error established but immaterial to those years, a correction in the next statements only if recording it there would not itself materially misstate that year, judged on amount and nature (otherwise the comparatives are revised), all under ASC Topic 250. The decision is the CFO's. Only manufactured finished goods revalue, because purchased ones are carried at their receipt cost. The opening 4,111,795.76 of finished goods has no item detail and is left out.
+> **Instructor notes, Requirement 9:** proposed rate per standard hour on the Part III plan (68,912.79 standard hours, a planning target of 1.18 hours per standard hour): direct labor 26.62 x 1.1414 = 30.38; overhead that varies 18.99; indirect labor at plan 0.18 x 30.38 = 5.47; supervision 263,191.24 x 1.1414 / 68,912.79 = 4.36; depreciation 293,499.96 / 68,912.79 = 4.26; total 63.46. Current 47.40; time-driven 61.81; 2026 actual 78.77, which includes the capacity left unused and the hours recorded above the routings (Part III): idle facility expense is an abnormal cost that Topic 330 charges to the period, while hours above the routings count only if the routing standard, normal support work and actual conditions show them abnormal. Revised standard costs (time-driven beside): BNH 398.17 (399.01), NGT 306.99 (308.67), SDB 337.91 (338.07), TBL 358.19 (357.64), SCN 189.74 (188.24), PIL 180.97 (180.09). Manufactured finished goods made since the opening and on hand, as the movements can rebuild them (completions less shipments plus returns, by item, the items with a positive balance): that counts the stock as made since the opening only if shipments drew on new production first, and FUR-SDB-0006 at 2024 and FUR-DSK-0044 at 2026 go negative, so the opening stock was drawn on and item-level opening balances are needed to know which layers remain: 2024 11,880.3 units, 16,482.8 standard hours, conversion 788,641.14 (47.85 an hour); 2025 17,103.3, 23,116.1, 1,097,455.36; 2026 21,883.6, 29,522.4, 1,402,508.30 (5,627,028.26 at standard). Revaluation at 63.46: +257,435 / +369,596 / +471,117. What is treated as normal capacity, the volume over which supervision and depreciation (8.62 an hour at plan) are spread, moves it: at 90% and 110% of the plan volume the rate is 64.42 and 62.68, and the revaluation +273,219 / +391,731 / +499,387 and +244,521 / +351,485 / +447,987. The indirect hours the rate allows are a different question, of labor content: with none (1.0 hours, 58.00) the revaluation is +167,288 / +243,171 / +309,655, and the 2025 balance (243,171) falls below the 5% screen while 2026's (309,655) stays above. Time-driven +230,093 / +331,251 / +422,145; at 2026 actual +922,829 (capitalizing idle capacity). Effect on the fiscal 2025 and 2026 statements at 63.46: retained earnings at January 1, 2025, +257,435, 2025 income +112,161, 2026 income +101,521; balance sheet +369,596 (2025) and +471,117 (2026), both above the 5% screen of tbl-18-02 (256,717.74 and 225,180.56) at either end of the normal-capacity range, while the income effects are below it. The 5% is a first, quantitative screen: a strong answer also weighs the nature of the item, the aggregate with other misstatements, the line items and periods it touches, and the tax effect the ledger cannot supply. The rates are 2027's plan applied to 2024-2026 stock: a sensitivity, not an established error. Before calling the difference an error, a strong answer asks whether the standards in use, the normal capacity of those years, and the costs known when each set of statements was prepared would have given a materially different inventory under Topic 330, names that evidence (period costs and volumes, the variances' disposition, counts and item-level opening balances), and recommends accordingly: revised statements if a material prior-period error is established (inventories, retained earnings, and income corrected, with the correction disclosed), the new standard prospectively if the difference is a change in estimate, and, for an error established but immaterial to those years, a correction in the next statements only if recording it there would not itself materially misstate that year, judged on amount and nature (otherwise the comparatives are revised), all under ASC Topic 250. The decision is the CFO's. Only manufactured finished goods revalue, because purchased ones are carried at their receipt cost. The opening 4,111,795.76 of finished goods has no item detail and is left out.
 
 ## What a strong answer says
 
 - **The rate.** Normal capacity at the plan volume, with supervision and depreciation spread over it; a standard on actual cost would capitalize idle capacity.
 - **The effect.** The balance effects exceed the screen and the income effects do not, at either end of the normal-capacity range; with no indirect hours the prior year's balance falls below it.
-- **Materiality is more than the screen.** The nature of the item, its aggregate with other misstatements, the line items and periods it touches, and the tax effect the ledger cannot supply bear on it.
-- **Evidence before correction.** Would the standards in use, the normal capacity of those years and the costs known when each set of statements was prepared have given a materially different inventory under Topic 330? Name the period costs and volumes, the variances' disposition, counts and item-level opening balances.
-- **The recommendation.** A material prior-period error: revised statements, with inventories, retained earnings and income corrected and the correction disclosed. A change in estimate: the new standard from now on. An error immaterial to the earlier years: corrected in the next statements only if recording it there would not itself materially misstate that year, judged on amount and nature, and otherwise by revising the comparatives (ASC Topic 250). The decision is the CFO's, and the shareholders hear which.
+- **Materiality is more than the screen.** The item's nature, its aggregate with other misstatements, the lines and periods it touches, and the tax effect the ledger cannot supply.
+- **Evidence before correction.** Would the standards in use, the normal capacity of those years and the costs then known have given a materially different inventory under Topic 330? Name the period costs and volumes, the variances' disposition, counts and item-level opening balances.
+- **The recommendation.** A material prior-period error: revised statements, with the correction disclosed. A change in estimate: the new standard from now on. An error immaterial to the earlier years: corrected in the next statements only if recording it there would not itself materially misstate that year, judged on amount and nature, and otherwise by revising the comparatives (ASC Topic 250). The decision is the CFO's, and the shareholders hear which.
 
 A weak answer calls the revaluation an error, or stops at the screen.
 

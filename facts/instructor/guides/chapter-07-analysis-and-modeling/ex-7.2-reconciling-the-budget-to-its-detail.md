@@ -26,7 +26,7 @@ By the end, students can:
 - reconcile a summary to its detail by account and find what the differences have in common (outcome 3);
 - write a finding that says which source to use and which control would have caught the problem (outcome 3).
 
-**Competencies practiced.** CPA Evolution Core S1 M4 (financial statement analysis and performance measures) and Core S1 M8 T2 (financial data: extraction, transformation and cleansing); IMA Budgeting and Forecasting, and Data Literacy; IFAC IES 2 (b) and IES 3 (a); AACSB A5 part 5.1.
+**Competencies practiced.** CPA Evolution Core S1 M8 T2 (financial data: extraction, transformation and cleansing); IMA Budgeting and Forecasting, and Data Literacy; IFAC IES 2 (b) and IES 3 (a); AACSB A5 part 5.1.
 
 ## Before you assign
 
@@ -57,23 +57,23 @@ c. Choose **Home > Merge Queries**, merge with the Account query on AccountID wi
 a. Import **T77_BudgetLine** with **Transform Data** and name the query `BudgetLineAll`.
 b. Filter BudgetCategory to clear **Balance Sheet**, which keeps Revenue, COGS and Operating Expense.
 c. Group by FiscalYear and AccountID with the sum of BudgetAmount, as in Step 1.
-d. Load both new queries together: **Close & Load To**, **Table**, **New worksheet**. The choice applies to both.
+d. Load both new queries together: **Close & Load To**, **Table**, **New worksheet**. The choice applies to both, so each query becomes its own worksheet Table named after it. Confirm both names in **Queries & Connections**, because the formulas below refer to them.
 
 **Check:** the query has {{ g.n_detail|count }} rows. **Watch for:** the Balance Sheet category left in, which makes the detail total far larger than the summary's and the difference many times the real gap.
 
 ### Requirement (3): The comparison and the cause
 
-**Step 3. Total both queries for {{ d.C }}.** On a worksheet named `Ex 7.2` type the year in B2 in blue, then:
+**Step 3. Total both queries for {{ d.C }}.** On a worksheet named `Ex 7.2` type the year in B2 in blue, and label A4:A6 `Budget summary`, `Budget detail` and `Detail less summary`. Enter the formulas below in B4, B5 and B6.
 
 ```
-=SUMIFS(BudgetSummary[BudgetAmount],BudgetSummary[FiscalYear],$B$2)
-=SUMIFS(BudgetLineAll[BudgetAmount],BudgetLineAll[FiscalYear],$B$2)
-=ROUND(B5-B4,2)
+B4  =SUMIFS(BudgetSummary[BudgetAmount],BudgetSummary[FiscalYear],$B$2)
+B5  =SUMIFS(BudgetLineAll[BudgetAmount],BudgetLineAll[FiscalYear],$B$2)
+B6  =ROUND(B5-B4,2)
 ```
 
 **Check:** ${{ summary|money }} against ${{ detail|money }}, a difference of ${{ gap|money }}.
 
-**Step 4. Compare by account.** List every account that appears in either query once, with its two totals and the difference, rounded to the cent. The model answer builds the list of account IDs with one formula, in A13:
+**Step 4. Compare by account.** List every account that appears in either query once, with its two totals and the difference, rounded to the cent. Use the union of the account IDs of both queries, so that an account absent from the summary stays on the list. The model answer builds that list with one formula, in A13:
 
 ```
 =LET(ids,UNIQUE(VSTACK(FILTER(BudgetSummary[AccountID],BudgetSummary[FiscalYear]=$B$2),FILTER(BudgetLineAll[AccountID],BudgetLineAll[FiscalYear]=$B$2))),SORTBY(ids,XLOOKUP(ids,Account[AccountID],Account[AccountNumber])))
@@ -83,14 +83,14 @@ It adds the two totals with SUMIFS and `=ROUND(E13#-D13#,2)`, then lists the row
 
 **Check:** {{ g.accounts_union|count }} accounts in all, {{ accounts|length }} of them with a difference, each missing from the summary entirely. **Watch for:** a difference left unrounded. The two sums differ by a fraction of a cent on accounts that agree, so every account looks different.
 
-**Step 5. Find what the differences share.** Open Tutorial 7.2's BudgetLine query and count the rows of these accounts with no cost center, and total their BudgetAmount:
+**Step 5. Find what the differences share.** Inspect the rows of these accounts in Tutorial 7.2's BudgetLine query, in the **Power Query Editor** or in its worksheet Table, where the blank CostCenterID cells show. Then close the editor and count the rows with no cost center, and total their BudgetAmount, with ordinary worksheet formulas and not Power Query custom columns:
 
 ```
 =COUNTIFS(BudgetLine[CostCenterID],"")
 =SUMIFS(BudgetLine[BudgetAmount],BudgetLine[CostCenterID],"")
 ```
 
-**Check:** {{ blank_rows|count }} rows, twelve months for each of {{ accounts|length }} accounts, totaling ${{ gap|money }}, the whole gap.
+**Check:** {{ blank_rows|count }} rows, twelve months for each of {{ accounts|length }} accounts, totaling ${{ gap|money }}, the whole gap. The model answer keeps the two results in B9 and B10.
 
 ### Requirement (4): The other years
 
@@ -100,7 +100,7 @@ It adds the two totals with SUMIFS and `=ROUND(E13#-D13#,2)`, then lists the row
 
 ### Requirement (5): The memo
 
-**Step 7. Write it.** An outline: to the controller; the two totals and the difference; the cause, with the evidence of Step 5; the same gap in every year; which Table the bank's summary should come from; one control.
+**Step 7. Write it.** An outline: to the controller; the two totals and the difference; the cause, with the evidence of Step 5; the same omission pattern in every year, with each year's amount stated separately; which Table the bank's summary should come from; one control. The grand total of revenue, cost of goods sold and operating expense adds amounts of different kinds, so it is a completeness control and not a profit subtotal.
 
 ## Expected results
 
@@ -122,7 +122,8 @@ It adds the two totals with SUMIFS and `=ROUND(E13#-D13#,2)`, then lists the row
 ## What a strong answer says
 
 - **Requirement (3).** The differing accounts, the common feature (no cost center, operating expense, twelve months) and the fact that every other account agrees to the cent.
-- **Requirement (5).** The two totals and the difference in the first paragraph, the cause in the second, and a recommendation that names the source for the bank (BudgetLine, or the summary after the unassigned lines are assigned) and a control: reconcile the summary to the detail by year and account, with a zero-difference check, review and sign-off before a summary leaves the company, and a cost center required on every line or an Unassigned cost center that reaches the summary. It says the effect: budgeted operating expenses are understated and budgeted profit overstated by about ${{ g.years[2].gap|money }} a year.
+- **Requirement (5).** The two totals and the difference in the first paragraph, the cause in the second, and a recommendation that names the source for the bank (BudgetLine, or the summary after the unassigned lines are assigned) and a control: reconcile the summary to the detail by year and account, with a zero-difference check, review and sign-off before a summary leaves the company, and a cost center required on every line or an Unassigned cost center that reaches the summary.
+- **A plus.** The effect of the gap on the budget as presented: budgeted operating expenses are understated and budgeted profit overstated by ${{ g.years[2].gap|money }} in {{ d.C }}, ${{ g.years[0].gap|money }} in {{ d.F }} and ${{ g.years[1].gap|money }} in {{ d.P }}. These are differences in how the budget is presented, not evidence that recorded profit is misstated.
 
 A weak answer calls the gap an error without saying where it comes from, or recommends fixing the numbers once with no control.
 
@@ -141,9 +142,9 @@ A weak answer calls the gap an error without saying where it comes from, or reco
 |---|---:|---|---|
 | Requirement 1: BudgetSummary | 15 | Grouped by year and account, names merged | Names missing |
 | Requirement 2: BudgetLineAll | 15 | Balance Sheet excluded, grouped as in 1 | Categories wrong |
-| Requirement 3: comparison and cause | 30 | Differing accounts listed, blank cost center named, rows counted | The difference without the cause |
+| Requirement 3: comparison and cause | 30 | Differing accounts listed, blank cost center named as the common feature | The difference without the cause |
 | Requirement 4: other years | 10 | All three years, differences rounded | One year missing |
-| Requirement 5: memo | 30 | Totals, cause, source, effect and control | Control missing |
+| Requirement 5: memo | 30 | Totals, cause, source and control | Control missing |
 
 ## Extensions and discussion questions
 

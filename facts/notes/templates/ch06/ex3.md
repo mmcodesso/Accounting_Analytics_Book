@@ -1,5 +1,6 @@
 <!-- Instructor notes, Exercise 6.3: {{ d.C }} margin at standard cost: {% for x in by_margin %}{{ x.group }} {{ x.pct|pct(2) }} ({{ 'margin ' if loop.first }}{{ x.margin|money }} on {{ x.revenue|money }}){{ ', ' if not loop.last }}{% endfor %}.
      Excluding Services, revenue shares are {% for g, r, m in shares %}{{ g }} {{ r|pct }}{{ ', ' if not loop.last }}{% endfor %}, and margin shares {% for g, r, m in shares %}{{ m|pct }}{{ ', ' if not loop.last }}{% endfor %}, so {{ more }} contribute more margin than revenue. Furniture types: highest {% for code, name, p in high %}{{ code }} ({{ name }}) {{ p|pct(2) }}{{ ' and ' if not loop.last }}{% endfor %}; lowest {% for code, name, p in low %}{{ code }} ({{ name }}) {{ p|pct(2) }}{{ ' and ' if not loop.last }}{% endfor %}. Services items carry StandardCost 0, so
-     their margin shows 100%; their cost is design staff time. Possible measures: ServiceTimeEntry.ExtendedCost for {{ d.C }} work dates
-     ({{ time_cost|money }}, a margin of about {{ time_pct|pct(0) }}) or the {{ d.C }} Design Services salaries expense in account 6280 ({{ salaries|money }}, about {{ salaries_pct|pct(0) }}). The gap
-     shows that the answer depends on the cost definition, which the report must state. -->
+     their margin shows 100%; their cost is design staff time. Illustrative scopes, not matched service margins: ServiceTimeEntry.ExtendedCost for {{ d.C }} work dates
+     ({{ time_cost|money }}, a margin of about {{ time_pct|pct(0) }}), which includes nonbillable hours, or the {{ d.C }} Design Services salaries expense in account 6280 ({{ salaries|money }}, about {{ salaries_pct|pct(0) }}),
+     which is the staff's whole pay whether or not the hours were billed. The two differ in scope and in period, and nonbillable capacity and overhead are outside both, so
+     the answer depends on the cost definition, which the report must state. -->

@@ -111,6 +111,7 @@ SCHEMA = {
 # requirement guides' front matter must agree; g0 claims it for every guide written so far.
 PLAN = {1: 90, 2: 150, 3: 90, 4: 180, 5: 150, 6: 150, 7: 120, 8: 120, 9: 150, 10: 90}
 WEIGHTS = {1: 7, 2: 10, 3: 7, 4: 12, 5: 9, 6: 12, 7: 8, 8: 9, 9: 14, 10: 12}
+SOLVER_MINUTES = 55     # the optional Solver test inside Requirement 7's 120 minutes (its guide's "How to run it")
 
 
 def need(d, claim, *tables: str) -> None:
@@ -368,6 +369,9 @@ def g0(d, claim):
     claim(set(sections) == {"Requirement 5", "Milestone 2"}, "the Checks tab holds the rows of Requirement 5 and Milestone 2")
     m = n18.model(d)
     claim(sum(WEIGHTS.values()) == 100, "the rubric weights of the ten requirements add up to 100")
+    r7_guide = (GUIDES / "req-7-value-the-capacity-that-buying-would-free.md").read_text(encoding="utf-8")
+    claim(f"{SOLVER_MINUTES} for the optional Solver test" in r7_guide,
+          "Requirement 7's guide gives the optional Solver test the minutes the case note leaves out of the required time")
     claim(set(PLAN) == set(WEIGHTS) == set(range(1, 11)), "the plan and the weights cover the ten requirements")
     for path in sorted(GUIDES.glob("req-*.md")):
         k = int(re.match(r"req-(\d+)-", path.name).group(1))
@@ -395,7 +399,9 @@ def g0(d, claim):
         p4=span(t, "Phase 4: Standards and the Memo", "Deliverables and Checklist"), r9=span(t, "Revise the standards", "Write the decision memo"),
         p4g=at(t, "Phase 4 at a glance"), r10=at(t, "Write the decision memo"), m4=at(t, "Milestone 4"), deliver=at(t, "Deliverables and Checklist"),
         before=at(t, "Before you submit"), ahead=span(t, "Looking Ahead", "About these slides"))
+    required = sum(PLAN.values()) - SOLVER_MINUTES
     return dict(plan=PLAN, weights=WEIGHTS, student_minutes=sum(PLAN.values()), student_hours=sum(PLAN.values()) // 60,
+                solver_minutes=SOLVER_MINUTES, required=f"{required // 60} hours {required % 60} minutes",
                 n_req=n_req, n_ms=n_ms, slides=len(t), s=s, n_queries=len(queries), per=per, n_sheets=len(wb), n_pages=len(pages),
                 checks=sum(sections.values()), per_section=sections, n_measures=len(measure_table()), dt=dt,
                 n_families=len(m["fam"]), n_quoted=len(m["quoted"]), n_items=m["explorer"]["n_items"])
@@ -690,8 +696,16 @@ def g5(d, claim):
     si = table_m("SalesInvoice")
     cv = _model_text("tables/Costing View.tmdl")
     claim("Standard" in cv or "Table.FromRows" in cv, "the Costing View table is typed with Enter data")
-    claim('"2026"' not in _model_text("tables/Key Measures.tmdl") and "'Practical Share' = 0.8" in _model_text("tables/Key Measures.tmdl"),
-          "the Practical Share measure is typed, not read from the workbook")
+    km = _model_text("tables/Key Measures.tmdl")
+    share_read = "SELECTEDVALUE ( 'Model Parameters'[PracticalShare] )" in km
+    claim(share_read or "'Practical Share' = 0.8" in km,
+          "the Practical Share measure is typed (the first build) or read from the workbook's name PracticalUsed through the Model Parameters query")
+    # the practical share changed to 85%: the probe that tells a drifting share from a synchronized one (MOD18-03)
+    p85 = m["avail"] * 0.85
+    rate85 = m["committed"] / p85
+    at85 = dict(share=0.85, pract=p85, rate=rate85, unused_cost=(p85 - m["used"]) * rate85)
+    claim(abs(at85["rate"] - m["td_rate"]) > 1 and abs(at85["pract"] - m["pract"]) > 1000,
+          "a different practical share moves the capacity, the rate and the unused capacity's cost")
     rel = _model_text("relationships.tmdl")
     claim("SalesInvoiceLine.ItemID" in rel and "toColumn: ItemCosts.ItemID" in rel, "the lines relate to the item costs on ItemID")
     return dict(
@@ -702,7 +716,7 @@ def g5(d, claim):
         m_year_step=step(claim, si, "Added Custom"), m_cols=step(claim, ic, "Removed Other Columns"),
         d_views=dax(claim, "Revenue", "Units", "Standard Cost", "Absorption Cost", "Time-Driven Cost"),
         d_switch=dax(claim, "Product Cost", "Margin", "Margin %", "Cost per Unit"),
-        d_share=dax(claim, "Practical Share"),
+        d_share=dax(claim, "Practical Share"), share_read=share_read, at85=at85, base_share=n18.PRACTICAL, base_pract=m["pract"], base_unused_cost=m["unused_h"] * m["td_rate"],
         c_nodefault=check_expr(claim, "2026 margin with no view selected (falls back to Standard)"),
         c_diff=check_expr(claim, "2026 margin less the workbook's, Time-driven"),
         c_blank=check_expr(claim, "lines with no item cost row (the design services, every year)"),
@@ -810,8 +824,14 @@ def g6(d, claim):
         ("sens", "V10"), ("gs_kept", "C19"), ("gs_red", "E19"), ("families", "B27"), ("gain", "B28"), ("severance", "B33"),
         ("tooling", "B34"), ("two_years", "B35"), ("corner", "A41"))}
     f["freight"], f["crew_removed"], f["quote_adj"] = (defined(claim, n) for n in ("Freight", "CrewRemoved", "QuoteAdjustment"))
+    # the two-year gate on each family (columns X to Z of the sheet, MOD18-04): present once the workbook is built with it
+    gate = str(ws["Y9"].value or "").startswith("Effect over the two years")
+    if gate:
+        f["once"], f["two"], f["be_two"] = (formula(claim, "Make or Buy", c) for c in ("X10", "Y10", "Z10"))
+        claim(all(q["two_year"] > 0 for q in buy) and all(q["two_year"] < 0 for q in lose),
+              "each family to buy covers its own one-time costs in the two years, and each family to make does not")
     return dict(
-        f=f, example=buy[0]["short"], by_type=round(by_type, 2), absorp_sum=round(absorp_sum, 2), nf_flip=nf_flip,
+        gate=gate, f=f, example=buy[0]["short"], by_type=round(by_type, 2), absorp_sum=round(absorp_sum, 2), nf_flip=nf_flip,
         nf_buy=word_of(len(nf)), tdw_flip=tdw_flip, tdw_buy=word_of(len(tdw)), pos_wrong=pos_wrong, sev_wrong=round(sev_wrong, 2),
         net_one=round(net_one, 2), net_free=round(2 * m["gain"], 2), swapped=round(swapped, 2), n_q22=len(row),
         be_share=be_share, payback=payback)
@@ -966,6 +986,8 @@ def g8(d, claim):
                                                               ("contrib", "L"), ("loss", "M"), ("revenue", "N"))}
     claim(abs(cell_value("Prices", f"G{b}") - fam[ex]["unit"]["td"] / (1 - n18.FLOOR)) < 0.005,
           "the workbook's Goal Seek result for the first family is the floor price")
+    # the increase, the volume lost and the revenue read the direct price, with a column that says Goal Seek still agrees (MOD18-05)
+    agrees = str(workbook()["Prices"]["O4"].value or "").startswith("Goal Seek agrees")
     f.update({k: table_formula(claim, "Prices", "PromotionVolume", c) for k, c in (("months", "Months"), ("value", "PromotionValue"),
                                                                                     ("expected", "Expected"), ("lift", "Lift"), ("z", "Z"))})
     f["total_rev"], f["still"], f["still_rev"] = (formula(claim, "Prices", f"B{row_of(claim, 'Prices', t)}")
@@ -976,7 +998,7 @@ def g8(d, claim):
     end_date = sorted({r[5] for r in q25 if r[3] == "Active"})
     claim(len(end_date) == 1, "every active price list ends on one date")
     return dict(
-        f=f, example=n18.short(ex), n_below=n18.word(len(m["reprice"])), n_rest=n18.word(len(m["reprice"]) - len(buy_names & {r["name"] for r in m["reprice"]})),
+        agrees=agrees, f=f, example=n18.short(ex), n_below=n18.word(len(m["reprice"])), n_rest=n18.word(len(m["reprice"]) - len(buy_names & {r["name"] for r in m["reprice"]})),
         ex=dict(margin=w_ex["m_td"], price=w_ex["price"], td=w_ex["td"], kept=w_ex["kept"], new=w_ex["td"] / (1 - n18.FLOOR)),
         end_date=end_date[0], n_q24=len(q24), n_q25=len(q25), n_q26=len(q26), expired=expired, lines_after=lines_after,
         low=min(r[6] for r in active), high=max(r[7] for r in active), mk=mk, loss_td=loss_td, all_rev=round(all_rev, 2),
@@ -991,6 +1013,17 @@ def g9(d, claim):
     need(d, claim)
     m = n18.model(d)
     P, Cc, Fy = d.P, d.C, d.F
+    # the rates on one basis: per standard hour completed (N18-01)
+    stdh = m["stdh"]
+    used_conv = m["used"] * m["td_rate"] + m["foh"]
+    unused_cost = m["unused_h"] * m["td_rate"]
+    claim(abs(used_conv / stdh - m["td_std"]) < 1e-9,
+          "the time-driven rate is the Factory Overhead entries plus the routing time used at the committed rate, per standard hour")
+    claim(abs((used_conv + unused_cost) / stdh - m["actual_rate"]) < 1e-9,
+          "the time-driven conversion plus the unused capacity's cost is the actual rate, so the time-driven rate leaves the unused capacity out")
+    claim(abs((m["conversion"] + unused_cost) / stdh - m["td_std"]) > 1,
+          "the released conversion plus the unused capacity's cost is not the time-driven rate")
+    rates = dict(td_rate=m["td_rate"], unused_per_hour=unused_cost / stdh, stdh=stdh)
     q27, q28, q29, q30, q31 = (run(d, quote(f"Requirement 9, Q{k}")) for k in (27, 28, 29, 30, 31))
     claim(len(q27) == 1 and abs(q27[0][0] - m["plan_dep"]) < 0.005, "Query 27 returns the next year's depreciation, the plan's")
     claim(len(q29) == len(d.years) and all(abs(r[3] - s["stdh"]) < 0.06 and abs(r[4] - s["conv"]) < 0.006 for r, s in zip(q29, m["stock"])),
@@ -1029,7 +1062,7 @@ def g9(d, claim):
     f["on_hand"] = table_formula(claim, "Standards", "OnHand", "StdHoursPerUnit")
     claim(ws.cell(rv, 1).value.startswith("Revaluation at the proposed rate"), "the revaluation row is found by its label")
     return dict(
-        f=f, n_q28=len(q28), n_items=[r[1] for r in q29], neg=neg, rate_nb=rate_nb, dep_base=round(dep_base, 2), rate_dep=rate_dep,
+        rates=rates, f=f, n_q28=len(q28), n_items=[r[1] for r in q29], neg=neg, rate_nb=rate_nb, dep_base=round(dep_base, 2), rate_dep=rate_dep,
         full_value=round(full_value, 2), with_closes=round(with_closes, 2), income_prior=income[P], mat=mat,
         bal_cur=s[Cc]["plan"], inc_cur=s[Cc]["plan"] - s[P]["plan"], no_burden=no_burden, years=list(d.years), p=p, hours_cur=s[Cc]["stdh"],
         flags=(s[P]["plan"] > mat[P], s[Cc]["plan"] > mat[Cc], s[P]["one"] > mat[P], s[Cc]["one"] > mat[Cc]))

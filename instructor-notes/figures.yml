@@ -17,11 +17,11 @@
   kind: diagram
   purpose: A decision aid for sorting a question into one of the four types of analytics.
   shows: A vertical flow of four yes/no questions, asked from the most demanding type down so that a mixed question takes
-    the highest type it asks for (does the answer recommend what to do under constraints, does it project what might happen,
-    does it explain why it happened, does it summarize what happened). Each yes leads to a type label with one Charles River
-    example question and the kind of evidence the answer needs (a recommendation with its constraints, an expectation or forecast,
-    a decomposition or trace, a summary). A no on the last question leads to a box that says to reword the question. A side
-    note says that most real questions combine two types.
+    the highest type it asks for (does the answer recommend what to do under constraints, does it estimate an outcome not
+    yet known, such as a forecast or an expectation, does it explain why it happened, does it summarize what happened). Each
+    yes leads to a type label with one Charles River example question and the kind of evidence the answer needs (a recommendation
+    with its constraints, an expectation or forecast, a decomposition or trace, a summary). A no on the last question leads
+    to a box that says to reword the question. A side note says that most real questions combine two types.
   data: The example questions are the model questions of Exercise 1.4 (the quarters and fiscal years come from that guide's
     context); the evidence lines follow its Step 1 table.
   status: built
@@ -31,10 +31,10 @@
   kind: diagram
   purpose: The path of the traced sale through the seven worksheets, with the one-to-many links and the ledger postings.
   shows: Left to right, boxes for SalesOrder (with its lines), Shipment, SalesInvoice, CashReceipt and CashReceiptApplication,
-    each carrying the document number and date of the traced sale. Labels on the arrows give how many shipments and invoices
-    the order has and how many invoices the receipt paid. Beneath them a GLEntry box receives dashed amber arrows from the
-    shipment, the invoice, the receipt and the application, each labeled with the accounts debited and credited. The sales
-    order and its lines have no arrow to the ledger, and a note says so.
+    each carrying the document number and date of the traced sale. Labels on the arrows place the traced documents among the
+    order's shipments and invoices and the invoices the receipt paid (for example "1 of" the order's shipments). Beneath them
+    a GLEntry box receives dashed amber arrows from the shipment, the invoice, the receipt and the application, each labeled
+    with the accounts debited and credited. The sales order and its lines have no arrow to the ledger, and a note says so.
   data: The traced sale of Figure 1.6 and its order, shipment, receipt and application, from the Expected results table of
     this guide.
   status: built
@@ -69,13 +69,14 @@
   unit: chapter-01-role-of-analytics
   file: ex-1.6-evaluating-journal-entry-data-for-audit-purposes.md
   kind: excel-mock
-  purpose: What the CreatedDate and ReversesJournalEntryID columns look like in JournalEntry, the evidence for requirements
-    3 and 4.
+  purpose: What the CreatedDate and ReversesJournalEntryID columns hold in JournalEntry, the evidence for requirements 3 and
+    4.
   shows: The JournalEntry worksheet filtered to the rows whose ReversesJournalEntryID is filled, with the columns JournalEntryID,
     EntryNumber, PostingDate, EntryType, TotalAmount, CreatedDate and ReversesJournalEntryID visible (Description and the
-    creator and approver columns are hidden so that the text stays legible). The time part of CreatedDate reads the same on
-    every row shown, and the CreatedDate and ReversesJournalEntryID cells are outlined. The EntryType of the rows shown is
-    Accrual Adjustment.
+    creator and approver columns are hidden so that the text stays legible). CreatedDate is shown with the number format changed
+    to yyyy-mm-dd hh:mm:ss, because the workbook formats it as a date and the grid shows no time until the format changes.
+    The time part of CreatedDate reads the same on every row shown, and the CreatedDate and ReversesJournalEntryID cells are
+    outlined. The EntryType of the rows shown is Accrual Adjustment.
   data: A few JournalEntry rows of the Accrual Adjustment type and their columns, taken from the current dataset.
   status: built
 - id: IF-02-0-A
@@ -184,16 +185,19 @@
   unit: chapter-03-accounting-data-environment
   file: 00-chapter-notes.md
   kind: diagram
-  purpose: A decision tree that sorts a column into primary key, foreign key, bridge key or the source-document trace.
-  shows: A vertical tree of four yes-or-no questions. Does the column identify the rows of its own table? Yes leads to primary
-    key, with SalesOrderID in SalesOrder as the example. Does it hold the key values of another table? Yes leads to foreign
-    key, with CustomerID in SalesOrder, and a side branch asks whether the same column reaches into another table group, which
-    makes it a bridge key, with ItemID in SalesOrderLine. Does the meaning of its value depend on another column? Yes leads
-    to a logical reference, not a key, with SourceDocumentID in GLEntry read together with SourceDocumentType. Each leaf shows
-    its example as a small table header (the logical reference shows SourceDocumentType and SourceDocumentID together), and
-    the leaf for the logical reference is drawn with the dashed amber style that the chapter's diagrams use for the trace.
-    A column that none of the questions fits is an ordinary column.
-  data: The examples named in the chapter (SalesOrder, SalesOrderLine, GLEntry); no counts.
+  purpose: A decision tree that sorts a column into primary key, the source-document trace, foreign key (with its self-reference
+    and bridge-key branches) or an ordinary column.
+  shows: A vertical tree of three yes-or-no questions, asked in an order that keeps a self-reference and the trace from being
+    misread. Is it the column chosen to identify each row of its own table? Yes leads to primary key, with SalesOrderID in
+    SalesOrder as the example, and a note that a column can play more than one role. Does a type column in the same row say
+    which table its value refers to? Yes leads to the source-document trace, read as two columns together and not one foreign
+    key, with SourceDocumentType and SourceDocumentID in GLEntry, drawn in the dashed amber style of the chapter's trace.
+    Does each filled-in value refer to a row of one fixed table, its own included? Yes leads to foreign key, with CustomerID
+    in SalesOrder, and a side question asks which table it refers to. Its own table makes a self-reference (ParentAccountID
+    in Account; Employee.ManagerID is another), another table group makes a bridge key (ItemID in SalesOrderLine), and neither
+    leaves an ordinary foreign key. A no to all three is an ordinary column, with OrderDate and OrderNumber, which is unique
+    but is not the key the table uses.
+  data: The examples named in the chapter (SalesOrder, SalesOrderLine, GLEntry, Account, Employee); no counts.
   status: built
 - id: IF-03-1-A
   unit: chapter-03-accounting-data-environment
@@ -731,8 +735,10 @@
   shows: A hub with three spokes. In the centre, a box for the opening balance entry, labeled with its entry number and with
     the chief financial officer as creator. Three boxes around it, each joined to the hub by an arrow. The receivables reconciliation
     of Tutorial 8.2, whose difference is the entry's line to account 1020. The journal entry tests of Tutorial 8.3, where
-    it is the only entry that scores four. The payables reconciliation of Exercise 8.2, whose difference is the entry's credit
-    to account 2010, balanced by a debit to cash of the same amount. Each outer box names its dollar amount.
+    it is the only entry that scores four. The payables reconciliation of Exercise 8.2, whose difference of account 2010 from
+    the open supplier invoices is smaller than the entry's credit to 2010 by the two debt reclassifications, so the box gives
+    that difference, the reclassifications, the entry's own credit to 2010 and the debit to cash that balances it. Each outer
+    box names its dollar amount.
   data: JournalEntry and GLEntry for the opening entry; the receivables and payables lines are the opening amounts in the
     Expected results of Exercises 8.1 and 8.2.
   status: built
@@ -841,12 +847,12 @@
   kind: diagram
   purpose: The two dates of a promotion, the order date that sets its months and the invoice date that sets when the discount
     reaches revenue.
-  shows: A twelve-month timeline of the report year. For each of the three proposed promotions solid cells mark the months
-    in which its lines were ordered and lighter cells mark each month in which they were invoiced. Beneath the timeline four
-    quarter bars show the discount billed in each quarter, the fourth the tallest. A dashed line marks the recorded end date
-    of the collection promotion, which falls before its own start.
-  data: The proposed promotions' order months, invoice months and discount billed by quarter (Requirement 2 Step 6, Requirement
-    3 Step 1).
+  shows: A twelve-month timeline of the report year. Each of the three proposed promotions has two tracks, Order months and
+    Invoice months, and each month with lines shows its count of lines, so billing in the order months and after them stays
+    visible. Beneath the timeline four quarter bars show the discount billed in each quarter, the fourth the tallest. A dashed
+    line marks the recorded end date of the collection promotion, which falls before its own start.
+  data: The proposed promotions' order months and invoice months with their line counts, and the discount billed by quarter
+    (Requirement 2 Step 6, Requirement 3 Step 1).
   status: built
 - id: IF-C2-1-A
   unit: case-part-2
@@ -1403,8 +1409,8 @@
     and exercise sits.
   shows: 'Left to right: the four Tables, the queries in Power Query, the model with three relationships, then the three report
     pages (Validation, Sales and Discounts, Review). Branches from the model lead to the six exercise pages, each labeled
-    with the query it adds (InvoiceHeaders for 13.1, PromotionProgram for 13.3, four Profile queries that do not load for
-    13.5) and with the tutorial it extends.'
+    with the query it adds (InvoiceHeaders for 13.1, PromotionProgram for 13.3, four Profile queries that do not load, with
+    a typed table of their figures, for 13.5) and with the tutorial it extends.'
   data: None; the boxes cite the tutorials, exercises and the model answer's queries and pages.
   status: built
 - id: IF-13-0-B
@@ -1412,9 +1418,10 @@
   file: 00-chapter-notes.md
   kind: pbi-mock
   purpose: The model answer in Model view, with the unrelated control table beside the related ones.
-  shows: Model view with six tables. SalesInvoiceLine in the middle, related to SalesInvoice, Item and PromotionProgram, SalesInvoice
-    related to Customer, each line with 1 and an asterisk and an arrow toward the lines. InvoiceHeaders stands apart with
-    no relationship line. Key columns are listed in each table.
+  shows: Model view of the model answer. SalesInvoiceLine in the middle, related to SalesInvoice, Item and PromotionProgram,
+    SalesInvoice related to Customer, each line with 1 and an asterisk and an arrow toward the lines. InvoiceHeaders stands
+    apart with no relationship line, as does the small table that holds the figures attached to the memo of Exercise 13.5.
+    Key columns are listed in each table.
   data: None; the tables, columns and relationships of the model answer.
   status: built
 - id: IF-13-0-C
@@ -1893,8 +1900,8 @@
   purpose: A board sketch of the order in which a reviewer takes the register's exceptions.
   shows: 'A short decision list from top to bottom. Expected every period, such as the year-end closes: disposition and evidence
     once, then check that it recurs. Recurs by design, such as registers approved by their own employee: one finding, change
-    the control. Fails several tests, such as the opening entry: first. New this month: next. Everything else: by amount and
-    age. Each box names its example from the register.'
+    the control. Fails several tests, such as the opening entry: use the score as a first cue. New this month: next. Everything
+    else: by amount and age. Each box names its example from the register.'
   data: None; the chapter's rules for ordering the review, with examples from the register.
   status: built
 - id: IF-16-1-A
@@ -2079,13 +2086,21 @@
   file: req-5-test-the-balances-behind-the-report.md
   kind: pbi-mock
   purpose: The Reconciliations page of the model answer, where each difference sits beside the findings that explain it.
-  shows: Report view, page Reconciliations. A matrix of six working-capital accounts on rows and source document types on
-    columns with the balance in each cell and a Total column, drawn in two panes because it is wider than the frame, the JournalEntry
-    column outlined; a row of cards for receivables, open receivables, their difference, payables, open payables and their
-    difference; a table of billing by invoice date against the ledger by year; the aged open payables; and the Findings table
-    with account, finding, amount and disposition.
-  data: The Expected results quantities (the balances by source, the two differences, the billing differences and the findings),
-    read-only.
+  shows: Report view, page Reconciliations, the upper part. A matrix of six working-capital accounts on rows and source document
+    types on columns with the balance in each cell and a Total column, drawn in two panes because it is wider than the frame,
+    the JournalEntry column outlined; below it a row of cards for receivables, open receivables, their difference, payables,
+    open payables and their difference, the two differences outlined.
+  data: The Expected results quantities (the balances by source and the two differences), read-only.
+  status: built
+- id: IF-C4-5-C
+  unit: case-part-4
+  file: req-5-test-the-balances-behind-the-report.md
+  kind: pbi-mock
+  purpose: The lower part of the Reconciliations page, where the cutoff, the aging and the Findings table sit.
+  shows: Report view, page Reconciliations, the lower part. A table of billing by invoice date against the ledger by year
+    with the difference; the aged open payables without the invoices moved to notes; and the Findings table with account,
+    finding, amount and disposition, its rows in the order the table lists them.
+  data: The Expected results quantities (the billing differences, the aged payables and the findings), read-only.
   status: built
 - id: IF-C4-5-B
   unit: case-part-4
@@ -2101,7 +2116,7 @@
   unit: case-part-4
   file: req-6-write-the-decision-memo.md
   kind: diagram
-  purpose: How the memo and its one-page appendix are laid out, and which requirement and report page supplies each part.
+  purpose: How the memo and its appendix are laid out, and which requirement and report page supplies each part.
   shows: 'Two page outlines side by side and a smaller third page for the appendix. The memo pages show the header lines,
     three headed sections in the order Financial reporting, Managerial accounting, Auditing, and a closing Recommendation.
     The appendix shows five numbered exhibit boxes. Tags name the source of each section and exhibit: Requirement 2 and the
@@ -2138,10 +2153,10 @@
   file: req-1-build-the-trial-balances-and-the-recorded.md
   kind: sql-mock
   purpose: The trial-balance query for the last year-end with its result, the check students make before they map anything.
-  shows: 'The tab LenderPackage.sql at the first query of Requirement 1: the two comment lines, the Params and Closes CTEs,
-    the SELECT and the WHERE clause with its NOT (...) test. The result grid shows AccountNumber, AccountName, AccountType,
-    AccountSubType, Balance, DebitBalance, CreditBalance and Postings for the first accounts, the cash row outlined; the message
-    pane reports one row for each account with postings.'
+  shows: The compact Execute SQL editor scrolled to the first query of Requirement 1, from the Params and Closes CTEs through
+    the SELECT and the WHERE clause with its NOT (...) test, without the window chrome so the SQL prints at a readable size.
+    The result grid shows AccountNumber, AccountName, AccountType, AccountSubType, Balance, DebitBalance, CreditBalance and
+    Postings for the first three accounts, the cash row outlined; the message pane reports one row for each account with postings.
   data: The trial-balance query for the last year-end, run read-only.
   status: built
 - id: IF-17-2-A
@@ -2257,9 +2272,10 @@
   file: req-10-write-the-decision-memo.md
   kind: diagram
   purpose: The page plan of the memo and its appendix, for the kickoff and for grading.
-  shows: 'Two columns of boxes: a memo of two pages with seven short sections in order (the finding, the two views, the decisions,
-    the whole paths, the prices, the standards and statements, the production manager''s decision), and an appendix of three
-    pages with three exhibits, each tagged with the sheet of the workbook it comes from.'
+  shows: 'Two columns of boxes: a memo of at most two pages with seven short sections in order (the finding, the two views,
+    the decisions, the whole paths, the prices, the standards and statements, the production manager''s decision), and an
+    appendix of at most three pages with three exhibits, each tagged with the sheet of the workbook it comes from and a callout
+    asking for legible summaries.'
   data: none; the sections and exhibits come from the requirement and from the sheets of the model workbook.
   status: built
 - id: IF-18-2-B
@@ -2426,9 +2442,9 @@
   kind: diagram
   purpose: The book's map of the cycle marked up the way Part 4 asks, the end state of the requirement.
   shows: 'The five documents of the cycle with their departments and the hub account, and the nine control-point badges in
-    three styles: the records evidence it, the records evidence part of it, the evidence lies outside the database. Below
-    the map the nine control points are listed with the missing evidence written beside each badge. A legend names the styles
-    and does not rely on color alone.'
+    three styles: the records evidence it, the records evidence part of it, the evidence lies mostly outside the database.
+    Below the map the nine control points are listed with the missing evidence written beside each badge. A legend names the
+    styles and does not rely on color alone.'
   data: The nine control-point rows of the Cycle Map worksheet (what the records evidence, what they cannot show).
   status: built
 - id: IF-19-10-A
@@ -2437,8 +2453,9 @@
   kind: pbi-mock
   purpose: The Credits Cycle page, where the new tests and the design findings show.
   shows: 'The Credits Cycle page of Audit Monitoring: a matrix of the four new tests by year with exceptions, population and
-    rate per 1,000, a row of cards for the exceptions, the reviewed exceptions, the exceptions covered by a design finding
-    and the open exceptions, and a table of the design findings with the period each covers and the date it is to be fixed.'
+    rate per 1,000, a row of cards for the exceptions, the reviewed exceptions, the exceptions mapped to a finding, the open
+    exceptions and the open findings, and a table of the findings (one for each supported cause) with the period each covers,
+    its target date and its status.'
   data: The Audit Monitoring model answer on the pinned dataset.
   status: built
 - id: IF-19-10-B
@@ -2447,9 +2464,9 @@
   kind: diagram
   purpose: How the flags reach the register, the picture a student needs when a rate comes out blank.
   shows: 'A left-to-right flow: the applications and the credit memos and refunds feed two flag queries, which are unpivoted
-    into two exception queries, appended into the register with the dispositions and the design findings, and tied by the
-    test identifier to the Tests table and by the process name to the Population measure. A side branch marks the anomaly
-    columns that stop at the refund table.'
+    into two exception queries, appended into the register with the dispositions and the mapping of each exception to its
+    finding, and tied by the test identifier to the Tests table and by the process name to the Population measure. A side
+    branch marks the anomaly columns that stop at the refund table.'
   data: none; the flow follows the model answer's queries.
   status: built
 - id: IF-19-2-A
@@ -2469,10 +2486,11 @@
   kind: excel-mock
   purpose: The Materiality worksheet with the three thresholds and the expectation of returns, the end state of Parts 1 and
     2.
-  shows: 'The top of the Materiality sheet: the parameter block with income, the three rates, overall materiality, performance
-    materiality and the clearly trivial threshold in cells whose names are written beside them as labels (in the workbook
-    the Name Box shows them); below it the three-year block of revenue, returns and return rate, then the expectation, the
-    recorded returns, the difference, the two comparisons and the conclusion text.'
+  shows: 'The top of the Materiality sheet: the parameter block with income, the rates, overall materiality, performance materiality,
+    the clearly trivial threshold and the analytical follow-up trigger (its own cell, a share of the expectation) in cells
+    whose names are written beside them as labels (in the workbook the Name Box shows them); below it the three-year block
+    of revenue, returns and return rate, then the expectation, the recorded returns, the difference, the comparisons with
+    the trigger and with performance materiality and the conclusion text.'
   data: The Materiality worksheet of Credits Audit.xlsx on the pinned dataset (income, thresholds, revenue and returns by
     year).
   status: built
@@ -2523,7 +2541,7 @@
   unit: chapter-19-customer-credits-audit
   file: req-6-sample-what-the-database-cannot-show.md
   kind: chart
-  purpose: Why almost any draw gives the same answer.
+  purpose: Why the plausible draws point the same way, and why the population test is the better evidence.
   shows: Bars of the probability of each deviation count in a draw from the remainder, the plausible range shaded, the model
     answer's frozen draw marked, and the upper deviation limit labeled at each end of the range.
   data: The hypergeometric distribution for the remainder and its deviating refunds, and the model workbook's frozen draw.
@@ -2640,8 +2658,8 @@
   shows: 'A decision tree. Start: can the student sign in at app.powerbi.com with a school account? No leads to Desktop in
     a lab or a Windows virtual machine. Yes leads to: may the student edit semantic models and upload to OneDrive for work
     or school? No leads to Plan C (instructor demonstration) or Desktop. Yes leads to: is there a Pro license? No leads to
-    Plan A or B with Exercise C.3 done by hand (steps 2, 3 and 5, formula retyped). Yes leads to Plan A or B with every step.
-    Each end box lists the tutorials and exercises that can be done.'
+    Plan A or B with Exercise C.3 on the manual route (formula and baseline recorded first, formula retyped). Yes leads to
+    Plan A or B with every step. Each end box lists the tutorials and exercises that can be done.'
   data: None; the plans, the tutorials and the exercises of this note.
   status: built
 - id: IF-AC-1-A
@@ -2664,9 +2682,9 @@
   purpose: The Ex C.2 page at its end state, where the Design Services row and the peaks can be read.
   shows: 'The report editor of the Power BI service on the page Ex C.2: a tile slicer with the current year selected; a matrix
     of Discounts with five segment rows and the twelve months as columns, the Design Services row reading zero in every month
-    and each other segment''s largest month outlined; and a line chart of Discounts by month in month order with a legend
-    of the five segments, the Design Services line flat along the axis. The Data pane, drawn as an inset because twelve months
-    of amounts need the window''s width, lists Key Measures first.'
+    and each other segment''s largest month outlined; and a line chart of Discounts by month in month order, titled as Requirement
+    6 asks, with a legend of the five segments and the Design Services line flat along the axis. The Data pane, drawn as an
+    inset because twelve months of amounts need the window''s width, lists Key Measures first.'
   data: Discounts by segment and month for the current year, as in the Expected results, read-only.
   status: built
 - id: IF-AC-3-A

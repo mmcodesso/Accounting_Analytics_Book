@@ -31,11 +31,11 @@ figures:
 | | |
 |---|---|
 | Part | Part III, Accounting Analytics with SQL: the last of four chapters. Chapters 9 to 11 queried, joined and analyzed; this chapter tests records, and it answers the question of Chapter 9 |
-| Analytics types | Diagnostic for most tests; the pay expectation is predictive and the recommendations that close each finding are prescriptive |
+| Analytics types | Diagnostic for most tests; the pay test is a recalculation, the estimate of the unrecorded late-December payroll in Exercise 12.1 is predictive, and the recommendations that close each finding are prescriptive |
 | Tools | DB Browser for SQLite {{ version }} on the working copy. Every test only reads |
 | Components | {{ unit.tutorials|length }} guided tutorials that build one script, Audit.sql, of 24 tests (L1 to L8, P1 to P6, H1 to H10), {{ n_exercises }} exercises ({{ per_perspective }} for each perspective), {{ n_questions }} multiple-choice questions and a deck of {{ slides }} slides |
 | Files students need | CharlesRiver_Work.sqlite from Tutorial 9.1. Chapter12-companion.zip holds Audit.sql at the start of Tutorials 12.2 and 12.3 and at the end. Chapter12-exercises-sql.zip holds Ex 12.1.sql to Ex 12.6.sql |
-| Time | Class: about 300 minutes. Students: about 90 minutes of reading, 60 to 110 for each tutorial and 80 to 120 for each exercise (assign two or three). The times are estimates: time them yourself |
+| Time | Class: 300 minutes in Plans A and B and 120 in Plan C. Students: about 90 minutes of reading, 75 to 90 for Tutorial 12.1, 60 to 75 for Tutorial 12.2, 90 to 110 for Tutorial 12.3 and 80 to 120 for each exercise (assign two or three). The plans do part of the tutorials in class, so class and student times overlap. All are provisional estimates: time them yourself |
 
 The chapter depends on these conditions of the data:
 
@@ -50,14 +50,16 @@ The chapter depends on these conditions of the data:
 2. Trace in both directions, list the exceptions with UNION ALL and test cutoff with the dates of the events. Practiced in Tutorial 12.1 (Steps 3 to 8), Exercise 12.1 and questions 2 to 5.
 3. Match purchase orders, receipts and invoices at the order line within a tolerance. Practiced in Tutorial 12.2 (Steps 1 to 3), Exercise 12.2 (4), which sums invoices to the receipt line the same way, and questions 6 and 7.
 4. Test approvals against limit, role and dates, and measure concentration. Practiced in Tutorial 12.2 (Steps 4 to 6), Exercises 12.4 and 12.5, and questions 10 and 11.
-5. Test the chain behind a cost, compare pay with an expectation, and judge what a pattern supports. Practiced in Tutorial 12.3 (Steps 2 to 9), Exercises 12.3 to 12.5, and questions 9, 12 and 15.
+5. Test the chain behind a cost, recalculate pay from hours and rates, and judge what a pattern supports. Practiced in Tutorial 12.3 (Steps 2 to 9), Exercises 12.3 to 12.5, and questions 9, 12 and 15.
 6. Re-perform tests as a documented library. Practiced in Tutorial 12.3 (Step 10), Exercise 12.6 and questions 13 and 14.
+
+The six outcomes follow the chapter's six learning objectives one for one, in the same order.
 
 ## Preparing to teach
 
 **Before the first class**
 
-- Students need CharlesRiver_Work.sqlite and DB Browser for SQLite {{ version }}. `SELECT sqlite_version();` shows the version. `LOG10`, used in Exercise 12.6, is in the Windows release and missing from DB Browser for SQLCipher.
+- Students need CharlesRiver_Work.sqlite and DB Browser for SQLite {{ version }}, whose own version is in its About dialog. `SELECT sqlite_version();` shows only the SQLite library's version. `SELECT LOG10(10.0);` returns 1 where the math functions of Exercise 12.6 are present, as in the Windows release and not in DB Browser for SQLCipher, and the model script's test B2 is the fallback.
 - Do the three tutorials yourself in order and save Audit.sql. Every test runs in a second or two on the working copy.
 - A late student takes Audit.sql from Chapter12-companion.zip, from the folder of the tutorial they start. Tutorial 12.1 needs only the working copy. The deck has a checkpoint slide for each tutorial.
 - Open the model scripts once. Each query has two comment lines, the library's structure, and the notes at the end repeat the requirements and the checks. The as-of date is typed into the queries: it moves when the test is rerun.
@@ -97,7 +99,7 @@ The chapter depends on these conditions of the data:
 | 1 | 60 | Tutorial 12.1 in pairs | 19 to 23 |
 | 1 | 15 | Debrief: both directions, cutoff, the six postings | 12, 15, 20, 21 |
 | 1 | 15 | The three-way match, a short lecture | 25 to 27 |
-| 1 | 50 | Tutorial 12.2 in pairs | 34 to 37 |
+| 1 | 50 | Tutorial 12.2 in pairs: Steps 1 to 4, then Steps 5 and 6 at home | 34 to 37 |
 | 2 | 10 | Can the records behind the explanation be trusted? | 39 to 42 |
 | 2 | 90 | Tutorial 12.3 in pairs: Steps 1 to 5, then 6 to 10 | 46 to 53 |
 | 2 | 25 | Debrief: surge days and what the committee can accept | 48 to 51, 64 |
@@ -127,15 +129,15 @@ Plan A is the safest, because the stumbles of this chapter are about reading a r
 
 | Step | Look for | Value |
 |---|---|---|
-| 1, 2 | Both reconcile | {{ t1.entries|count }} entries and ${{ t1.entry_total|money }} on both sides; payroll differs by ${{ t1.l2[0][3]|money }} in each year |
-| 3, 4 | Six postings, three registers | {{ t1.n_l3 }} rows; registers {% for r in t1.l4 %}{{ r[0] }}{{ ", " if not loop.last else "" }}{% endfor %}, two of an employee who had left |
-| 5, 6 | Cutoff | {{ t1.n_other }} invoices posted in another year, {{ t1.n_before }} dated before shipment, {{ t1.n_l6 }} shipment lines never invoiced |
-| 7, 8 | Year-end | {{ t1.n_l7 }} periods cross a year-end, the last {{ t1.open_status }} open with no registers; account `2030` at ${{ t1.opening|money }} |
+| 1 (L1), 2 (L2) | Both reconcile | {{ t1.entries|count }} entries and ${{ t1.entry_total|money }} on both sides; payroll differs by ${{ t1.l2[0][3]|money }} in each year |
+| 3 (L3), 4 (L4) | Six postings, three registers | {{ t1.n_l3 }} rows; registers {% for r in t1.l4 %}{{ r[0] }}{{ ", " if not loop.last else "" }}{% endfor %}, two of an employee who had left |
+| 5 (L5), 6 (L6) | Cutoff | {{ t1.n_other }} invoices posted in another year, {{ t1.n_before }} dated before shipment, {{ t1.n_l6 }} shipment lines never invoiced |
+| 7 (L7), 8 (L8) | Year-end | {{ t1.n_l7 }} periods cross a year-end, the last {{ t1.open_status }} open with no registers; account `2030` at ${{ t1.opening|money }} |
 
 **Stumbles to expect**
 
 - Steps 4 and 6: with INNER JOIN the tests return {{ t1.l4_inner }} rows in Step 4 and {{ t1.l6_inner }} in Step 6, a clean result that means nothing. Swapping two columns of the second query of Step 3 changes nothing, {{ t1.l3_swapped }} rows either way, because that query finds no rows.
-- Step 5: with the dating branch first, the invoices for the prior year's deliveries read {{ t1.re_other_2025 }} posted in another year and {{ t1.re_before_2025 }} dated before shipment, where the model has one more and one fewer. Without the GROUP BY in Shipped an invoice counts twice.
+- Step 5: with the dating branch first, the invoices for the prior year's deliveries read {{ t1.re_other_2025 }} posted in another year and {{ t1.re_before_2025 }} dated before shipment, where the model has one more and one fewer. With Shipped left at shipment-line grain (plain dates in place of MIN and MAX, no GROUP BY), {{ t1.fan_invoice }} counts twice, because it bills two lines of one shipment.
 - Step 7: an INNER JOIN to the registers returns {{ t1.l7_inner }} periods and loses the two open ones, the wages recorded nowhere.
 
 **The checkpoint to look for.** The six bullets. A strong student says the ledger holds up in what was tested and fails on timing.
@@ -146,15 +148,15 @@ Plan A is the safest, because the stumbles of this chapter are about reading a r
 
 | Step | Look for | Value |
 |---|---|---|
-| 1 | Four statuses, no exception | {% for r in t2.p1 %}{{ r[0] }} {{ r[1]|count }}{{ "; " if not loop.last else "" }}{% endfor %} |
-| 2, 3 | Tolerance, then the ledger | none above three percent, {{ t2.p2[2]|count }} above two, the largest increase {{ t2.p2[3]|pct(2) }}; ${{ t2.p3[0]|money }} against ${{ t2.p3[1]|money }} |
-| 4, 5 | Approvals | {% for r in t2.p4 %}{{ r[0] }} {{ r[1] }}{{ "; " if not loop.last else "" }}{% endfor %}; {{ t2.p5_orders }} orders behind {{ t2.p5_rows }} exceptions |
-| 6 | Concentration | {{ t2.approvers }} approvers; the first signs {{ t2.top_share|pct }} |
+| 1 (P1) | Four statuses, no exception | {% for r in t2.p1 %}{{ r[0] }} {{ r[1]|count }}{{ "; " if not loop.last else "" }}{% endfor %} |
+| 2 (P2), 3 (P3) | Tolerance, then the ledger | none above three percent, {{ t2.p2[2]|count }} above two, the largest increase {{ t2.p2[3]|pct(2) }}; ${{ t2.p3[0]|money }} against ${{ t2.p3[1]|money }} |
+| 4 (P4), 5 (P5) | Approvals | {% for r in t2.p4 %}{{ r[0] }} {{ r[1] }}{{ "; " if not loop.last else "" }}{% endfor %}; {{ t2.p5_orders }} orders behind {{ t2.p5_rows }} exceptions |
+| 6 (P6) | Concentration | {{ t2.approvers }} approvers; the first signs {{ t2.top_share|pct }} |
 
 **Stumbles to expect**
 
 - Step 1: comparing a receipt line with an invoice line row by row returns {{ t2.direct_rows|count }} rows and {{ t2.direct_off|count }} disagree; sum to the order line first.
-- Step 2: a price test without ABS finds the same lines, because every line above two percent is an increase.
+- Step 2: a price test without ABS finds the same lines, because every line above two percent is an increase. Dividing the two prices in place of comparing whole cents flags {{ t2.p2_boundary }} lines that are exactly two percent over, {{ t2.p2_div|count }} in place of {{ t2.p2[2]|count }}.
 - Step 3: the full value of the open receipt lines, not the part not yet invoiced, reads ${{ t2.p3_full|money }}.
 - Step 6: grouping by job title returns {{ t2.p6_by_title }} rows where {{ t2.approvers }} belong.
 
@@ -162,20 +164,22 @@ Plan A is the safest, because the stumbles of this chapter are about reading a r
 
 ### Guided Tutorial 12.3: Testing the Hours Behind the Variance
 
-**Purpose.** Students profile the time records, reconcile the chain from clock to payment, test whose time was paid, compare pay with an expectation, and test overtime, surge days and late direct time. **Time.** About 90 to 110 minutes, the longest. **Demonstrate, then hand over.** Demonstrate Steps 2, 5, 7 and 8. Leave the rest to students.
+**Purpose.** Students profile the time records, reconcile the chain from clock to payment, test whose time was paid, recalculate pay from hours and rates, and test overtime, surge days and late direct time. **Time.** About 90 to 110 minutes, the longest. **Demonstrate, then hand over.** Demonstrate Steps 2, 5, 7 and 8. Leave the rest to students.
 
 | Step | Look for | Value |
 |---|---|---|
-| 1, 2 | Profile; the chain | {{ t3.h1[0]|count }} entries, {{ t3.h1[1] }} not approved, {{ t3.h1[2] }} with no clock-out; {{ t3.h2[0] }} periods, {{ t3.h2[1] }} differ |
-| 3 | The first year | {{ t3.quiet_n }} periods from February to May with at most {{ t3.quiet_max|num }} indirect hours, against {{ t3.first_indirect|num }} in the first period |
-| 4, 5 | Whose pay; the expectation | {{ t3.n_other }} lines paid to another employee, {{ t3.n_unapproved }} on unapproved entries; differences {% for r in t3.h5 %}${{ r[3]|money }}{{ ", " if not loop.last else "" }}{% endfor %}, no line above a cent |
-| 6 | Overtime | {{ t3.h6[0][1]|count }} short entries, none approved; {{ t3.n_h7 }} long entries without a link |
-| 7 | Surge days | {% for r in t3.h8 %}{{ r[1] }}{{ ", " if not loop.last else "" }}{% endfor %} days a year; share of overtime {% for r in t3.h8 %}{{ r[4]|pct }}{{ ", " if not loop.last else "" }}{% endfor %} |
-| 8, 9 | Late direct time | share after the end {% for r in t3.h9 %}{{ r[3]|pct }}{{ ", " if not loop.last else "" }}{% endfor %}; Packing {{ t3.h10[0][2]|pct }} |
+| 1 (H1), 2 (H2) | Profile; the chain | {{ t3.h1[0]|count }} entries, {{ t3.h1[1] }} not approved, {{ t3.h1[2] }} with no clock-out; {{ t3.h2[0] }} periods, {{ t3.h2[1] }} differ |
+| 3 (H3) | The first year | {{ t3.quiet_n }} periods from February to May with at most {{ t3.quiet_max|num }} indirect hours, against {{ t3.first_indirect|num }} in the first period |
+| 4 (H4), 5 (H5) | Whose pay; the recalculation | {{ t3.n_other }} lines paid to another employee, {{ t3.n_unapproved }} on unapproved entries; differences {% for r in t3.h5 %}${{ r[3]|money }}{{ ", " if not loop.last else "" }}{% endfor %}, no line above a cent |
+| 6 (H6, H7) | Overtime | {{ t3.h6[0][1]|count }} short entries, none approved; {{ t3.n_h7 }} long entries without a link |
+| 7 (H8) | Surge days | {% for r in t3.h8 %}{{ r[1] }}{{ ", " if not loop.last else "" }}{% endfor %} days a year; share of overtime {% for r in t3.h8 %}{{ r[4]|pct }}{{ ", " if not loop.last else "" }}{% endfor %} |
+| 8 (H9), 9 (H10) | Late direct time | share after the end {% for r in t3.h9 %}{{ r[3]|pct }}{{ ", " if not loop.last else "" }}{% endfor %}; Packing {{ t3.h10[0][2]|pct }} |
+| 10 (save) | Audit.sql | L1 to L8, P1 to P6 and H1 to H10 under a completed header; save the file and reopen it to confirm |
 
 **Stumbles to expect**
 
 - Step 2: exact equality of REAL sums flags {{ t3.h2_exact }} periods; use a tolerance.
+- Step 4: the {{ t3.n_h4 }} rows are {{ t3.h4_lines }} earnings lines, because a line that fails both tests appears under both labels. Count items by their keys.
 - Step 5: without the overtime premium, {% for n in t3.h5_no %}{{ n|count }}{{ ", " if not loop.last else "" }}{% endfor %} lines are flagged, one for each overtime line.
 - Step 6: writing the threshold as `<` puts the entries of exactly half an hour among the longer ones, where {{ t3.h6_lt }} lack approval instead of {{ t3.h6[1][2] }}.
 - Step 7: comparing regular hours alone finds {{ t3.h8_reg_days }} surge days, not {{ t3.h8_days }}.
@@ -200,7 +204,7 @@ Plan A is the safest, because the stumbles of this chapter are about reading a r
 
 **Concentration is a design risk.** Questions 10 and 11, Exercises 12.4 and 12.5. An approval that never changes a request and comes from one person looks like a record more than an authorization, until the requests and the evidence of review show otherwise. Ask: what could the approver have stopped, and what else would catch an error the approver missed?
 
-**An expectation from the system's own rates recalculates.** Question 15, Tutorial 12.3 Step 5. The pay fits the hours and rates on file; whether the hours were worked is another question.
+**A recalculation tests arithmetic, not the hours.** Question 15, Tutorial 12.3 Step 5. The pay fits the hours and rates on file, which is a recalculation, not a substantive analytical procedure; whether the hours were worked is another question.
 
 **A pattern is not proof.** Questions 9 and 12, Exercise 12.3. Surge-day records look entered in bulk and late time is parked on finished operations. Neither shows that hours were not worked, and records that agree do not show that they were. Ask: what would corroborate them from outside the payroll system?
 
@@ -235,7 +239,7 @@ All six exercises are SQL scripts with a model answer in Chapter12-exercises-sql
 - *One exercise a session.* Take the basic one first: 12.4, 12.5, 12.3, 12.2, 12.1, 12.6.
 - *A light load.* Exercises 12.1 and 12.5 take about three and a half hours and cover outcomes 1, 2, 4 and 5.
 
-**Grading and discussion.** Requirements (1) to (4) of Exercises 12.1 to 12.5 and the tests of 12.6 suit grading from the script and the row counts. The memos, findings and notes suit class discussion. Collect the script, not a screenshot: its comment lines show the population and the expected result.
+**Grading and discussion.** Requirements (1) to (4) of Exercises 12.1 to 12.5 and the tests of 12.6 suit grading from the script and the row counts. The memos, findings and notes suit class discussion. Collect the script, not a screenshot: its comment lines show the population and the expected result. Full credit asks only for what each requirement asks. The extras the guides add, such as an overlap named between two lists, a crossing invoice and its accrual, the working-day method of a payroll estimate, a ledger comparison of the receipts not invoiced, or limits of the evidence, are a plus, named in What a strong answer says.
 
 ## Multiple-choice questions
 
@@ -251,7 +255,7 @@ All six exercises are SQL scripts with a model answer in Chapter12-exercises-sql
 - **Question 9.** Options B and D overclaim in either direction.
 - **Question 11.** Option A reports every short entry; confirm the policy first.
 - **Question 12.** Options A and C claim an overstated variance or unworked pay.
-- **Question 15.** Option A treats agreement with an expectation as proof the hours were worked.
+- **Question 15.** Option A treats agreement with the recalculation as proof the hours were worked.
 {% if n_longest %}
 - **Length.** The correct option is also the longest in {{ n_longest }} of the {{ n_questions }} questions ({{ longest_correct }}), so wording alone can give it away. If you grade with these, ask students to explain their answer or reword the options.
 {% endif %}

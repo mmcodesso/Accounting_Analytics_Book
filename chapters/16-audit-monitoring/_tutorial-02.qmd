@@ -99,8 +99,9 @@ The Tests table is the register's dimension: one row per test, with the process 
 a. In **Model view**, relate Exceptions to **Tests** on TestID, to the **Date** table on EventDate, and to **Employee** on EmployeeID.
 b. Relate PurchaseOrder to the **Date** table on OrderDate, and PayrollRegister to the **Date** table on PayDate.
 c. Hide the keys and the flag columns of the three population tables.
+d. In **Model view**, check that PurchaseOrder and PayrollRegister have no line to **Employee**, and delete any that you find.
 
-@fig-16-02 showed this model. The populations stay loaded, related to Date, so that a measure can count the documents of any month.
+@fig-16-02 showed this model. The populations stay loaded, related to Date, so that a measure can count the documents of any month. Employee relates only to Exceptions and, through the approver, to JournalEntry. A line from PayrollRegister to Employee would join on the payee's EmployeeID, so a click on an employee would filter the registers that employee was paid on, not the ones the employee approved.
 
 **Step 10. Measure the exceptions and their rates.**
 
@@ -153,7 +154,7 @@ a. Add a page named `Exception Detail`, and drag TestID from Tests into the **Dr
 b. Add a table visual with DocumentNumber, EventDate, Amount, EmployeeName, and JobTitle.
 c. On the Monitoring page, right-click the January cell of PO AfterTermination, and choose **Drillthrough > Exception Detail**.
 
-The detail page shows the orders behind that cell, as @fig-16-06 shows. They are dated after the termination of their recorded approver, an account executive whose employment had ended long before. Drill-through passes both the row and the column of the cell, so the page shows the test's exceptions of January only. A reviewer can start from any cell of the heat map and reach the documents that need a disposition.
+The detail page shows the orders behind that cell, as @fig-16-06 shows. They are dated after the termination of their recorded approver, an account executive whose employment had ended long before. Drill-through passes both the row and the column of the cell, so the page shows the test's exceptions of January only. The test has a third order, dated in another month, which the detail page leaves out, so it lists fewer orders than the test counts in all. A reviewer can start from any cell of the heat map and reach the documents that need a disposition.
 
 ![The Exception Detail Page.](/visuals/svg/fig-16-06-exception-detail.svg){#fig-16-06 fig-alt="A mock of a Power BI drill-through page named Exception Detail, with a back button and a note of its drill-through filters: the test of orders dated after the approver left, and the month of January. A table lists the orders behind that cell, with their numbers, order dates, amounts, and their approver, an account executive whose employment had ended in 2024."}
 

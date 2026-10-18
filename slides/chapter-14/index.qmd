@@ -92,7 +92,7 @@ ProductionCompletion and its lines have exactly one line per completion, so Powe
 - Keep Single unless you can say in one sentence why not
 
 ::: {.notes}
-Filters that travel both ways make a model slower, create paths the author did not intend, and produce results readers find hard to predict. Selecting a product could then filter the ledger, or the reverse. The better remedy is to put the attribute in the fact table and count there.
+Filters that travel both ways can slow a model's queries, create paths the author did not intend, and produce results readers find hard to predict. Selecting a product could then filter the ledger, or the reverse. The better remedy is to put the attribute in the fact table and count there.
 :::
 
 ## An inactive relationship waits for USERELATIONSHIP
@@ -248,7 +248,7 @@ A row context filters nothing by itself, so SUM in a calculated column on Custom
 - Use measures inside iterators over dimensions, or unique rows
 
 ::: {.notes}
-On a fact table whose rows can repeat, a formula that seems to calculate one row's value adds up all its duplicates. Iterate over fact tables only when each row is unique.
+On a fact table whose rows can repeat, a measure or CALCULATE inside an iterator turns each row into a filter that picks out all its duplicates, so a formula that seems to calculate one row's value adds them all up. Call measures inside an iterator over a fact table only when each row is unique, or iterate over the dimension instead. An iterator with a plain row expression, such as quantity times RELATED cost, needs no unique rows.
 :::
 
 ## Check your understanding {.check}
@@ -385,7 +385,7 @@ Discount Rate =
 DIVIDE ( [Discounts], [Price Before Discount] )
 ```
 
-- Each is calculated anew for every cell, which no implicit measure can do
+- The two ratios divide one total by another, which no implicit measure can do
 
 ::: {.notes}
 Price Before Discount multiplies each line's quantity by its unit price, so Discount Rate divides the discount dollars by the dollars they were taken from, and each line counts in proportion to its value. It is well above the Average of Discount that Chapter 13 found misleading, because the discounted lines are larger than the average line.
@@ -541,7 +541,7 @@ On the report page, a card above the matrix, filtered to the latest year, shows 
 
 ## Expense spikes in the months with three pay dates
 
-{{< book-figure fig-14-11 crop="0,0,1,0.8453" >}}
+{{< book-figure fig-14-11 crop="0,0,1,0.8078" >}}
 
 ::: {.notes}
 Expected Operating Expense averages the three months before each month with DATESBETWEEN, guarded by HASONEVALUE so it is blank unless the context is one month. The expectation excludes the month itself, so a spike cannot raise its own expectation. Apart from the second month, whose expectation rests on the start-up month alone, the months well above it are the six with three pay dates, which Chapter 11 traced to payroll recorded when paid. The first of them stands out most, because its expectation averages only the two months before it. After every refresh the measure is evaluated against the new data, which turns a one-time check into a monitoring tool.

@@ -1,6 +1,6 @@
 ## Guided Tutorial 12.3: Testing the Hours Behind the Variance
 
-**Context and objective.** The committee wants to know whether the extra hours behind the manufacturing variance were worked, approved, recorded against the right operations, and paid correctly, and why so little indirect time appears in the records for four months of 2024. In this tutorial, you will profile the time records, reconcile the hours along the chain from the time clock to the payroll, test whose time was paid, and compare the pay with an expectation built from the hours and the pay rates. You will then test the overtime approvals and the days on which everyone clocked the same hours, test when direct time was recorded, and decide what the results mean for the variance.
+**Context and objective.** The committee wants to know whether the extra hours behind the manufacturing variance were worked, approved, recorded against the right operations, and paid correctly, and why so little indirect time appears in the records for four months of 2024. In this tutorial, you will profile the time records, reconcile the hours along the chain from the time clock to the payroll, test whose time was paid, and recalculate the pay from the hours and the pay rates. You will then test the overtime approvals and the days on which everyone clocked the same hours, test when direct time was recorded, and decide what the results mean for the variance.
 
 **Prerequisites.** Complete Tutorials 12.1 and 12.2, and continue at the end of Audit.sql. If you start here, make the working copy as Step 1 of Tutorial 9.1 describes, and download Audit.sql as it stands at the end of Tutorial 12.2 from [Companion Files](#sec-companion-files). @fig-10-08 shows the payroll and time tables, and @fig-12-07 the chain of records that the tests follow.
 
@@ -94,7 +94,7 @@ b. Read the IndirectHours of the periods from February to May.
 
 The result answers, as far as the records can, the second question that Chapter 11 handed on. From February to May 2024, the plant recorded normal hours in every pay period, and most of them were direct time. From June, a large part of most periods is indirect. Nothing is missing from those months, as far as the chain of Step 2 can show: their hours were clocked, recorded, and paid like any others. The production records suggest an explanation. The plant was building stock, completing thousands of units more than it shipped in its first months, which is consistent with most hours being assigned to work orders. Indirect time rose from June, and by July completions had fallen back to the rate of shipments while the same employees kept recording their hours. The build is a plausible explanation of the mix, to be tested against the production schedules and the way hours were assigned. Exercise 12.3 measures the build.
 
-**Step 4. Test whose time was paid.** A payroll earnings line points to the labor time entry it pays, so each line can be checked against the employee paid and against the approval of the clock entry behind it. Employee appears twice in the test, as pe for the employee paid and as we for the employee who worked, so that each row can show both.
+**Step 4. Test whose time was paid.** A payroll earnings line points to the labor time entry it pays, so each line can be checked against the employee paid and against the approval of the clock entry behind it. Employee appears twice in the test, as pe for the employee paid and as we for the employee who worked, so that each row can show both. Each row also carries the keys of its earnings line and its register, so that a disposition can be tied to the row.
 
 a. Type and run the test below.
 
@@ -102,6 +102,7 @@ a. Type and run the test below.
    -- Tutorial 12.3, test H4: time paid to another person or unapproved
    -- Population: all earnings lines; expected: no rows
    SELECT 'Time paid to another employee' AS Test,
+       prl.PayrollRegisterLineID, pr.PayrollRegisterID,
        pr.EmployeeID AS PaidID, pe.JobTitle AS PaidTitle,
        lt.EmployeeID AS WorkedID, we.JobTitle AS WorkedTitle,
        we.TerminationDate AS WorkerLeft, prl.Amount
@@ -115,6 +116,7 @@ a. Type and run the test below.
    WHERE lt.EmployeeID <> pr.EmployeeID
    UNION ALL
    SELECT 'Time paid on an unapproved clock entry',
+       prl.PayrollRegisterLineID, pr.PayrollRegisterID,
        pr.EmployeeID, pe.JobTitle, lt.EmployeeID, we.JobTitle,
        we.TerminationDate, prl.Amount
    FROM PayrollRegisterLine AS prl
@@ -129,11 +131,11 @@ a. Type and run the test below.
    WHERE tc.ClockStatus <> 'Approved';
    ```
 
-b. Compare the PaidID and WorkedID of each row, and read the job titles.
+b. Compare the PaidID and WorkedID of each row, and read the job titles and the earnings line keys.
 
-The first test finds six earnings lines that pay one employee's time to others. The time belongs to an Inventory Specialist who left in September 2024, and the lines pay it to two other employees, another Inventory Specialist and an Assembler on the manufacturing payroll. The second test finds eight lines paid on clock entries not yet approved, two of them the Assembler's own time, and four of them lines that fail the first test as well. The amounts are small, but the exceptions reach the manufacturing payroll, and each needs a disposition.
+The first test finds six earnings lines that pay one employee's time to others. The time belongs to an Inventory Specialist who left in September 2024, and the lines pay it to two other employees, another Inventory Specialist and an Assembler on the manufacturing payroll. The second test finds eight lines paid on clock entries not yet approved, two of them the Assembler's own time, and four of them lines that fail the first test as well, so those four earnings lines appear under both labels and are one item each, not two. The amounts are small, but the exceptions reach the manufacturing payroll, and each needs a disposition.
 
-**Step 5. Compare the pay with an expectation.** A reconciliation compares two records; an expectation compares a record with what other data imply. Each earnings line should equal its hours times the employee's base hourly rate from the Employee table, and time and a half for overtime. Set the threshold before you run the test: a line that differs by more than one cent, the rounding of one amount, is an exception.
+**Step 5. Recalculate the pay from the hours and the rates.** A reconciliation compares two records; a recalculation recomputes an amount from its inputs. Each earnings line should equal its hours times the employee's base hourly rate from the Employee table, and time and a half for overtime. Set the threshold before you run the test: a line that differs by more than one cent, the rounding of one amount, is an exception.
 
 a. Type and run the test below.
 
@@ -165,7 +167,7 @@ a. Type and run the test below.
 
 b. Read the Difference and LinesAboveOneCent columns.
 
-The earnings paid differ from the expectation by a few dollars a year, the sum of each line's rounding, and no line differs by more than a cent. Every hour was paid at the paid employee's rate on file, and every overtime hour at time and a half. The test recalculates the pay from rates that the payroll system itself stores, so it cannot show that a rate was authorized or, as Step 4 found, that the hours belonged to the person paid. The pay is right for the hours recorded, so the rest of the tutorial asks about the hours themselves.
+The earnings paid differ from the recalculation by a few dollars a year, the sum of each line's rounding, and no line differs by more than a cent. Every hour was paid at the paid employee's rate on file, and every overtime hour at time and a half. The test recalculates the pay from rates that the payroll system itself stores, so it cannot show that a rate was authorized or, as Step 4 found, that the hours belonged to the person paid. The pay is right for the hours recorded, so the rest of the tutorial asks about the hours themselves.
 
 **Step 6. Test overtime against its approvals.** A time clock entry with overtime links to an overtime approval, and classifying the entries by the length of their overtime shows where the policy draws the line.
 
@@ -192,7 +194,8 @@ c. Type and run the test below, which lists the longer entries without an approv
    ```sql
    -- Tutorial 12.3, test H7: long overtime without an approval
    -- Population: overtime above half an hour; expected: no rows
-   SELECT e.JobTitle, e.TerminationDate, tc.WorkDate,
+   SELECT tc.TimeClockEntryID, tc.EmployeeID, e.JobTitle,
+       e.TerminationDate, tc.WorkDate,
        tc.OvertimeHours, tc.ClockOutTime, tc.ClockStatus,
        oa.OvertimeApprovalID AS UnlinkedApproval,
        ap.JobTitle AS ApprovedBy
@@ -204,7 +207,7 @@ c. Type and run the test below, which lists the longer entries without an approv
    WHERE tc.OvertimeHours > 0.5 AND tc.OvertimeApprovalID IS NULL;
    ```
 
-No entry with half an hour of overtime or less has an approval, while nearly every longer one does, which suggests a policy that exempts short overtime; the team should confirm it with the payroll department rather than assume it. Above that threshold, only three entries lack an approval link, all for the Inventory Specialist of Step 4, on New Year's Day of each year, still Pending, with no clock-out time, and two of them after the employee left. The left join finds an approval for each, entered by the Warehouse Manager, but none is linked to its entry.
+No entry with half an hour of overtime or less has an approval, while nearly every longer one has one linked, which suggests a policy that exempts short overtime; the team should confirm it with the payroll department rather than assume it. Above that threshold, only three entries lack an approval link, all for the Inventory Specialist of Step 4, on New Year's Day of each year, still Pending, with no clock-out time, and two of them after the employee left. The left join finds an approval for each, entered by the Warehouse Manager, but none is linked to its entry. A link shows only that an approval is recorded for the entry, not that it belongs to the same employee and day, is approved, or covers the hours worked.
 
 **Step 7. Look for days on which everyone clocked the same hours.** Employees who clock in and out themselves arrive and leave at slightly different times, so a day on which every hourly employee of a plant recorded exactly the same hours is unusual; this chapter calls such a day a surge day. The CTE PlantDays counts, for each day, the employees who clocked in and the different numbers of hours they recorded, and the final query summarizes the surge days by year, with the fewest employees on any of them.
 
@@ -247,12 +250,12 @@ The result, shown in @fig-12-08, is the most important finding of the audit. On 
 
 ![A Day Before the Surge Days and a Surge Day.](/visuals/svg/fig-12-09-normal-and-surge-day.svg){#fig-12-09 fig-alt="Two tables of the time clock entries of the same six Assemblers. On a day in March 2024, before the first surge day, their clock-in and clock-out times differ by minutes and hours, their regular hours vary, and only some of them recorded overtime, approved by the Production Manager. On a surge day in June 2026, all six clocked in and out at the same minutes on one of two shifts and recorded the same regular and overtime hours, all approved by the Production Manager on the work date; those cells are highlighted. A line under each table summarizes the day for all 64 hourly manufacturing employees: many different clock-in times and numbers of hours on the first day, and two clock-in times and one number of hours on the surge day, when every employee recorded overtime."}
 
-**Step 8. Test when direct labor was recorded.** Direct labor is recorded against a work order operation, which has an actual end date, and time recorded after that date was charged to work that was already finished. A CTE lists the surge days again, and a left join marks the time recorded on them.
+**Step 8. Test the work dates of direct labor.** Direct labor is charged to a work order operation, which has an actual end date, and time whose work date falls after that date was charged to work that was already finished. LaborTimeEntry holds the date of the work, not the date someone entered it, so "recorded after" in this chapter means a work date after the end of the operation. The test finds such time whatever the reason, and cannot tell a late entry for work done while the operation was open from time that belongs to another operation. A CTE lists the surge days again, and a left join marks the time dated on them.
 
 a. Type and run the test below.
 
    ```sql
-   -- Tutorial 12.3, test H9: direct time recorded after its operation
+   -- Tutorial 12.3, test H9: direct time dated after its operation ended
    -- Population: direct labor time; expected: a small share
    WITH SurgeDays AS (
        SELECT tc.WorkDate
@@ -287,7 +290,7 @@ a. Type and run the test below.
 
 b. Read ShareAfterEnd and AfterEndOnSurgeDays for each year.
 
-The result, shown in @fig-12-10, rises from about a fifth of direct labor in fiscal 2024 to half in fiscal 2025 and about two-thirds in fiscal 2026, and most of the late time was recorded on surge days. Exercise 12.3 finds the month in which the share first jumped. The inner join leaves out the few direct entries with no valid operation that Tutorial 10.3 found, so the shares are of the direct hours recorded against an existing operation.
+The result, shown in @fig-12-10, rises from about a fifth of direct labor in fiscal 2024 to half in fiscal 2025 and about two-thirds in fiscal 2026, and most of the late time was recorded on surge days. Exercise 12.3 finds the month in which the share first jumped. The inner join leaves out the few direct entries with no valid operation that Tutorial 10.3 found, so the shares are of the direct hours recorded against an existing operation. Exercise 12.3 repeats the comparison on the time dated within the operation's window, a sensitivity analysis of how the hours were assigned, not a confirmation that they were worked or assigned correctly.
 
 ![Direct Labor Recorded After Its Operation Ended.](/visuals/svg/fig-12-10-labor-after-operation-end.svg){#fig-12-10 fig-alt="A mock of the Execute SQL editor and its result. The editor, on the tab Audit.sql, is scrolled past a CTE of surge days to a query that joins direct labor time entries to their work order operations, compares each work date with the operation's actual end date, and left-joins the surge days. The result has one row for each year, with the direct hours, the hours recorded after the operation had ended, their share, which rises from about a fifth in 2024 to about half in 2025 and about two-thirds in 2026, and the part of them recorded on surge days, which is most of them. The share and surge-day columns are outlined."}
 
@@ -337,8 +340,8 @@ The script now holds the tests of the three tutorials, L1 to H10, each under a c
 - the profile finds a handful of entries awaiting approval and three with no clock-out time, in records that end on December 11, 2026;
 - clocked, recorded, and paid hours agree in every pay period the records share, and the manufacturing hours of February to May 2024 are recorded like any others, most of them direct;
 - six earnings lines pay a terminated employee's time to others, two of them to an Assembler, and eight rest on unapproved clock entries;
-- every earnings line agrees with the expectation from its hours and the employee's rate to within a cent;
-- long overtime is approved, except three entries of the terminated employee whose approvals are not linked;
+- every earnings line agrees with the recalculation from its hours and the employee's rate to within a cent;
+- long overtime has an approval linked, except three entries of the terminated employee whose approvals are not linked;
 - on a growing number of days every hourly manufacturing employee clocked the same hours, and by fiscal 2026 those days carried more than two-thirds of the plant's overtime;
 - the share of direct time recorded after its operation ended rose to about two-thirds, most of it on surge days and at Packing;
 - Audit.sql is saved with a completed header and a comment above each test.

@@ -99,7 +99,7 @@ f. Format the results as numbers with no decimals, and apply a conditional forma
 
 The table shows where the promotion would break even. At a 10 percent discount, the difference turns positive only between a 30 and a 35 percent increase in volume. At 5 percent, a much smaller increase would be enough, and at 15 percent even a 40 percent increase leaves the promotion short.
 
-**Step 6. Find the break-even lift with Goal Seek.**
+**Step 6. Find the break-even lift with Goal Seek.** Goal Seek starts from the current values of the model's inputs, so check first that B2 holds 10% and B3 holds 0%, the values from Step 1, and that B11 still shows a negative difference.
 
 a. Choose **Data > What-If Analysis > Goal Seek**.
 b. Enter `B11` in **Set cell**, `0` in **To value**, and `B3` in **By changing cell**, and click **OK**.

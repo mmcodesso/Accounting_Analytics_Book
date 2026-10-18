@@ -45,7 +45,7 @@ b. In the **Navigator**, select the **Select multiple items** check box, select 
 c. Rename the queries `Supplier`, `Employee` and `DisbursementPayment`. Keep every column of Supplier (17 columns). In Employee choose **Home > Choose Columns** and keep EmployeeID, EmployeeName, JobTitle, Address and City.
 d. Choose **Home > Close & Load > Close & Load To**, select **Table** and **New worksheet**, and rename the worksheets `Ex 5.5 Supplier`, `Ex 5.5 Employee` and `Ex 5.5 DisbursementPayment`.
 
-**Check:** Supplier 110 rows, Employee 120 with five columns, and DisbursementPayment 40,127. **Watch for:** a plain **Close & Load**, which sends the Tables to the Data Model and leaves no worksheets.
+**Check:** Supplier 110 rows, Employee 120 with five columns, and DisbursementPayment 40,127. **Watch for:** a plain **Close & Load**, which with Excel's default load settings sends the Tables to the Data Model and leaves no worksheets.
 
 ### Requirement (2): The match key
 
@@ -74,18 +74,20 @@ Repeat the second formula for EmployeeID and JobTitle. Count the suppliers with 
 
 ### Requirement (4): The payments
 
-**Step 5. Total the payments.** Add `PaymentCount` and `PaymentTotal` to the Supplier Table, for the matched suppliers only:
+**Step 5. Total the payments.** Add `PaymentTotal` to the Supplier Table, for the matched suppliers only, and, as the model answer does, `PaymentCount` beside it:
 
 ```
-=IF([@EmployeeMatches]>0,COUNTIFS(DisbursementPayment[SupplierID],[@SupplierID]),"")
 =IF([@EmployeeMatches]>0,SUMIFS(DisbursementPayment[Amount],DisbursementPayment[SupplierID],[@SupplierID]),"")
+=IF([@EmployeeMatches]>0,COUNTIFS(DisbursementPayment[SupplierID],[@SupplierID]),"")
 ```
 
-**Check:** 1,937 payments, $2,783,274.21. **Watch for:** the totals include 20 payments, $37,227.78, dated after the fiscal year-end. A student who audits one fiscal year should say which payments the memo counts. Summing on the supplier name gives the same totals here, because the supplier names are unique, but SupplierID is the key that stays right when a name repeats.
+Then state the range of payment dates the totals cover, for example with MINIFS and MAXIFS on PaymentDate for each matched supplier.
+
+**Check:** 1,937 payments, $2,783,274.21, dated March 23, 2024 to February 23, 2027. **Watch for:** a total read as one fiscal year's. The totals include 20 payments, $37,227.78, dated after December 31, 2026, so the requirement asks for the date range. A student who audits one fiscal year adds a PaymentDate criterion to both formulas and labels that total separately. Summing on the supplier name gives the same totals here, because the supplier names are unique, but SupplierID is the key that stays right when a name repeats.
 
 ### Requirement (5): The memo
 
-**Step 6. Write the half page.** The outline: the test and its key; the six matches, with the employee and job title for each; the payments; the statement that a shared address is a recognized red flag and not proof of a related party or a fictitious vendor; the observation that the employees' roles are not in purchasing, so each relationship needs an explanation; the observation that all six suppliers are approved and rated Low risk, so the master file's own rating does not flag them; and the next procedures: confirm ownership (registrations, the tax identification number, an inquiry of the employee), review who approved each supplier's setup and its invoices, compare prices with other suppliers of the same items, and test a sample of the payments for evidence that the goods or services were received.
+**Step 6. Write the half page.** The outline: the test and its key; the six matches, with the employee and job title for each; the payments and the dates they cover; the statement that a shared address is a recognized red flag and not proof of a related party or a fictitious vendor; the observation that the employees' roles are not in purchasing, so each relationship needs an explanation; the observation that all six suppliers are approved and rated Low risk, so the master file's own rating does not flag them; and the next procedures: confirm ownership (registrations, the tax identification number, an inquiry of the employee), review who approved each supplier's setup and its invoices, compare prices with other suppliers of the same items, and test a sample of the payments for evidence that the goods or services were received.
 
 **Check:** the memo names the six suppliers and calls the match a lead.
 
@@ -109,6 +111,7 @@ Repeat the second formula for EmployeeID and JobTitle. Count the suppliers with 
 ## What a strong answer says
 
 - **Requirement (2).** The key joins two fields because one is not unique, and standardizes because the match should not depend on how an address was typed. A strong answer says that the standardizing changed nothing here.
+- **Requirement (4).** Totals by SupplierID and the dates they cover. A plus: a count of payments beside each total, and a fiscal-year total labeled apart from the whole extract.
 - **Requirement (5).** The six suppliers, the employees and the payments; "a lead, not proof"; the roles; the next procedures in order of strength of evidence (ownership first).
 
 A weak answer calls the matches fraud, or lists them without next procedures.
@@ -129,7 +132,7 @@ A weak answer calls the matches fraud, or lists them without next procedures.
 | Requirement 1: loading | 15 | Three Tables as worksheets, Employee reduced to five columns | Loaded to the Data Model |
 | Requirement 2: the key | 20 | The same formula on both Tables, with a reason for the city | A key without TRIM and UPPER, or no reason |
 | Requirement 3: the matches | 20 | The count, the lookups with no #N/A, the six suppliers | Lookups that return errors |
-| Requirement 4: payments | 15 | COUNTIFS and SUMIFS on SupplierID | Totals from a filter |
+| Requirement 4: payments | 15 | SUMIFS on SupplierID for each match, with the range of payment dates stated | Totals from a filter, or no date range |
 | Requirement 5: the memo | 30 | Matches, payments, a lead not proof, next procedures | A list without procedures |
 
 ## Extensions and discussion questions

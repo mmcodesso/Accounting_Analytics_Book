@@ -22,11 +22,13 @@ The chapter depends on these conditions of the data:
 
 - The database has 82 tables, each with one integer surrogate key in its first column and no declared foreign keys, so every relationship is logical and has to be tested. The file declares three types (INTEGER, REAL and TEXT): dates are text and flags are 0 and 1.
 - Unique indexes protect OrderNumber, InvoiceNumber, EntryNumber and AccountNumber, but not PurchaseInvoice.InvoiceNumber, which is the supplier's own number.
-- The 12 foreign keys of Exercise 3.6 have 0 orphaned values. The one orphan in the data is in the source-document trace: 6 ledger rows typed PayrollPayment point to payments that do not exist. The trace is also ambiguous without its type: the key of the traced invoice, 7947, finds 38 ledger rows of 11 source types.
+- The 12 foreign keys of Exercise 3.6 have 0 orphaned values. One source type of the trace has exceptions: 6 ledger rows typed PayrollPayment point to payments that do not exist. The trace is also ambiguous without its type: the key of the traced invoice, 7947, finds 38 ledger rows of 11 source types.
 - 9 customers have no orders (all inactive), 12 items with a list price were never ordered, 439 invoice lines (design services) have no shipment line, and 9 shipment lines were never invoiced.
 - GLEntry has 815,921 rows and is the largest worksheet, so it filters slowly. The sale of Tutorial 3.2 exists as the chapter tells it: invoice SI-2025-007947 for Sullivan-Mcdonald, one of 8 invoices of order SO-2024-001697.
 
 ## What students should be able to do afterward
+
+These outcomes are this guide's own. They follow the chapter's six learning objectives in order, outcome 1 serving objective 1 and so on, each stated with what practices it.
 
 1. Explain how the database stores accounting data: tables, rows, columns, and the three types that the SQLite file declares, with dates as text, flags as 0 and 1, and NULL for a missing value. Practiced in questions 13 and 14 and in the data dictionary of Exercise 3.2.
 2. Name the primary key of a table and the foreign keys that connect it, and say which relationships the file declares (none) and which the data follow. Practiced in Tutorial 3.1 (Steps 2 and 3), Exercises 3.1, 3.2, 3.4, 3.5 and 3.6, and questions 1, 2, 8 and 9.
@@ -164,7 +166,7 @@ Plan A is the safest. Plan B costs the vocabulary lecture but makes the junction
 
 **A key's role depends on the table.** CustomerID is the primary key of Customer and a foreign key in SalesOrder. Question 2 tempts with composite key, and question 1's option C describes a foreign key. Ask: whose rows does this column identify?
 
-![A decision tree that sorts a column into primary key, foreign key, bridge key or the source-document trace.](../figures/chapter-03-accounting-data-environment/IF-03-0-B.pdf)
+![A decision tree that sorts a column into primary key, the source-document trace, foreign key (with its self-reference and bridge-key branches) or an ordinary column.](../figures/chapter-03-accounting-data-environment/IF-03-0-B.pdf)
 
 **An identifier is not a quantity.** Account numbers and IDs are integers that tools will add. Exercise 3.6 shows the practical error: testing GLEntry.AccountID against Account.AccountNumber flags every one of the 71 accounts the ledger uses. Ask: would the sum or the average mean anything?
 
@@ -178,7 +180,7 @@ Plan A is the safest. Plan B costs the vocabulary lecture but makes the junction
 
 ![What a join of Customer to SalesOrder to SalesOrderLine does to one customer's rows, and why counting customers by row overstates them.](../figures/chapter-03-accounting-data-environment/IF-03-0-A.pdf)
 
-**The trace is not a foreign key.** Question 12 tempts with it uses two columns. The point is that the target table depends on the type, so the key alone is ambiguous, as the live filter in Tutorial 3.2 shows. 6 PayrollPayment rows point to a payment that does not exist.
+**The trace is not a foreign key.** Question 12 tempts with it uses two columns. The point is that the target table depends on the type, so the key alone is ambiguous, as the live filter in Tutorial 3.2 shows. 6 ledger rows typed PayrollPayment point to a payment that does not exist.
 
 **One sale, several documents.** Students expect the invoice to hold the whole sale. The shipment posts the cost, the invoice the revenue, the receipt the cash, the application the settlement and the commission accrual the commission.
 
@@ -193,7 +195,7 @@ Plan A is the safest. Plan B costs the vocabulary lecture but makes the junction
 
 ## Using the exercises
 
-All six exercises end in a one-page written deliverable. There is no solution workbook; the model answers are in each exercise's guide. The outcome column uses the numbers of the list at the top of this note.
+All six exercises end in short written deliverables: Exercise 3.5 allows one to two pages, Exercise 3.4 half a page to a page, and the others about a page. There is no solution workbook; the model answers are in each exercise's guide. The outcome column uses the numbers of the list at the top of this note.
 
 | Exercise | Perspective | Tool | Time | Difficulty | Outcome |
 |---|---|---|---:|---|---|

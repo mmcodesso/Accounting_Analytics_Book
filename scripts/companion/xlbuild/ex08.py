@@ -630,43 +630,59 @@ def ex8_1(b: ExerciseBuild) -> None:
     fmt(ws, f"C{small_row + 1}:C{small_row + n_small}", DATE)
     fmt(ws, f"F{small_row + 1}:F{small_row + n_small}", MONEY)
     wo = small_row + n_small + 3
-    ws.Cells(wo - 1, 1).Value = "The aging if they were written off"
-    ws.Cells(wo - 1, 1).Font.Italic = True
-    header(ws, wo, 1, ["Bucket", "Invoices", "Open balance", "Written off", "Invoices after", "Balance after",
-                       "Loss rate", "Expected loss after"])
-    for i in range(len(audit.BUCKETS)):
-        r, ar = wo + 1 + i, 4 + i
-        put(ws, {f"A{r}": f"=Aging!A{ar}", f"B{r}": f"=Aging!B{ar}", f"C{r}": f"=Aging!C{ar}",
-                 f"D{r}": f'=COUNTIFS(OpenInvoices[Bucket],A{r},OpenInvoices[OpenBalance],"<{SMALL}")',
-                 f"E{r}": f"=B{r}-D{r}",
-                 f"F{r}": f'=C{r}-SUMIFS(OpenInvoices[OpenBalance],OpenInvoices[Bucket],A{r},OpenInvoices[OpenBalance],"<{SMALL}")',
-                 f"G{r}": f"=XLOOKUP(A{r},Buckets[Bucket],Buckets[LossRate])", f"H{r}": f"=ROUND(F{r}*G{r},2)"})
-    tot = wo + 1 + len(audit.BUCKETS)
-    put(ws, {f"A{tot}": "Total"})
-    for c in "BCDEFH":
-        put(ws, {f"{c}{tot}": f"=SUM({c}{wo + 1}:{c}{tot - 1})"})
-    for c in "BDE":
-        fmt(ws, f"{c}{wo + 1}:{c}{tot}", COUNT)
-    for c in "CFH":
-        fmt(ws, f"{c}{wo + 1}:{c}{tot}", MONEY)
-    fmt(ws, f"G{wo + 1}:G{tot - 1}", "0.0%")
-    bold(ws, f"A{tot}:H{tot}")
     old = f["old"]
     current = f["small_current"]
     assert len(current) + len(old) == n_small, "a balance under $10 is 1 to 60 days past due"
+
+    def aging_table(label: str, top: int, extra: str = "") -> int:
+        """The aging without the balances under $10 (those 61 or more days past due when `extra` adds that criterion):
+        a label above a header, one row for each bucket, and a total. Returns the total's row."""
+        ws.Cells(top - 1, 1).Value = label
+        ws.Cells(top - 1, 1).Font.Italic = True
+        header(ws, top, 1, ["Bucket", "Invoices", "Open balance", "Write-off count", "Invoices after", "Balance after",
+                            "Loss rate", "Expected loss after"])
+        for i in range(len(audit.BUCKETS)):
+            r, ar = top + 1 + i, 4 + i
+            put(ws, {f"A{r}": f"=Aging!A{ar}", f"B{r}": f"=Aging!B{ar}", f"C{r}": f"=Aging!C{ar}",
+                     f"D{r}": f'=COUNTIFS(OpenInvoices[Bucket],A{r},OpenInvoices[OpenBalance],"<{SMALL}"{extra})',
+                     f"E{r}": f"=B{r}-D{r}",
+                     f"F{r}": f'=C{r}-SUMIFS(OpenInvoices[OpenBalance],OpenInvoices[Bucket],A{r},'
+                              f'OpenInvoices[OpenBalance],"<{SMALL}"{extra})',
+                     f"G{r}": f"=XLOOKUP(A{r},Buckets[Bucket],Buckets[LossRate])", f"H{r}": f"=ROUND(F{r}*G{r},2)"})
+        total = top + 1 + len(audit.BUCKETS)
+        put(ws, {f"A{total}": "Total"})
+        for c in "BCDEFH":
+            put(ws, {f"{c}{total}": f"=SUM({c}{top + 1}:{c}{total - 1})"})
+        for c in "BDE":
+            fmt(ws, f"{c}{top + 1}:{c}{total}", COUNT)
+        for c in "CFH":
+            fmt(ws, f"{c}{top + 1}:{c}{total}", MONEY)
+        fmt(ws, f"G{top + 1}:G{total - 1}", "0.0%")
+        bold(ws, f"A{total}:H{total}")
+        return total
+
+    # the hypothetical the requirement asks for (all of them written off), then the recommended case, whose Current row stays
+    # whole because the invoice not yet due is not a residual
+    tot = aging_table("The aging if all of them were written off (the hypothetical)", wo)
+    wo2 = tot + 3
+    tot2 = aging_table("The aging if only the old balances (61 or more days past due) were written off (recommended)", wo2,
+                       ',OpenInvoices[DaysPastDue],">=61"')
     after_61 = [r for r in f["after"] if r["label"] in ("61-90 days", "Over 90 days")]
-    row = text_block(ws, tot + 2, f"{MA}, requirement (3)", [
+    row = text_block(ws, tot2 + 2, f"{MA}, requirement (3)", [
         f"{word(n_small, True)} open invoices have balances under ${SMALL}, together {money(f['small_total'])}. "
         + (f"One is current ({', '.join(i['number'] + ' ' + money(i['balance']) for i in current)}); "
            if len(current) == 1 else f"{word(len(current), True)} are current; ")
         + f"the other {word(len(old))} are 61 or more days past due, from {money(f['old_low'])} to {money(f['old_high'])}: "
         "small balances left after the customers paid; nothing in the data shows whether any of them is disputed. "
-        f"Writing all {word(n_small)} off, as the requirement asks, removes {money(f['small_total'])} from the aging and "
+        f"As a hypothetical, writing all {word(n_small)} off removes {money(f['small_total'])} from the aging and "
         f"lowers the expected loss from {money(f['loss'])} to {money(f['after_loss'])}, and the two oldest buckets then "
         f"hold {sum(r['count'] for r in after_61)} invoices instead of {sum(r['count'] + r['small'] for r in after_61)}, "
         "so what is left there is worth a collection call. "
-        + ("The current invoice is a whole invoice not yet due rather than a residual, so a small-balance policy "
-           "would keep it; the old balances are the candidates." if current else "")])
+        + (f"The current invoice is a whole invoice not yet due rather than a residual, so a small-balance policy would "
+           f"keep it. The recommended case writes off only the {word(len(old))} old balances, {money(f['old_total'])}, "
+           f"which lowers the expected loss to {money(f['after_old_loss'])} and leaves {money(f['total'] - f['old_total'])} "
+           "of gross supported receivables. Which balances qualify is a matter for an approved policy."
+           if current else "")])
 
     # (4) the adjusting entry.
     heading(ws, row, "(4) Adjusting journal entry")
@@ -753,6 +769,11 @@ def ex8_1(b: ExerciseBuild) -> None:
     b.check(t, "invoices after the write-off", f["count"] - n_small, f"='Ex 8.1'!E{tot}", 0, COUNT)
     b.check(t, "open balance after the write-off", round(f["total"] - f["small_total"], 2), f"='Ex 8.1'!F{tot}")
     b.check(t, "expected loss after the write-off", round(f["after_loss"], 2), f"='Ex 8.1'!H{tot}")
+    b.check(t, "invoices after writing off only the old balances", f["count"] - len(old), f"='Ex 8.1'!E{tot2}", 0, COUNT)
+    b.check(t, "open balance after writing off only the old balances", round(f["total"] - f["old_total"], 2),
+            f"='Ex 8.1'!F{tot2}")
+    b.check(t, "expected loss after writing off only the old balances", round(f["after_old_loss"], 2),
+            f"='Ex 8.1'!H{tot2}")
     b.check(t, "entry: debit to 6170", round(f["loss"], 2), f"='Ex 8.1'!B{entry + 1}")
     b.check(t, "entry: debits less credits", 0, f"='Ex 8.1'!B{entry + 3}-'Ex 8.1'!C{entry + 3}")
     b.check(t, "GL rows in accounts 1030 and 6170", f["gl_rows"], f"='Ex 8.1'!B{entry + 5}", 0, COUNT)
@@ -1457,6 +1478,14 @@ def ex8_5(b: ExerciseBuild) -> None:
     chart.HasTitle = True
     chart.ChartTitle.Text = "Requisitions by $50 band of RequisitionValue"
     chart.HasLegend = False
+    counts = f["bands"]
+    assert len(counts) == BAND_COUNT and counts[(BAND_EXAMINED - BAND_FROM) // BAND_WIDTH] == max(counts), \
+        "the band just below the limit is the tallest"
+    shape.Title = "Requisitions by 50-dollar band"
+    shape.AlternativeText = (
+        f"Requisition counts in {word(BAND_COUNT)} 50-dollar bands from {BAND_FROM:,} to below {BAND_FROM + BAND_COUNT * BAND_WIDTH:,}. "
+        f"Counts are {series(counts)}. The band from {BAND_EXAMINED:,} to below {BAND_EXAMINED + BAND_WIDTH:,} is the highest "
+        "and requires investigation. The table beside the chart gives the bands.")
     e0 = band_last + 8
     put(wr, {f"A{e0}": "Band examined, from", f"B{e0}": BAND_EXAMINED})
     fmt(wr, f"B{e0}", MONEY)
@@ -1630,14 +1659,15 @@ def ex8_5(b: ExerciseBuild) -> None:
         "production supervisor outside the purchasing and accounting roles, and the purchasing manager, on the two "
         f"capital invoices. The requisitions cluster just below $5,000, with {word(f['unapproved'])} converted to orders "
         "without approval.",
-        "Design or operation. The records are consistent with a weak design. They hold approvals by the person who "
-        "created the document, by someone whose limit is $0 or below the amount, and under the ID of a terminated "
-        "employee, and requisitions converted to orders without an approval, and nothing in the data stopped them. The "
-        "limits in the Employee table were not applied to these documents. Where a control existed, its operation may "
-        "have failed too, since managers approved above their limits. Whether each control was absent, bypassed, or "
-        "misconfigured takes the approval policy, the system's "
-        "configuration, and the access logs, so the classification is provisional until they are seen; if the design "
-        "let the exceptions through, fixing it matters more than retraining.",
+        "Design or operation. The records hold approvals by the person who created the document, by someone whose "
+        "recorded limit is $0 or below the amount, and under the ID of a terminated employee, and requisitions converted "
+        "to orders without an approval, and nothing in the data stopped them. That is consistent with a weak design, "
+        "and managers who approved above their limits may also have failed in operation, but the same records could "
+        "reflect an override or an incorrect extract. The limits in the Employee table are the current recorded limits, "
+        "so the above-limit flags assume that they also applied on the order dates. Whether each control was absent, "
+        "bypassed, or misconfigured takes the approval policy, the history of the limits, the system's configuration, "
+        "and the access logs, so the classification is provisional until they are seen; if the design let the "
+        "exceptions through, fixing it matters more than retraining.",
         f"Clean results. The near-duplicate test flags {f['same']} payments in {f['pairs']} pairs of the same supplier "
         "and amount, but none pays the same invoice, which rules out a second payment of the same invoice for the same "
         "amount but not every duplicate. Purchase order numbers are unique, have no gaps in any year, and continue "
@@ -1929,7 +1959,7 @@ def ex8_6(b: ExerciseBuild) -> None:
         f"dates cite them ({money(f['after_total'])} of order value, not a loss): " + "; ".join(
             f"list {x['id']}: " + ", ".join(f"{f['grid'][(x['id'], y)]:,} in {y}" for y in years if f["grid"][(x["id"], y)])
             for x in fl)
-        + f". The records show no check that stops an order line from citing an expired list. Lists "
+        + f". The extract shows no check that stopped an order line from citing an expired list. Lists "
         f"{series(x['id'] for x in unused)} are "
         "Active copies of the Design Trade list, with no lines, that price nothing. Their intended purpose is the first "
         "question, because unused records alone do not prove a deficiency, but they make it harder to see which list is "
@@ -1956,26 +1986,28 @@ def ex8_6(b: ExerciseBuild) -> None:
         (f"Promotions {series(p['id'] for p in pt_rows)}: end dates on or before their start dates",
          "Possibly", "Possibly",
          "The promotions were recorded, and approved by the sales manager on their start dates, with an end date "
-         "that is not after the start date. The records show no date check (a possible design weakness), and the "
-         f"discount was then granted on every collection line ordered in {ordered_in} (a possible failure of operation)."
+         "that is not after the start date. The extract shows no date check that stopped them, which could reflect a "
+         "missing or inadequate control (a possible design weakness), and the discount was then granted on every "
+         f"collection line ordered in {ordered_in} (a possible bypass of the dates, or wrong dates in the master data)."
          + (f" Promotion {series(p['id'] for p in same)} ends on its start date, as a one-day promotion would, so only "
             "the date policy can make that record invalid." if same else "")),
         (f"{word(n_req, True)} pending override requests, billed at their ApprovedUnitPrice on "
          f"{len(pend)} invoice lines", "Possibly", "Possibly",
          "Order lines carry the price of an override that is still Pending, under a price-list PricingMethod and "
-         "with no PriceOverrideApprovalID. The records show no link from a price to an approved request (a possible "
-         "design weakness), and the requests are Pending with blank approval fields in this extract (a possible "
-         "failure of operation)."),
+         "with no PriceOverrideApprovalID. The extract shows no link from a price to an approved request, which could "
+         "reflect a missing control (a possible design weakness), an override or an incomplete extract, and the requests "
+         "are Pending with blank approval fields (a possible failure of operation). The cause is not established from "
+         "these records."),
         (f"Expired price lists {list_ids} cited by {f['after']:,} order lines after their end dates", "Possibly",
          "Possibly",
-         "Order lines cite expired lists, and one list ends before it starts. The records show no date check (a "
-         "possible design weakness), and the extract holds no successor to the segment lists (a possible failure of "
-         "operation)."),
+         "Order lines cite expired lists, and one list ends before it starts. The extract shows no date check that "
+         "stopped them (a possible design weakness), and it holds no successor to the segment lists (a possible failure "
+         "of operation)."),
         (f"Lists {series(x['id'] for x in unused)}: Active copies with no lines", "Possibly", "",
          "Duplicate master data that nothing uses, a possible weakness in how price lists are set up and retired. "
          "Their intended purpose is the first question, because unused records alone do not prove a deficiency."),
         (f"Customer {own[0]['customer']}'s lines citing list {cited['id']}", "Possibly", "",
-         "The price matches the customer's own list, but the record names another list. The records show no check "
+         "The price matches the customer's own list, but the record names another list. The extract shows no check "
          "that the cited list set the price, a possible design weakness that the configuration would confirm."),
     ]
     width = sum(ws.Columns(c).ColumnWidth for c in "FGHIJ")
@@ -2007,8 +2039,9 @@ def ex8_6(b: ExerciseBuild) -> None:
         "Recommendations. Reject promotions and price lists whose end date is before the start date, and define "
         "whether a promotion may last one day; block "
         "pricing from expired lists, and renew or retire the segment lists; allow an override price only after the "
-        "request is approved, and link the approval to the line; remove the unused copies; and review the promotion "
-        "and price-list setups each year before they take effect. Most exceptions are consistent with design "
+        "request is approved, and link the approval to the line; confirm the purpose and owner of the unused lists and "
+        "retire or correct them under the authorized master-data process if they are unnecessary; and review the "
+        "promotion and price-list setups each year before they take effect. Most exceptions are consistent with design "
         "weaknesses, since nothing in the records stopped them, so the fixes may belong in the system, with a periodic "
         "review as the "
         "detective control; the classification is provisional until the system's configuration and the pricing policy "

@@ -5,12 +5,12 @@
      3 A: drill-through opens another page filtered to the selected item.
      4 C: tooltips are not interactive and screen readers cannot read them (Learn).
      5 B: a disconnected table supplies categories; the measure reads the selected step.
-     6 D: store the first day of the period and relate it one-to-many to the date table.
+     6 D: store the first day of the period and relate that date many-to-one to the date table (Date is the one side, BudgetLine the many side).
      7 C: actual less budget, positive for an expense, is spending above budget, unfavorable.
      8 A: the commission budget was calculated on the budget's revenue volume, several times actual.
      9 B: a classification difference moves cost between cost centers; the total is unchanged.
      10 D: a visual calculation sees only the rows on its visual ({{ visual|num(3) }} against the measure's {{ measure|num(3) }}).
-     11 A: visual calculations cannot be reused or exported; KPIs belong in measures.
+     11 A: visual calculations cannot be reused in another visual and their exports must be tested for the mode and version in use; a KPI that readers export and compare belongs in a measure.
      12 C: a filter argument on the same column replaces the existing filter unless KEEPFILTERS is used.
      13 C: the page navigator follows the pages by itself; a bookmark keeps the state it captured until it is updated.
      14 B: a GENERATESERIES-style table and a measure with SELECTEDVALUE, and optionally a slider.

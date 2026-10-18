@@ -13,7 +13,7 @@ figures:
   - id: IF-19-3-A
     kind: excel-mock
     purpose: The Materiality worksheet with the three thresholds and the expectation of returns, the end state of Parts 1 and 2.
-    shows: "The top of the Materiality sheet: the parameter block with income, the three rates, overall materiality, performance materiality and the clearly trivial threshold in cells whose names are written beside them as labels (in the workbook the Name Box shows them); below it the three-year block of revenue, returns and return rate, then the expectation, the recorded returns, the difference, the two comparisons and the conclusion text."
+    shows: "The top of the Materiality sheet: the parameter block with income, the rates, overall materiality, performance materiality, the clearly trivial threshold and the analytical follow-up trigger (its own cell, a share of the expectation) in cells whose names are written beside them as labels (in the workbook the Name Box shows them); below it the three-year block of revenue, returns and return rate, then the expectation, the recorded returns, the difference, the comparisons with the trigger and with performance materiality and the conclusion text."
     data: The Materiality worksheet of Credits Audit.xlsx on the pinned dataset (income, thresholds, revenue and returns by year).
 ---
 {% set g = ch19_g3 %}
@@ -101,7 +101,7 @@ ORDER BY gl.FiscalYear;
 
 **Check:** rates {{ rates[0]|pct(3) }}, {{ rates[1]|pct(3) }} and {{ rates[2]|pct(3) }}; SQL test P1 returns the same three rows.
 
-**Step 4. Expect, compare, conclude.** The expectation is the last year's revenue times the previous year's rate; the difference is the recorded returns less the expectation, set against the two thresholds.
+**Step 4. Expect, compare, conclude.** The expectation is the last year's revenue times the previous year's rate; the difference is the recorded returns less the expectation. It is an unexplained difference, not an identified misstatement, so it is judged against the follow-up trigger the student states, and against performance materiality for context. The clearly trivial threshold governs the accumulation of identified misstatements and does not decide whether an analytical difference is investigated. The model sets its own trigger, {{ g.follow_rate|pct(0) }} of the expectation, a case assumption for a one-rate expectation (its cell is separate from ClearlyTrivial, whatever the two amounts happen to be).
 
 ```jinja
 {{ g.f_exp }}
@@ -110,9 +110,9 @@ ORDER BY gl.FiscalYear;
 
 {{ figure('IF-19-3-A') }}
 
-**Check:** expected ${{ exp|money }} against ${{ actual|money }} recorded, a difference of ${{ diff|money }} ({{ diff_pct|pct(1) }}); the conclusion text reads "Investigate (Requirement 5)". **Watch for:**
+**Check:** expected ${{ exp|money }} against ${{ actual|money }} recorded, a difference of ${{ diff|money }} ({{ diff_pct|pct(1) }}), above the model's trigger (${{ g.follow_up|money }}) and below performance materiality (${{ perf|money }}); the conclusion reads "{{ g.concl }}". A difference under the trigger is never simply accepted: qualitative risk and the expectation's precision still count, and a test of positive and negative differences uses the magnitude. **Watch for:**
 
-- Comparing the difference with overall materiality: it is {{ g.mat_ratio|pct(0) }} of it, so "immaterial" tempts. Materiality is not the test for investigating; the clearly trivial threshold is, and the difference is above it and below performance materiality.
+- Comparing the difference with overall materiality: it is {{ g.mat_ratio|pct(0) }} of it, so "immaterial" tempts. Materiality is not the test for investigating, and neither is the clearly trivial threshold: the student's own trigger is, stated with its basis.
 - The first year's rate. It gives an expectation of ${{ exp_f|money }} and recorded returns {{ f_pct|pct(1) }} above it, because the first year had no earlier sales to return, so its rate understates.
 
 ### Part 3: Risks and the matrix
@@ -141,7 +141,7 @@ ORDER BY gl.FiscalYear;
 ## What a strong answer says
 
 - **The base and the thresholds are right and visible:** income as the ledger records it, closes out, and three named cells that later formulas read.
-- **The expectation is judged, not just computed.** The difference is above clearly trivial and below performance materiality: investigate (Requirement 5 finds where), neither accept nor conclude.
+- **The expectation is judged, not just computed.** An unexplained difference above the student's stated trigger and below performance materiality: investigate (Requirement 5 finds where), neither accept nor conclude.
 - **The brainstorm uses the records:** the incompatible duties of customer service, the refund approvers with no preparer.
 - **The matrix plans the audit:** each risk has a control point, a test, a tool and where the evidence lies, rated by likelihood and magnitude.
 
@@ -150,7 +150,7 @@ A weak answer takes revenue or credits as the base, calls the difference immater
 ## Common mistakes and how to respond
 
 - **The closes left in.** *Symptom:* materiality `{{ 0|money }}`. *Response:* ask what the closing entry does to income.
-- **Difference against materiality.** *Symptom:* "immaterial, no work". *Response:* ask which threshold decides whether to look.
+- **Difference against materiality or clearly trivial.** *Symptom:* "immaterial, no work", or "above clearly trivial" as the reason. *Response:* ask what trigger decides whether to look, and what clearly trivial is for.
 - **The first year's rate.** *Symptom:* a difference of {{ f_pct|pct(0) }}. *Response:* ask how many earlier sales the first year had.
 - **Typed thresholds.** *Symptom:* later sheets disagree after a change. *Response:* ask where each formula reads the number.
 - **A matrix of SQL.** *Symptom:* no row says the evidence is outside the database. *Response:* ask what a query cannot show about a refund.
@@ -160,7 +160,7 @@ A weak answer takes revenue or credits as the base, calls the difference immater
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
 | Thresholds | 25 | Right base, three named cells | Right numbers typed in |
-| Expectation | 25 | Rates, expectation, both comparisons, the reasoned conclusion | Numbers without the conclusion |
+| Expectation | 25 | Rates, expectation, the difference, a stated trigger with its basis and the reasoned conclusion (performance materiality in context) | Numbers without the conclusion |
 | Brainstorm | 20 | Five schemes, with opportunity from the records | Generic opportunities |
 | Matrix | 30 | Nine points, tool and evidence location, ratings argued | Risks without tests or ratings |
 

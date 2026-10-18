@@ -120,8 +120,8 @@ def ex3(d, claim):
     low, high = min(r[2] for r in items), max(r[2] for r in items)
     claim(low >= 0.30, "no item is below 30 percent")
     top = max(groups, key=lambda g: g["margin"])
-    claim(top is min(groups, key=lambda g: g["pct"]), f"{top['name']}, which earns the most per unit, has the lowest "
-                                                      "average percentage")
+    claim(top is min(groups, key=lambda g: g["pct"]), f"{top['name']}, which has the highest average list-price margin "
+                                                      "per unit, has the lowest average percentage")
     method = d.q("SELECT COUNT(*), SUM(PricingMethod LIKE '%Price List' AND UnitPrice < BaseListPrice - 0.005), "
                  "SUM(Discount > 0) FROM SalesInvoiceLine")[0]
     claim(method[1] > method[0] / 2, "most sales are billed at price-list prices below list")

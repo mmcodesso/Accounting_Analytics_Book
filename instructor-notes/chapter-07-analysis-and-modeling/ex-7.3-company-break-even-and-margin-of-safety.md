@@ -25,7 +25,7 @@ By the end, students can:
 ## Before you assign
 
 - **Files and software.** The analysis workbook at the end of Chapter 7's tutorials, with InvoiceLines, BudgetLine and GLOpex (Tutorial 7.2). Students import the ledger again for requirement 4, with **Transform Data**, never **Load**.
-- **Data conditions.** Services lines carry no standard cost, so design staff sit in the fixed costs. The budget files interest expense under Operating Expense although the chart of accounts makes it Other Expense. Accounts for freight-out, the purchase price variance and the manufacturing variance have journal-entry rows that are only the year-end close, so excluding the JournalEntry source removes just the close. The manufacturing variance grows every year of the window.
+- **Data conditions.** Services lines carry no standard cost, so design staff sit in the fixed costs. The budget files interest expense under Operating Expense although the chart of accounts makes it Other Expense. In 2026, the journal-entry rows on the accounts for freight-out, the purchase price variance and the manufacturing variance are only the year-end close, so excluding the JournalEntry source removes just the close. That exclusion is not a general rule. In 2024 a Factory Overhead entry (9,354.82) also posts to the manufacturing variance account, so a year-by-year extension identifies the closing vouchers by their EntryType instead. The manufacturing variance grows every year of the window.
 - **Verify first.** Run requirement 4 once. GLCostVariances holds 34,822 rows.
 
 ## How to run it
@@ -36,7 +36,7 @@ Individual, about 90 minutes: 15 for the ratio (requirement 1), 10 for the fixed
 
 ### Requirement (1): The contribution margin ratio
 
-**Step 1. Set up the model.** On a worksheet named `Ex 7.3` enter the year in B3 in blue, then calculate in B5 to B9:
+**Step 1. Set up the model.** On a worksheet named `Ex 7.3` set B3 to 2026 and label A3 `Base year (fixed)`. B3 is not a year selector, because BudgetLine, GLOpex and GLCostVariances are filtered to 2026, and a different year needs every input, query filter and closing-entry exclusion changed together. Then calculate in B5 to B9:
 
 ```
 =SUMIFS(InvoiceLines[LineTotal],InvoiceLines[FiscalYear],$B$3)
@@ -50,7 +50,14 @@ Individual, about 90 minutes: 15 for the ratio (requirement 1), 10 for the fixed
 
 ### Requirement (2): The fixed costs
 
-**Step 2. Take the operating-expense budget and remove two items.** B11 is the operating-expense budget, B12 the commission budget (commissions are already in the margin), B13 the interest budget, and B14 `=B11-B12-B13`.
+**Step 2. Take the operating-expense budget and remove two items.** B11 is the operating-expense budget, B12 the commission budget (commissions are already in the margin), B13 the interest budget, and B14 the fixed costs.
+
+```
+B11  =SUMIFS(BudgetLine[BudgetAmount],BudgetLine[BudgetCategory],"Operating Expense")
+B12  =SUMIFS(BudgetLine[BudgetAmount],BudgetLine[AccountNumber],6290)
+B13  =SUMIFS(BudgetLine[BudgetAmount],BudgetLine[AccountNumber],7030)
+B14  =B11-B12-B13
+```
 
 **Check:** $8,318,595.27 less $2,264,973.29 and $28,946.47 is $6,024,675.51. **Watch for:** the commission budget left in, which counts commissions twice and raises break-even by about $5,035,000, or the interest left in, which models profit after interest and raises it by about $64,342.74.
 
@@ -112,12 +119,13 @@ c. Enter B9 as the **Row input cell** and B23 as the **Column input cell**, and 
 | Break-even with the added items; margin of safety | $19,959,700.32; 32.9% | 5 |
 | Revenue for an operating income of 4 million, with and without the added items | $28,850,972.83; $22,283,030.44 | 7 |
 
-> **Instructor notes, Exercise 7.3:** 2026 revenue 29,756,420.08 (including Services); standard cost of products 15,803,272.88; commissions (GL 6290, excluding close JE-2026-000296) 566,347.93; contribution margin 13,386,799.27; CM ratio 44.99%. Fixed costs: 2026 operating-expense budget 8,318,595.27 less commission budget 2,264,973.29 and interest budget 28,946.47 (account 7030, which the budget files under Operating Expense but the income statement shows below operating income) = 6,024,675.51; a student who keeps the interest models profit after interest rather than operating income, with break-even about 64,342.74 higher (the budget is reasonable because salaries, rent, depreciation, and the other recurring accounts came within a few percent of actual, as Tutorial 7.2 showed). Break-even revenue 13,391,757.93; margin of safety 16,364,662.15 (55.0%). Adding 5050 Freight-Out 513,133.49, 5060 Purchase Price Variance 176,011.36, and 5080 Manufacturing Variance 2,265,636.88 (total 2,954,781.73): break-even 19,959,700.32, margin of safety 32.9%. Goal Seek for operating income of 4,000,000 under (4): revenue 28,850,972.83; without the added items it would be 22,283,030.44. Treating Services' design staff as fixed and all product standard cost as variable are further simplifications worth naming.
+> **Instructor notes, Exercise 7.3:** 2026 revenue 29,756,420.08 (including Services); standard cost of products 15,803,272.88; commissions (GL 6290, excluding close JE-2026-000296) 566,347.93; contribution margin 13,386,799.27; CM ratio 44.99%. Fixed costs: 2026 operating-expense budget 8,318,595.27 less commission budget 2,264,973.29 and interest budget 28,946.47 (account 7030, which the budget files under Operating Expense but the income statement shows below operating income) = 6,024,675.51; a student who keeps the interest models profit after interest rather than operating income, with break-even about 64,342.74 higher (the budget is reasonable because salaries, rent, depreciation, and the other recurring accounts came within a few percent of actual, as Tutorial 7.2 showed). Break-even revenue 13,391,757.93; margin of safety 16,364,662.15 (55.0%). Adding 5050 Freight-Out 513,133.49, 5060 Purchase Price Variance 176,011.36, and 5080 Manufacturing Variance 2,265,636.88 (total 2,954,781.73): break-even 19,959,700.32, margin of safety 32.9% (the exercise treats these items as fixed-equivalent costs, which the totals do not establish). Goal Seek for operating income of 4,000,000 under (4): revenue 28,850,972.83; without the added items it would be 22,283,030.44. Treating Services' design staff as fixed and all product standard cost as variable are further simplifications worth naming.
 
 ## What a strong answer says
 
 - **Requirement (2).** The budget is a reasonable source because the recurring expenses came close to budget. The commission is out because it varies with revenue and is already in the margin. Interest is out because it is a financing cost shown below operating income.
-- **Requirement (6).** A break-even figure for each set of fixed costs, with the second preferred. The assumption that matters most is the manufacturing variance treated as fixed: it grew from $1,317,927.32 to $1,861,950.08 to $2,265,636.88, and returning to its first-year level would lower break-even revenue by about $2,107,000. The ratio matters too: each percentage point moves break-even revenue by about $444,000. Services' design staff treated as fixed and all of the products' standard cost as variable are further simplifications.
+- **Requirement (6).** A break-even estimate with the fixed costs behind it. The assumption that matters most is the manufacturing variance treated as fixed: it grew from $1,317,927.32 to $1,861,950.08 to $2,265,636.88, and returning to its first-year level would lower break-even revenue by about $2,107,000. The ratio matters too. Near the current assumptions, a one-percentage-point change moves break-even revenue by about $444,000, a local effect that is not constant over the whole grid of the data table. Services' design staff treated as fixed and all of the products' standard cost as variable are further simplifications.
+- **A plus.** Both estimates side by side. The second includes costs the first leaves out, and the exercise treats freight-out and the two variances as fixed-equivalent costs for this scenario, which the totals do not establish. Both estimates also assume a constant sales mix, unchanged prices and unit costs, and a stated range of activity, and the strongest answers test an alternative cost-behavior assumption before recommending one economic estimate.
 
 A weak answer reports the first break-even without noticing what the standard costs omit, or names no assumption.
 
@@ -139,11 +147,11 @@ A weak answer reports the first break-even without noticing what the standard co
 | Requirement 3: break-even | 10 | Break-even and margin of safety, in dollars and percent | One missing |
 | Requirement 4: added items | 20 | Query filtered correctly, three items, second break-even | Closing entry left in |
 | Requirement 5: table and Goal Seek | 20 | Data table with the right inputs, Goal Seek result kept | Inputs swapped, or no Goal Seek |
-| Requirement 6: memo | 20 | Both estimates, the key assumption named | No key assumption |
+| Requirement 6: memo | 20 | A break-even estimate with its fixed costs, the key assumption named | No key assumption |
 
 ## Extensions and discussion questions
 
-- Treat half of the manufacturing variance as variable and recompute. How far does break-even move?
+- Treat half of the manufacturing variance as variable and recompute. Remove that half from the fixed costs and add its ratio to revenue to the variable costs, so that the total modeled cost at the base-year revenue stays the same. Break-even then falls by about $905,657, to $19,054,043. Taking the half out of the fixed costs alone, with the ratio unchanged, gives $17,441,651, which changes the cost behavior and the baseline cost together.
 - Repeat requirement 3 with the budget of the first year of the window as the fixed costs. How stable is the margin of safety?
 - Discuss: a margin of safety of 33% instead of 55%. Which would you tell a lender?
 - Discuss: Chapter 18 separates the variable and fixed parts of standard cost. What would change in this model?

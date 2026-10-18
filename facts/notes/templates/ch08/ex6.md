@@ -2,10 +2,8 @@
 <!-- Instructor notes, Exercise 8.6: promotions {% for p in flagged %}{{ p.id }} ({{ p.code }}, {{ p.collection }} Collection, {{ 'effective ' if loop.first }}{{ p.start }} to {{ p.end }}){{ sep(loop) }}{% endfor %}
      are {{ pct|pct(0) }} collection
      promotions approved by EmployeeID {{ approver.id }} ({{ approver.name }}, {{ approver.title }}) on their start dates. All of their invoice lines were ordered
-     outside the effective dates{% if same_day %} (both dates count as inside, and promotion{{ 's' if same_day|length > 1 }} {% for p in same_day %}{{ p }}{{ sep(loop) }}{% endfor %}, which end{{ 's' if same_day|length == 1 }} on {{ 'its' if same_day|length == 1 else 'their' }} start date and could be a
-     one-day promotion, still {{ 'covers' if same_day|length == 1 else 'cover' }} none of {{ 'its' if same_day|length == 1 else 'their' }} lines){% endif %}: {% for f in flagged_lines %}{{ f.n|count }} lines with {{ 'discounts of ' if loop.first }}{{ f.discount|money }}{{ sep(loop) }}{% endfor %}, a total of
-     {{ n_lines|count }} lines and {{ discount|money }}, ordered in {% for m in order_months %}{{ m }}{{ sep(loop) }}{% endfor %} of each year and invoiced through {{ last_months|join(' or ') }}. Every line of the other
-     promotions was ordered within its dates.
+     outside the effective dates{% if same_day %} (both dates count as inside, so promotion{{ 's' if same_day|length > 1 }} {% for p in same_day %}{{ p }}{{ sep(loop) }}{% endfor %}, which end{{ 's' if same_day|length == 1 }} on {{ 'its' if same_day|length == 1 else 'their' }} start date, still {{ 'covers' if same_day|length == 1 else 'cover' }} none of {{ 'its' if same_day|length == 1 else 'their' }} lines){% endif %}: {% for f in flagged_lines %}{{ f.n|count }} lines with {{ 'discounts of ' if loop.first }}{{ f.discount|money }}{{ sep(loop) }}{% endfor %}, a total of
+     {{ n_lines|count }} lines and {{ discount|money }}, ordered in {% for m in order_months %}{{ m }}{{ sep(loop) }}{% endfor %} of each year and invoiced through {{ last_months|join(' or ') }}.
      Pending overrides: IDs {% for o in overrides %}{{ o.id }}{{ sep(loop) }}{% endfor %}
      on SalesOrderLineIDs {% for o in overrides %}{{ o.line }}{{ sep(loop) }}{% endfor %}. They were
      billed on {{ billed }} invoice lines
@@ -22,6 +20,6 @@
      order lines under {{ method }} that cite list {{ cited }}: SalesOrderLineIDs {% for o in own %}{{ o.line }} ({{ o.date }}){{ sep(loop) }}{% endfor %}. Their UnitPrice equals {{ 'the' if customers|length == 1 else 'each' }} customer's own list ({% for o in own %}{{ o.price|money }}{{ ', ' if not loop.last }}{% endfor %}), not list {{ cited }} ({% for o in own %}{{ o.cited|money }}{{ ', ' if not loop.last }}{% endfor %}): {{ 'the' if customers|length == 1 else 'each' }}
      order line carries the customer's contract price, but the record names the wrong{% if stale %}, and in {% for y in stale %}{{ y }}{{ sep(loop) }}{% endfor %} expired,{% endif %} list. No other customer with its
      own list has {{ method }} lines. The classification stays provisional until the system's configuration, the approval history and the pricing policy are seen.
-     The records hold end dates on or before start dates, order lines carrying a pending price, and lines citing expired lists,
-     with no check in the records that would stop them (a possible design weakness), and the approvals did not stop the discounts
-     while the {{ renewed }} have no successor in the extract (a possible operating failure). -->
+     The extract shows end dates on or before start dates, order lines carrying a pending price, and lines citing expired lists, and it shows
+     no check that stopped them. That could reflect a missing or inadequate control (a possible design weakness), an override or a control not
+     followed (a possible operating failure), or an incorrect extract, and the cause is not established from these records. -->

@@ -2,7 +2,9 @@
      Not flagged: {% for r in missed %}{{ r.group }} Q{{ r.q }} {{ '+' if r.diff > 0 }}{{ r.diff|money }} ({{ r.pct|spct }}){{ ', the ' ~ largest ~ ' dollar difference, and ' if loop.first }}{% endfor %}. A percentage test
      alone misses large dollar differences in {{ lines }}; a tolerable amount based on materiality, or an expectation that
      reflects known changes such as the promotion, would treat them differently. Prior-year revenue is a weak expectation because it
-     ignores growth and known events, which students may note. Follow-up examples: {{ example.group }} Q{{ example.q }}, the largest flagged
+     ignores growth and known events, which students may note; the student text calls it a deliberately simple expectation. An audit would also assess the reliability of the data, refine
+     the expectation for known changes, set the acceptable difference from materiality and the audit objective, and corroborate management's explanations, and a difference
+     below the thresholds does not show that an amount is free of misstatement. Follow-up examples: {{ example.group }} Q{{ example.q }}, the largest flagged
      difference, is mostly {{ example.driver }} (units {{ example.units|spct }}, price per unit {{ example.price|spct }}), so the evidence is {% if example.driver == 'volume' %}its invoice lines
      by customer and item, traced to their orders and shipping documents, and the question is which customers bought {{ 'more' if example.diff > 0 else 'less' }} and why{% else %}the price
      lists, promotions, and overrides on its lines, and the question is what changed in pricing{% endif %}{% if example.group != 'Services' %}; for

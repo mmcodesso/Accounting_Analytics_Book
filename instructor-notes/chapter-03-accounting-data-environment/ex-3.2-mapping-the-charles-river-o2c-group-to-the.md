@@ -15,7 +15,7 @@ A data dictionary is the first document an analyst writes about a source, and th
 
 By the end, students can:
 
-- name the tables of the revenue cycle and state what each records (chapter outcome 1);
+- name the tables of the revenue cycle and state what each records (outcome 1);
 - name the foreign key of each link and read its cardinality and optionality at both ends (outcomes 2 and 3);
 - say which revenue information lives only in the Accounting Core, and which keys reach it (outcome 4);
 - turn the findings into a one-page data dictionary excerpt that a colleague could use.
@@ -90,11 +90,11 @@ Pairs work well, and it also suits a gallery walk. For about 60 minutes: 15 list
 
 SalesOrder is the O2C table that already carries a cost center: 5,580 orders belong to Sales and 239 to Design Services. The ledger repeats it. On an invoice's ledger rows the revenue rows carry its order's cost center, and the receivable and the sales tax rows carry none.
 
-**Check:** the student names the missing information, the Accounting Core table, and the column. **Watch for:** the claim that the invoice stores the revenue account (it stores the amounts; the account is in the ledger and the item's mapping), and the claim that no O2C table has a cost center.
+**Check:** the student names the missing information, the table that holds it (Accounting Core, or CostCenter in Organizational Planning for the cost center's name), and the column. **Watch for:** the claim that the invoice stores the revenue account (it stores the amounts; the account is in the ledger and the item's mapping), and the claim that no O2C table has a cost center.
 
 ### Requirement (4): Write the data dictionary excerpt
 
-**Step 4. Write one page.** A model page has three parts: a table entry for each table (purpose, primary key, foreign keys with their parents, the main columns with their types, and the number of rows), a relationship table, and a paragraph on the links to the Accounting Core. A model entry for SalesInvoice, with the types the file declares:
+**Step 4. Write one page.** A model page has three parts: a table entry for each table (purpose, primary key, foreign keys with their parents), a relationship table, and a paragraph on the links to the Accounting Core. The main columns with their types and the number of rows are a plus, not a requirement, unless a full column-level dictionary is assigned, and the types come from the database file: the worksheet shows values, not the declared types. A model entry for SalesInvoice, with the types the file declares:
 
 | Column | Type | Role |
 |---|---|---|
@@ -153,7 +153,7 @@ A weak answer lists the tables without roles, gives one-to-many for every line, 
 | Requirement 1: the tables | 20 | Every table of the path with the event it records | Tables without roles, or a junction table missing |
 | Requirement 2: the relationships | 30 | A key and both ends for each pair, with optionality | Cardinality only, or a pair missing |
 | Requirement 3: the gaps | 25 | Each gap with its table and column, and the cost center noted | Gaps named without the join |
-| Requirement 4: the excerpt | 25 | A usable page with keys, types and the logical links | Correct but not usable alone |
+| Requirement 4: the excerpt | 25 | A usable page with the table roles, the keys and the links to the Accounting Core | Correct but not usable alone |
 
 ## Extensions and discussion questions
 

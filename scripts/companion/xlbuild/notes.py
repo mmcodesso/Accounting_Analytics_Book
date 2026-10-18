@@ -33,12 +33,29 @@ def tutorial_file(tutorial: str) -> Path:
     return next((REPO / "chapters").glob(f"{int(chapter):02d}-*")) / f"_tutorial-{int(k):02d}.qmd"
 
 
+def table_number(ref: str) -> str:
+    """A table's number as Quarto prints it, from its ID: tbl-05-03 is Table 5.3 and tbl-a-01 Table A.1 (the book
+    numbers its table IDs in the order of the tables)."""
+    part, k = ref.split("-")[1:3]
+    return f"Table {int(part) if part.isdigit() else part.upper()}.{int(k)}"
+
+
 def plain(text: str) -> str:
-    """Markdown to plain text: no emphasis, no figure references, link text only, code without backticks."""
+    """Markdown to plain text: no emphasis, no figure references, table references as "Table N.M", link text only,
+    code without backticks. Code spans are set aside first, so a literal such as `****` keeps its asterisks."""
+    code: list[str] = []
+
+    def keep(m) -> str:
+        code.append(m.group(1))
+        return f"\x00{len(code) - 1}\x00"
+
+    text = re.sub(r"`([^`]*)`", keep, text)
     text = re.sub(r"\(@fig-[\w-]+\)|@fig-[\w-]+", "the figure", text)
+    text = re.sub(r"@(tbl-\w+-\d+)", lambda m: table_number(m.group(1)), text)
     text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
-    text = text.replace("**", "").replace("`", "")
+    text = text.replace("**", "")
     text = re.sub(r"(?<!\w)\*(?!\s)([^*]+)\*", r"\1", text)
+    text = re.sub("\x00(\\d+)\x00", lambda m: code[int(m.group(1))], text)
     return re.sub(r"\s+", " ", text).strip()
 
 
@@ -153,7 +170,27 @@ def write(wb, *, file_name: str, role: str, sections: list[dict], stamp: dict, c
             ws.Range(f"B{r}").WrapText = True
             ws.Rows(r).AutoFit()
     ws.Range(f"B{first}:B{last}").HorizontalAlignment = -4152   # right, like the numbers beside them
+    for r, (style, cells) in enumerate(rows, start=1):
+        # a text check such as a list of IDs: wrapped and left-aligned in Expected and Actual, so both show whole
+        # (column C is narrow and D holds the result, so the text could not overflow)
+        if style.startswith("check") and isinstance(cells[1], str) and len(cells[1]) > 16:
+            ws.Range(f"B{r}:C{r}").WrapText = True
+            ws.Range(f"B{r}:C{r}").HorizontalAlignment = -4131         # left
+            # sized for column C, which wraps the most; the Actual formula may not have calculated yet, so the height
+            # comes from the expected text, which an agreeing Actual repeats
+            ws.Rows(r).RowHeight = min(409, 15 * wrapped_lines(cells[1], 16) + 3)
     return ws, first, last
+
+
+def wrapped_lines(text: str, width: int) -> int:
+    """How many lines a text takes when it wraps at spaces in a column about `width` characters wide."""
+    lines, used = 1, 0
+    for w in text.split():
+        if used and used + 1 + len(w) > width:
+            lines, used = lines + 1, len(w)
+        else:
+            used += (1 if used else 0) + len(w)
+    return lines
 
 
 def read_result(ws, first: int, last: int) -> tuple[bool, list[str]]:

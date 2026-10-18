@@ -30,7 +30,7 @@ a. Still on the Shipment worksheet, filter the Status column to show only "In Tr
 b. Look at the ShipmentDate and DeliveryDate columns for these rows.
 c. Record how many shipments are affected, then clear the filter.
 
-You will find shipments from every year of the data still marked "In Transit," and every one of them has a DeliveryDate on or before the year-end under review. What that means depends on what the DeliveryDate records, so confirm it before you judge the rows. If it records the actual delivery, the Status and DeliveryDate columns describe the same fact, whether the goods have arrived, and they disagree. That is a consistency problem, and a timeliness problem as well, because the status was not updated when the goods arrived. If it records the expected delivery, the shipments are overdue, and the date alone does not show that they arrived. Record them for follow-up with the carrier or the customer.
+You will find shipments from every year of the data still marked "In Transit," and every one of them has a DeliveryDate on or before December 31, 2026, the year-end under review. What that means depends on what the DeliveryDate records, so confirm it before you judge the rows. If it records the actual delivery, the Status and DeliveryDate columns describe the same fact, whether the goods have arrived, and they disagree. That is a consistency problem, and a timeliness problem as well, because the status was not updated when the goods arrived. If it records the expected delivery, the shipments are overdue, and the date alone does not show that they arrived. Record them for follow-up with the carrier or the customer.
 
 **Step 4. Look for duplicate customers.**
 
@@ -44,7 +44,7 @@ If the details differ, the records may describe two different companies that hap
 **Step 5. Look for freight outliers.**
 
 a. Return to the Shipment worksheet and sort the FreightCost column from largest to smallest.
-b. Calculate the typical freight cost for a shipment with the AVERAGE function, and compare the highest values with it.
+b. In a cell outside the Shipment Table, such as on a new worksheet, calculate the typical freight cost for a shipment with `=AVERAGE(T14_Shipment[FreightCost])`, and compare the highest values with it.
 c. Make a note of the largest values, which are several times the average.
 
 In a real engagement, you would investigate these outliers further, for example by comparing them with the size of the order, before deciding whether they are legitimate or errors. Nothing in the Charles River data marks them as errors, which is exactly why an outlier is a question to investigate rather than a conclusion.
@@ -64,8 +64,8 @@ a. In the next column (column N), type the header `Check` and enter this formula
    =IF(M2=0, "No shipment", IF(C2<M2, "Check", "OK"))
    ```
 
-b. Adjust the column letters if your workbook differs, and copy both formulas down.
-c. Filter the Check column for "Check."
+b. Adjust the column letters if your workbook differs. The Table fills each formula down its column, so check that the last invoice row has a result.
+c. Filter the Check column for "Check" and record the count, then filter it for "No shipment", record that count, and clear the filter.
 
 You should find a handful of invoices dated before any shipment on their order, a potential accuracy problem that also matters for revenue cutoff. The test is a screen at the level of the order: an invoice marked OK may still bill lines that shipped later than the order's first shipment, which later chapters test by tracing each invoice line to its own shipment. @fig-02-05 shows the result, with the columns between the keys and the helper columns hidden. The "No shipment" rows are invoices for design services, which do not involve shipments.
 

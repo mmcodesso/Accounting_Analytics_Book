@@ -41,7 +41,7 @@ The product is recorded on the work order, the hours in the labor time and the p
 - A database stores each fact once and links the tables through keys
 - A close names its work order; the work order names its item; the item its group
 - No foreign keys are declared, so nothing guarantees that the keys match
-- A join on mismatched keys returns fewer or more rows, never an error, so test it
+- A join on the wrong keys raises no error and may keep a plausible count, so test keys, matches and totals
 
 ::: {.notes}
 A join is the SQL version of Power Query's Merge from Chapter 5: Inner keeps the matched rows, Left Outer keeps every row of the first query, and Left Anti keeps the rows with no match. XLOOKUP behaves like a left join that brings back one column, as long as its key is unique: where the key repeats, XLOOKUP still returns one match, while a join returns a row for each.
@@ -323,7 +323,7 @@ What is wrong with each result?
 Ask students how they would have noticed each one with a control total.
 :::
 
-## Each one counts something twice {.answer}
+## Fan-out and grouping errors {.answer}
 
 1. Fan-out: each invoice's total repeats once per line
 2. It counts lines: use COUNT(DISTINCT) on the invoice key
@@ -487,7 +487,7 @@ Students measure the output and its standard hours, the payroll's hours and pay,
 {{< book-figure fig-10-09 crop="0,0,1,0.618" >}}
 
 ::: {.notes}
-The first derived table sums the hours by year and labor type; the second sums the standard hours of output by year, counting completions only up to the last day with time records. Each holds one row per year, so the join cannot fan out.
+The first derived table sums the hours by year and labor type, so it holds two rows a year. The second sums the standard hours of the output by year, counting completions only up to the last day with time records, so it holds one row a year. Each hours row meets exactly one output row, which gives six rows. The standard hours repeat on the two rows of a year, so they must not be added across the labor types.
 :::
 
 ## Direct time stayed below the standard hours

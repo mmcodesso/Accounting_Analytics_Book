@@ -136,15 +136,24 @@ def if_03_0_a() -> Diagram:
 # -- IF-03-0-B: sorting a column into primary key, foreign key, bridge key or the trace ---------------------------------
 
 def if_03_0_b() -> Diagram:
-    """A decision tree for the role of a column (Chapter 3 note, Difficult ideas)."""
-    for table, cols in {"SalesOrder": ["SalesOrderID", "CustomerID", "OrderDate"], "SalesOrderLine": ["ItemID"],
-                        "GLEntry": ["SourceDocumentType", "SourceDocumentID"]}.items():
+    """A decision tree for the role of a column (Chapter 3 note, Difficult ideas). The questions run in this order so
+    that a self-reference (ParentAccountID) and the trace (SourceDocumentID) are not misread as a key to another table:
+    the designated key, then the trace, then a key to one fixed table with its two branches, then an ordinary column."""
+    for table, cols in {"SalesOrder": ["SalesOrderID", "OrderNumber", "CustomerID", "OrderDate"], "SalesOrderLine": ["ItemID"],
+                        "GLEntry": ["SourceDocumentType", "SourceDocumentID"], "Account": ["AccountID", "ParentAccountID"],
+                        "Employee": ["EmployeeID", "ManagerID"]}.items():
         require_columns(table, cols)
     assert cardinality("Customer", "CustomerID", "SalesOrder", "CustomerID")[0] == "ERmandOne", "CustomerID is a foreign key"
+    data = ctx.data()
+    assert data.one("SELECT COUNT(*) FROM Account WHERE ParentAccountID IS NOT NULL AND ParentAccountID NOT IN "
+                    "(SELECT AccountID FROM Account)") == 0, "ParentAccountID refers to rows of Account itself"
+    assert data.one("SELECT COUNT(*) FROM Employee WHERE ManagerID IS NOT NULL AND ManagerID NOT IN "
+                    "(SELECT EmployeeID FROM Employee)") == 0, "ManagerID refers to rows of Employee itself"
+    assert data.one("SELECT COUNT(DISTINCT OrderNumber) = COUNT(*) FROM SalesOrder") == 1, "OrderNumber is unique"
     d = Diagram("Sorting a Column into Its Role")
     qx, qw, bx, bw, ex, ew = 0, 270, 330, 230, 596, 252
     qh = 52
-    ys = {"pk": 0, "fk": 100, "side": 200, "bridge": 300, "ref": 436, "attr": 556}
+    ys = {"pk": 0, "trace": 124, "fk": 236, "side": 336, "self": 436, "bridge": 536, "attr": 656}
 
     def question(text: str, x: float, y: float, w: float = qw, h: float = qh) -> str:
         return d.box(text, x, y, w, h, fill=BLUE_TINT, stroke=BLUE, stroke_width=1.5)
@@ -153,37 +162,46 @@ def if_03_0_b() -> Diagram:
              dashed: bool = False) -> str:
         return d.box(text, x, y, w, h, fill=fill, stroke=stroke, stroke_width=2 if dashed else 1.5, dashed=dashed)
 
-    q1 = question("Does the column identify the rows of its own table?", qx, ys["pk"])
-    q2 = question("Does it hold the key values of another table?", qx, ys["fk"])
-    q3 = question("Does the meaning of its value depend on another column?", qx, ys["ref"])
+    q1 = question("Is it the column chosen to identify each row of its own table?", qx, ys["pk"])
+    q2 = question("Does a type column in the same row say which table its value refers to?", qx, ys["trace"])
+    q3 = question("Does each filled-in value refer to a row of one fixed table, its own included?", qx, ys["fk"])
     l_pk = leaf("<b>Primary key</b><br>identifies each row of its own table", ys["pk"])
-    l_fk = leaf("<b>Foreign key</b><br>holds the key values of another table", ys["fk"])
-    side = question("Does the same column reach into another table group?", bx, ys["side"], w=bw)
-    l_bridge = leaf("<b>Bridge key</b><br>a foreign key across table groups", ys["bridge"])
-    l_ref = leaf("<b>Logical reference, not a key</b><br>read together with SourceDocumentType", ys["ref"], fill=AMBER_TINT,
-                 stroke=AMBER, dashed=True)
+    l_ref = leaf("<b>The source-document trace</b><br>read the two columns together; not one foreign key", ys["trace"],
+                 fill=AMBER_TINT, stroke=AMBER, dashed=True)
+    l_fk = leaf("<b>Foreign key</b><br>a logical link in Charles River, tested rather than declared", ys["fk"])
+    side = question("Which table does it refer to?", bx, ys["side"], w=bw)
+    l_self = leaf("<b>Self-reference</b><br>a foreign key to its own table", ys["self"])
+    l_bridge = leaf("<b>Bridge key</b><br>a foreign key into another table group", ys["bridge"])
     l_attr = leaf("<b>An ordinary column</b><br>it describes the row", ys["attr"], fill=GRAY_TINT, stroke=GRAY, x=qx, w=qw)
     d.arrow(q1, l_pk, exit=RIGHT, entry=LEFT, label="Yes")
-    d.arrow(q2, l_fk, exit=RIGHT, entry=LEFT, label="Yes")
     d.arrow(q1, q2, exit=BOTTOM, entry=TOP, label="No")
+    d.arrow(q2, l_ref, exit=RIGHT, entry=LEFT, label="Yes")
     d.arrow(q2, q3, exit=BOTTOM, entry=TOP, label="No")
-    d.arrow(q3, l_ref, exit=RIGHT, entry=LEFT, label="Yes")
+    d.arrow(q3, l_fk, exit=RIGHT, entry=LEFT, label="Yes")
     d.arrow(q3, l_attr, exit=BOTTOM, entry=TOP, label="No")
     d.arrow(l_fk, side, exit=BOTTOM, entry=TOP, label="then ask")
-    d.arrow(side, l_bridge, exit=BOTTOM, entry=TOP, label="Yes")
+    d.arrow(side, l_self, exit=BOTTOM, entry=TOP, label="its own table")
+    d.arrow(side, l_bridge, exit=(0, 0.75), entry=LEFT,
+            points=[(bx - 14, ys["side"] + 0.75 * qh), (bx - 14, ys["bridge"] + qh / 2)])
+    d.text("another group", bx - 118, ys["bridge"] + qh / 2 - 22, 100, 20, size=SMALL, align="right")
     # The examples, as small table headers.
-    t_pk = _table(d, "SalesOrder", ex, ys["pk"], [("PK", "SalesOrderID")], w=ew)
-    t_fk = _table(d, "SalesOrder", ex, ys["fk"], [("FK", "CustomerID")], w=ew)
-    t_br = _table(d, "SalesOrderLine", ex, ys["bridge"], [("FK", "ItemID")], w=ew)
-    t_ref = _table(d, "GLEntry", ex, ys["ref"] - 12, [("", "SourceDocumentType"), ("", "SourceDocumentID")], w=ew)
-    d.vertex("", DASHED_AMBER, ex - 4, ys["ref"] - 16, ew + 8, t_ref.h + 8)
-    d.text("<i>No: it stays an ordinary foreign key, inside its own table group.</i>", ex, ys["side"] + 4, ew, 44, size=SMALL,
-           color=GRAY)
+    _table(d, "SalesOrder", ex, ys["pk"], [("PK", "SalesOrderID")], w=ew)
+    t_ref = _table(d, "GLEntry", ex, ys["trace"] - 12, [("", "SourceDocumentType"), ("", "SourceDocumentID")], w=ew)
+    d.vertex("", DASHED_AMBER, ex - 4, ys["trace"] - 16, ew + 8, t_ref.h + 8)
+    _table(d, "SalesOrder", ex, ys["fk"], [("FK", "CustomerID")], w=ew)
+    _table(d, "Account", ex, ys["self"], [("FK", "ParentAccountID")], w=ew)
+    _table(d, "SalesOrderLine", ex, ys["bridge"], [("FK", "ItemID")], w=ew)
+    _table(d, "SalesOrder", ex, ys["attr"], [("", "OrderDate"), ("", "OrderNumber")], w=ew)
+    d.text("<i>A column can play more than one role: CustomerID is also the key of Customer.</i>", ex, 58, ew, 34,
+           size=SMALL, color=GRAY)
+    d.text("<i>Neither: an ordinary foreign key, inside its own table group.</i>", ex, ys["side"] + 6, ew, 40,
+           size=SMALL, color=GRAY)
+    d.text("<i>Employee.ManagerID is another.</i>", ex, ys["self"] + 58, ew, 20, size=SMALL, color=GRAY)
     d.text("<i>ItemID in SalesOrderLine reaches Item, in Master Data.</i>", ex, ys["bridge"] + 58, ew, 34, size=SMALL,
            color=GRAY)
-    d.text("<i>The dashed amber leaf is the source-document trace: its two columns work as one.</i>", ex, ys["ref"] + 68,
-           ew, 50, size=SMALL, color=GRAY)
-    ly = ys["attr"] + 84
+    d.text("<i>OrderNumber is unique, but it is not the key the table uses, so it is an ordinary column.</i>", ex,
+           ys["attr"] + 82, ew, 50, size=SMALL, color=GRAY)
+    ly = ys["attr"] + 146
     d.box("", 0, ly + 3, 16, 14, fill=BLUE_TINT, stroke=BLUE, stroke_width=1.5)
     d.text("A question to ask of the column", 22, ly, 220, 20, size=SMALL, valign="middle")
     d.box("", 262, ly + 3, 16, 14, fill=TEAL_TINT, stroke=TEAL, stroke_width=1.5)

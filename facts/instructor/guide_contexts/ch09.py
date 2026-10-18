@@ -140,6 +140,12 @@ def tutorial_92(d, claim) -> dict:
     claim(like == 1, "the voucher pattern JE-<year>-% finds the same single posting")
     net = d.one("SELECT ROUND(SUM(Debit) - SUM(Credit), 2) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ?", var, year)
     claim(abs(net) < 0.005, "the postings of the whole year net to zero, because the close clears the account")
+    wo_docs = d.one("SELECT COUNT(DISTINCT SourceDocumentID) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? "
+                    "AND SourceDocumentType = 'WorkOrderClose'", var, year)
+    claim(wo_docs == d.one("SELECT COUNT(*) FROM WorkOrderClose WHERE CloseDate BETWEEN ? AND ?", f"{year}-01-01", f"{year}-12-31")
+          and wo_docs < by_type["WorkOrderClose"] <= 2 * wo_docs,
+          "the year's WorkOrderClose postings to 5080 come from the year's closes, most of which post more than one row "
+          "(material and conversion), so the rows are postings, not closes")
     wrong = d.one("SELECT COUNT(*) FROM GLEntry WHERE AccountID = ? AND FiscalYear = ? OR FiscalYear = ?", var, prior, year)
     right = d.one("SELECT COUNT(*) FROM GLEntry WHERE AccountID = ? AND (FiscalYear = ? OR FiscalYear = ?)", var, prior, year)
     claim(wrong > 10 * right, "an OR without parentheses returns the whole year's ledger, more than ten times the intended rows")
@@ -148,7 +154,7 @@ def tutorial_92(d, claim) -> dict:
           "SUBSTR's text year equals no open work order as a number and every open work order as text")
     open_n = d.one("SELECT COUNT(*) FROM WorkOrder WHERE ClosedDate IS NULL")
     claim(d.one("SELECT COUNT(*) FROM WorkOrder WHERE ClosedDate = NULL") == 0, "a comparison with NULL finds no work order")
-    return dict(year=year, prior=prior, rows=sum(by_type.values()), wo_rows=by_type["WorkOrderClose"], close=close[0],
+    return dict(year=year, prior=prior, rows=sum(by_type.values()), wo_rows=by_type["WorkOrderClose"], wo_docs=wo_docs, close=close[0],
                 close_credit=close[1], close_date=close[3], close_text=close[4], wrong=wrong, right=right, open_n=open_n,
                 substr_text=d.one("SELECT COUNT(*) FROM WorkOrder WHERE ClosedDate IS NULL AND SUBSTR(WorkOrderNumber, 4, 4) = ?", str(year)),
                 statuses=[(r[0], r[1]) for r in d.q("SELECT Status, COUNT(*) FROM WorkOrder WHERE ClosedDate IS NULL GROUP BY 1 "
@@ -205,8 +211,14 @@ def chapter(d, claim):
 def g1(d, claim):
     need(d, claim, "Account", "GLEntry")
     n = d.one("SELECT COUNT(*) FROM Account")
-    numbers = [r[0] for r in d.q("SELECT AccountNumber FROM Account")]
-    claim(numbers == sorted(numbers), "the accounts are stored in AccountNumber order, so a query with no ORDER BY looks sorted by chance (the guide says so)")
+    clearing_id, variance_id = d.account("1090"), d.account("5080")
+    claim(d.one("SELECT COUNT(*) FROM Account a JOIN Account b ON a.AccountID < b.AccountID AND a.AccountNumber > b.AccountNumber") > 0,
+          "AccountID order is not account-number order, so no sorting rule can be read from AccountID (the guide says so)")
+    claim(d.one("SELECT COUNT(*) FROM Account WHERE AccountID < ? AND AccountNumber > 1090", clearing_id) > 0
+          and d.one("SELECT COUNT(*) FROM Account WHERE AccountID < ? AND AccountNumber > 5080", variance_id) > 0,
+          "accounts with lower AccountIDs than 1090 and 5080 carry higher account numbers, the example the guide gives")
+    before = d.q("SELECT AccountID, AccountNumber FROM Account WHERE AccountID < ? AND AccountNumber > 1090 "
+                 "ORDER BY AccountID DESC LIMIT 1", clearing_id)[0]
     pairs = rows(d, "SELECT DISTINCT AccountType, AccountSubType FROM Account")
     subtypes = d.one("SELECT COUNT(DISTINCT AccountSubType) FROM Account")
     claim(d.one("SELECT COUNT(DISTINCT AccountType) FROM Account") == 5, "the chart has five account types")
@@ -245,7 +257,7 @@ def g1(d, claim):
           "every AccountID is smaller than every header account number, so a posting test written with account numbers returns nothing")
     claim(d.one("SELECT COUNT(*) FROM GLEntry WHERE AccountID = ?", d.account("1090")) > 0, "account 1090 has postings, so the test can return rows")
     sources = [r[0] for r in d.q("SELECT DISTINCT SourceDocumentType FROM GLEntry WHERE AccountID = ? ORDER BY 1", d.account("1090"))]
-    return dict(n=n, no=no, sources_1090=sources, pairs=pairs, n_sub=subtypes, header_lower=header_lower, parent_eq=parent_eq, parent_is=parent_is,
+    return dict(n=n, no=no, sources_1090=sources, before=dict(id=before[0], number=before[1]), pairs=pairs, n_sub=subtypes, header_lower=header_lower, parent_eq=parent_eq, parent_is=parent_is,
                 credit_half=credit_half, debit_half=debit_half, unparenthesized=unparenthesized, like_all=like_all,
                 like_active=like_active, like_text="; ".join(f"{a['number']} {a['name']}" for a in like_active), n_like_all=len(like_all), n_like_active=len(like_active),
                 header_postings=d.one("SELECT COUNT(*) FROM GLEntry WHERE AccountID IN (SELECT AccountID FROM Account WHERE AccountSubType = 'Header')"),

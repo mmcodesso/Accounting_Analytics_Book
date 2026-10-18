@@ -23,7 +23,7 @@ By the end, students can:
 ## Before you assign
 
 - Students need their Tutorial 2.1 and 2.2 notes (or the tutorials to rerun) and the data quality checklist of Chapter 2. Exercises 2.1 and 2.2 are the closest practice.
-- The requirement relies on these conditions: the ledger's rows after 2026-12-31 are all of one source document type (DisbursementPayment); the ledger's monthly row counts in the last six periods are similar, so the fourth quarter is not partial; 9 invoices are dated before the first shipment of their order, and only 3 of them hold Furniture lines; some customers share a name; and the blank list prices belong to items the company buys.
+- The requirement relies on these conditions: the ledger's rows after 2026-12-31 are all of one source document type (DisbursementPayment); the published operating window ends on 2026-12-31, and the monthly counts and the documents' last dates support comparing the fourth and third quarters of 2026, while the ledger's tail of 2027 holds only supplier payments (these observations do not prove that every expected document is present); 9 invoices are dated before the first shipment of their order, and only 3 of them hold Furniture lines; some customers share a name; and the blank list prices belong to items the company buys.
 - Verify that students kept their working copy unchanged, since a helper column from Tutorial 2.1 (Min Date and Check in SalesInvoice) is reused here. If they did not keep it, the first step of Phase 2 rebuilds it in five minutes.
 
 ## How to run it
@@ -47,7 +47,7 @@ d. The periods of 2026 from 7 to 12 hold similar numbers of rows:
    - period 11: 28,605
    - period 12: 27,211
 
-**Check:** the sales documents stop on the last day of fiscal 2026, so the fourth quarter is complete for sales and shipments; the ledger's later rows are payments of prior-year supplier invoices, with no sales and no shipments, so no margin can come from them. The latest complete quarter is 2026 Q4, compared with 2026 Q3. A student who also looked at the start finds 279 invoices in the first month of the extract against 512 in the second: a partial first month that does not touch these quarters, which is the other edge.
+**Check:** the sales documents stop on the last day of fiscal 2026, so the fourth quarter is complete for sales and shipments; the ledger's later rows are payments of prior-year supplier invoices, with no sales and no shipments, so no margin can come from them. The latest complete quarter is 2026 Q4, compared with 2026 Q3. This supports the comparison window, but it does not establish that the extract is complete or that the cutoff is right. A student who also looked at the start finds 279 invoices in the first month of the extract against 512 in the second. That is a question about the opening coverage to investigate, not by itself a partial month, and it does not touch these quarters.
 
 **Watch for:** "the latest quarter is 2027 Q1" because those rows are the latest, and "the latest quarter is complete because it has ledger rows". Ask what kind of rows.
 
@@ -83,14 +83,14 @@ The filter lists 9 invoices. To see which hold Furniture lines, filter SalesInvo
 
 **Step 4. List prices that are blank by design.** Filter the Item worksheet's ListPrice column for blanks: 43 items, all in Capex, Packaging, Raw Materials, and Services. **Check:** no Furniture item has a blank list price, and no invoice line is for an item with one, so the Furniture lines are untouched. The blanks are items the company buys, not products it sells.
 
-**Step 5. The other findings of Tutorial 2.1 (not named in the case).** A strong student also considers blank tracking numbers and "In Transit" shipments whose delivery date has passed. For the Furniture shipments of the two quarters:
+**Step 5. The other findings of Tutorial 2.1 (not named in the case).** A strong student also considers blank tracking numbers and "In Transit" shipments whose delivery date has passed. Use 2026-12-31 as the as-of date of this static case, not today's date: select the Furniture shipments by ShipmentDate in each quarter, keep Status In Transit, and test DeliveryDate earlier than 2026-12-31. For the Furniture shipments of the two quarters:
 
 | Quarter | Furniture shipments | With a blank TrackingNumber | Lines | Standard cost | Still "In Transit" with a past delivery date |
 |---|---:|---:|---:|---:|---:|
 | 2026 Q3 | 531 | 16 | 28 | $82,731.53 | 38 |
 | 2026 Q4 | 530 | 28 | 46 | $122,218.45 | 46 |
 
-**Check:** a shipment's cost posts on its ShipmentDate whatever its tracking number or status says, so neither changes the margin arithmetic. They weaken the evidence that the goods left, which matters for the auditing view in Requirement 6.
+**Check:** a shipment's cost posts on its ShipmentDate whatever its tracking number or status says, so neither changes the margin arithmetic. They call for corroboration of dispatch and delivery, and an overdue In Transit status may also be stale status data, so establish what DeliveryDate records before reading the flag. The flag alone does not show that goods failed to leave or that revenue is misstated. This matters for the auditing view in Requirement 6.
 
 ## Expected results
 

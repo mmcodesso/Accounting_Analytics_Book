@@ -215,6 +215,11 @@ def ex1(d, claim):
 
     all_est, mfg_est = estimates((0, 1)), estimates((1,))
     claim(abs(all_est[0] - total / base_days * left) < 0.01, "the working-day estimate uses the registers' full cost")
+    base_weekdays = weekdays(processed[0][2], processed[-1][3])
+    claim(base_weekdays == 10 * len(processed),
+          "the processed periods hold ten weekdays each, so salaries per weekday are a tenth of a period's")
+    claim(left < base_days and week_days < base_weekdays and all_est[1] > all_est[0],
+          "the split method (hourly pay over working days, salaries over weekdays) gives a higher estimate than the working-day method")
     accrued = d.account("2030")
     sources = dict(d.q("SELECT SourceDocumentType, ROUND(SUM(Credit) - SUM(Debit), 2) FROM GLEntry WHERE AccountID = ? "
                        "AND PostingDate <= ? GROUP BY 1", accrued, asof(d)))
@@ -236,7 +241,9 @@ def ex1(d, claim):
                 first=int(processed[0][1][-3:]), last=int(processed[-1][1][-3:]),
                 avg=total / len(processed), avg_mfg=mfg / len(processed), days=left, start_day=int(start[8:]),
                 low=thousands(min(all_est)), high=thousands(max(all_est)),
-                mfg_low=thousands(min(mfg_est)), mfg_high=thousands(max(mfg_est)), opening=opening)
+                mfg_low=thousands(min(mfg_est)), mfg_high=thousands(max(mfg_est)), opening=opening,
+                base_days=base_days, base_weekdays=base_weekdays, week_days=week_days,
+                split_total=all_est[1], split_mfg=mfg_est[1])
 
 
 # --- Exercise 12.2 --------------------------------------------------------------------------------
@@ -270,6 +277,16 @@ def ex2(d, claim):
                     f"ON g.SourceDocumentType = 'CreditMemo' AND g.SourceDocumentID = cm.CreditMemoID "
                     f"WHERE g.AccountID = ? AND g.Credit > 0 AND cm.OriginalSalesInvoiceID IN ({ids})", d.account("2060"))
     claim(to_2060 == len(negative), "every invoice with a negative balance has a credit memo posted to account 2060")
+    credit_gl = d.q(f"SELECT cm.CreditMemoID, SUM(CASE WHEN g.AccountID = ? THEN g.Credit ELSE 0 END), "
+                    f"SUM(CASE WHEN g.AccountID = ? THEN g.Credit ELSE 0 END) FROM CreditMemo cm JOIN GLEntry g "
+                    f"ON g.SourceDocumentType = 'CreditMemo' AND g.SourceDocumentID = cm.CreditMemoID "
+                    f"WHERE cm.OriginalSalesInvoiceID IN ({ids}) AND cm.CreditMemoDate <= ? GROUP BY cm.CreditMemoID",
+                    ar, d.account("2060"), end)
+    to_1020 = [r for r in credit_gl if r[1] > 0]
+    credited_2060 = round(sum(r[2] for r in credit_gl), 2)
+    claim(0 < len(to_1020) < len(negative), "some, not all, of the credit memos on those invoices also credit account 1020")
+    claim(abs(credited_2060 + sum(r[2] for r in negative)) < 0.005,
+          "what the credit memos credit to account 2060 equals the total of the negative invoice balances")
     claim(all(r[4] > 0 for r in negative), "every invoice with a negative balance has been paid")
     refunded = d.one(f"SELECT COUNT(DISTINCT cm.OriginalSalesInvoiceID) FROM CreditMemo cm JOIN CustomerRefund r "
                      f"ON r.CreditMemoID = cm.CreditMemoID WHERE cm.OriginalSalesInvoiceID IN ({ids}) AND r.RefundDate <= ?", end)
@@ -277,6 +294,11 @@ def ex2(d, claim):
                          f"(SELECT SUM(a.AppliedAmount) FROM CashReceiptApplication a WHERE a.SalesInvoiceID = si.SalesInvoiceID "
                          f"AND a.ApplicationDate <= ?)", end)
     claim(refunded >= 0.95 * len(negative), "the credits on those invoices are (almost all) refunded")
+    refund_total = d.one(f"SELECT ROUND(SUM(r.Amount), 2) FROM CustomerRefund r JOIN CreditMemo cm ON cm.CreditMemoID = r.CreditMemoID "
+                         f"WHERE cm.OriginalSalesInvoiceID IN ({ids}) AND r.RefundDate <= ?", end)
+    balance_2060 = -d.balance(["2060"], end)
+    claim(abs(balance_2060 - (credited_2060 - refund_total)) < 0.005,
+          "account 2060 holds what the credits put there less the refunds, the credits not yet refunded")
     # paid in full strictly before the first credit memo (a date has no time, so a same-day application is left out)
     full_before = d.one(f"SELECT COUNT(*) FROM SalesInvoice si WHERE si.SalesInvoiceID IN ({ids}) AND si.GrandTotal - 0.005 <= "
                         f"(SELECT COALESCE(SUM(a.AppliedAmount), 0) FROM CashReceiptApplication a WHERE a.SalesInvoiceID = "
@@ -326,6 +348,8 @@ def ex2(d, claim):
     return dict(asof=end, n=len(positive), total=total, customers=len(by_customer), b=buckets, ar=ar, ledger=ledger,
                 difference=ledger - total, entry=entry, n_negative=len(negative), negative=sum(r[2] for r in negative),
                 paid_in_full=paid_in_full, full_before=full_before, refunded=refunded, grni_shown=grni_shown,
+                n_to_1020=len(to_1020), to_1020=round(sum(r[1] for r in to_1020), 2), credited_2060=credited_2060,
+                refund_total=refund_total, unrefunded=round(balance_2060, 2),
                 strata=strata, key_share=strata[-1]["amount"] / total, grni_lines=len(grni), grni=grni_total, gl2020=gl2020,
                 rounding=abs(grni_total - gl2020),
                 months=[(m, months[m][1], months[m][0]) for m in sorted(months, reverse=True)],
@@ -553,12 +577,8 @@ def ex6(d, claim):
                  "GROUP BY 1, 2 HAVING COUNT(*) > 1 ORDER BY CheckNumber")
     claim(all(r[2] == 2 for r in checks), "each repeated check number is used twice")
     claim(len({r[0] for r in checks}) == 1, "the repeated check numbers are all for one supplier")
-    logged = d.anomalies("duplicate_vendor_payment_reference")
-    claim(logged is not None, "the AnomalyLog is available")
-    logged = logged or []
-    with_check = [r[0] for r in d.q("SELECT CheckNumber FROM DisbursementPayment WHERE DisbursementID IN (%s) "
-                                    "AND CheckNumber IS NOT NULL ORDER BY CheckNumber" % ",".join(map(str, logged or [0])))]
-    claim(with_check == [r[1] for r in checks], "the logged references with check numbers are the repeated checks")
+    claim(d.one("SELECT COUNT(*) FROM DisbursementPayment WHERE (CheckNumber IS NULL) <> (PaymentMethod <> 'Check')") == 0,
+          "a payment carries a check number exactly when it was paid by check, so ACH and wire payments need a separate reference test")
     end = asof(d)
     pairs = d.q("SELECT julianday(b.PaymentDate) - julianday(a.PaymentDate), a.PurchaseInvoiceID = b.PurchaseInvoiceID "
                 "FROM DisbursementPayment a JOIN DisbursementPayment b ON b.SupplierID = a.SupplierID AND b.Amount = a.Amount "
@@ -594,7 +614,7 @@ def ex6(d, claim):
     claim(all(f"{a:e}"[0] == f"{a:.15e}"[0] for a, _ in payments),
           "no payment's first digit changes between six and fifteen decimals")
     return dict(n_dupes=word(len(dupes)), n_checks=word(len(checks)).capitalize(), check_supplier=checks[0][0],
-                checks=[r[1] for r in checks], n_logged=word(len(logged)), n_with_check=word(len(with_check)),
+                checks=[r[1] for r in checks],
                 pairs=len(pairs), within30=sum(1 for r in pairs if abs(r[0]) <= 30),
                 within14=sum(1 for r in pairs if abs(r[0]) <= 14), series=series,
                 mad_all=mad([a for a, _ in payments]), mad_full=mad([a for a, g in payments if abs(a - g) < 0.005]),

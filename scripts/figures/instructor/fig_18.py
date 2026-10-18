@@ -226,7 +226,7 @@ def if_18_0_a() -> Diagram:
                valign="bottom")
     # the memo
     my = fy + fh + 50
-    memo = d.box("<b>The memo to the CFO and the production manager</b> (Requirement 10): two pages, with an appendix of three and a decision table.<br>"
+    memo = d.box("<b>The memo to the CFO and the production manager</b> (Requirement 10): at most two pages, with the decision table, and at most three pages of exhibits.<br>"
                  "Every number in it traces to one of the three files.", 0, my, 860, 52, fill=GRAY_TINT, stroke=GRAY, stroke_width=1.5, size=SMALL,
                  rounded=False)
     for fid, fx in zip(fids, fxs):
@@ -1993,9 +1993,9 @@ def if_18_10_b() -> Diagram:
             d.box(f"<b>{esc(tag)}</b>", tx, py + PH - 30, tw2, 22, fill=BLUE, stroke=BLUE, color=WHITE, size=SMALL)
             tx += tw2 + 6
         py += PH + 12
-    kit.callout(d, "Each exhibit is cited in the memo by name and supports a number the memo states. The decision table of the Memo sheet goes with the memo, in its third section.",
+    kit.callout(d, "Each exhibit is cited in the memo by name, with its sheet and the date of its assumptions, and supports a number the memo states. Keep the summaries on the last page legible and the detailed sheets for traceability. The decision table of the Memo sheet goes with the memo, in its third section.",
                 RX, py + 2, RW, "teal")
-    _note(d, "Left: the seven sections of the model memo in their order, each with the requirements that supply its evidence. Right: the appendix, one exhibit to a page, each tagged "
+    _note(d, "Left: the seven sections of the model memo in their order, each with the requirements that supply its evidence. Right: the appendix, at most three pages, each exhibit tagged "
              "with the sheet of Make Buy Reprice.xlsx it comes from.", left_bottom + 10)
     return d
 

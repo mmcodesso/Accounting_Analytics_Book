@@ -14,7 +14,7 @@
 | Part | Part V, Capstone Cases. The case is an independent final-project option: it asks for nothing from another capstone, and the Part III and Part IV case files are only an optional head start |
 | Analytics types | Descriptive (the statements and notes), diagnostic (the rebuilt accruals, the cutoff tests, the opening balances), predictive (the estimates: payroll at a cost per working day, returns still to come) and prescriptive (what to record, pass and settle) |
 | Tools | SQL in DB Browser for SQLite, Excel and Power BI Desktop. Where the choice is clear the requirement says why a tool fits; where it is not, students choose and explain |
-| Components | Nine requirements in four phases, with a milestone after each; no tutorials, exercises or questions. The deck has 63 slides. The model answer is three files: LenderPackage.sql (62 queries), Charles River Lender Package.xlsx (30 worksheets) and the Power BI project Charles River Lender Review (7 pages, 144 checks) |
+| Components | Nine requirements in four phases, with a milestone after each; no tutorials, exercises or questions. The deck has 63 slides. The model answer is three files: LenderPackage.sql (63 queries), Charles River Lender Package.xlsx (30 worksheets) and the Power BI project Charles River Lender Review (7 pages, 144 checks) |
 | Files students need | CharlesRiver.sqlite, copied as CharlesRiver_Capstone.sqlite; CharlesRiver.xlsx; and the three files they build. Solutions: Chapter17-capstone-sql.zip, Chapter17-capstone-excel.zip and Chapter17-capstone-pbi.zip |
 | Deliverables | The script; the workbook; a PDF of the draft statements and notes; the Review file with its Questions table and Tests tab; a memo of two pages with an appendix of three |
 | Time | Class: about 220 minutes in Plan A. Students: about 21 hours in all, from 90 minutes for Requirement 1 to 180 for each of Requirements 5 and 6 |
@@ -45,6 +45,7 @@ The case depends on these conditions of the data, all visible in the files stude
 - Open the model answer as Opening a Companion File on the Downloads page describes. The Review project reads two workbooks, CharlesRiver.xlsx and the package workbook, so use **Change Source** for both and refresh once before class; the ledger is large.
 - In **DAX query view**, run the Checks tab: all 144 rows should agree. Run the script top to bottom on a copy of the database; every query is read-only except the views it creates.
 - Open the deck. Slides 7 to 8 set out the criteria, which are the six bullets of "What a Strong Submission Includes".
+- Know where the complete answers are. A guide quotes only the part of a query, formula or measure that its step needs, and says so. The complete blocks are in the solution files: each query under the comment heading the guide names in LenderPackage.sql, each formula on its worksheet (**Formulas > Name Manager** lists the names the formulas read), and each measure and test in the project's Key Measures table and its Tests tab.
 
 **Pitfalls that cost class time**
 
@@ -59,7 +60,7 @@ The case depends on these conditions of the data, all visible in the files stude
 
 ## Teaching approaches
 
-**Plan A: take-home work with four class touchpoints (220 minutes in class).** It fits a course that wants the work done outside class and catches the errors that compound: the as-of rule, the clearing, the cutoff method and the reversal. The risk is a late start, so assign Requirements 1 and 2 at the kickoff.
+**Plan A: take-home work with five class touchpoints (220 minutes in class).** It fits a course that wants the work done outside class and catches the errors that compound: the as-of rule, the clearing, the cutoff method and the reversal. The risk is a late start, so assign Requirements 1 and 2 at the kickoff.
 
 | Touchpoint | Minutes | Activity | Slides |
 |---|---:|---|---|
@@ -81,7 +82,7 @@ The case depends on these conditions of the data, all visible in the files stude
 | 5. Debrief | 10 | Looking ahead | 60 to 62 |
 | | 220 | Total | |
 
-**Plan B: lab sessions (four sessions of 150 minutes, 600 minutes in all).** Students work in class on the data-heavy phases and you circulate. It fits a computer lab. Requirements 6 to 9 are done outside class; use the last two touchpoints of Plan A for them.
+**Plan B: lab sessions (four sessions of 150 minutes, 600 minutes in the lab).** Students work in class on the data-heavy phases and you circulate. It fits a computer lab. Requirements 6 to 9 are done outside class. Add the last two touchpoints of Plan A for them, 75 minutes, so Plan B takes 675 minutes of class time in all.
 
 | Session | Minutes | Activity | Slides |
 |---|---:|---|---|
@@ -193,8 +194,8 @@ Every requirement is part of the case, and each phase depends on the one before 
 Four bundles:
 
 - **The full case (the default).** All nine requirements, graded with the rubric below. About 21 hours.
-- **A financial accounting version.** Requirements 1, 3, 4, 5, 6 and 7 with a one-page memo, in the workbook and the script only. It leaves out the Review file and the review of later events.
-- **An auditing version.** Requirements 1 to 4, 8 and 9: the ledger, the rebuilt liability, the cutoff tests, what the data cannot settle, and the memo. It leaves out the statements.
+- **A financial accounting version.** Requirements 1, 3, 4, 5, 6 and 7 with a one-page memo, in the workbook and the script only. It leaves out the Review file and the review of later events. Requirement 6's tests in the Review file become the workbook's own checks (each entry balances, no line posts to cash, the adjusted statements reconcile to the adjusted trial balances), so grade that row of Requirement 6's guide on them, and keep Requirement 2's questions as a list in the workbook.
+- **An auditing version.** Requirements 1 to 4, 8 and 9: the ledger, the rebuilt liability, the cutoff tests, what the data cannot settle, and the memo. It leaves out Requirements 5 to 7, which Requirements 8 and 9 build on, so give students the model answer's schedule of adjustments and adjusted statements (the Adjustments and Statements worksheets of the solution workbook), with their assumptions, before Requirement 8. Requirement 9 then asks for the memo and an evidence report in place of the package's PDF.
 - **Teams of three.** One file for each tool, with one student leading each (SQL, Excel, Power BI), a shared schedule of adjustments and an individual one-page reflection on the recommendation.
 
 The check slides suit class discussion. Requirements 1, 3 and 4 suit grading from the files, because each ends in numbers that agree or do not; Requirements 2 and 6 suit grading from the Tests tab; Requirements 5, 7 and 9 from the schedule, the notes and the memo. A fast way to grade is to read the memo's opening and recommendation, then trace one number in each section back to the workbook.
@@ -223,7 +224,7 @@ Four criteria run through every requirement.
 | Judgment | Error or estimate decided on the facts, materiality by size and other grounds, tools chosen and defended | Requirements 2, 5 and 8 |
 | Communication | A memo in the order of the CFO's questions, careful with its words, ending in a recommendation | Requirement 9 |
 
-Each requirement guide has its own grading table out of 100; scale it by the weight above to place it in the case grade.
+Each requirement guide has its own grading table out of 100; scale it by the weight above to place it in the case grade. Give full credit to a supported alternative that states its assumptions, applies its method consistently, covers the required populations and periods, and reconciles through the package. The model answer's row counts, question counts and A3 choice are diagnostics of the model, not requirements, and an equivalent split of accounts or a reasoned presentation earns the same credit.
 
 ## Connections
 

@@ -142,9 +142,10 @@ def ex1(b: Build) -> None:
         f"(4) Account 1020 at {end}: {money(ctx['ledger'])}. The difference, {money(ctx['difference'])}, is the "
         f"receivables line of the opening entry {ctx['entry']}, which no invoice supports: Chapter 8's finding, now "
         "followed on every refresh.",
-        f"(5) {ctx['n_negative']} invoices have credits and applications above their total, {money(ctx['negative'])}: "
-        f"credit memos on invoices already paid, which Chapter 8 found credited to 2060 (customer credit balances) and "
-        f"refunded ({ctx['refunded']} of them). They belong with the refunds, not in the aging."]))
+        f"(5) {ctx['n_negative']} invoices have credits and applications above their total, {money(ctx['negative'])}. "
+        f"The excess is recorded in 2060 (customer credit balances), which Chapter 8 found refunded ({ctx['refunded']} of them). "
+        "On most of them the invoice was already paid in full and on a few only partly paid, and the credit memo does not always "
+        "follow the payment. They belong with the refunds, not in the aging."]))
     page.expect = ["Bucket", "Current", "Over 90 days", money(ctx["total"]), money(ctx["ledger"]),
                    money(ctx["difference"]), "Model answer"]
 
@@ -299,11 +300,12 @@ def ex3(b: Build) -> None:
     page = b.report.add(Page("ex163", "Ex 16.3"))
     ym = col("Date", "YearMonth")
     page.add(Visual("surgeDaysByMonth", "clusteredColumnChart", 20, 20, 820, 220, {"Category": [ym], "Y": [M("Surge Days")]},
-                    title="Surge days by month", filters=[keep("sdmYears", col("Date", "Year"), years)]))
+                    title="Surge days by month", filters=[keep("sdmYears", col("Date", "Year"), years)],
+                    sort=[(ym, "Ascending")]))
     page.add(Visual("surgeOvertime", "lineClusteredColumnComboChart", 20, 250, 820, 260, {
         "Category": [ym], "Y": [M("Surge Overtime Hours")], "Y2": [M("Surge Share of Overtime")]},
         title="Surge-day overtime hours by month, and their share of the plant's overtime",
-        filters=[keep("somYears", col("Date", "Year"), years)]))
+        filters=[keep("somYears", col("Date", "Year"), years)], sort=[(ym, "Ascending")]))
     page.add(Visual("surgeByYear", "tableEx", 20, 530, 820, 180, {"Values": [
         col("Date", "Year"), M("Surge Days"), M("Surge Overtime Hours"), M("Plant Overtime Hours"),
         M("Surge Share of Overtime")]}, title="By year", filters=[keep("sbyYears", col("Date", "Year"), years)]))
@@ -383,14 +385,16 @@ def ex4(b: Build) -> None:
         "(2) The measure leaves out only the expected closes and the recurring PR SelfApproved: open exceptions, "
         "deficiencies and follow-ups stay in, so it is not the rate of open exceptions. KEEPFILTERS keeps a selected "
         "test or disposition intersected with the exclusions instead of replacing it.",
-        f"(4) Purchase orders: the exceptions rose by {ctx['rose']} ({po[1][0]} to {po[2][0]}) while the rate "
-        f"{ctx['moved']} ({po[1][2]:.2f} to {po[2][2]:.2f}), because orders grew by {pct(ctx['growth'], 0)}; from "
+        f"(4) Purchase orders: the exceptions rose by {ctx['rose']} ({po[1][0]} to {po[2][0]}) while orders grew by "
+        f"{pct(ctx['growth'], 0)} ({po[1][1]:,} to {po[2][1]:,}), so the rate {ctx['moved']} ({po[1][2]:.2f} to "
+        f"{po[2][2]:.2f} failed tests per 1,000 orders), nearly flat at the chart's scale and not unchanged. From "
         f"{years[0]} the rate fell by {ctx['fell']} while orders more than doubled.",
         f"(5) Journal entries are the process to watch: the unexplained rate fell from {je[0]:.2f} to {je[1]:.2f} and "
         f"rose to {je[2]:.2f}, mostly through single documents that fail several tests (the opening entry's "
         f"{ctx['opening']}, the debt reclassifications' {ctx['reclass']} each), while Weekend, Backdated, and "
-        f"SelfApproved {ctx['still']}. Payroll's unexplained exceptions are {ctx['pr_left']} a year, so its rate is "
-        f"almost entirely the design finding. The purchase orders' rate fell by {ctx['fell']} from {years[0]} and "
+        f"SelfApproved {ctx['still']}. Payroll has {ctx['pr_left']} exceptions a year once the recurring self-approval "
+        f"test is left out. Its rate of all exceptions is dominated by that test, and the unexplained rate shows the follow-ups and "
+        f"deficiencies that remain. The purchase orders' rate fell by {ctx['fell']} from {years[0]} and "
         f"{ctx['moved']} in the last year. A lower rate under the same tests is not by itself better controls: the mix "
         "of documents and the causes of the exceptions would show whether a control changed. The unexplained rate shows "
         "what changes once the expected and recurring exceptions are set aside."], size=10))

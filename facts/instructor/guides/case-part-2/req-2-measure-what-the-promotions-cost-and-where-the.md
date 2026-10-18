@@ -87,17 +87,17 @@ The cost {{ grew }} in {{ span }} years. Rounding each line before summing, as E
 
 ### Phase 2: Gross to net
 
-**Step 3. Build the schedule by item group for the report year.** One row for each item group, with these columns:
+**Step 3. Build the schedule by item group for the report year.** Put the five item groups in A5:A9, the headings in row 4 (A Item group, B List amount, C Price-list and override reductions, D Promotional discounts, E Net billed, F Line rounding) and a total in row 10. In row 5:
 
 ```
-List amount:         =SUMIFS(BilledLines[ListAmount],BilledLines[ItemGroup],$A5,BilledLines[InvoiceYear],ReportYear)
-Price-list and override reductions:  =B5-SUMIFS(BilledLines[GrossAmount],BilledLines[ItemGroup],$A5,BilledLines[InvoiceYear],ReportYear)
-Promotional discounts:  =SUMIFS(BilledLines[DiscountAmount],BilledLines[ItemGroup],$A5,BilledLines[InvoiceYear],ReportYear)
-Net billed:          =SUMIFS(BilledLines[LineTotal],BilledLines[ItemGroup],$A5,BilledLines[InvoiceYear],ReportYear)
-Line rounding:       =E5-(B5-C5-D5)
+B:  =SUMIFS(BilledLines[ListAmount],BilledLines[ItemGroup],$A5,BilledLines[InvoiceYear],ReportYear)
+C:  =B5-SUMIFS(BilledLines[GrossAmount],BilledLines[ItemGroup],$A5,BilledLines[InvoiceYear],ReportYear)
+D:  =SUMIFS(BilledLines[DiscountAmount],BilledLines[ItemGroup],$A5,BilledLines[InvoiceYear],ReportYear)
+E:  =SUMIFS(BilledLines[LineTotal],BilledLines[ItemGroup],$A5,BilledLines[InvoiceYear],ReportYear)
+F:  =E5-(B5-C5-D5)
 ```
 
-Add a total row and, optionally, a waterfall from the total row.
+Fill them down and, optionally, draw a waterfall from the total row.
 
 **Check:**
 
@@ -133,7 +133,7 @@ b. For each account, total its credits in `RevenuePostings` and compare with the
 
 The ledger is ${{ ledger_total|money }} against ${{ net|money }}, a difference of ${{ difference|money }}. It is the invoices {{ first }} to {{ last }}, dated late in {{ x.prior_year }} and posted on {{ cutoff_posted }}, a cutoff matter from Exercise 6.1. The ledger selects by posting date and `BilledLines` by invoice date, so the posting date is the evidence that places them in the report year's ledger, and the invoice number's year is only the clue that finds them. **Watch for:** freight and sales tax. {{ freight_name }} ({{ x.freight_account }}) comes from the invoice header, not the lines, so a student who adds it to the revenue accounts reads a difference of ${{ x.with_freight|money }} instead; account {{ x.tax_account }} holds the sales tax.
 
-**Step 5. Say where the cost appears.** In `Accounts` find {{ x.discount_account }} {{ discounts_name }}, a contra revenue account, and look for it in `RevenuePostings` and the ledger: there are no postings. Each invoice line is recorded at its net price, so the revenue accounts already exclude every price reduction and the income statement shows net revenue and nothing about the promotions. The cost becomes visible only in a gross-to-net schedule, or if revenue were recorded at the price before the promotion and the discount in {{ x.discount_account }}. **Watch for:** {{ x.returns_account }} {{ x.returns_name }}, which records returns, offered as the discount account.
+**Step 5. Say where the cost appears.** In `Accounts` find {{ x.discount_account }} {{ discounts_name }}, a contra revenue account, and look for it in `RevenuePostings` and the ledger: there are no postings. Each invoice line is recorded at its net price, so the revenue accounts already exclude every price reduction. Reported revenue is already lower, but the income statement does not separately identify the promotional reduction. The cost becomes visible only in a gross-to-net schedule, or if revenue were recorded at the price before the promotion and the discount in {{ x.discount_account }}. **Watch for:** {{ x.returns_account }} {{ x.returns_name }}, which records returns, offered as the discount account.
 
 **Step 6. Place the proposal's discounts in quarters.** Use SUMIFS on `BilledLines` by PromotionID, the report year and InvoiceQuarter. These are invoice quarters, and the ledger's quarter follows the posting date, which differs only for invoices like those of Step 4.
 

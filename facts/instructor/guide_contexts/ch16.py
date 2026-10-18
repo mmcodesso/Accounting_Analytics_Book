@@ -154,6 +154,16 @@ def source_of(claim, table: str) -> str:
     return "\n".join(lines)
 
 
+def custom_expr(claim, lines: list[str], column: str) -> str:
+    """The expression of a Custom Column step of the project, alone: what the Custom Column dialog takes."""
+    found = [l for l in lines if "Table.AddColumn(" in l and f'"{column}", each ' in l]
+    claim(len(found) == 1, f"the solution project's query has the custom column {column}")
+    m = re.search(r'"' + re.escape(column) + r'", each (.*)\),?$', found[0]) if found else None
+    claim(m is not None, f"the step of {column} is a Table.AddColumn with an expression")
+    expr = m.group(1) if m else ""
+    return re.sub(r" else ", "\nelse ", expr) if len(expr) > 60 else expr
+
+
 def exercise_counts() -> dict[str, int]:
     persp, current, counts = {"Financial": "financial", "Managerial": "managerial", "Auditing": "auditing"}, None, {}
     for line in (CHAPTER / "_exercises.qmd").read_text(encoding="utf-8").splitlines():
@@ -291,7 +301,7 @@ def g1(d, claim):
                "WHERE CreditMemoDate <= ?1 GROUP BY OriginalSalesInvoiceID) "
                "SELECT ROUND(si.GrandTotal - COALESCE(a.Applied, 0) - COALESCE(c.Credited, 0), 2), "
                "julianday(?1) - julianday(si.DueDate), a.Applied IS NULL AND c.Credited IS NULL, "
-               "a.Applied IS NOT NULL AND c.Credited IS NOT NULL FROM SalesInvoice si "
+               "a.Applied IS NOT NULL AND c.Credited IS NOT NULL, si.SalesInvoiceID, si.GrandTotal, COALESCE(a.Applied, 0), si.InvoiceNumber FROM SalesInvoice si "
                "LEFT JOIN Applied a ON a.SalesInvoiceID = si.SalesInvoiceID LEFT JOIN Credited c ON c.SalesInvoiceID = si.SalesInvoiceID "
                "WHERE si.InvoiceDate <= ?1", end)
     positive = [r for r in rows if r[0] > 0]
@@ -319,6 +329,48 @@ def g1(d, claim):
     credit_acct = "2060"
     credit_name = d.one("SELECT AccountName FROM Account WHERE AccountNumber = ?", credit_acct)
     claim(credit_name is not None, "account 2060 exists")
+    # the invoices with a negative balance: what applied cash and the credit memos did to them, and where the credit posted
+    ids = ",".join(str(r[4]) for r in negative)
+    full = [r for r in negative if abs(r[6] - r[5]) < 0.005]
+    part = [r for r in negative if r[6] < r[5] - 0.005]
+    claim(len(full) + len(part) == len(negative) and full and part,
+          "every invoice with a negative balance has applied cash equal to its total or less, and both kinds exist")
+    post = {(inv, str(acct)): amount for inv, acct, amount in d.q(
+        "SELECT cm.OriginalSalesInvoiceID, a.AccountNumber, SUM(g.Credit) FROM GLEntry g JOIN Account a ON a.AccountID = g.AccountID "
+        "JOIN CreditMemo cm ON cm.CreditMemoID = g.SourceDocumentID "
+        f"WHERE g.SourceDocumentType = 'CreditMemo' AND cm.OriginalSalesInvoiceID IN ({ids}) AND a.AccountNumber IN ('1020', '2060') GROUP BY 1, 2")}
+    to_2060 = sum(v for (inv, acct), v in post.items() if acct == "2060")
+    to_1020 = sum(v for (inv, acct), v in post.items() if acct == "1020")
+    claim(abs(to_2060 + sum(r[0] for r in negative)) < 0.005,
+          "the credits posted to account 2060 equal the negative balances: the customer credit is the excess over the invoice")
+    claim(all(abs(post.get((r[4], "1020"), 0) + post.get((r[4], "2060"), 0)
+                  - d.one("SELECT SUM(GrandTotal) FROM CreditMemo WHERE OriginalSalesInvoiceID = ? AND CreditMemoDate <= ?", r[4], end)) < 0.005
+              for r in negative),
+          "each credit memo on these invoices posts wholly to accounts 1020 and 2060")
+    claim(all((r[4], "1020") not in post for r in full) and all((r[4], "1020") in post for r in part),
+          "the credit memos of the invoices paid in full credit only account 2060, and those of the partly paid ones also credit 1020")
+    after_app = d.q("SELECT COUNT(DISTINCT ap.SalesInvoiceID), COUNT(DISTINCT ap.CashReceiptApplicationID) FROM CashReceiptApplication ap "
+                    "WHERE ap.SalesInvoiceID IN (%s) AND ap.ApplicationDate > (SELECT MIN(cm.CreditMemoDate) FROM CreditMemo cm "
+                    "WHERE cm.OriginalSalesInvoiceID = ap.SalesInvoiceID)" % ids)[0]
+    receipt_after = d.one("SELECT COUNT(*) FROM (SELECT ap.SalesInvoiceID, MIN(cr.ReceiptDate) AS first_receipt FROM CashReceiptApplication ap "
+                          "JOIN CashReceipt cr ON cr.CashReceiptID = ap.CashReceiptID "
+                          "WHERE ap.SalesInvoiceID IN (%s) GROUP BY ap.SalesInvoiceID) r "
+                          "WHERE r.first_receipt > (SELECT MIN(cm.CreditMemoDate) FROM CreditMemo cm WHERE cm.OriginalSalesInvoiceID = r.SalesInvoiceID)" % ids)
+    claim(0 < after_app[0] < len(negative) and 0 < receipt_after < len(negative),
+          "some, not all, of the invoices with a negative balance have an application, or even their first receipt, dated after the credit memo, so "
+          "the order of payment and credit is not the same for all")
+    # a worked example: the first partly paid invoice (lowest ID) whose credit memo precedes its first receipt
+    example = None
+    for r in sorted(part, key=lambda r: r[4]):
+        cm_date, cm_no, cm_total = d.q("SELECT MIN(CreditMemoDate), MIN(CreditMemoNumber), SUM(GrandTotal) FROM CreditMemo "
+                                       "WHERE OriginalSalesInvoiceID = ?", r[4])[0]
+        rc = d.q("SELECT MIN(cr.ReceiptDate), MIN(ap.ApplicationDate) FROM CashReceiptApplication ap JOIN CashReceipt cr ON cr.CashReceiptID = ap.CashReceiptID "
+                 "WHERE ap.SalesInvoiceID = ?", r[4])[0]
+        if rc[0] and cm_date <= rc[0] and cm_date <= rc[1]:
+            example = dict(number=r[7], total=r[5], applied=r[6], memo=cm_no, memo_total=cm_total, residual=-r[0], to_1020=post[(r[4], "1020")],
+                           to_2060=post[(r[4], "2060")], posted=cm_date, receipt=rc[0], applied_on=rc[1])
+            break
+    claim(example is not None, "a partly paid invoice has its credit memo dated before its first receipt and application")
     order = sorted(BUCKETS)
     claim(order != BUCKETS, "sorted as text the buckets are out of order")
     ar = table_m("ARInvoices")
@@ -330,7 +382,12 @@ def g1(d, claim):
                 m_bucket=steps(claim, ar, "Added Custom1", "Added Custom2"),
                 m_ledger=steps(claim, table_m("ARLedger"), "Filtered Rows"),
                 m_neg=steps(claim, table_m("ARCreditBalances"), "Filtered Rows"),
-                m_open=measure(claim, "Open Balance"), m_ledger_m=measure(claim, "Ledger Receivables"),
+                n_full_applied=len(full), n_part_applied=len(part), to_2060=to_2060, to_1020=to_1020, after_app_n=after_app[0],
+                after_app_rows=after_app[1], receipt_after_n=receipt_after, example=example,
+                e_days=custom_expr(claim, ar, "DaysPastDue"), e_bucket=custom_expr(claim, ar, "Bucket"),
+                e_order=custom_expr(claim, ar, "BucketOrder"), e_open=custom_expr(claim, ar, "OpenBalance"),
+                m_open=measure(claim, "Open Balance"), m_open_n=measure(claim, "Open Invoices"), m_ledger_m=measure(claim, "Ledger Receivables"),
+                m_credit=measure(claim, "Credit Balances"), m_credit_n=measure(claim, "Credit Balance Invoices"),
                 m_diff=measure(claim, "Unreconciled Difference"),
                 t_aging=visual_title(claim, "ex161", "aging"), t_source=visual_title(claim, "ex161", "ledgerBySource"),
                 dax_open=check_expr(claim, "Exercise 16.1", "open balance"),
@@ -501,7 +558,7 @@ def g5(d, claim):
                 after=after, all_payments=len(amounts) + after, ranges=ranges,
                 m_pay=steps(claim, table_m("Payments"), "Filtered Rows", "Added Custom"),
                 c_digit=column_line(claim, "Payments", "FirstDigit"), t_digits=source_of(claim, "Digits"),
-                m_observed=measure(claim, "Observed Share"), m_mad=measure(claim, "Benford MAD"),
+                m_counted=measure(claim, "Payments Counted"), m_observed=measure(claim, "Observed Share"), m_mad=measure(claim, "Benford MAD"),
                 m_expected=measure(claim, "Benford Share"),
                 t_chart=visual_title(claim, "ex165", "digits"), t_slicer=visual_title(claim, "ex165", "kindSlicer"),
                 t_table=visual_title(claim, "ex165", "madByKind"),
@@ -534,10 +591,17 @@ def g6(d, claim):
     pairs14 = sum(1 for x in days if x <= 14)
     claim(pairs14 > 0, "some pairs fall within two weeks")
     note = n16.ex6(d, lambda c, t: None)
-    return dict(merge_rows=len(merged), self_pairs=len(self_pairs), date_only=len(date_only), id_only=len(id_only), orders=orders,
+    # a relationship from Employee to PayrollRegister on the payee's EmployeeID would intersect with the approver
+    top = d.q("SELECT ApprovedByEmployeeID, COUNT(*) FROM PayrollRegister GROUP BY 1 ORDER BY 2 DESC LIMIT 1")[0]
+    paid_to_self = d.one("SELECT COUNT(*) FROM PayrollRegister WHERE ApprovedByEmployeeID = ?1 AND EmployeeID = ?1", top[0])
+    claim(0 < paid_to_self < top[1], "the employee who approves the most registers was paid on only some of them, so a relationship on the payee would cut the count")
+    return dict(merge_rows=len(merged), approver_n=top[1], payee_n=paid_to_self, self_pairs=len(self_pairs), date_only=len(date_only), id_only=len(id_only), orders=orders,
                 registers=registers, n_approvers=len(approvers), n_employees=d.one("SELECT COUNT(*) FROM Employee"),
                 within14=pairs14, shortest=min(days), longest=max(days), total_orders=orders,
                 m_pairs=steps(claim, table_m("PaymentPairs"), "Merged Queries", "Filtered Rows"),
+                e_days_apart=custom_expr(claim, table_m("PaymentPairs"), "DaysApart"), e_same=custom_expr(claim, table_m("PaymentPairs"), "SameInvoice"),
+                m_pair_count=measure(claim, "Pairs"), m_within30=measure(claim, "Pairs Within 30 Days"),
+                m_orders_share=measure(claim, "Orders Share"), m_registers_share=measure(claim, "Registers Share"),
                 m_orders=measure(claim, "Orders Approved"), m_entries=measure(claim, "Entries Approved"),
                 m_registers=measure(claim, "Registers Approved"), m_entries_share=measure(claim, "Entries Share"),
                 m_pairs_same=measure(claim, "Pairs on the Same Invoice"),

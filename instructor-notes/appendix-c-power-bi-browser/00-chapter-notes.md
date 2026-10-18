@@ -17,7 +17,7 @@
 | Components | Three guided tutorials (11, 9 and 5 steps), three exercises (one for each perspective) and eight multiple-choice questions. No slide deck, no companion files and no solution files: the Power BI projects open only in Desktop |
 | What students need | A school account, CharlesRiver.xlsx (the service reports about 123 MB), and a text editor for Tests.dax |
 | License | None beyond a school account, except Exercise C.3, which needs a Pro license for version history |
-| Time | Class: about 180 minutes (Plan A). Students: about 90, 60 and 30 minutes for Tutorials C.1 to C.3, and 60, 45 and 45 for the exercises. Estimates: time them yourself |
+| Time | Class: about 180 minutes (Plan A). Students: about 90, 60 and 30 minutes for Tutorials C.1 to C.3 (180 in all), and 60, 45 and 45 for the exercises (150), so about five and a half hours before setup and prerequisite reading. Class time is tutorial work and counts toward those times, not as homework on top of them. Estimates: time them yourself with your cohort |
 
 The appendix depends on these conditions of the data:
 
@@ -37,11 +37,11 @@ The appendix depends on these conditions of the data:
 
 ## Preparing to teach
 
-**Accounts and licenses.** Students sign in with a school account; a personal address does not work. A free license builds models and reports in My workspace, a personal area, which is all the tutorials and Exercises C.1 and C.2 need. A Pro license adds sharing, shared workspaces and version history. Exercise C.3 uses version history, and Guided Tutorial B.2 of the publishing appendix needs the model in a shared workspace, which a student chooses at Step 7 of C.1.
+**Accounts and licenses.** Students sign in with a school account; a personal address does not work. A free license builds models and reports in My workspace, a personal area, which is all the tutorials and Exercises C.1 and C.2 need. A Pro license adds sharing, shared workspaces and version history. Exercise C.3 uses version history, and Guided Tutorial B.2 of the publishing appendix needs the model in a shared workspace, preferably an exercise workspace your institution approves, which a student chooses at Step 7 of C.1.
 
-**What can block the work.** The appendix names one tenant setting, *Users can edit semantic models in the Power BI service*, and says a feature turned off there is unavailable whatever the license. The steps may also depend on the **Get Data** tile, on permission to create a semantic model, and on OneDrive for work or school, because the upload goes there. The book does not say which other settings an administrator may have changed. Before the term, have a student-licensed test account do Step 2 of C.1 (Choose data), Step 7 (**Create a semantic model only**) and Step 3 of C.3 (**New measure**): if one stops, ask the administrator to allow a group that holds your students. If the answer is no, use Plan C, or send students to Desktop in a lab or a Windows virtual machine, as the appendix advises.
+**What can block the work.** The appendix names one tenant setting, *Users can edit semantic models in the Power BI service*, and says a feature turned off there is unavailable whatever the license. The steps may also depend on the **Get Data** tile, on permission to create a semantic model, and on OneDrive for work or school, because the upload goes there. The book does not say which other settings an administrator may have changed. Before the term, have a student-licensed test account, not your instructor account, do what students will do: the upload and **Choose data** (Steps 1 and 2 of C.1), **Transform data** and **Save** in Power Query Online (Step 7 of C.1, **Create a semantic model only**, and Step 2 of C.3), opening the model in **Editing**, **Run** in DAX query view (Microsoft's page says it needs write permission on the model and the tenant setting for editing models, so a workspace Viewer cannot run it), **New measure** (Step 3 of C.3), the Sales and Discounts page and the matrix, legend and slicers of Exercise C.2, a report **Save** and a reopen, and, when you assign Exercise C.3, **Save to version history** and a restore (which need Write and Build permission on the model, and a license above free). A menu that appears, or an instructor account that works, is not proof that a student can. If one step stops, ask the administrator to allow a group that holds your students. If the answer is no, use Plan C, or send students to Desktop in a lab or a Windows virtual machine, as the appendix advises.
 
-**What was read, where and when.** The service steps were read in one account, the author's school account, in My workspace, on October 6, 2026, in one browser session. The account showed the two version history commands, so it holds a Pro license or its equivalent; the license itself was not read. The service changes without notice, so labels and timings in your tenant may differ. Of the author's timings, the upload took under a minute and the model editor opened in under a minute. Confirm these before class:
+**What was read, where and when.** The service steps were read in one account, the author's school account, in My workspace, on October 6, 2026, in one browser session. The account showed the two version history commands, so it holds a Pro license or its equivalent; the license itself was not read. The service changes without notice, so labels and timings in your tenant may differ. Of the author's timings, the upload took under a minute and the model editor opened in under a minute. The dated observations describe what was seen in one account, and the record that holds them is `facts/instructor/observations/appendix-c-service-observations-2026-10-06.md`. The numerical checks of these guides (the totals, the quarters, the promotions) come from the public dataset and do not independently establish those interface observations, so repeat a representative student-account run of the appendix before you teach it. Confirm these before class:
 
 | Not confirmed | Why |
 |---|---|
@@ -51,12 +51,13 @@ The appendix depends on these conditions of the data:
 | The query of Exercise C.1 and the DAX checks in the exercise guides | Built from the book's test and from Desktop-verified expressions, not run in a service |
 | A relationship to a Table added later (Exercise C.1 extension) | The test added T7_PromotionProgram and stopped at Save |
 | A change to an Enter data table saved in Power Query Online | The test reopened **Create table** from the Source step and saved nothing, and Microsoft's Enter data page documents such changes only in Desktop, so a browser reader reads Guided Tutorial B.2, Steps 1 and 4 |
-| Test as role for Guided Tutorial B.1's checks as a manager, and from My workspace | Not run; Test as role views a role or a person of the organization, and the security table's addresses belong to no one there |
+| Test as role for Guided Tutorial B.1's checks as a manager, and from My workspace | Not run; Test as role views a role or a person of the organization and, as Microsoft's page says, evaluates dynamic rules with the tester's own identity, so it cannot play the fictional addresses of the security table |
 
-**What the book rests on.** The statements that cite Microsoft Learn are the upload through OneDrive, the type detection from the first rows, the column profile, the report editor, version history (the license, the five versions and the 14-day restore), DAX query view, the editing setting, the saves of the model editor and Power Query Online, and the free license. The other differences the tutorials meet (dates read as numbers, the missing card, display units set card by card, a month axis sorted by value, the model editor's commands) rest on the author's test alone, and two of them differ from Learn. Learn's upload page has the student change Anonymous to Organizational account and sign in, where the test found it set already, and Learn's card page puts the display units under Callout values > Values for all cards. The tutorials now say what the test saw and what to do when a tenant shows the other state.
+**What the book rests on.** The statements that cite Microsoft Learn are the upload through OneDrive, the type detection from the first rows, the column profile, the report editor, version history (the license, the capture on opening in Editing mode, the five versions and the 14-day restore), DAX query view (the write permission and the tenant setting in the web), the editing setting, the saves of the model editor and Power Query Online, and the free license. The other differences the tutorials meet (dates read as numbers, the missing card, display units set card by card, a month axis sorted by value, the model editor's commands) rest on the author's test alone, and two of them differ from Learn. Learn's upload page has the student change Anonymous to Organizational account and sign in, where the test found it set already, and Learn's card page puts the display units under Callout values > Values for all cards. The tutorials now say what the test saw and what to do when a tenant shows the other state.
 
 **The week before.**
 
+- Run the account checks above with a student-licensed account, so that a blocked account is found before the class, not at its first session or clinic.
 - Do the three tutorials in your own account and keep the semantic model as your reference answer. There is no model file. Chapter13-exercises-pbi.zip holds the same model for Desktop with a Checks tab, a way to compare numbers if you have Desktop.
 - Have each student upload CharlesRiver.xlsx before class, from the Downloads page. Uploads of about 123 MB from a whole class on one network are slow, and the service renames a second copy, so a student may have CharlesRiver 1.xlsx.
 - Ask students to create a text file named Tests.dax now, because the service discards DAX query tabs on close.
@@ -82,7 +83,7 @@ The appendix depends on these conditions of the data:
 | 1 | 20 | Tutorial C.1 Steps 1 to 4, live, students following |
 | 1 | 35 | Students: Steps 5 to 8 (custom columns, the profile, the semantic model, the defaults) |
 | 1 | 10 | Debrief: the profile on the first rows and on the entire data set |
-| 1 | 5 | Assign Steps 9 to 11 as homework if they are not finished |
+| 1 | 5 | Students who have not finished Steps 5 to 8 finish them before Session 2; Steps 9 to 11 are Session 2 work, not homework |
 | 2 | 20 | Steps 9 and 10 (relationships, properties) in pairs |
 | 2 | 10 | Step 11 and the checkpoint: each pair reads the fiscal 2026 row of the Validation page |
 | 2 | 25 | Tutorial C.2 Steps 1 to 6 (the page, the slicer, the card, the display units, the sort) |
@@ -91,7 +92,7 @@ The appendix depends on these conditions of the data:
 | 2 | 5 | Questions 2, 3, 5 and 6 as clickers |
 | | 180 | Total |
 
-**Plan B: flipped (one clinic, 75 minutes).** Students do the three tutorials at home, about 180 minutes. It fits students who work on their own computers.
+**Plan B: flipped (one clinic, 75 minutes).** Students do the three tutorials at home, about 180 minutes. It fits students who work on their own computers. Run the account checks of Preparing to teach before the tutorials go home, because the clinic is too late to find a blocked account. The exercises are assigned at the end of the clinic and done afterward, and the clinic's work on C.1 counts toward them once.
 
 | Minutes | Activity |
 |---:|---|
@@ -101,7 +102,7 @@ The appendix depends on these conditions of the data:
 | 15 | Assign the exercises, and the rules of Exercise C.3 |
 | 75 | Total |
 
-**Plan C: instructor demonstration (60 minutes).** It fits a tenant that blocks student editing, or a class with few accounts. Students then do the exercises in Desktop, Exercise C.3 by hand, as without a Pro license, because Desktop has no version history.
+**Plan C: instructor demonstration (60 minutes).** It fits a tenant that blocks student editing, or a class with few accounts. Students then do the exercises in Desktop, Exercise C.3 by hand, as without a Pro license, because Desktop has no version history. Their starting model is Charles River Reports at the end of Tutorial 13.2, which is the Start of Tutorial 13.3 folder of the Chapter 13 start files (Chapter13-companion.zip), pointed at their copy of CharlesRiver.xlsx. It already holds the model and the Sales and Discounts page. The adaptation is the Key Measures table and the Revenue measure of Tutorial C.3, which they add with **Home > Enter data** and **Home > New measure**, and the exercises' queries and the manual repair of C.3 run in Desktop's DAX query view as in the service.
 
 | Minutes | Activity |
 |---:|---|
@@ -130,7 +131,7 @@ Plan A is the safest and the longest. Plan B is the cheapest in class time, and 
 | 8 | **Manage relationships** reads "There are no relationships defined yet." | the defaults created none |
 | 11 | Fiscal 2026 row | 9,522 lines, $29,756,420.08, $33,589,137.45, $362,110.75 |
 
-**Stumbles.** Step 1: a personal account, or a slow upload. Step 3: **Add new step** in place of **Replace current**, which rounds every rate to zero before the fix. Step 4: the date left as a number, so the custom columns of Step 5 cannot take a year from it. Step 5: the **Data type** box is set in the dialog, so no separate typing step follows. Step 6: the profile options stay unavailable until **Enable column profile** is on. Step 9: the column is chosen by clicking it in the preview. Step 11: SalesInvoiceLineID left at the visual's default, which can be Sum, so the table shows a sum of IDs instead of the line count. **Checkpoint to look for.** The four items of the tutorial's checkpoint, and an item group table with 5 rows and no (Blank).
+**Stumbles.** Step 1: a personal account, or a slow upload. Step 3: **Add new step** in place of **Replace current**, which rounds every rate to zero before the fix. Step 4: the date left as a number, so the custom columns of Step 5 cannot take a year from it. Step 5: the **Data type** box is set in the dialog, so no separate typing step follows. Step 6: the profile options stay unavailable until **Enable column profile** is on. Step 9: the column is chosen by clicking it in the preview. Step 11: SalesInvoiceLineID left at the visual's default, which can be Sum, so the table shows a sum of IDs instead of the line count. **Checkpoint to look for.** The tutorial's checkpoint, and an item group table with 5 rows and no (Blank).
 
 ### Guided Tutorial C.2: Building the Sales and Discounts Page in the Browser
 
@@ -144,7 +145,7 @@ Plan A is the safest and the longest. Plan B is the cheapest in class time, and 
 | 6 | Sorted by value the axis starts Oct, Sep, Nov, Dec | by **Month** the line is near zero, then rises |
 | 9 | Furniture leads the bar chart | 96.1% of the discounts |
 
-**Stumbles.** Step 3: the default visuals restored add a second card and a multi-row card; use the one between **Gauge** and **KPI**. Step 4: ticking the key puts it in **Categories** and splits the card into one card for each of 7,171 invoices. Step 5: **Display units** appears only when **Apply settings to** names one card. Step 6: a line that falls reads as a trend. **Checkpoint to look for.** The cards equal the Validation page, and the invoice card is lower than its line count.
+**Stumbles.** Step 3: the default visuals restored add a second card and a multi-row card; use the card whose wells are **Value**, **Categories** and **Tooltips**, which the test saw between **Gauge** and **KPI**, and pick it by name and wells, not by position. Step 4: ticking the key puts it in **Categories** and splits the card into one card for each of 7,171 invoices. Step 5: **Display units** appears only when **Apply settings to** names one card. Step 6: a line that falls reads as a trend. **Checkpoint to look for.** The cards equal the Validation page, and the invoice card is lower than its line count.
 
 ### Guided Tutorial C.3: Adding a Measures Table and a First Measure
 
@@ -197,9 +198,9 @@ Plan A is the safest and the longest. Plan B is the cheapest in class time, and 
 
 - *Three tracks.* Financial students do C.1, managerial students C.2 and auditing students C.3, then swap their answers.
 - *All three.* About two and a half hours, covering outcomes 2 to 5. Outcome 1 comes from the tutorials.
-- *Without Pro.* C.1 and C.2, and C.3 by hand, with the formula retyped.
+- *Without Pro.* C.1 and C.2, and C.3 by the manual route: the formula and baseline result recorded first, the formula retyped, the method labeled manual repair.
 
-**Grading and discussion.** C.1's Tests.dax and C.3's change log suit grading, and C.2's page suits a screenshot. C.2's last requirement and C.3's comparison suit class discussion. Do C.3 last: it changes the Revenue measure that C.1's query reads.
+**Grading and discussion.** C.1's Tests.dax and C.3's change log suit grading, and so do C.2's saved page and the screenshot or table that students attach to it. The rubrics grade only what each requirement asks, so a clean extra, such as promotion amounts read from T7_PromotionProgram, is a plus. C.2's fifth requirement and C.3's comparison suit class discussion. Do C.3 last: it changes the Revenue measure that C.1's query reads.
 
 ## Multiple-choice questions
 
@@ -214,7 +215,7 @@ Key: 1 C, 2 A, 3 D, 4 B, 5 B, 6 D, 7 C, 8 A.
 | 5 | B | keys used by relationships are set not to summarize, so the field lands in Categories; drag it to Value and choose Count (Distinct). |
 | 6 | D | the chart is sorted by its values; More options \> Sort by \> Month, then Sort ascending. |
 | 7 | C | Power Query Online's Save applies its changes to the model; Close & Apply is Desktop's. |
-| 8 | A | Power Query Online also types each column from its first 200 rows, where Discount is zero. |
+| 8 | A | with automatic type detection enabled, Power Query Online types each column from its first 200 rows, where Discount is zero. |
 
 **Questions where a wrong option tempts**
 
@@ -224,7 +225,6 @@ Key: 1 C, 2 A, 3 D, 4 B, 5 B, 6 D, 7 C, 8 A.
 - **Question 4.** Option C blames the mode; the book's reason is the close.
 - **Question 6.** Option A agrees with what the sorted line shows, so it is the dangerous one.
 - **Question 7.** Option A is Desktop's command, and option D is the first save only.
-- **Length.** The correct option is also the longest in 6 of the 8 questions (1, 2, 4, 5, 6, and 8), so wording alone gives it away. Shuffle or shorten it for a quiz.
 
 Use the questions as a ten-minute quiz or as clickers after each tutorial.
 
@@ -232,6 +232,6 @@ Use the questions as a ten-minute quiz or as clickers after each tutorial.
 
 **Builds on.** Chapter 13, whose model and Sales and Discounts page the tutorials rebuild; Chapter 14, whose Key Measures table and Revenue measure Tutorial C.3 starts; Chapter 4, which taught the first-rows rule; and Chapter 6, which the Validation page reconciles to.
 
-**Later.** Students who continue Part IV in the browser use the appendix's last section and its table of command names. It sends them through Tutorial 13.3 before Chapter 14, has them keep the Key Measures table, Revenue and Exercise C.1's measures when Tutorial 14.2 creates them, and has them rewrite their saved tests on the Date table's fields after Tutorial 14.1. Chapter 16's Audit Monitoring is a second model, read from the uploaded copy. In the appendix on publishing and securing reports, Test as role takes the place of **View as**. For a model in a shared workspace, Guided Tutorial B.2 skips Publish, and the student reads Steps 1 and 4, which change the security table in Desktop, and does the rest. A student whose model is in My workspace reads its Steps 1 to 4 and does Step 5. Chapter 16's change control is what Exercise C.3 compares with. The Part II case and Chapter 15 use the promotions that Exercise C.2 reads.
+**Later.** Students who continue Part IV in the browser use the appendix's last section and its table of command names. It sends them through Tutorial 13.3 before Chapter 14, has them keep the Key Measures table, Revenue and Exercise C.1's measures when Tutorial 14.2 creates them, and has them rewrite their saved tests on the Date table's fields after Tutorial 14.1. Chapter 16's Audit Monitoring is a second model, read from the uploaded copy. In the appendix on publishing and securing reports, Test as role takes the place of **View as**, but it evaluates dynamic rules with the tester's own identity and cannot play the fictional addresses of Guided Tutorial B.1's security table. Students define B.1's roles with Manage roles, record the identity on the Who Am I card, and read or watch you demonstrate B.1's checks as the Sales, Warehouse and Production managers, unless you supply a separately tested exercise with real sign-in names. A student who is not mapped should see no protected rows, and that blank result verifies denial for that identity, not the manager-specific results. For a model in a shared workspace, which should be an exercise workspace you approve, Guided Tutorial B.2 skips Publish, and the student reads Steps 1 and 4, which change the security table in Desktop, does the rest, and removes only the role members the test added. A student whose model is in My workspace reads its Steps 1 to 4 and does Step 5. Chapter 16's change control is what Exercise C.3 compares with. The Part II case and Chapter 15 use the promotions that Exercise C.2 reads.
 
 **Appendix D.** It maps each exercise to the professional frameworks, and each exercise guide names the competencies it practices.

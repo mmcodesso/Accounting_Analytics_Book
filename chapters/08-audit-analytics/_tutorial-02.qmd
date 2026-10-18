@@ -31,7 +31,7 @@ h. Filter OpenBalance to values greater than 0.
 i. Choose **Home > Close & Load > Close & Load To**, select **Only Create Connection**, and click **OK**. The choice applies to all four new queries.
 j. Open **Data > Queries & Connections**, right-click **OpenInvoices**, choose **Load To**, and load it as a **Table** on a **New worksheet**, as in Tutorial 8.1, Step 1. Rename the new worksheet `OpenInvoices`.
 
-Most invoices are fully paid and drop out, leaving about a thousand open invoices. A negative balance is also removed: it belongs to an invoice that was paid and then credited. Charles River records such a credit as a liability to the customer, in account 2060 Customer Deposits and Unapplied Cash, and later refunds it, so it is not a receivable.
+Most invoices are fully paid and drop out, leaving about a thousand open invoices. A negative balance is also removed: the receipts and credit memos recorded on that invoice together exceed its total. Most of these invoices were paid in full, although not always before the credit memo, and a few were only partly paid. Charles River records the excess as a liability to the customer, in account 2060 Customer Deposits and Unapplied Cash, and in nearly every case refunds it later, so it is not a receivable.
 
 **Step 3. Age the open invoices.**
 

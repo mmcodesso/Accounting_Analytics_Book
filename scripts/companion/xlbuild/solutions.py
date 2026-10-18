@@ -91,6 +91,7 @@ def requirement_info(source: Path, label: str) -> dict:
     """A case's Requirement N or Milestone N: its title, its text as items, and its instructor note."""
     kind, n = label.split()
     text = source.read_text(encoding="utf-8")
+    text = re.sub(r"^:::[ \t]*\{[^\n]*\n.*?^:::[ \t]*$", "", text, flags=re.M | re.S)   # callouts: their own heading must not end a requirement
     label_pattern = rf"<!--\s*Instructor notes, {kind} {n}\b[^:]*:\s*(.*?)-->"
     note = re.search(label_pattern, text, flags=re.S)
     if not note:

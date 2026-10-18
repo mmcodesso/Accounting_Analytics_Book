@@ -28,7 +28,7 @@ By the end, students can:
 - **Files and software.** The copy of Charles River Furniture Analysis.xlsx, with CharlesRiver.xlsx where the queries point. XLOOKUP needs Excel for Microsoft 365 or a recent perpetual version; check students' versions.
 - **Data conditions.** The FreightTerms values are Prepaid and Prepaid and Add. Every shipment's sales order is found, so no lookup fails. Prepaid shipments bill no freight, and Prepaid and Add shipments bill most but not all of what the carrier charged. Shipments and sales orders are 9,707 and 5,819 rows.
 - **The Table order matters.** In the Shipment Table FreightCost is column J, BillableFreightAmount K, then the two new columns FreightTerms (L) and FreightMargin (M). The grid's amounts are not adjacent, so a fill across fails in one column.
-- **Load choice.** Both Tables load as worksheets. A plain Close & Load sends them to the Data Model.
+- **Load choice.** Both Tables load as worksheets. With Excel's default load settings a plain Close & Load sends them to the Data Model.
 
 ## How to run it
 
@@ -66,7 +66,12 @@ e. Rename the two worksheets `Ex 4.4 Shipment` and `Ex 4.4 SalesOrder`.
 
 a. Select the shipment data cells with the first data cell active, and choose **Home > Conditional Formatting > New Rule**.
 b. Select **Use a formula to determine which cells to format** and enter `=$M2<0`. Choose a fill.
-c. On `Ex 4.4` enter `=COUNTIFS(Shipment[FreightMargin],"<0")` and, beside it, `=SUMIFS(Shipment[FreightMargin],Shipment[FreightMargin],"<0")`.
+c. Insert a worksheet named `Ex 4.4` for the summary, and enter the count and, beside it, the total:
+
+   ```
+   =COUNTIFS(Shipment[FreightMargin],"<0")
+   =SUMIFS(Shipment[FreightMargin],Shipment[FreightMargin],"<0")
+   ```
 
 **Check:** 7,632 shipments, with a total FreightMargin of -$868,490.27. **Watch for:** the rule written with a structured reference, which a rule cannot use, and confusion with the grid's overall FreightMargin, which is smaller because shipments above cost offset some.
 
@@ -142,7 +147,7 @@ A weak answer reports a loss on 7,632 shipments without separating the two terms
 | Requirement 1: loading | 10 | Both Tables as worksheets, named Shipment and SalesOrder | Loaded to the Data Model |
 | Requirement 2: columns | 15 | A lookup with no errors and the margin formula | Values pasted |
 | Requirement 3: rule and counts | 15 | A rule on the margin column and counts that agree with it | Rule without counts |
-| Requirement 4: grid | 20 | Mixed references, locked FreightTerms, totals tied to the Table | Hand-edited, or no tie-out |
+| Requirement 4: grid | 20 | Correct SUMIFS sum columns, mixed row references, the FreightTerms criterion and a tie-out to the entire Table. Pasting and then editing the sum columns, as Step 5 does, is full credit, and so is a formula that reads its column from the header | Hard-coded results, wrong references, or no tie-out |
 | Requirement 5: slicer | 15 | SUBTOTAL average for each term, recorded | One term only |
 | Requirement 6: interpretation | 25 | Absorbed by design versus shortfall, with the numbers | A single conclusion |
 

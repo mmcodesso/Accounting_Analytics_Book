@@ -4,5 +4,6 @@
      records. Spread over 52 weeks that is about {{ weekly }} hours a week, an equivalent rather than a measured weekly average, because
      the direct records end on {{ direct_end }} and the indirect records on {{ indirect_end }}. By job title: {% for title, n, hours in titles %}{{ title }} {{ n }}{{ ' employees' if loop.first }}, {{ hours|num }}{{ ' hours' if loop.first }} ({{ (hours / n)|num(1) }}{{ ' each' if loop.first }}){{ '; ' if not loop.last }}{% endfor %}. The claim is not supported by these totals: recorded overtime is spread across the plant's hourly employees; staffing,
      demand, approvals, and how time is captured still need to be examined before naming a cause. A
-     running share needs SUM(x) OVER (ORDER BY x DESC ROWS UNBOUNDED PRECEDING) divided by SUM(x) OVER (), both taught in the
-     section on window functions; ROWS matters if two employees tie. -->
+     running share needs SUM(x) OVER (ORDER BY x DESC, EmployeeID ROWS UNBOUNDED PRECEDING) divided by SUM(x) OVER (), both taught in the
+     section on window functions; the unique tie-breaker EmployeeID keeps the running order deterministic, and the frame matters
+     only when the order alone is not unique, so that tied employees would be peers. -->

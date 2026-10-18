@@ -116,11 +116,11 @@ WHERE dl.PaymentDate BETWEEN '2027-01-01' AND '2027-02-23'
 ORDER BY Record DESC, DueDate;
 ```
 
-**Check:** pay periods {{ periods[0] }} and {{ periods[1] }}, paid {{ pay_dates[0] }} and {{ pay_dates[1] }}, have no registers, and the note payments due ({{ note_dates }}) are all Scheduled with no journal entry. The extract holds no payroll, no note payments, no sales and no receipts: it ends, it does not prove the company stopped paying.
+**Check:** pay periods {{ periods[0] }} and {{ periods[1] }}, with scheduled pay dates of {{ pay_dates[0] }} and {{ pay_dates[1] }}, have no registers, and the note payments due ({{ note_dates }}) are all Scheduled with no journal entry. The extract holds no payroll, no note payments, no sales and no receipts: it ends, it does not prove the company stopped paying.
 
 ### Part 2: The search for unrecorded liabilities
 
-**Step 4. Search the later payments for invoices recorded late.** Group the payments by invoice and compare each invoice's received date with the year-end: an invoice received after it, for goods received before it, would be an unrecorded liability.
+**Step 4. Search the later payments for invoices recorded late.** Group the payments by invoice and compare each invoice's received date with the year-end. An invoice received after it, for goods or services received before it, is a candidate for an unrecorded liability, not a finding. Trace it to the year-end ledger first (goods received not invoiced in `2020`, accrued expenses and the other accruals) and measure only what the ledger did not hold, so nothing is counted twice. At the end of {{ d.P }}, for example, {{ g.later_receipts|count }} receipts were billed on {{ g.later_invoices|count }} invoices received after the year-end, and every one of those receipts already sat in `2020`.
 
 ```sql
 -- Requirement 8: the 2027 supplier payments and the invoices they paid, a search for unrecorded liabilities
@@ -217,7 +217,7 @@ A weak answer concludes either way from the ledger alone.
 |---|---:|---|---|
 | Profile and comparison | 20 | Contents, same weeks, limits stated | Contents only |
 | Search for unrecorded liabilities | 25 | Invoices by received date, result and its limit | Payments counted as liabilities |
-| Events and the date | 15 | Three events, the date to be disclosed | Events without the date |
+| Events and the date | 15 | The relevant events, the three of Step 5 at least, and the date to be disclosed | Events without the date |
 | Conditions and mitigating factors | 25 | Both measured from the adjusted statements | One side |
 | Evidence needed and wording | 15 | Bounded conclusion, evidence named | Conclusion stated as fact |
 

@@ -25,8 +25,8 @@ Students can:
 ## Before you assign
 
 - **From earlier work.** Requirements 1 to 5 complete, with their tables and Case.sql, and the memos of the Part I and Part II cases as models. No new SQL: students write the memo and appendix in a word processor.
-- **Length.** At most two pages, with a one-page appendix of 5 exhibits. The model answer in Case.sql is an outline of about 341 words, not a finished memo.
-- **The model's view.** The hours are unsupported, not fictitious; the plan allows no routine overtime; the 2026 statements get the payroll accrual and the cutoff; the cost of the hours stays out of inventory. Students may reach another recommendation from the same evidence. Grade the reasoning and the wording, not the verdict, if it follows from the exhibits and states its limits.
+- **Length.** At most two pages, with a one-page appendix of 5 exhibits. The model answer in Case.sql is an outline of about 369 words, not a finished memo. Students choose the decision-critical results for each exhibit and keep full reconciliations and entries in the labeled output of Case.sql. A landscape exhibit page is fine, and you may allow a second exhibit page when a readable layout needs it, rather than shrinking the type.
+- **The model's view.** The hours are unsupported, not fictitious; the plan allows no routine overtime; the 2026 statements get the payroll accrual and the cutoff; identified abnormal costs are expensed and normal conversion cost needs a separate allocation analysis. Students may reach another recommendation from the same evidence. Grade the reasoning and the wording, not the verdict, if it follows from the exhibits and states its limits.
 
 ## How to run it
 
@@ -46,42 +46,48 @@ Individual, about 90 minutes in class or as a take-home: 15 to plan the evidence
 |---|---|---|---|
 | Auditing | What the records outside the time clock show, how independent they are, the open explanations and the evidence that would settle them, what the control needs | Requirement 2 | 1 |
 | Managerial accounting | What the hours produced and cost, the bridge, the plan with its assumptions and the overtime it allows | Requirements 3 and 4 | 2, 3, 4 |
-| Financial reporting | The adjustments and their effect, and why the cost of the hours stays out of inventory | Requirement 5 | 5 |
+| Financial reporting | The adjustments and their effect, why identified abnormal costs are expensed, and why normal conversion cost needs its own allocation analysis | Requirement 5 | 5 |
 
 ### Part 2: The sections and the close
 
 **Step 3. Auditing.** Say that the records outside the time clock do not support the surge-day hours as recorded: on 93 surge days the plant used 2.0 different clock-in times a day against 22.4 on ordinary days, rostered 8.0 hours and clocked 12.5, and 1,475 approvals cite an operation that had ended. Say that the records that agree (attendance, punches) come from the time clock, the rosters and approvals from one manager, and that the calendar, the plan and the output are not shown to be independent of that manager. Name two explanations, the hours worked and entered as a block, or not worked as recorded, and the evidence outside the database that would separate them. Say what the control needs: its configuration, since the stored exceptions only point to a rule, a rule that compares overtime with a roster or plan, and a review of the 18 open exceptions.
 
-**Step 4. Managerial accounting.** Output was flat (70,871, 66,109 and 66,998 standard hours) while surge overtime rose from 3,456 to 14,112 hours; the last year's cost was 188,060.04 as a premium or 564,180.12 in full before burden, two alternatives and not a sum. Account 5080 grew 947,709.56, nearly all payroll charged to 1090 (966,846.03). The plan at 1.18 hours per standard hour needs 81,317 hours against 131,072 of regular capacity and expects a variance of 1,107,366; it allows no routine overtime, and exceptions are approved against a dated plan, because the year's total does not show that every week fits. State the assumptions, and that the budget's volume was not used.
+**Step 4. Managerial accounting.** Output was flat (70,871, 66,109 and 66,998 standard hours) while surge overtime rose from 3,456 to 14,112 hours; the last year's cost was 214,651.73 as a premium or 643,955.19 in full, each with the employer's taxes and benefits as Requirement 3 asks, two alternatives and not a sum. Account 5080 grew 947,709.56, nearly all payroll charged to 1090 (966,846.03). The plan at 1.18 hours per standard hour needs 81,317 hours against 131,072 of regular capacity and expects a variance of 1,107,366; it allows no routine overtime, and exceptions are approved against a dated plan, because the year's total does not show that every week fits. State the assumptions, and that the budget's volume was not used.
 
-**Step 5. Financial reporting.** Record the payroll accrual of 383,044.82; with the 2025 work paid in 2026 (365,921.19), income falls only 17,123.63, while the liability rises by the full accrual. With the cutoff (+24,940.25), adjusted net income is 4,511,427.86. The net change is small, but the liability left out is 8.5% of net income, so judge it and each error on their own, and call the missing accrual a recurring deficiency. Keep the cost of the hours out of inventory: actual conversion cost was 78.77 per standard hour against the standard 47.40, and the abnormal part, from idle capacity and hours beyond the work, is a cost of the period.
+**Step 5. Financial reporting.** Record the payroll accrual of 383,044.82; with the 2025 work paid in 2026 (365,921.19), income falls only 17,123.63, while the liability rises by the full accrual. With the cutoff (+24,940.25), adjusted net income is 4,511,427.86, on the stated assumption that the manufacturing parts are period costs. The net change is small, but the liability left out is 8.5% of net income, so judge it and each error on their own, and call the missing accrual a recurring deficiency. Do not raise the standards to absorb the cost: actual conversion cost was 78.77 per standard hour against the standard 47.40. Identified abnormal costs, such as idle capacity, are expensed, and normal conversion cost needs a separate allocation analysis. Unsupported hours are not automatically an abnormal cost of the same amount.
 
-**Step 6. Recommend.** Stop routine surge days and require overtime to be approved in advance against a plan, by someone outside production; review the open attendance exceptions and add a rule that compares overtime with the roster; have internal audit corroborate a sample of surge days with access logs and interviews; adopt a 2027 plan at about the first year's hours per standard hour as a target to test, with no routine overtime and exceptions against a dated plan; keep the direct-hour standards, which the records give no reason to revise, and review the overhead rates on normal capacity; record the year-end payroll accrual now and at every year-end.
+**Step 6. Recommend.** Stop routine surge days and require overtime to be approved in advance against a plan, by someone outside production; review the open attendance exceptions and add a rule that compares overtime with the roster; have internal audit corroborate a sample of surge days with access logs and interviews; adopt a 2027 plan at about the first year's hours per standard hour as a target to test, with no routine overtime and exceptions against a dated plan; keep the direct-hour standards provisionally, since the records give no reason to revise them and the comparison does not show they are right, and review the overhead rates on normal capacity; record the year-end payroll accrual now and at every year-end.
 
-**Step 7. Build the appendix.** One page, 5 numbered exhibits, each cited in the memo: the corroboration matrix, output against hours, the bridge of the variance, the 2027 plan against the status quo, the proposed adjustments.
+**Step 7. Build the appendix.** One page, 5 numbered exhibits, each cited in the memo: the corroboration matrix, output against hours, the bridge of the variance, the 2027 plan against the status quo, the proposed adjustments. Each panel carries only the decisive results.
 
-**Check:** the memo answers the controller's questions in the order they were asked, every number appears in an exhibit or a query, the word fictitious appears nowhere, and the length holds.
+- Corroboration: three or four decisive tests, the independence of the time clock and of the manager judged apart, and what remains unknown.
+- Output: the three annual comparisons, one qualified weekly result, and the cutoff note.
+- Bridge: all six ledger lines and the total, with the payroll measures marked as non-additive diagnostics.
+- Plan: the three scenarios, the baseline assumptions and a work-center scheduling caveat.
+- Adjustments: the payroll, cutoff, opening-equity and liability effects with the manufacturing assumption beside them, referring to the full entries.
+
+**Check:** the memo answers the controller's questions in the order they were asked, every number appears in an exhibit or a query, no hours are called fictitious and no person blamed without evidence ("these records do not prove the hours were fictitious" is acceptable), and the length holds.
 
 ## Expected results
 
 | Memo section | Numbers a correct memo carries | Source |
 |---|---|---|
 | Auditing | 93 surge days; 2.0 against 22.4 clock-in times; 8.0 hours rostered, 12.5 clocked | R2 |
-| Managerial accounting | Premium 188,060.04, full 564,180.12; 5080 up 947,709.56; variance 1,107,366 | R3, R4 |
-| Financial reporting | Accrual 383,044.82; adjusted net income 4,511,427.86 | R5 |
+| Managerial accounting | Premium 214,651.73, full 643,955.19, with burden; 5080 up 947,709.56; variance 1,107,366 | R3, R4 |
+| Financial reporting | Accrual 383,044.82; adjusted net income 4,511,427.86, on the manufacturing assumption | R5 |
 | Recommendation | No routine overtime; approval in advance; corroborate; accrue every year-end | R2 to R5 |
 
-> **Instructor notes, Requirement 6:** a strong memo does not conclude that the hours were fictitious. The records outside timekeeping do not support the surge-day hours as recorded, and the ones that agree with them come from the same system or the same manager; the question goes to the evidence outside the database. The recommendation: stop routine surge days and require overtime to be approved in advance against a plan, by someone outside production; review the open attendance exceptions and add a rule that compares overtime with the roster; have internal audit corroborate a sample of surge days with access logs and interviews; adopt a 2027 plan at about the 2024 level of hours per standard hour as a target to test, with no routine overtime, since the year's capacity allows it, and exceptions approved against a dated plan; keep the direct-hour standards, which the records give no reason to revise, and review the overhead rates on normal capacity; and record the year-end payroll accrual now and at every year-end. A strong memo judges materiality on more than the net effect on income.
+> **Instructor notes, Requirement 6:** a strong memo does not assert that the hours were fictitious or assign blame without evidence. The records outside timekeeping do not support the surge-day hours as recorded, and the ones that agree with them come from the same system or the same manager; the question goes to the evidence outside the database. The recommendation: stop routine surge days and require overtime to be approved in advance against a plan, by someone outside production; review the open attendance exceptions and add a rule that compares overtime with the roster; have internal audit corroborate a sample of surge days with access logs and interviews; adopt a 2027 plan at about the 2024 level of hours per standard hour as a target to test, with no routine overtime, since the year's capacity allows it, and exceptions approved against a dated plan; keep the direct-hour standards provisionally, since the records give no reason to revise them and the comparison does not show they are right, and review the overhead rates on normal capacity; and record the year-end payroll accrual now and at every year-end. A strong memo judges materiality on more than the net effect on income, labels the manufacturing assumption beside its adjusted income, and says that identified abnormal costs are expensed while normal conversion costs need a separate allocation analysis.
 
 ## What a strong answer says
 
 - **Opening.** The question and the answer in two sentences, before any detail.
 - **Auditing.** The records contradict or fail to support the hours; the agreeing records are not independent; two explanations remain, and the evidence that separates them lies outside the database.
 - **Managerial accounting.** Output flat, overtime up, the cost two ways, the bridge, and a plan with stated assumptions that needs no routine overtime.
-- **Financial reporting.** The accruals, the effect on income against the balance sheet, materiality, and why the cost of the hours stays out of inventory.
+- **Financial reporting.** The accruals, the effect on income against the balance sheet, materiality, and why identified abnormal costs are expensed while normal conversion cost needs its own allocation analysis.
 - **Recommendation.** Specific actions, owners, and a way to learn more.
 
-A strong memo makes choices: it leaves out findings that do not bear on the decision and states what the data cannot show. A weak memo reports every result in the order found, hedges the recommendation, or says fictitious.
+A strong memo makes choices: it leaves out findings that do not bear on the decision and states what the data cannot show. A weak memo reports every result in the order found, hedges the recommendation, or asserts fictitious hours without evidence.
 
 ## Common mistakes and how to respond
 
@@ -100,7 +106,7 @@ A strong memo makes choices: it leaves out findings that do not bear on the deci
 | Auditing | 25 | Evidence, independence, open explanations, outside evidence, control needs | Results without independence |
 | Managerial accounting | 25 | Output, cost, bridge, plan and assumptions, overtime allowed | Results listed without a conclusion |
 | Financial reporting | 20 | Accruals, effect on income and balance sheet, materiality, inventory | One accrual, or no reason for inventory |
-| Recommendation | 15 | Specific actions, owners, a way to learn more | A decision without actions |
+| Recommendation | 15 | Specific actions, owners, a way to learn more; another recommendation that follows from the exhibits and states its limits | A decision without actions |
 | Exhibits and traceability | 10 | 5 exhibits, cited, agreeing with the text | Missing or inconsistent |
 | Form and audience | 5 | Two pages, three sections, plain for the controller | Over length or unorganized |
 

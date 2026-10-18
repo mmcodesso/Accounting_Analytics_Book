@@ -384,8 +384,11 @@ def g5(d, claim):
 @context("ch04.g6")
 def g6(d, claim):
     schema(d, claim, {"PriceOverrideApproval": ["PriceOverrideApprovalID", "SalesOrderLineID", "RequestedByEmployeeID", "ApprovedByEmployeeID",
-                                                "RequestDate", "ApprovedDate", "ReferenceUnitPrice", "ApprovedUnitPrice", "Status"],
-                      "Employee": ["EmployeeID", "EmployeeName", "JobTitle"], "SalesInvoiceLine": ["SalesOrderLineID", "UnitPrice", "PricingMethod"]})
+                                                "RequestDate", "ApprovedDate", "ReferenceUnitPrice", "RequestedUnitPrice", "ApprovedUnitPrice",
+                                                "Status"],
+                      "Employee": ["EmployeeID", "EmployeeName", "JobTitle"],
+                      "SalesInvoiceLine": ["SalesInvoiceLineID", "SalesOrderLineID", "UnitPrice", "PricingMethod", "PriceListLineID",
+                                           "PriceOverrideApprovalID"]})
     req = d.q("SELECT PriceOverrideApprovalID, SalesOrderLineID, RequestedByEmployeeID, ApprovedByEmployeeID, Status, "
               "1 - ApprovedUnitPrice / ReferenceUnitPrice, ApprovedUnitPrice FROM PriceOverrideApproval ORDER BY PriceOverrideApprovalID")
     names = {e: (n, t) for e, n, t in d.q("SELECT EmployeeID, EmployeeName, JobTitle FROM Employee")}
@@ -409,10 +412,16 @@ def g6(d, claim):
     claim(top[4] == "Approved" and sorted(r[5] for r in req)[-2] < top[5], "the request with the largest DiscountFromReference is an Approved one, with no tie")
     pending = []
     for r in (r for r in req if r[4] == "Pending"):
-        billed = d.q("SELECT UnitPrice, PricingMethod FROM SalesInvoiceLine WHERE SalesOrderLineID = ?", r[1])
-        pending.append(dict(id=r[0], line=r[1], lines=len(billed), at_price=sum(1 for u, _ in billed if abs(u - r[6]) < 0.005),
-                            methods=and_join(sorted({m for _, m in billed}))))
+        billed = d.q("SELECT UnitPrice, PricingMethod, SalesInvoiceLineID, PriceOverrideApprovalID FROM SalesInvoiceLine "
+                     "WHERE SalesOrderLineID = ? ORDER BY SalesInvoiceLineID", r[1])
+        requested = d.one("SELECT RequestedUnitPrice FROM PriceOverrideApproval WHERE PriceOverrideApprovalID = ?", r[0])
+        pending.append(dict(id=r[0], line=r[1], lines=len(billed), at_price=sum(1 for u, *_ in billed if abs(u - r[6]) < 0.005),
+                            methods=and_join(sorted({m for _, m, *_ in billed})), line_ids=and_join(b[2] for b in billed),
+                            linked=sum(1 for b in billed if b[3] is not None), requested=requested, price=r[6]))
     claim(all(p["lines"] > 0 and p["at_price"] == p["lines"] for p in pending), "every Pending request's order line was invoiced, at the pending price")
+    claim(all(p["linked"] == 0 for p in pending), "no invoice line of a Pending request carries a PriceOverrideApprovalID")
+    claim(all(abs(p["requested"] - p["price"]) >= 0.005 for p in pending),
+          "on every Pending request the amount in ApprovedUnitPrice differs from the RequestedUnitPrice, so it is not the requested price")
     return dict(grid=grid, own_row=own_row, blank=sum(1 for r in req if r[3] is None), top_id=top[0], pending=pending,
                 pending_lines=sum(p["lines"] for p in pending), n_approved=len(approved),
                 letters=letters_of(d, claim, "PriceOverrideApproval", extra=["DiscountFromReference", "SelfApproved"]))

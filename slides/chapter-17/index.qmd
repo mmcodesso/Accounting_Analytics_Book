@@ -437,10 +437,10 @@ Equipment financed by a note and a disposal with no proceeds moved no cash, so t
 - **Produce:** notes on assets, debt, revenue, accruals and inventories
 - **Tool:** SQL rebuilds the schedules; the workbook formats them
 - **Revisit:** Chapters 10 and 11's queries, Chapter 14's sales model
-- **Check:** each note agrees with a line of the statements
+- **Check:** each note's schedule agrees with the statements
 
 ::: {.notes}
-Roll property and equipment forward by class and reconcile it to the ledger; give each note payable's terms, maturities and current portion; disaggregate revenue on the adjusted basis and show the contract balances; and test whether any recorded service work was not billed at a year-end. For the timing, the case assumes that the design-service contracts give an enforceable right to payment for the work completed to date, so their revenue is recognized over time. If you use the sales model for revenue, it must still be reconciled to the ledger and the cutoff adjustment, so choose, and say why. The notes on accounting policies and on the CFO's matters, such as income taxes and leases, complete the package before it goes to the bank.
+Roll property and equipment forward by class and reconcile it to the ledger; give each note payable's terms, maturities and current portion; disaggregate revenue on the adjusted basis and show the contract balances; and test whether any recorded service work was not billed at a year-end. For the timing, the case assumes that the design work creates no asset with an alternative use to Charles River and that the contracts give an enforceable right to payment for the work completed to date, so the revenue is recognized over time. If you use the sales model for revenue, it must still be reconciled to the ledger and the cutoff adjustment, so choose, and say why. The notes on accounting policies and on the CFO's matters, such as income taxes and leases, complete the package before it goes to the bank.
 :::
 
 ## Milestone 3: before you hand it in

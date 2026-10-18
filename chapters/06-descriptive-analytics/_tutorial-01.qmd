@@ -77,7 +77,9 @@ c. In B12 and C12, enter these two formulas, the group's number of lines and its
 
 d. In D12, enter `=C12/B12`. Copy B12:D12 and paste it into B13:D15.
 e. Type `Total of groups` in A16, and enter `=SUM(B12:B15)` in B16 and `=SUM(C12:C15)` in C16.
-f. Type `Difference from control total` in A17, and enter `=B16-B2` in B17 and `=C16-B3` in C17.
+f. Type `Difference from control total` in A17, and enter `=B16-B2` in B17 and `=ROUND(C16-B3,2)` in C17.
+
+The ROUND in C17 compares the revenue to the cent. Adding thousands of amounts can leave a residue far smaller than a cent, which is not exactly zero in binary arithmetic, and the rounding makes such a difference read as zero.
 
 The differences are not zero. The four product lines account for fewer lines and less revenue than the year's total, so the summary is incomplete.
 
@@ -117,6 +119,7 @@ G18 equals the number of lines in B2, so every line of the year falls in exactly
 a. Select G1:G17 and choose **Insert > Insert Column or Bar Chart > Clustered Column**.
 b. Right-click the chart, choose **Select Data**, click **Edit** under **Horizontal (Category) Axis Labels**, select F2:F17, and click **OK** twice.
 c. Right-click a bar, choose **Format Data Series**, and set **Gap Width** to 0%.
+d. Choose **Chart Design > Add Chart Element > Axis Titles**, and add the titles `Line total, lower bound of the $1,000 bin` under the chart and `Lines` beside it, so that the chart says what its bars count.
 
 The chart in @fig-06-02 rises to its highest bar at the left and trails off to the right: most lines are under a few thousand dollars, and a thin tail reaches far beyond them. That is the right skew that the average and the median suggested in Step 4, now visible at a glance. Excel labels each bar with its lower bound from column F, so your last bar reads 15000, the open-ended bin that the figure labels 15k+.
 

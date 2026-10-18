@@ -47,7 +47,7 @@ The case depends on these conditions of the data, all visible in the working cop
 - The punches behind each clock entry repeat its times; the rosters and the overtime approvals come from the Production Manager. The work center calendar, the capacity plan and the output lie outside the time clock, though the records do not show who keeps them.
 - Time records end on {{ r3.cutoff }} (indirect labor time on {{ r4.ind_end }}), the calendar on {{ r1.cal_last }}; payroll posts on pay dates, with no accrual at any year-end.
 - The plant's output is about {{ r4.use|pct(0) }} of its regular employee-hours, and the budget plans {{ r4.budget }} times the units it completed.
-- All {{ r1.exceptions }} attendance exceptions are Open and never reviewed, and {{ r2.wrong }} of them name the wrong employee.
+- All {{ r1.exceptions }} attendance exceptions remain Open with no reviewer or review date recorded in this dataset, and {{ r2.wrong }} of them name the wrong employee. Evidence of a review may exist outside the dataset, so ask whether it does.
 - Account 2030 carries an opening balance of {{ r5.opening|money }} that no payroll ever cleared, and the ledger records no income tax.
 
 ## What students should be able to do afterward
@@ -70,7 +70,7 @@ The case depends on these conditions of the data, all visible in the working cop
 
 **Pitfalls that cost class time**
 
-- Three calendars (slide {{ s.calendars }}; the check on slides {{ s.cal_check }} and {{ s.cal_answer }}). Time records follow the work date and end on {{ r3.cutoff }}; the ledger follows the pay date, which put {{ r3.lf.paydates }} payrolls in the first year and {{ r3.lc.paydates }} in the last; output follows the completion date and includes weekends. Mixing them is the commonest error: the last year reads {{ r3.ys[2].ratio|num(3) }} hours per standard hour when output is cut off at the last time record, and a different figure when it is not.
+- Three calendars (slide {{ s.calendars }}; the check on slides {{ s.cal_check }} and {{ s.cal_answer }}). Time records follow the work date and end on {{ r3.cutoff }}; the ledger follows the pay date, which charged {{ r3.lf.paydates }} payroll postings to account 1090 in the first year and {{ r3.lc.paydates }} in the last (Manufacturing had {{ r3.mfg_dates[0] }} pay dates in the first year, and the first of them posted to 5080); output follows the completion date and includes weekends. Mixing them is the commonest error: the last year reads {{ r3.ys[2].ratio|num(3) }} hours per standard hour when output is cut off at the last time record, and a different figure when it is not.
 - Dates without days and fan-out (slide {{ s.dates }}). Roster times carry no date, and a late shift clocks out the next day. Each clock entry has two to four punches, RoughCutCapacityPlan repeats a work center's hours on every item row, and WorkCenterCalendar has a row for each work center and date. Summarize each side before the join.
 - The plant's {{ c.hourly }} hourly employees, not the cost center's {{ c.cost_center }}: the salaried staff keep no time clock, so a headcount from the cost center breaks the attendance test and the capacity.
 - Correlated subqueries on TimeClockPunch, which has no index on TimeClockEntryID. A query that runs for minutes is almost always one of these, or a join that was not summarized.
@@ -96,7 +96,9 @@ The case depends on these conditions of the data, all visible in the working cop
 | 4. Debrief | 5 | Looking ahead to Part IV | {{ s.ahead }} |
 | | 150 | Total | |
 
-**Plan B: lab sessions (three sessions of 120 minutes, 360 minutes in all).** Students work in class and you circulate. It fits a computer lab or a course that does not want to depend on outside work. Requirements 4 to 6 go home, and the memo is collected the week after.
+Collect a checkable hand-in at each touchpoint after the kickoff: the population reconciliation and the provisional evidence matrix at the second, the exact bridge and the scenario assumptions at the third, and the balanced adjustment schedule with the memo at the fourth.
+
+**Plan B: lab sessions (three sessions of 120 minutes, 360 minutes in all).** Three 120-minute guided labs support substantial outside work: Requirements 1 to 3 and the start of 4 are done in class while you circulate, and Requirements 4 to 6 and any unfinished earlier work are completed outside class. It fits a computer lab. The memo is collected the week after.
 
 | Session | Minutes | Activity | Slides |
 |---|---:|---|---|
@@ -129,7 +131,7 @@ The case depends on these conditions of the data, all visible in the working cop
 - **A bridge is not a set of measures.** The ledger lines sum to the {{ r3.bridge.delta|money }} growth of 5080; the three measures overlap and do not. Ask which are ledger lines.
 - **A scenario is not a forecast.** The expected variances ({{ r4.variance|map('num')|join(', ') }}) are what each ratio would produce, and the budget's volume would have put the plan {{ g4.budget_over|num }} hours beyond regular capacity. Ask what each ratio assumes.
 - **Two accruals nearly cancel in income and not on the balance sheet.** Income moves {{ r5.change|money }}; the liability moves {{ r5.p.accrual|money }}. Ask what opening retained earnings would then claim.
-- **Abnormal cost belongs in the period.** The actual conversion cost was {{ r5.actual_rate|num(2) }} per standard hour against {{ r5.std_rate|num(2) }}; raising the standards would carry idle capacity and unsupported hours into {{ r5.fg|money }} of finished goods. Ask where an abnormal cost goes, and how much of the difference is abnormal.
+- **Identified abnormal cost belongs in the period.** The actual conversion cost was {{ r5.actual_rate|num(2) }} per standard hour against {{ r5.std_rate|num(2) }}; raising the standards would carry any idle capacity and unsupported hours into {{ r5.fg|money }} of finished goods, while normal conversion cost needs its own allocation on normal capacity. Ask where an abnormal cost goes, and how much of the difference is abnormal.
 - **A saved view is not saved until Write Changes.** The next session fails with "no such table". Ask whether the changes were written.
 
 ## Discussion prompts
@@ -160,8 +162,8 @@ Every requirement is part of the case, and each depends on the first. The figure
 Three bundles:
 
 - **The full case (the default).** All six requirements, graded with the rubric below. About 13 hours.
-- **A shorter version for an audit course.** Requirements 1, 2 and 5 and a one-page memo on their sections. It skips the plan.
-- **Teams of three.** One script and one memo for the team, with one student leading each perspective (Requirement 2 for auditing, Requirements 3 and 4 for managerial accounting, Requirement 5 for financial reporting), and an individual one-page reflection on the recommendation.
+- **A shorter version for an audit course.** Requirements 1, 2 and 5 and a one-page memo. Requirement 2's matrix needs Requirement 3's output comparison, and Requirement 5's manufacturing allocation needs Requirement 4's overhead analysis, so supply verified extracts of both, and students cite them as supplied evidence. Or leave the output and manufacturing-allocation conclusions out explicitly and assess only the evidence students produced. Do not require conclusions that rest on skipped work.
+- **Teams of three.** One script and one memo for the team, with one student leading each perspective (Requirement 2 for auditing, Requirements 3 and 4 for managerial accounting, Requirement 5 for financial reporting), a common owner and a second reviewer for Requirement 1 and the final integration, and an individual one-page reflection on the recommendation.
 
 The check slides on calendars, independence and the inventory standard suit class discussion. Requirements 1 and 5 suit grading from the script and its tables, Requirements 2 to 4 from the exhibits, and Requirement 6 from the memo. A fast way to grade the script is to run it top to bottom on a fresh copy of the database and compare each reconciliation with the Expected results of the requirement guide.
 
@@ -186,7 +188,7 @@ Four criteria run through every requirement.
 | Judgment | Design separated from operation, a scenario read as a scenario, the inventory standard applied, materiality judged | Requirements 2, 4 and 5 |
 | Communication | A memo in the order of the questions, within two pages, careful with the word unsupported, ending in a recommendation | Requirement 6 |
 
-Each requirement guide has its own grading table out of 100; scale it by the weight above to place it in the case grade.
+Each requirement guide has its own grading table out of 100; scale it by the weight above to place it in the case grade. Full credit asks only for what a requirement asks, so extras such as a balanced posting schedule are a plus. Deduct an originating error once, where it starts, and grade the reasoning that follows from it on its own terms. Grade the claim, its evidence, its limits and the recommendation, not the presence of one word such as fictitious.
 
 ## Connections
 

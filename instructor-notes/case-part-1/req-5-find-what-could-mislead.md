@@ -19,7 +19,7 @@ By the end, students can:
 - trace an odd total to a source document type, a voucher and an EntryType;
 - explain why the entry does not belong in a quarterly measure, exclude it by a rule, and recompute the margins.
 
-**Competencies practiced.** CPA Evolution Core S2 M5 (risk of fraud and noncompliance); IMA Data Literacy, and Internal Control within Reporting and Control; IFAC IES 4 (a), professional skepticism and professional judgment; AACSB A5 part 5.2. The analytics type is descriptive, applied with an auditor's skepticism.
+**Competencies practiced.** CPA Evolution Core S1 M8 T3 to T4 (data mining and analysis of financial data); IMA Data Literacy and Data Analysis within Data Analytics and Insights; IFAC IES 4 (a), professional skepticism and professional judgment; AACSB A5 part 5.2. The analytics type is descriptive, applied with an auditor's skepticism.
 
 ## Before you assign
 
@@ -102,7 +102,7 @@ The margin at standard cost is 42.26% in 2026 Q3 and 40.78% in 2026 Q4.
 
 ![The naive and the corrected Furniture margin for the two quarters, side by side.](../figures/case-part-1/IF-C1-5-B.pdf)
 
-**Step 7. State what the margins show.** On this measure the Furniture margin fell from 43.33% to 41.06%, a drop of 2.27 points. Revenue fell 3.0% from 2026 Q3 to 2026 Q4 while cost rose 0.9%. The measure takes revenue before customer credits, which post to a shared account, and cost after the returned goods, so it overstates the margin, and a model answer says so. The cross-check at standard cost also falls, by 1.48 points, but it is a separate measure (the invoice lines before returns), so it supports the direction of the change, not the level. That is the descriptive answer. Why it fell is the Part II question.
+**Step 7. State what the margins show.** On this measure the Furniture margin fell from 43.33% to 41.06%, a drop of 2.27 points. Revenue fell 3.0% from 2026 Q3 to 2026 Q4 while cost rose 0.9%. The measure takes revenue before customer credits, which post to a shared account, and cost after the returned goods, so it overstates the margin, and a model answer says so. The cross-check at standard cost also falls, by 1.48 points, but it is a separate measure (the invoice lines before returns), so it supports the direction of the change, not the level. For reference, the invoice lines at standard cost come to $2,473,065.77 in 2026 Q3 and $2,461,576.82 in 2026 Q4, against posted shipment cost net of cost returns of $2,427,252.91 and $2,450,061.07. The gaps, $45,812.86 and $11,515.75, are differences between the two definitions (invoice and shipment timing, unmatched shipments, returns), not errors in the four tie-outs. That is the descriptive answer. Why it fell is the Part II question.
 
 ## Expected results
 
@@ -148,5 +148,5 @@ A weak answer reports the naive percentage as the result, removes one side of th
 ## Extensions and discussion questions
 
 - Net the revenue side of returns. The Furniture credit memo lines were $55,437.94 in 2026 Q3 and $39,719.44 in 2026 Q4. The margin is then 42.59% and 40.49%. Does the fall survive?
-- Add the Furniture shipment lines of 2026 Q4 with no invoice line to revenue at their order price ($34,792.96). The margin of 2026 Q4 would be 41.55%, still below 2026 Q3. What does that say about the cutoff?
+- As a hypothetical sensitivity only, add the order-price amount of the Furniture shipment lines of 2026 Q4 with no invoice line ($34,792.96) to 2026 Q4 revenue, leaving their recorded cost as it is. The margin would be 41.55%, still below 2026 Q3. The calculation does not establish whether the revenue belongs in 2026 Q4. What order, shipment, delivery and billing evidence would you obtain to tell a timing difference from an omission or an item to correct?
 - Discuss: which test of Chapter 2's checklist, if any, would have flagged this before the margin was computed?

@@ -22,6 +22,6 @@
 
 **Report-page tooltip.** A small report page that Power BI shows when the reader points at a data point, filtered to that data point. It replaces the default tooltip with chosen visuals, but it is not interactive and screen readers cannot read it.
 
-**Visual calculation.** A DAX calculation defined on a single Power BI visual, which works on the rows and columns the visual shows and is stored with the visual rather than in the model. Functions such as RUNNINGSUM, MOVINGAVERAGE, and PREVIOUS make running totals, moving averages, and comparisons with the previous row short formulas.
+**Visual calculation.** A DAX calculation defined on a single Power BI visual, which works on the visual's data matrix, including any fields hidden from the display, and is stored with the visual rather than in the model. Functions such as RUNNINGSUM, MOVINGAVERAGE, and PREVIOUS make running totals, moving averages, and comparisons with the previous row short formulas.
 
 **What-if parameter.** A numeric range parameter, created with Modeling > New parameter > Numeric range, that adds a table of allowed values, a measure returning the value the reader selects, and optionally a slider, so that measures using it recalculate as the reader changes an assumption.

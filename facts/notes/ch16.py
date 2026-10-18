@@ -276,6 +276,10 @@ def t2(d, claim):
     years = {p: per_year(d, [e["date"] for e in ex if e["process"] == p]) for p in PROCESSES}
     diaz_orders = sum(1 for o in orders(d) if o["approver"] == po_after[0]["approver"])
     claim(diaz_orders == len(po_after), "the departed approver approved only the orders flagged after termination")
+    po_ex = [e for e in ex if e["test"] == "PO AfterTermination"]
+    po_jan = [e for e in po_ex if e["date"][5:7] == "01"]
+    claim(0 < len(po_jan) < len(po_ex),
+          "the orders after termination fall in more than one month name, so a January drill-through lists only some of them (all of them would show a lost month filter)")
     claim(all(o["approver"] is not None and o["approver"] in emp and o["limit"] is not None for o in orders(d))
           and all(r["approver"] is not None and r["approved"] is not None for r in regs),
           "every order has an approver with a recorded limit, and every register an approver and an approval date")
@@ -291,6 +295,8 @@ def t2(d, claim):
                 self_low=min(self_months.values()), self_high=max(self_months.values()),
                 self_cal_low=min(calendar), self_cal_high=max(calendar), approvers=named,
                 po_after=[dict(number=o["number"], when=month_year(o["date"])) for o in po_after],
+                po_jan=[dict(number=e["doc"], amount=e["amount"], date=e["date"]) for e in po_jan],
+                po_other=[dict(number=e["doc"], amount=e["amount"], date=e["date"]) for e in po_ex if e not in po_jan],
                 po_after_by=po_after[0]["approver"], po_after_limit=emp[po_after[0]["approver"]]["limit"],
                 years=years, je_rates=[1000 * n / p for n, p in zip(years["JE"], per_year(d, pops["JE"]))],
                 diaz_orders=word(diaz_orders), diaz_rate=1000 * len(po_after) / len(pops["PO"]))
@@ -575,7 +581,8 @@ def ex4(d, claim):
     claim(po_n[2] > po_n[1] and po_pop[2] / po_pop[1] - 1 > po_n[2] / po_n[1] - 1 - 0.1,
           f"the order exceptions rose from {d.P} to {d.C}, but orders grew about as fast or faster, so the rate did not rise much")
     change = po_r[2] / po_r[1] - 1
-    moved = "barely moved" if abs(change) < 0.1 else f"fell by {fraction(-change)}" if change < 0 else f"rose by {fraction(change)}"
+    moved = (f"rose by only {100 * change:.0f}%" if 0 <= change < 0.1 else f"fell by only {-100 * change:.0f}%" if -0.1 < change < 0
+             else f"fell by {fraction(-change)}" if change < 0 else f"rose by {fraction(change)}")
     claim(po_r[2] < po_r[0], f"from {d.F} the order rate fell")
     claim(po_pop[2] / po_pop[0] > 2, f"orders more than doubled from {d.F}")
     je = unexplained["JE"]
@@ -601,7 +608,7 @@ def ex4(d, claim):
     pr_self = per_year(d, [e["date"] for e in ex if e["test"] == "PR SelfApproved"])
     claim(all(s / n > 0.9 for s, n in zip(pr_self, counts["PR"])), "payroll's rate is almost entirely the design finding")
     return dict(table=[(p, list(zip(counts[p], pops[p], rates[p]))) for p in ("JE", "PO", "PR")], unexplained=unexplained,
-                po_n=po_n, po_r=po_r, growth=po_pop[2] / po_pop[1] - 1, opening=word(opening["score"]),
+                po_n=po_n, po_r=po_r, po_pop=po_pop, rate_rise=change, growth=po_pop[2] / po_pop[1] - 1, opening=word(opening["score"]),
                 rose=fraction(po_n[2] / po_n[1] - 1), moved=moved, fell=fraction(1 - po_r[2] / po_r[0]),
                 still="barely move" if spread <= 1 else "move little",
                 opening_year=int(opening["date"][:4]), reclass=word(reclass[0]["score"]),

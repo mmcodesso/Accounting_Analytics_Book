@@ -25,7 +25,7 @@ A cost analyst asks three questions of the manufacturing data: what goes into a 
 
 By the end, students can:
 
-- name the production tables and say what a row of each records (chapter outcome 3);
+- name the production tables and say what a row of each records (outcome 3);
 - follow ParentItemID, BOMID and ComponentItemID from a product to its components, and explain why Item sits at both ends (outcome 5);
 - say what the data allow a cost analyst to compare, and which table holds the variance;
 - state which tables and columns give the variance of one product, and what the data do not store;
@@ -43,7 +43,7 @@ By the end, students can:
 
 Individual work, or pairs for requirements (2) and (4). For about 75 minutes: 15 on the tables (requirement 1), 20 on the bill (requirement 2), 15 on production and closes (requirement 3), 10 on the variance (requirement 4) and 15 on the memo (requirement 5).
 
-**Hints.** For requirement (2), if a student cannot see why Item appears twice, ask which column of BillOfMaterialLine holds the component, and which table holds its name. For requirement (4), ask which table has a variance in dollars. **Collect** the memo and the roll-up.
+**Hints.** For requirement (2), if a student cannot see why Item appears twice, ask which column of BillOfMaterialLine holds the component, and which table holds its name. For requirement (4), ask which table has a variance in dollars. **Collect** the memo. A numerical roll-up is an optional extension (Step 3 shows it).
 
 ## Step-by-step solution
 
@@ -83,7 +83,7 @@ c. For each line, look up ComponentItemID in **Item**.
 
 **Step 3. Roll up the material cost.** For each line multiply QuantityPerUnit by one plus ScrapFactorPct and by the component's StandardCost, and add the lines. The model product comes to ${{ material|num(2) }}. The product's StandardCost is ${{ item.cost|money }} and its StandardConversionCost ${{ item.conversion|money }}, so StandardCost less conversion is ${{ (item.cost - item.conversion)|num(2) }}.
 
-**Check:** the roll-up equals the material part of the standard cost within a cent or two, and equals the standard material cost per unit on the product's completion lines (${{ per_unit|num(2) }}). The same holds for all {{ n_roll }} manufactured items that have a bill. Without the scrap factor the model product comes to ${{ noscrap|num(2) }}, which does not reproduce it. A cost analyst uses the path to calculate the material cost of any product, and to see which components drive it. **Watch for:** the roll-up without the scrap factor.
+**Check:** the roll-up equals the material part of the standard cost within a cent or two. On the completion records, the sum of ExtendedStandardMaterialCost over the sum of QuantityCompleted comes to the same, ${{ per_unit|num(2) }}, though a single completion line's ratio can differ, because each extended amount is rounded to the cent (most for a line of a fraction of a unit). The same holds for all {{ n_roll }} manufactured items that have a bill. Without the scrap factor the model product comes to ${{ noscrap|num(2) }}, which does not reproduce it. A cost analyst uses the path to calculate the material cost of any product, and to see which components drive it. **Watch for:** the roll-up without the scrap factor.
 
 ### Requirement (3): Read the production records
 
@@ -130,7 +130,7 @@ For the model product, the {{ v.closes }} closes total ${{ v.total|money }}: mat
 ## What a strong answer says
 
 - **Requirement (1).** Each table of the diagram with what a row records, the {{ n_omitted }} Manufacturing tables the diagram leaves out, and LaborTimeEntry for the actual hours.
-- **Requirement (2).** The path in order, the bill reconciled to the standard cost with the scrap factor, and Item named as a parent and a component.
+- **Requirement (2).** The path in order, the calculation explained with the scrap factor, and Item named as a parent and a component. A numerical roll-up that reconciles to the standard cost is a plus.
 - **Requirement (3).** Planned and completed quantities that agree, completions in parts, and the variance columns of the close as the place where plan and result differ.
 - **Requirement (4).** The join path, the sign convention, and what is derived and what is stored.
 - **Requirement (5).** A verdict with limits.
@@ -152,7 +152,7 @@ A weak answer lists tables, looks for a component table, or says that the databa
 | Criterion | Points | Full credit | Partial credit |
 |---|---:|---|---|
 | Requirement 1: the tables | 15 | Every table of the diagram with what a row records, and the tables it leaves out | Names without roles |
-| Requirement 2: the path | 25 | The keys in order, the roll-up with the scrap factor, and Item at both ends explained | The path without the roll-up |
+| Requirement 2: the path | 25 | The keys in order, a correct explanation of the calculation (QuantityPerUnit times one plus ScrapFactorPct times the component's StandardCost), and Item at both ends explained | The path with an incomplete explanation of the calculation or of Item's two roles |
 | Requirement 3: the records | 20 | Plan and result tables, partial completions, the variance columns | Tables without the comparison |
 | Requirement 4: the variance | 25 | The join, the sign, and what is derived | The variance without the path |
 | Requirement 5: the memo | 15 | A verdict, named tables and limits | A summary with no verdict |

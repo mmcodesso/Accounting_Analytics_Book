@@ -255,11 +255,39 @@ def g1(d, claim):
     claim(max_share < 0.02, "the Furniture credits are under two percent of the revenue billed in every quarter")
     alt3, alt4 = gross[3] - by_invoice.get(3, 0.0), gross[4] - by_invoice.get(4, 0.0)
     claim(alt4 < alt3, "the Furniture revenue still falls from the third to the fourth quarter when each credit is assigned to the quarter of its original invoice")
+    # the two comparisons requirement (4) can lead to: the workbook's row 18 moves only the credits for earlier years'
+    # invoices out of the year, while a full original-quarter view also moves credits between the quarters of the year
+    early_by_q = dict(d.q("SELECT (CAST(substr(m.CreditMemoDate, 6, 2) AS INTEGER) + 2) / 3, SUM(l.LineTotal) FROM CreditMemoLine l "
+                          "JOIN CreditMemo m ON m.CreditMemoID = l.CreditMemoID JOIN SalesInvoice s ON s.SalesInvoiceID = m.OriginalSalesInvoiceID "
+                          "JOIN Item i ON i.ItemID = l.ItemID WHERE i.ItemGroup = 'Furniture' AND substr(m.CreditMemoDate, 1, 4) = ? "
+                          "AND substr(s.InvoiceDate, 1, 4) < ? GROUP BY 1", y, y))
+    claim(list(early_by_q) == [1], "the Furniture credits for earlier years' invoices all fall in the first quarter's credit memos")
+    net_memo = [gross[k] - by_memo.get(k, 0.0) for k in range(1, 5)]
+    prior_only = [round(net_memo[k - 1] + early_by_q.get(k, 0.0), 2) for k in range(1, 5)]
+    alt = [round(gross[k] - by_invoice.get(k, 0.0), 2) for k in range(1, 5)]
+    moves = []
+    for mq, iy, iq, amount in d.q(
+            "SELECT (CAST(substr(m.CreditMemoDate, 6, 2) AS INTEGER) + 2) / 3, substr(s.InvoiceDate, 1, 4), "
+            "(CAST(substr(s.InvoiceDate, 6, 2) AS INTEGER) + 2) / 3, ROUND(SUM(l.LineTotal), 2) FROM CreditMemoLine l "
+            "JOIN CreditMemo m ON m.CreditMemoID = l.CreditMemoID JOIN SalesInvoice s ON s.SalesInvoiceID = m.OriginalSalesInvoiceID "
+            "JOIN Item i ON i.ItemID = l.ItemID WHERE i.ItemGroup = 'Furniture' AND substr(m.CreditMemoDate, 1, 4) = ? "
+            "GROUP BY 1, 2, 3 ORDER BY 1, 2, 3", y):
+        if (iy, iq) != (y, mq):
+            moves.append(dict(source=f"{y}-Q{mq}", target=f"{iy}-Q{iq}", amount=amount, earlier=iy < y))
+    claim(all(m["target"] < m["source"] for m in moves), "a credit's invoice is never in a later quarter than the credit memo")
+    claim(sum(1 for m in moves if not m["earlier"]) > 0,
+          "some credits of the year are for invoices of an earlier quarter of the same year, so a full original-quarter view moves more than the earlier-year credits")
+    claim(all(prior_only[k] == round(net_memo[k], 2) for k in range(1, 4)) and prior_only[0] > net_memo[0],
+          "moving only the earlier-year credits raises the first quarter's net revenue and leaves the other three unchanged")
+    furn_lines_year = d.one("SELECT COUNT(*) FROM CreditMemoLine l JOIN CreditMemo m ON m.CreditMemoID = l.CreditMemoID JOIN Item i "
+                            "ON i.ItemID = l.ItemID WHERE i.ItemGroup = 'Furniture' AND substr(m.CreditMemoDate, 1, 4) = ?", y)
     return dict(y=y, periods=periods(d), memos=memos, lines=lines, memos_all=memos_all, lines_all=lines_all, wrong_key=wrong_key, furniture_credit=furniture_credit, mixed=mixed, header=header,
                 header_over=round(header - furniture_credit, 2), early_memos=len(early), early_lines=early_lines, early_furn_lines=early_furn_lines,
                 early_furn=early_furn, early_first=min(r[1] for r in early), early_last=max(r[1] for r in early),
                 inv_first=min(r[2] for r in early), inv_last=max(r[2] for r in early),
                 by_invoice=[by_invoice.get(k, 0.0) for k in range(0, 5)], max_share=max_share, alt3=round(alt3, 2), alt4=round(alt4, 2),
+                alt=alt, prior_only=prior_only, early_by_q=[round(early_by_q.get(k, 0.0), 2) for k in range(1, 5)],
+                moves=moves, within_moves=[m for m in moves if not m["earlier"]], furn_lines_year=furn_lines_year,
                 letters=letters_of(d, claim, "CreditMemoLine", extra=CML_EXERCISE))
 
 
@@ -353,6 +381,19 @@ def g4(d, claim):
           "the promotions with every line after the end date are the ones whose dates are wrong (one day, or an end before the start)")
     others = [p for p in promos if p not in flagged]
     claim(all(0.2 < p["share"] < 0.6 for p in others), "every other promotion has between a fifth and three-fifths of its lines invoiced after the end date")
+    # the orders behind the flagged promotions' lines: no order date falls inside the recorded dates
+    for p in flagged:
+        first, last = d.q("SELECT MIN(o.OrderDate), MAX(o.OrderDate) FROM SalesInvoiceLine l JOIN SalesInvoice si ON si.SalesInvoiceID = l.SalesInvoiceID "
+                          "JOIN SalesOrder o ON o.SalesOrderID = si.SalesOrderID WHERE l.PromotionID = ?", p["id"])[0]
+        first_long, last_long = long_date(first[:10]), long_date(last[:10])
+        span = (first_long.rsplit(",", 1)[0] if first[:4] == last[:4] else first_long) + " to " + last_long
+        p.update(order_first=first[:10], order_last=last[:10], order_span=span,
+                 start_long=long_date(p["start"][:10]), end_long=long_date(p["end"][:10]))
+        claim(first[:10] > p["end"][:10], f"promotion {p['id']}'s orders are all dated after its recorded end date")
+    one_day = [p for p in flagged if p["kind"] == "lasts one day"]
+    claim(len(one_day) == 1, "one flagged promotion is recorded for a single day")
+    # Exercise 5.4 done straight after the tutorials, without Exercise 5.2: OrderDate and the lag follow Tutorial 5.1's columns
+    direct = letters_of(d, claim, "SalesInvoice", extra=SI_TUTORIAL + ["OrderDate"] + SI_LAG)
     top = max(promos, key=lambda p: p["lines"])
     rows = d.q("SELECT si.InvoiceDate, so.OrderDate FROM SalesInvoice si JOIN SalesOrder so ON so.SalesOrderID = si.SalesOrderID")
     lags = [(date.fromisoformat(i) - date.fromisoformat(o)).days for i, o in rows]
@@ -366,6 +407,9 @@ def g4(d, claim):
                 one_day_ids=and_join(p["id"] for p in promos if p["kind"] == "lasts one day"),
                 backwards_ids=and_join(p["id"] for p in promos if p["kind"] == "ends before it starts"),
                 spread=max(quarter_means) - min(quarter_means), lowest=min(quarter_means), highest=max(quarter_means), n_promos=len(promos),
+                one_day=one_day[0], backwards=[p for p in flagged if p["kind"] == "ends before it starts"],
+                n_orders=d.one("SELECT COUNT(DISTINCT SalesOrderID) FROM SalesInvoice"), n_invoices=len(rows),
+                direct_letters=direct, last_promo_row=19 + len(promos),
                 letters=letters_of(d, claim, "SalesInvoice", extra=SI_TUTORIAL + SI_EXERCISES + SI_LAG))
 
 
@@ -398,11 +442,14 @@ def g5(d, claim):
     late_n, late_paid = d.q(f"SELECT COUNT(*), ROUND(SUM(Amount), 2) FROM DisbursementPayment WHERE SupplierID IN ({inlist}) AND PaymentDate > ?",
                             f"{d.C}-12-31")[0]
     claim(late_n > 0, "the payments in the Table include some dated after the fiscal year-end")
+    pay_first, pay_last = d.q(f"SELECT MIN(PaymentDate), MAX(PaymentDate) FROM DisbursementPayment WHERE SupplierID IN ({inlist})")[0]
+    claim(pay_last[:4] > str(d.C), "the matched suppliers' payments run past the fiscal year-end")
     titles = {}
     for m in matches:
         titles[m[4]] = titles.get(m[4], 0) + 1
     return dict(matches=[dict(id=m[0], name=m[1], emp=m[2], emp_name=m[3], title=m[4]) for m in matches], n_match=len(matches),
                 raw=raw, by_address=by_address, by_city=by_city, n_pay=n_pay, paid=paid, late_n=late_n, late_paid=late_paid,
+                pay_first=long_date(pay_first[:10]), pay_last=long_date(pay_last[:10]), year_end=long_date(f"{d.C}-12-31"),
                 n_suppliers=d.one("SELECT COUNT(*) FROM Supplier"), n_employees=d.one("SELECT COUNT(*) FROM Employee"),
                 n_payments=d.one("SELECT COUNT(*) FROM DisbursementPayment"), n_titles=len(titles),
                 supplier_columns=len(d.q("PRAGMA table_info(Supplier)")))

@@ -77,6 +77,8 @@ c. Merge Approvers again on CreatedByEmployeeID, expand EmployeeName and rename 
 
 **Check:** {{ selfs|length }} self-approved orders, {{ n_above }} above the limit and {{ term|length }} approved after termination; {{ s2 }} orders score 2 and {{ s1 }} score 1. **Watch for:** the blank guard left out of AfterTermination. An empty cell compares as earlier than any date, so the flag is TRUE for nearly every order.
 
+Employee.MaxApprovalAmount is the current recorded limit, so AboveLimit assumes that it also applied on the order date. Ask for the delegation policy and the history of the limits before concluding that an approval exceeded the authority then in force. Check the approver matches too: every approver here is an Employee row with a recorded limit, so no order drops out, but a left merge that finds no approver leaves a blank limit, and missing authority is reported separately from an exceeded one.
+
 **Step 3. Record a disposition for each flagged order.** Sort by RiskScore, filter to 1 or more, paste the rows as values with **Paste Special > Values** and add a `Disposition` column and a provisional `Design or operation` column, as in Tutorial 8.3 Step 5. The model answer's groups:
 
 - {{ x.kinds.capital }} note-financed capital purchases, created and approved by the {{ big_role|lower }} (limit ${{ big_limit|money }}): follow up, possibly design and operation; ask for the board's approval.
@@ -89,7 +91,7 @@ c. Merge Approvers again on CreatedByEmployeeID, expand EmployeeName and rename 
 
 ### Requirement (3): Supplier invoices
 
-**Step 4. Build InvoiceApprovals.** Import **T37_PurchaseInvoice** as `InvoiceApprovals`, merge Approvers on ApprovedByEmployeeID, expand the name, title and limit, add `AboveLimit` as `=[@GrandTotal]>[@ApproverLimit]` and list the invoices whose ApproverTitle is not Chief Financial Officer. **Check:** {{ inv_other }} of {{ inv_total|count }} invoices have another approver ({{ inv_cfo|count }} were approved by the chief financial officer), together ${{ x.other_total|money }}. They fall into three groups:
+**Step 4. Build InvoiceApprovals.** Import **T37_PurchaseInvoice** as `InvoiceApprovals`, merge Approvers on ApprovedByEmployeeID, expand the name, title and limit, add `AboveLimit` as `=[@GrandTotal]>[@ApproverLimit]` (the current-limit caveat of Step 2 applies here too) and list the invoices whose ApproverTitle is not Chief Financial Officer. **Check:** {{ inv_other }} of {{ inv_total|count }} invoices have another approver ({{ inv_cfo|count }} were approved by the chief financial officer), together ${{ x.other_total|money }}. They fall into three groups:
 
 - {{ g.zero.name }}, {{ g.zero.title }}, limit ${{ g.zero.limit|money }}: {{ g.zero.ids|length }} invoices. Not on the records: a role with no recorded approval authority, so request the delegation policy.
 - {{ g.within.name }}, {{ g.within.title }}, limit ${{ g.within.limit|money }}: {{ g.within.ids|length }} invoices, within the limit. Not without the policy: a role outside purchasing and accounting usually confirms receipt, so request the policy that says who may approve invoices.

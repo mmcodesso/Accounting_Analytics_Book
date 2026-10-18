@@ -71,7 +71,7 @@ Individual, about 75 minutes: 20 on the grid (requirement 1), 10 on shares (2), 
 
 a. Put the threshold in a cell, B14, as `0.02` and format it as a percentage, so a student can change it.
 b. Select A4 to I11 with A4 active, then choose **Home > Conditional Formatting > New Rule**.
-c. Select **Use a formula to determine which cells to format**, enter `=ABS($I4)>$B$14` and choose a fill.
+c. Select **Use a formula to determine which cells to format**, enter `=ABS($I4)>$B$14` and choose a fill. `=OR($I4>$B$14,$I4<-$B$14)`, or two rules for the rises and the falls, does the same.
 d. In B15 count the product types over the threshold: `=SUMPRODUCT(--(ABS(I4:I11)>B14))`.
 
 **Check:** nothing is highlighted and B15 reads 0. **Watch for:** a rule that passes this check and is wrong. No change in share exceeds two points in either direction, so a rule without ABS, or one that compares with `2` instead of `0.02`, also highlights nothing. Test the rule by typing `0.01` in B14: B15 then reads {{ g.one_n|count }}, and the rows of {{ g.one|join(', ') }} light up, the rises and the falls alike. Put `0.02` back.
@@ -100,7 +100,7 @@ d. In B15 count the product types over the threshold: `=SUMPRODUCT(--(ABS(I4:I11
 ## What a strong answer says
 
 - **Requirement (1).** A grid that ties to the Furniture total, with the item group as a criterion and a reason for it.
-- **Requirement (3).** A rule with ABS and an active cell stated, tested by lowering the threshold.
+- **Requirement (3).** A rule that tests the change in either direction, with ABS or an OR, and its active cell stated. A plus: the reason no row qualifies at two points, and the rule tested by lowering the threshold to one point, which highlights {{ g.one|join(', ') }}.
 - **Requirement (4).** Which types gained and lost, the size of the largest shifts, the conclusion that the mix moved modestly, and two reasons to prefer shares: the quantity field is not whole units, and shares do not need it. A strong student adds that shares of dollars still mix price and volume, which Chapter 6's bridge separates.
 
 A weak answer reads the unit counts as volume, or calls the mix shift large without a threshold.
@@ -120,7 +120,7 @@ A weak answer reads the unit counts as volume, or calls the mix shift large with
 |---|---:|---|---|
 | Requirement 1: the grid | 30 | SUMIFS with three criteria, a Total that ties | A grid without the ItemGroup criterion, or typed |
 | Requirement 2: shares | 20 | Shares and change in points, locked total row | Relative total row |
-| Requirement 3: the rule | 25 | Formula rule with ABS, tested | A rule that is not tested |
+| Requirement 3: the rule | 25 | A formula rule that highlights a change of more than two points in either direction (ABS, an OR, or two rules) | A rule for one direction only, or a threshold of 2 |
 | Requirement 4: the interpretation | 25 | Direction, size, modest shift, the quantity limit | Direction only |
 
 ## Extensions and discussion questions

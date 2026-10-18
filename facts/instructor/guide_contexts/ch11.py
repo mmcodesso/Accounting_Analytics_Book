@@ -115,6 +115,11 @@ def year_bounds(year: int) -> tuple[str, str]:
     return f"{year}-01-01", f"{year}-12-31"
 
 
+def month_label(month: str) -> str:
+    """'2026-01' as 'January 2026'."""
+    return f"{MONTHS[int(month[5:7]) - 1]} {month[:4]}"
+
+
 # the pieces of the monthly measure (Tutorial 11.3) and its variants
 OUTPUT = """MonthlyOutput AS (
     SELECT strftime('%Y-%m', pc.CompletionDate) AS Month,
@@ -231,6 +236,24 @@ def tutorial_111(d, claim) -> dict:
     lo, hi = year_bounds(d.C)
     ot_year = d.one("SELECT ROUND(SUM(OvertimeHours), 0) FROM LaborTimeEntry WHERE LaborType <> 'NonManufacturing' AND WorkDate BETWEEN ? AND ?", lo, hi)
     ot_year_all = d.one("SELECT ROUND(SUM(OvertimeHours), 0) FROM LaborTimeEntry WHERE WorkDate BETWEEN ? AND ?", lo, hi)
+    # Review F05: removing the LaborType filter from Step 2 changes the days with time and the overtime, and leaves the
+    # direct and indirect columns alone, because their CASE expressions still restrict those sums.
+    cols = """SELECT strftime('%Y-%m', WorkDate) AS m, COUNT(DISTINCT WorkDate),
+        SUM(CASE LaborType WHEN 'Direct Manufacturing' THEN RegularHours + OvertimeHours ELSE 0 END),
+        SUM(CASE LaborType WHEN 'Indirect Manufacturing' THEN RegularHours + OvertimeHours ELSE 0 END), SUM(OvertimeHours)
+        FROM LaborTimeEntry {where} GROUP BY m ORDER BY m"""
+    with_filter = d.q(cols.format(where="WHERE LaborType <> 'NonManufacturing'"))
+    without_filter = d.q(cols.format(where=""))
+    claim([r[0] for r in with_filter] == [r[0] for r in without_filter], "the pivot has the same months with and without the LaborType filter")
+    claim(all(abs(a[2] - b[2]) < 1e-6 and abs(a[3] - b[3]) < 1e-6 for a, b in zip(with_filter, without_filter)),
+          "without the LaborType filter the direct and indirect hours do not change, because their CASE expressions restrict them")
+    days_changed = [(a[0], a[1], b[1]) for a, b in zip(with_filter, without_filter) if a[1] != b[1]]
+    claim(0 < len(days_changed) < len(with_filter) and all(b > a for _, a, b in days_changed),
+          "without the LaborType filter some months, not all, gain days with time records")
+    claim(all(b[4] > a[4] for a, b in zip(with_filter, without_filter)), "without the LaborType filter every month gains overtime hours")
+    claim(days_changed[0][0] == with_filter[0][0], "the first month of the window is among those whose days with time records change")
+    last_year_first = next((c for c in days_changed if c[0][:4] == str(d.C)), None)
+    claim(last_year_first is not None, "some month of the last year gains a day with time records")
 
     last = d.one("SELECT MAX(WorkDate) FROM LaborTimeEntry")
     month_end, short = d.q("SELECT date(MAX(WorkDate), 'start of month', '+1 month', '-1 day'), julianday(date(MAX(WorkDate), 'start of month', '+1 month', '-1 day')) - julianday(MAX(WorkDate)) FROM LaborTimeEntry")[0]
@@ -277,6 +300,8 @@ def tutorial_111(d, claim) -> dict:
         broad_n=len(broad), n_months=len(pivot), first=pivot[0], quiet=quiet, quiet_low=min(q[3] for q in quiet),
         quiet_high=max(q[3] for q in quiet), zero_month=zero[0], days_last=pivot[-1][1], overtime_first=pivot[0][4],
         overtime_first_all=all_types[pivot[0][0]], ot_year=ot_year, ot_year_all=ot_year_all, last=last, month_end=month_end,
+        n_days_changed=len(days_changed), days_first=(month_label(days_changed[0][0]), days_changed[0][1], days_changed[0][2]),
+        days_year=(month_label(last_year_first[0]), last_year_first[1], last_year_first[2]),
         short=int(short), no_start=no_start, no_start_days=int(no_start_days), jan31=jan31, n_text=n_text, n_num=n_num,
         h1_low=min(h1), h1_high=max(h1), n_high=len(high), dips=dips, ind_low=min(ind), ind_high=max(ind), lead=lead)
 
@@ -471,6 +496,17 @@ def chapter(d, claim):
     claim(n_q == 15, "the chapter has fifteen multiple-choice questions (the key's rationales and the note's plans use their numbers)")
     peers = peers_demo(d, claim)
     n_close = d.one("SELECT COUNT(*) FROM JournalEntry WHERE EntryType LIKE 'Year-End Close%'")
+    # Review F06: the claim is about the five product-line revenue accounts, not every account typed Revenue.
+    pl_entries = d.q("""SELECT DISTINCT gl.VoucherNumber FROM GLEntry AS gl INNER JOIN Account AS a ON a.AccountID = gl.AccountID
+        WHERE a.AccountNumber IN (4010, 4020, 4030, 4040, 4080) AND gl.SourceDocumentType = 'JournalEntry' ORDER BY 1""")
+    pl_closes = [r[0] for r in pl_entries]
+    claim(len(pl_closes) == len(d.years) and rows(d, "SELECT 1 FROM JournalEntry WHERE EntryNumber IN (%s) AND EntryType LIKE 'Year-End Close%%'"
+                                                    % ",".join(f"'{c}'" for c in pl_closes)) == len(pl_closes),
+          "the only journal entries to the five product-line revenue accounts are year-end closes, one for each year of the window")
+    n_revenue_je = d.one("""SELECT COUNT(DISTINCT gl.VoucherNumber) FROM GLEntry AS gl INNER JOIN Account AS a ON a.AccountID = gl.AccountID
+        WHERE a.AccountType = 'Revenue' AND gl.SourceDocumentType = 'JournalEntry'""")
+    claim(n_revenue_je > len(pl_closes) and n_close > len(pl_closes),
+          "journal entries other than these three closes post to accounts typed Revenue, and the window has more closes than these three")
     month_end_entries = d.one("SELECT COUNT(*) FROM JournalEntry WHERE PostingDate = date(PostingDate, 'start of month', '+1 month', '-1 day')")
     claim(0 < month_end_entries < d.one("SELECT COUNT(*) FROM JournalEntry"), "some but not all journal entries are posted on a month-end")
     n_year_text = d.one("SELECT COUNT(*) FROM JournalEntry WHERE strftime('%Y', PostingDate) = ?", str(d.C))
@@ -478,7 +514,8 @@ def chapter(d, claim):
     claim(n_year_num == 0 < n_year_text, "a strftime year compared with a number finds no journal entries, and with text finds the year's")
     return dict(f=d.F, p=d.P, y=d.C, n=d.N, n_exercises=sum(ex.values()), per_perspective=ex.get("financial", 0), slides=slide_count(),
                 n_questions=n_q, longest_correct=and_list(longest), n_longest=len(longest), t1=t1, t2=t2, t3=t3, peers=peers,
-                n_year_text=n_year_text, n_year_num=n_year_num, month_end_entries=month_end_entries, n_close=n_close, version="3.13.1")
+                n_year_text=n_year_text, n_year_num=n_year_num, month_end_entries=month_end_entries, n_close=n_close,
+                pl_closes=pl_closes, n_pl_closes=len(pl_closes), n_revenue_je=n_revenue_je, version="3.13.1")
 
 
 # --- Exercise 11.1: the statements from the ledger ----------------------------------------------------------------------
@@ -564,10 +601,25 @@ def g1(d, claim):
           "the ledger rows after the as-of date are one kind of document, and the cash they credit is what the dropped date takes out of total assets")
     n_closes = len(d.closes)
     claim(n_closes > len(closes), "closing entries of other years exist besides the as-of date's two")
+    # Review F01: SQLite lets an ORDER BY stand inside a view, and the query that reads the view can sort the rows another way.
+    d.con.execute("CREATE TEMP VIEW ScratchSorted AS SELECT 2 AS x UNION ALL SELECT 1 ORDER BY x DESC")
+    try:
+        resorted = d.q("SELECT x FROM ScratchSorted ORDER BY x")
+    finally:
+        d.con.execute("DROP VIEW IF EXISTS temp.ScratchSorted")
+    claim(resorted == [(1,), (2,)], "an ORDER BY inside a view does not stop the query that reads the view from sorting the rows another way")
+    # Review F03: a common-size column over the stacked view must divide by net revenue, not by the sum of the view's amounts,
+    # because the view repeats its subtotals and holds the balance sheet lines as well.
+    ln = good["lines"]
+    oi = good["gm"] + ln["Operating expenses"]
+    le_total = ln["Current liabilities"] + ln["Long-term liabilities"] + good["equity"] + good["ni"]
+    view_sum = round(sum(ln.values()) + good["net_revenue"] + good["gm"] + oi + good["ni"] + good["assets"] + le_total, 2)
+    claim(view_sum > 5 * good["net_revenue"] and good["gm"] / view_sum < 0.2 * good["gm_pct"],
+          "the sum of every amount in the stacked view is many times net revenue, so dividing by it would understate every margin")
     return dict(n_closes=n_closes, asof=asof, credits=credits, p_asof=p_asof, p_ni=p_good["ni"], p_close=p_closes[-1], wrong_gm=wrong_gm, n_accounts=n_accounts, n_lines=good["n_lines"], other=other, closed_equity=in_["equity"], closed_ni=abs(in_["ni"]),
                 every_ni=every["ni"], late=late, nodate_assets=nodate["assets"], nodate_diff=round(good["assets"] - nodate["assets"], 2),
                 first_net_revenue=first["net_revenue"], first_n_lines=first["n_lines"], raw_assets=raw["assets"], retained=retained,
-                n_view_lines=17, n_contra_current=n_contra_current)
+                n_view_lines=17, n_contra_current=n_contra_current, view_sum=view_sum, wrong_gm_pct=good["gm"] / view_sum)
 
 
 # --- Exercise 11.2: monthly revenue ---------------------------------------------------------------------------------------
@@ -616,6 +668,13 @@ def g2(d, claim):
     filtered = d.q(f"""SELECT ROUND(LAG(Revenue) OVER (PARTITION BY ProductLine, FiscalPeriod ORDER BY FiscalYear), 2) FROM ({base})
         WHERE ProductLine = 'Furniture' AND FiscalYear = ?""", d.C)
     claim(all(f[0] is None for f in filtered) and len(filtered) == 12, "a year filter in the same SELECT as the LAG leaves every prior year NULL")
+    # Review F02: the same holds for a CTE that supplies the LAG with only the last year; the filter belongs after the LAG.
+    after = d.q(f"""SELECT PriorYear FROM (SELECT FiscalYear, LAG(Revenue) OVER (PARTITION BY ProductLine, FiscalPeriod ORDER BY FiscalYear) AS PriorYear
+        FROM ({base})) WHERE FiscalYear = ?""", d.C)
+    before = d.q(f"""SELECT PriorYear FROM (SELECT FiscalYear, LAG(Revenue) OVER (PARTITION BY ProductLine, FiscalPeriod ORDER BY FiscalYear) AS PriorYear
+        FROM ({base}) WHERE FiscalYear = ?)""", d.C)
+    claim(len(after) == len(before) == 5 * 12 and all(a[0] is not None for a in after) and all(b[0] is None for b in before),
+          "a year filter after the LAG keeps a prior year on every row of the last year, and the same filter before it, in the SELECT or in an earlier step, leaves every prior year NULL")
     n_num = d.one("SELECT COUNT(*) FROM GLEntry WHERE strftime('%Y', PostingDate) = ?", d.C)
     claim(n_num == 0, "a strftime year compared with a number finds no ledger rows")
     chg = [(m, r[("Furniture", d.C, m)][3], r[("Furniture", d.C, m)][4]) for m in range(1, 13)]
@@ -628,7 +687,7 @@ def g2(d, claim):
              f"{d.C}-12-31")[0][0]
     return dict(n_rows=n_rows, prev_month=prev_month, prev_month_sep=r[("Furniture", d.C, 9)][3], wrong_line=wrong_line, cum=cum[-1][1],
                 in_dec=in_dec[-1], n_num=n_num, tb=tb, oct_pct=(oct_now / oct_before - 1), down_month=MONTHS[rank_down - 1],
-                y=d.C, null_years=rows(d, f"SELECT 1 FROM ({base}) WHERE FiscalYear = {d.F}"))
+                y=d.C, null_years=rows(d, f"SELECT 1 FROM ({base}) WHERE FiscalYear = {d.F}"), n_last_year=len(after))
 
 
 # --- Exercise 11.3: ranking items ---------------------------------------------------------------------------------------
@@ -660,6 +719,10 @@ def g3(d, claim):
     low = d.q(f"""SELECT COUNT(*), SUM(UnitMargin = GroupLowest) FROM (SELECT UnitMargin,
         MIN(UnitMargin) OVER (PARTITION BY ItemGroup ORDER BY UnitMargin DESC) AS GroupLowest FROM ({MARGINS}))""")[0]
     claim(low[0] == low[1] == n, "a MIN over an ordered window runs only to the current row, so it reads the row's own margin on every item")
+    # Review F17: RANK and DENSE_RANK part at the rows after a tie as well as at the tie.
+    demo = d.q("WITH T(v) AS (VALUES (100), (90), (90), (80)) SELECT RANK() OVER w, DENSE_RANK() OVER w FROM T WINDOW w AS (ORDER BY v DESC)")
+    claim([r[0] for r in demo] == [1, 2, 2, 4] and [r[1] for r in demo] == [1, 2, 2, 3],
+          "over the values 100, 90, 90 and 80, RANK gives 1, 2, 2, 4 and DENSE_RANK gives 1, 2, 2, 3")
     whole = d.one(f"SELECT COUNT(DISTINCT m) FROM (SELECT MAX(UnitMargin) OVER () AS m FROM ({MARGINS}))")
     grouped = rows(d, f"SELECT ItemGroup, MAX(UnitMargin) FROM ({MARGINS}) GROUP BY ItemGroup")
     claim(whole == 1 and grouped < n, "a window with no partition returns one value on every row, and GROUP BY collapses the items")
@@ -701,6 +764,14 @@ def g4(d, claim):
     claim(len({round(r[2], 6) for r in ranked}) == len(ranked), "no two employees have the same overtime total")
     ties = d.one(f"SELECT SUM(a <> b) FROM (SELECT SUM(OT) OVER (ORDER BY OT DESC ROWS UNBOUNDED PRECEDING) AS a, SUM(OT) OVER (ORDER BY OT DESC) AS b FROM ({good}))")
     claim(ties == 0, "with no ties, the default window and ROWS UNBOUNDED PRECEDING give the same running total")
+    # Review F07: peers are the rows tied on every ORDER BY term, so a unique tie-breaker leaves none, whatever the totals.
+    fixture = "WITH T(EmployeeID, OT) AS (VALUES (1, 30.0), (2, 20.0), (3, 20.0), (4, 10.0)) "
+    differ_unique = d.one(fixture + "SELECT SUM(a <> b) FROM (SELECT SUM(OT) OVER (ORDER BY OT DESC, EmployeeID ROWS UNBOUNDED PRECEDING) AS a, "
+                                    "SUM(OT) OVER (ORDER BY OT DESC, EmployeeID) AS b FROM T)")
+    differ_tied = d.one(fixture + "SELECT SUM(a <> b) FROM (SELECT SUM(OT) OVER (ORDER BY OT DESC ROWS UNBOUNDED PRECEDING) AS a, "
+                                  "SUM(OT) OVER (ORDER BY OT DESC) AS b FROM T)")
+    claim(differ_unique == 0 and differ_tied == 1,
+          "with two equal totals, the default window and ROWS UNBOUNDED PRECEDING agree when EmployeeID breaks the tie and differ when the order is the total alone")
     asc = d.q(f"SELECT SUM(OT) OVER (ORDER BY OT ROWS UNBOUNDED PRECEDING) / SUM(OT) OVER () FROM ({good}) ORDER BY OT")
     asc_half = next(i for i, r in enumerate(asc, 1) if r[0] >= 0.5)
     claim(asc_half == half + 1, "ordered from the lowest, one more employee is needed to reach half")

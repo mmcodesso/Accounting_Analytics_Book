@@ -375,8 +375,9 @@ def if_10_5_a() -> Diagram:
     _note(d, f"Outlined: SourceDocumentID. The {_word(len(rows))} rows are {_word(len(rows) // 2)} pairs of {_money(ex['amount'])}, a "
              f"debit \"{rows[0][5]}\" and a credit \"{rows[1][5]}\", posted on {_date(rows[0][1])}, {_date(rows[2][1])} and "
              f"{_date(rows[4][1])}. They name payroll payments {docs[0]}, {docs[1]} and {docs[2]}, which are not in "
-             f"PayrollPayment. This is an integrity failure: the database declares no foreign keys, so nothing stopped "
-             f"these rows from naming a payment that is not there.", mock["bottom"])
+             f"PayrollPayment, a referential-integrity failure in the extract. The query does not show how the rows "
+             f"arose, and a reference whose table depends on its source type needs a test that reads the type, which "
+             f"one ordinary foreign key cannot do.", mock["bottom"])
     return d
 
 
@@ -393,7 +394,7 @@ def if_10_6_a() -> Diagram:
     assert joined == ex["fan"] == g["one_n"] == g["inv_n"] * g["pay_n"], (joined, g["inv_n"], g["pay_n"])
     db.emphasize_cells(d, mock["geometry"], [(-1, 0), (0, 0)])
     _note(d, f"Outlined: {joined:,} rows, which is {g['inv_n']:,} invoices times {g['pay_n']:,} payments of supplier "
-             f"{ex['first']}: the two tables share only SupplierID, so every invoice meets every payment. Summing "
+             f"{ex['first']}. This query joins on SupplierID alone, so every invoice meets every payment. Summing "
              f"GrandTotal over this join gives {_money(g['one_total'])} where the invoices total {_money(g['inv_total'])}. "
              f"Total each table on its own, then join the totals.", mock["bottom"])
     return d
@@ -413,18 +414,28 @@ def if_10_0_a() -> Diagram:
     t1, ex1, ex2, g3 = ch["t1"], ctx.values("ch10.ex1"), ctx.values("ch10.ex2"), ctx.values("ch10.g3")
     ex3, ex6, g5, g6 = ctx.values("ch10.ex3"), ctx.values("ch10.ex6"), ctx.values("ch10.g5"), ctx.values("ch10.g6")
     d = Diagram("Choosing the Join or the Summary")
+    lo, hi = f"{ctx.data().C}-01-01", f"{ctx.data().C}-12-31"
+    ungrouped, items = ctx.data().q(
+        "SELECT COUNT(*), COUNT(DISTINCT i.ItemID) FROM Item i LEFT JOIN WorkOrder wo ON wo.ItemID = i.ItemID "
+        "LEFT JOIN WorkOrderClose woc ON woc.WorkOrderID = wo.WorkOrderID AND woc.CloseDate BETWEEN ? AND ? "
+        "WHERE i.SupplyMode = 'Manufactured'", lo, hi)[0]
+    assert items == t1["step6_on"] and ungrouped > 10 * items, (ungrouped, items)   # a row for each work order
     rows = [
         ("Only the rows that match in both tables", "Each close with its work order and item",
          "INNER JOIN on the logical key",
          "For the ledger, name SourceDocumentType and SourceDocumentID in ON.",
-         f"the join returns as many rows as the child table: {t1['n_close']:,} closes after each join, "
-         f"{ex1['rows']:,} invoice lines in Exercise 10.1.",
+         f"joined to a unique parent key, each child row matches once, so the join returns as many rows as the "
+         f"child table: {t1['n_close']:,} closes after each join, {ex1['rows']:,} invoice lines in Exercise 10.1. "
+         f"Check the key and trace a sample row as well.",
          ("Tutorial 10.1, Steps 1 and 2", "Exercises 10.1 (1) and 10.2 (1)")),
         ("Every row of the first table, matched or not", "Every manufactured item, with its closes if it has any",
          "LEFT JOIN",
-         "A condition on the second table goes in ON; in WHERE it turns the join back into an inner join.",
-         f"the rows equal the first table's: {t1['step6_on']} items with the date in ON, {t1['step6_where']} with it "
-         f"in WHERE.",
+         "A condition that limits the second table's matches, such as the close-date range, goes in ON. In WHERE it "
+         "drops the unmatched rows, as an inner join would. The anti-join's IS NULL test is the exception and stays "
+         "in WHERE.",
+         f"after GROUP BY ItemID, one row per manufactured item: {t1['step6_on']} with the date in ON, "
+         f"{t1['step6_where']} with it in WHERE. Before grouping, the join returns a row for each of the items' work "
+         f"orders, many more rows than items.",
          ("Tutorial 10.1, Step 6",)),
         ("Only the rows of the first table that match nothing", "Ledger rows with no payroll payment",
          "Anti-join: LEFT JOIN, then IS NULL on the second table's key",

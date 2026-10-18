@@ -30,13 +30,13 @@ By the end, students can:
 
 ## How to run it
 
-Individual, about 90 minutes: 15 on requirement 1, 20 on requirement 2, 15 on requirement 3, 20 on requirement 4 and 20 on the profile. Hold back the two-condition FILTER until a student's median is the same in every row. Collect the workbook and the profile.
+Individual, about 90 minutes: 15 on requirement 1, 20 on requirement 2, 15 on requirement 3, 20 on requirement 4 and 20 on the profile. The task prints the two-condition FILTER. Before students use it, ask them to explain why the two conditions are multiplied and what a median that is the same in every row would mean. Collect the workbook and the profile.
 
 ## Step-by-step solution
 
 ### Requirement (1): Statistics by item group
 
-**Step 1. Build the table.** On `Ex 6.6`, list the five item groups from row 5. For each group enter the count, the total, the average and the median, and add a total row.
+**Step 1. Build the table.** On `Ex 6.6`, list the five item groups from row 5. For each group enter the count, the total, the average and the median. In the total row sum the counts and the revenues, divide the total revenue by the total number of lines for the overall average, and take the overall median from all of the year's lines. Do not sum the group averages or medians, and do not average the five averages without weights.
 
 ```
 =COUNTIFS(InvoiceLines[ItemGroup],$A5,InvoiceLines[FiscalYear],2026)
@@ -57,15 +57,25 @@ Individual, about 90 minutes: 15 on requirement 1, 20 on requirement 2, 15 on re
 
 ### Requirement (3): Pricing methods
 
-**Step 4. Build the pricing PivotTable.** Insert a PivotTable with FiscalYear in **Filters**, PricingMethod in **Rows**, ItemGroup in **Columns**, and SalesInvoiceLineID (as a count), LineTotal and LineTotal as **% of Grand Total** in **Values**.
+**Step 4. Build the pricing PivotTable.** Insert a PivotTable with FiscalYear in **Filters**, PricingMethod in **Rows**, ItemGroup in **Columns**, and SalesInvoiceLineID (as a count), LineTotal and LineTotal as **% of Grand Total** in **Values**. After placing FiscalYear in **Filters**, select 2026 explicitly, because a new PivotTable does not inherit another PivotTable's selection.
 
-**Check:** Segment Price List 83.6% of revenue (8,405 lines); Customer Price List 10.7% of revenue (816 lines); Base List 4.1% of revenue (144 lines); Approved Override 1.6% of revenue (157 lines). **Watch for:** the count field summed. SalesInvoiceLineID is a number, so Excel sums it until it is changed to **Count**. The base list prices only the hourly design services.
+**Check:** the count totals 9,522 and the revenue $29,756,420.08. Segment Price List 83.6% of revenue (8,405 lines); Customer Price List 10.7% of revenue (816 lines); Base List 4.1% of revenue (144 lines); Approved Override 1.6% of revenue (157 lines). **Watch for:** the count field summed. SalesInvoiceLineID is a number, so Excel sums it until it is changed to **Count**. The base list prices only the hourly design services.
 
 ### Requirement (4): Promotions
 
-**Step 5. Build the promotion PivotTable.** Insert a PivotTable with FiscalYear in **Filters**, PromotionID in **Rows**, and the count of lines and the sum of DiscountAmount in **Values**.
+**Step 5. Build the promotion PivotTable.** Insert a PivotTable with FiscalYear in **Filters**, PromotionID in **Rows**, and the count of lines and the sum of DiscountAmount in **Values**. Select 2026 in the filter explicitly.
 
-**Step 6. Share and dates.** Next to it calculate each group's promotion lines over its lines (for example `=COUNTIFS(InvoiceLines[ItemGroup],$A57,InvoiceLines[FiscalYear],2026,InvoiceLines[PromotionID],"<>")`), and look up each promotion's name and dates from PromotionProgram to see which ran in the year before.
+**Check:** the counts add up to 9,522 lines, 796 with a promotion and 8,726 in the (blank) row.
+
+**Step 6. Share and dates.** Next to it calculate each group's promotion lines over its lines, as one formula (here for the group named in A57, with a line break only for reading), and format it as a percentage. Look up each promotion's name and dates from PromotionProgram to see which ran in the year before.
+
+```
+=COUNTIFS(InvoiceLines[ItemGroup],$A57,InvoiceLines[FiscalYear],2026,
+          InvoiceLines[PromotionID],"<>")
+ /COUNTIFS(InvoiceLines[ItemGroup],$A57,InvoiceLines[FiscalYear],2026)
+```
+
+The controls are Furniture 695 of 3,496, Lighting 38 of 2,496, Textiles 28 of 1,359, Accessories 35 of 2,027, Services 0 of 144 lines.
 
 **Check:** promotions 5 (10 lines, $662.89); 6 (54 lines, $6,858.14); 7 (68 lines, $30,478.57); 8 (576 lines, $296,053.58); 9 (88 lines, $28,057.57). Promotion lines as a share of each group's lines: Furniture 19.9%, Textiles 2.1%, Accessories 1.7%, Lighting 1.5%, Services 0.0%. The promotions of the year before are 5 (Textiles, September to October 2025) and 6 (Wholesale, November 2025), invoiced from January to March. **Watch for:** a promotion with no lines in the year left out of the lookup, and the blank row (8,726 lines) read as missing data. It means no promotion.
 
@@ -93,6 +103,8 @@ Individual, about 90 minutes: 15 on requirement 1, 20 on requirement 2, 15 on re
 - **Pricing.** Segment price lists carry most of the revenue, and approved overrides, the one manual path, are small.
 - **Matters for the audit.** Discounts are billed after promotions ended, one promotion's dates are inconsistent, and overrides are natural targets. The profile names them as questions, not conclusions.
 
+**A plus, not required.** Each paragraph tied to a number from the summaries.
+
 A weak profile repeats the PivotTable values without reading them, or states findings the data cannot show.
 
 ## Common mistakes and how to respond
@@ -111,7 +123,7 @@ A weak profile repeats the PivotTable values without reading them, or states fin
 | Requirement 2: customers | 20 | By CustomerID, names looked up, top five and ten shares | By name, or no shares |
 | Requirement 3: pricing | 15 | Counts and shares by method and group | Revenue only |
 | Requirement 4: promotions | 20 | Counts, discounts, group shares, late promotions named | One part missing |
-| Requirement 5: the profile | 25 | Population, concentration, pricing and audit matters, each tied to a number | Descriptive only |
+| Requirement 5: the profile | 25 | Population, concentration, pricing and audit matters | Descriptive only |
 
 ## Extensions and discussion questions
 

@@ -207,6 +207,10 @@ def above_zero(name: str, f: dict) -> dict:
                                                                  "Right": {"Literal": {"Value": "0D"}}}}}]}}
 
 
+# a table visual with its total row off: a sum of year-end comparisons would mean nothing (U24, item 7)
+NO_TOTAL = {"total": [{"properties": {"totals": lit(False)}}]}
+
+
 def by_year(column: str, years: list[int]) -> str:
     """SWITCH on the year in the filter context: the workbook's column of that year-end (Recorded2026, ...)."""
     cases = ",\n".join(f"    {y}, SUM ( WorkingTB[{column}{y}] )" for y in years)
@@ -345,7 +349,9 @@ def r2(b: Build) -> None:
                                       'GLEntry[SourceDocumentType] <> "JournalEntry" ) + 0', COUNT,
               "Postings from a source document (anything but a journal entry).")
     b.measure(S, "Journal Entries Only", "IF ( [Postings] > 0 && [Document Postings] = 0, 1, 0 )", COUNT,
-              "1 when every posting to the account is a journal entry: a balance no source document supports.")
+              "1 when every GL posting to the account has SourceDocumentType JournalEntry. It shows how the balance was "
+              "posted, not whether records outside the ledger support it (the property and debt records support the "
+              "equipment and the notes).")
     b.measure(V, "Trial Balance Accounts", "COUNTROWS ( FILTER ( VALUES ( Account[AccountNumber] ), NOT ISBLANK ( [Balance] ) ) )",
               COUNT, "Accounts with postings on or before the as-of date (the rows of Requirement 1's trial balance).")
     b.measure(V, "Accounts at Zero", "COUNTROWS ( FILTER ( VALUES ( Account[AccountNumber] ), VAR B = [Balance] RETURN "
@@ -707,20 +713,25 @@ def r6(b: Build) -> None:
               "The workbook's adjusted balance (WorkingTB) at the year-end in the filter context.")
     b.measure(P6, "Workbook Adjusted Net Income", f"- CALCULATE ( [Workbook Adjusted Balance], WorkingTB[AccountType] IN {PL} )",
               MONEY, "Net income from the workbook's adjusted trial balance: its revenue and expense accounts, sign reversed.")
-    b.measure(P6, "Net Income Difference", "ROUND ( [Adjusted Net Income] - [Workbook Adjusted Net Income], 2 )", MONEY,
-              "Adjusted net income in this file less the workbook's: zero when they agree.")
+    one = ("One year-end at a time: blank unless one year is in the filter context, so a total row compares "
+           "nothing.")
+    b.measure(P6, "Net Income Difference", "IF ( HASONEVALUE ( 'Date'[Year] ), ROUND ( [Adjusted Net Income] - "
+                                           "[Workbook Adjusted Net Income], 2 ) )", MONEY,
+              "Adjusted net income in this file less the workbook's: zero when they agree. " + one)
     b.measure(P6, "Workbook Recorded Total Assets", 'CALCULATE ( [Workbook Recorded Balance], WorkingTB[AccountType] = "Asset" )',
               MONEY, "Total assets of the workbook's trial balance at the year-end in the filter context.")
-    b.measure(P6, "Total Assets Difference", "ROUND ( [Total Assets] - [Workbook Recorded Total Assets], 2 )", MONEY,
-              "Total assets from the ledger less the workbook's trial balance: zero when they agree.")
-    b.measure(P6, "Accounts Disagreeing", "COUNTROWS ( FILTER ( VALUES ( WorkingTB[AccountNumber] ), "
-                                          "ABS ( [Balance] - [Workbook Recorded Balance] ) > 0.005 ) ) + 0", COUNT,
-              "Accounts whose ledger balance at the year-end differs from the workbook's trial balance.")
-    b.measure(P6, "Adjusted Accounts Disagreeing", "COUNTROWS ( FILTER ( VALUES ( WorkingTB[AccountNumber] ), ABS ( "
-                                                   "[Balance] + [Adjustment Amount] - [Workbook Adjusted Balance] ) "
-                                                   "> 0.005 ) ) + 0", COUNT,
+    b.measure(P6, "Total Assets Difference", "IF ( HASONEVALUE ( 'Date'[Year] ), ROUND ( [Total Assets] - "
+                                             "[Workbook Recorded Total Assets], 2 ) )", MONEY,
+              "Total assets from the ledger less the workbook's trial balance: zero when they agree. " + one)
+    b.measure(P6, "Accounts Disagreeing", "IF ( HASONEVALUE ( 'Date'[Year] ), COUNTROWS ( FILTER ( VALUES ( "
+                                          "WorkingTB[AccountNumber] ), ABS ( [Balance] - [Workbook Recorded Balance] ) "
+                                          "> 0.005 ) ) + 0 )", COUNT,
+              "Accounts whose ledger balance at the year-end differs from the workbook's trial balance. " + one)
+    b.measure(P6, "Adjusted Accounts Disagreeing", "IF ( HASONEVALUE ( 'Date'[Year] ), COUNTROWS ( FILTER ( VALUES ( "
+                                                   "WorkingTB[AccountNumber] ), ABS ( [Balance] + [Adjustment Amount] - "
+                                                   "[Workbook Adjusted Balance] ) > 0.005 ) ) + 0 )", COUNT,
               "Accounts whose ledger balance plus the adjustment lines at the year-end differs from the workbook's "
-              "adjusted trial balance: the totals can agree while two accounts are off by the same amount.")
+              "adjusted trial balance: the totals can agree while two accounts are off by the same amount. " + one)
     b.measure(P6, "Adjusted Total Assets", 'CALCULATE ( [Balance] + [Adjustment Amount], Account[AccountType] = "Asset" )',
               MONEY, "Total assets after the adjustment lines at the year-end in the filter context.")
 
@@ -737,11 +748,11 @@ def r6(b: Build) -> None:
         yr, M("Adjusted Net Income"), M("Workbook Adjusted Net Income"), M("Net Income Difference"),
         M("Adjusted Accounts Disagreeing")]},
         title="Adjusted net income: the ledger plus the adjustment lines, against the workbook",
-        filters=[keep("agreeYears", yr, [P, C])]))
+        filters=[keep("agreeYears", yr, [P, C])], objects=NO_TOTAL))
     page.add(Visual("assetTable", "tableEx", 600, 360, 660, 190, {"Values": [
         yr, M("Total Assets"), M("Workbook Recorded Total Assets"), M("Total Assets Difference"), M("Accounts Disagreeing"),
         M("Adjusted Total Assets")]}, title="Recorded total assets: the ledger against the workbook's trial balances",
-        filters=[keep("assetYears", yr, years)]))
+        filters=[keep("assetYears", yr, years)], objects=NO_TOTAL))
     pl_types = ["Revenue", "Expense"]
     page.add(Visual("incomeMatrix", "pivotTable", 20, 570, 760, 330, {
         "Rows": [col("WorkingTB", "StatementLine")], "Columns": [yr], "Values": [M("Adjusted P&L Amount")]},
@@ -829,6 +840,11 @@ def r6(b: Build) -> None:
                 f"CALCULATE ( [Adjusted Accounts Disagreeing], {cy} )", 0)
     b.check(s, f"the workbook's adjusted trial balance at {ch17.ye(C)} balances", 0,
             f"ROUND ( SUM ( WorkingTB[Adjusted{C}] ), 2 )")
+    # the comparisons are defined for one year-end at a time: with no year, or several, they return blank (U24, item 7)
+    b.check(s, "comparisons with no single year-end in the filter context (blank)", 1,
+            "IF ( ISBLANK ( CALCULATE ( [Net Income Difference], REMOVEFILTERS ( 'Date' ) ) ) && ISBLANK ( CALCULATE ( "
+            "[Total Assets Difference], REMOVEFILTERS ( 'Date' ) ) ) && ISBLANK ( CALCULATE ( [Accounts Disagreeing], "
+            "REMOVEFILTERS ( 'Date' ) ) ), 1, 0 )", 0)
 
 
 # --- Milestone 3: the statements' totals the Review file reproduces --------------------------------------------------

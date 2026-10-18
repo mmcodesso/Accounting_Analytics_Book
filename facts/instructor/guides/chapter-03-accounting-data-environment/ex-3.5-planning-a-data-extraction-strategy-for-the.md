@@ -25,7 +25,7 @@ The first technical decision in an audit that uses data is what to extract. This
 
 By the end, students can:
 
-- choose the table group, the tables and the population for a procedure (chapter outcome 5);
+- choose the table group, the tables and the population for a procedure (outcome 5);
 - name the keys that connect them, and the direction in which a completeness test must run (outcomes 2 and 4);
 - explain how a journal entry reaches its ledger rows when GLEntry has no JournalEntryID (outcome 6);
 - say which columns sit in which table, and so which table each filter must read;
@@ -53,13 +53,13 @@ Individual work, followed by a pair swap in which each student critiques a class
 
 **Check:** the plan names the three keys and the amount, and says that a valid customer and a valid item are tests of the keys (orphan tests, as in Exercise 3.6).
 
-**Step 2. Test that each invoice reached the ledger.** Filter GLEntry for SourceDocumentType SalesInvoice and join its SourceDocumentID to SalesInvoice.SalesInvoiceID. The model result: {{ unposted }} invoices have no ledger rows, and no ledger row of the type names a missing invoice. The control total is the invoice's SubTotal against the revenue credits of its rows.
+**Step 2. Test that each invoice reached the ledger.** Filter GLEntry for SourceDocumentType SalesInvoice and join its SourceDocumentID to SalesInvoice.SalesInvoiceID. The model result: {{ unposted }} invoices have no ledger rows, and no ledger row of the type names a missing invoice. The control totals are per invoice: SubTotal against the credits to the revenue accounts other than {{ freight_acct }} Freight Revenue, FreightAmount against the {{ freight_acct }} credit, TaxAmount against the {{ tax_acct }} Sales Tax Payable credit and GrandTotal against the {{ ar_acct }} Accounts Receivable debit. All four agree on every invoice. The revenue credits in all are SubTotal plus FreightAmount, so on the {{ freight_invoices|count }} invoices with freight they exceed SubTotal.
 
 **Check:** the type and the key are used together. **Watch for:** SourceDocumentID without the type.
 
 **Step 3. Explain why that test is not enough, and name an independent population.** The posting test starts from invoices that exist. A sale that was never invoiced has no row in SalesInvoice, so no test that starts there can find it. Completeness needs a population of events from outside the invoices.
 
-- *Goods.* Shipment and ShipmentLine: join ShipmentLine to SalesInvoiceLine on ShipmentLineID and keep the shipment lines with no match. The model result is {{ n_uninvoiced }} of {{ shipped|count }} shipment lines, all shipped in the last month of shipments (the last shipment is dated {{ last_ship }}):
+- *Goods.* Shipment and ShipmentLine: join ShipmentLine to SalesInvoiceLine on ShipmentLineID and keep the shipment lines with no match. The model result is {{ n_uninvoiced }} of {{ shipped|count }} shipment lines, all shipped in the last month of shipments (the last shipment is dated {{ last_ship }}). They are candidates for the cutoff test, to investigate against the terms, the delivery and the billing before they are called omitted revenue:
 
 | Shipment | Shipped | Standard cost |
 |---|---|---:|
@@ -67,8 +67,8 @@ Individual work, followed by a pair swap in which each student critiques a class
 | {{ r[0] }} | {{ r[1] }} | ${{ r[2]|money }} |
 {% endfor %}
 
-- *Design services.* The invoice lines with no shipment line are the {{ service_lines|count }} service billing lines. The independent population is ServiceTimeEntry: its billable hours ({{ hours|num(2) }}) equal the hours billed on ServiceBillingLine.
-- *Orders.* SalesOrder is a third population, a commitment that should end in an invoice.
+- *Design services.* The invoice lines with no shipment line are the {{ service_lines|count }} service billing lines. The independent population is ServiceTimeEntry: its billable hours ({{ hours|num(2) }}) equal the hours billed on ServiceBillingLine, and they also agree for each engagement and month, which matters because equal grand totals can hide errors that offset.
+- *Orders.* SalesOrder is a third population, a cross-check rather than proof: an order should end in an invoice once it is fulfilled. The {{ n_no_invoice }} orders with no invoice are {% for o in no_invoice %}{{ o.n }} {{ o.status }}{{ ' and ' if not loop.last else '' }}{% endfor %}, so their fulfillment, terms and cutoff are what to check.
 
 {{ figure('IF-03-5-A') }}
 
@@ -100,17 +100,17 @@ Individual work, followed by a pair swap in which each student critiques a class
 | Question | Columns in JournalEntry | Columns in GLEntry or Employee |
 |---|---|---|
 | Who | CreatedByEmployeeID, ApprovedByEmployeeID | Employee: JobTitle and MaxApprovalAmount of the approver |
-| When | CreatedDate, PostingDate, ApprovedDate | PostingDate, CreatedDate (repeating the entry's) |
+| When | CreatedDate, PostingDate, ApprovedDate | PostingDate; GLEntry's own CreatedDate, a system value kept apart |
 | How much | TotalAmount | Debit and Credit of each line |
 | What | EntryType, Description | AccountID, CostCenterID and the line's Description |
 
-**Check:** the entry-level filters (who, when, how much in total, what kind) read JournalEntry, and the line-level ones (which account, which cost center) read GLEntry. A filter on the approver's limit needs Employee. **Watch for:** GLEntry's own CreatedByEmployeeID and CreatedDate used as the preparer's. For these rows they repeat the entry's, but for other types they are system values.
+**Check:** the entry-level filters (who, when, how much in total, what kind) read JournalEntry: CreatedByEmployeeID and CreatedDate for the preparer and the creation time, ApprovedByEmployeeID and ApprovedDate for the approval. The line-level ones (which account, which cost center, debit and credit) read GLEntry, and PostingDate gives the accounting date, not the time of posting. A filter on the approver's limit needs Employee, joined twice when both the creator's and the approver's attributes are needed. **Watch for:** GLEntry's own CreatedByEmployeeID and CreatedDate used as the preparer's. For these rows CreatedByEmployeeID repeats the entry's creator, but CreatedDate differs from the entry's on {{ je_created_rows|count }} rows of {{ je_created_entries }} entries, and for other types both are system values. Keep GLEntry.CreatedDate apart, and ask about the differences.
 
 ### Requirement (4): Write the plan
 
-**Step 8. Write one to two pages.** A model plan has a table for each procedure with these rows: objective; population (table and filter); tables joined and the keys; period; direction of the test; controls; known limits. For example, for the journal entries: population JournalEntry in the period; joined to GLEntry on type and key and to Employee on the approver; controls that the count of entries and the sum of TotalAmount agree with the debits of the ledger rows; limits that GLEntry's creator column is not the preparer.
+**Step 8. Write one to two pages.** The requirement asks for the selections, the tables and the relationships of each procedure. A model plan goes further, with a table for each procedure with these rows: objective; population (table and filter); tables joined and the keys; period; direction of the test; controls; known limits. For example, for the journal entries: population JournalEntry in the period; joined to GLEntry on type and key and to Employee on the approver; controls that the number of JournalEntry headers equals the number of distinct SourceDocumentIDs of type JournalEntry, and, separately, that the sums of TotalAmount, Debit and Credit agree; limits that GLEntry's creator column is not the preparer. The plan is a plan: it needs neither queries nor the guide's exception counts.
 
-**Check:** each procedure has a population, keys, a control total and a limit, and the plan asks for only the tables it needs.
+**Check:** each procedure has its tables, keys and relationships, and the plan asks for only the tables it needs. A population, a control total and a limit for each are a plus.
 
 ## Expected results
 
@@ -129,7 +129,7 @@ Individual work, followed by a pair swap in which each student critiques a class
 - **Requirement (1).** The tables and keys of the invoice population, the posting test through the type and key, the reason it falls short, and an independent population from shipments, service time and orders.
 - **Requirement (2).** The line-level keys, the comparisons, and the gaps: no receipt price, parts, and lines with no order line.
 - **Requirement (3).** The two tables, the logical link with its two columns, and the columns sorted by the table that holds them.
-- **Requirement (4).** A plan with populations, keys, direction, controls and limits.
+- **Requirement (4).** A plan with the tables and keys of each procedure. Populations, the direction of each test, controls and limits are a plus.
 
 A weak answer names tables with no keys, tests completeness from the invoices, joins headers instead of lines, or says to extract everything.
 
@@ -150,7 +150,7 @@ A weak answer names tables with no keys, tests completeness from the invoices, j
 | Requirement 1: revenue completeness | 30 | Tables and keys, the posting test, the reversed direction and an independent population | Tables without the direction |
 | Requirement 2: the three-way match | 25 | Line-level keys, the comparisons and at least two gaps | Keys without gaps |
 | Requirement 3: the journal entries | 25 | The two tables, the logical link and the columns sorted | The tables without the link |
-| Requirement 4: the plan | 20 | A table for each procedure with controls and limits | A narrative without controls |
+| Requirement 4: the plan | 20 | The selections, tables and relationships of all three procedures, organized for a reader | A plan that leaves out a procedure or its relationships |
 
 ## Extensions and discussion questions
 

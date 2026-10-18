@@ -12,7 +12,7 @@ a. Open the file CharlesRiver.xlsx in Excel.
 b. Click through several worksheet tabs at the bottom of the screen and note the variety of table names, from Customer and SalesOrder through WorkOrder and PayrollRegister.
 c. Use @tbl-01-03 to match the worksheets you see to their table groups.
 
-The workbook contains a large number of worksheets, each representing one table in the Charles River database and arranged by table group.
+The workbook contains a large number of worksheets, each representing one table in the Charles River database. Their order follows the business cycles only roughly, and some master data tables, such as Item and Employee, sit among them, so a worksheet's position does not tell you its group.
 
 **Step 2. Explore the Customer worksheet.**
 
@@ -46,7 +46,7 @@ This table contains the individual debit and credit entries that make up the gen
 
 Notice that the database contains far more than sales and accounting data. Work orders track production with columns for the item produced, the planned quantity, the released, due, and completed dates, and the status. Payroll registers record each employee's pay for a period with columns for gross pay, employee withholdings, employer taxes and benefits, and net pay. These table groups will become important in the SQL and Power BI parts of the book.
 
-**Checkpoint.** At this point, you should have examined worksheets from at least four table groups (Order-to-Cash, Master Data, Accounting Core, and either Manufacturing or Payroll and Time). You should be able to answer the following questions:
+**Checkpoint.** At this point, you should have examined worksheets from five table groups (Order-to-Cash, Master Data, Accounting Core, Manufacturing, and Payroll and Time). You should be able to answer the following questions:
 
 - Which four product groups make up the finished goods that Charles River sells? (Furniture, Lighting, Textiles, and Accessories.)
 - Which columns in GLEntry trace each entry back to its source document? (SourceDocumentType, which identifies the kind of document, together with SourceDocumentID, which identifies the specific document, and SourceLineID, which identifies the line when the posting comes from a single line.)

@@ -81,14 +81,15 @@ d. Drag Amount to the **Values** area again, open its **Value Field Settings**, 
 
 **Step 5. Compute the days after the due date.** In the Payments Table add `DaysAfterDue` with `=[@PaymentDate]-[@DueDate]` and format it as a whole number. Excel shows the difference of two dates as a date until you do.
 
-**Step 6. Count and summarize.** Put the year in a cell and use it in each formula, so the table can be rerun for another year.
+**Step 6. Count and summarize.** In the model answer, type `Fiscal year` in E29 and `{{ d.C }}` in F29, below the category PivotTable, and use `$F$29` in every timing formula, so the table can be rerun for another year. With another layout, change every year reference consistently.
 
 ```
-=COUNTIFS(Payments[FiscalYear],F21,Payments[DaysAfterDue],"<0")
-=COUNTIFS(Payments[FiscalYear],F21,Payments[DaysAfterDue],0)
-=COUNTIFS(Payments[FiscalYear],F21,Payments[DaysAfterDue],">0")
-=MEDIAN(FILTER(Payments[DaysAfterDue],Payments[FiscalYear]=F21))
-=AVERAGEIFS(Payments[DaysAfterDue],Payments[FiscalYear],F21)
+=COUNTIFS(Payments[FiscalYear],$F$29,Payments[DaysAfterDue],"<0")
+=COUNTIFS(Payments[FiscalYear],$F$29,Payments[DaysAfterDue],0)
+=COUNTIFS(Payments[FiscalYear],$F$29,Payments[DaysAfterDue],">0")
+=MEDIAN(FILTER(Payments[DaysAfterDue],Payments[FiscalYear]=$F$29))
+=AVERAGEIFS(Payments[DaysAfterDue],Payments[FiscalYear],$F$29)
+=COUNTIFS(Payments[FiscalYear],$F$29,Payments[DaysAfterDue],">30")
 ```
 
 **Check:** {{ before|count }} before the due date, {{ on|count }} on it and {{ after|count }} after, {{ after_share|pct(1) }} by count and {{ after_value|pct(1) }} by value; the median is {{ median|num(0) }} days after, the mean {{ mean|num(1) }}, and {{ late30|count }} payments are more than 30 days late. **Watch for:** the year criterion left out of a COUNTIFS, which counts all {{ g.allyears.n|count }} payments.
@@ -116,7 +117,7 @@ d. Drag Amount to the **Values** area again, open its **Value Field Settings**, 
 ## What a strong answer says
 
 - **Requirement (2).** The three marks read as concentration in dollars, with the largest supplier's share, and the finding that spending is spread across suppliers and weighted by category, which dollars alone do not turn into a measure of dependence.
-- **Requirement (4).** Both findings in the first paragraph, with numbers. The gains and losses of paying late (cash kept longer; late fees, credit holds, worse prices, strained relationships) and of paying early (cash used sooner, a free loan to the supplier without a discount), and a recommendation to schedule runs by due date and to find out why payments are late.
+- **Requirement (4).** Both findings in the first paragraph, with numbers. The gains and losses of paying late (cash kept longer; late fees, credit holds, worse prices, strained relationships) and of paying early (cash used sooner, a free loan to the supplier without a discount). As a plus, a recommendation to schedule runs by due date and to find out why payments are late.
 
 A weak answer calls the company healthy because it pays late, or concentrated because a category is large.
 
@@ -128,7 +129,7 @@ A weak answer calls the company healthy because it pays late, or concentrated be
 - **Days as a date.** *Symptom:* DaysAfterDue shows dates in January of `1900`. *Response:* ask what the difference of two dates is.
 - **Unfiltered timing formulas.** *Symptom:* counts of all years. *Response:* ask where the year is in the formula.
 - **Late read as healthy.** *Symptom:* "we conserve cash". *Response:* ask what the supplier does.
-- **Early and late both treated as problems.** *Symptom:* a memo with no recommendation. *Response:* ask what the target is.
+- **Early and late both treated as problems.** *Symptom:* a memo that lists both as problems with no view on the target. *Response:* ask what the target is.
 
 ## Grading guide
 
@@ -137,7 +138,7 @@ A weak answer calls the company healthy because it pays late, or concentrated be
 | Requirement 1: queries, filter and running share | 30 | Year fixed, sorted by amount, running share on SupplierName | Right table for all years |
 | Requirement 2: marks and categories | 20 | Three marks, category table | One mark wrong |
 | Requirement 3: timing | 25 | Whole-number days, counts, median, tail, year-specific | Counts without the median |
-| Requirement 4: memo | 25 | Both findings, gains and losses, a recommendation | No recommendation |
+| Requirement 4: memo | 25 | Both findings, what they mean for supplier risk and cash, gains and losses of paying early or late | One finding or the gains and losses missing |
 
 ## Extensions and discussion questions
 

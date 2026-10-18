@@ -98,7 +98,7 @@ The model memo follows a fixed order, and its parts take these words:
 
 ### Phase 5: The recommendation and the appendix
 
-**Step 5. End with the next analysis.** A model recommends the diagnostic analysis of Part II, decomposing the change between {{ m.ql3 }} and {{ m.ql4 }} into volume, mix, price and cost effects by product, from the invoice lines and the item master, on the measure above. It asks the controller to settle three treatments first, the revenue side of returns, the lines invoiced in one quarter and shipped in another, and the unbilled shipments. State the decision the controller needs to make.
+**Step 5. End with the next analysis.** A model recommends the diagnostic analysis of Part II, decomposing the change between {{ m.ql3 }} and {{ m.ql4 }} into volume, mix, price and cost effects by product, from the invoice lines and the item master. That decomposition is of the invoice-line margin at standard cost, labeled as that measure. If it is to explain the posted ledger margin, the two measures are first reconciled for invoice and shipment timing, the unmatched shipments, the cost of returns, the customer credits and any difference in the cost basis. The model asks the controller to agree how returns are presented and which measure the diagnosis uses, and to investigate the invoice and shipment timing and the unbilled shipments under the recognition policy, keeping the order-price amount as a labeled sensitivity until then. State the decision the controller needs to make.
 
 **Step 6. Assemble the one-page appendix.** The data map of Requirement 2 and the reconciliation table of Requirement 4, on one page, readable on their own.
 
@@ -115,7 +115,7 @@ The model memo follows a fixed order, and its parts take these words:
 | Furniture shipment lines with no invoice line, {{ m.ql4 }} | {{ r.recon[1].uninvoiced.lines }} | Step 2 |
 | Cutoff invoices; with Furniture lines | {{ t.n_nine }}; {{ t.n_furniture }} | Step 2 |
 
-For the instructor only: what the Part II diagnosis will find, in outline. Units of Furniture invoiced barely change ({{ m.q3.units|count }} to {{ m.q4.units|count }}, {{ m.units_change|num(1) }}%); the standard cost per unit is about the same (${{ m.q3.cost_per_unit|money }} to ${{ m.q4.cost_per_unit|money }}); the average price falls from ${{ m.q3.price|money }} to ${{ m.q4.price|money }} per unit ({{ m.price_change|num(1) }}%), and the promotional discounts on Furniture lines more than double. A good memo does not claim this; it recommends the analysis that will.
+For the instructor only: what the Part II diagnosis will find, in outline. Units of Furniture invoiced barely change ({{ m.q3.units|num(2) }} to {{ m.q4.units|num(2) }}, {{ m.units_change|num(1) }}%); the standard cost per unit is about the same (${{ m.q3.cost_per_unit|money }} to ${{ m.q4.cost_per_unit|money }}); the average price falls from ${{ m.q3.price|money }} to ${{ m.q4.price|money }} per unit ({{ m.price_change|num(1) }}%), and the promotional discounts on Furniture lines more than double. A good memo does not claim this; it recommends the analysis that will.
 
 ## What a strong answer says
 

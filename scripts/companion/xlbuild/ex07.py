@@ -218,7 +218,7 @@ def ex7_1(b: ExerciseBuild) -> None:
             ws.Range(f"{c}{r}").Formula = f"=SUMIFS(InvoiceLines[LineTotal],InvoiceLines[ItemGroup],{c}$3,InvoiceLines[Period],$B{r})"
         ws.Range(f"H{r}").Formula = f"=SUM(C{r}:G{r})"
     values(ws, {"A16": "Control total"})
-    ws.Range("H16").Formula = "=SUM(H4:H15)-SUM(InvoiceLines[LineTotal])"
+    ws.Range("H16").Formula = "=ROUND(SUM(H4:H15)-SUM(InvoiceLines[LineTotal]),2)"      # to the cent: no binary residue
     # Requirement 2: the backtest
     values(ws, {"A18": f"Backtest: each method fitted to the quarters of {d.F} and {d.P} (QuarterIndex 1 to 8), forecasting "
                        f"the four quarters of {d.C}; the last two methods leave out {d.F}-Q1, which holds the start-up month",
@@ -576,7 +576,7 @@ def ex7_3(b: ExerciseBuild) -> None:
         ("Filtered Rows1", pq.select_rows(f"({cond})")),
         ("Filtered Rows2", pq.select_rows('([SourceDocumentType] <> "JournalEntry")'))]))
     names = dict(d.q("SELECT AccountNumber, AccountName FROM Account WHERE AccountNumber IN (5050, 5060, 5080)"))
-    values(ws, {"A1": f"Exercise 7.3: company break-even and margin of safety, {d.C}", "A3": "Year", "B3": d.C,
+    values(ws, {"A1": f"Exercise 7.3: company break-even and margin of safety, {d.C}", "A3": "Base year (fixed)", "B3": d.C,
                 "A5": "Revenue (InvoiceLines)", "A6": "Standard cost of the products sold (InvoiceLines)",
                 "A7": "Sales commission expense (GLOpex, account 6290)", "A8": "Contribution margin",
                 "A9": "Contribution margin ratio",
@@ -592,7 +592,8 @@ def ex7_3(b: ExerciseBuild) -> None:
                 "A29": "Revenue (changed by Goal Seek)", "A30": "Operating income at that revenue (B29 x B9 - B23)",
                 "A31": "Check: (target + fixed costs) / ratio", "A32": "The same without the added items"})
     bold(ws, "A1")
-    blue(ws, "B3")
+    note(ws, "B3", f"A fixed base year, not a year selector: BudgetLine, GLOpex and GLCostVariances are filtered to {d.C}, so another "
+                   "year needs every input, query filter and closing-entry exclusion changed together.")
     blue(ws, "B28")
     formulas(ws, {
         "B5": "=SUMIFS(InvoiceLines[LineTotal],InvoiceLines[FiscalYear],$B$3)",
@@ -672,9 +673,10 @@ def ex7_3(b: ExerciseBuild) -> None:
         "the plant's hours and "
         "overhead, part of which would fall with volume; if it returned to its "
         f"{d.F} level, break-even revenue would fall by about {round((v[d.C] - v[d.F]) / e['ratio'], -3):,.0f}. The contribution "
-        "margin ratio matters too: at these fixed "
-        f"costs each percentage point of the ratio moves break-even revenue by about {round(per_point, -3):,.0f}, as the data table "
-        "shows. Two further simplifications are worth naming: Services' design staff are treated as fixed (Services "
+        "margin ratio matters too: near these assumptions "
+        f"each percentage point of the ratio moves break-even revenue by about {round(per_point, -3):,.0f}, a local effect, not a constant "
+        "one over the data table's grid. The second estimate also treats freight-out and the two variances as fixed-equivalent costs, "
+        "which the totals do not establish. Two further simplifications are worth naming: Services' design staff are treated as fixed (Services "
         "carries no standard cost), and all of the products' standard cost as variable, though it includes fixed overhead.",
     ]
     model_answer(ws, 35, paras, last_col="H")
@@ -1218,6 +1220,16 @@ def ex7_5(b: ExerciseBuild) -> None:
         ("Filtered Rows1", pq.select_rows('([SourceDocumentType] <> "JournalEntry")')),
         ("Added Custom", pq.add_custom("Amount", "[Debit] - [Credit]"))]))
     load(b, "SalesCommissionAccrual", nav(b, 27, "SalesCommissionAccrual"))
+    # Step 6a: each accrual's date against its invoice's date (a reference query of the accruals, loaded to a worksheet)
+    load(b, "AccrualDates", pq.steps_query([
+        ("Source", "SalesCommissionAccrual"),
+        ("Merged Queries", pq.merge("SalesInvoice", "SalesInvoiceID", "SalesInvoiceID", "SalesInvoice")),
+        ("Expanded SalesInvoice", pq.expand("SalesInvoice", ["InvoiceDate"])),
+        ("Added Custom", pq.add_custom("DateDiffers", "[AccrualDate] <> [InvoiceDate]")),
+        ("Added Custom1", pq.add_custom("MonthDiffers",
+                                        "Date.StartOfMonth([AccrualDate]) <> Date.StartOfMonth([InvoiceDate])")),
+        ("Removed Other Columns", pq.select_columns(["SalesCommissionAccrualID", "AccrualDate", "InvoiceDate", "DateDiffers",
+                                                      "MonthDiffers"]))]))
     values(ws, {"A1": "Exercise 7.5: regression-based expectations for revenue and sales commission expense",
                 "A3": "Month", "B3": "Revenue (InvoiceLines)", "C3": "Invoices (SalesInvoice)",
                 "D3": "Commission expense (GLCommission, 6290)", "E3": "Expected commission", "F3": "Difference",
@@ -1234,8 +1246,9 @@ def ex7_5(b: ExerciseBuild) -> None:
             formulas(ws, {f"E{r}": f"=$K$18+$K$19*B{r}", f"F{r}": f"=D{r}-E{r}", f"G{r}": f"=F{r}/E{r}",
                           f"H{r}": f'=IF(ABS(G{r})>0.03,"Investigate","")'})
     values(ws, {"A40": "Control totals"})
-    formulas(ws, {"B40": "=SUM(B4:B39)-SUM(InvoiceLines[LineTotal])", "C40": "=SUM(C4:C39)-ROWS(SalesInvoice[SalesInvoiceID])",
-                  "D40": "=SUM(D4:D39)-SUM(GLCommission[Amount])"})
+    formulas(ws, {"B40": "=ROUND(SUM(B4:B39)-SUM(InvoiceLines[LineTotal]),2)",
+                  "C40": "=SUM(C4:C39)-ROWS(SalesInvoice[SalesInvoiceID])",
+                  "D40": "=ROUND(SUM(D4:D39)-SUM(GLCommission[Amount]),2)"})      # money to the cent: no binary residue
     ws.Range("A4:A39").NumberFormat = "mmm yyyy"
     ws.Range("B4:B40").NumberFormat = MONEY
     ws.Range("C4:C40").NumberFormat = COUNT
@@ -1395,8 +1408,8 @@ def ex7_5(b: ExerciseBuild) -> None:
         "the commission rates applied (the customer mix), and the credit-memo adjustments posted in the month.",
         " ".join(evidence),
         f"Reconciliation: the accruals dated in {d.C} total {e['accruals']:,.2f}. The ledger's {d.C} commission expense, "
-        f"{sum(v for v in e['by_type'].values()):,.2f}, is the accrual postings less {e['adj_rows']} "
-        f"SalesCommissionAdjustment rows ({-adj:,.2f}), which reverse commissions on credit memos; that source document "
+        f"{sum(v for v in e['by_type'].values()):,.2f}, is the accrual postings plus {e['adj_rows']} "
+        f"signed SalesCommissionAdjustment postings ({adj:,.2f}), which reverse commissions on credit memos; that source document "
         "type explains the whole difference. The reconciliation shows that the records agree, not that each "
         "commission is right.",
     ]
@@ -1447,6 +1460,11 @@ def ex7_5(b: ExerciseBuild) -> None:
     b.check(t, "SalesCommissionAdjustment rows (K28)", e["adj_rows"], "='Ex 7.5'!K28", 0, COUNT)
     b.check(t, f"GL 6290, {d.C} (K29)", round(sum(e["by_type"].values()), 2), "='Ex 7.5'!K29", 0.01)
     b.check(t, "unexplained difference (K31)", 0, "='Ex 7.5'!K31", 0.005)
+    b.check(t, "accruals compared with their invoices (AccrualDates)", e["accrual_count"], "=ROWS(AccrualDates[DateDiffers])", 0, COUNT)
+    b.check(t, "accruals dated differently from their invoice (AccrualDates)", int(e["other_day"]),
+            "=COUNTIF(AccrualDates[DateDiffers],TRUE)", 0, COUNT)
+    b.check(t, "of them in another month (AccrualDates)", int(e["other_month"]), "=COUNTIF(AccrualDates[MonthDiffers],TRUE)", 0,
+            COUNT)
 
 
 # --- Exercise 7.6 ---------------------------------------------------------------------------------------------------
@@ -1622,14 +1640,16 @@ def ex7_6(b: ExerciseBuild) -> None:
         f"{e['low']:.2f} to {e['high']:.2f}) except {words(len(adj))}: DemandForecastID "
         + series(str(r[0]) for r in adj)
         + f", the first forecast week of each year for {code} ({name}, {group}) at warehouse {a0[3]}, "
-        f"{e['warehouse'].get(a0[3], '')}, each {multiples[0]:.1f} times its baseline, entered as {a0[4]} by {pname} "
+        f"each {multiples[0]:.1f} times its baseline, entered as {a0[4]} by {pname} "
         f"(employee {a0[7]}), a {ptitle}, with no approver. The list tests the approval of planners' adjustments. These "
         f"are the only unapproved forecasts in the Table ({words(e['unapproved'])} in all), so an approval is recorded for "
         "every other adjustment but not for these; a recorded approval shows that the step was taken, not how carefully "
-        "the change was reviewed. The quantities are small, but an unapproved override by a buyer who plans "
-        f"most forecasts ({e['planned']:,} of {e['current']:,}) and also creates purchase orders ({e['pos']:,} of them) "
-        "is an authorization exception worth reporting, and the buyer's two roles make an independent review more "
-        "important.",
+        "the change was reviewed. The three missing approvals are documented approval-record exceptions, small in quantity, "
+        f"on forecasts entered by a buyer who plans most forecasts ({e['planned']:,} of {e['current']:,}). The buyer's role "
+        "creates a potential segregation-of-duties risk, to confirm against the required approvals, delegated authority and "
+        "compensating reviews before concluding that the role combination breaches company policy. The records of this "
+        "workbook do not show whether that employee also places purchase orders, which the Employee and DemandForecast "
+        "Tables cannot confirm.",
         "Evidence and explanations to request: the forecasting method and its inputs, and why it runs above orders; "
         "management's own comparisons of forecast with actual orders; the reasons for the three overrides and who should "
         "have approved them; how the forecast feeds purchasing, production, and the budget; and inventory levels and "

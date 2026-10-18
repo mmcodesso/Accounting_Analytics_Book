@@ -1,6 +1,8 @@
 <!-- Instructor notes, Exercise 6.2: {{ d.C }} shares of grand total: {% for s, g, share, v in shares[:3] %}{{ s }}-{{ g }} {{ share|pct(2) }} ({{ v|money }}){{ ', ' if not loop.last }}{% endfor %}; then {% for s, g, share, v in shares[3:] %}{{ s }}-{{ g }} {{ share|pct(2) }}{{ ' and ' if not loop.last }}{% endfor %}. Changes
      from {{ d.P }} for combinations with at least $500,000 in {{ d.P }}: increases {% for s, g, a, b, c in up %}{{ s }}-{{ g }} {{ c|spct }} ({{ a|num }} to {{ b|num }}){{ ' and ' if not loop.last }}{% endfor %}; decreases {% for s, g, a, b, c in down %}{{ s }}-{{ g }} {{ c|spct }} ({{ a|num }} to {{ b|num }}){{ ' and ' if not loop.last }}{% endfor %}. Segments: {% for s, c in segments %}{{ s }} {{ c|spct(2) }}{{ ', ' if not loop.last }}{% endfor %}; total {{ total_change|spct(2) }}. Regions: {% for r, c in regions %}{{ r }} {{ c|spct }}{{ ', ' if not loop.last }}{% endfor %}. Design Services buys only Services, so the
      segment and the product line coincide there. Requirement (5): the invoice-based revenue differs from the revenue the income
-     statement reports by freight revenue (4050, which has no invoice line), sales returns and allowances (4060, the credit memos), and
-     the three cutoff invoices of Exercise 6.1, which the ledger records in a different year from their invoice dates. A nonpublic entity may elect not to give the quantitative disaggregation
-     (ASC 606-10-50-7); the exercise treats the disclosure as if it were required. -->
+     statement reports by freight revenue (4050, net of freight credits, which has no invoice line), sales returns and allowances (4060, the credit memos), and
+     the three cutoff invoices of Exercise 6.1, which the ledger records in a different year from their invoice dates; the reconciliation is as recorded, before correction of the cutoff error. The exercise
+     assumes a public business entity applying U.S. GAAP (ASC 606-10-50-5 and 55-91). An entity that is not one may elect not to give the quantitative
+     disaggregation (ASC 606-10-50-7), but it must still disclose, at a minimum, revenue by the timing of transfer and qualitative information on how
+     economic factors affect its revenue, so the election does not remove all disaggregation. -->

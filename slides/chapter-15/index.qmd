@@ -55,7 +55,7 @@ Operating expense of several million dollars is neither good nor bad until the r
 - The five-second test: can someone say what the page shows?
 
 ::: {.notes}
-Lipe and Salterio found that participants acting as superiors, evaluating two units, relied on the measures common to both and ignored those unique to each. That is a warning, not a reason to give every department the same KPIs: define the shared measures the same way, keep each department's own measures, and make clear that they count. Cardinaels and van Veen-Dirks found that organizing the measures changed how evaluators weighted them, and with markers for above, below and on target added, the organized scorecard drew more weight to any category in which the units differed, so a marker should appear only where it signals something to act on. Detail is available on demand, through drill-through pages and tooltips, rather than crowding the page.
+Lipe and Salterio found that participants acting as superiors, evaluating two units, relied on the measures common to both and ignored those unique to each. That is a warning, not a reason to give every department the same KPIs: define the shared measures the same way, keep each department's own measures, and make clear that they count. Cardinaels and van Veen-Dirks found that organizing the measures changed how evaluators weighted them, and in a second experiment, with markers for above, below and on target on both scorecards, the organized scorecard drew more weight to any category in which the units differed, so a marker should appear only where it signals something to act on. Detail is available on demand, through drill-through pages and tooltips, rather than crowding the page.
 :::
 
 ## Each reader gets a page and a KPI
@@ -68,7 +68,7 @@ The controller's Validation page carries the control totals of the earlier chapt
 
 ## Four pages for four readers, and an About page
 
-{{< book-figure fig-15-01 crop="0,0,1,0.4743" >}}
+{{< book-figure fig-15-01 crop="0,0,1,0.4743" alt="Detail of the package plan, with a page navigator across the top, the About page at the left, and the Promotions, Budget, Plant, and Validation pages, each labeled with its reader and the key measure and comparison it shows." >}}
 
 ::: {.notes}
 The About page opens the package and states its purpose, readers, source and period, and where each KPI is defined and tested. It holds the page navigator, as every visible page does, with one button for each visible page.
@@ -76,7 +76,7 @@ The About page opens the package and states its purpose, readers, source and per
 
 ## Three hidden pages hold the detail
 
-{{< book-figure fig-15-01 crop="0.1921,0.3894,0.4097,0.5062" >}}
+{{< book-figure fig-15-01 crop="0.1921,0.3894,0.4097,0.5062" alt="Detail of the three hidden pages. Arrows lead from the Promotions page to Promotion Detail and Promotion Tooltip, and from the Budget page to Cost Center Detail, three dashed boxes that describe a promotion's terms and months, a promotion's months while pointing, and one cost center's accounts." >}}
 
 ::: {.notes}
 Promotion Detail and Cost Center Detail are reached by drill-through from the Promotions and Budget pages, and Promotion Tooltip by pointing at a promotion. They are hidden from the page tabs and the navigator, and left by the back button or by moving the pointer away.
@@ -105,7 +105,7 @@ Drill-through is how a report lets managers explore causes on their own, as Chap
 
 ## Drill-down stays put; drill-through opens a page
 
-{{< book-figure fig-15-02 crop="0,0,1,0.8909" >}}
+{{< book-figure fig-15-02 crop="0,0,1,0.8909" alt="Detail of two panels. On the left, a matrix of revenue by item group in which Furniture is expanded into its product types. On the right, a bar chart of discounts by promotion whose first bar is right-clicked, a Drillthrough menu offering Promotion Detail, and an arrow to a separate page filtered to that promotion, with a back button." >}}
 
 ::: {.notes}
 On the left, expanding Furniture shows its product types in the same matrix, as in Chapter 13. On the right, right-clicking a promotion's bar and choosing Drillthrough opens a separate page filtered to that promotion, with a back button.
@@ -168,7 +168,7 @@ SELECTEDVALUE returns the step of the current bar, or a blank when the context h
 
 ## Everyday prices take more than the promotions
 
-{{< book-figure fig-15-03 crop="0,0.1094,1,0.4241" >}}
+{{< book-figure fig-15-03 crop="0,0.1094,1,0.4241" alt="Detail of the Promotions page, with a waterfall chart of fiscal 2026 revenue. A tall column for revenue at list price is followed by a step down for price lists and overrides, a much smaller step down for promotions, and a total column for net revenue." >}}
 
 ::: {.notes}
 The waterfall starts at the list amount, steps down twice, and ends with the total that Power BI adds, equal to the latest year's revenue of Chapter 6. The price lists and overrides take far more off the list amount than the promotions do, as the Part II case found.
@@ -176,7 +176,7 @@ The waterfall starts at the list amount, steps down twice, and ends with the tot
 
 ## One promotion gave away several times any other
 
-{{< book-figure fig-15-03 crop="0,0.5363,1,0.3365" >}}
+{{< book-figure fig-15-03 crop="0,0.5363,1,0.3365" alt="Detail of the Promotions page, with a bar chart of promotional discounts by promotion. The Furniture Seasonal Promotion bar is far longer than the Harbor Collection and Design Trade Customer bars, and the two promotions of fiscal 2025, Wholesale Customer and Textiles Seasonal, are barely visible." >}}
 
 ::: {.notes}
 The Furniture Seasonal Promotion leads by far. Two promotions of the year before still appear, because their last orders were invoiced early in the latest year.
@@ -184,7 +184,7 @@ The Furniture Seasonal Promotion leads by far. Two promotions of the year before
 
 ## Drill-through: one promotion, month by month
 
-{{< book-figure fig-15-04 crop="0,0,1,0.8371" >}}
+{{< book-figure fig-15-04 crop="0,0,1,0.8371" alt="Detail of the Promotion Detail page for the Furniture Seasonal Promotion, with a back button, a table of its scope, ten percent discount and effective dates in September and October 2026, a card of its invoice lines and discounts, and a column chart of discounts by month in which the November and December columns, invoiced after the end date, are outlined." >}}
 
 ::: {.notes}
 The Furniture Seasonal Promotion ran in September and October, but its discounts continue into November and December: Chapter 5 found those lines were ordered within the promotion's dates and invoiced later. Drilling through on the Harbor Collection Promotion shows an end date before its start date, which cannot be right. The Part II case found failing recorded dates in every collection promotion, and their orders point to the end date as the likely error.
@@ -192,7 +192,7 @@ The Furniture Seasonal Promotion ran in September and October, but its discounts
 
 ## The tooltip shows the months while pointing
 
-{{< book-figure fig-15-05 crop="0,0,1,0.8519" >}}
+{{< book-figure fig-15-05 crop="0,0,1,0.8519" alt="Detail of the promotions bar chart with the pointer on the Furniture Seasonal Promotion bar, and the Promotion Tooltip page beside it showing that promotion's discounts by month, from September to December 2026, as a column chart." >}}
 
 ::: {.notes}
 The pointer rests on the promotion's bar, and the Promotion Tooltip page appears beside it, filtered to that promotion. A summary page could not have shown either finding of the detail pages; they appear in two clicks.
@@ -231,7 +231,7 @@ Charles River's operating expense shows four of the causes at once. Sales spent 
 
 - The sales budget plans several times the volume actually sold
 - Revenue and cost of sales fall far short of it every month
-- The huge variances measure the plan's volume, not the year
+- The huge variances measure the plan's volume, not operating performance
 - Flex the budget to actual volume first, or leave revenue off
 
 ::: {.notes}
@@ -291,13 +291,13 @@ Optional arguments name the direction the calculation moves through the visual, 
 {{< book-table tbl-15-04 >}}
 
 ::: {.notes}
-The order of the rows in the visual plays the part of ORDER BY, restarting at a higher level plays the part of PARTITION BY, and the number of rows in a moving average plays the part of the frame, as in Chapter 11.
+These are conceptual counterparts, not translations. The order of the rows in the visual plays the part of ORDER BY, restarting at a higher level plays the part of PARTITION BY, and the number of rows in a moving average plays the part of the frame, as in Chapter 11.
 :::
 
 ## It sees only what its visual shows
 
 - On a chart starting mid-way, a moving average has fewer months
-- It cannot be reused in another visual, exported or pinned
+- It cannot be reused in another visual or pinned, and its exports need a test
 - One visual's shape, such as a year-to-date line: a visual calculation
 - A number readers rely on, compare or export: a measure with a test
 
@@ -310,7 +310,7 @@ A measure written with the time intelligence of Chapter 14 reaches into the mode
 {{< book-table tbl-15-05 >}}
 
 ::: {.notes}
-The calculated column of Chapter 14 completes the comparison: it sees its own row and related rows, is stored at refresh, and can be used to filter, group or sort.
+The calculated column of Chapter 14 completes the comparison: in an Import model like this one it sees its own row and related rows, is stored at refresh, and can be used to filter, group or sort. Whether an export includes a visual calculation depends on the export mode and the Power BI version, and an export of the underlying data leaves it out, so test the export readers will use.
 :::
 
 ## Check your understanding {.check}
@@ -357,7 +357,7 @@ Drilling through to the accounts finds a depreciation account with expense and n
 
 ## BudgetLine shares three dimensions with the ledger
 
-{{< book-figure fig-15-07 crop="0,0,1,0.8266" >}}
+{{< book-figure fig-15-07 crop="0,0,1,0.8266" alt="Detail of Model view with BudgetLine and GLEntry as the two fact tables. Account, CostCenter, and Date each relate to both, many to one, and BudgetLine relates to Date on BudgetDate, the first day of each budget month, which is highlighted." >}}
 
 ::: {.notes}
 BudgetLine and GLEntry are two fact tables sharing Account, CostCenter and Date, so a visual grouped by cost center or month can place the budget beside the ledger. BudgetDate, the first day of each budget month, is added in Step 1. Budget lines and postings without a cost center meet in the (Blank) row.
@@ -365,7 +365,7 @@ BudgetLine and GLEntry are two fact tables sharing Account, CostCenter and Date,
 
 ## Three cost centers stand out against the budget
 
-{{< book-figure fig-15-08 crop="0.0093,0.1684,0.9177,0.6863" >}}
+{{< book-figure fig-15-08 crop="0.0093,0.1684,0.9177,0.6863" alt="Detail of the matrix of fiscal 2026 operating expense by cost center, with budget, actual, variance, and variance percentage columns. Each percentage has a marker beside it, an arrow down for Sales and Administration, an arrow up for the Warehouse, and a circle for the other rows, and those three rows are outlined. A legend names the three markers." >}}
 
 ::: {.notes}
 Sales spent far less than its budget, the Warehouse far more, and Administration less; every other cost center is a few percent under. The (Blank) row holds the expenses without a cost center, such as rent, utilities and insurance, which Chapter 7's Budget Table left out; here the budget and actual agree closely.
@@ -373,7 +373,7 @@ Sales spent far less than its budget, the Warehouse far more, and Administration
 
 ## Volume and classification explain the big variances
 
-{{< book-figure fig-15-09 crop="0.0139,0.0304,0.9687,0.719" >}}
+{{< book-figure fig-15-09 crop="0.0139,0.0304,0.9687,0.719" alt="Detail of the reconciliation table for fiscal 2026 operating expense by cost center, with the variance as booked, the volume effect, the classification effect, the remaining variance, and the remaining percentage. Sales has a large negative volume effect, the Warehouse and Administration have equal and opposite classification effects, and the outlined classification column totals zero." >}}
 
 ::: {.notes}
 Each cost center's variance is the volume in the commission budget, plus the classification of depreciation, plus what remains. The classification column totals zero, the signature of a classification difference. What remains is a few percent below budget nearly everywhere, consistent with the payroll burden rate, and it still has to be explained before anyone calls it efficient or wasteful spending. Sales remains further below, because the actual commission rate on merchandise was also below the budgeted rate.
@@ -381,7 +381,7 @@ Each cost center's variance is the volume in the commission budget, plus the cla
 
 ## RUNNINGSUM shows how the variance built up
 
-{{< book-figure fig-15-06 crop="0,0.2771,0.6389,0.6359" >}}
+{{< book-figure fig-15-06 crop="0,0.2771,0.6389,0.6359" alt="Detail of the visual calculation editor, with the formula bar holding the YTD Variance calculation as RUNNINGSUM of Variance to Flexed, and the visual matrix of the twelve months of fiscal 2026 with the variance and its running total. January and July are outlined." >}}
 
 ::: {.notes}
 The year-to-date variance climbs in January, falls through June, climbs again in July, and falls for the rest of the year. January and July are the months with three pay dates: against a budget that spreads salaries evenly, they look unfavorable and every other month favorable. A reader in July would have seen operating expense close to the flexed budget for the year to date, and the months between show the payroll timing behind it.
@@ -405,12 +405,12 @@ Without the flex and the reconciliation, the page would have rewarded Sales for 
 - A field parameter lets the reader choose the measure a chart shows
 
 ::: {.notes}
-In Desktop, and while a report is edited in the service, a button responds to a click only while Ctrl is held, so you can still select it to edit it; a reader viewing the report simply clicks it. A bookmark keeps the state it captured, its filters, slicers, sort order and visible visuals, until someone updates it, while the navigator follows the pages by itself. Hiding a page tidies the navigation; it does not decide who may see the data. A field parameter is a small table listing fields with NAMEOF, and it cannot serve as the field of a drill-through or tooltip page.
+In Desktop, and while a report is edited in the service, a button responds to a click only while Ctrl is held, so you can still select it to edit it; a reader viewing the report simply clicks it. A bookmark keeps the state it captured, its filters, slicers, sort order and visible visuals, until someone updates it, while the navigator follows the pages by itself. Hiding a page tidies the navigation; it does not decide who may see the data. A field parameter is a small table listing fields with NAMEOF, and it cannot serve as the field of a drill-through or tooltip page. Microsoft's workaround links the fields the parameter references, which a parameter of measures does not offer.
 :::
 
 ## The About page documents the package
 
-{{< book-figure fig-15-12 crop="0,0.016,1,0.4032" >}}
+{{< book-figure fig-15-12 crop="0,0.016,1,0.4032" alt="Detail of the text box of the About page, which states the report's purpose, its three readers, its source and period with the last dates of the time records, and where its measures are defined and tested. The page navigator below the text is not in this detail." >}}
 
 ::: {.notes}
 The About page states the report's purpose, its readers, its source and period, and where each KPI is defined and tested, the counterpart of Chapter 4's Documentation worksheet. Below the text sits the page navigator, one button for each visible page. Every measure carries a description, the Validation page keeps reproducing the sales totals, and the Tests tab grows with each new page. Every Part of the book has ended its tool's work this way, because an error in a monthly report is repeated every month until someone finds it.
@@ -455,7 +455,7 @@ Labor time and completions join the model as two more fact tables, with Employee
 {{< book-steps 15.3 8-13 >}}
 
 ::: {.notes}
-The KPI card sets the latest trailing figure beside the first year's level, the KPI with its comparison; without its year filter it is blank, because its window would end in the empty last year of the Date table. Step 11 stops the work-center and job-title charts from filtering the KPI, and the report is saved on the About page, the page it then opens on when no landing page is set. Test 5 returns the yearly ratios of Chapter 11's view, which shows that the model reproduces them, not that the ratio is a complete measure of labor performance.
+The KPI card sets the latest trailing figure beside the first year's level, the KPI with its comparison, under a title that says the latest month is provisional; without its year filter it is blank, because its window would end in the empty last year of the Date table. Step 11 stops the work-center and job-title charts from filtering the KPI, and the report is saved on the About page, the page it then opens on when no landing page is set. Test 5 returns the yearly ratios of Chapter 11's view, which shows that the model reproduces them, not that the ratio is a complete measure of labor performance.
 :::
 
 ## KEEPFILTERS lets the two filters combine
@@ -480,7 +480,7 @@ Without KEEPFILTERS, Direct Hours would return every manufacturing hour. A filte
 
 ## On a filtered axis, the visual calculation drifts
 
-{{< book-figure fig-15-10 crop="0,0,1,0.8723" >}}
+{{< book-figure fig-15-10 crop="0,0,1,0.8723" alt="Detail of a line chart of the trailing twelve-month hours per standard hour for 2025, with the measure as a solid line and the visual calculation on an axis starting in January 2025 as a dashed line. A dashed frame covers January to November, where the two differ, and the lines meet in December." >}}
 
 ::: {.notes}
 On a table that starts at the beginning of the data, the visual calculation of two twelve-month moving averages agrees with the measure. On one that starts a year later, it averages one month in the first month, two in the second, and agrees with the measure again only in the twelfth. The measure, whose DATESINPERIOD window reaches into the model, is the figure the production manager relies on.
@@ -488,18 +488,18 @@ On a table that starts at the beginning of the data, the visual calculation of t
 
 ## The trailing ratio rose in every year
 
-{{< book-figure fig-15-11 crop="0,0,1,0.4284" >}}
+{{< book-figure fig-15-11 crop="0,0,1,0.4377" alt="Detail of the top half of the Plant page. A card titled to say that December 2026 is provisional shows the trailing hours per standard hour beside the 2024 level, a bar chart shows 2026 direct hours by work center with Packing far the longest, and a line chart shows the trailing ratio rising from December 2024 to December 2026." >}}
 
 ::: {.notes}
-The plant recorded more hours for each standard hour of output in every successive year, the trend Part III explained. Most direct hours of the latest year were recorded at Packing, the work center Chapter 11 found far above its planned load, and the (Blank) work center holds the few direct lines without an operation. The bar chart does not filter the card or the line: one work center's hours over the whole plant's output would describe neither.
+The plant recorded more hours for each standard hour of output in every successive year, the trend Part III explained. The card's title says that December 2026 is provisional, because direct time and output run to December 11, 2026, and indirect time to December 4, 2026. Most direct hours of the latest year were recorded at Packing, the work center Chapter 11 found far above its planned load, and the (Blank) work center holds the few direct lines without an operation. The bar chart does not filter the card or the line: one work center's hours over the whole plant's output would describe neither.
 :::
 
-## Overtime rose alike for every job title
+## Overtime share rose across all three job titles
 
-{{< book-figure fig-15-11 crop="0,0.434,1,0.4681" >}}
+{{< book-figure fig-15-11 crop="0,0.443,1,0.443" alt="Detail of the Plant page's column chart of the overtime share by job title for 2024, 2025, and 2026, which rises from year to year for Assembler, Machine Operator, and Quality Technician." >}}
 
 ::: {.notes}
-The overtime share rose by about two-thirds or more from the first year to the latest for every manufacturing job title alike, the plant-wide pattern of the surge days that Chapter 12 found.
+The overtime share rose by about two-thirds or more from the first year to the latest for each of the three manufacturing job titles, the plant-wide pattern of the surge days that Chapter 12 found.
 :::
 
 ## Checkpoint

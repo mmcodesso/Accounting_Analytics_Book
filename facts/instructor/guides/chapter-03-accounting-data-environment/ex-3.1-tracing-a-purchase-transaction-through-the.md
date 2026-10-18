@@ -25,7 +25,7 @@ Tutorial 3.2 followed a sale. This exercise asks students to follow a purchase o
 
 By the end, students can:
 
-- follow the foreign keys of an invoice line to its receipt line, order line, order and supplier, and name each key (chapter outcome 2);
+- follow the foreign keys of an invoice line to its receipt line, order line, order and supplier, and name each key (outcome 2);
 - find the ledger rows of three different documents with the type-and-key filter (outcome 6);
 - translate each AccountID into an account and say what the posting means (outcome 4);
 - explain why the invoice debits goods received not invoiced and not inventory, and where the price difference goes;
@@ -35,9 +35,9 @@ By the end, students can:
 
 ## Before you assign
 
-- Students need CharlesRiver_Work.xlsx and Tutorial 3.2, whose filter pattern they repeat. PurchaseInvoice has {{ rows.PurchaseInvoice|count }} rows, PurchaseInvoiceLine {{ rows.PurchaseInvoiceLine|count }} and DisbursementPayment {{ rows.DisbursementPayment|count }}, so filters work without delay.
+- Students need CharlesRiver_Work.xlsx and Tutorial 3.2, whose filter pattern they repeat. PurchaseInvoice has {{ rows.PurchaseInvoice|count }} rows, PurchaseInvoiceLine {{ rows.PurchaseInvoiceLine|count }} and DisbursementPayment {{ rows.DisbursementPayment|count }}, far fewer than GLEntry, so their filters respond quickly on most computers.
 - The exercise relies on these conditions. Most paid invoices have a single line ({{ paid_one|count }} of {{ paid|count }}). Each invoice line names either a receipt line or an accrual journal entry: the {{ accrual }} lines with an accrual have no receipt line and no order line, which is a dead end for this exercise, as requirement (2) warns. Every purchase invoice credits accounts payable for its GrandTotal, and the ledger rows of each of the three documents balance.
-- Real invoices are untidy. {{ split|count }} receipt lines are billed on more than one invoice line, so a student may find an invoiced quantity that differs from the received one; some invoices are paid in two or three payments. Neither is an error. Ask the student to explain it. Some invoices also carry purchase tax ({{ taxed|count }} of the paid single-line invoices). Such an invoice posts the tax to the purchase price variance account in a row of its own, with no SourceLineID, so its price variance is the line total less the receipt value, not the GrandTotal less it. The model invoice has none.
+- Real invoices are untidy. {{ split|count }} receipt lines are billed on more than one invoice line, so a student may find an invoiced quantity that differs from the received one; some invoices are paid in two or three payments. Neither is an error. Ask the student to explain it. Some invoices also carry purchase tax ({{ taxed|count }} of the paid single-line invoices). Such an invoice posts the tax to the purchase price variance account in a row of its own, with no SourceLineID, so its price variance is measured on the line, not on the GrandTotal. And the line total less the receipt value is the variance only when the line bills the whole receipt. A line that bills part of a receipt clears only the goods received not invoiced of the quantity it bills: invoice {{ part.number }} bills {{ part.billed|num(2) }} of {{ part.received|num(2) }} units received, clears ${{ part.grni|money }} of a receipt value of ${{ part.receipt|money }}, and its variance, ${{ part.ppv|money }}, is its line total of ${{ part.total|money }} less the amount cleared. Because the stored amounts are rounded to the cent, prorating the receipt value need not reproduce the ledger to the cent. The model invoice bills its whole receipt and carries no tax.
 - Do the trace once yourself on a different invoice from the model below, so you can answer questions about the unusual ones.
 
 ## How to run it
@@ -82,7 +82,7 @@ c. On **PurchaseInvoiceLine**, filter PurchaseInvoiceID for that number. Confirm
 a. On **GLEntry**, filter SourceDocumentType for PurchaseInvoice and SourceDocumentID for {{ pid }}, the invoice's key and not its number.
 b. Record GLEntryID, AccountID, Debit, Credit and SourceLineID of each row.
 c. On **Account**, look up each AccountID and write the account number and name.
-d. Total the Debit and Credit columns.
+d. Total the Debit and Credit columns of the visible rows, by hand for a few rows, or in a cell outside the Table with `=SUBTOTAL(109,T3_GLEntry[Debit])` and `=SUBTOTAL(109,T3_GLEntry[Credit])`, which add only the rows the filter shows (a SUM would add the hidden rows too). Clear any old filter first.
 
 | GLEntryID | AccountID | Account | Debit | Credit | SourceLineID |
 |---:|---:|---|---:|---:|---:|
@@ -136,7 +136,7 @@ c. On **GLEntry**, filter SourceDocumentType for DisbursementPayment and SourceD
 | Order unit cost; invoice unit cost | ${{ pol.cost|money }}; ${{ pil.cost|money }} | Step 2 |
 | Ledger rows of the invoice; of the receipt; of the payment | {{ gl_pi|length }}; {{ gl_gr|length }}; {{ gl_dp|length }} | Steps 3, 4 and 6 |
 | Purchase price variance | ${{ variance_abs|money }}, {{ variance_side }} | Step 5 |
-| Invoices paid in one payment; in more than one | {{ single|count }}; {{ multi|count }} | Requirement (4) |
+| Invoices with one recorded payment; with more than one (Paid and Partially Paid) | {{ single|count }}; {{ multi|count }} | Requirement (4) |
 | Ledger rows found by the invoice's key alone; their types | {{ same_rows }}; {{ same_types }} | Step 3 |
 
 ## What a strong answer says

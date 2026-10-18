@@ -35,7 +35,7 @@
 
 (2) For each pair of connected tables in the revenue cycle path, identify the foreign key that creates the connection and state the cardinality and optionality of the relationship, reading both ends of each line.
 
-(3) Identify what revenue cycle information requires joining to the Accounting Core group. Consider whether the O2C tables alone record the general ledger postings and the account classifications, and note which O2C table already carries a cost center. For each gap you identify, explain which Accounting Core table and column would provide the missing information.
+(3) Identify what revenue cycle information requires joining to the Accounting Core group. Consider whether the O2C tables alone record the general ledger postings and the account classifications, and note which O2C table already carries a cost center. For each gap you identify, explain which Accounting Core table and column, or which table of another group, would provide the missing information.
 
 (4) Prepare a brief written summary (one page) that could serve as a data dictionary excerpt for the revenue-related tables in Charles River.
 
@@ -81,7 +81,7 @@
 
 (4) Test whether every AccountID in the Budget table appears in GLEntry. Build a PivotTable of the distinct AccountID values in each worksheet and compare the two lists with XLOOKUP or COUNTIFS, as in Tutorial 2.2. Record any budgeted accounts with no ledger activity, and explain what a clean result tells you.
 
-(5) Write a brief assessment (one half to one page) that documents the join path from the budget to the ledger, the grain at which the two are compared, the accounts and periods in scope and how you treat the year-end closing entries, the relationships involved, and any gaps that would affect the report. Keep budgeted combinations with no actuals, actuals with no budget, and ledger rows with no cost center visible rather than letting them drop out.
+(5) Write a brief assessment (one half to one page) that documents the join path from the budget to the ledger, the grain at which the two are compared, the accounts and periods in scope and how you treat the year-end closing entries (they are the journal entries whose EntryType begins with Year-End Close, and the source-document trace of Tutorial 3.2 finds their ledger rows), the relationships involved, and any gaps that would affect the report. Keep budgeted combinations with no actuals, actuals with no budget, and ledger rows with no cost center visible rather than letting them drop out.
 
 **Deliverable.** A written assessment of the keys and relationships that connect Charles River budgets to actual spending by cost center.
 

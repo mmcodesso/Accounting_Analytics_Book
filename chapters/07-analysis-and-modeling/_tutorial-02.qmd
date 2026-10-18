@@ -78,15 +78,22 @@ g. In B17 and B18, enter the budgeted and the actual units:
 h. Copy B4:B12 to C4:E12 and B17:B18 to C17:E18.
 i. In F4, enter `=SUM(B4:E4)`, and copy it to F5:F12 and F17:F18.
 j. Type `Lines without a planned price` in A20, and enter `=COUNTBLANK(FlexLines[PlannedPrice])` in B20.
+k. Type `Row control` in A22, and enter this formula in B22:
 
-Each product line now shows its revenue, cost, and margin three ways, with the units behind them in rows 17 and 18. B20 counts only a handful of lines, the seasonal launches described in Step 3.
+   ```
+   =ROWS(FlexLines[LineTotal])-COUNTIFS(InvoiceLines[FiscalYear],2026,InvoiceLines[ItemGroup],"<>Services")
+   ```
+
+Each product line now shows its revenue, cost, and margin three ways, with the units behind them in rows 17 and 18. B20 counts only a handful of lines, the seasonal launches described in Step 3. B22 is zero: FlexLines has exactly the product lines of 2026 that InvoiceLines has, so the merge on year, month, and item added no rows. A merge on a key that appeared twice would repeat invoice lines and overstate every total.
 
 **Step 5. Calculate the two variances.**
 
 a. In B13, enter `=B9-B6`, the sales-volume variance.
 b. In B14, enter `=B12-B9`, the flexible-budget variance.
 c. Copy B13:B14 to C13:E14, and copy F12 to F13:F14.
-d. Check that, in every column, the static margin in row 6 plus the two variances in rows 13 and 14 equals the actual margin in row 12.
+d. Type `Margin bridge difference` in A21, enter `=ROUND(B6+B13+B14-B12,2)` in B21, and copy it to C21:F21.
+
+Every cell of B21:F21 is zero: in every column, the static margin in row 6 plus the two variances in rows 13 and 14 equals the actual margin in row 12. The check tests the arithmetic of the bridge, not whether the source data are complete.
 
 The sales-volume variance dwarfs everything else in the report. Compare rows 17 and 18: the budget planned for several times the units that each product line sold. A gap that large says more about the forecast behind the budget than about how the business was run, so the static budget is a poor measure of 2026's performance, and the reason to judge 2026 against the flexible budget instead. Against the flexible budget, every product line earned less than planned on the units it sold, by a few percent of revenue.
 
@@ -195,8 +202,8 @@ The Documentation worksheet now lists every query and worksheet that the budget 
 
 **Checkpoint.** Check that:
 
-- only a handful of FlexLines rows have no planned price, and you can explain why;
-- on the BudgetReport worksheet, the static margin plus the two variances equals the actual margin for every product line;
+- only a handful of FlexLines rows have no planned price, you can explain why, and the row control in B22 is zero;
+- on the BudgetReport worksheet, the margin bridge difference in row 21 is zero for every product line, so the static margin plus the two variances equals the actual margin;
 - the price gap before discounts is a similar small percentage of flexible revenue in every product line;
 - the Furniture price after promotions falls in September and October and stays below the price before promotions through December;
 - the burden rate and the flexed commission explain the two largest operating-expense variances.

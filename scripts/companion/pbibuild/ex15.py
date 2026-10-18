@@ -78,6 +78,9 @@ def ex1(b: Build) -> None:
     ctx = ch15.ex1(b.data, claim)
     now, before = ctx["now"], ctx["before"]
     sub = "Other Income or Expense"
+    carrying = (now["cost"]["amount"] - now["acc"]["amount"]) - (before["cost"]["amount"] - before["acc"]["amount"])
+    claim(abs(carrying + before["proceeds"] - (now["loss"] - before["loss"])) < 0.005,
+          "the difference between the two losses is the difference in carrying amounts plus the prior year's proceeds")
     # (1) the Ledger Detail page: AccountSubType in its drill-through well, as left after a drill-through on the subtype
     page = b.report.add(Page("ledgerDetail", "Ledger Detail"))
     page.hidden = True
@@ -102,8 +105,10 @@ def ex1(b: Build) -> None:
         f"proceeds {money(now['proceeds'])} = {money(now['loss'])}.",
         f"{before['number']} disposes of asset {before['asset']} (\"{before['event_desc']}\"): " + "; ".join(entry(before)) +
         f". The same calculation, {money(before['cost']['amount'])} - {money(before['acc']['amount'])} - "
-        f"{money(before['proceeds'])} in proceeds = {money(before['loss'])}, gives a smaller loss because the asset was "
-        "sold for cash and was further depreciated relative to its cost.",
+        f"{money(before['proceeds'])} in proceeds = {money(before['loss'])}, gives a smaller loss for two reasons: the "
+        f"asset's carrying amount was {money(before['cost']['amount'] - before['acc']['amount'])} against "
+        f"{money(now['cost']['amount'] - now['acc']['amount'])}, {money(carrying)} lower, and the cash proceeds took "
+        f"{money(before['proceeds'])} off it, which together make the {money(now['loss'] - before['loss'])} difference.",
         f"The closes {', '.join(ctx['closes'])} credit {ctx['account']['number']} too, but GL Amount leaves the closes "
         "out, so the drill-through lists only the two loss entries.",
         "(5) Drill-through passes every filter of the data point: the row (AccountSubType) and the matrix column (Year). "
@@ -165,11 +170,17 @@ def ex2(b: Build) -> None:
     months = [f"{y}-{m:02d}" for m in range(1, 13)]
     values = lambda: [col("Date", "YearMonth"), M("Net Income"), ytd, change, M("Net Income YTD")]   # noqa: E731
     page = b.report.add(Page("ex152", "Ex 15.2"))
-    page.add(CalcVisual("netIncomeByMonth", "tableEx", 20, 20, 600, 420, {"Values": values()},
-                    title=f"Net income by month, fiscal {y}", filters=[keep("nimYear", col("Date", "Year"), [y])]))
-    page.add(CalcVisual("secondHalf", "tableEx", 20, 460, 600, 250, {"Values": values()},
+    # both tables stay sorted by YearMonth, oldest first: a running sum reads the rows in the order the visual shows
+    order = [(col("Date", "YearMonth"), "Ascending")]
+    page.add(CalcVisual("netIncomeByMonth", "tableEx", 20, 20, 600, 420, {"Values": values()}, sort=order,
+                    title=f"Net income by month, fiscal {y}", filters=[keep("nimYear", col("Date", "Year"), [y])],
+                    alt_text="Fiscal year net income by month with its running year to date and its change from the "
+                             "previous month, as visual calculations, and the year to date as a measure."))
+    page.add(CalcVisual("secondHalf", "tableEx", 20, 460, 600, 250, {"Values": values()}, sort=order,
                     title="Filtered to July to December (requirement 3)",
-                    filters=[keep("shYear", col("Date", "Year"), [y]), keep("shMonths", col("Date", "YearMonth"), months[6:])]))
+                    filters=[keep("shYear", col("Date", "Year"), [y]), keep("shMonths", col("Date", "YearMonth"), months[6:])],
+                    alt_text="The same table filtered to July to December, where the running sum of the visual "
+                             "calculation restarts and the year to date of the measure does not."))
     nm = [v for _, v in ctx["months"]]
     low = ctx["low"]
     page.add(answer("ex152Answer", 640, 20, 620, 690, [
@@ -183,8 +194,9 @@ def ex2(b: Build) -> None:
             (f"{x['name']} has three pay dates, as does {', '.join(x['others'])} (Chapters 11 and 14)." if x["pay"] else
              f"{x['name']} is the peak of the promotion's discounts, with Furniture revenue {pct(x['furniture'])} below "
              f"the same month a year earlier (Chapter 11)." if x["promo"] else "") for x in low),
-        "(5) The measure: it is right whatever the visual shows, it can be reused and exported, and a filter on the "
-        "months cannot change what it means."]))
+        "(5) The measure: with this marked Date table and the calendar-year context of the exercise, it retains the "
+        "earlier months that the filter removes from the displayed axis, and it can be reused on other pages and "
+        "tested. The visual calculation suits one chart whose shape is the point."]))
     feb = nm[1] - nm[0]
     page.expect = ["YTD", "Change", "Net Income YTD", money(ctx["h2"]), money(feb), money(ctx["ni"]), "Model answer"]
 
@@ -237,11 +249,13 @@ def ex3(b: Build) -> None:
     # (3) the chart, with the slicer Power BI adds; a table records the three measures by year
     page = b.report.add(Page("ex153", "Ex 15.3"))
     pf = col(p, p)
-    page.add(slicer("plantMeasureSlicer", 20, 20, 300, 150, pf, ["Labor Cost per Standard Hour"], title=p))
+    page.add(slicer("plantMeasureSlicer", 20, 20, 300, 150, pf, ["Labor Cost per Standard Hour"], single=True, title=p))
     page.add(ParamVisual("plantMeasureChart", "clusteredColumnChart", 340, 20, 920, 330,
                          {"Category": [col("Date", "Year")], "Y": [M(n) for n in PLANT]},
                          title="The plant measure chosen in the slicer, by year",
-                         filters=[keep("pmYears", col("Date", "Year"), years)], params={"Y": pf}))
+                         filters=[keep("pmYears", col("Date", "Year"), years)], params={"Y": pf},
+                         alt_text="Columns by year for the one plant measure selected in the slicer: hours per standard "
+                                  "hour, the overtime share or the labor cost per standard hour."))
     page.add(Visual("plantMeasureTable", "tableEx", 20, 370, 600, 160, {"Values": [col("Date", "Year")] + [M(n) for n in PLANT]},
                     title="The three measures by year (requirement 3)", filters=[keep("pmtYears", col("Date", "Year"), years)]))
     yr = ctx["years"]
@@ -253,8 +267,11 @@ def ex3(b: Build) -> None:
         f"(from {yr[0]['per_hour']:.2f} to {yr[-1]['per_hour']:.2f}), because the overtime share grew and overtime hours "
         f"cost a premium; the straight-time rate barely moved ({', '.join(f'{r:.2f}' for r in ctx['rates'])}), so the "
         f"cost per standard hour rose {pct(yr[-1]['per_std'] / yr[0]['per_std'] - 1)}.",
-        "(5) A field parameter cannot be the field of a drill-through (or tooltip) page; Power BI allows the underlying "
-        "fields instead, so the drill-through page lists the measures' own fields (Year, JobTitle) in its well."]))
+        "(5) A field parameter cannot itself be the linked field of a drill-through or tooltip page. Microsoft's "
+        "documented workaround uses the individual fields that the parameter references. This parameter references "
+        "measures, and Year and JobTitle are context dimensions, not those references. A separate detail page could be "
+        "designed around Year, which is present on the source chart. No such detail page is included in this "
+        "solution; test the limitation in Desktop."]))
     page.expect = [p, "Labor Cost per Standard Hour"] + [f"{x['per_std']:.2f}" for x in yr] + [f"{yr[0]['ratio']:.2f}"]
 
     t = "Exercise 15.3"
@@ -319,9 +336,13 @@ def ex4(b: Build) -> None:
                     objects={"data": [{"properties": {"mode": lit("Single")}}]}))
     page.add(card("liftCards", 400, 20, 860, 110, [M("Design Trade Units"), M("Design Trade Price per Unit"),
                                                    M("Design Trade Cost per Unit"), meas("Discount", "Discount Value"),
-                                                   M("Break-even Lift")]))
+                                                   M("Break-even Lift")],
+                  alt_text="The promotion's units, price before discount per unit and standard cost per unit, the "
+                           "discount the slider selects in whole percents, and the break-even lift as a percentage."))
     page.add(Visual("liftByDiscount", "tableEx", 20, 150, 360, 560, {"Values": [d, M("Break-even Lift")]},
-                    title="Break-even lift at each discount"))
+                    title="Break-even lift at each discount",
+                    alt_text="The break-even lift, as a percentage of volume, at every whole discount from 0 to 20 "
+                             "percent."))
     page.extra = {"visualInteractions": [{"source": "discountSlider", "target": "liftByDiscount", "type": "NoFilter"}]}
     lifts = dict(ctx["lifts"])
     case_lift = lifts[0.12]
@@ -395,7 +416,9 @@ def ex5(b: Build) -> None:
             ("forecastFromFebruary", fit[1:], f"Revenue, February {first} to September {y}, with a three-month forecast")]):
         page.add(Visual(name, "lineChart", 20, 20 + 290 * i, 760, 280,
                         {"Category": [col("Date", "MonthStart")], "Y": [M("Revenue")]}, title=title, objects=forecast,
-                        filters=[keep(f"{name}Months", col("Date", "YearMonth"), months)]))
+                        filters=[keep(f"{name}Months", col("Date", "YearMonth"), months)],
+                        alt_text="Monthly revenue in dollars on a continuous date axis, with the three-month forecast "
+                                 "and its confidence interval drawn forward from the last month of the history."))
     q4 = [f"{y}-{m:02d}" for m in (10, 11, 12)]
     page.add(Visual("actualQ4", "tableEx", 20, 600, 760, 110, {"Values": [col("Date", "YearQuarter"), M("Revenue")]},
                     title="Actual revenue of the quarter forecast",
@@ -428,11 +451,13 @@ def ex5(b: Build) -> None:
         f"(5) Starting {fc('February')}. January {first}, the start-up month, is {pct(ctx['start'], 0)} of the year's "
         "other months; leaving it out changes the forecast, which shows how sensitive it is to one unrepresentative "
         f"month. {ctx['years'].capitalize()} years of history give limited evidence of a stable seasonal pattern.",
-        "(6) Audit note: the forecast is fit for the 2027 plan only if its hindcast error on a known quarter is "
-        "disclosed with it, beside the benchmarks it beat or did not beat on each measure of error, with the fitted "
-        "period and the treatment of the start-up month. Here the mean is closest on the quarter total, and the two "
-        "forecasts have the smaller average error by month, so the note names the error that matches the planning "
-        "decision. One known quarter is not enough to adopt a method, so test it on more quarters first."]))
+        "(6) Audit note: the recommendation is a limited trial, not adoption, for the 2027 plan. The forecast would "
+        "go to managers only with its hindcast error on a known quarter, beside the benchmarks it beat or did not beat "
+        "on each measure of error, with the fitted period and the treatment of the start-up month. Here the mean is "
+        "closest on the quarter total, and the two forecasts have the smaller average error by month, so the note names "
+        "the error that matches the planning decision. One known quarter is thin evidence, so more forecast origins "
+        "should be tested before the method is adopted, and a reasoned rejection supported by the comparisons would "
+        "also be a sound answer."]))
     # the forecast's points, as UI Automation reads them from the canvas ("MonthStart 10/1/2026. Forecast 1 ...")
     page.expect = ["MonthStart", "Revenue", money(ctx["actual"]), "Model answer"] + [
         f"Forecast 1 {money(x)}. Upper bound {money(hi)}. Lower bound {money(lo)}." for v in FORECAST.values()
@@ -488,10 +513,11 @@ def ex6(b: Build) -> None:
              .merge(center, "WorkCenterID", "WorkCenterID", ["WorkCenterName"])
              .rename({"WorkCenterID": "ClockWorkCenterID", "WorkCenterName": "ClockWorkCenter"}))
     # (3) the two tests
-    paths.custom("SameWorkCenter", "if [OperationWorkCenter] = null or [ClockWorkCenter] = null then null "
-                                   "else [OperationWorkCenter] = [ClockWorkCenter]", "type logical")
-    paths.custom("AfterOperationEnd", "if [ActualEndDate] = null then null else [WorkDate] > [ActualEndDate]",
-                 "type logical")
+    # the keys are compared (each work center has its own name, so the names would give the same answer here)
+    paths.custom("SameWorkCenter", "if [OperationWorkCenterID] = null or [ClockWorkCenterID] = null then null "
+                                   "else [OperationWorkCenterID] = [ClockWorkCenterID]", "type logical")
+    paths.custom("AfterOperationEnd", "if [ActualEndDate] = null or [WorkDate] = null then null else "
+                                      "[WorkDate] > [ActualEndDate]", "type logical")
     ids = ("LaborTimeEntryID", "WorkOrderOperationID", "TimeClockEntryID", "OperationWorkCenterID", "ClockWorkCenterID")
     m.add(query_table(paths, summarize={k: "none" for k in ids}, hidden=set(ids)))
     m.relate("LaborPaths.WorkDate", "Date.Date")
@@ -519,7 +545,10 @@ def ex6(b: Build) -> None:
     page.add(Visual("pathMatrix", "pivotTable", 20, 200, 1240, 224, {"Rows": [ow], "Columns": [cw], "Values": [M("Path Hours")]},
                     title=f"Direct hours of {y}: operation's work center (rows) against the time clock's (columns)",
                     filters=[keep("pmType", lt, [DIRECT]), keep("pmYear", col("Date", "Year"), [y]),
-                             keep("pmBlank", ow, [None], exclude=True)]))
+                             keep("pmBlank", ow, [None], exclude=True)],
+                    alt_text="Hours of direct manufacturing time of the year, with the work center of the operation on "
+                             "the rows and the work center of the time clock on the columns; the cells on the diagonal "
+                             "are the lines on which the two agree."))
     page.add(Visual("lateShare", "tableEx", 640, 20, 620, 174, {"Values": [
         col("LaborPaths", "SameWorkCenter"), M("Path Lines"), M("Share After Operation End")]},
         title=f"Direct lines of {y} by whether the paths agree, and the share recorded after the operation ended",
@@ -529,16 +558,26 @@ def ex6(b: Build) -> None:
                     filters=[keep("ibcType", lt, [INDIRECT]), keep("ibcYear", col("Date", "Year"), [y])],
                     sort=[(M("Path Hours"), "Descending")]))
     yrs = ctx["years"]
+    rows_m = [dict(name="Quality Assurance" if r["label"] == "QA" else r["label"], hours=r["diag"] + sum(h for _, h in r["off"]),
+                   off=sum(h for _, h in r["off"])) for r in ctx["m"]]
+    for r_ in rows_m:
+        r_["share"] = r_["off"] / r_["hours"]
+    top_off, top_share = max(rows_m, key=lambda r_: r_["off"]), max(rows_m, key=lambda r_: r_["share"])
+    claim(top_off["name"] == "Packing" and top_share["name"] == "Quality Assurance",
+          "Packing has the largest hours off the diagonal and Quality Assurance the largest share of its hours")
     page.add(answer("ex156Answer", 640, 440, 620, 270, [
         "(4) Disagreements (lines / of lines on both paths / hours): " + "; ".join(
             f"{v['year']} {v['differ']:,} / {v['lines']:,} / {v['hours']:,.1f}" for v in yrs) +
-        f"; {ctx['total']:,} in all. Packing operations were often clocked at another work center.",
+        f"; {ctx['total']:,} in all. In {y} {top_off['name']} has the largest hours off the diagonal "
+        f"({top_off['off']:,.1f} of {top_off['hours']:,.1f}), and {top_share['name']} the largest share "
+        f"({pct(top_share['share'])} of its hours).",
         f"(5) After the operation's end: {ctx['late_differ']:,} of the {ctx['differ']:,} disagreeing lines "
         f"({pct(ctx['late_differ'] / ctx['differ'])}) against {ctx['late_direct']:,} of all {ctx['direct']:,} direct lines "
         f"of {y} ({pct(ctx['late_direct'] / ctx['direct'], 2)}); the {ctx['untested']} lines without an operation cannot "
         f"be tested, and among the {ctx['now']:,} lines on both paths the share is {pct(ctx['late_all'] / ctx['now'], 2)}. "
         "The disagreement concentrates in the late time of Chapter 12.",
-        "(6) The clock places the indirect hours mostly at " + ", ".join(f"{n} ({h:,.1f})" for n, h in ctx["indirect"][:3]) +
+        "(6) The clock places the indirect hours of the year, " + f"{sum(h for _, h in ctx['indirect']):,.1f} in all, at " +
+        ", ".join(f"{n} ({h:,.1f})" for n, h in ctx["indirect"]) +
         ". The operation path answers what work the time was charged to; the clock path where the time clock placed "
         "the employee. "
         "Neither alone supports the Packing finding, which needs corroboration."], size=9))

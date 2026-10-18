@@ -42,7 +42,7 @@ Students can:
 
 ## How to run it
 
-Pairs, about 150 minutes: 20 for the populations, 40 for the clearing and the view, 15 for the lag, 30 for the parts, 35 for the aging and the decision, 10 to write the assumption. The routine for every query: type it at the end of the script, select it, choose **Execute all/selected SQL**, read the message pane. Hold back the view until students have tried to subtract invoice totals. **Collect** the script and the written assumption.
+Pairs, about 150 minutes: 20 for the populations, 40 for the clearing and the view, 15 for the lag, 30 for the parts, 35 for the aging and the decision, 10 to write the assumption. Hold back the view until students have tried to subtract invoice totals. **Collect** the script and the written assumption.
 
 {{ figure('IF-17-3-A') }}
 
@@ -56,7 +56,7 @@ Pairs, about 150 minutes: 20 for the populations, 40 for the clearing and the vi
 
 ### Part 2: What had cleared each accrual
 
-**Step 2. Subtract what cleared each accrual by each date, and save the result as a view.** The Clearing CTE unions the two sources, the invoice debits to `2040` for the lines that refer to the accrual and the Accrual Adjustment debits that reverse it. The view OpenAccruals then lists each accrual still open at each year-end with its age and an IsOld flag.
+**Step 2. Subtract what cleared each accrual by each date, and save the result as a view.** The Clearing CTE unions the two sources, the invoice debits to `2040` for the lines that refer to the accrual and the Accrual Adjustment debits that reverse it. The view OpenAccruals then lists each accrual still open at each year-end with its age and an IsOld flag. The block is the view's first CTE only. The complete view is under the heading `{{ g.h.view }}`.
 
 ```sql
 Clearing AS (
@@ -96,7 +96,7 @@ Clearing AS (
 
 ### Part 4: The parts and the reconciliation
 
-**Step 4. Split `2040` and reconcile.** The opening line, the shipment credits less the settlements, and the open accruals by age, beside the ledger. Only the closing SELECT is shown; its CTEs sum the opening entry, the freight and the ledger.
+**Step 4. Split `2040` and reconcile.** The opening line, the shipment credits less the settlements, and the open accruals by age, beside the ledger. Only the closing SELECT is shown. Its Parts CTE sums the opening entry, the freight and the ledger, OpenAccruals is Step 2's view, and the complete query is under the heading `{{ g.h.parts }}`.
 
 ```sql
 SELECT pa.AsOfDate, ROUND(pa.Opening, 2) AS Opening,

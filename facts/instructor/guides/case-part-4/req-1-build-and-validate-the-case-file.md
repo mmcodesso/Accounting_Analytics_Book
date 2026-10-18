@@ -46,30 +46,34 @@ Individual or pairs, about 150 minutes: 50 for the queries and model, 30 for pro
 
 ## Step-by-step solution
 
-The project encodes the model and the structure of each page, and its Checks tab proves every value below. How a page looks is visible only in Desktop.
+The project encodes the model and the structure of each page, and its Checks tab proves every value below. How a page looks is visible only in Desktop. The M blocks of a Custom Column are the expression alone, which the dialog takes under the column's name and type. Power Query shows the same step in the formula bar and the Advanced Editor as a `Table.AddColumn` assignment, which is not pasted into the dialog.
 
 ### Part 1: The queries and the model
 
 **Step 1. Load the ledger star and flag the closes.**
 
-a. Save Charles River Cash Case.pbix and turn off the two loading options of Tutorial 13.1.
+a. Save Charles River Cash Case.pbix and turn off Auto date/time and Autodetect new relationships under Current File, as Tutorial 13.1 did.
 b. Choose **Home > Get data > Excel workbook**, select GLEntry, Account and JournalEntry, and choose **Transform Data**.
 c. In GLEntry, choose **Home > Choose Columns**, keep only what the model needs and filter no rows. Merge JournalEntry on VoucherNumber and EntryNumber with **Home > Merge Queries** and expand EntryType.
-d. Add `IsYearEndClose` with **Add Column > Custom Column** (Tutorial 14.3) and clear **Enable load** on JournalEntry.
+d. Name the column `IsYearEndClose`, choose **Add Column > Custom Column** (Tutorial 14.3), enter only the expression below, set the type to True/False, and clear **Enable load** on JournalEntry.
 
 ```m jinja
-{{ g.m_close }}
+{{ g.e_close }}
 ```
 
 **Check:** GLEntry has all {{ gl_rows|count }} rows and {{ close_rows }} are flagged: the {{ n_closes }} closes ({{ closes|join('; ') }}). **Watch for:** closes left unflagged. Net income nets to zero in every year, because each close moves a year's revenue and expenses to retained earnings.
 
 **Step 2. Carry the channel into Receipts.**
 
-a. In Requisitions, choose **Add Column > Custom Column** for the channel, from the justification, and again for the work order it names. Merge WorkOrder and Employee (requester and approver).
+a. In Requisitions, choose **Add Column > Custom Column**, name the column `Channel`, enter only the first expression below and set the type to Text. Add `WorkOrderID` from the second expression, as a Whole number. Merge WorkOrder and Employee (requester and approver).
 b. In Receipts, merge OrderLines on POLineID, then Requisitions on RequisitionID, and expand Channel.
 
 ```m jinja
-{{ g.m_channel }}
+{{ g.e_channel }}
+```
+
+```m jinja
+{{ g.e_workorder }}
 ```
 
 **Check:** {{ shortfall|count }} work-order shortfall requisitions, {{ supply|count }} supply plan and {{ n_other }} other. Receipts goes through the order line because the order header names no requisition on {{ blank_header|count }} orders. **Watch for:** a merge through the header. {{ g.hdr_lines|count }} of {{ g.receipt_lines|count }} receipt lines then have no channel, and the materials among them, {{ g.hdr_mat_lines|count }} lines worth ${{ g.hdr_mat_value|money }}, drop out of Requirement 4's channel columns.
@@ -84,7 +88,7 @@ c. Choose **Modeling > New measure** for each measure and type its definition in
 {{ g.m_policy }}
 ```
 
-**Check:** Item has {{ g.n_items|count }} rows. **Watch for:** the policy merged before it is grouped. Item then has {{ g.ungrouped|count }} rows, so ItemID is no longer unique and the relationship cannot be one to many.
+**Check:** Item has {{ g.n_items|count }} rows. **Watch for:** the policy merged before it is grouped. The {{ g.two_policy|count }} items with a policy at both warehouses appear twice, so Item has {{ g.ungrouped|count }} rows, ItemID is no longer unique and the relationship cannot be one to many. The Group By step is shown as the formula bar reads it.
 
 ### Part 2: Profiles and links
 
@@ -93,6 +97,7 @@ c. Choose **Modeling > New measure** for each measure and type its definition in
 a. In Power Query, choose **View > Column quality**, **Column distribution** and **Column profile**.
 b. Click **{{ g.label_top }}** in the status bar and choose **Column profiling based on entire data set**.
 c. Read Justification, Status and ApprovedByEmployeeID in Requisitions.
+d. Profile every other new Table the same way (Receipts, Issues, InventoryPolicy, the invoice, payment and credit Tables, DebtSchedule) and record its grain, row count, missing and duplicate keys, date range, errors and disposition. Check that each merge keeps its fact table's row count.
 
 **Check:** {{ requisitions|count }} requisitions, Justification never empty, {{ no_approver }} without an approver and {{ g.all_approved|count }} Approved. **Watch for:** the default profile. The first {{ g.top_n|count }} rows are all converted to orders, so no Approved requisition shows, only {{ g.top_no_app }} of the {{ g.all_no_app }} blank approvers do, and the shortfall channel is {{ g.top['Shortfall'][0] }} rows of the thousand when it is most of the data set.
 
@@ -153,7 +158,7 @@ A weak submission says the totals "look right" and has no Tests tab.
 
 - **Closes left in.** *Symptom:* net income reads zero in every year. *Response:* ask what a close does to a year's revenue and expenses.
 - **Merge through the header.** *Symptom:* {{ g.hdr_lines|count }} receipt lines with no channel. *Response:* ask which table names the requisition for each line.
-- **Policy not grouped.** *Symptom:* {{ g.ungrouped|count }} item rows. *Response:* ask how many policy rows an item has.
+- **Policy not grouped.** *Symptom:* {{ g.ungrouped|count }} item rows. *Response:* ask how many policy rows an item has, and which items have two.
 - **Profile of the first rows.** *Symptom:* no Approved requisition in the profile. *Response:* ask which basis the status bar names.
 - **Last posting as Data Through.** *Symptom:* {{ g.last }} on the About page. *Response:* ask what posts after the year.
 

@@ -225,13 +225,14 @@ def r1(b: Build) -> None:
     per_type = n["exceptions"] // len(n["exc_types"])
     s.query("Requirement 1: profile of AttendanceException by type, with the columns not always filled in",
             f"Population: every exception; expected: {n['exceptions']} exceptions, {per_type} of each of "
-            f"{len(n['exc_types'])} types, none reviewed",
+            f"{len(n['exc_types'])} types, no reviewer and no review date",
             """
             SELECT ExceptionType, Severity, Status,
                 COUNT(*) AS Exceptions,
                 COUNT(EmployeeShiftRosterID) AS WithRoster,
                 COUNT(ShiftDefinitionID) AS WithShift,
                 COUNT(ReviewedByEmployeeID) AS Reviewed,
+                COUNT(ReviewedDate) AS WithReviewDate,
                 MIN(WorkDate) AS FirstDate,
                 MAX(WorkDate) AS LastDate
             FROM AttendanceException
@@ -241,8 +242,10 @@ def r1(b: Build) -> None:
             [Check("exception types", n["exc_types"], lambda r: r.col("ExceptionType")),
              Check("exceptions of each type", [per_type] * len(n["exc_types"]), lambda r: r.col("Exceptions")),
              Check("statuses", ["Open"], lambda r: sorted(set(r.col("Status")))),
-             Check("exceptions reviewed", d.one("SELECT COUNT(ReviewedByEmployeeID) FROM AttendanceException"),
-                   lambda r: r.total("Reviewed"))])
+             Check("exceptions with a reviewer", d.one("SELECT COUNT(ReviewedByEmployeeID) FROM AttendanceException"),
+                   lambda r: r.total("Reviewed")),
+             Check("exceptions with a review date", d.one("SELECT COUNT(ReviewedDate) FROM AttendanceException"),
+                   lambda r: r.total("WithReviewDate"))])
 
     centers = d.one("SELECT COUNT(DISTINCT WorkCenterID) FROM WorkCenterCalendar")
     s.query("Requirement 1: profile of WorkCenterCalendar, with any work center and date that appears twice",
@@ -712,8 +715,8 @@ def r2(b: Build) -> None:
                        n["threshold"])
     s.query("Requirement 2: the Off Shift Clocking rule reperformed on every entry, and the exceptions raised",
             f"Population: PlantEntries with their rosters; expected: no surge entry arrives {n['threshold']} minutes "
-            f"late or was flagged; {num(n['beyond'])} ordinary entries also leave more than {n['threshold']} "
-            f"minutes late, in whole minutes",
+            f"late or carries any attendance exception; {num(n['beyond'])} ordinary entries also leave more than "
+            f"{n['threshold']} minutes late, in whole minutes, and no plant entry carries an Off Shift Clocking exception",
             """
             WITH RuleMinutes AS (
                 SELECT MIN(MinutesVariance) AS Minutes
@@ -733,7 +736,9 @@ def r2(b: Build) -> None:
                         ON r.EmployeeShiftRosterID = pe.EmployeeShiftRosterID
             ),
             Flagged AS (
-                SELECT TimeClockEntryID
+                SELECT TimeClockEntryID,
+                    MAX(CASE WHEN ExceptionType = 'Off Shift Clocking'
+                        THEN 1 ELSE 0 END) AS OffShift
                 FROM AttendanceException
                 GROUP BY TimeClockEntryID
             )
@@ -742,7 +747,8 @@ def r2(b: Build) -> None:
                     THEN 1 ELSE 0 END) AS LateArrivals,
                 SUM(CASE WHEN t.Departure > (SELECT Minutes FROM RuleMinutes)
                     THEN 1 ELSE 0 END) AS LateDepartures,
-                COUNT(f.TimeClockEntryID) AS Flagged
+                COUNT(f.TimeClockEntryID) AS AnyAttendanceException,
+                COALESCE(SUM(f.OffShift), 0) AS OffShiftException
             FROM Timing AS t
                 LEFT JOIN Flagged AS f
                     ON f.TimeClockEntryID = t.TimeClockEntryID
@@ -753,10 +759,13 @@ def r2(b: Build) -> None:
                    lambda r: r.where(DayType="Surge")["LateArrivals"]),
              Check("surge entries leaving late by the rule (all of them)", surge_entries,
                    lambda r: r.where(DayType="Surge")["LateDepartures"]),
-             Check("surge entries flagged", d.one(
+             Check("surge entries with any attendance exception", d.one(
                  notes(b).PLANT + "SELECT COUNT(ae.AttendanceExceptionID) FROM PlantEntries pe JOIN AttendanceException ae "
                  "ON ae.TimeClockEntryID = pe.TimeClockEntryID WHERE pe.DayType = 'Surge'"),
-                   lambda r: r.where(DayType="Surge")["Flagged"]),
+                   lambda r: r.where(DayType="Surge")["AnyAttendanceException"]),
+             Check("ordinary entries with any attendance exception (other types than Off Shift Clocking)",
+                   sum(x[1] for x in n["plant_flagged"]), lambda r: r.where(DayType="Ordinary")["AnyAttendanceException"]),
+             Check("plant entries with an Off Shift Clocking exception", 0, lambda r: r.total("OffShiftException")),
              Check("ordinary entries leaving more than the rule's minutes late", n["beyond"],
                    lambda r: r.where(DayType="Ordinary")["LateDepartures"])])
 
@@ -765,7 +774,7 @@ def r2(b: Build) -> None:
     wrong = d.one("SELECT COUNT(*) FROM AttendanceException ae JOIN TimeClockEntry tc ON tc.TimeClockEntryID = "
                   "ae.TimeClockEntryID WHERE ae.EmployeeID <> tc.EmployeeID")
     s.query("Requirement 2: the operation of the attendance-exception control, review and status by type",
-            f"Population: every exception; expected: all {n['exceptions']} Open and none reviewed since "
+            f"Population: every exception; expected: all {n['exceptions']} Open with no reviewer recorded since "
             f"{d.F}; {pending} Paid Without Approved Clock on Pending entries; {wrong} name the wrong employee",
             """
             SELECT ae.ExceptionType, COUNT(*) AS Exceptions,
@@ -950,8 +959,9 @@ def r2(b: Build) -> None:
     ow = n["over_weeks"]
     over_text = " and ".join(f"{w} at {v:.1%}" for w, v in ow)
     s.answer("Requirement 2", f"""
-        Corroboration matrix. Supports the hours, though both records come from the time clock and so show only its
-        internal consistency: every hourly employee present on every surge day ({sg['employees']:.0f} people a day,
+        Corroboration matrix. Supports means agreement with a specified recorded feature, such as attendance or a
+        timestamp, and does not establish that all {n['clocked']:.1f} recorded hours were worked. Supports the hours,
+        though both records come from the time clock and so show only its internal consistency: every hourly employee present on every surge day ({sg['employees']:.0f} people a day,
         against {od['employees']:.1f} on ordinary days, though {od['all_present']} of {od['days']} ordinary days also had
         all {n['plant']}, so attendance says little); badge punches on every entry, with meal punches on every surge
         entry. Contradicts or leaves unexplained: about {sg['clock_ins']:.0f} clock-in times a day for the whole plant, so
@@ -970,17 +980,19 @@ def r2(b: Build) -> None:
         The rosters and the overtime approvals come from the same manager, the {n['creator_title']}, who creates every
         manufacturing roster and approved every surge-day approval on the work date. The calendar, the capacity plan,
         and the output lie outside the clock trail, but the records do not show who keeps or can change them, so their
-        independence from the {n['creator_title']} is not established. None of them supports the hours as recorded.
+        independence from the {n['creator_title']} and from the time clock is judged separately, and a record whose
+        provenance is not shown stays not established. None of them supports the hours as recorded.
 
         The control. The {n['n_off']} Off Shift Clocking exceptions are consistent with a rule that flags arrivals
         {n['threshold']} minutes or more after the scheduled start, but {n['n_off']} examples cannot show its threshold,
-        whether it also tests departures, or whether approved overtime is exempt. The system's configuration and its
-        change history would show them. On that reading, surge arrivals {n['early']} minutes early and departures
+        whether it also tests departures, or whether approved overtime is exempt. All {n['n_off']} belong to
+        {' and '.join(n['off_centers']).lower()} employees, so no plant entry carries one. The system's configuration and
+        its change history would show them. On that reading, surge arrivals {n['early']} minutes early and departures
         {n['late'] // 60} hours late with approved overtime could not be flagged, and nothing compares overtime with a
         roster or a plan made in advance, a weakness of design to confirm against the configuration. All
-        {n['exceptions']} exceptions are Open and none was reviewed in up to {n['years']} years, among them {n['n_pwac']}
-        Paid Without Approved Clock and {n['wrong']} that name the wrong employee, a failure of operation in the review
-        the records show, unless the review took place outside them.
+        {n['exceptions']} exceptions are Open with no reviewer or review date recorded in up to {n['years']} years, among
+        them {n['n_pwac']} Paid Without Approved Clock and {n['wrong']} that name the wrong employee, a failure of
+        operation in the review the records show, unless evidence of a review exists outside them.
 
         Two explanations fit the records: the hours were worked, and the time was entered for the plant as a block,
         which breaks the timekeeping control but not the pay; or the hours were not worked as recorded. Evidence outside
@@ -1167,6 +1179,29 @@ def r3(b: Build) -> None:
                       lambda r, p=p, t=t: r.where(Period=p, WeekType=t)["NextSixWeeks"], 0.5),
                 Check(f"{label}: frames short of six weeks", g["short"],
                       lambda r, p=p, t=t: r.where(Period=p, WeekType=t)["ShortFrames"]))])
+
+    s.query(f"Requirement 3: the weeks of {d.C} over six complete following weeks, surge weeks against the others",
+            f"Population: PlantWeeks, {d.C}, with six following weeks that end before the last, partial week; expected: "
+            f"{surge['n_six']} surge weeks at {surge['six']:,.2f} standard hours and {other['n_six']} other weeks at "
+            f"{other['six']:,.2f}",
+            f"""
+            SELECT CASE WHEN SurgeDays > 0 THEN 'Surge'
+                    ELSE 'Ordinary' END AS WeekType,
+                COUNT(*) AS Weeks,
+                ROUND(AVG(NextSixWeeks), 2) AS FollowingOutput
+            FROM PlantWeeks
+            WHERE {year_between(d.C, 'WeekStart')}
+                AND FollowingWeeks = 6
+                AND date(WeekStart, '+42 days') < (
+                    SELECT MAX(WeekStart) FROM PlantWeeks)
+            GROUP BY WeekType
+            ORDER BY WeekType DESC;
+            """,
+            [Check("surge weeks with six complete following weeks", surge["n_six"], lambda r: r.where(WeekType="Surge")["Weeks"]),
+             Check("other weeks with six complete following weeks", other["n_six"], lambda r: r.where(WeekType="Ordinary")["Weeks"]),
+             Check("output after surge weeks", round(surge["six"], 2), lambda r: r.where(WeekType="Surge")["FollowingOutput"], 0.005),
+             Check("output after other weeks", round(other["six"], 2), lambda r: r.where(WeekType="Ordinary")["FollowingOutput"],
+                   0.005)])
 
     weekend = d.one(f"SELECT COUNT(*) FROM ProductionCompletion WHERE strftime('%w', CompletionDate) IN ('0', '6') "
                     f"AND substr(CompletionDate, 1, 4) = '{d.C}'")
@@ -1896,6 +1931,46 @@ def r4(b: Build) -> None:
             + [Check(f"{y} forecast to orders", round(v, 2), lambda r, y=y: r.where(FiscalYear=y)["ForecastToOrdered"],
                      0.0051) for y, v in forecast.items()])
 
+    s.query(f"Requirement 4: the {c} budget's volume weighted by standard labor hours, against the regular capacity",
+            f"Population: BudgetLine revenue of manufactured items, {c}, with each item's standard labor hours per unit; "
+            f"expected: {num(n['budget_units'], 2)} units, {num(n['budget_std'], 2)} standard hours, {num(n['budget_over'], 2)} "
+            f"above the {num(n['capacity'])} regular hours",
+            f"""
+            WITH Capacity AS (
+                SELECT (SELECT COUNT(*)
+                        FROM Employee AS e
+                            INNER JOIN CostCenter AS cc
+                                ON cc.CostCenterID = e.CostCenterID
+                        WHERE cc.CostCenterName = 'Manufacturing'
+                            AND e.PayClass = 'Hourly'
+                            AND e.IsActive = 1)
+                    * 8
+                    * (SELECT COUNT(DISTINCT CalendarDate)
+                       FROM WorkCenterCalendar
+                       WHERE IsWorkingDay = 1
+                           AND {year_between(c, 'CalendarDate')})
+                    AS RegularHours
+            )
+            SELECT b.FiscalYear,
+                ROUND(SUM(b.Quantity), 2) AS BudgetUnits,
+                ROUND(SUM(b.Quantity * i.StandardLaborHoursPerUnit), 2)
+                    AS BudgetStandardHours,
+                (SELECT RegularHours FROM Capacity) AS RegularCapacity,
+                ROUND(SUM(b.Quantity * i.StandardLaborHoursPerUnit)
+                    - (SELECT RegularHours FROM Capacity), 2)
+                    AS HoursAboveCapacity
+            FROM BudgetLine AS b
+                INNER JOIN Item AS i ON i.ItemID = b.ItemID
+            WHERE b.FiscalYear = {c}
+                AND b.BudgetCategory = 'Revenue'
+                AND i.SupplyMode = 'Manufactured'
+            GROUP BY b.FiscalYear;
+            """,
+            [Check("budget units", round(n["budget_units"], 2), lambda r: r.value("BudgetUnits"), 0.005),
+             Check("budget standard hours, item by item", round(n["budget_std"], 2), lambda r: r.value("BudgetStandardHours"), 0.005),
+             Check("regular capacity", n["capacity"], lambda r: r.value("RegularCapacity")),
+             Check("hours above the regular capacity", round(n["budget_over"], 2), lambda r: r.value("HoursAboveCapacity"), 0.005)])
+
     categories = [r[0] for r in d.q("SELECT DISTINCT b.BudgetCategory FROM BudgetLine b JOIN CostCenter c ON "
                                     "c.CostCenterID = b.CostCenterID WHERE c.CostCenterName = 'Manufacturing'")]
     s.query("Requirement 4: what the budget holds for Manufacturing",
@@ -2006,14 +2081,16 @@ def r4(b: Build) -> None:
     stray = " and ".join(f"{x['number']}, dated {x['dated']} and posted {x['posted']}" for x in n["stray"])
     s.answer("Requirement 4", f"""
         Assumptions (the Params CTE): volume {money(n['std'])} standard hours, the {c} output, because the budget plans
-        about {n['budget']} times the units the plant completed and the demand forecast {n['forecast_low']} to
+        about {n['budget']} times the units the plant completed (weighted item by item, {num(n['budget_std'])} standard
+        hours, {num(n['budget_over'])} more than the regular capacity) and the demand forecast {n['forecast_low']} to
         {n['forecast_high']} times the units ordered, and no year has a manufacturing labor or overhead budget; a target
         of {levels[1]:.2f} hours per standard hour, the {d.F} level, a planning target to test rather than a measure of
         what the work requires; a straight-time rate of {n['rate']:.2f} an hour (the {c} base rates weighted by hours)
         with a {n['burden']:.2%} burden, on the assumption that paid hours follow the hours scheduled; {n['days']}
         working days, from {c}, because the calendar stops early in {nn}; Factory Overhead at its {c} run rate,
-        {money(n['foh'])}; and {nn} depreciation of {money(n['dep_n'])} from FixedAsset, after the same schedule
-        reproduced {c}'s {money(n['dep_c'])} to the cent. Salaried staff ({n['titles']}) cost {money(n['salary'])}
+        {money(n['foh'])}; and {nn} depreciation of {money(n['dep_n'])} from FixedAsset (cost over useful life, zero residual value, from the
+        month after the in-service date through the month before disposal and no longer than the life), after the same
+        schedule reproduced {c}'s {money(n['dep_c'])} to the cent. Salaried staff ({n['titles']}) cost {money(n['salary'])}
         before the burden. The standard conversion of the plan is what completions released to 1090 in {c},
         {money(n['released'])}; the completion lines dated in {c} carry {money(n['lines'])}, and the difference is
         {stray}.
@@ -2034,11 +2111,12 @@ def r4(b: Build) -> None:
         are not the normal capacity of the inventory standard, and part of the applied overhead is variable, so the
         residual is not all idle capacity until the overhead is analyzed into fixed and variable, normal and abnormal.
 
-        Standards: the records give no reason to revise the direct-hour standards. Direct time stayed below the
-        standard hours ({num(n['direct'])} against {num(n['std_cut'])} to {n['cutoff']}, and {num(n['direct_common'])}
-        against {num(n['std_common'])} counted on both sides to {n['ind_end']}, the day indirect time ends), but that
-        compares period totals and does not validate the standards. Review the rates, and do not raise the fixed
-        overhead rate to absorb idle capacity (Requirement 5).""")
+        Standards: keep the direct-hour standards provisionally, since the records give no reason to revise them. Direct
+        time stayed below the standard hours ({num(n['direct'])} against {num(n['std_cut'])} to {n['cutoff']}, and
+        {num(n['direct_common'])} against {num(n['std_common'])} counted on both sides to {n['ind_end']}, the day
+        indirect time ends), but that compares period totals, does not validate the standards and does not show that they
+        are right. Review the rates on a defensible normal-capacity basis, and do not raise the fixed overhead rate
+        simply to absorb idle capacity (Requirement 5).""")
 
 
 # --- Requirement 5: the year-end close -------------------------------------------------------------------------------
@@ -2380,6 +2458,55 @@ def r5(b: Build) -> None:
              Check("liability left out against current liabilities", round(n["liab_cl"], 4),
                    lambda r: r.value("LiabilityToCurrentLiabilities"), 0.00005)])
 
+    s.query(f"Requirement 5: the standard conversion cost that completions dated after the time records end released to "
+            "1090",
+            f"Population: ProductionCompletion lines and the 1090 postings of completions from the day after the last "
+            f"time record ({n['after_first']}) and from the day after the last processed period (December {n['left_day']}) to "
+            f"{c}-12-31; expected: {n['after_time']['n']} completions and {money(n['after_time']['cost'])}, then "
+            f"{n['in_window']['n']} and {money(n['in_window']['cost'])}, each equal to the credits to 1090",
+            f"""
+            WITH Windows AS (
+                SELECT 'After the last time record' AS Basis,
+                    date((SELECT MAX(WorkDate) FROM TimeClockEntry),
+                        '+1 day') AS FirstDay
+                UNION ALL
+                SELECT 'After the last processed period',
+                    date((SELECT MAX(LastDay) FROM PayrollAccrual), '+1 day')
+            )
+            SELECT w.Basis, w.FirstDay,
+                (SELECT COUNT(DISTINCT pc.ProductionCompletionID)
+                 FROM ProductionCompletion AS pc
+                 WHERE pc.CompletionDate BETWEEN w.FirstDay AND '{c}-12-31')
+                    AS Completions,
+                (SELECT ROUND(SUM(pcl.ExtendedStandardConversionCost), 2)
+                 FROM ProductionCompletionLine AS pcl
+                     INNER JOIN ProductionCompletion AS pc
+                         ON pc.ProductionCompletionID = pcl.ProductionCompletionID
+                 WHERE pc.CompletionDate BETWEEN w.FirstDay AND '{c}-12-31')
+                    AS StandardConversion,
+                (SELECT ROUND(SUM(gl.Credit - gl.Debit), 2)
+                 FROM GLEntry AS gl
+                     INNER JOIN Account AS a ON a.AccountID = gl.AccountID
+                 WHERE a.AccountNumber = 1090
+                     AND gl.SourceDocumentType = 'ProductionCompletion'
+                     AND gl.PostingDate BETWEEN w.FirstDay AND '{c}-12-31')
+                    AS CreditedTo1090
+            FROM Windows AS w
+            ORDER BY w.FirstDay;
+            """,
+            [Check("completions after the last time record", n["after_time"]["n"],
+                   lambda r: r.where(Basis="After the last time record")["Completions"]),
+             Check("standard conversion after the last time record", round(n["after_time"]["cost"], 2),
+                   lambda r: r.where(Basis="After the last time record")["StandardConversion"], 0.005),
+             Check("credited to 1090 after the last time record", round(n["after_time"]["cost"], 2),
+                   lambda r: r.where(Basis="After the last time record")["CreditedTo1090"], 0.005),
+             Check("completions after the last processed period", n["in_window"]["n"],
+                   lambda r: r.where(Basis="After the last processed period")["Completions"]),
+             Check("standard conversion after the last processed period", round(n["in_window"]["cost"], 2),
+                   lambda r: r.where(Basis="After the last processed period")["StandardConversion"], 0.005),
+             Check("credited to 1090 after the last processed period", round(n["in_window"]["cost"], 2),
+                   lambda r: r.where(Basis="After the last processed period")["CreditedTo1090"], 0.005)])
+
     s.query("Requirement 5: actual conversion cost per standard hour against the standard, and the finished goods "
             "it would revalue",
             f"Population: PlantLedger and {c}'s completions; account 1040 at {c}-12-31; expected: "
@@ -2438,9 +2565,13 @@ def r5(b: Build) -> None:
         {money(n['mfg_all_in'])} (its gross pay and {money(n['mfg_employer'])} of employer costs), the other cost
         centers' salary accounts for their gross pay, {money(n['other_gross'])}, and 6060 for their employer costs only,
         {money(n['other_employer'])}; credit 2030 for gross pay, 2032 for employer taxes, and 2033 for benefits. The
-        manufacturing part stays in 1090 until it is cleared, because no completion releases standard cost against it.
-        On the case's reading that it is a cost of the period, a second entry moves it to 5080 (debit 5080, credit 1090),
-        once the accountant has judged how much of it is normal cost that the standards should carry.
+        manufacturing part stays in 1090 until it is cleared. Completions continue to the year-end and have already
+        released standard conversion cost ({n['in_window']['n']} completions dated December {n['left_day']} to 31
+        released {money(n['in_window']['cost'])}), so posting the accrual does not create another release. For the income
+        figures below, the accrual's manufacturing part and the prior year's ({money(prior['mfg'])}) are taken as costs of
+        the period, a second entry moving each to 5080 (debit 5080, credit 1090). How much of either is normal
+        conversion cost that belongs in inventory, and how much is abnormal, needs the overhead analysis of Requirement 4
+        and evidence on normal capacity, and any other split changes the income and equity figures.
 
         The year-end before was not accrued either: {money(prior['total'])} of {pp_} work (manufacturing
         {money(prior['mfg'])}) was charged to fiscal {c}. Recording both raises {c} expense by only
@@ -2453,20 +2584,42 @@ def r5(b: Build) -> None:
 
         ASC Topic 330: {c}'s conversion cost on the ledger was {n['actual_rate']:.2f} per standard hour of the year's
         output against the standard {n['std_rate']:.2f}, a pay-year cost over output rather than a matching of hours to
-        work. Raising the standards to absorb it would carry idle capacity and unsupported hours into finished goods
-        ({money(n['fg'])} at year-end) and defer them to later years. The part of the cost that comes from idle capacity
-        or from hours beyond the work is abnormal and belongs in {c}'s cost of goods sold, and measuring that part needs
-        Requirement 4's analysis of the overhead.
+        work. Raising the standards to absorb it would carry any idle capacity and any unsupported hours into finished goods
+        ({money(n['fg'])} at year-end) and defer them to later years. Identified abnormal costs, such as idle capacity,
+        belong in {c}'s cost of goods sold, and normal conversion cost needs a separate allocation on normal capacity.
+        Hours with no support are not automatically hours not worked or an abnormal cost of the same amount, and
+        measuring the abnormal part needs Requirement 4's analysis of the overhead.
 
         Cutoff (L5, L6): fiscal {c} revenue includes {money(n['delivered'])} of December {pp_} deliveries and excludes
         {n['n_uninv']} shipment lines of December {c} never invoiced, {money(n['uninv'])} at order price, whose standard
         cost ({money(n['uninv_std'])}) is already in cost of goods sold: {money(n['net_rev'])} more {c} revenue. Adjusted
-        net income {money(ni)} - {money(n['change'])} + {money(n['net_rev'])} = {money(n['adj_ni'])} (the ledger records
-        no income tax). The net effect on income, {money(n['effect'])}, is {n['share']:.2%} of net income, but that does
+        net income {money(ni)} - {money(n['change'])} + {money(n['net_rev'])} = {money(n['adj_ni'])}, on the assumption
+        that the manufacturing parts are period costs and not an independently determined split of normal and abnormal
+        cost (the ledger records no income tax). The net effect on income, {money(n['effect'])}, is {n['share']:.2%} of net income, but that does
         not make the errors immaterial. The liability left out is {n['liab_ni']:.1%} of net income and {n['liab_cl']:.1%}
         of current liabilities, the prior-year error moves opening retained earnings, and the missing year-end accrual
         is a deficiency in the close that recurs every year, so each is judged on its own and together with the
-        qualitative factors. The case supplies no materiality threshold. {', '.join(a['number'] for a in asv)} is not a
+        qualitative factors. The case supplies no materiality threshold.
+
+        Adjustment schedule, a proposal and not a change to the database, on the manufacturing assumption above. Round
+        each line to cents and put any cent left over on a named line, never by changing a query total: the cost centers'
+        amounts rounded one by one add to {money(n['centers_sum'])}, a cent off the accrual rounded once, so the entry
+        is built from the totals. (1) Accrual: debit 1090 {money(n['mfg_all_in'])}, the other cost centers' salary
+        accounts {money(n['other_gross'])} and 6060 {money(n['other_employer'])}; credit 2030 {money(p['gross'])}, 2032
+        {money(p['tax'])} and 2033 {money(p['ben'])}. (2) The manufacturing part to the period: debit 5080, credit 1090,
+        {money(n['mfg_all_in'])}. (3) The {pp_} work paid in {c}: debit opening retained earnings {money(prior['total'])};
+        credit 5080 {money(n['split']['mfg'])} (Manufacturing, where the same assumption puts it), the salary accounts
+        {money(n['split']['other_gross'])} and 6060 {money(n['split']['other_employer'])}, which carries the
+        {money(n['split']['residual'])} left over from rounding. (4) The {pp_} revenue recognized in {c}: debit the
+        revenue accounts and credit opening retained earnings {money(n['delivered'])}. (5) The {c} deliveries not
+        invoiced: debit 1020 and credit the revenue accounts {money(n['uninv'])}, with no further cost of goods sold,
+        because their {money(n['uninv_std'])} of standard cost is already recorded. The effects reconcile: receivables
+        +{money(n['uninv'])}, liabilities +{money(p['accrual'])}, opening equity {money(n['open_equity'])}, the year's
+        income {money(n['effect'])}, ending equity {money(n['end_equity'])}. The {money(n['opening'])} in 2030 is neither
+        released nor netted. The estimate uses the manufacturing working-day calendar and the recent processed-payroll
+        mix for every cost center, so check salary arrangements, unusual overtime and December work patterns, and true it
+        up to the payroll actually posted. A different defensible allocation method is a sensitivity, not an arithmetic
+        error in the stipulated method. {', '.join(a['number'] for a in asv)} is not a
         payables cutoff item: its accrual {', '.join(a['je'] for a in asv)} carried the liability at the year-end.""")
 
 
@@ -2488,17 +2641,18 @@ def r6(b: Build) -> None:
         {r4n['levels'][1]:.2f} hours per standard hour needs {num(r4n['need'][1])} hours against
         {num(r4n['capacity'])} of regular capacity on the year's total and expects a variance of about
         {num(r4n['variance'][1])}. Financial reporting: record the payroll accrual of {money(r5n['p']['accrual'])} and
-        the revenue cutoff ({money(r5n['net_rev'])}), for adjusted net income of {money(r5n['adj_ni'])}. The net effect
-        is small, but the liability left out is not, and each error is judged on its own. Keep the cost of the hours out
-        of inventory.
+        the revenue cutoff ({money(r5n['net_rev'])}), for adjusted net income of {money(r5n['adj_ni'])}, on the stated
+        assumption that the manufacturing parts are period costs. The net effect is small, but the liability left out is
+        not, and each error is judged on its own. Identified abnormal costs are expensed, while normal conversion costs
+        need a separate inventory-allocation analysis.
 
         Recommendation: stop routine surge days and require overtime to be approved in advance against a plan, by
         someone outside production; review the open attendance exceptions, obtain the rule's configuration, and add a
         rule that compares overtime with the roster; have internal audit corroborate a sample of surge days with access
         logs and interviews; adopt a {d.N} plan at about the {d.F} level of hours per standard hour as a target to test,
         with no routine overtime, since the year's capacity allows it, and exceptions approved against a dated plan; keep
-        the direct-hour standards, which the records give no reason to revise, and review the overhead rates on normal
-        capacity; and record the year-end payroll accrual now and at every year-end.""")
+        the direct-hour standards provisionally, since the records give no reason to revise them and the comparison does
+        not show they are right, and review the overhead rates on normal capacity; and record the year-end payroll accrual now and at every year-end.""")
 
 
 EXERCISES = [("Requirement 1", r1), ("Requirement 2", r2), ("Requirement 3", r3), ("Requirement 4", r4),

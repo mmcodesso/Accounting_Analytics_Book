@@ -32,7 +32,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 (5) Compare the balances of the product revenue accounts, 4010 to 4040 and 4080, with the fiscal 2026 revenue of their item groups in InvoiceLines. Three accounts differ by small amounts. Identify the invoices responsible, using what you found in Exercise 5.2 about invoices numbered in one fiscal year and dated in another, and explain which date should determine the period of their revenue and what evidence would settle it. Each invoice line's ShipmentLineID leads, through the ShipmentLine and Shipment worksheets of CharlesRiver_Work.xlsx, to the date its goods were delivered.
 
-(6) Write a memo of half a page to the controller that presents the common-size income statement, describes what it shows about Charles River's cost structure, and explains the reconciling differences.
+(6) Write a memo of half a page to the controller that presents the common-size income statement, describes what it shows about Charles River's cost structure, and explains the reconciling differences. State that the statement is as recorded, before any correction of the differences you found.
 
 **Deliverable.** A trial balance whose debit and credit balances agree, a common-size income statement for fiscal 2026 that ties to the closing entry, a revenue reconciliation, and a half-page memo.
 
@@ -44,7 +44,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Table group:** Order-to-Cash, with the Customer and Item tables from Master Data
 
-**Scenario.** The revenue standard of the Financial Accounting Standards Board (FASB) requires a public company to disaggregate its revenue into categories that show how economic factors affect the nature, amount, timing, and uncertainty of its revenue and cash flows, and it offers major product lines and types of customer as examples of such categories (FASB, 2014). The controller asks you to prepare a first disaggregation on that basis from the invoice lines, for management, before it is reconciled to the revenue the financial statements report.
+**Scenario.** For this disclosure-style exercise, assume that Charles River is a public business entity applying U.S. GAAP. The revenue standard of the Financial Accounting Standards Board (FASB) requires such an entity to disaggregate its revenue into categories that show how economic factors affect the nature, amount, timing, and uncertainty of its revenue and cash flows, and it offers major product lines and types of customer as examples of such categories (FASB, 2014, ASC 606-10-50-5 and 55-91). The controller asks you to prepare a first disaggregation on that basis from the invoice lines, for management, before it is reconciled to the revenue the financial statements report.
 
 **Requirements.**
 
@@ -52,11 +52,11 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 (2) Keep that PivotTable, and build a second one with the same fields, adding FiscalYear to the Columns area, above ItemGroup. Show 2025 and 2026, and calculate each combination's change from 2025 with % Difference From. Identify the two largest percentage increases and the two largest percentage decreases among the combinations with at least $500,000 of revenue in 2025.
 
-(3) Repeat the year-over-year comparison in a third PivotTable, by Region instead of by segment.
+(3) Repeat the year-over-year comparison in a third PivotTable, by Region instead of by segment, and report the change of each region as a whole.
 
 (4) Write a disclosure-style paragraph of four to six sentences that presents the disaggregation you would recommend, states why you chose its categories, and summarizes the changes from the previous year.
 
-(5) List the differences between this invoice-based revenue and the revenue that the income statement of Exercise 6.1 reports, which would have to be reconciled before the disaggregation could support a disclosure in the financial statements.
+(5) List and quantify the differences between this invoice-based revenue and the revenue that the income statement of Exercise 6.1 reports, which would have to be reconciled before the disaggregation could support a disclosure in the financial statements.
 
 **Deliverable.** Three PivotTables, a list of the largest combinations and changes, a disclosure paragraph, and the list of differences to reconcile.
 
@@ -122,7 +122,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 **Table group:** Order-to-Cash, with the Item table from Master Data
 
-**Scenario.** As part of the audit of fiscal 2026 revenue, your senior asks you to perform a simple analytical procedure: develop an expectation of each product line's revenue for each quarter, compare the recorded revenue with it, and identify the differences that need investigation, as the auditing standard of the Public Company Accounting Oversight Board (PCAOB) describes (PCAOB, n.d.).
+**Scenario.** As part of the audit of fiscal 2026 revenue, your senior asks you to perform a simple analytical procedure: develop an expectation of each product line's revenue for each quarter, compare the recorded revenue with it, and identify the differences that need investigation, as the auditing standard of the Public Company Accounting Oversight Board (PCAOB) describes (PCAOB, n.d.). For this exercise, use the same quarter of the previous year as a deliberately simple expectation and apply the thresholds of requirement (3). In an audit, you would also assess the reliability of the data, refine the expectation for known changes, set the acceptable difference from materiality and the audit objective, and corroborate management's explanations, and a difference below the thresholds would not by itself show that an amount is free of misstatement.
 
 **Requirements.**
 
@@ -130,7 +130,7 @@ As in the earlier chapters, work on these exercises in a fresh copy of your anal
 
 (2) On a separate worksheet, use each group's revenue in the same quarter of 2025 as the expectation for 2026, and calculate the difference in dollars and as a percentage of the expectation.
 
-(3) Flag the differences that exceed both 10 percent of the expectation and $50,000, the thresholds your senior chose for this exercise, in either direction: compare the absolute values, with ABS, so that decreases are flagged as well as increases. List the flagged differences.
+(3) Flag the differences that exceed both 10 percent of the expectation and $50,000, the thresholds your senior chose for this exercise, in either direction: compare the absolute values, with ABS, so that decreases are flagged as well as increases. Store the two thresholds in labeled input cells, and refer to those cells in the flag formula. List the flagged differences.
 
 (4) Identify the largest difference in dollars that your threshold does not flag, and explain what that says about the design of the threshold.
 

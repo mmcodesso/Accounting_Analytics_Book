@@ -36,9 +36,9 @@ Individual or pairs, about 120 minutes: 25 for the imports and the item list (re
 
 ### Requirement (1): The data and the items
 
-**Step 1. Import the four Tables.** Choose **Data > Get Data > From File > From Excel Workbook** and select T44_Item, T50_RoutingOperation, T47_WorkCenter and T48_WorkCenterCalendar. For T44_Item, **Transform Data**, name the query `ItemRouting` and keep ItemID, ItemCode, ItemGroup, StandardCost, StandardFixedOverheadCost, SupplyMode and RoutingID. Name the others `RoutingOperation`, `WorkCenter` and `WorkCenterCalendar`.
+**Step 1. Import the four Tables.** Choose **Data > Get Data > From File > From Excel Workbook** and select T44_Item, T50_RoutingOperation, T47_WorkCenter and T48_WorkCenterCalendar. For T44_Item, **Transform Data**, name the query `ItemRouting` and keep ItemID, ItemCode, ItemGroup, StandardCost, StandardFixedOverheadCost, SupplyMode and RoutingID. Name the others `RoutingOperation`, `WorkCenter` and `WorkCenterCalendar`. Load all four to worksheet Tables named after their queries (**Close & Load To**, **Table**), because the worksheet formulas read them as Tables.
 
-**Step 2. List the manufactured items sold.** On a worksheet named `Ex 7.4` enter the year in B2, and in A21 the list of items:
+**Step 2. List the manufactured items sold.** On a worksheet named `Ex 7.4` set B2 to 2026 and B3 to `=CommissionRate`. In A20:I20 type `ItemID`, `ItemCode`, `ItemGroup`, `RoutingID`, `Demand`, `Average price`, `Variable standard cost`, `Contribution per unit` and `Quantity`. Enter the item list in A21, and leave every cell that a spill will fill, here and below, empty:
 
 ```
 =SORT(FILTER(ItemRouting[ItemID],(ItemRouting[SupplyMode]="Manufactured")*(SUMIFS(InvoiceLines[Quantity],InvoiceLines[ItemID],ItemRouting[ItemID],InvoiceLines[FiscalYear],$B$2)>0)))
@@ -48,27 +48,63 @@ Individual or pairs, about 120 minutes: 25 for the imports and the item list (re
 
 ### Requirement (2): Demand, contribution and hours
 
-**Step 3. Build the item table in rows 21 to 103.**
+**Step 3. Build the work centers and the item table in rows 21 to 103.** The work-center block comes first, because the hours matrix needs its IDs. Every formula goes in its one named cell, and the line breaks below are only for reading.
 
-a. Demand (column E): the units sold in the year by SUMIFS on InvoiceLines.
-b. Average price (F): revenue divided by demand. Variable standard cost (G): StandardCost less StandardFixedOverheadCost.
-c. Contribution per unit (H): `=F21#-G21#-$B$3*F21#`, with B3 `=CommissionRate`.
-d. Hours per unit at each work center (columns J to N, headed by the transposed center names): SUMIFS of StandardRunHoursPerUnit by routing and center.
+a. In A10:H10 type `WorkCenterID`, `Work center`, `Available hours`, `Capacity (half)`, `Hours to meet all demand`, `Demand / capacity`, `Hours used (SUMPRODUCT)` and `Slack`, then enter these formulas, each of which spills over the five centers:
 
 ```
-=SUMIFS(RoutingOperation[StandardRunHoursPerUnit],RoutingOperation[RoutingID],D21#,RoutingOperation[WorkCenterID],J19#)
+A11  =SORT(WorkCenter[WorkCenterID])
+B11  =XLOOKUP(A11#,WorkCenter[WorkCenterID],WorkCenter[WorkCenterName])
+C11  =SUMIFS(WorkCenterCalendar[AvailableHours],
+         WorkCenterCalendar[WorkCenterID],A11#,
+         WorkCenterCalendar[CalendarDate],">="&DATE($B$2,1,1),
+         WorkCenterCalendar[CalendarDate],"<"&DATE($B$2+1,1,1))
+D11  =C11#/2
 ```
 
-**Check:** the commission rate is 1.903%. **Watch for:** a contribution that keeps the fixed overhead in the standard cost, or leaves out the commission. Both change the objective and the items Solver cuts.
+b. In the item table, units sold by SUMIFS on InvoiceLines (demand), the average price as revenue over demand, the variable standard cost as StandardCost less StandardFixedOverheadCost, and the contribution per unit:
+
+```
+B21  =XLOOKUP(A21#,ItemRouting[ItemID],ItemRouting[ItemCode])
+C21  =XLOOKUP(A21#,ItemRouting[ItemID],ItemRouting[ItemGroup])
+D21  =XLOOKUP(A21#,ItemRouting[ItemID],ItemRouting[RoutingID])
+E21  =SUMIFS(InvoiceLines[Quantity],InvoiceLines[ItemID],A21#,
+         InvoiceLines[FiscalYear],$B$2)
+F21  =SUMIFS(InvoiceLines[LineTotal],InvoiceLines[ItemID],A21#,
+         InvoiceLines[FiscalYear],$B$2)/E21#
+G21  =XLOOKUP(A21#,ItemRouting[ItemID],
+         ItemRouting[StandardCost]-ItemRouting[StandardFixedOverheadCost])
+H21  =F21#-G21#-$B$3*F21#
+```
+
+c. Hours per unit at each work center, in columns J to N. Row 19 holds the numeric work center IDs, because SUMIFS matches RoutingOperation[WorkCenterID], and row 20 the names for reading:
+
+```
+J19  =TRANSPOSE(A11#)
+J20  =TRANSPOSE(B11#)
+J21  =SUMIFS(RoutingOperation[StandardRunHoursPerUnit],
+         RoutingOperation[RoutingID],D21#,
+         RoutingOperation[WorkCenterID],J19#)
+```
+
+d. Copy E21:E103 and choose **Paste Special > Values** into I21:I103. These are Solver's 83 changing cells, so they must hold typed values and not a spill linked to demand.
+
+**Check:** the commission rate is 1.903%, the work-center block has 5 rows, and the hours matrix is 83 items by 5 centers. **Watch for:** a contribution that keeps the fixed overhead in the standard cost, or leaves out the commission. Both change the objective ($9,049,940.03 with the fixed overhead kept and $9,937,437.23 without the commission, against the model answer's) and the shadow price ($148.42 and $173.01). In this dataset neither changes the quantities, so the same 7 items are cut. The cost definition still matters, because a different demand mix or capacity pattern could change the plan.
 
 ### Requirement (3): The model
 
-**Step 4. Capacity and hours.**
+**Step 4. Hours used, slack and the objective.**
 
-a. In C11:C15 total each work center's available hours in the year from WorkCenterCalendar with SUMIFS on the center and a date range, and in D11 `=C11#/2`.
-b. Fill I21:I103 with the demand as a starting plan.
-c. Hours to meet all demand (E) and hours used (G) for each center: `=SUMPRODUCT(J$21:J$103,$E$21:$E$103)` and `=SUMPRODUCT(J$21:J$103,$I$21:$I$103)`. Slack is `=D11-G11`.
-d. In B4 the objective: `=SUMPRODUCT(H21:H103,I21:I103)`.
+a. The capacity is in D11 from Step 3, and the starting plan is in I21:I103.
+b. In E11 and G11 enter the hours to meet all demand and the hours used for the first center, which uses matrix column J:
+
+```
+E11  =SUMPRODUCT(J$21:J$103,$E$21:$E$103)
+G11  =SUMPRODUCT(J$21:J$103,$I$21:$I$103)
+```
+
+c. For the centers in rows 12 to 15 use the matrix columns K, L, M, N in place of J, keeping rows 21 to 103. A straight fill downward would keep column J in every row and give every center the first center's hours.
+d. In F11 enter `=E11/D11` and in H11 `=D11-G11`, and fill both down through row 15. In B4 enter the objective: `=SUMPRODUCT(H21:H103,I21:I103)`.
 
 **Check:** hours to meet all demand against half of capacity: Cutting 79%; Assembly 109%; Finishing and Test 107%; Packing 94%; Quality Assurance 13%. The contribution if all demand were met is $9,861,535.80. **Watch for:** capacity left at the full hours. Nothing then binds and the loss is zero.
 
@@ -87,7 +123,7 @@ d. Click **Solve**, choose **Keep Solver Solution**, and select **Answer** and *
 
 **Step 6. Read the Answer report.** Assembly uses all of its 27,589 hours. Finishing and Test ends at 14,764 of 15,117 hours and would bind next. The plan makes 76 items in full and reduces 7: LGT-TBL-0003 (0.0 of 826.5 units); LGT-FLR-0006 (224.8 of 717.0 units); FUR-DSK-0011 (0.0 of 537.9 units); FUR-TBL-0013 (0.0 of 364.6 units); LGT-FLR-0008 (0.0 of 315.7 units); LGT-SCN-0011 (0.0 of 805.0 units); LGT-FLR-0039 (0.0 of 642.0 units).
 
-**Step 7. Read the Sensitivity report.** In the Constraints block, the Assembly row shows a shadow price of $166.98, with an allowable increase of 212 hours and a decrease of 97: the value holds for capacity from 27,492 to 27,800 hours. It equals the contribution per Assembly hour of LGT-FLR-0006, the one item made in part (224.8 of 717.0).
+**Step 7. Read the Sensitivity report.** In the Constraints block, the Assembly row shows a shadow price of $166.98, with an allowable increase of 212 hours and a decrease of 97: the value holds for capacity from 27,492 to 27,800 hours. It equals the contribution per Assembly hour of LGT-FLR-0006, the one item made in part (224.8 of 717.0). The allowable increase and decrease describe a change in Assembly's capacity alone, with every other input held. At the top of the range the item made in part reaches its demand, and at the bottom its quantity reaches zero, so another item takes its place and the shadow price changes. Neither end is another work center starting to bind. After a larger change, or a change in another input at the same time, solve again.
 
 ![Why Solver cuts the items it cuts, ranked by contribution per Assembly hour against the shadow price.](../figures/chapter-07-analysis-and-modeling/IF-07-4-A.pdf)
 
@@ -114,7 +150,8 @@ d. Click **Solve**, choose **Keep Solver Solution**, and select **Answer** and *
 ## What a strong answer says
 
 - **Requirement (5).** Assembly is the only center that binds, though Finishing and Test is close. The plan cuts the items that earn the least for each Assembly hour, which are not always the items with the smallest unit margin: LGT-CHD-0029 and LGT-CHD-0010 earn less per unit than some items that are cut, and are made in full because they use less Assembly time. The shadow price is the most an extra Assembly hour is worth, and only over the range the report gives.
-- **The recommendation.** Protect Assembly hours in the upgrade schedule, give priority to the items with the highest contribution per Assembly hour, price overtime or outsourcing against the shadow price, and talk to sales about the reduced items. It names the limits: demand and prices fixed, fractional units allowed, run hours exact, and setup hours ignored. With setup hours spread over each item's average lot, the contribution lost rises to about $562,000.
+- **The recommendation.** Protect Assembly hours in the upgrade schedule, give priority to the items with the highest contribution per Assembly hour, price overtime or outsourcing against the shadow price, and talk to sales about the reduced items.
+- **A plus.** The limits: demand and prices fixed, fractional units allowed, run hours exact, and setup hours ignored. With setup hours spread over each item's average lot, the contribution lost rises to about $562,000.
 
 A weak answer lists the quantities without saying which resource drives them, reads the shadow price as a price per item, or applies it beyond its range.
 
@@ -125,6 +162,7 @@ A weak answer lists the quantities without saying which resource drives them, re
 - **Whole units required.** *Symptom:* no Sensitivity report. *Response:* ask what the chapter says the report needs.
 - **No demand limit.** *Symptom:* quantities above demand. *Response:* ask who will buy them.
 - **Mismatched SUMPRODUCT ranges.** *Symptom:* #VALUE!. *Response:* ask whether both ranges have the same size.
+- **A fill-down of the hours formulas.** *Symptom:* the same hours at every center. *Response:* ask which matrix column each center needs.
 - **Shadow price misread.** *Symptom:* "an item is worth this much". *Response:* ask for the unit of a shadow price.
 
 ## Grading guide
@@ -136,7 +174,7 @@ A weak answer lists the quantities without saying which resource drives them, re
 | Requirement 3: the model | 15 | Capacity at half, SUMPRODUCT hours and objective | Capacity wrong |
 | Requirement 4: Solver | 20 | Maximize, both constraints, Simplex LP, no integers, both reports | A constraint missing |
 | Requirement 5: reading | 15 | Binding center, shadow price and range, items cut, loss | Shadow price without range |
-| Recommendation | 15 | Action, reasons, limits | Limits missing |
+| Recommendation | 15 | Action and the reasons from the results | No reasons |
 
 ## Extensions and discussion questions
 
