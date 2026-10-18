@@ -507,18 +507,18 @@ def print_snapshot(ctx: Context, fresh: bool = False) -> dict[str, str]:
 def print_plan(ctx: Context, forced: bool) -> Plan:
     snap = print_snapshot(ctx)
     record = ctx.store['units'].get('print/interiors')
-    command = [py('scripts/print/build.py', *(['--draft'] if isbn_blank() else []))]
+    commands = [py('scripts/print/build.py', *(['--draft'] if isbn_blank() else []))]
     outputs = ['outputs/print/*_Print_Color*.pdf', 'outputs/print/*_Print_BW*.pdf']
     again = lambda c: print_snapshot(c, fresh=True)                      # noqa: E731
     if forced:
-        return Plan([command], 'forced', snap, again)
+        return Plan(commands, 'forced', snap, again)
     if record is None:
-        return Plan([command], 'not recorded as built', snap, again)
+        return Plan(commands, 'not recorded as built', snap, again)
     if any(not output_exists(o) for o in outputs):
-        return Plan([command], 'a print PDF is missing', snap, again)
+        return Plan(commands, 'a print PDF is missing', snap, again)
     diff = changes(record['snapshot'], snap)
     if diff:
-        return Plan([command], 'changed: ' + ', '.join(diff[:3]), snap, again)
+        return Plan(commands, 'changed: ' + ', '.join(diff[:3]), snap, again)
     return Plan([], 'current', snap, again)
 
 

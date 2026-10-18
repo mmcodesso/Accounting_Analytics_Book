@@ -217,7 +217,7 @@ class DecisionTests(unittest.TestCase):
     def test_a_changed_file_a_changed_token_and_a_missing_output_run_it(self) -> None:
         unit = self.unit()
         store = self.recorded(unit)
-        (self.root / 'a.txt').write_text('two', encoding='utf-8')
+        (self.root / 'a.txt').write_text('a longer second version', encoding='utf-8')
         self.git('add', '--all')
         plan = be.plan_unit(unit, self.context(store), False)
         self.assertTrue(plan.commands)
@@ -301,7 +301,7 @@ class RunTests(unittest.TestCase):
         self.assertEqual([r.status for r in self.run_units([unit])], ['built'])
         self.assertTrue((self.root / 'out.txt').is_file())
         self.assertEqual([r.status for r in self.run_units([unit])], ['current'])
-        (self.root / 'a.txt').write_text('two', encoding='utf-8')
+        (self.root / 'a.txt').write_text('a longer second version', encoding='utf-8')
         results = self.run_units([unit])
         self.assertEqual([r.status for r in results], ['built'])
         self.assertEqual(results[0].detail, 'changed: a.txt')
@@ -343,6 +343,23 @@ class PlanTests(unittest.TestCase):
             self.assertEqual(be.main(['--plan', '--no-office']), 0)
         self.assertIn('companion-excel', out.getvalue())
         self.assertIn('Plan:', out.getvalue())
+
+    @unittest.skipUnless(HAS_GIT, 'git is not installed')
+    def test_every_units_forced_plan_is_a_list_of_commands(self) -> None:
+        """Including the opt-in print and publish units, which a default run never plans."""
+        args = namespace(print=True, publish_dry_run=True)
+        ctx = be.Context({'units': {}})
+        count = 0
+        for stage in be.build_stages(args):
+            for unit in stage.units:
+                plan = be.plan_unit(unit, ctx, True)
+                self.assertTrue(plan.commands, unit.name)
+                for command in plan.commands:
+                    self.assertIsInstance(command, list, unit.name)
+                    self.assertTrue(all(isinstance(part, str) for part in command), f'{unit.name}: {command}')
+                    self.assertTrue(be.shown(command), unit.name)
+                count += 1
+        self.assertGreater(count, 40)
 
     def test_the_readme_describes_the_script(self) -> None:
         readme = (ROOT / 'README.md').read_text(encoding='utf-8')
