@@ -80,7 +80,7 @@ Individual or pairs, about 150 minutes: 20 for the key figures and the conclusio
 
 **Watch for:** an action with no owner or date, and an owner assumed to agree.
 
-**Step 6. Fit the pages.** Three pages and an appendix of at most three, of selected, condensed exhibits (the map, the reconciliation, the test results, the sample plan, the evaluation, the action plans), not every workbook sheet. The model's text (conclusion, findings, clean results and action plans) runs to about 1,725 words; count yours, then cut the findings' prose before the clean results.
+**Step 6. Fit the pages.** Three pages and an appendix of at most three, of selected, condensed exhibits (the map, the reconciliation, the test results, the sample plan, the evaluation, the action plans), not every workbook sheet. The model's text (conclusion, findings, clean results and action plans) runs to about 1,854 words; count yours, then cut the findings' prose before the clean results.
 
 ## Expected results
 

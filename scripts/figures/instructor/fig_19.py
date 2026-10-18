@@ -2396,9 +2396,11 @@ def if_19_10_b() -> Diagram:
     d.text("<b>Process</b>", x5 + w5 / 2 - 70, tst[0] + tst[1] + 6, 62, 18, size=SMALL, align="right")
     if new:
         fnd = (y0 + 236, 76.0)
-        n_fnd = node(x5, fnd[0], w5, fnd[1], "Findings", "two rows: owner, dates, closure fields", "table")
+        # the Findings box starts a little to the right of its column, so the key's label has room in the gap
+        fx = x5 + 12.0
+        n_fnd = node(fx, fnd[0], w5 - 12.0, fnd[1], "Findings", "two rows: owner, dates, closure fields", "table")
         d.arrow(n_reg, n_fnd, exit=(1, (fnd[0] + fnd[1] / 2 - reg[0]) / reg[1]), entry=(0, 0.5), meta=STRAIGHT_)
-        d.text("<b>FindingID</b>", x4 + w4 + 2, fnd[0] + fnd[1] / 2 - 22, x5 - x4 - w4 - 4, 18, size=SMALL, align="center")
+        d.text("<b>FindingID</b>", x4 + w4 + 2, fnd[0] + fnd[1] / 2 - 22, fx - x4 - w4 - 4, 18, size=SMALL, align="center")
     # the key
     ky = 28.0
     for i, (label, kind) in enumerate((("A table the model loads", "table"), ("A query with Enable load cleared", "query"), ("Anomaly columns, outside the register", "anomaly"))):

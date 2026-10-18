@@ -1225,9 +1225,11 @@ def ex7_5(b: ExerciseBuild) -> None:
         ("Source", "SalesCommissionAccrual"),
         ("Merged Queries", pq.merge("SalesInvoice", "SalesInvoiceID", "SalesInvoiceID", "SalesInvoice")),
         ("Expanded SalesInvoice", pq.expand("SalesInvoice", ["InvoiceDate"])),
-        ("Added Custom", pq.add_custom("DateDiffers", "[AccrualDate] <> [InvoiceDate]")),
+        # compared as dates: the two columns can carry different types (Date and Date/Time), and values of different
+        # types never compare equal, so every row would differ
+        ("Added Custom", pq.add_custom("DateDiffers", "Date.From([AccrualDate]) <> Date.From([InvoiceDate])")),
         ("Added Custom1", pq.add_custom("MonthDiffers",
-                                        "Date.StartOfMonth([AccrualDate]) <> Date.StartOfMonth([InvoiceDate])")),
+                                        "Date.StartOfMonth(Date.From([AccrualDate])) <> Date.StartOfMonth(Date.From([InvoiceDate]))")),
         ("Removed Other Columns", pq.select_columns(["SalesCommissionAccrualID", "AccrualDate", "InvoiceDate", "DateDiffers",
                                                       "MonthDiffers"]))]))
     values(ws, {"A1": "Exercise 7.5: regression-based expectations for revenue and sales commission expense",

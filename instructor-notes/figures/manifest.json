@@ -672,24 +672,24 @@
   },
   "IF-13-0-A": {
    "unit": "chapter-13-power-bi-essentials",
-   "source": "dfba3c2bea03da2feaf49a9d5e86e96394086d3b025082e55e73a753de53338c",
-   "generator": "6a51f6e44e0c4419755270f9538e3020d3aa4b43e0fc1360ed0852324579db47",
-   "pdf_sha256": "8e9cd136942bfe0eec7f0c57dd98ef5fff4fe086fdd16a919e12100b77c6780b",
-   "pdf_bytes": 86860
+   "source": "94e29696629b894afb662f7e46de9c30c98f20f35a94235ec106b421311f5a69",
+   "generator": "fce344bc0a39dca24a551d348cc364c4da3c33274c4b1f9bc467c11c49879a4f",
+   "pdf_sha256": "f341cd491cd3d64516021a131ceb08e168e1735244b6bca4c099c2b978cc1050",
+   "pdf_bytes": 86911
   },
   "IF-13-0-B": {
    "unit": "chapter-13-power-bi-essentials",
-   "source": "12494d4ec7629c3e95c5a282b2c169ee7ee72baeec26c62295194283e407b581",
-   "generator": "6a51f6e44e0c4419755270f9538e3020d3aa4b43e0fc1360ed0852324579db47",
-   "pdf_sha256": "6af1608d322b2c6645e08cf15135a0632dd2657ea7e9773fdffd7de9522c51ae",
-   "pdf_bytes": 94268
+   "source": "0e34af2aa08a93ef757f6e9381c2d76f3e33394b8d2587090828814439d87f9f",
+   "generator": "f8e051f41364f1b4d9b28fedcc2840a455f2705e03aa076f667399ff26ef25c3",
+   "pdf_sha256": "400482b7c79aea7a55a6e73dcbf8892ae585aca447d809c575298e431a0b866e",
+   "pdf_bytes": 97130
   },
   "IF-13-0-C": {
    "unit": "chapter-13-power-bi-essentials",
-   "source": "44b5c55816eafad533d4acffa48528371c1284e94465edc68232ad9fad2fec65",
-   "generator": "6a51f6e44e0c4419755270f9538e3020d3aa4b43e0fc1360ed0852324579db47",
-   "pdf_sha256": "a1f0ccacdbc2498a4d6d50ab48cf74b0b03ed863d0533c6103bf604da717575c",
-   "pdf_bytes": 162856
+   "source": "ccfd57feb4b7c368c0b49363ed390a6a77c3f670a358a1f21f88013813be9bfa",
+   "generator": "da0f8af06d5de8a0346c2020aeeffc1d8b871aed58d7f47d82e9a40fe4ae4b04",
+   "pdf_sha256": "aa06e389c0a2adfd36792e70bf14920416bbd6777bf5cc8b899bdbd272610275",
+   "pdf_bytes": 162898
   },
   "IF-13-1-A": {
    "unit": "chapter-13-power-bi-essentials",
@@ -1183,17 +1183,17 @@
   },
   "IF-18-5-B": {
    "unit": "chapter-18-make-buy-or-reprice",
-   "source": "6f165235238f5b898fa95868329d94e13fa745c5e2273d4af0b971ec3d1796c3",
-   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
-   "pdf_sha256": "f18e2e677f93937df99ecd3de8ea5e95ed5806d90d1439775f7542ee32a62d82",
-   "pdf_bytes": 163061
+   "source": "8babd515edc3f43963fe18f2f874eec8e69f14506e4503aebabe277009d598da",
+   "generator": "4331d1e5dabc8f4d89030d60f7c86915565a34d9acc20565a273849614273a73",
+   "pdf_sha256": "0920fe526c7de0bf7466bb5516007c3872bdf438aaf217cc444893cd5cb52fa5",
+   "pdf_bytes": 162800
   },
   "IF-18-6-A": {
    "unit": "chapter-18-make-buy-or-reprice",
-   "source": "a6437e0d2d8876eb879221668d9aa6d3cf8b87c50bbbf1b133595e3eafcdae25",
-   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
-   "pdf_sha256": "9560158090932297549f0361cda2f1ba4fbfb5fdaf6ec3a48c1d2082207be5e7",
-   "pdf_bytes": 102931
+   "source": "55a2853ff5edd779dc7cd2cdaa340c365d1f76f21888bf52da55dd97090b1993",
+   "generator": "4331d1e5dabc8f4d89030d60f7c86915565a34d9acc20565a273849614273a73",
+   "pdf_sha256": "ca99b42858768ee853967d291ee127c84b5aa5585ea8b8fcec62721a0aabb877",
+   "pdf_bytes": 104580
   },
   "IF-18-6-B": {
    "unit": "chapter-18-make-buy-or-reprice",
@@ -1218,10 +1218,10 @@
   },
   "IF-18-8-A": {
    "unit": "chapter-18-make-buy-or-reprice",
-   "source": "0f2181ae87ee205524f19e51f750b773c926f10830b7dd63baa490160f0a93b9",
-   "generator": "d810dba4b5c32c7de8fb991e94c4c245a1541aaf6b37c8a30ac7a23769d1bea9",
-   "pdf_sha256": "36d43949a691ffa8643849ac7fcf35a257fc583145df0d79a71deb566aee81cc",
-   "pdf_bytes": 110749
+   "source": "5c82c92fad4bd52dac784d4420892f5ab27e5041863f5065c208c64a09452625",
+   "generator": "73614ff246766c65d12ceba20b8843d6756c78fc62e57068c16c33b890da736d",
+   "pdf_sha256": "78d0d6e8e763199e47a19a658748e415f49986b3a7f70cb2beb8833b39fc2415",
+   "pdf_bytes": 111695
   },
   "IF-18-9-A": {
    "unit": "chapter-18-make-buy-or-reprice",
@@ -1253,24 +1253,24 @@
   },
   "IF-19-1-A": {
    "unit": "chapter-19-customer-credits-audit",
-   "source": "b0029ee9137109d7b41ffc92a668bdd3d7fa1ddfa5773da206a3db25c94e6fb2",
-   "generator": "5ffc531b0b7eb310ac805c2fb39a5cd148caf5ba2fa1a9e95fcaaa2e6574bac6",
-   "pdf_sha256": "30893813d2c130e60eef8758e20a576aaf6d4cd9e597fc9987eeede47da94a39",
-   "pdf_bytes": 116461
+   "source": "bcb927a05a9a2c3b43b21b74500474c470b58af3a2c00d53ed86990f4c4a8e3f",
+   "generator": "8d1ca415059991d85a94901cd9526f9b4190e5df6008bbce3927eccf9cff31d1",
+   "pdf_sha256": "0d6c2608f2eaaacf5c5d26de6fb93935f29720bc558816a079dc4b7a6727b5b2",
+   "pdf_bytes": 116700
   },
   "IF-19-10-A": {
    "unit": "chapter-19-customer-credits-audit",
-   "source": "548e8dc6b40e2eccca75e1c2b9d570dcfae496f3459a9433dae5418774432646",
-   "generator": "09424c9620774f42b73673685bdfc51bc31169fb64d63cc110f09e49d7c0cd2c",
-   "pdf_sha256": "cfd6d7a6c63e8c56dfca3bcbdb6c2a4985385526b216357cb251f755af45932b",
-   "pdf_bytes": 101916
+   "source": "2a7ab50f62bc56acd659eea73fc8e43a000eb77ab1ddfdde4cc989ae7441caae",
+   "generator": "8d1ca415059991d85a94901cd9526f9b4190e5df6008bbce3927eccf9cff31d1",
+   "pdf_sha256": "26c902ad4e8faa613bc3308ba4ebba2d1b963f5c6060c8801a55efc39700a3a4",
+   "pdf_bytes": 103433
   },
   "IF-19-10-B": {
    "unit": "chapter-19-customer-credits-audit",
-   "source": "ca8d5f42345bead40bc3b846be115659e5862aa9b711d9cbd82d2d991a602a4a",
-   "generator": "b562e495ea6f27f7168ec56ee9720e8f17c13fa1b8e1b29e62e79c4bf9e41c26",
-   "pdf_sha256": "239615c7ef87b0a511a606f9e9af2bd2d36fea1ca7647849a284e51c51526a49",
-   "pdf_bytes": 70716
+   "source": "d3ec86ac7a01b9a0ffa92236d9ef01d212059ad3499d9bfde3c378ba16c9356b",
+   "generator": "1c8ee0634a4326cf7cc72f6c6c51944092d0985e1915092000759b10be891df8",
+   "pdf_sha256": "aaf6170742cb6aae73c355448b7ddd1c154c71eef9ae426bd24b3696b70d244e",
+   "pdf_bytes": 70874
   },
   "IF-19-2-A": {
    "unit": "chapter-19-customer-credits-audit",
@@ -1281,10 +1281,10 @@
   },
   "IF-19-3-A": {
    "unit": "chapter-19-customer-credits-audit",
-   "source": "89b8b89f488481c14ff2782a0c525d63efb3be32e335ad0788ca189d55500fc3",
-   "generator": "5ffc531b0b7eb310ac805c2fb39a5cd148caf5ba2fa1a9e95fcaaa2e6574bac6",
-   "pdf_sha256": "f83157cbc696ecf52f6281c330e7bcb68ad083573d914d96ad3ac1b3faa969b4",
-   "pdf_bytes": 119527
+   "source": "4d6ef07be3febcb86ba0cf6c9997761d1df82b67b6fe7183c55feb87dc1339cb",
+   "generator": "8d1ca415059991d85a94901cd9526f9b4190e5df6008bbce3927eccf9cff31d1",
+   "pdf_sha256": "e76d8e804175f2679f5fde4d6ffb87f2ac9cc90568df3ba87bfc52b2ee56bc3a",
+   "pdf_bytes": 121297
   },
   "IF-19-4-A": {
    "unit": "chapter-19-customer-credits-audit",
@@ -1309,17 +1309,17 @@
   },
   "IF-19-6-A": {
    "unit": "chapter-19-customer-credits-audit",
-   "source": "9825f03596d47fb97925815c1d2990c4f52add4f0f8e4e3d7e94603c3c80f9c9",
-   "generator": "5ffc531b0b7eb310ac805c2fb39a5cd148caf5ba2fa1a9e95fcaaa2e6574bac6",
-   "pdf_sha256": "bcc81ec253e051cbaf693139b89368bc03542bd9ff42631ca25956b46b68bc47",
-   "pdf_bytes": 137679
+   "source": "86d2c0bea7b38e8ba390cd5fff51980a41af845ea843132b7ed26570d4f12b88",
+   "generator": "8d1ca415059991d85a94901cd9526f9b4190e5df6008bbce3927eccf9cff31d1",
+   "pdf_sha256": "19c115090a6a55410eed586eb16ca5622e22a50b7a8505de584a6aad7f255568",
+   "pdf_bytes": 137340
   },
   "IF-19-6-B": {
    "unit": "chapter-19-customer-credits-audit",
-   "source": "e306e072b62da0f6d9aa409b92aa0a91a9900084ce9c7dfa116186baf85a8c04",
-   "generator": "5ffc531b0b7eb310ac805c2fb39a5cd148caf5ba2fa1a9e95fcaaa2e6574bac6",
-   "pdf_sha256": "bf5f843cefa0be2360ca229baec9e71e49b0d72edf01bb7bcb4173ed9468f68c",
-   "pdf_bytes": 87487
+   "source": "417a1375d2902ad18bf5a750b025a08553c764b79f1013a00437e4a788e518ed",
+   "generator": "8d1ca415059991d85a94901cd9526f9b4190e5df6008bbce3927eccf9cff31d1",
+   "pdf_sha256": "bb1c5b4604219cc7a8d1f9f0c5dd8653ce9efe37e3191f128225848e7244cacd",
+   "pdf_bytes": 87461
   },
   "IF-19-7-A": {
    "unit": "chapter-19-customer-credits-audit",
@@ -1330,17 +1330,17 @@
   },
   "IF-19-8-A": {
    "unit": "chapter-19-customer-credits-audit",
-   "source": "ae268cd8c30c0fe08c802fd32e0d0c2017b6155d01f12d7bd801d44d2883d531",
-   "generator": "09424c9620774f42b73673685bdfc51bc31169fb64d63cc110f09e49d7c0cd2c",
-   "pdf_sha256": "f2b846943993c978686f6e52b3c6867d71a26a6d8c07a3c735fccf8300c64697",
-   "pdf_bytes": 128314
+   "source": "4d3fe5fc3a4d3cec07f2e469d37d54e41855845c5e9fe5a7ce051a746a8b8894",
+   "generator": "8d1ca415059991d85a94901cd9526f9b4190e5df6008bbce3927eccf9cff31d1",
+   "pdf_sha256": "b5986449ce84c7e9171ee1504fa20fa8c8a59bd8d79a07bfbfaa6d68373b9dcf",
+   "pdf_bytes": 128414
   },
   "IF-19-9-A": {
    "unit": "chapter-19-customer-credits-audit",
-   "source": "99f4a0f1814b5780f91176aecafc4da3fcab776d7f858ac06a99d1824eb4c3e1",
-   "generator": "09424c9620774f42b73673685bdfc51bc31169fb64d63cc110f09e49d7c0cd2c",
-   "pdf_sha256": "f53152f65e8ccb23d405202d8380dc6e6b00830255d75a9d65a3247a6cfb94ac",
-   "pdf_bytes": 94900
+   "source": "080617e85f1229912f27171b9567f1973292eaaa213bfb805a3037f577e5a606",
+   "generator": "8d1ca415059991d85a94901cd9526f9b4190e5df6008bbce3927eccf9cff31d1",
+   "pdf_sha256": "88d7622b654af7d1b08da526630fc6bc489e0b8a15fa31630cf2ee96f51577c3",
+   "pdf_bytes": 95289
   },
   "IF-AB-0-A": {
    "unit": "appendix-b-publishing-security",
@@ -1358,17 +1358,17 @@
   },
   "IF-AB-1-A": {
    "unit": "appendix-b-publishing-security",
-   "source": "4b1377a53124e520ba530d6bc14d497b1c5237b7bb8d5e14636e73aa4dfc43e3",
-   "generator": "6285ac27d183ede8df06d3d8028f38d8b46235470ec5782da45968f4b2302566",
-   "pdf_sha256": "d704181f49d9b4478c21df1fa83d1076f1e3b6114729dcdc105b4f37d79e6bb8",
-   "pdf_bytes": 97261
+   "source": "afb9c925478c5d54b5b80cabe8bf5fa5f6230c987e5d01b06e763b2fb0763181",
+   "generator": "d4eb8d354409bf9a7a9bdcf2d7fe35b64ae458b825a34e36de1c3d09edf196f9",
+   "pdf_sha256": "6934db85dcc7172375eb3504c4bf812ea25fe14cff515253aeee320cd24e0a74",
+   "pdf_bytes": 97251
   },
   "IF-AB-1-B": {
    "unit": "appendix-b-publishing-security",
-   "source": "68c98887a905832eb6906edbbf13364632a349243b8e83415c7fe348a8cf4b23",
-   "generator": "6285ac27d183ede8df06d3d8028f38d8b46235470ec5782da45968f4b2302566",
-   "pdf_sha256": "29358c0228097d5d298a06e693b48c98c2c4c3154e08ec8179172a2eb1d5e65f",
-   "pdf_bytes": 128150
+   "source": "45d7e5781bd6f34ae627e929a6d68e0b8e77fab0755d903fb25489dd3fe452cb",
+   "generator": "d4eb8d354409bf9a7a9bdcf2d7fe35b64ae458b825a34e36de1c3d09edf196f9",
+   "pdf_sha256": "78dc089314843bb12c5ce67634642e8cd68ac1822e3ff83da9bfdbb8acdcb098",
+   "pdf_bytes": 128140
   },
   "IF-AB-2-A": {
    "unit": "appendix-b-publishing-security",

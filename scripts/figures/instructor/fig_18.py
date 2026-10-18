@@ -1691,12 +1691,13 @@ def if_18_8_a() -> Diagram:
         if below[i]:
             x = inc[f]
             _agree(ws, f"G{r}", w["td"] / (1 - n.FLOOR), 0.01)
+            _agree(ws, f"I{r}", w["td"] / (1 - n.FLOOR), 1e-6)       # the direct price, which the increase now reads (MOD18-05)
             _agree(ws, f"J{r}", x["increase"], 1e-6)
             _agree(ws, f"M{r}", x["loss"], 1e-6)
             _agree(ws, f"N{r}", x["revenue"], 0.05)
             assert ws[f"G{r}"].fill.fill_type == "solid", "Goal Seek's changing cells are shaded in the workbook"
         else:
-            assert all(ws[f"{c}{r}"].value is None for c in "GJMN"), "a family at or above the floor has no target price"
+            assert all(ws[f"{c}{r}"].value in (None, "") for c in "GIJMN"), "a family at or above the floor has no target price"
     buy_names = {b["name"] for b in buy}
     need = [f for f, b in zip(names, below) if b and f not in buy_names]
     t_rows = [_row_of(ws, "Families below the floor"), _row_of(ws, "  which"), _row_of(ws, "Revenue a year if volume holds"),
@@ -1706,12 +1707,12 @@ def if_18_8_a() -> Diagram:
     assert ws["B23"].value == ", ".join(f for f, b in zip(names, below) if b) and ws["B25"].value == ", ".join(need)
     _agree(ws, "B24", sum(r["revenue"] for r in reprice), 0.05)
     _agree(ws, "B26", sum(inc[f]["revenue"] for f in need), 0.05)
-    letters = ["A", "B", "C", "D", "E", "F", "G", "J", "L", "M", "N"]
-    widths = [24, 72, 56, 72, 84, 84, 58, 84, 66, 90, 90, 80]
+    letters = ["A", "B", "C", "D", "E", "F", "G", "I", "J", "L", "M", "N"]
+    widths = [24, 72, 52, 64, 72, 72, 56, 76, 70, 60, 84, 86, 72]
     assert abs(sum(widths) - 860) < 1
     d = Diagram("The Prices Sheet's Table of Floor Prices")
     formula = _g().clean(_g().workbook()["Prices"]["M6"].value)
-    assert formula == '=IF(F6,1-L6/(L6+G6-C6),"")', formula
+    assert formula == '=IF(F6,1-L6/(L6+I6-C6),"")', formula
     _formula_bar(d, 0, 0, 860, "M6", formula)
     sy = 40.0
     _ws(d, 0, sy, letters, widths, [], show_letters=True)
@@ -1722,11 +1723,11 @@ def if_18_8_a() -> Diagram:
         g_fill = dict(fill=AMBER_TINT) if ws[f"G{r}"].fill.fill_type == "solid" else {}
         rows.append(dict(n=str(r), cells=[dict(text=f, clip=False), _num(_show(ws, f"B{r}")), _num(_show(ws, f"C{r}")), _num(_show(ws, f"D{r}")),
                                            _num(_show(ws, f"E{r}")), dict(text=_show(ws, f"F{r}"), align="center", clip=False),
-                                           _num(_show(ws, f"G{r}"), **g_fill), _num(_show(ws, f"J{r}")), _num(_show(ws, f"L{r}")),
+                                           _num(_show(ws, f"G{r}"), **g_fill), _num(_show(ws, f"I{r}")), _num(_show(ws, f"J{r}")), _num(_show(ws, f"L{r}")),
                                            _num(_show(ws, f"M{r}")), _num(_show(ws, f"N{r}"))]))
     geo = _ws(d, 0, y, [], widths, rows, show_letters=False)
     for a, b in _runs(below):
-        _outline(d, geo, (1 + a, 0), (1 + b, 10), CORAL, inset=1.5)
+        _outline(d, geo, (1 + a, 0), (1 + b, 11), CORAL, inset=1.5)
     y = _gap(d, 0, geo["bottom"], sum(widths), "Row 21 is blank. The totals block, rows 22 to 26, is drawn with column A widened to show its labels", h=24)
     w2 = [24, 400, 100, 110, 110, 116]
     rows2 = [dict(n="22", cells=[dict(text=ws["A22"].value, clip=False), _num(_show(ws, "B22"))]),
@@ -1737,9 +1738,10 @@ def if_18_8_a() -> Diagram:
     geo2 = _ws(d, 0, y, [], w2, rows2, show_letters=False)
     bottom = _tabs(d, geo2["bottom"] + 10, "Prices", ["Growth 50% Sensitivity", "Prices", "Standards"])
     _note(d, f"Outlined in coral: the {n.word(sum(below))} families whose margin on time-driven cost is below the {n.FLOOR:.0%} floor; only they have a target price, an increase, "
-             f"a volume they can lose and a revenue. The shaded cells of column G are Goal Seek's changing cells. The volume the increase can lose is the formula in the bar: one "
-             f"minus the contribution per unit now, over that contribution plus the increase per unit. Columns H, I and K are hidden here, and the columns are narrower than the "
-             f"workbook's. The totals read {_show(ws, 'B24')} a year if volume holds. Of the families bought in Requirement 6, {n.word(len(buy_names & {f for f, b in zip(names, below) if b}))} "
+             f"a volume they can lose and a revenue. The shaded cells of column G are Goal Seek's changing cells, and column I computes the same price directly. The increase, the volume "
+             f"it can lose and the revenue read column I. The volume the increase can lose is the formula in the bar: one minus the contribution per unit now, over that "
+             f"contribution plus the increase per unit. Columns H, K and O are hidden here (O says whether Goal Seek agrees with column I), and the columns are narrower "
+             f"than the workbook's. The totals read {_show(ws, 'B24')} a year if volume holds. Of the families bought in Requirement 6, {n.word(len(buy_names & {f for f, b in zip(names, below) if b}))} "
              f"are among those below the floor, so {_show(ws, 'B26')} a year is what the other {n.word(len(need))} bring.", bottom + 4)
     return d
 

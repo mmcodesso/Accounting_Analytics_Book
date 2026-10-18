@@ -88,7 +88,7 @@ c. Record the selected IDs, the date and the method, with a copy of the plan (ra
 =COUNTIF(K53:K111,"Deviation")
 ```
 
-**Check:** the model's draw holds 15 deviations (25.4%), an upper limit of 36.4%: no reliance. The population test finds 52 of the 215 (24.2%) and 6 of the 7 key items, the same conclusion. A draw holds 10 to 19 deviations in 93% of cases, with limits from 27% to 44%, and a draw with no deviation has probability 3.1e-09.
+**Check:** the model's draw holds 14 deviations (23.7%), an upper limit of 34.6%: no reliance. The population test finds 52 of the 215 (24.2%) and 6 of the 7 key items, the same conclusion. A draw holds 10 to 19 deviations in 93% of cases, with limits from 27% to 44%, and a draw with no deviation has probability 3.1e-09.
 
 **Watch for:** the draw's rate offered as the population's, or the limit as a forecast, and a limit on the planned size instead of the tested count (one deviation reads 7.7898% at 59 and 4.9994% at a planned 93, which would wrongly cross the 5% boundary). A changed plan means a new selection: the model reads "Plan changed: redraw or revalidate the selection". Where the data hold the evidence, the query replaces the sample.
 
@@ -102,7 +102,7 @@ c. Record the selected IDs, the date and the method, with a copy of the plan (ra
 =SUM(--(XLOOKUP(XLOOKUP(Refunds[CreditMemoID],Credits[CreditMemoID],Credits[SalesReturnID]),ReturnLines[SalesReturnID],ReturnLines[ReasonCode])="Damaged"))
 ```
 
-**Check:** 50 refunds, 2 key and 48 in the remainder. The model's draw holds 7, and even if all of them passed the limit would be 34.82%, so examine all 50: with no sample, no sampling risk. **Watch for:** the whole draw counted as inspected, which gives 4.95% and a false pass.
+**Check:** 50 refunds, 2 key and 48 in the remainder. The model's draw holds 13, and even if all of them passed the limit would be 20.58%, so examine all 50: with no sample, no sampling risk. **Watch for:** the whole draw counted as inspected, which gives 4.95% and a false pass.
 
 **Step 8. Mark what is not tested.** Fill the attribute columns of the draw with the words the model uses (Not tested: no document in the database; Not applicable for A3 on a refund of another return). The deliverable is the plan, the frozen selection and the rule.
 
@@ -115,7 +115,7 @@ c. Record the selected IDs, the date and the method, with a copy of the plan (ra
 | Remainder; amount | 215; $185,089.94 | 3 |
 | Upper limit at zero to three deviations | 4.95%; 7.79%; 10.29%; 12.62% | 4 |
 | D1 in the remainder; in the key items | 52 of 215; 6 of 7 | 6 |
-| Model draw: deviations; limit; Damaged refunds | 15; 36.4%; 7 | 6, 7 |
+| Model draw: deviations; limit; Damaged refunds | 14; 34.6%; 13 | 6, 7 |
 | Damaged refunds: all; in the remainder | 50; 48 | 7 |
 
 > **Instructor notes, Requirement 6:** key items 7 refunds, 31,628.48 (RF-2025-000097, -000109, -000113, -000120, -000134, RF-2026-000158, -000218), examined in full and evaluated apart from the sample; remainder 215 (185,089.94). Expected parameters 95% / 5% / 0%, so n = 59 (27% of 215; the large-population table is conservative). Upper limits at n = 59: 0 deviations 4.95%, 1 7.79%, 2 10.29%, 3 12.62%; only zero deviations supports reliance at 5%, and the rule must reach at least one more deviation than the plan allows (BETA.INV holds for fewer deviations than items; every item deviating gives 100%, so the guarded form is IF(k = n, 1, BETA.INV(confidence, k + 1, n - k)) for a whole k from 0 to n). The order is part of the control: plan and rule first, then select and freeze with the IDs, actual size, parameters, date and method, never backdating a rule; the evaluation uses the frozen selection's tested count and plan. A1 and A2 apply to every refund; A3 applies only to refunds of Damaged returns: 50 in all (2 key items, 48 in the remainder), so a draw of 59 expects about 13.2 of them (a frozen draw holds its own number, to count on the sheet), and even 13 that all passed would give an upper limit of 20.58%, far above 5%: plan A3 on its own population, best by examining all 50 (no sampling risk) or by a sample sized for the 48, and record the other refunds as not applicable, never as passes. The draw covers fiscal 2024 to 2026, so it supports a conclusion on the three years together (81 of the 215 remainder refunds are dated in 2026); a conclusion as at the end of 2026 also needs evidence that the controls did not change. Data attribute (Requirement 4's definition): 52 of the 215 deviate (24.2%), and 6 of the 7 key items (by receipt date 45 and 6, the same conclusion); a sample of 59 expects 14.3, and about 93% of draws give 10 to 19 (P(X \<= 9) = 0.041, P(X \<= 19) = 0.967), with upper limits of about 27% at 10, 35% at 14, and 44% at 19: no plausible draw supports reliance on the control, as the population test does not (the plan is graded, not the draw's own counts) (a draw with no deviation at all has a probability of about 3.1e-09). Point: where the data allow, a population test replaces the sample; sampling remains for evidence outside the database. No document results exist, so the deliverable is the plan, the frozen selection, and the decision rule; do not invent results.
@@ -154,4 +154,4 @@ A weak answer samples A3 across all refunds, or reports passes for documents nob
 ## Extensions and discussion questions
 
 - A sample of 59 is 27% of the remainder. Why would a finite-population correction allow a smaller one, and why does the size at a `2%` expected rate, 181, call for examining all?
-- Discuss: the sample's limit is 36.4%. What can the committee do with it, and what can it not?
+- Discuss: the sample's limit is 34.6%. What can the committee do with it, and what can it not?

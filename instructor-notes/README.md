@@ -29,7 +29,7 @@ These files are public, like the rest of the book. Try an exercise first, then c
 | [chapter-16-audit-monitoring](chapter-16-audit-monitoring/00-chapter-notes.md) | Chapter 16: Audit Monitoring and Report Assurance | 7 of 7 |
 | [case-part-4](case-part-4/00-case-notes.md) | Part IV Case: Finding the Cash Behind the Profit | 7 of 7 |
 | [chapter-17-statements-for-a-lender](chapter-17-statements-for-a-lender/00-case-notes.md) | Chapter 17: Financial Statements for a Lender | 10 of 10 |
-| [chapter-18-make-buy-or-reprice](chapter-18-make-buy-or-reprice/00-case-notes.md) | Chapter 18: Make, Buy, or Reprice | 10 of 11 |
+| [chapter-18-make-buy-or-reprice](chapter-18-make-buy-or-reprice/00-case-notes.md) | Chapter 18: Make, Buy, or Reprice | 11 of 11 |
 | [chapter-19-customer-credits-audit](chapter-19-customer-credits-audit/00-case-notes.md) | Chapter 19: Auditing the Customer Credits Cycle | 11 of 11 |
 | [appendix-b-publishing-security](appendix-b-publishing-security/00-chapter-notes.md) | Appendix B: Publishing, Securing, and Sharing Reports | 3 of 3 |
 | [appendix-c-power-bi-browser](appendix-c-power-bi-browser/00-chapter-notes.md) | Appendix C: Power BI in the Browser | 4 of 4 |

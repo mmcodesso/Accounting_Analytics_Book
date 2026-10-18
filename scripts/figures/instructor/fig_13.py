@@ -377,7 +377,7 @@ def if_13_0_b() -> Diagram:
     if attached:                       # Exercise 13.5's figures, typed with Enter data: a table with no relationship
         columns = ["QueryName", "ColumnName", "Comment"]
         assert set(columns) <= set(_model_columns(ATTACHED))
-        extra = pbi.model_table(d, ATTACHED, 600, cust.y + cust.h + 12, columns, w=190)
+        extra = pbi.model_table(d, ATTACHED, 600, cust.y + cust.h + 12, columns, w=214)      # the name is longer than the others
         assert extra.y + extra.h <= win.bottom - 4, "the attached table fits the canvas"
     xl.emphasis(d, inv.x, inv.y, inv.w, inv.h)
     d.text("<i>InvoiceHeaders, the control table of Exercise 13.1: no relationship line touches it.</i>", 92, inv.y + 66, 210, 60,
@@ -492,7 +492,7 @@ def if_13_0_c() -> Diagram:
         assert abs(a - expected) <= c["tolerance"], f"{c['label']}: {a} against {expected}"
         rows.append([section, c["label"], c["expected"], f"{a:.15g}", "True"])
     before, total_rows = _checks_position(section)
-    pane_w = 128
+    pane_w = 140                      # the longest table name of the model answer (Ex 13.5 Profile Figures) needs this much
     d = Diagram("The Checks Tab in DAX Query View")
     row_h = pbi.ROW
     height = 96 + 10 + 164 + 14 + 24 + 24 + len(rows) * row_h + 30 + 14
@@ -507,7 +507,7 @@ def if_13_0_c() -> Diagram:
     gy = bottom + 14
     d.text("<b>Results</b>", x, gy, 120, 22, size=SMALL)
     gy += 24
-    widths = [96, 262, 112, 124, 60]
+    widths = [96, 250, 112, 124, 60]
     grid_w = sum(widths)
     headers = ["[Section]", "[Check]", "[Expected]", "[Actual]", "[Agrees]"]
     cx = x
