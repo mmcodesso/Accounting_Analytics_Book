@@ -27,6 +27,10 @@ filters:
   # blocks below. After Quarto's own filters, like book-pages.lua, so the edition and revision are known.
   - path: filters/book-metadata.lua
     at: post-quarto
+  # After Quarto has rendered its figure nodes into <div>s that carry the figures' alt text: HTML5 allows alt only on
+  # img, and EPUBCheck (and so Draft2Digital) rejects the EPUB for it. EPUB only.
+  - path: filters/epub-markup.lua
+    at: post-render
   - filters/pdf-code.lua
   - filters/learning-objectives.lua
   - filters/pdf-keep-together.lua

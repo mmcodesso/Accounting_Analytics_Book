@@ -28,11 +28,12 @@ SVG = b'<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"/>'
 def make_epub(path: Path, *, image: str = "png", compress_mimetype: bool = False, mimetype_first: bool = True,
               missing_image: bool = False, bad_anchor: bool = False, text: str = "Body.", orphan: bool = False,
               wrong_type: bool = False, bad_xml: bool = False, spine_missing: bool = False,
-              figures: int = 1) -> Path:
+              figures: int = 1, div_alt: bool = False) -> Path:
     ext = "svg" if image == "svg" else "png"
     media_type = "image/svg+xml" if ext == "svg" else ("image/jpeg" if wrong_type else "image/png")
-    imgs = "".join(f'<figure><img src="../media/file{i}.{ext}" alt="Figure {i}"/><figcaption>Cap {i}</figcaption></figure>'
-                   for i in range(figures))
+    wrapper = ' alt="A description"' if div_alt else ""
+    imgs = "".join(f'<div class="quarto-float"{wrapper}><figure><img src="../media/file{i}.{ext}" alt="Figure {i}"/>'
+                   f'<figcaption>Cap {i}</figcaption></figure></div>' for i in range(figures))
     anchor = "nowhere" if bad_anchor else "sec"
     chapter1 = (f'<?xml version="1.0"?><html xmlns="http://www.w3.org/1999/xhtml"><body><p>{text}</p>{imgs}'
                 f'<p><a href="ch002.xhtml#{anchor}">next</a></p></body></html>')
@@ -124,9 +125,17 @@ def make_docx(path: Path, *, cx: int = 5334000, cy: int = 2429000, image=None, s
 
 class TempCase(unittest.TestCase):
     def setUp(self) -> None:
+        import os
+        from unittest.mock import patch
         temp = tempfile.TemporaryDirectory(prefix="ebook check ")
         self.addCleanup(temp.cleanup)
         self.dir = Path(temp.name)
+        # Whatever EPUBCheck and Java this computer has (the PATH, JAVA_HOME, outputs/tools) must not decide a test.
+        self.enterContext(patch.object(ev, "TOOLS", self.dir / "no-tools"))
+        self.enterContext(patch("shutil.which", return_value=None))
+        self.enterContext(patch.dict(os.environ))
+        for name in ("EPUBCHECK_JAR", "JAVA_HOME"):
+            os.environ.pop(name, None)
 
 
 class EpubTests(TempCase):
@@ -183,6 +192,38 @@ class EpubTests(TempCase):
         changed = make_epub(self.dir / "changed.epub", image="png", figures=2, text="Different body.")
         errors = ev.compare_epub(old, changed).errors
         self.assertTrue(any("differ from the earlier EPUB" in e for e in errors), errors)
+
+    def test_alt_on_a_wrapper_is_an_error_but_not_on_an_image(self) -> None:
+        errors = ev.validate_epub(make_epub(self.dir / "a.epub", figures=3, div_alt=True)).errors
+        self.assertTrue(any("3 element(s) carry an alt attribute" in e and "<div>" in e for e in errors), errors)
+        self.assertEqual(ev.validate_epub(make_epub(self.dir / "b.epub", figures=3)).errors, [])
+
+    def test_the_comparison_ignores_only_the_alt_the_filter_removes(self) -> None:
+        old = make_epub(self.dir / "old.epub", image="svg", figures=2, div_alt=True)
+        new = make_epub(self.dir / "new.epub", image="png", figures=2)
+        self.assertEqual(ev.compare_epub(old, new).errors, [])
+
+    def test_epubcheck_results_are_reported(self) -> None:
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        jar = self.dir / "epubcheck.jar"
+        jar.write_bytes(b"x")
+        epub = make_epub(self.dir / "a.epub")
+        clean = SimpleNamespace(returncode=0, stderr="",
+                                stdout="Validating\nMessages: 0 fatals / 0 errors / 0 warnings / 0 infos\n")
+        broken = SimpleNamespace(returncode=1, stderr="",
+                                 stdout="ERROR(RSC-005): a.xhtml(1,2): bad\nERROR(RSC-005): b.xhtml(3,4): bad\n")
+        results = {}
+        for name, outcome in (("clean", clean), ("broken", broken)):
+            report = ev.validate_epub(epub)
+            with patch.dict("os.environ", {"EPUBCHECK_JAR": str(jar)}), patch("shutil.which", return_value=None), \
+                    patch.object(ev, "find_java", return_value="java"), patch("subprocess.run", return_value=outcome):
+                ev.run_epubcheck(epub, report)
+            results[name] = report
+        self.assertEqual(results["clean"].errors, [])
+        self.assertIn("0 errors", results["clean"].info["epubcheck"])
+        self.assertEqual(len(results["broken"].errors), 1)
+        self.assertIn("2 problem(s)", results["broken"].errors[0])
 
     def test_epubcheck_is_reported_as_not_run_when_missing(self) -> None:
         report = ev.validate_epub(make_epub(self.dir / "a.epub"))

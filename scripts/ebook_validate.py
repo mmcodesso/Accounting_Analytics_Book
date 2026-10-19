@@ -53,6 +53,11 @@ EMU_PER_INCH = 914400
 IMAGE_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif",
                ".svg": "image/svg+xml", ".webp": "image/webp"}
 MAX_LISTED = 12
+ALT_ELEMENTS = {"img", "area", "input"}
+
+
+def local_name(tag: str) -> str:
+    return tag.rsplit("}", 1)[-1]
 
 
 def q(prefix: str, name: str) -> str:
@@ -224,6 +229,7 @@ def validate_epub(path: Path, *, allow_svg: bool = False, expect_figures: int | 
     broken_images: list[str] = []
     broken_links: list[str] = []
     svg_uses: list[str] = []
+    misplaced_alt: list[str] = []
     for path_, tree in trees.items():
         for img in tree.iter(q("x", "img")):
             src = img.get("src") or ""
@@ -244,6 +250,10 @@ def validate_epub(path: Path, *, allow_svg: bool = False, expect_figures: int | 
                 figures += 1
                 if not (img.get("alt") or "").strip():
                     missing_alt += 1
+        for element in tree.iter():
+            tag = local_name(element.tag)
+            if element.get("alt") is not None and tag not in ALT_ELEMENTS:
+                misplaced_alt.append(f"{path_}: <{tag}>")
         for link in tree.iter(q("x", "a")):
             href = link.get("href") or ""
             if not is_local(href):
@@ -258,6 +268,9 @@ def validate_epub(path: Path, *, allow_svg: bool = False, expect_figures: int | 
         report.error(f"{len(broken_images)} image reference(s) do not resolve: {listed(broken_images)}")
     if broken_links:
         report.error(f"{len(broken_links)} internal link(s) do not resolve: {listed(broken_links)}")
+    if misplaced_alt:
+        report.error(f"{len(misplaced_alt)} element(s) carry an alt attribute that XHTML 5 allows only on img, area "
+                     f"and input (EPUBCheck RSC-005): {listed(misplaced_alt)}")
     if svg_uses and not allow_svg:
         report.error(f"{len(svg_uses)} SVG diagram(s) remain in the pages: {listed(svg_uses)}")
     if missing_alt:
@@ -313,24 +326,55 @@ def validate_epub(path: Path, *, allow_svg: bool = False, expect_figures: int | 
     return report
 
 
+# Where scripts/install_epubcheck.py puts EPUBCheck and a Java runtime (untracked).
+TOOLS = Path(__file__).resolve().parents[1] / "outputs" / "tools"
+
+
+def find_java() -> str | None:
+    """Java from the path, JAVA_HOME or outputs/tools/jre (scripts/install_epubcheck.py)."""
+    import os
+    found = shutil.which("java")
+    if found:
+        return found
+    homes = [Path(os.environ["JAVA_HOME"])] if os.environ.get("JAVA_HOME") else []
+    homes += sorted((TOOLS / "jre").glob("*"))
+    for home in homes:
+        for name in ("java.exe", "java"):
+            if (home / "bin" / name).is_file():
+                return str(home / "bin" / name)
+    return None
+
+
+def find_epubcheck_jar() -> Path | None:
+    """EPUBCHECK_JAR, else outputs/tools/epubcheck (scripts/install_epubcheck.py)."""
+    import os
+    explicit = os.environ.get("EPUBCHECK_JAR")
+    if explicit and Path(explicit).is_file():
+        return Path(explicit)
+    return next(iter(sorted((TOOLS / "epubcheck").rglob("epubcheck.jar"))), None)
+
+
 def run_epubcheck(path: Path, report: Report) -> None:
-    """Run EPUBCheck when it and Java are installed; say so when they are not."""
+    """Run EPUBCheck and report what it finds.
+
+    It is the check distributors such as Draft2Digital run on an uploaded EPUB. It is the `epubcheck` command when that
+    exists, else the jar (EPUBCHECK_JAR or outputs/tools) with Java. When either is missing the report says so, and
+    the checks above do not replace it: python scripts/install_epubcheck.py installs both under outputs/tools."""
     command = shutil.which("epubcheck")
-    jar = None
-    if command is None:
-        import os
-        jar = os.environ.get("EPUBCHECK_JAR")
-        if jar and Path(jar).is_file() and shutil.which("java"):
-            command_list = ["java", "-jar", jar, str(path)]
-        else:
-            report.info["epubcheck"] = "not run (EPUBCheck or Java is not installed; set EPUBCHECK_JAR)"
-            return
-    else:
+    if command is not None:
         command_list = [command, str(path)]
+    else:
+        jar, java = find_epubcheck_jar(), find_java()
+        if not (jar and java):
+            report.info["epubcheck"] = "not run (python scripts/install_epubcheck.py installs EPUBCheck and Java)"
+            return
+        command_list = [java, "-jar", str(jar), str(path)]
     result = subprocess.run(command_list, capture_output=True, text=True)
-    report.info["epubcheck"] = "passed" if result.returncode == 0 else "failed"
+    summary = next((line for line in result.stdout.splitlines() if line.startswith("Messages:")), "")
+    report.info["epubcheck"] = (summary or "completed") if result.returncode == 0 else "failed"
     if result.returncode != 0:
-        report.error("EPUBCheck reported problems:\n" + (result.stdout + result.stderr).strip()[:4000])
+        errors = [line for line in (result.stdout + result.stderr).splitlines() if line.startswith(("ERROR", "FATAL"))]
+        report.error(f"EPUBCheck reported {len(errors)} problem(s): " + listed(line[:300] for line in errors[:4]))
 
 
 # --- DOCX -----------------------------------------------------------------------------------------------------
@@ -510,6 +554,7 @@ def normalize_epub_part(name: str, data: bytes) -> bytes:
     text = data.decode("utf-8", "replace")
     text = re.sub(r"media/(file\d+)\.(?:svg|png)", r"media/\1.IMG", text)
     text = re.sub(r"\b(file\d+)_(?:svg|png)\b", r"\1_IMG", text)       # Pandoc's manifest ids end in the extension
+    text = re.sub(r'(<div\b[^>]*?) alt="[^"]*"', r"\1", text)           # filters/epub-markup.lua drops it from the wrapper
     text = re.sub(r'media-type="image/(?:svg\+xml|png)"', 'media-type="image/IMG"', text)
     text = re.sub(r'<meta property="dcterms:modified">[^<]*</meta>', "", text)
     text = re.sub(r"<dcterms:modified[^>]*>[^<]*</dcterms:modified>", "", text)

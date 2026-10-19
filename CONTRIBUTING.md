@@ -298,10 +298,13 @@ Word documents. The settings are in `visuals/ebook-figures.yml`.
 
 ```sh
 python -m pip install -r scripts/requirements-ebook.txt   # Pillow, NumPy, PyYAML
+python scripts/install_epubcheck.py                       # EPUBCheck, and Java if there is none, under outputs/tools/
 ```
 
-Optional: Inkscape or `rsvg-convert` (to render the SVG instead of the Draw.io source), PyMuPDF
-(`python -m pip install pymupdf`) and Word for the previews, and Java with EPUBCheck for the EPUB check.
+EPUBCheck is the validator that distributors such as Draft2Digital run on an uploaded EPUB, so install it: the build then
+runs it on every EPUB (nothing is installed on the system; deleting `outputs/tools/` removes it). Optional: Inkscape or
+`rsvg-convert` (to render the SVG instead of the Draw.io source), and PyMuPDF (`python -m pip install pymupdf`) and Word
+for the previews.
 
 **Build.**
 
@@ -343,8 +346,11 @@ label from the low-resolution image Draw.io embeds in the SVG, so their PNGs are
 **Checks.** `python scripts/ebook_validate.py --epub FILE --docx FILE [--baseline-epub OLD] [--baseline-docx OLD]`
 reads the EPUB as a ZIP and as XML (the stored `mimetype` first, the package, manifest, spine, cover, every page, image
 and internal link, no SVG left) and the DOCX the same way (every part, relationship and content type, each picture's
-aspect ratio, the text column and its resolution), runs EPUBCheck when it and Java are installed, and with a baseline
-build proves that only the pictures changed. `python scripts/ebook_preview.py word|epub|figures` draws pages for a
+aspect ratio, the text column and its resolution), runs EPUBCheck (installed by `install_epubcheck.py`, or `epubcheck` on
+the path, or `EPUBCHECK_JAR` with Java) and fails on any error it reports, and with a baseline build proves that only the
+pictures changed. `filters/epub-markup.lua` keeps the EPUB valid where Quarto's own markup is not: Quarto copies each
+figure's alt text onto the wrapping `<div>`, which HTML5 forbids, so every figure was an EPUBCheck error (RSC-005) and
+Draft2Digital refused the file. `python scripts/ebook_preview.py word|epub|figures` draws pages for a
 look: the DOCX through a hidden Word (this is also the check that Word opens it), the EPUB pages in headless Edge, and
 sampled figures against their SVG. The checks that need no book build are in `tests/test_figure_raster.py`,
 `tests/test_ebook_validate.py` and `tests/test_build_ebooks.py`.
