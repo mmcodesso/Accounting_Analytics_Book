@@ -872,6 +872,12 @@ class BuildTests(unittest.TestCase):
                     calls.append("figures")
                     return
                 self.assertEqual("1", env["AA_DRAWIO_EXPORTS_READY"])
+                if "scripts/figure_raster.py" in command:      # the EPUB's and the DOCX's optimized diagrams
+                    calls.append("raster")
+                    return
+                if "scripts/ebook_validate.py" in command:     # the checks of those two files
+                    calls.append("validate")
+                    return
                 fmt = command[command.index("--to") + 1]
                 calls.append(fmt)
                 if "slides" in command:
@@ -889,7 +895,7 @@ class BuildTests(unittest.TestCase):
                 build_all.build(root, "fake-quarto")
             finally:
                 for p in patches: p.stop()
-            self.assertEqual(["figures", "pdf", "epub", "docx", "revealjs", "pptx", "html"], calls)
+            self.assertEqual(["figures", "raster", "pdf", "epub", "docx", "validate", "revealjs", "pptx", "html"], calls)
             # The PDF, EPUB, DOCX and PowerPoint files are staged for the release, not copied into the site.
             for ext in ("pdf", "epub", "docx"):
                 self.assertEqual(ext, (root / f"outputs/build/downloads/book-latest.{ext}").read_text())

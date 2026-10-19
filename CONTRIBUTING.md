@@ -278,6 +278,82 @@ commit it is first published from; later publishes of the same revision replace
 only the changed files. The workflow's check fails when the site links a file the
 release lacks, and warns when a file on the release is older than the text.
 
+### The diagrams in the EPUB and the DOCX
+
+The website and the PDF keep the diagrams as SVG and vector PDF. Draw.io's SVG files are large (every text label
+carries a PNG fallback), and Pandoc puts them into the EPUB as they are and into the DOCX twice (the SVG and a PNG
+made from it), so the two formats were 69 and 83 MB. They now carry one optimized PNG per diagram instead, and the
+SVG files stay the authoritative copies: nothing in `visuals/src`, `visuals/svg` or `visuals/pdf` is touched.
+
+**How it works.** `filters/raster-figures.lua` (registered in `_quarto.yml`, active only for `epub` and `docx`)
+points each `visuals/svg/<name>.svg` at `outputs/ebook-figures/<name>.png`. `scripts/figure_raster.py` makes those
+files: it renders the Draw.io source at 1728 pixels across (the book's own exporter, so fonts and labels are exact),
+checks that the aspect ratio is the SVG's, reduces the image to the smallest adaptive palette of at most 256 colors
+that stays within a small error (no dithering; the white background and the flat fills stay exact; a figure that cannot
+be reduced, such as a photograph, stays an RGB PNG), and stamps a pixel density that keeps it as large on the page as
+the SVG was. Pandoc then writes the picture parts, relationships and sizes itself, so the files stay normal EPUB and
+Word documents. The settings are in `visuals/ebook-figures.yml`.
+
+**Install once** (on top of Quarto and the Draw.io desktop app):
+
+```sh
+python -m pip install -r scripts/requirements-ebook.txt   # Pillow, NumPy, PyYAML
+```
+
+Optional: Inkscape or `rsvg-convert` (to render the SVG instead of the Draw.io source), PyMuPDF
+(`python -m pip install pymupdf`) and Word for the previews, and Java with EPUBCheck for the EPUB check.
+
+**Build.**
+
+```sh
+quarto render --to epub            # or --to docx: any PNG that is missing or out of date is made on the way (quietly)
+python scripts/build_ebooks.py            # both formats: the PNGs with progress, the renders, the checks, a size report
+python scripts/build_ebooks.py --epub     # one format (or --docx); add --force-figures to render every diagram again
+python scripts/build_ebooks.py --baseline # also build the same text with SVG diagrams, and prove nothing else changed
+python scripts/build_all.py               # the full local build does the same for both formats
+python scripts/release.py publish         # publishes the optimized files like any other build
+```
+
+The files land in `_book/` and are copied to `outputs/build/downloads/book-latest.epub` and `.docx`, which the
+release uses. `outputs/build/ebook-report.json` has the sizes, the number of figures, how many figures are palette
+or RGB, and the checks.
+
+**The cache.** `outputs/ebook-figures/` (untracked) holds `<name>.png` (the finished picture, shared by the EPUB and
+the DOCX), `raw/<name>.png` (what the renderer drew) and `manifest.json`. A PNG is made again only when its Draw.io
+source, the SVG's size or a render setting (renderer, width, background) changed, which is decided by a SHA-256
+over them, so repeated builds reuse every figure. Changing only a palette setting reduces the cached renders again
+in about a minute with no Draw.io. A cold cache takes about ten minutes for the whole book.
+
+```sh
+python scripts/figure_raster.py settings             # the settings in effect
+python scripts/figure_raster.py ensure --all         # make what is missing or stale (--force renders everything again)
+python scripts/figure_raster.py verify               # list PNGs that are missing or stale; renders nothing
+python scripts/figure_raster.py prune [--raw]        # delete PNGs of figures that no longer exist (and the renders)
+```
+
+**Changing the look.** Edit `visuals/ebook-figures.yml`: `width` (pixels across; 1728 is about 190 pixels an inch on the
+SVG's 9-inch page and about 296 on the 5.8-inch column Pandoc gives a Word picture), `palette.max-colors` and
+`min-colors`, and the tolerances (the largest difference in any color channel, on a scale of 0 to 255: `tolerance` is the
+target for 99.99% of the pixels, `mean-tolerance` and `max-tolerance` are limits). A lower tolerance picks larger
+palettes and bigger files. `palette.enabled: false` keeps every figure an RGB PNG. To render from the SVG with Inkscape
+instead of from the Draw.io source, set `renderer: inkscape` (or `AA_FIGURE_RENDERER=inkscape`); `INKSCAPE_BIN`,
+`RSVG_CONVERT_BIN` and `DRAWIO_BIN` name an executable that is not on the path. Inkscape and rsvg-convert draw each text
+label from the low-resolution image Draw.io embeds in the SVG, so their PNGs are softer than the Draw.io render.
+
+**Checks.** `python scripts/ebook_validate.py --epub FILE --docx FILE [--baseline-epub OLD] [--baseline-docx OLD]`
+reads the EPUB as a ZIP and as XML (the stored `mimetype` first, the package, manifest, spine, cover, every page, image
+and internal link, no SVG left) and the DOCX the same way (every part, relationship and content type, each picture's
+aspect ratio, the text column and its resolution), runs EPUBCheck when it and Java are installed, and with a baseline
+build proves that only the pictures changed. `python scripts/ebook_preview.py word|epub|figures` draws pages for a
+look: the DOCX through a hidden Word (this is also the check that Word opens it), the EPUB pages in headless Edge, and
+sampled figures against their SVG. The checks that need no book build are in `tests/test_figure_raster.py`,
+`tests/test_ebook_validate.py` and `tests/test_build_ebooks.py`.
+
+**Troubleshooting.** The render stops with the figure's name when a conversion fails: Draw.io not found
+(`DRAWIO_BIN`), Python not found by Quarto (`AA_PYTHON`), an aspect ratio that differs from the SVG's (an out-of-date
+export: run `python scripts/export_drawio_svgs.py`), or a renderer timeout. To keep SVG diagrams in a build, for
+example to compare, set `AA_EBOOK_FIGURES=svg`.
+
 ## Chapter slides
 
 `slides/` is a separate Quarto project. Each chapter's deck, `slides/chapter-NN/index.qmd`,

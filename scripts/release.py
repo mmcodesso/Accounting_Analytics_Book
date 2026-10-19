@@ -46,7 +46,7 @@ BUILT = ('book', 'deck')                   # the kinds compared by fingerprint
 # What the built files are made from. A fingerprint holds the git object of each input path, so a file is out of
 # date exactly when one of them changed after it was built.
 BOOK_INPUTS = ('_quarto.yml', '_variables.yml', 'index.qmd', 'front-matter', 'chapters', 'cases', 'appendices',
-               'back-matter', 'shared/fragments', 'visuals', 'styles', 'filters')
+               'back-matter', 'shared/fragments', 'visuals', 'styles', 'filters', 'scripts/figure_raster.py')
 DECK_INPUTS = ('_variables.yml', 'slides/_quarto.yml', 'slides/theme', 'slides/shortcodes', 'slides/filters',
                'filters/strip-comments.lua', 'scripts/slides', 'shared/fragments', 'visuals/src', 'visuals/svg')
 BOOK_SOURCES = ('index.qmd', 'front-matter', 'chapters', 'cases', 'appendices', 'back-matter', 'shared/fragments')

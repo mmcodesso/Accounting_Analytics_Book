@@ -1,0 +1,30 @@
+# How scripts/figure_raster.py makes the PNG copies of the diagrams that the EPUB and the DOCX use in place of the
+# SVG (filters/raster-figures.lua swaps them in; the website and the PDF are not touched). Read with
+# python scripts/figure_raster.py settings. Changing a value makes the PNGs again; changing only the palette
+# values reuses the cached renders and takes seconds (python scripts/figure_raster.py ensure --all).
+
+# drawio renders visuals/src/<name>.drawio with the Draw.io desktop app, the book's own exporter (exact fonts and
+# labels). inkscape and rsvg render visuals/svg/<name>.svg instead, which carries only low-resolution label images.
+renderer: drawio
+
+# Pixels across, whatever the height: about 190 pixels an inch on the 9-inch page of the SVG and 296 on the
+# 5.8-inch picture column Pandoc gives a Word figure.
+width: 1728
+background: "#FFFFFF"
+cache-dir: outputs/ebook-figures
+
+palette:
+  enabled: true
+  # The smallest adaptive palette from min-colors to max-colors (steps of 16, 32, 48, 64, 96, 128, 192, 256) whose
+  # error stays inside the tolerance, with no dithering. The error is the largest difference in any color channel
+  # against the rendered PNG, on a scale of 0 to 255:
+  #   tolerance       the target for 99.99% of the pixels
+  #   mean-tolerance  a limit for the mean over all pixels
+  #   max-tolerance   a limit for the worst pixel
+  # When no palette reaches the target, the largest one inside both limits is used; a figure that meets neither
+  # limit (a photograph) stays an RGB PNG.
+  max-colors: 256
+  min-colors: 64
+  tolerance: 8
+  mean-tolerance: 1.5
+  max-tolerance: 16

@@ -6,7 +6,8 @@ comprehensive case) exists, like a chapter: there is no
 approval step. --check runs the fast source checks (no Quarto, no dataset); --slides-only renders
 the decks without the book; --preview CHAPTER serves one deck in the browser.
 
-The full build (local) renders the PDF, EPUB and DOCX into outputs/build/downloads/, both deck
+The full build (local) renders the PDF, EPUB and DOCX into outputs/build/downloads/ (the EPUB and the DOCX with
+optimized PNG diagrams, which scripts/figure_raster.py makes and scripts/ebook_validate.py checks), both deck
 formats, and the site; the PDF, EPUB, DOCX and PowerPoint files are published as the assets of the
 revision's release by scripts/release.py, not with the site. --site (GitHub Actions) renders only
 the site: the book's HTML and the Reveal decks, with no Draw.io, TeX, or PowerPoint step. --release
@@ -166,11 +167,16 @@ def build(root: Path, quarto: str, *, slides_only=False, chapter_id: str | None 
     if not (slides_only or site):
         downloads = root / 'outputs/build/downloads'
         reset_owned(root, downloads)
+        # The EPUB and the DOCX carry optimized PNGs of the diagrams in place of the SVGs (filters/raster-figures.lua).
+        # Make them first, with progress; only new or changed diagrams are rendered. The PDF and the HTML are unchanged.
+        run(root, [sys.executable, 'scripts/figure_raster.py', 'ensure', '--all'], env)
         for ext in ('pdf', 'epub', 'docx'):
             run(root, [quarto, 'render', '--to', ext], env)
             product = root / '_book' / f'Accounting-Analytics.{ext}'
             if not product.is_file(): raise ValueError(f'Expected book output was not created: {product}')
             shutil.copy2(product, downloads / f'book-latest.{ext}')
+        run(root, [sys.executable, 'scripts/ebook_validate.py', '--epub', str(downloads / 'book-latest.epub'),
+                   '--docx', str(downloads / 'book-latest.docx'), '--report', 'outputs/build/ebook-report.json'], env)
     if decks:
         for fmt in formats:
             if chapter_id:

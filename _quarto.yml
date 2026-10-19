@@ -14,6 +14,9 @@ project:
 filters:
   - filters/strip-comments.lua
   - filters/pdf-figures.lua
+  # The EPUB and the DOCX get an optimized PNG of each diagram in place of its (large) SVG; scripts/figure_raster.py
+  # makes them, as visuals/ebook-figures.yml sets. HTML and PDF are untouched.
+  - filters/raster-figures.lua
   - filters/slide-links.lua
   # After Quarto's own filters, so the {{< var >}} values on the title and copyright pages are filled in
   # before the filter writes them out as LaTeX, XHTML or Word XML.

@@ -1,0 +1,7 @@
+# The Python packages of the EPUB and DOCX build: scripts/figure_raster.py (the optimized PNG diagrams),
+# scripts/ebook_validate.py (the checks) and scripts/build_ebooks.py. Install with
+#   python -m pip install -r scripts/requirements-ebook.txt
+# The Draw.io desktop app renders the diagrams (the book's own exporter); Inkscape and rsvg-convert are optional
+# renderers (renderer: in visuals/ebook-figures.yml). PyMuPDF is optional too: scripts/ebook_preview.py uses it.
+-r slides/requirements.txt
+numpy==2.3.4
