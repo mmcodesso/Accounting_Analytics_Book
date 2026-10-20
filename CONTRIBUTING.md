@@ -419,6 +419,62 @@ it measures with Arial to fit on one line (checked against the heights of the ol
 ever taken for one line). It saves 5 MB more than v2 (0.13 MB gzipped), so it was not adopted. `native_labels_copy` is in
 `svg_native.py` if vector text outside browsers ever matters.
 
+### Search appearance: site name, icons and structured data
+
+Google showed this website as `accountinganalyticshub.com` with a generic globe, because the subdomain had no icon of its
+own (`/favicon.ico` was a 404, and Google keeps one favicon per hostname) and no clear site name. Since 2026-10-20 the
+site names itself "Accounting Analytics" (alternate name "Accounting Analytics Textbook"), which is neither the book's
+title, which stays the homepage's `<title>` and heading, nor the publisher's name, Accounting Analytics Hub. Everything is
+set in `_quarto.yml`, so it survives a rebuild. (`site-identity` and `hub` sit inside `indexing`, because a new top-level
+map would become an empty custom property of the DOCX.)
+
+| What | Where |
+|---|---|
+| The site's name and alternate name | `indexing.site-identity` (the homepage's WebSite structured data, `filters/book-metadata.lua`); `book.open-graph.site-name`; `book.sidebar.title` |
+| The publisher's ids, name and addresses | `indexing.hub` (Accounting Analytics Hub: its page for this book is the authoritative landing page, and this website is never canonicalized to it) |
+| The homepage's structured data | `filters/book-metadata.lua`: one graph with one WebSite, the homepage, the Book, five editions, the author and the publisher |
+| The icons | `favicon.ico`, `favicon-*.png` and `apple-touch-icon.png` at the root, linked by `styles/book-html-head.html` |
+| The link to the publisher's page | `book.page-footer`, on every page (raw HTML links: a Markdown link in the metadata becomes an unused hyperlink relationship in the DOCX) |
+| The short description | top-level `description` (the homepage's meta description and social cards) |
+
+The structured data takes the Hub's own `@id`s for the publisher (`<hub>#organization`), the author
+(`<author>#person`) and the five editions (`<book>#edition-pdf`, `-epub`, `-paperback-bw`, `-paperback-color`,
+`-hardcover`), and the same names, ISBNs (digits only) and edition wording, so that the two sites describe one book.
+Only the free editions, PDF and EPUB, carry an offer, of price 0; no printed edition carries a price, and nothing is typed
+`Product`. The DOI is the Zenodo concept DOI, which names the book across revisions, as the Hub's work does.
+
+**The icons** are made from `visuals/branding/favicon.png` by `python scripts/make_favicons.py` (`--preview FILE` writes
+a contact sheet of every size on white and on dark, and under the circular crop Google's mobile results use). The mark
+sits on a white rounded square so that it reads on a dark browser tab. Edit the source or the script, run it, and commit the
+new files; `tests/test_site_metadata.py` fails when `favicon.ico` no longer matches them.
+
+**Two corrections after the render** (`scripts/finish_site.py`, the project's post-render step): Quarto writes
+the homepage into `sitemap.xml` as `/index.html` while its canonical link says `/`, and it overwrites every page's
+`og:site_name` with the book's title, whatever `open-graph.site-name` says. The script fixes both.
+
+`python scripts/verify/site_metadata_check.py --site _book` checks the rendered site (CI runs it after the build): one
+WebSite with the configured name, the ids, ISBNs and offers above, a canonical link that is each page's own address,
+`og:site_name`, the footer links, the icon files, `robots.txt` and the sitemap. It reads files, so it cannot say what Google
+will show.
+
+**Asking Google to look again (Search Console).** After a deploy:
+
+1. Use a property that covers the subdomain: a Domain property for `accountinganalyticshub.com` (verified by a DNS TXT
+   record), or a URL-prefix property for `https://aa.accountinganalyticshub.com/`.
+2. **URL Inspection**: enter `https://aa.accountinganalyticshub.com/`, choose **Test live URL**, open **View tested page**
+   to see that the HTML holds the icon links and the JSON-LD, and then **Request indexing**. Other pages are recrawled on
+   their own schedule, or by repeating this for them.
+3. **Sitemaps**: submit `https://aa.accountinganalyticshub.com/sitemap.xml`.
+4. Open `/favicon.ico` and `/favicon-96x96.png` in a browser, and check that `robots.txt` still allows them (Google
+   fetches them with Googlebot-Image).
+5. Validate the live homepage's structured data with the Schema Markup Validator (validator.schema.org). Google's Rich
+   Results Test does not check site names, and it has no result type for a Book.
+
+Then wait. Google says a recrawl takes from a few days to a few weeks, and does not promise to show a favicon or a name even
+when every guideline is met. If it still shows another name after several weeks, Google's own steps are, in order: keep the
+preferred name in `alternateName` (done), add the lowercase hostname `aa.accountinganalyticshub.com` as a further
+`alternateName`, and as a last resort set the hostname as the `name`; each is an edit to `indexing.site-identity`.
+
 ## Chapter slides
 
 `slides/` is a separate Quarto project. Each chapter's deck, `slides/chapter-NN/index.qmd`,

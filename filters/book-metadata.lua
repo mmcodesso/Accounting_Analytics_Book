@@ -4,8 +4,13 @@
 -- language), license, copyright and image; the edition and the revision come from _variables.yml.
 --   HTML: every page links its license (<link rel="license">, which search engines read as its terms of reuse). The
 --         homepage also carries the book as schema.org structured data (JSON-LD: the book with one edition per ISBN,
---         its author with the ORCID iD and ISNI, its publisher and subjects, and the website), and the two Google
---         Scholar tags that Quarto's own (google-scholar in index.qmd) leave out for a book: keywords and publisher.
+--         its author with the ORCID iD and ISNI, its publisher and subjects, the homepage and the website), og:type
+--         and og:url, and the two Google Scholar tags that Quarto's own (google-scholar in index.qmd) leave out for
+--         a book: keywords and publisher. The website's name (indexing.site-identity in _quarto.yml: name and
+--         alternateName, which Google reads from the homepage's WebSite node first) is not the book's title. The
+--         publisher, the author, the work and the editions take the @ids, names, ISBNs and edition wording that the
+--         publisher's own website, Accounting Analytics Hub, gives them (indexing.hub), so the two describe one book.
+--         The free editions (PDF, EPUB) carry a free offer; no printed edition carries a price.
 --   EPUB: the long description, the BISAC subjects (Quarto's schema takes a single subject), and the author's name as
 --         catalogs sort it (Codesso, Mauricio). book-pages.lua writes the identifiers (ISBN, DOI).
 --   DOCX: the long description, the file's Comments.
@@ -54,26 +59,45 @@ end
 
 -- The book --------------------------------------------------------------------------------------------------------
 
--- The ISBNs in the order the structured data lists the editions, with each edition's schema.org format.
+-- The ISBNs in the order the structured data lists the editions, with each edition's schema.org format. The label
+-- ends the edition's name and `fragment` its @id on the publisher's website, as that website writes them; only the
+-- free digital editions carry an offer.
 local EDITIONS = {
-  {key = 'pdf', format = 'EBook', encoding = 'application/pdf', label = 'PDF'},
-  {key = 'epub', format = 'EBook', encoding = 'application/epub+zip', label = 'EPUB'},
-  {key = 'paperback-color', format = 'Paperback', label = 'paperback, color'},
-  {key = 'paperback-bw', format = 'Paperback', label = 'paperback, black and white'},
-  {key = 'hardcover', format = 'Hardcover', label = 'hardcover'},
+  {key = 'pdf', format = 'EBook', encoding = 'application/pdf', label = 'PDF', fragment = 'edition-pdf', free = true},
+  {key = 'epub', format = 'EBook', encoding = 'application/epub+zip', label = 'EPUB', fragment = 'edition-epub',
+   free = true},
+  {key = 'paperback-bw', format = 'Paperback', label = 'Paperback · Black and white',
+   fragment = 'edition-paperback-bw'},
+  {key = 'paperback-color', format = 'Paperback', label = 'Paperback · Color', fragment = 'edition-paperback-color'},
+  {key = 'hardcover', format = 'Hardcover', label = 'Hardcover', fragment = 'edition-hardcover'},
 }
+
+-- Where the free editions are offered: the Downloads page's "Latest Book Version" heading, as the publisher's
+-- offers name it.
+local DOWNLOADS_PATH = 'front-matter/downloads.html#latest-book-version'
 
 local function read_book(meta)
   local book = meta.book or {}
   local indexing = meta.indexing or {}
   local citation = meta.citation or {}
   local vars = meta['_quarto-vars'] or {}
+  local identity = field(indexing, 'site-identity') or {}
+  local hub = field(indexing, 'hub') or {}
   local site = text(field(book, 'site-url'))
   if site then site = site:gsub('/*$', '/') end
   local edition = text(field(field(vars, 'book'), 'edition'))
+  local revision = text(field(field(vars, 'book'), 'revision'))
   local info = {
     title = text(field(book, 'title')) or text(meta.title),
     site = site,
+    site_name = text(field(identity, 'name')),
+    alternate_names = texts(field(identity, 'alternate-name')),
+    description = text(meta.description),
+    hub = {name = text(field(hub, 'name')), url = text(field(hub, 'url')), book_url = text(field(hub, 'book-url')),
+           author_url = text(field(hub, 'author-url'))},
+    -- The wording of the publisher's own pages, "First Edition; revision 2027.1" (the PDF's XMP says "First edition").
+    edition_title = edition and (edition:gsub('^%l', string.upper) .. ' Edition'
+                                 .. (revision and ('; revision ' .. revision) or '')),
     -- book.date, as typed (Quarto turns citation.issued into CSL date parts).
     date = text(field(book, 'date')) or text(meta.date),
     language = text(field(citation, 'language')) or 'en-US',
@@ -85,7 +109,7 @@ local function read_book(meta)
     resource_type = text(field(indexing, 'resource-type')),
     bisac = {},
     edition = edition and (edition:gsub('^%l', string.upper) .. ' edition'),
-    revision = text(field(field(vars, 'book'), 'revision')),
+    revision = revision,
     doi = text(meta.doi),
     license = text(field(meta.license, 'link')),
     license_text = text(field(meta.license, 'text')),
@@ -166,7 +190,9 @@ local function organization(affiliation)
   return object({{'@type', 'Organization'}, {'name', affiliation.department}, {'parentOrganization', institution}})
 end
 
-local function person_node(person, id)
+-- The author's node. On the publisher's website the person has its own page and @id, so this node takes that @id and
+-- url, and the faculty page moves to sameAs.
+local function person_node(person, id, hub_url)
   local same_as, identifiers, affiliations = {}, {}, {}
   if person.orcid then
     same_as[#same_as + 1] = 'https://orcid.org/' .. person.orcid
@@ -176,25 +202,50 @@ local function person_node(person, id)
     same_as[#same_as + 1] = 'https://isni.org/isni/' .. person.isni
     identifiers[#identifiers + 1] = object({{'@type', 'PropertyValue'}, {'propertyID', 'ISNI'}, {'value', person.isni}})
   end
+  if hub_url and person.url then same_as[#same_as + 1] = person.url end
   for _, affiliation in ipairs(person.affiliations) do affiliations[#affiliations + 1] = organization(affiliation) end
   return object({{'@type', 'Person'}, {'@id', id}, {'name', person.name}, {'givenName', person.given},
-                 {'familyName', person.family}, {'url', person.url}, {'sameAs', nonempty(same_as)},
+                 {'familyName', person.family}, {'url', hub_url or person.url}, {'sameAs', nonempty(same_as)},
                  {'identifier', nonempty(identifiers)}, {'affiliation', nonempty(affiliations)}})
 end
 
+-- The ISBN as the publisher's website writes it, digits only.
+local function isbn_digits(isbn) return (isbn:gsub('[%s%-]', '')) end
+
 local function structured_data(info)
-  local site = info.site
-  local book_id, publisher_id = site .. '#book', site .. '#publisher'
+  local site, hub = info.site, info.hub
+  local book_id, website_id = site .. '#book', site .. '#website'
+  -- The publisher's website owns these @ids when the hub block names it; otherwise they are this website's own.
+  local publisher_id = hub.url and (hub.url .. '#organization') or (site .. '#publisher')
+  local language = info.language:match('^%a+') or info.language
   local graph, author_refs, editions, subjects, audience = {}, {}, {}, {}, {}
   for i, person in ipairs(info.authors) do
     local id = site .. '#author' .. (i > 1 and ('-' .. i) or '')
+    local hub_url = nil
+    if i == 1 and hub.author_url then id, hub_url = hub.author_url .. '#person', hub.author_url end
     author_refs[#author_refs + 1] = reference(id)
-    graph[#graph + 1] = person_node(person, id)
+    graph[#graph + 1] = person_node(person, id, hub_url)
+  end
+  local publisher = nil
+  if info.publisher then
+    publisher = reference(publisher_id)
+    graph[#graph + 1] = object({{'@type', 'Organization'}, {'@id', publisher_id}, {'name', hub.name or info.publisher},
+                                {'url', hub.url}})
   end
   for _, entry in ipairs(info.isbns) do
-    editions[#editions + 1] = object({{'@type', 'Book'}, {'name', info.title .. ' (' .. entry.edition.label .. ')'},
-      {'isbn', entry.isbn}, {'bookFormat', 'https://schema.org/' .. entry.edition.format},
-      {'encodingFormat', entry.edition.encoding}, {'bookEdition', info.edition}, {'inLanguage', info.language}})
+    local format = entry.edition
+    local offer = nil
+    if format.free then
+      offer = object({{'@type', 'Offer'}, {'url', site .. DOWNLOADS_PATH}, {'price', 0}, {'priceCurrency', 'USD'},
+                      {'availability', 'https://schema.org/InStock'}})
+    end
+    editions[#editions + 1] = object({{'@type', 'Book'},
+      {'@id', (hub.book_url or site) .. '#' .. format.fragment},
+      {'name', info.title .. ' — ' .. format.label}, {'isbn', isbn_digits(entry.isbn)},
+      {'bookFormat', 'https://schema.org/' .. format.format}, {'encodingFormat', format.encoding},
+      {'bookEdition', info.edition_title}, {'inLanguage', language}, {'exampleOfWork', reference(book_id)},
+      {'author', nonempty(author_refs)}, {'publisher', publisher}, {'isAccessibleForFree', format.free or nil},
+      {'offers', offer}})
   end
   for _, subject in ipairs(info.bisac) do
     subjects[#subjects + 1] = object({{'@type', 'DefinedTerm'}, {'name', subject.heading}, {'termCode', subject.code},
@@ -209,24 +260,29 @@ local function structured_data(info)
              or object({{'@type', 'Person'}, {'name', info.holder}})
   end
   local doi_url = info.doi and ('https://doi.org/' .. info.doi)
-  local publisher = nil
-  if info.publisher then
-    publisher = reference(publisher_id)
-    graph[#graph + 1] = object({{'@type', 'Organization'}, {'@id', publisher_id}, {'name', info.publisher}})
-  end
+  -- The book is one work with the publisher's catalog page and the DOI (the Zenodo concept DOI, all versions)
+  -- as other addresses for it.
+  local same_as = {}
+  if hub.book_url then same_as[#same_as + 1] = hub.book_url end
+  if doi_url then same_as[#same_as + 1] = doi_url end
   table.insert(graph, 1, object({
     {'@type', 'Book'}, {'@id', book_id}, {'name', info.title}, {'url', site},
     {'description', info.summary}, {'author', nonempty(author_refs)}, {'publisher', publisher},
     {'datePublished', info.date}, {'copyrightYear', info.year and tonumber(info.year)}, {'copyrightHolder', holder},
-    {'license', info.license}, {'isAccessibleForFree', true}, {'inLanguage', info.language},
-    {'bookEdition', info.edition}, {'version', info.revision},
+    {'license', info.license}, {'isAccessibleForFree', true}, {'inLanguage', language},
+    {'bookEdition', info.edition_title}, {'version', info.revision},
     {'image', info.image and (site .. info.image:gsub('^/', ''))},
     {'identifier', info.doi and object({{'@type', 'PropertyValue'}, {'propertyID', 'DOI'}, {'value', info.doi}})},
-    {'sameAs', doi_url}, {'keywords', nonempty(info.keywords)}, {'about', nonempty(subjects)},
+    {'sameAs', nonempty(same_as)}, {'keywords', nonempty(info.keywords)}, {'about', nonempty(subjects)},
     {'learningResourceType', info.resource_type}, {'educationalLevel', nonempty(info.levels)},
     {'audience', nonempty(audience)}, {'workExample', nonempty(editions)}}))
-  graph[#graph + 1] = object({{'@type', 'WebSite'}, {'@id', site .. '#website'}, {'url', site}, {'name', info.title},
-    {'inLanguage', 'en'}, {'publisher', publisher}, {'about', reference(book_id)}})
+  table.insert(graph, 2, object({{'@type', 'WebPage'}, {'@id', site .. '#webpage'}, {'url', site},
+    {'name', info.title}, {'description', info.description}, {'inLanguage', language},
+    {'isPartOf', reference(website_id)}, {'mainEntity', reference(book_id)}}))
+  -- The one WebSite node: Google reads the site's name from it, so it names the site, not the book or the publisher.
+  graph[#graph + 1] = object({{'@type', 'WebSite'}, {'@id', website_id}, {'url', site},
+    {'name', info.site_name or info.title}, {'alternateName', nonempty(info.alternate_names)},
+    {'inLanguage', language}, {'publisher', publisher}, {'about', reference(book_id)}})
   return json(object({{'@context', 'https://schema.org'}, {'@graph', graph}}))
 end
 
@@ -248,6 +304,9 @@ local function html_metadata(info)
   local head = {}
   if info.license then head[#head + 1] = '<link rel="license" href="' .. attribute(info.license) .. '">' end
   if is_homepage() and info.site then
+    -- Quarto's social cards carry neither; the homepage is the website's front page and its own canonical address.
+    head[#head + 1] = '<meta property="og:type" content="website">'
+    head[#head + 1] = '<meta property="og:url" content="' .. attribute(info.site) .. '">'
     if info.publisher then
       head[#head + 1] = '<meta name="citation_publisher" content="' .. attribute(info.publisher) .. '">'
     end

@@ -8,8 +8,20 @@ project:
     - '!instructor-notes/**'
     # Tells search engines they may crawl the site, and where book.site-url's sitemap.xml is.
     - robots.txt
+    # The website's icons, at the root where browsers and search engines ask for /favicon.ico. Made by
+    # scripts/make_favicons.py from visuals/branding/favicon.png; styles/book-html-head.html links them.
+    - favicon.ico
+    - favicon-48x48.png
+    - favicon-96x96.png
+    - favicon-192x192.png
+    - apple-touch-icon.png
   pre-render:
     - python scripts/export_drawio_svgs.py --pre-render
+  post-render:
+    # Lists the homepage in sitemap.xml at its canonical address (Quarto writes /index.html, its canonical link says /)
+    # and sets og:site_name on every page to indexing.site-identity.name, which Quarto overwrites with the book's title. Does
+    # nothing for a render with no output to correct (the PDF, the print profiles).
+    - python scripts/finish_site.py
 
 filters:
   - filters/strip-comments.lua
@@ -60,10 +72,29 @@ book:
   # Quarto builds sitemap.xml, the canonical links and the social cards' image links from it.
   site-url: "https://aa.accountinganalyticshub.com"
   # Social cards (Open Graph, X/Twitter) for every page: its title, its description (front matter, or the
-  # description below), and the cover. The cover is portrait, so the small card suits it.
-  open-graph: true
+  # description below), and the cover. The cover is portrait, so the small card suits it. og:site_name is the
+  # site's name, "Accounting Analytics" (indexing.site-identity below; tests/test_metadata.py checks that they
+  # agree). Quarto 1.10 writes the book's title there whatever site-name says, so scripts/finish_site.py corrects
+  # it after the render.
+  open-graph:
+    site-name: "Accounting Analytics"
+    locale: en_US
   twitter-card:
     card-style: summary
+  # The sidebar's header on every page: the logo (scripts/make_favicons.py makes it from visuals/branding) over the
+  # site's short name. Quarto prints no sidebar title when there is a logo and no title, hence both. The book's
+  # full title stays the homepage's title and heading and the first entry of the contents.
+  sidebar:
+    logo: visuals/branding/aa-logo.png
+    logo-alt: "Accounting Analytics logo"
+    title: "Accounting Analytics"
+  # The website's footer on every page (HTML only): the publisher and the publisher's page for this book, which
+  # holds the publication catalog (indexing.hub below). Chapter text is untouched. The links are raw HTML because a
+  # Markdown link in the book's metadata becomes an unused hyperlink relationship in the DOCX.
+  page-footer:
+    border: true
+    left: 'Published by <a href="https://accountinganalyticshub.com/">Accounting Analytics Hub</a>'
+    right: '<a href="https://accountinganalyticshub.com/books/accounting-analytics/">Publisher''s page for this book</a>'
   cover-image: visuals/cover/cover.png
   cover-image-alt: "Cover of Accounting Analytics: An Integrated Approach"
   chapters:
@@ -133,6 +164,26 @@ doi: "10.5281/zenodo.23425591"
 # What catalogs, stores and search engines read about the book besides its title, author and ISBNs. Unknown to
 # Quarto, so its own templates never show it: filters/book-metadata.lua and the anchors below put it where it goes.
 indexing:
+  # How search engines name this website (author's request 2026-10-20). Google reads the WebSite structured data on
+  # the homepage first (name and alternateName, filters/book-metadata.lua), then og:site_name (book.open-graph), the
+  # <title> and the headings. The preferred name is neither the book's title, which stays the homepage's <title>, nor
+  # the publisher's name. (Kept inside this block: a new top-level key would become an empty custom property of the
+  # DOCX, as every top-level map does.)
+  site-identity:
+    name: "Accounting Analytics"
+    alternate-name:
+      - "Accounting Analytics Textbook"
+  # The publisher's website, Accounting Analytics Hub, owns the publication catalog: its page for this book is the
+  # authoritative landing page, and its structured data defines the publisher, the author, the work and each edition
+  # by @id (<url>#organization, <author-url>#person, <book-url>#book and #edition-pdf, -epub, -paperback-bw,
+  # -paperback-color, -hardcover). The structured data of this website reuses those ids and the same names, ISBNs and
+  # edition wording, so that the two describe one book. This website owns the full text and is never canonicalized
+  # to the Hub. Each URL ends in a slash.
+  hub:
+    name: "Accounting Analytics Hub"
+    url: "https://accountinganalyticshub.com/"
+    book-url: "https://accountinganalyticshub.com/books/accounting-analytics/"
+    author-url: "https://accountinganalyticshub.com/author/mauricio-codesso/"
   # The long description: the EPUB's dc:description, the DOCX's Comments, Google Scholar's citation_abstract on the
   # homepage, the structured data and CITATION.cff's abstract. A retailer that asks for one (IngramSpark) takes it
   # too. The short one, for search results and social cards, is `description` below.
@@ -194,7 +245,7 @@ indexing:
 # The short description (at most about 155 characters, which search results show in full): the homepage's meta
 # description and social card, and the default for a page whose front matter has no description of its own. Every
 # page of the book has one, written for that page. (book.description would replace them all with the book's.)
-description: "A free, open textbook that teaches accounting analytics with Excel, SQL, and Power BI through financial accounting, managerial accounting, and auditing questions."
+description: "A free, open textbook that teaches accounting analytics with Excel, SQL, and Power BI, using the Charles River Accounting Dataset. Read online or download."
 
 # The book's own citation. index.qmd turns on Google Scholar's tags (google-scholar), so the homepage is the one
 # record of the book and the chapters carry none (Quarto never prints this in a book; the suggested citations of
@@ -235,6 +286,11 @@ format:
     number-sections: true
     # <link rel="canonical"> on every page, from book.site-url, so search engines index each page at one address.
     canonical-url: true
+    # The website's icons: favicon.ico and the PNGs at the project root (resources above), linked by root-relative
+    # address, because the site is served from the root of its own subdomain. Google keeps one favicon per hostname,
+    # so these do not depend on the icons of accountinganalyticshub.com. Quarto's own favicon option is left unset:
+    # it would add a second rel="icon". HTML only; the file holds no comment, which would ship in every page.
+    include-in-header: styles/book-html-head.html
   pdf:
     documentclass: scrreprt
     papersize: letter

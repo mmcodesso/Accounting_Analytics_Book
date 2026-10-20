@@ -618,3 +618,10 @@ body.welcome-page .edition-line {
   font-weight: 600;
   text-transform: capitalize;
 }
+
+/* The logo above the sidebar's title (book.sidebar.logo in _quarto.yml): sized so that the contents stay in view. */
+.sidebar-header .sidebar-logo {
+  width: auto;
+  max-width: 100%;
+  max-height: 84px;
+}

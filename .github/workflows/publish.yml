@@ -56,6 +56,11 @@ jobs:
         # rendered for the browser only.
         run: python scripts/build_all.py --site
 
+      - name: Check the site's search metadata
+        # What Google reads: the site name, canonical links, structured data, icons, sitemap and the publisher's
+        # links, as _quarto.yml sets them. Files only; which name or icon Google shows is checked in Search Console.
+        run: python scripts/verify/site_metadata_check.py --site _book
+
       - name: Check the release files
         # Fails if the site links a file the revision's release lacks; warns (job summary) when a
         # PDF, EPUB, DOCX or PowerPoint file on the release was built before the latest text.

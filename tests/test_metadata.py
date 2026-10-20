@@ -53,6 +53,67 @@ class IdentifierTests(unittest.TestCase):
         self.assertFalse(CONFIG['book']['site-url'].endswith('/'))
 
 
+class SearchAppearanceTests(unittest.TestCase):
+    """What Google reads to name and show the website (indexing.site-identity and indexing.hub, the footer, the icons)."""
+
+    def test_open_graph_site_name_is_the_sites_name(self):
+        self.assertEqual(CONFIG['indexing']['site-identity']['name'], CONFIG['book']['open-graph']['site-name'])
+
+    def test_the_site_is_not_named_by_the_books_title_or_the_publisher(self):
+        identity = CONFIG['indexing']['site-identity']
+        self.assertNotEqual(identity['name'], CONFIG['book']['title'])
+        self.assertNotEqual(identity['name'], CONFIG['indexing']['hub']['name'])
+        self.assertTrue(identity['alternate-name'])
+        self.assertNotIn(identity['name'], identity['alternate-name'])
+
+    def test_the_sidebar_shows_the_sites_name(self):
+        self.assertEqual(CONFIG['indexing']['site-identity']['name'], CONFIG['book']['sidebar']['title'])
+        self.assertTrue((ROOT / CONFIG['book']['sidebar']['logo']).is_file())
+
+    def test_description_fits_a_search_result(self):
+        self.assertLessEqual(len(CONFIG['description']), 160)
+
+    def test_hub_addresses_are_https_and_end_in_a_slash(self):
+        hub = CONFIG['indexing']['hub']
+        for key in ('url', 'book-url', 'author-url'):
+            self.assertRegex(hub[key], r'^https://[^/]+/.*/$|^https://[^/]+/$', key)
+        self.assertTrue(hub['book-url'].startswith(hub['url']))
+        self.assertTrue(hub['author-url'].startswith(hub['url']))
+        self.assertEqual(hub['name'], CONFIG['citation']['publisher'])
+
+    def test_the_footer_links_the_hub_and_its_page_for_the_book(self):
+        footer = CONFIG['book']['page-footer']
+        self.assertIn(f'href="{CONFIG["indexing"]["hub"]["url"]}"', footer['left'])
+        self.assertIn(f'href="{CONFIG["indexing"]["hub"]["book-url"]}"', footer['right'])
+        # A Markdown link in the book's metadata would become an unused hyperlink relationship in the DOCX.
+        self.assertNotIn('](', footer['left'] + footer['right'])
+
+    def test_the_icons_are_project_resources_and_linked_from_every_html_page(self):
+        head = (ROOT / CONFIG['format']['html']['include-in-header']).read_text(encoding='utf-8')
+        icons = ['favicon.ico', 'favicon-48x48.png', 'favicon-96x96.png', 'favicon-192x192.png', 'apple-touch-icon.png']
+        for icon in icons:
+            self.assertIn(icon, CONFIG['project']['resources'], icon)
+            self.assertIn('/' + icon, head, icon)
+            self.assertTrue((ROOT / icon).is_file(), icon)
+        # Quarto's own favicon option would add a second rel="icon".
+        self.assertNotIn('favicon', CONFIG['book'])
+        self.assertNotIn('<!--', head)
+
+    def test_robots_does_not_block_the_icons(self):
+        robots = (ROOT / 'robots.txt').read_text(encoding='utf-8')
+        self.assertNotRegex(robots, r'(?im)^\s*disallow:\s*\S')
+
+    def test_the_post_render_step_finishes_the_site(self):
+        self.assertIn('python scripts/finish_site.py', CONFIG['project']['post-render'])
+
+    def test_the_free_editions_are_offered_at_a_heading_that_exists(self):
+        # The offers' address, front-matter/downloads.html#latest-book-version (filters/book-metadata.lua).
+        downloads = (ROOT / 'front-matter/downloads.qmd').read_text(encoding='utf-8')
+        self.assertRegex(downloads, r'(?m)^## Latest Book Version\s*$')
+        lua = (ROOT / 'filters/book-metadata.lua').read_text(encoding='utf-8')
+        self.assertIn("'front-matter/downloads.html#latest-book-version'", lua)
+
+
 class CopyTests(unittest.TestCase):
     def test_copyright_page_prints_the_orcid_and_the_isni(self):
         pages = (ROOT / 'front-matter/_book-pages.qmd').read_text(encoding='utf-8')
