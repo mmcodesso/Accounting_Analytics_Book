@@ -4,7 +4,7 @@
 Each visuals/src/*.drawio file is exported twice:
 
 - visuals/svg/<name>.svg, forced to the light theme on a white background, for
-  HTML, EPUB, and DOCX;
+  HTML and the Reveal decks (the EPUB and DOCX carry PNGs, see scripts/figure_raster.py);
 - visuals/pdf/<name>.pdf, a cropped vector PDF that filters/pdf-figures.lua
   substitutes for the SVG in the PDF build, so figure text stays vector text.
 """
@@ -27,6 +27,9 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+from scripts import svg_native  # noqa: E402
 DEFAULT_SRC_DIR = REPO_ROOT / "visuals" / "src"
 DEFAULT_OUT_DIR = REPO_ROOT / "visuals" / "svg"
 DEFAULT_PDF_DIR = REPO_ROOT / "visuals" / "pdf"
@@ -39,6 +42,13 @@ DEFAULT_COVER_WIDTH = 1105
 DEFAULT_COVER_HEIGHT = 1430
 DEFAULT_COVER_WEB_WIDTH = 510
 DEFAULT_COVER_WEB_HEIGHT = 660
+# What Draw.io leaves in an SVG for a viewer that cannot draw an HTML label (the <switch> fallback of each label):
+#   text-fallback  its own plain text, one line (--embed-svg-fonts false): the 165 diagrams are about 10 MB
+#   png-fallback   a PNG of the label at four times its size (Draw.io's default): 101 MB, but rsvg-convert and
+#                  Inkscape draw every label completely, which scripts/figure_raster.py needs from them
+# Browsers draw the HTML label in both, so the pictures on the website and in the decks are identical.
+SVG_LABELS = ("text-fallback", "png-fallback")
+DEFAULT_SVG_LABELS = "text-fallback"
 # Bump when the export recipe changes in a way that requires new outputs.
 EXPORT_RECIPE_VERSION = 1
 DRAWIO_TEXT_WARNING_PATTERN = re.compile(
@@ -95,6 +105,13 @@ def parse_args() -> argparse.Namespace:
         "--pre-render",
         action="store_true",
         help="Reuse exports prepared by build_all.py when running as a Quarto hook.",
+    )
+    parser.add_argument(
+        "--svg-labels",
+        choices=SVG_LABELS,
+        default=DEFAULT_SVG_LABELS,
+        help="What an SVG holds for a viewer that cannot draw HTML labels: Draw.io's plain text "
+             f"(default, small) or a PNG of each label (large). Defaults to {DEFAULT_SVG_LABELS}.",
     )
     parser.add_argument(
         "--manifest",
@@ -271,7 +288,7 @@ class ExportManifest:
             return previous == self.record(source, output, settings)
         # Bootstrap existing local exports once, using the old timestamp rule.
         # Never infer freshness from timestamps on a GitHub Actions checkout.
-        defaults = {".svg": {"padding": DEFAULT_PADDING}, ".pdf": {},
+        defaults = {".svg": {"padding": DEFAULT_PADDING, "labels": DEFAULT_SVG_LABELS}, ".pdf": {},
                     ".png": {"width": DEFAULT_COVER_WIDTH, "height": DEFAULT_COVER_HEIGHT}}
         return (os.environ.get("GITHUB_ACTIONS") != "true"
                 and settings == defaults.get(output.suffix)
@@ -481,12 +498,23 @@ def run_drawio(command: list[str], source: Path, temp_output: Path, kind: str) -
         )
 
 
+def strip_svg(path: Path) -> None:
+    """Drop the markup no viewer needs (svg_native.strip_svg_metadata): the drawing is unchanged."""
+    text = path.read_text(encoding="utf-8")
+    stripped = svg_native.strip_svg_metadata(text)
+    if stripped != text:
+        path.write_text(stripped, encoding="utf-8")
+
+
 def export_svg(
     drawio_bin: Path,
     source: Path,
     output: Path,
     padding: float,
+    labels: str = DEFAULT_SVG_LABELS,
 ) -> None:
+    if labels not in SVG_LABELS:
+        raise ExportError(f"Unknown SVG label mode {labels!r}; use one of {', '.join(SVG_LABELS)}.")
     output.parent.mkdir(parents=True, exist_ok=True)
     temp_output = output.with_name(f".{output.stem}.tmp.svg")
     if temp_output.exists():
@@ -499,6 +527,7 @@ def export_svg(
         "svg",
         "--svg-theme",
         "light",
+        *(svg_native.DRAWIO_NO_RASTER_FALLBACK if labels == "text-fallback" else ()),
         "-o",
         str(temp_output),
         str(source),
@@ -509,7 +538,9 @@ def export_svg(
     remove_drawio_text_warning(temp_output)
     force_light_colors(temp_output)
     add_white_background(temp_output)
-    optimize_svg(temp_output)
+    if labels == "png-fallback":
+        optimize_svg(temp_output)
+    strip_svg(temp_output)
     temp_output.replace(output)
 
 
@@ -672,7 +703,7 @@ def run() -> int:
             print(f"Using Draw.io executable: {drawio_bin}")
         return drawio_bin
 
-    print(f"Using transparent SVG padding: {format_number(args.padding)}")
+    print(f"Using transparent SVG padding: {format_number(args.padding)}; SVG label fallback: {args.svg_labels}")
     if not args.skip_cover:
         print(f"Using ebook cover PNG size: {args.cover_width}x{args.cover_height} pixels")
     print("Checking recorded source/output checksums for existing exports.")
@@ -688,7 +719,7 @@ def run() -> int:
             targets.append(pdf_dir / f"{source.stem}.pdf")
 
         for output in targets:
-            settings = {"padding": args.padding} if output.suffix == ".svg" else {}
+            settings = {"padding": args.padding, "labels": args.svg_labels} if output.suffix == ".svg" else {}
             if not force_export and manifest.current(source, output, settings):
                 manifest.remember(source, output, settings)
                 print(f"skip   {source.relative_to(REPO_ROOT)} -> {output.relative_to(REPO_ROOT)}")
@@ -699,7 +730,7 @@ def run() -> int:
                 continue
 
             if output.suffix == ".svg":
-                export_svg(executable(), source, output, args.padding)
+                export_svg(executable(), source, output, args.padding, args.svg_labels)
             else:
                 export_pdf(executable(), source, output)
             manifest.remember(source, output, settings)

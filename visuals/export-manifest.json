@@ -1185,1485 +1185,1650 @@
       "source_sha256": "44362589d58bf61ae54630a23b1bc7bbdc7330deeedd9a6fe662487da6e8e3c2"
     },
     "visuals/svg/fig-01-01-analytics-continuum.svg": {
-      "output_sha256": "8b09da8acbfee03464450f7b3ad6fb61314f0c530a6e41a178b9364f8495dc4a",
+      "output_sha256": "ddf25279631aa5d3374f71e814dbb1fcedfd10bf46ce7be2ddaabaf08c5d92be",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-01-01-analytics-continuum.drawio",
       "source_sha256": "318190b68a957ed6dd49992dff5d09a8dbd8029e4a6568d4644412bbb0d17221"
     },
     "visuals/svg/fig-01-02-analytics-workflow.svg": {
-      "output_sha256": "21a98d05c5959622559e1b7c8d7a177d94310cdfbccc26fcb746f81c9854a7c6",
+      "output_sha256": "dc5bd5e39791c28f97edf04a496739cdefa8311af05acf128e36c7cf9e7696f2",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-01-02-analytics-workflow.drawio",
       "source_sha256": "528e852cd216bfc2a24991578287d6d1aee9e53e918f1d839039388ef26717df"
     },
     "visuals/svg/fig-01-03-tools-workflow-mapping.svg": {
-      "output_sha256": "15d2cd27f17cfbc5a46e5efadbd343066d1dc6b5295412bceff4b10ca3e8ce69",
+      "output_sha256": "056ea75c66a36706dcc7eb3dcd047c305e718f663757b868739a227ff38f348b",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-01-03-tools-workflow-mapping.drawio",
       "source_sha256": "f2cd73a9f44f290884a59cd6ff771d82ad66973d1a586e13ab9afd78aa0dc857"
     },
     "visuals/svg/fig-01-04-charles-river-architecture.svg": {
-      "output_sha256": "7b914a8c4eab2bd540378a994abbeae79326f62eb31bd0f2d2319904b46250d7",
+      "output_sha256": "21558866a3ca81b488c027f6d482b56ae991edf57284bffe68aa1dde616388a4",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-01-04-charles-river-architecture.drawio",
       "source_sha256": "9da5235f675366809347695b6b7c767174b885493eb7aaa02d0eb3f6f06baf0e"
     },
     "visuals/svg/fig-01-05-o2c-process-flow.svg": {
-      "output_sha256": "55e850bab6268b926d23246e39dd059921b7fe24c736b40d3826ab707c439ba3",
+      "output_sha256": "a124c4bef0bd3a81a1f022b1ec1960fc9e0b676d03d19350e4f2665d3c2640a6",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-01-05-o2c-process-flow.drawio",
       "source_sha256": "b40f0b93f6b58321c7e3da56ba811b308bcceb58c1148a23c46cda708acceb92"
     },
     "visuals/svg/fig-01-06-ledger-posting-trace.svg": {
-      "output_sha256": "aa10c6812a7ecdd4d51814503d5bd1d9d6f33a29f3a73733a3a6fe3c659eb938",
+      "output_sha256": "9b5a4e5f3bbc3bde074b134c837e00a6ea4225eb01e25014ebf9e32d326ccf4b",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-01-06-ledger-posting-trace.drawio",
       "source_sha256": "efc18bc3e675db24bc6989f47b90a60abac334224340bf00507daf2cd99dd8e6"
     },
     "visuals/svg/fig-01-07-salesorder-worksheet.svg": {
-      "output_sha256": "a27688f45e213beae4be65ce655b5a7c92be47dad37040377321b72ecb49013f",
+      "output_sha256": "519e337823a9a31af049fa54413ed61bf58a8c7ea63f6e8ba1a50e8b52760e2c",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-01-07-salesorder-worksheet.drawio",
       "source_sha256": "922dbd37b9a4ddfb23790d644d0b14f5d69f3708b399e046ab38ea03443491f8"
     },
     "visuals/svg/fig-01-08-book-organization-map.svg": {
-      "output_sha256": "363d6713b0a58c9b36b7c4a989011ae8adf373614ca5c1afc6998b7b1139b4f0",
+      "output_sha256": "37f40eb6503b3347cf7d4e80de1b978dd46f887d28a261162add702440e9977d",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-01-08-book-organization-map.drawio",
       "source_sha256": "6723f8e597a8db479c8f790e01b2e1871519282c48707843dc48a498e04fa63a"
     },
     "visuals/svg/fig-02-01-spectrum-data-structure.svg": {
-      "output_sha256": "9d17ceec618a8e27cceaa6b3d091c1e00d5892c05dcb1c319e2325061e5bb222",
+      "output_sha256": "f0867570688c30ce1cc498c63e973d8bd0d32690f1c2fd42c6b3a67884987c86",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-02-01-spectrum-data-structure.drawio",
       "source_sha256": "0e390139a6e13de1c222dd8410bbf669a548aee711c3489067f459489e1c64bd"
     },
     "visuals/svg/fig-02-02-sources-accounting-data.svg": {
-      "output_sha256": "cacd583b5e3941899f23c8f3b247369d3e7278a3b4ce25619b03c175212e7948",
+      "output_sha256": "d21ea675bee911ebff02f5e20779ec9e71f1191f6415074cbe5df0c91b757cdb",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-02-02-sources-accounting-data.drawio",
       "source_sha256": "625e6e9a5fdf8acb67ec520feba70ee4f06d8c00e8de08b57b820a3edfe22ed3"
     },
     "visuals/svg/fig-02-03-data-quality-problems.svg": {
-      "output_sha256": "9227148dab5e3318de3cc17f42b6864f43a611b4e89c597e55aa0bf7668d1adc",
+      "output_sha256": "b860aabe0969dbaf07ca83ffa12ff920e93caea13caa110dfd64e1ca5b2abd73",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-02-03-data-quality-problems.drawio",
       "source_sha256": "8d1d2555d22123942fe5e646c0a158377d8dfd2ed144641a80f6260077914e26"
     },
     "visuals/svg/fig-02-04-shipment-blank-tracking.svg": {
-      "output_sha256": "a44a28a1ffb373a27b3b5a7512c34cfe1ea0acf819183c289593d1ca2cec5633",
+      "output_sha256": "c56c3991d3a3f448aba6df01d69b6033481a59f1f75f205b970f9e895922ea24",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-02-04-shipment-blank-tracking.drawio",
       "source_sha256": "956d3edf02769399373d2367360afb4d6c989ae1f776af99ff557fff38818972"
     },
     "visuals/svg/fig-02-05-salesinvoice-date-check.svg": {
-      "output_sha256": "ce493fbd6fe156d9190545533615a7e57f29d05a3e40004a7b8d4255819b9c3e",
+      "output_sha256": "9c379019b4053fa31341ffcc353202f862e14ddf02b3c9d6c8169446cb79ca45",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-02-05-salesinvoice-date-check.drawio",
       "source_sha256": "124dfc2c4d6c889bc1718faca861bc950a637857a57009473ac32dd7bb2797c8"
     },
     "visuals/svg/fig-02-06-messy-vs-tidy-data.svg": {
-      "output_sha256": "8a25cb4496e170870577f2a174141393025310f3d21d60ea3798336abc6b7373",
+      "output_sha256": "cc78e28494e001efbaa5b3d055e80ab17e450f6fb6db2e56b7a447ee63ebdd5d",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-02-06-messy-vs-tidy-data.drawio",
       "source_sha256": "52b3edf4a805c15184bcf04a26a36cfdc112496c5aa01b15e5c8b09e85b4cb40"
     },
     "visuals/svg/fig-02-07-glentry-debit-credit-sum.svg": {
-      "output_sha256": "68eaec76a642d582f32b8498038b56024805d2b838bd11ddaff215ea9209ee2a",
+      "output_sha256": "9a0beab552b385211cf9835eb20b26747398a526cf173590e27fe42e571dfba1",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-02-07-glentry-debit-credit-sum.drawio",
       "source_sha256": "33f3f8b68b6c55725583ce6efd379518b42ecb3b11a77cca39cc0efae499afa1"
     },
     "visuals/svg/fig-03-01-anatomy-database-table.svg": {
-      "output_sha256": "e1f919fc006defff730087fe6b77a89755ea77b64519c47f0afa68d7491116b5",
+      "output_sha256": "098d982ee56ed3944731de3da8f579d516e36ff78aeafb4e80c7974031a3d5ee",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-03-01-anatomy-database-table.drawio",
       "source_sha256": "f8ca54de199278fb5a4dc4f38677b01d6c2f2c958127c16f62bc5f5b2ee9fe78"
     },
     "visuals/svg/fig-03-02-pk-fk-illustrated.svg": {
-      "output_sha256": "57869075f2e491bf8a70ace334e5d5874778a37f71f346a372ede28c765623f5",
+      "output_sha256": "b36a4674daa93d963fcfd780e58a0b62609d69d241efa14337debc253bd16738",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-03-02-pk-fk-illustrated.drawio",
       "source_sha256": "dd5c84e2b7217d037b8d06ce9880edd0e5ca2082e467d5c85e7686a470b9ced8"
     },
     "visuals/svg/fig-03-03-three-cardinality-types.svg": {
-      "output_sha256": "8bc639b43dcbeb33875c266e385749bb5c98cdeb2b5dfe2116bfb758598e19ab",
+      "output_sha256": "78b3ef9959686cc9044d4a05c841da5e30b6f69d1b639dbb646ac0d6b49827d3",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-03-03-three-cardinality-types.drawio",
       "source_sha256": "dad8cdd18ae51f7b582c7d8e790ac538a9d4a5f4511919815b91013df5a7fd48"
     },
     "visuals/svg/fig-03-04-crows-foot-notation.svg": {
-      "output_sha256": "05b3bb0893b5d8682f7c33c6ce3631384d9c7319c39152eafc2c55205c85e888",
+      "output_sha256": "284295ab050c0740c158d7d9c119986c5437a6a0b2cb465e440390630a8703d5",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-03-04-crows-foot-notation.drawio",
       "source_sha256": "2c78a61272c6d9110f9bdec94b0fb6faf9a6483b6a8e5bb1d1cd863a6a3a9d65"
     },
     "visuals/svg/fig-03-05-chart-of-accounts-table.svg": {
-      "output_sha256": "9c21e0d6e2f9148b04638c46f40fecc97139b256ba20160ab4c8241209198058",
+      "output_sha256": "eb4b64d7fc15d2740704aea665bc06a883d9a00f090d1e5b994fdc8dcf72d14c",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-03-05-chart-of-accounts-table.drawio",
       "source_sha256": "91aa07bc0265d95b6c4900bf466cbb8ca31381c375f5e0372f6d46977b884e80"
     },
     "visuals/svg/fig-03-06-gl-subledger-relationship.svg": {
-      "output_sha256": "936d8b045f82d63367512d1e9c095b93675a0adbcda29d44e8fefe1126445e1e",
+      "output_sha256": "f2c086b0d0c763131db8e0e0a409e8312824ee4c804691b2ffd7e42031e50f7c",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-03-06-gl-subledger-relationship.drawio",
       "source_sha256": "96179fe8192974a5e744b526b39b9057950677234666c53bf3705131d9a264be"
     },
     "visuals/svg/fig-03-07-o2c-core-er.svg": {
-      "output_sha256": "c629a5050898dfcea0195b6649b92017a901fb0c0dfdb0dd7a032dee294c676a",
+      "output_sha256": "1e1a711df18cc48e84945960a3fd08f9f86a8a7f14f0ed4a4f9450865c05682d",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-03-07-o2c-core-er.drawio",
       "source_sha256": "0981dc8cdf000ea8e24142fd7a421a02cd487c720fa4cde6b10d23b722135ad9"
     },
     "visuals/svg/fig-03-08-manufacturing-er-focused.svg": {
-      "output_sha256": "84fbb1f6d2749376ca3a44a9e6c9d42a2bb8e54b12c9a227ead1bbeb69dc1e2e",
+      "output_sha256": "4b626c9ea91c880a354425899d0bc7e383dd54e3ea9088f6dd6065d7beb2dd5e",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-03-08-manufacturing-er-focused.drawio",
       "source_sha256": "c8e5af48f37b09136589766df02fdd0b0a1f63d44b0c6577287ee979feb7c735"
     },
     "visuals/svg/fig-03-09-accounting-core-er.svg": {
-      "output_sha256": "f42d4e1fcf5448e1651e25120362aca9be0864759e8f5a6180948b601c8c7113",
+      "output_sha256": "92508263bbc355812adcf25f142377231146bb1382c2e5720b610beacc7b8c2c",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-03-09-accounting-core-er.drawio",
       "source_sha256": "87e965384c52d9869cfea6ddb2b1fa10d9f57808311e90c39391f855c4ecf6d4"
     },
     "visuals/svg/fig-03-10-cross-group-traced-path.svg": {
-      "output_sha256": "805e00b175e4c283313e453ba1c54f2008db36bfbeb6a83f62a84d736341c625",
+      "output_sha256": "3de8731579237b7ddede24046bf2d01b51cf6aa078eaafc82b1bea329f3689c6",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-03-10-cross-group-traced-path.drawio",
       "source_sha256": "e67af8f27aab13f70bc75249ca3caee83b044eefa9a6bf4875a6dd25a1f5bfe4"
     },
     "visuals/svg/fig-04-01-range-vs-table.svg": {
-      "output_sha256": "fff119791eb9e05d4da25bf426f402a9718c5d9494544ec7a11ddb271e0de7a5",
+      "output_sha256": "b67a6828374eaf82c04f5ce4770442916143309e415e8f3c509e394e5344c4bf",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-04-01-range-vs-table.drawio",
       "source_sha256": "d1bb7c1cec7648d626d72c66a585a7ceaac652cfa4f44bf75bb5c1470abc923e"
     },
     "visuals/svg/fig-04-02-power-query-navigator.svg": {
-      "output_sha256": "583edd527bce0ff4ac4ae294e29d33e03e527a7288497fe844f153e1bcb0192c",
+      "output_sha256": "e488e67a08fa6a8756ab13985505ad41f3fca2419c3709b84d7a9e066c3fac0d",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-04-02-power-query-navigator.drawio",
       "source_sha256": "467c8b7d3f479e2cc5d04f312f5959c09ac46262834a5483f76418b88a0c511f"
     },
     "visuals/svg/fig-04-03-power-query-editor-item.svg": {
-      "output_sha256": "bc1d7b4a3dd5f0f301390a04648e51e603a6e37d3f4df81345f6746e2ef76bc4",
+      "output_sha256": "0cd8d2a5c35dc7766fad5e600c6d41c79a16b9f2d1f8201bc278e9de59bcd599",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-04-03-power-query-editor-item.drawio",
       "source_sha256": "be31185a812ca645ae17e4a002c35c62830ebf9681b2ee79d0d560486aed7b0b"
     },
     "visuals/svg/fig-04-04-salesinvoiceline-table.svg": {
-      "output_sha256": "f724e4b06bd288dc2ff1d7f15ee6e5d4257ae445326abe7938ec87c6d7fd72fb",
+      "output_sha256": "61a423f283b6f28bf2805c9f23f345caab71b9539364c1f2d8ef8be07ba9d12b",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-04-04-salesinvoiceline-table.drawio",
       "source_sha256": "3e6882e3611670b5e9f5f34a41a3d4db6244ae26ec6024f632d8b5d02fa4e072"
     },
     "visuals/svg/fig-04-05-cell-reference-types.svg": {
-      "output_sha256": "46cacd6e8b42efad70195e598d67527b460e3a5b7c60b02dc18a32876f3a029e",
+      "output_sha256": "f940e2bc493f5557fd8efcd42322123a5a12be9f5e3736c048e7f69d1024c4f1",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-04-05-cell-reference-types.drawio",
       "source_sha256": "72199127166b28c6ab1fee3475703710b2675acdb73cd4a74f77d23c9783dc58"
     },
     "visuals/svg/fig-04-06-analysis-worksheet.svg": {
-      "output_sha256": "3d931346e19fefb0e016bb596b231dc83b7a314b498ba4d2695cd23019e427d6",
+      "output_sha256": "5f5d0de70785f395186a8d430cfb9a7f1b938fe99549dd8fd6aa26c48ca8d158",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-04-06-analysis-worksheet.drawio",
       "source_sha256": "44ad00885da65eb866294ff64b8cc99f6c01d29280279261a920ee419a93089a"
     },
     "visuals/svg/fig-04-07-analysis-workbook-layout.svg": {
-      "output_sha256": "9f9ebd1a8c2b048bfa2d91861d055b635681f0c9ec774115a73c6f5e89a0d73d",
+      "output_sha256": "dd98ede2a78ef2b330bf44bb249ad8291cfcc924be5e5f28b3170557dab429af",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-04-07-analysis-workbook-layout.drawio",
       "source_sha256": "82648b17868997f5ebf9b01d12ff5fbe2a1d63a49ddae5858b636618a1ef8792"
     },
     "visuals/svg/fig-04-08-promotion-slicer.svg": {
-      "output_sha256": "3ac2e9272bfcd03c936298d17e457e47e40484995b511477eeb19fafa27bd73e",
+      "output_sha256": "ed11d518fd282e63ec7f67d01534dab93eb5f93cf8ac74739daa78ff5910f685",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-04-08-promotion-slicer.drawio",
       "source_sha256": "5b79c9a7a8d9e07331f8bdea3bd5965fb33e4a34cc2f0daa9a6153a4ecce4093"
     },
     "visuals/svg/fig-04-09-documentation-sheet.svg": {
-      "output_sha256": "e0fe2d60064b5b1df5e5ae01d84f28d7f82aaa2064be863ac0e23f4791b2c329",
+      "output_sha256": "9a6f214eae483acf1d5a8937c460a3f454bc104b836250b01ab95ad0348c73d0",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-04-09-documentation-sheet.drawio",
       "source_sha256": "4572975c49cc0238cd9710eef27bb726cfcf8038b55d092f0469ab05399ab9c5"
     },
     "visuals/svg/fig-05-01-invoicelines-map.svg": {
-      "output_sha256": "db138b2290e72a656b15b11e97f7d8d3923b033453e739374c5dbe27b3a9214e",
+      "output_sha256": "0172a46fe9b67060865934d3d97642105bf6b5590572382004f06eec90816266",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-05-01-invoicelines-map.drawio",
       "source_sha256": "a6cd9ef2d510507a143f6abee72bd5d7d8be59cf3a93463de6bc546e0cc76999"
     },
     "visuals/svg/fig-05-02-item-product-type.svg": {
-      "output_sha256": "872b5310ff404b6f5d4abbcebcc17fb461464349bb7f4677aba16c9e5d54fa9a",
+      "output_sha256": "5f73ca76f3ff0a8707bfdad77bc8efab1d8dee78523d755dff8bad2d99d2617e",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-05-02-item-product-type.drawio",
       "source_sha256": "75f8263c8630161eeba9b8917bc7d7c668c850365723c9a9eaa957bc1416beee"
     },
     "visuals/svg/fig-05-03-salesinvoice-periods.svg": {
-      "output_sha256": "c420ce8b6106a7447a898d737f69f20a501a8c97e712c7dd57cd4ec3b70fc726",
+      "output_sha256": "0923ee1c08d5213de911bb791df2a0813a0c79936c34d380f6efda0acbadc900",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-05-03-salesinvoice-periods.drawio",
       "source_sha256": "8830360065569794d2a50a6d6cd1fa92e6bfe4967fade2749c4ee3a11c285ed3"
     },
     "visuals/svg/fig-05-04-xlookup-anatomy.svg": {
-      "output_sha256": "a695e9a012c63f48ca9b030c4ae63286d33aee2f94905c2addb24cf6a282754d",
+      "output_sha256": "853b54214d6c0c1ad51f741aa1364dd2772ccb8c0b1712c8624c10a74e611e81",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-05-04-xlookup-anatomy.drawio",
       "source_sha256": "2342877ee56b9d5b62fdef9848cfbe540f9dfc670c5cb373088671433342d217"
     },
     "visuals/svg/fig-05-05-invoice-line-lookups.svg": {
-      "output_sha256": "21d4a00a342507093cad3717a42ae301a97bd7dc5ba8927c0c210a2b8f2fe567",
+      "output_sha256": "48f9b1e8faa0570679abc76961daa5fa406426b97d3646e17026e1c2bd7776ab",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-05-05-invoice-line-lookups.drawio",
       "source_sha256": "32bbd37de207c94bef0c7953fd9338b4d038bc21aaac486f749514723f4a5869"
     },
     "visuals/svg/fig-05-06-merge-dialog.svg": {
-      "output_sha256": "ba43be76d4872dadb7e94b9e1ca0a6763a80578e3bebe6993bc2a87803f5af80",
+      "output_sha256": "7847d50dd69f14da950131150be9b4239851947bcf7d0fb8e85fab90ad29dc23",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-05-06-merge-dialog.drawio",
       "source_sha256": "4519cac772c5d2b237bfd5f9662115c7920daa64cb942133b0790c73d8679f08"
     },
     "visuals/svg/fig-05-07-custom-column.svg": {
-      "output_sha256": "b791a39d3c9837cfb5f706796e4873780439dd797b2de131468edcac1de0087c",
+      "output_sha256": "0af84bb60a206897d876b97c0dd9b14ef2e65a2d739034a3a095ee190d3c8608",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-05-07-custom-column.drawio",
       "source_sha256": "4731ff6fb2d6baccda2732c25d718513ab1dcc5e2aa36c5766f8dde6612d9243"
     },
     "visuals/svg/fig-05-08-invoicelines-table.svg": {
-      "output_sha256": "ecffe5c8d4403acf1b8c4f4d5eb5bbac9151214c24de6b8647c791a9bb6c05ac",
+      "output_sha256": "2019d8716cee7b90b5be109996d9fd9498563681f1833c3e783659dffe48197f",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-05-08-invoicelines-table.drawio",
       "source_sha256": "f6e084a8a09bb503ec4c8ba492c688ce259dac3106342c41eafee508be8d889b"
     },
     "visuals/svg/fig-06-01-fiscal-2026-profile.svg": {
-      "output_sha256": "64ccee6faa9c3f853227a3179d5caa03cbcb0857f03ab617335f70e2fd434a47",
+      "output_sha256": "fbaa32af9619057ca7ceba1389cf7ccbf4817dfffc0521a00bf690a1a3f9d6e6",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-06-01-fiscal-2026-profile.drawio",
       "source_sha256": "62453d8bfbca7ec37ff33b8dc8f4e33ebe66933c6348dcd4952aab270e37143e"
     },
     "visuals/svg/fig-06-02-line-total-histogram.svg": {
-      "output_sha256": "f64a6345fcfc20ddfc04a07134a3957e1c2356453ca31aff66d5f4d699b4d51e",
+      "output_sha256": "48f7fcf06eab1ae72cc796d9b4736b9f0bc96cfe7be28c58f831ce89f88754ed",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-06-02-line-total-histogram.drawio",
       "source_sha256": "3e9bd90c131f52fc5db5dcdb5adc5cd60e641d7851ccfe4d783e4b0bd9e77938"
     },
     "visuals/svg/fig-06-03-pivottable-areas.svg": {
-      "output_sha256": "4b875545d1530bc08f81c9fa011c218d750782c434d5df4ede7a5493c520c065",
+      "output_sha256": "6367e08e58a6379ca846cb275170ffc9dbef415e87079cd291f40ed2e1461a79",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-06-03-pivottable-areas.drawio",
       "source_sha256": "236c69a263afa339e98ea81490fdf92c6b53b4875291a542efcb4a9a94d91b86"
     },
     "visuals/svg/fig-06-04-show-values-as.svg": {
-      "output_sha256": "e2f464d6b152e709816057b480ff8d617c88cdff946fd96042075c62d79dff71",
+      "output_sha256": "7f1a7c77539176b90143712f14bc86604bcaea4091b11529a1531f0820d62c0f",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-06-04-show-values-as.drawio",
       "source_sha256": "77c1b4d56e45a48bb78a5043cf6d97f69d1a6a65c0c7318c506fa160d0154d68"
     },
     "visuals/svg/fig-06-05-calculated-field.svg": {
-      "output_sha256": "779d0c9da21dcca17b8ee716a84aede086dc19ecacacae457b9f44ff1c706c06",
+      "output_sha256": "f6e02e464c67e1c4a48c063fbb4651bf0c546839453dccf57217125ed797f8b8",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-06-05-calculated-field.drawio",
       "source_sha256": "d35ca1bb9a17d1ac756b15ea112e2871d5302fcf1bde2c25c256658fd7e110d3"
     },
     "visuals/svg/fig-06-06-revenue-margin-pivot.svg": {
-      "output_sha256": "130468c8a3599f6aa72284a8a5d9d013ada39dc51d3ea71e94cdb87c95eb89bb",
+      "output_sha256": "d057b97fc33a1a1ac54f71e7b0e4ef601cdf1659b55e1aa655e6bd949c441816",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-06-06-revenue-margin-pivot.drawio",
       "source_sha256": "b426403232cd39c2f24b0f8a5a9676b6345ee5251ff01f6dca0bc62821baaf6a"
     },
     "visuals/svg/fig-06-07-ledger-to-income-statement.svg": {
-      "output_sha256": "873ed344aa18dc2bcd7b6e5f35024fc7ac1e70e275d68562329e6f119f0c3581",
+      "output_sha256": "1cac90cb263f472b13f3b17c6c58f157ea0b57099530e749c30259e12df63d4c",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-06-07-ledger-to-income-statement.drawio",
       "source_sha256": "b305a9d48bc7a10e233a4cc3e630f7ca2219c5568f46cae8d91e532ef1299f32"
     },
     "visuals/svg/fig-06-08-furniture-drivers.svg": {
-      "output_sha256": "51783190b00ed232523d6b8a71856023cb78483b285daac16d6d17beef9d0829",
+      "output_sha256": "e60b9cb4f39bc4a84dfaea73df85edde826e198af45c17614d935f7e07567f9f",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-06-08-furniture-drivers.drawio",
       "source_sha256": "cd0e2462f1e1c8eafc83b6a0ff0937002aae130d75da66eeb3dd4447fb2e2d57"
     },
     "visuals/svg/fig-06-09-margin-bridge.svg": {
-      "output_sha256": "aef6aed993972b0f01543d381941c5a8b2896cabaf57032302e9fed68ec82f50",
+      "output_sha256": "0658ac22bc5de0b70c9f2970008e168f961f063a73886d268bcbccd7789c7efe",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-06-09-margin-bridge.drawio",
       "source_sha256": "b48b7fc7c6ae192c17e1adb682ce002c2524135417633df1f959f4403fde0f8f"
     },
     "visuals/svg/fig-06-10-discounts-by-promotion.svg": {
-      "output_sha256": "92460fb09e0175d41dae6a0fb7f973820f73736f6afdc1d4149ded16a29220ae",
+      "output_sha256": "24a020f4f176cc752fde49ffb015e8d67b726af70eb36c1a18583218dfa1e075",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-06-10-discounts-by-promotion.drawio",
       "source_sha256": "dcf73a6a57bd805e8ca73f9658406248635b861de42457c4320d8e830e2dc80f"
     },
     "visuals/svg/fig-07-01-monthly-revenue-trend.svg": {
-      "output_sha256": "91af81c99a0a6c125b9551ee140ab7d252eff8e87d2f435946c2fb3d9410d488",
+      "output_sha256": "75c0598053e1ed6d83cd4316c8f2e319ab02ea0bf0732f75d41197a3d53c0ca0",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-07-01-monthly-revenue-trend.drawio",
       "source_sha256": "8cd94737dd2ccf0bd1e5ecfe536bd25de281e72c8c96885a13713a94c34f9d5f"
     },
     "visuals/svg/fig-07-02-regression-output.svg": {
-      "output_sha256": "58fa6929d2295d30784754745ea30fe6e4a72ea1d277a71c359c69bc7ece4686",
+      "output_sha256": "53d3bfa8600a02dd80db9a13ab4cbe8631722838ecce5307c94f3794f1da6eb0",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-07-02-regression-output.drawio",
       "source_sha256": "40160ec49b0d56a16bf72cefc7b623db675d516b080ccea8dd51e869463225c8"
     },
     "visuals/svg/fig-07-03-forecast-backtest.svg": {
-      "output_sha256": "776f004405c33e44fd7a9b3c29a60974ec9cbb56f9d7ff4a138175bc38e82fa6",
+      "output_sha256": "df0e4688928ebedb39722dd4d41b4771ceac9f3968d8cf74fbd95d60b96cb43e",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-07-03-forecast-backtest.drawio",
       "source_sha256": "f521e67aab05a43c7a5fedec025ecf68f4fe955072dcc2ab37c393e2d8a824c7"
     },
     "visuals/svg/fig-07-04-flexible-budget-levels.svg": {
-      "output_sha256": "034996fb2bcb65e17bdfc7e2a2a1e804e854d9bf7cdc4d5c56c0aa4032bccb4f",
+      "output_sha256": "d910e9dcbd5bc6de448205007a59aa11c44b16cbc8c990c3573a3c545637a9f1",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-07-04-flexible-budget-levels.drawio",
       "source_sha256": "a7c529880239719f83f5ed307abb8c508189983461034e881b65c36b00124aa1"
     },
     "visuals/svg/fig-07-05-flexible-budget-report.svg": {
-      "output_sha256": "b3154319677bfae3e09bff482541ac3d75107148823c405e1cfc833284bb2582",
+      "output_sha256": "964ccb779f75353b7f351c8958789869052144bf37aa8702e31b68a0ecb1b246",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-07-05-flexible-budget-report.drawio",
       "source_sha256": "84ae42c1fe6a2e902051ad47820adbf169cc51d1d6261a0aadb3dc1b1d0a5962"
     },
     "visuals/svg/fig-07-06-furniture-price-by-month.svg": {
-      "output_sha256": "c57ee07f2f19b38d3a58d7befd0761819013c2e2178c91949a62461322a8c3f4",
+      "output_sha256": "7967b96ab6e3b69375bfee28038fc6ed390ad25ab9689afd419c3ca429f483d9",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-07-06-furniture-price-by-month.drawio",
       "source_sha256": "bf1e391bd0dac53bd64f6d7eed0c293ae69dad58dad64c900b3e8d9e0e773d1c"
     },
     "visuals/svg/fig-07-07-promotion-model.svg": {
-      "output_sha256": "3d67c7cab51404e167f1e81a195331e938a9feb07c11419232e1b236d2d665d7",
+      "output_sha256": "f73fb37146aa4733444900758f5a1fbe4e38cc289c7c83125bbc768a0dd37aef",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-07-07-promotion-model.drawio",
       "source_sha256": "8b8e56543b6a9c9b466f2a5fa700a4cc79e32bbe3cb9114a813f2bf3eae60a72"
     },
     "visuals/svg/fig-07-08-scenario-summary.svg": {
-      "output_sha256": "989640efa343f3c6e67cd7d21b123bcdd0a01eb5573434cdb75c3fe884cda9fb",
+      "output_sha256": "11638eabb6acd5f97083024a9940b5391f4e7825f6c972f08cffd7eb25f207d5",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-07-08-scenario-summary.drawio",
       "source_sha256": "7df3c947210c1a95189103b842ca62c25b05f3de920867afba15b615c977eac0"
     },
     "visuals/svg/fig-08-01-audit-analytics-workflow.svg": {
-      "output_sha256": "8f92d8f6f43c85e3860d8ae449dcb94eeecb5eb7f515b0d995a441d0f6fabbe4",
+      "output_sha256": "16710a3a47881d13f2149a810d48344103259b2de0900909dfb39f24304c1028",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-08-01-audit-analytics-workflow.drawio",
       "source_sha256": "a7915a3dc9bae4bed60e5ebbe0f0c6a0b52726eef3480f6bbdf5949c32fbab8b"
     },
     "visuals/svg/fig-08-02-payment-strata.svg": {
-      "output_sha256": "dc35bdd8970b5ba7854f3541cc48f4004251fbe1ad3f698dc6953ddc1310323b",
+      "output_sha256": "3b9a384c3683cb9e4a6ea33d9d73e4d7b41c3aa48dbb1c82235fe2ae5e20a7bd",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-08-02-payment-strata.drawio",
       "source_sha256": "dc7fe15a03f79059122c7c2afddade782119a9486c0430a8350cdcebeefa5d3c"
     },
     "visuals/svg/fig-08-03-benford-all-payments.svg": {
-      "output_sha256": "df636616fc59fdbcced0637fc5c88a0b0d0884ec741fcf8db167f703e3e8bb5b",
+      "output_sha256": "13fcf235b7ea3965b43c22fe44ce2b94abf8f313272978b22e8646d6adfdfd65",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-08-03-benford-all-payments.drawio",
       "source_sha256": "38606ad93d3f5f1796e8b7cd3cb88e5a04d464fea0fbcdf28f6a45b8e8a67882"
     },
     "visuals/svg/fig-08-04-benford-by-payment-type.svg": {
-      "output_sha256": "77b0393faa52f977efe13c3b98d31384538e8e6a0863709997ddce2aeab796e4",
+      "output_sha256": "f94ac03a7bc755f9118ccf6f6041650b169ea139dcbe98a8ddf3eb5b7058c7b7",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-08-04-benford-by-payment-type.drawio",
       "source_sha256": "48f8433b96d01a1c5fe3c599456d7e83b0020932006f4dfb3acf4ef66d11dafe"
     },
     "visuals/svg/fig-08-05-ar-aging-reconciliation.svg": {
-      "output_sha256": "d208d58b376a7c8b63d1407ee091c895e99076578874bad1e9d14fdbb9284cc7",
+      "output_sha256": "d549e150bb3dae17c3f964ef59cb2283119fbdad343d53615d103a7ce80f92cd",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-08-05-ar-aging-reconciliation.drawio",
       "source_sha256": "f824ba2752c4209aa65c74f5c76b5f3fa845483452e99dc243afcb82bde08eae"
     },
     "visuals/svg/fig-08-06-ar-ledger-by-source.svg": {
-      "output_sha256": "ef150d7b2b57194f75f6bcb1b262bd7f13feda3ad1e7b530b7de7d312fd458e3",
+      "output_sha256": "8abc9071a86cb0a5364c383850f374d2890e9c98298645810e657cc9dd954e3b",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-08-06-ar-ledger-by-source.drawio",
       "source_sha256": "e1165069e64787e506fa4c828a5bfff97cc90772a5233b9c0e4bb5bc4298165b"
     },
     "visuals/svg/fig-08-07-journal-entry-flags.svg": {
-      "output_sha256": "1795def916192fb42af28508df34fde4860c78f0c08e0b2a39251d2692e87a8d",
+      "output_sha256": "82321f60841e95de621797ca3f64a51dbd3d51a6b8cd8ef2c7017af910adc51b",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-08-07-journal-entry-flags.drawio",
       "source_sha256": "9e5a7cd26fa75fb9e899e41988767da6200bea1f9239286599857745fdac642c"
     },
     "visuals/svg/fig-08-08-journal-entry-drilldown.svg": {
-      "output_sha256": "3c3e28aa9ac06b8a61c7908e180fe965006719d1f2c77161d80cb282619610ea",
+      "output_sha256": "b127ecc835123d9687edbf617e26bd54c0f85fd0919c97c791e655a3f97408eb",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-08-08-journal-entry-drilldown.drawio",
       "source_sha256": "bb5f9ca52c4eeaa67740d2bd8da545a1658e158d8199598ae946288e7d6e1143"
     },
     "visuals/svg/fig-08-09-audit-workpaper.svg": {
-      "output_sha256": "f88b8142a300c133b9138ac779f6c9eb56fb5b7d13497eb95eb25dcdb5773e39",
+      "output_sha256": "ff29e9a3a64b26e02ca1880f8c9be41cd39a4317faf2f2c5c5d2838ad960a15e",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-08-09-audit-workpaper.drawio",
       "source_sha256": "c87890807414fde7af519caedc5e3825751d45d27136e9c5b184800e90ed7eeb"
     },
     "visuals/svg/fig-09-01-import-vs-query.svg": {
-      "output_sha256": "a0335d373183a9eb411035f67e88c49a30c06e5e6f3f168f840956ef49086abe",
+      "output_sha256": "712325f45430f2b15babd981dd6fb2e3e67d9cf6930e09cbe1280cba69957b8d",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-01-import-vs-query.drawio",
       "source_sha256": "7c9ba1de8e8e4fc4cf22483318efe8e4dd55bc02c9b9684c0d2c988f13699c95"
     },
     "visuals/svg/fig-09-02-database-structure.svg": {
-      "output_sha256": "ecd3a899cd53c4a1a0af0d9670fdf58cd2c43e469c896a5a81d8f838c995d918",
+      "output_sha256": "9b77f7385f097dc0a74cb281d693418578c859a6dd6d466793b6899f5d0d93a5",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-02-database-structure.drawio",
       "source_sha256": "382b268b12fa038d08d25b2bdd0df6922b4228e8dfdec74bb92b20e151b687ab"
     },
     "visuals/svg/fig-09-03-account-columns.svg": {
-      "output_sha256": "9c7a8dbd73fa0543c8b47bf069f528888856b7b3a0c4d4a799e3702fc8cf219e",
+      "output_sha256": "e4bb8806b976a121374cf61b2ca9d0e9d1bfba5937ce9e1dfb28d60a5fa11178",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-03-account-columns.drawio",
       "source_sha256": "e956d424c685ae0742f11bbfc3f5febd3a5b5ad62696009868c0d08f366fa6d2"
     },
     "visuals/svg/fig-09-04-syntax-error.svg": {
-      "output_sha256": "94e90f798ae129020870ce38eb4fa04fd8d4957cced7f8bc876bb172b9459e37",
+      "output_sha256": "88e71333500bcfcacce1f93868b47ece615cd57f78077e65877477252e679e25",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-04-syntax-error.drawio",
       "source_sha256": "99ea4a8113fb81285ec973e52fe32eb51a0ae6d8bd9b0ad7829cc1902245aebf"
     },
     "visuals/svg/fig-09-05-variance-check.svg": {
-      "output_sha256": "ac47bf2d88d93264ea6a61c18b3580c6c1c6e7df3cfea3b61c6c0fe9a68c471d",
+      "output_sha256": "ce14f18a88c4359865d1dbf836a3389f45a69829f2b1ead8b42fe3c3ed5c6696",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-05-variance-check.drawio",
       "source_sha256": "2268f309d942b73ba4d9bcc8e47e0918a5dcf2d39733a3f20b4d486b40ffa4e6"
     },
     "visuals/svg/fig-09-06-where-null.svg": {
-      "output_sha256": "997dba414df127003d29e073f9ec213c6e0b759872c488d709abebc8783db3ee",
+      "output_sha256": "7022d2e728aef82454e362c19a1ec27936aa1a5350b7292d14fcd77b60155eb9",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-06-where-null.drawio",
       "source_sha256": "692427647474c3c1a565d86e432b80a9dee4ed8206c7ba345cb2a622b22d78b7"
     },
     "visuals/svg/fig-09-07-variance-sources.svg": {
-      "output_sha256": "0441f9b307a8c486d5c83461d298634ba2bfbc535427cc1e6ac6aa6805db09c8",
+      "output_sha256": "4b5d1b921396abfbb7ba353e2664f88ff75aae6ce60296be09e4c8ada972d2ae",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-07-variance-sources.drawio",
       "source_sha256": "46a631015deefc4f5606377dee96b12b57d4828212d15396149e72dcd3363f3d"
     },
     "visuals/svg/fig-09-08-query-anatomy.svg": {
-      "output_sha256": "f640ff3f818ebfb61405e28ebd0727968dd00bb3ebe2efd38e8af72569e40d21",
+      "output_sha256": "62a81b0bd9d469cdfda5fa85d3d6bea96672e5302681d280a9b9b2da06a6a4f9",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-08-query-anatomy.drawio",
       "source_sha256": "ea388561210e0749ef55bb8ee1280e1442e449b7db12c64eeb63714cdfa18f0f"
     },
     "visuals/svg/fig-09-09-top-variances.svg": {
-      "output_sha256": "97813e7351697105ed008da091e2edee2896831b20add66d0fc21c5c2d531efb",
+      "output_sha256": "a135537a3d2b120eaa66a18bf610debd6a1a9daf18a3be03f8ea2d0acc37e6ae",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-09-top-variances.drawio",
       "source_sha256": "0642d954f9b1929458f95b0b62cb9fb54ba3cb4be25677e0b4fa68a9486f7d8a"
     },
     "visuals/svg/fig-09-10-saved-script.svg": {
-      "output_sha256": "40d8ec127d4f700b9b1a29e3278f95eee66ca43e410b44a2d5d24651b7e77905",
+      "output_sha256": "3140aa1b936057de25f60bfc91f0ef911a5e24cae201695ecccb0b705ec08db7",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-09-10-saved-script.drawio",
       "source_sha256": "f0a713f6e0ffb4285e1043026b63c64279d039281c314741b4b86801ff69261b"
     },
     "visuals/svg/fig-10-01-join-matching.svg": {
-      "output_sha256": "8a4914eb41d4a3d3b9b9f4d16f0ef4acdbb0addb6b814488ad5a4c42242c96f3",
+      "output_sha256": "890d44889dde9aee493a3f95e670c3e03fd812c2efc06502a49e9ebf8c446cb7",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-10-01-join-matching.drawio",
       "source_sha256": "a2403fc5096915d928883de36d3b2d0fe032466cd1937542d7e9bf5517881bea"
     },
     "visuals/svg/fig-10-02-group-by.svg": {
-      "output_sha256": "53abb5134292ea409ca84e623f1c10de7b1670f6dd27c026ab8cefa6b31d05f9",
+      "output_sha256": "4952b8c2ff34d1c850c69a7aa0ef7f146b7f4cdf84df199f33b92f5fe986d886",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-10-02-group-by.drawio",
       "source_sha256": "f2fa371d126acb9abaf2d42564c5b3faf0e05258aa50df4fbd94e3dc57c8631d"
     },
     "visuals/svg/fig-10-03-variance-by-group-year.svg": {
-      "output_sha256": "d93415d46a492977423b177facea3a828f43e698dcc9f8a9bbb4a083cf5832de",
+      "output_sha256": "0fd5018982cd33414489fe892cc5ba825804c52884f255ff72c8208be9e2fdec",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-10-03-variance-by-group-year.drawio",
       "source_sha256": "c06dff150ce595a1221a3b6a12a7f805ca4171e01d2dc6fad0048baa97c8cd5b"
     },
     "visuals/svg/fig-10-04-fan-out.svg": {
-      "output_sha256": "fc3f9229fb7c49e50798bd03a0c201daace36397df0394d41bb688c7de1216da",
+      "output_sha256": "c935cbe421f6a33bf7820899996e18c25c669530b8b6eab3e0e89a85a3e44499",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-10-04-fan-out.drawio",
       "source_sha256": "70b22a89e7adf8444c727088d82fa7b87abe5ac9beacf413deed941e29cf2f7a"
     },
     "visuals/svg/fig-10-05-evaluation-order.svg": {
-      "output_sha256": "0c4086f6d44172d7040c27d8c7b1e20b521105daa22c093590c34abed218302c",
+      "output_sha256": "5482b6110a882cd8cbe14cd9145c86668ca3c2f607d1f2d71c429c21e0ecf324",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-10-05-evaluation-order.drawio",
       "source_sha256": "4c87713d9a18eef69fc631154b207c24fbda5abdc19a3bcd5c165910a083ee4f"
     },
     "visuals/svg/fig-10-06-trial-balance.svg": {
-      "output_sha256": "a72afae69637f97415cb46ed57f5c27e30f535f39a729d70ecb7267da8f343cf",
+      "output_sha256": "64058cdf6c3bf04270b2fcc3d82ff479f99d74156c005309589383f709ad3e9d",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-10-06-trial-balance.drawio",
       "source_sha256": "6779dfaeeb9129e6bd7b418957ff0b9d84b44ff30f9cbba92d3ca7229fc97212"
     },
     "visuals/svg/fig-10-07-conversion-cost-flow.svg": {
-      "output_sha256": "46c316db73f1cc8a18926a1a228d267ee071cff0a57d5cfad88302da8611a4d3",
+      "output_sha256": "dca8d2c8fda2e0865968ab85e1f1ec9d42c8e5fd89368115469f8e734e06ad7d",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-10-07-conversion-cost-flow.drawio",
       "source_sha256": "7157f003480ea5545f3ff2276015bfa2ce02bd69925b84c2cc50506e00b0cbaf"
     },
     "visuals/svg/fig-10-08-payroll-time-er.svg": {
-      "output_sha256": "53972a1dc90a010ca362247dee278bf03c7f740b187d84d8c378b796becd6a30",
+      "output_sha256": "8e66f7060250628ed09b0e4a8fd6d7da08441a3a3c8c5574912180124619a8b8",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-10-08-payroll-time-er.drawio",
       "source_sha256": "b35e5cff16f9d876119fd28843184efb03a22663ab0fba874da2df8e26c00c8c"
     },
     "visuals/svg/fig-10-09-hours-per-standard-hour.svg": {
-      "output_sha256": "3ccd5821b9a2c794187b61b3ab7caada59c6777af10447e83dbe44a47bdea81e",
+      "output_sha256": "3497c653eb5baf836565c23909a17338fb21b224017752f7b2b10555e2d32c90",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-10-09-hours-per-standard-hour.drawio",
       "source_sha256": "c0c98b2d2ec4efb21cd29271adc5135a19344917d0b3577a2b7f1a06554f571e"
     },
     "visuals/svg/fig-11-01-conditional-aggregation.svg": {
-      "output_sha256": "dc66605c38a599446ed900f263bb21812e473ef1df3e5cf0866ee5419cb635ec",
+      "output_sha256": "d0d621d661bb1f6ea5956e6190671cf5d5288b802b61b5840c0dbe1b9c76d663",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-11-01-conditional-aggregation.drawio",
       "source_sha256": "34bc81a2744c7dab6bebf88f1723d2b26e69c7dcc087b85a723380c1f60b5c84"
     },
     "visuals/svg/fig-11-02-early-months.svg": {
-      "output_sha256": "2f968896fe37b3e5eadb0929b1bc397e3b6b05699f4225775636706b8c574b0a",
+      "output_sha256": "05f38f7c67403a5f1958225bba4dc070105d80fbba31d54d3033911aea244159",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-11-02-early-months.drawio",
       "source_sha256": "e90f4b7a0bb8e220bdf468d87fddd2bfa6c3e6a41d7f522bb19da6a6cf5b5e33"
     },
     "visuals/svg/fig-11-03-overtime-shares.svg": {
-      "output_sha256": "548b3826ae16b9010d811f853a63249ba43655fa399e9722bac706f4e0695626",
+      "output_sha256": "e8b7f2f9f110611921db06948d7b4db39c725890bf0d6bbc6ff98234b9699e38",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-11-03-overtime-shares.drawio",
       "source_sha256": "99add7393fd99a0055deacc4ffb5fc97aad655d62bfc77b79f54d90e7e92bb51"
     },
     "visuals/svg/fig-11-04-window-frames.svg": {
-      "output_sha256": "078bcbeed7689225002ff9a1718ff720dea6c2eb5ecc9a7c58484dd87c86402b",
+      "output_sha256": "2aef29362d6c7a1b755903f9b0d701d6b19b3836c5b9ed24476e10501513c82f",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-11-04-window-frames.drawio",
       "source_sha256": "8095e3034c9e3efc3609d0ec1f344cfde3c2e6ab66e10a95748314b3ccd464c5"
     },
     "visuals/svg/fig-11-05-gap-year-to-date.svg": {
-      "output_sha256": "6e7b37fca383070adde627ebc3deefab05c876271dac6c775baa488a66006dfc",
+      "output_sha256": "959f17f25932ea566b38d149209520295eb31e11c30e9fe8f3fd51483c9f4a85",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-11-05-gap-year-to-date.drawio",
       "source_sha256": "142293e29681af748fa79cfc6e6f05c38963098293f3dae04dff9112c33c9916"
     },
     "visuals/svg/fig-11-06-gap-pay-dates.svg": {
-      "output_sha256": "b05ff477dbd0d1b3d06c183bd85e57ac7755015e3440a49d53e276ec77d2dcd2",
+      "output_sha256": "e048667e6f133fc7f860ef9b6637a20f4dcafb55a79fd83849ef8ce2ef57d5fa",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-11-06-gap-pay-dates.drawio",
       "source_sha256": "71e46b0b0ceb3d2a98c9755fe88b6cdf298c4e4361d23c3e074757d2743dc87e"
     },
     "visuals/svg/fig-11-07-work-center-rank.svg": {
-      "output_sha256": "bd5041e2b96a50d43b40d04d472538bdfd2dba30bf1b66621ebfc8e15db1e1b6",
+      "output_sha256": "ad164ec58d0d7c16dd67aee1cd1522e97e0a53a2eb134bd1e981a011a5af1d2b",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-11-07-work-center-rank.drawio",
       "source_sha256": "b091398be2c1877ad7f6a493c48fe447b92381a616bec621a636b4df25b6ca22"
     },
     "visuals/svg/fig-11-08-cte-pipeline.svg": {
-      "output_sha256": "798b7d05769747eeef48ba98471097b6d0674fc261dde1b3f584fd4e0481f8aa",
+      "output_sha256": "9becbedec161cab19f9b1f0a65d447e37c4e4fb88472096bc93254d617cb7725",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-11-08-cte-pipeline.drawio",
       "source_sha256": "1d54237442c2154c63c4d074506dcc6c4d18619e59e48b8d01addd4616d85fef"
     },
     "visuals/svg/fig-11-09-view-in-structure.svg": {
-      "output_sha256": "46bc078d785f19e06bf51f5c4b7c2762b8366113818a6155bc82fa80b7009682",
+      "output_sha256": "50a5025a8260f88a25cb30cd0e491e77634f7d84568558dbf47e494941ceb883",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-11-09-view-in-structure.drawio",
       "source_sha256": "c596feeafb9f565424db34e0c019044c534394493faf5a5a542bb532bb780fa4"
     },
     "visuals/svg/fig-11-10-monthly-measure.svg": {
-      "output_sha256": "3a62e8c157782903853963bf2834712e22914b6c8ce4055155b7f83bc8fc625b",
+      "output_sha256": "826c5a82e708742cdc3a0e3df6cbe5824f2738d0ec05e587142621a8d078cfb4",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-11-10-monthly-measure.drawio",
       "source_sha256": "d602ce0c8643c5b65e11844ca210ceb6433020307b29af17425e85f1bd604300"
     },
     "visuals/svg/fig-12-01-two-way-trace.svg": {
-      "output_sha256": "5c89bfcd4cd78a1d48a2c12f4efdcf22caa4007fd0f7cde6029eb9aab77c6fda",
+      "output_sha256": "51255906d328186bad43b7ecd320b9c413acb015f547bd07882d54bf8c16d346",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-12-01-two-way-trace.drawio",
       "source_sha256": "5cf9e1b8ea29719f35f959af3ad47ef5e947f03de066c77965198b1cf7844d56"
     },
     "visuals/svg/fig-12-02-trace-exceptions.svg": {
-      "output_sha256": "3a28ec0d0f07595a275506358988c2e13647e9e0f44822012ce2bd77683c87fb",
+      "output_sha256": "7b671737df317cc726a97da1bf0cd9036a0a366b8af923c3caf4add74eff8cec",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-12-02-trace-exceptions.drawio",
       "source_sha256": "e91dff12f65951ca30b47ac42285c9abc48e86c67249bdaef1f55f1881ae094c"
     },
     "visuals/svg/fig-12-03-revenue-cutoff.svg": {
-      "output_sha256": "408b2d04b4d216ab9ababef765b223042e08bade22cbc01e3f1d0c30af655ce3",
+      "output_sha256": "52e9c44eb22fd3e611985e24e8f0c2e5773f94bf4978c1fffc4a00dc1bc504b2",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-12-03-revenue-cutoff.drawio",
       "source_sha256": "761906c21f9161ca9c045c9ac35ff4332cc4e9d0eadd13f97941fd23068e037a"
     },
     "visuals/svg/fig-12-04-three-way-match.svg": {
-      "output_sha256": "d93b0ecfd9584e6b3f5bbf8d2d65404667198118f1a6fd73848b2b394dde8117",
+      "output_sha256": "65a060ab3354e725992f891d0804b598d0597a30e12ff374b85cb584e086b7ee",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-12-04-three-way-match.drawio",
       "source_sha256": "bf64661217687da092d62eaf9d84b04e3d2d55c173edac71677daeab53d5f373"
     },
     "visuals/svg/fig-12-05-three-way-match-status.svg": {
-      "output_sha256": "163b4356b4de495e6b5e3d767e94eb9594737501fd85d7ea91acd6305cbe2bd0",
+      "output_sha256": "6fa55c6e6c3f52a26de0baad67154343118c84ce9b2af13d6e3539f5afed5d79",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-12-05-three-way-match-status.drawio",
       "source_sha256": "a3c08bf3492b7dc8d1802048728ba20d7e4374a69424ca72ed7f944a5e119def"
     },
     "visuals/svg/fig-12-06-approval-exceptions.svg": {
-      "output_sha256": "184ae9bfbf73175eebbedb9343b89ae7ef93faa9ce97a934aede0d6ba0d0c578",
+      "output_sha256": "e4842fa40c5f30002643658fb3f394f515ecbab0417048e67d72f2dd0e918a07",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-12-06-approval-exceptions.drawio",
       "source_sha256": "cbf7250d07bc35dd11693f189463edd993e0dc79093fae1e01991653fc69a6d6"
     },
     "visuals/svg/fig-12-07-labor-record-chain.svg": {
-      "output_sha256": "27f15cad4e604de492e9c52b4d01eb8a36540d8b013f9f51873b6d0d0c051bd8",
+      "output_sha256": "5716a85248ef9eb241c441f211a049f7081ec9250d942526a5cb67589c582cea",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-12-07-labor-record-chain.drawio",
       "source_sha256": "59eb338f977571acaa9239790cdfa1d1394a88582f2873eb90b00febe2542689"
     },
     "visuals/svg/fig-12-08-surge-days.svg": {
-      "output_sha256": "84a19890ea1725a3f03011c444bab97a3800f95cf490f45628296267ecee6983",
+      "output_sha256": "eead65111684f34f3a73033432f0588f682d6b49386af6db64eed23f61287ac0",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-12-08-surge-days.drawio",
       "source_sha256": "c751ca3956b8d71b7e26fd2f2d682828450293e5b94474b0c1803f24ed39590c"
     },
     "visuals/svg/fig-12-09-normal-and-surge-day.svg": {
-      "output_sha256": "044e66982419a5ccd595a44c8cfcb1d4ee8a848e999c0f2d3fa4e0906f65a6e0",
+      "output_sha256": "9a9379f7954fe62e449f51816fbef019746d70cfd0ba78ab47ab349ae7208a80",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-12-09-normal-and-surge-day.drawio",
       "source_sha256": "f48ab41d70ab359de4b4f4b4ee43ae735e68d6dcf2ea9955432966b4f9dff546"
     },
     "visuals/svg/fig-12-10-labor-after-operation-end.svg": {
-      "output_sha256": "96332b6f4199878c703a13da7bd50d5d184ebd020e887458ae2e789a362f1a1f",
+      "output_sha256": "82483cf3b5a8d4d672a7b555c78d4d6a379cdca41b6ef9488b0c4d601ff56562",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-12-10-labor-after-operation-end.drawio",
       "source_sha256": "d4deadb64a5c00db16f3132ac8f60b1dafb5967bdfb9bac063fa4d3d4c918509"
     },
     "visuals/svg/fig-12-11-audit-library.svg": {
-      "output_sha256": "b81ec23802a109bfef9b24f6aa48ac5a5cbd89e48410d8e1ee0ad889e69cf655",
+      "output_sha256": "5873b7799014b1373552ea4b37be06ae30338215886a30d7930aaded96957445",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-12-11-audit-library.drawio",
       "source_sha256": "124049c78f884c0296dc80013ba88e0ad04567807ce8332c4bb3c61271516fb5"
     },
     "visuals/svg/fig-13-01-power-bi-workflow.svg": {
-      "output_sha256": "8abbae51c2aa7d096273f207ddb234dbf7779865a9ad93194059407059cbe6e9",
+      "output_sha256": "2e5f4acd793d957d913fbdef35ef6885c50f4076291373eded0b6dd51b6f7568",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-13-01-power-bi-workflow.drawio",
       "source_sha256": "064f946c56147b58e0b7d42468d38b5345e6fd204992df807b45ce427a201aca"
     },
     "visuals/svg/fig-13-02-desktop-window.svg": {
-      "output_sha256": "38f00d4931974f5ac5256ec09285021980f3e035a3e7489c7578bd188ac9b365",
+      "output_sha256": "6c145a61f065a20adac83b16c07fe506094be7f2a10227a535ffc3dd27c8c5c1",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-13-02-desktop-window.drawio",
       "source_sha256": "54abdc0ae15ced546565dadb040037b8f2c046df954be5c06adb64bbb338eb10"
     },
     "visuals/svg/fig-13-03-column-profile.svg": {
-      "output_sha256": "062b19dd4c648881d8a1b25edf0deac8437e8243a3a6cb4bb41fa06d11199453",
+      "output_sha256": "f2838b35601d63ceebc458de641f90eda99cbcbb5b419d649b93ab633ba6920c",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-13-03-column-profile.drawio",
       "source_sha256": "9768ad358f39ac02e26bc84e94407e484b05e5f753b9c296ab6ac9f3e2e38f97"
     },
     "visuals/svg/fig-13-04-model-view.svg": {
-      "output_sha256": "471c4db9c930acd819a3d866850990d72a34bd3a8fa03cfec5c8116ee454234b",
+      "output_sha256": "e88d9747352a1d69890169b3409b5629b96c5cd1d46db9d494af21181fcd8d8e",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-13-04-model-view.drawio",
       "source_sha256": "bde009c68d536f4f64c08c5790281147670e88896f1044646da57ffe893aa4f2"
     },
     "visuals/svg/fig-13-05-validation-page.svg": {
-      "output_sha256": "2288e139eaf37d37423b4dab09c838e8ca0f54a9d8f96e867b6190b9eef7890c",
+      "output_sha256": "ec19b135c7190acffad213e3b75b9e3e72941358b2c179f9136d4cea031b1e8e",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-13-05-validation-page.drawio",
       "source_sha256": "5a81d7d17d78ea21f0bcd107ada616220ff134f9e42a621be483fec2403efa1f"
     },
     "visuals/svg/fig-13-06-sales-discounts-page.svg": {
-      "output_sha256": "27c46060df3de1797db2c6dfd640691c9eef07a201e4a657118b6dc5ae6d060e",
+      "output_sha256": "659a29b009958df2ee6aa986f4f480859caaafea2e97342f2b4c1b2cb147edff",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-13-06-sales-discounts-page.drawio",
       "source_sha256": "f638cf9807d05a2fee31a9c9a3bb1c9f6d9d1cf0e539807adc1ae827fec2b590"
     },
     "visuals/svg/fig-13-07-encodings.svg": {
-      "output_sha256": "9ab6e320260b74d61013f68f71607bf6ad34cf2ebdf7b367a181cd0fcfbcb41a",
+      "output_sha256": "2403517ed3324be691eedb67db942219abbe46e068f86ea0800ee01b7dbb678c",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-13-07-encodings.drawio",
       "source_sha256": "0e251b706496a3b4adb66ad2c49ab57056c1c1b0ee07b1be98beecf5850e71c4"
     },
     "visuals/svg/fig-13-08-value-axis.svg": {
-      "output_sha256": "c53e9e4c39f70dd83842e8034756f19a453a93ef10973b1a515f01b4ee80a9d2",
+      "output_sha256": "55f18dca8a1a340b1dcf16d5e708b7f8936f92265a25f4341719c14f740c97dd",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-13-08-value-axis.drawio",
       "source_sha256": "cd06023710517f10c77b98bfafba3232101ed630efc9d6561656864cba3ebbfd"
     },
     "visuals/svg/fig-13-09-dual-axis.svg": {
-      "output_sha256": "a4a825fc29ce328030832abf82297b07972165c1f7babdb2e605bbdefb45d91e",
+      "output_sha256": "6c82437687975fde7bc733a4222808c5ffe1750c49576595ea843775bbd87ad6",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-13-09-dual-axis.drawio",
       "source_sha256": "3cfe2bc634b4601962d6e21c6504f0ce0e90a37013ff23fc33bb555e19519619"
     },
     "visuals/svg/fig-14-01-star.svg": {
-      "output_sha256": "6738fc146759c98ad045a38b460db97c306fdfe54aac35042ba1cd74e83d6d46",
+      "output_sha256": "6a37eba889ed9268fa8fc515ba69be6d9fa0049a62f238f3ea7c4aa3a3de854c",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-14-01-star.drawio",
       "source_sha256": "5d680076c40bc94a644b54e95d778161b65929e9c79176ae8d0282aa410ae7fa"
     },
     "visuals/svg/fig-14-02-date-table.svg": {
-      "output_sha256": "31d2d3ffe4b5fe809a648494242f20c4300549569511ed9a1b01ae76e1dad805",
+      "output_sha256": "0d3791d5d630295f79172e577c2664627b0f0f064258419f3df0e1b46eaf87ea",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-14-02-date-table.drawio",
       "source_sha256": "04829887cb76d9d53fadba7220787bc902ded29db6f59369c1a21850ef80ec53"
     },
     "visuals/svg/fig-14-03-filter-context.svg": {
-      "output_sha256": "3df7c1d89d7347d26c9d88e6c3fbafd8fadd796a625f0a6f8205e1da7228e988",
+      "output_sha256": "5df671480ec669d075b0434ab72f92a0ceced44efd9c26f9b09629e18d2f0ab1",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-14-03-filter-context.drawio",
       "source_sha256": "f9a96a6761bb81fb0b601bf23125fc128361ef5b378433c1631726d8bb57fd88"
     },
     "visuals/svg/fig-14-04-context-transition.svg": {
-      "output_sha256": "3be9acb6367bd7fcf2ca6dfa74a4dc0a398b0f902de78c0f99ad5edda797dd2a",
+      "output_sha256": "f962d8378fa33fbed8ebaa3840776c203d8d5b4ab88f2eabd6089185f0ba1696",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-14-04-context-transition.drawio",
       "source_sha256": "fb9d9d7b86b24ca2d94fef123799dd7ea8b3d799164bcda48888d8812ce8cfef"
     },
     "visuals/svg/fig-14-05-calculate.svg": {
-      "output_sha256": "d196e199e101bcecb0815552c8713da14d5688064e0637c442567377a9dea6ea",
+      "output_sha256": "0d25773839494edae470477a1452cf1dc19b36525e9cf6b9f0c6ba1047921ffd",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-14-05-calculate.drawio",
       "source_sha256": "b6f507ddadd64e5bcda355f54325ba14a67d82d80eb58aa8e056a84e3279a6d9"
     },
     "visuals/svg/fig-14-06-dax-query-view.svg": {
-      "output_sha256": "becff8f8ece2971d73e2913d2ed7cfa6063cd4b6f608f8f1cfe444f4718cbe14",
+      "output_sha256": "903dd95c3f9abfed56fda70fd5eaaa7e13fe02e639ca58a86dc38c115e4b40e7",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-14-06-dax-query-view.drawio",
       "source_sha256": "779c3073ce349d26c33a8bb6598707009bfdf244a30b52bf04d8afbe181d1ff6"
     },
     "visuals/svg/fig-14-07-margin-matrix.svg": {
-      "output_sha256": "2038b0ed6005cfc2c97bb09138b67bbfeaa3af76839f15f2d3219fba2482fe5d",
+      "output_sha256": "89f02bcf3c9cf398a7d859d451c965345c9fa51d89b55554dc400692a94cba04",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-14-07-margin-matrix.drawio",
       "source_sha256": "b037a6c8bd537e8a39cec73e02edfd7650ea2e30d929e003687622c753917399"
     },
     "visuals/svg/fig-14-08-two-stars.svg": {
-      "output_sha256": "e3ce3de63a7ace2042881d86daf1abe5f5af12dda736ceaea5ca6014ed08df7d",
+      "output_sha256": "b9ec9af10fd493f9375296c33b418d2ff8cddf36418c035bdeebca36a9dd7e7e",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-14-08-two-stars.drawio",
       "source_sha256": "816d28b190b82617b0940d99be6fd8964e5bfee45842f4d538264fb8c3b4f9c7"
     },
     "visuals/svg/fig-14-09-closes-trap.svg": {
-      "output_sha256": "f0dbcb0fff8ceb70ecc4556d922daf8638920358797ef90b5447a342ead7586c",
+      "output_sha256": "acd134c7991e9e28200324489fb6b5bfa153103ae8d8642730ceca56769dbcd2",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-14-09-closes-trap.drawio",
       "source_sha256": "bfe9d5232bacd69ed4fcda5f272bd72f4bd3238d0a5e49930e614800293f6d2d"
     },
     "visuals/svg/fig-14-10-income-statement.svg": {
-      "output_sha256": "99015acbb793794e69a4e325d34d72108743a713da2d0c1cf3e1d546ee9a2db3",
+      "output_sha256": "9a1c80e6bce6d0512c05d5455b4c75f4201c228bb239bea0d29155e2e163bd12",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-14-10-income-statement.drawio",
       "source_sha256": "a07a29de026231afe0291b0ecbf6da5f3da41777108c320d46a5195baa0a3e43"
     },
     "visuals/svg/fig-14-11-expense-expectation.svg": {
-      "output_sha256": "64d305016c86cd01cce30fd9459aab89ff1f0ea485c84e94197160d2c7eff4dc",
+      "output_sha256": "6df37cfa32a1abeaac5c3535541ea158c0e5b9d6cbdef19ad92c4b71a82a1249",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-14-11-expense-expectation.drawio",
       "source_sha256": "1852a4ca5b6ff718bc6d0a30c4c3db7f525bd0a12a3e8553a716c546d494a3cf"
     },
     "visuals/svg/fig-15-01-package-plan.svg": {
-      "output_sha256": "3160784fba521d0e566a14aa0dbd9d4fb03b85afac4181f46ffb31116dfbdb24",
+      "output_sha256": "a463ce11da3bfd53fd6d89c1eb2666214d8008743d8bcda7bfb9129572dd65c0",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-15-01-package-plan.drawio",
       "source_sha256": "14e081bffe79f96debdc15fe4d3a98fb0794692b840caa152fe5e719d6e674eb"
     },
     "visuals/svg/fig-15-02-drill-down-through.svg": {
-      "output_sha256": "577b21cf23d8122eb234220dee152b57ecc946e2804dc0a7efb2cb6cd8f57cc9",
+      "output_sha256": "3e01598020dabe80cec408cb517a272a35eda879e697ee528a31f5ea2eaf92d2",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-15-02-drill-down-through.drawio",
       "source_sha256": "69b50e79a246619d701485602408b62b68016e6b04a6077caccb3c98fbc2e7f8"
     },
     "visuals/svg/fig-15-03-promotions-page.svg": {
-      "output_sha256": "d28dceb71c5eb8ad53b9570e72a7390b17d648b73d232f4fb921240759646a1f",
+      "output_sha256": "a81be09166ee03b5988383553952d5b3779395a90fda4815a6c7db205c6eb1fd",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-15-03-promotions-page.drawio",
       "source_sha256": "42f7b906ebb28118b700ad4c6682d91fdda58e394f32899104ef043d66bc59e4"
     },
     "visuals/svg/fig-15-04-promotion-detail.svg": {
-      "output_sha256": "e62df3c01be549dcba4b44b3bc50814469eb9fcdd70ad66ba5edf6c71438780e",
+      "output_sha256": "b03ff2fc315ec63a145aaebf497453831d3ad5e3b0d9c51e2bbd9dca9fb755c5",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-15-04-promotion-detail.drawio",
       "source_sha256": "1be1feff876ac523dcca969f73de6daff6460d783c126d8c4b53f3fd8e60b61c"
     },
     "visuals/svg/fig-15-05-promotion-tooltip.svg": {
-      "output_sha256": "a9930772fe66a9a7d9d49ae265d80be127d95fa917991bc70c103611c2ddfa39",
+      "output_sha256": "cdc9c248b6c8ca7ac05cf60ceb3936a4137675a31dc659c0ae8a01ba53625d2e",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-15-05-promotion-tooltip.drawio",
       "source_sha256": "ec230af49276761a411e822013c4534db8140a7ba5362bb82f38d62eb83e4a54"
     },
     "visuals/svg/fig-15-06-visual-calc-editor.svg": {
-      "output_sha256": "1c597cbce466d235f0adea38fd5858409bc1cb8d05cb63abe75936668d6e9338",
+      "output_sha256": "f903fe6d56186ade999f31ec6401d670f5a73fa014341b41ba5a10c953813764",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-15-06-visual-calc-editor.drawio",
       "source_sha256": "1b0151c80061009d05ea1d648cd2fbf9460402df38f2c3f007bf1fbf964ecd6f"
     },
     "visuals/svg/fig-15-07-budget-model.svg": {
-      "output_sha256": "f56306bfc9f71f085cbe6b89e9b001e8c3345ce538eb64d8d732c8cde0baa96d",
+      "output_sha256": "cf56ae09bffc1f44c1f12dbca34b98f63f9bdc9960cde4e6911558c24f98ec63",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-15-07-budget-model.drawio",
       "source_sha256": "41244427a28b7c9ca10702dbb08c7fcd5299c7192e012e876aabb558c6ed124d"
     },
     "visuals/svg/fig-15-08-budget-matrix.svg": {
-      "output_sha256": "1dcbee4be63faa9d013232428bfa4a0fae3d5a4b773c2ac0e5cf7718325c35a0",
+      "output_sha256": "b7d139d440866cc9d6731869d4829b3c3ed815ae359bd9291f60b89849616bfb",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-15-08-budget-matrix.drawio",
       "source_sha256": "6628698b445900a741377c4687ad05f13188bc8fe536272e670b0fb765d81f16"
     },
     "visuals/svg/fig-15-09-variance-reconciliation.svg": {
-      "output_sha256": "7f9ac0376f814c0468c7c5504dad3d5d3dddd218b6facb3ac011fcbc1d6a8f7f",
+      "output_sha256": "333f81add0402bcbf14ba9d0c0e4a110a14427ef0c93f4a974f9abe69ff96709",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-15-09-variance-reconciliation.drawio",
       "source_sha256": "2e5c300d320237acc4fd62b6cdf5c084331ecd70c71b5f99c0829fec87dfe93c"
     },
     "visuals/svg/fig-15-10-measure-vs-visual-calc.svg": {
-      "output_sha256": "519c0aeb0ae083fa932b4fadaa2a215020d14a0e19522fe95bb352d3f062b350",
+      "output_sha256": "8914ce35a1fd0ebe029eaa4b1e2a1b33e7f3d8eb891588113a953360d0a3f481",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-15-10-measure-vs-visual-calc.drawio",
       "source_sha256": "c8de934d9b2d4acd35b5035d2d1008db5d352c3563ff03e11af15859884502a0"
     },
     "visuals/svg/fig-15-11-plant-page.svg": {
-      "output_sha256": "9bbb4ec228c08650855ff5fc620029837bdf4ca2f6934f8f76d7fa14349a6f24",
+      "output_sha256": "f8a76b98fed2659399f38794da75407cd52de6adf7f4e17a180d7d989f017fba",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-15-11-plant-page.drawio",
       "source_sha256": "961c2eb5374c1b42c215b950130b4a7f6e1c9165f756b483ed235f7390f8e934"
     },
     "visuals/svg/fig-15-12-about-page.svg": {
-      "output_sha256": "e10d541de5139554885955ab946eb265a57d15689eabcbd8b02fc192b7372925",
+      "output_sha256": "20d07d63d2cc4e455f1cdab9dfc5cf74ebc8e8a2e7035909ceb7b86e6befded3",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-15-12-about-page.drawio",
       "source_sha256": "60afeb26d10d5409d87de303b9d2070fcce4ba00c2d3dd825f681100518d4cc4"
     },
     "visuals/svg/fig-16-01-monitoring-cycle.svg": {
-      "output_sha256": "b0ea1221fda2016e83b329a30c8b309ab042818f184b10a753e9ec81c0dfad46",
+      "output_sha256": "62e07e1cfed2534b86e8784a97b903f8e3beef6cc1ece4a015ec2649a88c64a1",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-16-01-monitoring-cycle.drawio",
       "source_sha256": "580b6836e36d5baf5b1961b8d50f31cd82a046529ef231b01993308e6da13528"
     },
     "visuals/svg/fig-16-02-exception-register.svg": {
-      "output_sha256": "da9430187d1efe82094bd3e84b89f8bf9071fc90862127fa1e7c77bab46dee52",
+      "output_sha256": "1f91aaae47ba5b787d663074e723dcf80252a8e0acf2aedc7ae56e1985a183b8",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-16-02-exception-register.drawio",
       "source_sha256": "36078ee4b7bfddacb9b23dd1f335da86cd4bffc7aeab52cb8113a4f9af122402"
     },
     "visuals/svg/fig-16-03-je-flags.svg": {
-      "output_sha256": "5d5ce4d0a74a2f0ad93c54c53daa369ecc6d132ebed4e53f702c4bd114ab28e2",
+      "output_sha256": "ed12c561cffbfb98f530d7b2209af24abd55f0696b36361e855759a15de71966",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-16-03-je-flags.drawio",
       "source_sha256": "073ce5b65c7e873f0fb06a021a3bec013312ebc56fc2615a8933f345f7f2cf36"
     },
     "visuals/svg/fig-16-04-entry-lines.svg": {
-      "output_sha256": "e0f81c66c26dbcb9e11f327bbdb8c45fbb069895ad530e3b0740e13c2f9b2567",
+      "output_sha256": "d7ebb2c2a07c06fa9f114d30f9eeac8bfaaf70fa7bcd8c820d44370be1b9e840",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-16-04-entry-lines.drawio",
       "source_sha256": "04245a1d82f96af2b4c8232fe673416ce68ec7a34dbe28a22f5dbf936c3f3cd8"
     },
     "visuals/svg/fig-16-05-monitoring-page.svg": {
-      "output_sha256": "0025e5bc06fafa5f90d1228c9281f3ebfbc26a378cd7524c985c2d1473adfca1",
+      "output_sha256": "f438bf1bcb63a06e0496ec6ac5f59fded8244560825ea198d1603a322345ff8d",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-16-05-monitoring-page.drawio",
       "source_sha256": "925df4cbcea4250fc8f2ab1a62a361221fee5e68542e3b10460470df7efadad2"
     },
     "visuals/svg/fig-16-06-exception-detail.svg": {
-      "output_sha256": "50927ca6a277fd7f7345eff2a791ccf9fa5e1595b6dba6a39c54313c55ca4141",
+      "output_sha256": "fc6a73013de7a20732d6d9c32997bebe0fb83ec86127a4cda6566a3efe7ccce1",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-16-06-exception-detail.drawio",
       "source_sha256": "724c7eb7f79e828e777f58a118529714255038e98609024c968cdc298f0315b6"
     },
     "visuals/svg/fig-16-07-review-page.svg": {
-      "output_sha256": "0c5a7a5a01a9f4470525d7d98de23cf21c0071a9289dd0b3f17497d4ff0290b8",
+      "output_sha256": "4ea14197393579fb7ed9a0fc969fbd9d73e71435a19684c13d642c7f622a9c24",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-16-07-review-page.drawio",
       "source_sha256": "fdd1f3958310f0c96bd75254aced24f5f78207c684b6b85218156fc85b4077ab"
     },
     "visuals/svg/fig-16-08-population-test.svg": {
-      "output_sha256": "d8e9418881ddc34b2ed73ddbd6f182a32939e66e494910580ca9de6b3d0c57c5",
+      "output_sha256": "6beeee4a84ad849ce0c39ecfd6906a90d895e911d13ccdc2dea977fad95cf36b",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-16-08-population-test.drawio",
       "source_sha256": "e8f1946fc48a12d838d96a8ea3122979cb229351cb4e84ac6d251676d11e67ae"
     },
     "visuals/svg/fig-17-01-accrual-trace.svg": {
-      "output_sha256": "fe5cc0aff7e38941081235c7e1bac28e8e544fff5c29694f010c80a418570184",
+      "output_sha256": "f2a78016c0ebba62efdd2a181a10ca821fa8e9e3f09febd59ad47ff08408538a",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-17-01-accrual-trace.drawio",
       "source_sha256": "4524a387bf6b24951fefe51013a558794179658f06a9127d845f56391e2ada5a"
     },
     "visuals/svg/fig-17-02-adjustment-timeline.svg": {
-      "output_sha256": "872856faaa2a32c802e937bcd37ecb2ee891a8095cd0b736449886e7f141be0d",
+      "output_sha256": "3a54a82b86de6d16e47b001924dafea7918d354397cb25946fed811fcf68edf1",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-17-02-adjustment-timeline.drawio",
       "source_sha256": "7c9952ca2a4b1ed15243a641789e693894dfa1c12ee265d0bf2ddcbd1e2092d7"
     },
     "visuals/svg/fig-18-01-costing-views.svg": {
-      "output_sha256": "70b3ad59f70255d18c2b92f76f3b5e1a05c90427eda6504d94d9f05a69c0184f",
+      "output_sha256": "ca64bf9a101302299a0769f7fe4217b6cd4756b25a121802cd44d76986bc8739",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-18-01-costing-views.drawio",
       "source_sha256": "5eb6be3617cdfa1d82e8ece08452a99f16c0fed60eaa6b287816498c608f946f"
     },
     "visuals/svg/fig-18-02-make-or-buy-test.svg": {
-      "output_sha256": "17cb4ecdcaf76a1411a6dfc036325f5f210868ebe57fcec3d2b79df13c40089d",
+      "output_sha256": "b481b1df6020b49bd53a871e536c291bb087ddba03ef225211b3f743e21601d5",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-18-02-make-or-buy-test.drawio",
       "source_sha256": "5406e49c0d1be047f6fa03b23c18757c25fa2041070c239cedb82bf6952c7d3c"
     },
     "visuals/svg/fig-19-01-credits-cycle.svg": {
-      "output_sha256": "68b37387aa47855d89e78cba7d1e23a0e753d16ade7a380179dc375bcbc52147",
+      "output_sha256": "772ca7af4eb222f841e6ed21d0f8a2f63af860241f6eb213bad04e30dacd3bfe",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-19-01-credits-cycle.drawio",
       "source_sha256": "f011318a1a7f2221ffa67456b8a8a4401b41a24ce39b0873a7240102c06595d2"
     },
     "visuals/svg/fig-19-02-deficiency-evaluation.svg": {
-      "output_sha256": "9c30250e89f0df32b637a444f0440667f72076058d0b5c9eb350b300c980e479",
+      "output_sha256": "34a8e6beb6e947a79454cd5b35282e4b603b7758532730c1583e80e1c1faafa7",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-19-02-deficiency-evaluation.drawio",
       "source_sha256": "1a3dec004ac6cb30ae5fa4bc018ebea5fa35bf269be5c7e6440c65fc98f296e4"
     },
     "visuals/svg/fig-b-01-rls-reach.svg": {
-      "output_sha256": "6d667b0ff5087637b00a6858bb2a8d595e73d15415dd0037f4075e80261af777",
+      "output_sha256": "40d3f11b05186c3088d85ccc7e0fdf4991f7d85887dcd0ecad982f2f796edfec",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-b-01-rls-reach.drawio",
       "source_sha256": "78dc632acc44a2165004c3e69aac370ceec18e84834f68c2b6e9373119355ec5"
     },
     "visuals/svg/fig-b-02-access-review.svg": {
-      "output_sha256": "072fe1f0c9b871967dce421266007391dda773e83f1727d43854d2c8ee406a61",
+      "output_sha256": "c7bed625b33b3513b950d74ee9c44b832ad5323fa559a7ec046ea5c7215b2865",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-b-02-access-review.drawio",
       "source_sha256": "e8dbc9f6f7ea5c984b191f6ebc64914221bd19ab9cb3bf0859d944a742f0d4af"
     },
     "visuals/svg/fig-b-03-manage-roles.svg": {
-      "output_sha256": "9309b1937cf6b711fdc689452e5d964a16f4ca758bec35840e3c79428069ea31",
+      "output_sha256": "9dd27c75fb4461a4a7d0bc674668faef57bbc494a748cef58b4a7f7e4f083e6c",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-b-03-manage-roles.drawio",
       "source_sha256": "189fbb699c7af1a85f4f4f960f46852419ecc169f6a63b7ef8b3266acfc5a08c"
     },
     "visuals/svg/fig-b-04-view-as.svg": {
-      "output_sha256": "f8492c0ec35118f5ed7f776e23f4b22a8e21c8f1f35edf62324b4aef76c39eb3",
+      "output_sha256": "2514523d2a539bd7bbf48dac64c6210b1574bc3e88b9a4a903b4f35344bb636d",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-b-04-view-as.drawio",
       "source_sha256": "3d5c7335a54369748229b3ce99bbf4f46577d620f9bd372be95c262452fa8a7c"
     },
     "visuals/svg/fig-b-05-sharing-paths.svg": {
-      "output_sha256": "3e1fcf509f3ef6e6d37729ad9a402d97819ac49df8c66bef2d65dc95330d1735",
+      "output_sha256": "e25fb2c9605da8710f088ca8aea78104e23db61d79e71644746bc137d7b550b9",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-b-05-sharing-paths.drawio",
       "source_sha256": "09d69402d0f700a1d6a2ef864cae9c764ba1ff9a80988ce8aedb91a6286800a7"
     },
     "visuals/svg/fig-c-01-upload-and-choose.svg": {
-      "output_sha256": "17f3df33129965bbbbaffc6a8b7d366827230d3a186fff921976bad0e3cbbbc8",
+      "output_sha256": "bba095158e839e04387c358a6332900be871b33bf1a4632c03baca70007f5046",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-c-01-upload-and-choose.drawio",
       "source_sha256": "83921c469a0a431cdf697d36047a50d6f90810d5a468f6e04e28db16064593fc"
     },
     "visuals/svg/fig-c-02-dates-as-numbers.svg": {
-      "output_sha256": "8d3527209e9fca977c0fa427f71487d04435b75dba38ae9f207cd5fb284fb4e1",
+      "output_sha256": "6ca2d646d5a0c29596ee10f0603a8cbea517c088942e0a03ded1dd70a5e7fbdf",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-c-02-dates-as-numbers.drawio",
       "source_sha256": "95eb5663f9bcc946333ca06667f3d4fcc0a17cd8f93ba71f94f07ef57d2e9017"
     },
     "visuals/svg/fig-c-03-model-editor.svg": {
-      "output_sha256": "fa48539c7db2e7e2d26d13261f2274a40fc616bf1a9aefcb9087bb8109447af8",
+      "output_sha256": "40d3485bb56b746fb22e4de290ecf00cf4696f16a53b4d008d9e6b9cdb32c600",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-c-03-model-editor.drawio",
       "source_sha256": "039e439a13b48618e7b66830dae2f85d7d38a9aaea786e14b26bace49f70decc"
     },
     "visuals/svg/fig-c-04-cards-and-sort.svg": {
-      "output_sha256": "16a9fbf7c35925d0ad98ac60c4be23660842fcc9309f25f1acc9e24c9cfd1c23",
+      "output_sha256": "3d9daf4043a5b322b5b4d7f5b03a6680eb51fc56c4dfa0849c2acbbe8f082614",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-c-04-cards-and-sort.drawio",
       "source_sha256": "7a7bafb4ba17b1879c68b80fea765b7acd72fc79e6b969e98ea8b00f41dfc04b"
     },
     "visuals/svg/fig-c-05-dax-query-measure.svg": {
-      "output_sha256": "a3855cd1720967438cb40a06c6b3e331fadbc3b43a6c4cf7a4d65f602163c6b1",
+      "output_sha256": "acfb53d4598b051876866611842dd32e0ace332e2c00113324f5590c3107177b",
       "recipe": 1,
       "settings": {
+        "labels": "text-fallback",
         "padding": 0.5
       },
       "source": "visuals/src/fig-c-05-dax-query-measure.drawio",

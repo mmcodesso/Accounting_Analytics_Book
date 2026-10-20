@@ -9,8 +9,8 @@ font and its printed size, the lowest text contrast, and any rule violations:
 - palette colors only, and every text/background pair at 4.5:1 or better;
 - every ER endpoint (edges tagged er= or trace=) matches the data.
 
-With --exports it also checks visuals/svg (light color scheme, no light-dark(), white background)
-and visuals/pdf (a vector PDF for every source).
+With --exports it also checks visuals/svg (light color scheme, no light-dark(), white background, no PNG
+fallback of a label, a size that a text-fallback export stays under) and visuals/pdf (a vector PDF for every source).
 
 Usage:
     python scripts/figures/check_figures.py [--exports] [--src-dir DIR] [name-prefix ...]
@@ -33,6 +33,8 @@ from drawio import FONT_FAMILY, FRAME_WIDTH, MAX_HEIGHT, PALETTE, SMALL, WHITE  
 SRC_DIR = REPO_ROOT / "visuals" / "src"
 SVG_DIR = REPO_ROOT / "visuals" / "svg"
 PDF_DIR = REPO_ROOT / "visuals" / "pdf"
+# A text-fallback export is at most 165 KB (the largest of 165 diagrams); a PNG fallback makes one 0.2 to 1.2 MB.
+SVG_MAX_BYTES = 400_000
 PDF_TEXT_WIDTH_PT = 522   # letter paper with 0.75 in and 0.5 in margins
 HTML_COLUMN_PX = 800
 MIN_CONTRAST = 4.5
@@ -217,6 +219,10 @@ def check_exports(stem: str) -> tuple[float | None, list[str]]:
             problems.append("SVG is not forced to the light color scheme")
         if "background-color: #FFFFFF;" not in text[:3000]:
             problems.append("SVG has no white background")
+        if re.search(r"<switch>(?:(?!</switch>).)*?<image\b", text, re.S):
+            problems.append("SVG labels carry PNG fallbacks (export without --svg-labels png-fallback)")
+        if svg.stat().st_size > SVG_MAX_BYTES:
+            problems.append(f"SVG is {svg.stat().st_size / 1e3:.0f} KB, over the {SVG_MAX_BYTES / 1e3:.0f} KB limit")
         width = svg_width(svg)
     if not (PDF_DIR / f"{stem}.pdf").exists():
         problems.append("vector PDF export missing")

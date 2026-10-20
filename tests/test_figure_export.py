@@ -37,7 +37,7 @@ class FigureExportHookTests(unittest.TestCase):
             with patch.object(export_drawio_svgs, 'REPO_ROOT', root), \
                  patch.object(export_drawio_svgs, 'find_drawio_executable', return_value=Path('drawio')), \
                  patch.object(export_drawio_svgs, 'export_svg',
-                              side_effect=lambda exe, src, out, padding: write(root, str(out), '<svg/>')) as svg, \
+                              side_effect=lambda exe, src, out, padding, labels: write(root, str(out), '<svg/>')) as svg, \
                  patch.object(export_drawio_svgs, 'export_pdf',
                               side_effect=lambda exe, src, out, **kwargs: write(root, str(out), 'PDF')) as pdf, \
                  patch.object(export_drawio_svgs, 'export_cover_png',
@@ -53,6 +53,7 @@ class FigureExportHookTests(unittest.TestCase):
                 self.assertEqual(2, pdf.call_count)
                 self.assertEqual(2, cover.call_count)
                 self.assertEqual({'crop': False}, pdf.call_args.kwargs)
+                self.assertEqual('text-fallback', svg.call_args.args[-1])
                 self.assertEqual((510, 660), cover.call_args.args[-2:])
                 # Normal explicit exports reuse the manifest; --force overrides it.
                 for flags in ([], ['--pre-render', '--force']):
@@ -85,7 +86,7 @@ class ExportFreshnessTests(unittest.TestCase):
         self.pdf = write(self.root, 'pdf/figure.pdf', 'PDF')
         self.path = self.root / 'export-manifest.json'
         self.state = export_drawio_svgs.ExportManifest(self.path)
-        self.settings = {'padding': 0.5}
+        self.settings = {'padding': 0.5, 'labels': 'text-fallback'}
         self.state.remember(self.source, self.svg, self.settings)
         self.state.remember(self.source, self.pdf, {})
         self.state.save()
@@ -110,7 +111,9 @@ class ExportFreshnessTests(unittest.TestCase):
         self.assertFalse(self.state.current(self.source, self.pdf, {}))
 
     def test_only_missing_modified_or_reconfigured_output_is_stale(self) -> None:
-        self.assertFalse(self.state.current(self.source, self.svg, {'padding': 2}))
+        self.assertFalse(self.state.current(self.source, self.svg, {'padding': 2, 'labels': 'text-fallback'}))
+        self.assertFalse(self.state.current(self.source, self.svg, {'padding': 0.5, 'labels': 'png-fallback'}))
+        self.assertFalse(self.state.current(self.source, self.svg, {'padding': 0.5}), 'an entry made before the label mode existed')
         self.assertTrue(self.state.current(self.source, self.pdf, {}))
         self.svg.write_text('<svg>modified</svg>', encoding='utf-8')
         self.assertFalse(self.state.current(self.source, self.svg, self.settings))
@@ -130,7 +133,8 @@ class ExportFreshnessTests(unittest.TestCase):
             self.assertFalse(state.current(self.source, self.svg, self.settings))
         with patch.dict(os.environ, {'GITHUB_ACTIONS': 'false'}):
             self.assertTrue(state.current(self.source, self.svg, self.settings))
-            self.assertFalse(state.current(self.source, self.svg, {'padding': 2}))
+            self.assertFalse(state.current(self.source, self.svg, {'padding': 2, 'labels': 'text-fallback'}))
+            self.assertFalse(state.current(self.source, self.svg, {'padding': 0.5, 'labels': 'png-fallback'}))
             os.utime(self.source, (3000, 3000))
             self.assertFalse(state.current(self.source, self.svg, self.settings))
 
@@ -144,6 +148,67 @@ class ExportFreshnessTests(unittest.TestCase):
              patch.object(export_drawio_svgs, 'find_drawio_executable', side_effect=AssertionError('unneeded')):
             self.assertEqual(0, export_drawio_svgs.run())
         self.assertEqual(stamp, self.path.stat().st_mtime_ns)
+
+
+class SvgLabelModeTests(unittest.TestCase):
+    """What Draw.io is asked for and what is kept: a plain-text fallback (small) or a PNG of every label (large)."""
+
+    EXPORT = ('<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" '
+              '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
+              '<svg xmlns="http://www.w3.org/2000/svg" style="background: transparent; background-color: transparent; '
+              'color-scheme: light;" version="1.1" width="100px" height="40px" viewBox="0 0 100 40"><defs/><g>'
+              '<rect x="0" y="0" width="9" height="9" fill="#ffffff" stroke="#d5d8dc" pointer-events="all" '
+              'style="fill: light-dark(rgb(255, 255, 255), rgb(18, 18, 18)); stroke: rgb(213, 216, 220);"/>'
+              '<switch><foreignObject requiredFeatures="x"><div xmlns="http://www.w3.org/1999/xhtml">Hi</div></foreignObject>'
+              '<text x="1" y="2">Hi</text></switch></g></svg>')
+
+    def export(self, labels: str | None = None):
+        commands = []
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = write(root, 'src/figure.drawio', '<mxfile><diagram/></mxfile>')
+            output = root / 'svg' / 'figure.svg'
+
+            def fake(command, src, target, kind):
+                commands.append(command)
+                target.write_text(self.EXPORT, encoding='utf-8')
+
+            with patch.object(export_drawio_svgs, 'run_drawio', side_effect=fake), \
+                 patch.object(export_drawio_svgs, 'optimize_svg') as optimize:
+                arguments = (Path('drawio'), source, output, 0.5) + ((labels,) if labels else ())
+                export_drawio_svgs.export_svg(*arguments)
+            return commands[0], output.read_text(encoding='utf-8'), optimize
+
+    def test_the_default_asks_draw_io_not_to_draw_a_png_of_every_label(self) -> None:
+        command, _, optimize = self.export()
+        self.assertEqual(['--embed-svg-fonts', 'false'], command[command.index('--embed-svg-fonts'):][:2])
+        optimize.assert_not_called()
+
+    def test_png_fallback_is_draw_ios_own_export_with_its_pngs_recompressed(self) -> None:
+        command, _, optimize = self.export('png-fallback')
+        self.assertNotIn('--embed-svg-fonts', command)
+        optimize.assert_called_once()
+
+    def test_the_markup_no_viewer_needs_is_dropped_and_the_label_is_kept_in_both_modes(self) -> None:
+        for labels in ('text-fallback', 'png-fallback'):
+            _, text, _ = self.export(labels)
+            self.assertNotIn('<defs/>', text)
+            self.assertNotIn('DOCTYPE', text)
+            self.assertNotIn('pointer-events', text)
+            self.assertNotIn('light-dark(', text)
+            self.assertIn('<rect x="0" y="0" width="9" height="9" fill="#ffffff" stroke="#d5d8dc"/>', text)
+            self.assertIn('<div xmlns="http://www.w3.org/1999/xhtml">Hi</div>', text)
+            self.assertIn('<text x="1" y="2">Hi</text>', text)
+            self.assertIn('background-color: #FFFFFF;', text)
+            self.assertIn('viewBox="-0.5 -0.5 101 41"', text)
+
+    def test_an_unknown_mode_is_refused(self) -> None:
+        with self.assertRaises(export_drawio_svgs.ExportError):
+            self.export('raster')
+
+    def test_the_default_mode_is_the_small_one(self) -> None:
+        self.assertEqual('text-fallback', export_drawio_svgs.DEFAULT_SVG_LABELS)
+        self.assertEqual(('text-fallback', 'png-fallback'), export_drawio_svgs.SVG_LABELS)
 
 
 class SvgCompressionTests(unittest.TestCase):

@@ -88,7 +88,7 @@ To preview the website locally as well, run the full build,
 `python scripts/build_all.py`; `publish` then reuses its files if nothing changed
 since.
 
-The EPUB and the DOCX carry an optimized PNG of each diagram instead of its large SVG, made automatically from the
+The EPUB and the DOCX carry an optimized PNG of each diagram instead of its SVG (whose HTML labels they cannot draw), made automatically from the
 Draw.io sources and cached in `outputs/ebook-figures/`. `python -m pip install -r scripts/requirements-ebook.txt`
 installs what that needs; `python scripts/build_ebooks.py` builds and checks just those two formats. The
 [contributor guide](CONTRIBUTING.md#the-diagrams-in-the-epub-and-the-docx) has the settings and the details.

@@ -151,15 +151,17 @@ editing moved pages: it preserves the former HTML addresses.
 
 Diagrams are Draw.io files in `visuals/src/`, one page per file, named
 `fig-CC-NN-slug.drawio`. The pre-render hook exports each diagram twice: a
-light-theme SVG in `visuals/svg/` for the website, EPUB, and Word, and a vector
-PDF in `visuals/pdf/`. For the PDF book, `filters/pdf-figures.lua` swaps the PDF
+light-theme SVG in `visuals/svg/` for the website and the slides, and a vector
+PDF in `visuals/pdf/` (the EPUB and Word carry PNGs of the diagrams, see below). For the PDF book, `filters/pdf-figures.lua` swaps the PDF
 in for the SVG, so figure text stays sharp and searchable in print. Always
 reference the SVG in the chapter; the filter handles the PDF.
 
-SVG exports losslessly compress the embedded PNG text fallbacks that document
-viewers use. Vector markup, text, dimensions, colors, and fallback pixels stay
-unchanged. This optimization runs automatically during export and uses only
-Python's standard library.
+Draw.io writes every label of an SVG as HTML (a `foreignObject`), which browsers draw, plus a fallback for viewers
+that cannot. The exporter asks Draw.io for its plain-text fallback (`--embed-svg-fonts false`) instead of a PNG of
+every label, and removes the markup that no viewer needs, so the 165 SVGs are about 10 MB instead of 101 MB and
+the website and the Reveal decks look exactly as before. `--svg-labels png-fallback` brings the PNGs back (only
+`rsvg-convert` and Inkscape need them, see below). This runs automatically during export and uses only Python's
+standard library.
 
 The cover source is `visuals/cover/accounting_analytics_cover.drawio`. The exporter
 creates `cover-web.png` at 510 x 660 pixels for the website and README,
@@ -280,10 +282,13 @@ release lacks, and warns when a file on the release is older than the text.
 
 ### The diagrams in the EPUB and the DOCX
 
-The website and the PDF keep the diagrams as SVG and vector PDF. Draw.io's SVG files are large (every text label
-carries a PNG fallback), and Pandoc puts them into the EPUB as they are and into the DOCX twice (the SVG and a PNG
-made from it), so the two formats were 69 and 83 MB. They now carry one optimized PNG per diagram instead, and the
-SVG files stay the authoritative copies: nothing in `visuals/src`, `visuals/svg` or `visuals/pdf` is touched.
+The website and the PDF keep the diagrams as SVG and vector PDF. The labels of an SVG are HTML, which an EPUB reader or
+Word cannot draw, and Draw.io's SVGs used to carry a PNG of every label for them (101 MB in all), so Pandoc put 101 MB
+into the EPUB as it was and into the DOCX twice (the SVG and a PNG made from it) and the two formats were 69 and 83 MB.
+They now carry one optimized PNG per diagram instead, drawn from the Draw.io source, and the SVG files stay the
+authoritative copies: nothing in `visuals/src`, `visuals/svg` or `visuals/pdf` is touched. (The SVGs themselves are now
+about 10 MB, see "Smaller SVG files" below, but their plain-text label fallback would show long or bold labels cut
+short in an EPUB, so the PNGs stay.)
 
 **How it works.** `filters/raster-figures.lua` (registered in `_quarto.yml`, active only for `epub` and `docx`)
 points each `visuals/svg/<name>.svg` at `outputs/ebook-figures/<name>.png`. `scripts/figure_raster.py` makes those
@@ -340,8 +345,12 @@ SVG's 9-inch page and about 296 on the 5.8-inch column Pandoc gives a Word pictu
 target for 99.99% of the pixels, `mean-tolerance` and `max-tolerance` are limits). A lower tolerance picks larger
 palettes and bigger files. `palette.enabled: false` keeps every figure an RGB PNG. To render from the SVG with Inkscape
 instead of from the Draw.io source, set `renderer: inkscape` (or `AA_FIGURE_RENDERER=inkscape`); `INKSCAPE_BIN`,
-`RSVG_CONVERT_BIN` and `DRAWIO_BIN` name an executable that is not on the path. Inkscape and rsvg-convert draw each text
-label from the low-resolution image Draw.io embeds in the SVG, so their PNGs are softer than the Draw.io render.
+`RSVG_CONVERT_BIN` and `DRAWIO_BIN` name an executable that is not on the path. Inkscape and rsvg-convert cannot draw the
+HTML labels of the committed SVGs, so they need a copy that carries Draw.io's PNG of every label, made once with
+`python scripts/export_drawio_svgs.py --svg-labels png-fallback --out-dir outputs/ebook-figures/svg --skip-pdf --skip-cover
+--manifest outputs/ebook-figures/svg-manifest.json` (`figure_raster.py` reads that copy when it exists and otherwise says
+that labels will come out cut short). They draw each label from that low-resolution image, so their PNGs are softer than
+the Draw.io render.
 
 **Checks.** `python scripts/ebook_validate.py --epub FILE --docx FILE [--baseline-epub OLD] [--baseline-docx OLD]`
 reads the EPUB as a ZIP and as XML (the stored `mimetype` first, the package, manifest, spine, cover, every page, image
@@ -359,6 +368,56 @@ sampled figures against their SVG. The checks that need no book build are in `te
 (`DRAWIO_BIN`), Python not found by Quarto (`AA_PYTHON`), an aspect ratio that differs from the SVG's (an out-of-date
 export: run `python scripts/export_drawio_svgs.py`), or a renderer timeout. To keep SVG diagrams in a build, for
 example to compare, set `AA_EBOOK_FIGURES=svg`.
+
+### Smaller SVG files
+
+The 165 SVGs in `visuals/svg` were 101 MB, and 90% of that was one PNG per text label (9,238 labels, no other image in
+any diagram). Draw.io writes each label as an HTML `foreignObject` and, for viewers that cannot draw it, a fallback. By
+default the fallback is a PNG of the label at four times its size, which browsers never use and gzip cannot shrink (the
+set was 67 MB gzipped). Since 2026-10-20 `scripts/export_drawio_svgs.py` asks Draw.io for its plain-text fallback
+instead (`--embed-svg-fonts false`) and then removes the markup that no viewer needs (`scripts/svg_native.py`: the
+`style` that repeats `fill` and `stroke`, the `pointer-events` of shapes, an empty `<defs/>` and the DOCTYPE). The SVGs
+are now about 9.6 MB, 0.54 MB gzipped, and Edge, Chrome and Firefox draw exactly the same pixels as before (0 differing
+pixels in all 165 diagrams in Edge, and in 11 test diagrams in the other two). Nothing else changed: the `.drawio`
+sources, the PDFs (`filters/pdf-figures.lua` swaps every SVG for its vector PDF) and the EPUB and DOCX PNGs.
+
+```sh
+python scripts/export_drawio_svgs.py                       # the plain-text fallback (default)
+python scripts/export_drawio_svgs.py --svg-labels png-fallback --out-dir outputs/ebook-figures/svg --skip-pdf --skip-cover     --manifest outputs/ebook-figures/svg-manifest.json     # a copy with the PNGs, for rsvg-convert and Inkscape only
+python scripts/figures/check_figures.py --exports          # also fails on a PNG fallback or an SVG over 400 KB
+```
+
+The label mode is part of each SVG's entry in `visuals/export-manifest.json`, so changing it makes only the SVGs stale. In
+a viewer that cannot draw HTML labels (`rsvg-convert`, Inkscape, MuPDF) the fallback is complete text for 95% of the labels
+(8,813 of 9,238) and the first line, in one weight, for the other 417. Nothing in the book's builds uses such a viewer
+(`figure_raster.py` draws from the Draw.io source by default), and its `rsvg` and `inkscape` renderers read the copy with
+the PNGs, as described above. Safari was not tested; it draws the HTML label as the other browsers do.
+
+**What was measured, and what was not adopted.** `scripts/svg_lab.py` is the lab that compared the options, writing
+only to `outputs/svg-lab/` (untracked). Its baseline is the SVGs with PNG labels (`baseline --rev <commit before
+2026-10-20>`, or a new export with `--svg-labels png-fallback`).
+
+```sh
+python scripts/svg_lab.py baseline --rev COMMIT                          # v0, the files with a PNG of every label
+python scripts/svg_lab.py audit                                          # what is in the SVGs; picks the test diagrams
+python scripts/svg_lab.py build --variants v1 v2 v3 --set representative # or --set all (about 16 minutes)
+python scripts/svg_lab.py compare --set all --engines edge chrome firefox  # outputs/svg-lab/report.md
+python scripts/svg_lab.py determinism --set representative
+```
+
+| variant | what it does | all 165 diagrams |
+|---|---|---|
+| v1 | strips the markup and keeps the PNGs | 100.4 MB (-0.9%) |
+| **v2** | **the plain-text fallback and the stripping: this is the exporter now** | **9.6 MB (-90.6%), 0.54 MB gzipped** |
+| v3 | v2, and every label that fits on one line becomes native `<text>` (Draw.io's "Convert labels to SVG", the style `convertToSvg=1`, switched on in a temporary copy of the source) | 4.0 MB (-96.0%), 0.41 MB gzipped |
+
+v2's output is byte for byte the same on a second export. v3 keeps every cell's characters, weight, slant and color, but
+its text sits 0.5 to 1.0 pixel lower in Chromium, bold text is a little lighter, one diagram's drawing is a pixel shorter,
+and only 94.5% of the labels can be converted: Draw.io's conversion does not wrap text, does not read `<br>`, and drops a
+label's background (an edge label would show the line through it), so `svg_native.single_line_cells` converts only labels
+it measures with Arial to fit on one line (checked against the heights of the old PNG fallbacks: no label that wraps was
+ever taken for one line). It saves 5 MB more than v2 (0.13 MB gzipped), so it was not adopted. `native_labels_copy` is in
+`svg_native.py` if vector text outside browsers ever matters.
 
 ## Chapter slides
 

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Optimized PNG copies of the book's diagrams, for the EPUB and the DOCX.
 
-The website and the PDF keep the diagrams as SVG and vector PDF (scripts/export_drawio_svgs.py). Draw.io's SVG
-files are large, because every text label carries a PNG fallback inside a <foreignObject>, and Pandoc puts them
-into the EPUB as they are and into the DOCX twice (the SVG and a PNG made from it). filters/raster-figures.lua
-therefore swaps each visuals/svg/<name>.svg for the PNG that this module makes, in those two formats only.
+The website and the PDF keep the diagrams as SVG and vector PDF (scripts/export_drawio_svgs.py). The SVG labels
+are HTML (a <foreignObject>), which EPUB readers and Word cannot draw; what they would show instead is Draw.io's
+one-line plain text, or, in an export that carries a PNG of every label, 101 MB of images that Pandoc puts into the
+EPUB as they are and into the DOCX twice (the SVG and a PNG made from it). filters/raster-figures.lua therefore swaps
+each visuals/svg/<name>.svg for the PNG that this module makes, in those two formats only.
 
 For each figure the module
 
@@ -313,6 +314,8 @@ class Project:
             raise RasterError(f"No SVG for {stem}: expected {svg}. Export the diagrams "
                               f"(python scripts/export_drawio_svgs.py).")
         source = self.src_dir / f"{stem}.drawio" if kind == "drawio" else svg
+        if kind == "svg" and (self.cache / "svg" / f"{stem}.svg").is_file():
+            source = self.cache / "svg" / f"{stem}.svg"     # an export with a PNG of every label, see ensure()
         if not source.is_file():
             raise RasterError(f"No Draw.io source for {stem}: expected {source}.")
         return Figure(stem, source, svg, self.cache / f"{stem}.png")
@@ -459,6 +462,19 @@ class Result:
     seconds: float = 0.0
 
 
+WARNING_TEXT_LABELS = (
+    "note: the SVG has no PNG of its labels (the exports keep Draw.io's one-line plain text instead, which is how the "
+    "website's files stay small), so this renderer draws long or formatted labels cut short and in one weight. For "
+    "complete labels export a copy with the PNGs: python scripts/export_drawio_svgs.py --svg-labels png-fallback "
+    "--out-dir outputs/ebook-figures/svg --skip-pdf --skip-cover --manifest outputs/ebook-figures/svg-manifest.json; "
+    "this renderer then reads that copy.")
+
+
+def has_label_images(svg: Path) -> bool:
+    """Whether the SVG carries a PNG of its labels (an export with --svg-labels png-fallback)."""
+    return b"data:image/png;base64," in svg.read_bytes()
+
+
 def is_current(entry: dict | None, key: str, target: Path) -> bool:
     return bool(entry and entry.get("key") == key and target.is_file()
                 and target.stat().st_size == entry.get("bytes") and file_digest(target) == entry.get("png_sha256"))
@@ -537,6 +553,7 @@ def ensure(root: Path, stems: Sequence[str] | None = None, *, settings: Settings
     renderer: Renderer | None = None
     kind = RENDERERS[settings.renderer].source_kind
     results: list[Result] = []
+    warned = False
     for number, stem in enumerate(names, 1):
         figure = project.figure(stem, kind)
         size = svg_size(figure.svg)
@@ -553,6 +570,9 @@ def ensure(root: Path, stems: Sequence[str] | None = None, *, settings: Settings
             if rendered:
                 if renderer is None:
                     renderer = RENDERERS[settings.renderer](settings)
+                if kind == "svg" and not warned and not has_label_images(figure.source):
+                    warned = True
+                    log(WARNING_TEXT_LABELS)
                 render_raw(renderer, figure, raw_file)
             figures[stem] = make_figure(project, figure, rkey, key, size, raw_file)
         except RasterError as exc:
