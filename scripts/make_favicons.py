@@ -1,4 +1,4 @@
-"""Makes the website's icons and its sidebar logo from the logo in visuals/branding/favicon.png.
+"""Makes the website's icons from the logo in visuals/branding/favicon.png.
 
     python scripts/make_favicons.py [--preview FILE]
 
@@ -13,7 +13,7 @@ project.resources in _quarto.yml and linked by styles/book-html-head.html:
     favicon-48x48.png       favicon-96x96.png      favicon-192x192.png
     apple-touch-icon.png    180 px, opaque (iOS puts transparent pixels on black)
 
-and visuals/branding/aa-logo.png, the mark alone, cropped, for the sidebar of every page.
+(The sidebar shows the site's name as text, with no logo.)
 
 --preview writes a contact sheet (each size on white and on dark, and under a circular crop) to look at before
 committing the icons. The source is raster, so there is no SVG icon."""
@@ -28,7 +28,6 @@ from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'visuals/branding/favicon.png'
-LOGO = ROOT / 'visuals/branding/aa-logo.png'
 
 # The mark's width as a share of the icon, and the tile's corner radius as a share of its side.
 MARK_SHARE = 0.78
@@ -39,8 +38,6 @@ MASTER = 1024
 PNG_ICONS = {'favicon-48x48.png': 48, 'favicon-96x96.png': 96, 'favicon-192x192.png': 192}
 ICO_SIZES = (16, 32, 48)
 APPLE_TOUCH = ('apple-touch-icon.png', 180)
-LOGO_WIDTH = 360
-LOGO_PADDING = 0.03
 
 
 def crop_mark(source: Image.Image) -> Image.Image:
@@ -96,13 +93,6 @@ def write_if_changed(path: Path, data: bytes) -> bool:
     return True
 
 
-def sidebar_logo(mark: Image.Image) -> Image.Image:
-    pad = round(mark.width * LOGO_PADDING)
-    padded = Image.new('RGBA', (mark.width + 2 * pad, mark.height + 2 * pad), (255, 255, 255, 0))
-    padded.alpha_composite(mark, (pad, pad))
-    return padded.resize((LOGO_WIDTH, round(padded.height * LOGO_WIDTH / padded.width)), Image.LANCZOS)
-
-
 def contact_sheet(master: Image.Image) -> Image.Image:
     """Each size at its own scale (top) and magnified 3x (below), on white, on dark, and under a circular crop."""
     sizes = (16, 32, 48, 96)
@@ -139,7 +129,6 @@ def build(preview: Path | None) -> list[str]:
         put(ROOT / name, png_bytes(resample(rounded, size)))
     apple = master_tile(mark, APPLE_SHARE, rounded=False)
     put(ROOT / APPLE_TOUCH[0], png_bytes(resample(apple, APPLE_TOUCH[1]).convert('RGB')))
-    put(LOGO, png_bytes(sidebar_logo(mark)))
     if preview:
         preview.parent.mkdir(parents=True, exist_ok=True)
         contact_sheet(rounded).save(preview)

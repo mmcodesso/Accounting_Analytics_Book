@@ -81,12 +81,10 @@ book:
     locale: en_US
   twitter-card:
     card-style: summary
-  # The sidebar's header on every page: the logo (scripts/make_favicons.py makes it from visuals/branding) over the
-  # site's short name. Quarto prints no sidebar title when there is a logo and no title, hence both. The book's
-  # full title stays the homepage's title and heading and the first entry of the contents.
+  # The sidebar's header on every page: the site's short name, which is also the visible text that supports the
+  # structured data's name. There is no logo or cover here (the author's choice, 2026-10-20: a logo took too much
+  # of the sidebar). The book's full title stays the homepage's title and heading and the first entry of the contents.
   sidebar:
-    logo: visuals/branding/aa-logo.png
-    logo-alt: "Accounting Analytics logo"
     title: "Accounting Analytics"
   # The website's footer on every page (HTML only): the publisher and the publisher's page for this book, which
   # holds the publication catalog (indexing.hub below). Chapter text is untouched. The links are raw HTML because a

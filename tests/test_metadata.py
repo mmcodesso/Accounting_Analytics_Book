@@ -68,7 +68,8 @@ class SearchAppearanceTests(unittest.TestCase):
 
     def test_the_sidebar_shows_the_sites_name(self):
         self.assertEqual(CONFIG['indexing']['site-identity']['name'], CONFIG['book']['sidebar']['title'])
-        self.assertTrue((ROOT / CONFIG['book']['sidebar']['logo']).is_file())
+        # With a logo and no title Quarto prints no sidebar title, so a logo needs the title set as well.
+        self.assertNotIn('logo', CONFIG['book']['sidebar'])
 
     def test_description_fits_a_search_result(self):
         self.assertLessEqual(len(CONFIG['description']), 160)
