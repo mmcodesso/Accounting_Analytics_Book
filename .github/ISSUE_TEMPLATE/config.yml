@@ -1,0 +1,6 @@
+# Errors and suggestions come in through a form, not through GitHub issues, so a visit to "New issue" ends there.
+blank_issues_enabled: false
+contact_links:
+  - name: Report an error or suggest an improvement
+    url: https://aa.accountinganalyticshub.com/feedback/
+    about: Use the feedback form. No GitHub account is needed. Name the chapter or section and describe what you found.
